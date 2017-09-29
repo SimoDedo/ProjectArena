@@ -1,61 +1,57 @@
 ﻿using System;
 using System.IO;
-using System.Collections;
 using System.Collections.Generic;
-
 using UnityEngine;
 
 public class MapGenerator : MonoBehaviour {
 
 	// Do I have to generate my seed?
-	public bool useRandomSeed = true;
-	// Seed used to generate the map.
-	public string seed = null;
+	[SerializeField] private bool useRandomSeed = true;
+    // Seed used to generate the map.
+    [SerializeField] private string seed = null;
 
-	// Map width.
-	public int width = 100;
-	// Map height.
-	public int height = 100;
-	// Border size.
-	public int borderSize = 5;
-	// Wall height.
-	public int wallHeight = 5;
-	// Passage width.
-	public int passageWidth = 5;
-	// Minimum size of a wall region.
-	public int wallThresholdSize = 50;
-	// Minimum size of a room region.
-	public int roomThresholdSize = 50;
+    // Map width.
+    [SerializeField] private int width = 100;
+    // Map height.
+    [SerializeField] private int height = 100;
+    // Border size.
+    [SerializeField] private int borderSize = 5;
+    // Wall height.
+    [SerializeField] private int wallHeight = 5;
+    // Passage width.
+    [SerializeField] private int passageWidth = 5;
+    // Minimum size of a wall region.
+    [SerializeField] private int wallThresholdSize = 50;
+    // Minimum size of a room region.
+    [SerializeField] private int roomThresholdSize = 50;
 	// How much the map will be randomly filled at the beginning.
-	[Range(0, 100)]
-	public int ramdomFillPercent = 50;
+    [SerializeField, Range(0, 100)] private int ramdomFillPercent = 50;
 	// Number of smoothing iterations to be done.
-	[Range(0, 3)]
-	public int smoothingIterations = 3;
-	// You must have more than this number of neighbour to became wall.
-	[Range(0, 9)]
-	public int neighbourTileLimitHigh = 4;
-	// You must have less than this number of neighbour to became room.
-	[Range(0, 9)]
-	public int neighbourTileLimitLow = 4;
+	[SerializeField, Range(0, 3)] private int smoothingIterations = 3;
+    // You must have more than this number of neighbour to became wall.
+    [SerializeField, Range(0, 9)] private int neighbourTileLimitHigh = 4;
+    // You must have less than this number of neighbour to became room.
+    [SerializeField, Range(0, 9)] private int neighbourTileLimitLow = 4;
 
-	// Char that denotes a room;
-	public char charRoom = 'v';
-	// Char that denotes a wall;
-	public char charWall = 'w';
+    // Char that denotes a room;
+    [SerializeField] private char roomChar = 'v';
+    // Char that denotes a wall;
+    [SerializeField] private char wallChar = 'w';
+    // Custom objects that will be added to the map.
+    [SerializeField] private MapObject[] mapObjects;
 
-	// Do I have to create a  mesh representation?
-	public bool createMesh = false;
-	// Object containing the Map Builder script.
-	public GameObject mapBuilder;
+    // Do I have to create a  mesh representation?
+    [SerializeField] private bool createMesh = false;
+    // Object containing the Map Builder script.
+    [SerializeField] private GameObject mapBuilder;
 
-	// Do I have to create a .txt output?
-	public bool createTextFile = false;
-	// Path where to save the text map.
-	public string textFilePath = null;
+    // Do I have to create a .txt output?
+    [SerializeField] private bool createTextFile = false;
+    // Path where to save the text map.
+    [SerializeField] private string textFilePath = null;
 
-	// Map, defined as a grid of chars.
-	private char [,] map;
+    // Map, defined as a grid of chars.
+    private char [,] map;
 	// Hash of the seed.
 	private int hash;
 
@@ -86,14 +82,14 @@ public class MapGenerator : MonoBehaviour {
 				if (x >= borderSize && x < width + borderSize && y >= borderSize && y < height + borderSize)
 					borderedMap[x, y] = map[x - borderSize, y - borderSize];
 				else
-					borderedMap[x, y] = charWall;
+					borderedMap[x, y] = wallChar;
 			}
 		}
 
 		if (createMesh) {
 			if (mapBuilder != null) {
-				MapBuilderFromText mapBuilderFromText = mapBuilder.GetComponent<MapBuilderFromText>();
-				mapBuilderFromText.BuildMap(borderedMap, charWall, 1, wallHeight);
+				IMapBuilderFromText mapBuilderFromText = mapBuilder.GetComponent<IMapBuilderFromText>();
+				mapBuilderFromText.BuildMap(borderedMap, wallChar, 1, wallHeight);
 			} else
 				Debug.Log("Please attach a Map Builder to the script.");
 		}
@@ -102,28 +98,28 @@ public class MapGenerator : MonoBehaviour {
 			SaveMapAsText();
 	}
 
-	// Cleans the map.
+	// Processes the map.
 	private void ProcessMap() {
-		List<List<Coord>> wallRegions = GetRegions(charWall);
+		List<List<Coord>> wallRegions = GetRegions(wallChar);
 
 		foreach (List<Coord> wallRegion in wallRegions) {
 			if (wallRegion.Count < wallThresholdSize) {
 				foreach (Coord tile in wallRegion) {
-					map[tile.tileX, tile.tileY] = charRoom;
+					map[tile.tileX, tile.tileY] = roomChar;
 				}
 			}
 		}
 
-		List<List<Coord>> roomRegions = GetRegions(charRoom);
+		List<List<Coord>> roomRegions = GetRegions(roomChar);
 		List<Room> survivingRooms = new List<Room>();
 
 		foreach (List<Coord> roomRegion in roomRegions) {
 			if (roomRegion.Count < roomThresholdSize) {
 				foreach (Coord tile in roomRegion) {
-					map[tile.tileX, tile.tileY] = charWall;
+					map[tile.tileX, tile.tileY] = wallChar;
 				}
 			} else {
-				survivingRooms.Add(new Room(roomRegion, map, charWall));
+				survivingRooms.Add(new Room(roomRegion, map, wallChar));
 			}
 		}	
 
@@ -135,6 +131,8 @@ public class MapGenerator : MonoBehaviour {
 
 			ConnectClosestRooms(survivingRooms);
 		}
+
+        PopulateMap();
 	}
 
 	// Connects each room which the closest one.
@@ -216,8 +214,42 @@ public class MapGenerator : MonoBehaviour {
 			DrawCircle(c, passageWidth);
 	}
 
-	// Draws a circe of a given radius around a point.
-	private void DrawCircle (Coord c, int r) {
+    // Adds custom objects to the map.
+    private void PopulateMap() {
+        if (mapObjects.Length > 0) {
+            List<Coord> roomTiles = GetFreeTiles();
+
+            foreach (MapObject o in mapObjects) {
+                for (int i = 0; i < o.numObjPerMap; i++) {
+                    if (roomTiles.Count > 0) {
+                        int selected = UnityEngine.Random.Range(0, roomTiles.Count);
+                        map[roomTiles[selected].tileX, roomTiles[selected].tileY] = o.objectChar;
+                        roomTiles.RemoveAt(selected);
+                    } else {
+                        Debug.LogError("Error while populating the map, no more free tiles are availabe.");
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    // Returns a list of the free tiles.
+    private List<Coord> GetFreeTiles() {
+        List<Coord> roomTiles = new List<Coord>();
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (map[x, y] == roomChar)
+                    roomTiles.Add(new Coord(x, y));
+            }
+        }
+
+        return roomTiles;
+    }
+
+    // Draws a circe of a given radius around a point.
+    private void DrawCircle (Coord c, int r) {
 		for (int x = - r; x <= r; x++) {
 			for (int y = - r; y <= r; y++) {
 				if (x * x + y * y <= r) {
@@ -225,12 +257,11 @@ public class MapGenerator : MonoBehaviour {
 					int drawY = c.tileY + y;
 					
 					if (IsInMapRange(drawX, drawY))
-						map[drawX, drawY] = charRoom;
+						map[drawX, drawY] = roomChar;
 				}
 			}
 		}
 	}
-
 
 	// Returns a list of coordinates for each point in the line.
     private List<Coord> GetLine(Coord from, Coord to) {
@@ -341,10 +372,10 @@ public class MapGenerator : MonoBehaviour {
 
 	// Tells if the "general" (full/room) type of two tiles is the same.
 	private bool IsSameGeneralType(char tyleType, char t) {
-		if (tyleType == charWall)
-			return t == charWall;
+		if (tyleType == wallChar)
+			return t == wallChar;
 		 else
-			return t != charWall;
+			return t != wallChar;
 	}
 
 	// Tells if a tile is in the map.
@@ -365,9 +396,9 @@ public class MapGenerator : MonoBehaviour {
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
 				if (x == 0 || x == width - 1 || y == 0 || y == height - 1)
-					map[x, y] = charWall;
+					map[x, y] = wallChar;
 				else	
-					map[x, y] = (pseudoRandomGen.Next(0, 100) < ramdomFillPercent) ? charWall : charRoom;
+					map[x, y] = (pseudoRandomGen.Next(0, 100) < ramdomFillPercent) ? wallChar : roomChar;
 			}	
 		}
 	}
@@ -379,9 +410,9 @@ public class MapGenerator : MonoBehaviour {
 				int neighbourWallTiles = GetSurroundingWallCount(x, y);
 
 				if (neighbourWallTiles > neighbourTileLimitHigh)
-					map[x, y] = charWall;
+					map[x, y] = wallChar;
 				else if  (neighbourWallTiles < neighbourTileLimitLow)
-					map[x, y] = charRoom;
+					map[x, y] = roomChar;
 			}	
 		}
 	}
@@ -417,7 +448,7 @@ public class MapGenerator : MonoBehaviour {
 
 	// Return 1 if the tile is a wall, 0 otherwise.
 	private int getMapTileAsNumber(int x, int y) {
-		if (map[x, y] == charWall)
+		if (map[x, y] == wallChar)
 			return 1;
 		else 
 			return 0;	
@@ -435,7 +466,7 @@ public class MapGenerator : MonoBehaviour {
 		public Room () {			
 		}
 
-		public Room (List<Coord> roomTiles, char[,] map, char charWall) {
+		public Room (List<Coord> roomTiles, char[,] map, char wallChar) {
 			tiles = roomTiles;
 			roomSize = tiles.Count;
 			connectedRooms = new List<Room>();
@@ -446,7 +477,7 @@ public class MapGenerator : MonoBehaviour {
 				for (int x = tile.tileX - 1; x <= tile.tileX + 1; x++) {
 					for (int y = tile.tileY - 1; y <= tile.tileY + 1; y++) {
 						if (x == tile.tileX || y == tile.tileY) {
-							if (map[x, y] == charWall)
+							if (map[x, y] == wallChar)
 								edgeTiles.Add(tile);
 						}
 					}
@@ -483,10 +514,19 @@ public class MapGenerator : MonoBehaviour {
 		}
 	}
 
-		// Saves the map in a text file.
+    // Informations about an object. 
+    [Serializable]
+    private struct MapObject {
+        // Character which defines the object.
+        public char objectChar;
+        // Number of objects to be put in the map.
+        public int numObjPerMap;
+    }
+
+	// Saves the map in a text file.
 	private void SaveMapAsText() {
 		if (textFilePath == null && !Directory.Exists(textFilePath)) {
-			Debug.Log("ERROR: error while retrieving the folder, please insert a valid path.");
+			Debug.LogError("Error while retrieving the folder, please insert a valid path.");
 		} else {
 			try {
 				String textMap = "";
@@ -501,7 +541,7 @@ public class MapGenerator : MonoBehaviour {
 
 				System.IO.File.WriteAllText(@textFilePath + "/map_" + hash.ToString() + ".txt" , textMap);
 			} catch (Exception) {
-				Debug.Log("ERROR: error while retrieving the folder, please insert a valid path and check its permissions.");
+				Debug.LogError("Error while retrieving the folder, please insert a valid path and check its permissions.");
 			}
 		}
 	}
@@ -525,7 +565,7 @@ public class MapGenerator : MonoBehaviour {
 		if (map != null) {
 			for (int x = 0; x < width; x++) {
 				for (int y = 0; y < height; y++) {
-					Gizmos.color = (map[x, y] == charWall) ? Color.black : Color.white;
+					Gizmos.color = (map[x, y] == wallChar) ? Color.black : Color.white;
 					Vector3 position = new Vector3(- width / 2 + x + 0.5f, 0, - height / 2 + y + 0.5f);
 					Gizmos.DrawCube(position, Vector3.one);
 				}

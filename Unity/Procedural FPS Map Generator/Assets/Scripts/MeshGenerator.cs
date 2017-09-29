@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class MeshGenerator : MonoBehaviour, MapBuilderFromText {
+public class MeshGenerator : MonoBehaviour, IMapBuilderFromText {
 
 	public SquareGrid squareGrid;
 	public MeshFilter walls;
@@ -105,9 +105,9 @@ public class MeshGenerator : MonoBehaviour, MapBuilderFromText {
 
 		wallMesh.vertices = wallVertices.ToArray();
 		wallMesh.triangles = wallTriangles.ToArray();
+        wallMesh.RecalculateNormals();
 
-
-		Unwrapping.GenerateSecondaryUVSet(wallMesh); 
+        Unwrapping.GenerateSecondaryUVSet(wallMesh); 
 
 		walls.mesh = wallMesh;
 
