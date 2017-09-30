@@ -51,6 +51,8 @@ public class MapGenerator : MonoBehaviour {
     [SerializeField] private bool createMesh = false;
     // Object containing the Map Builder script.
     [SerializeField] private GameObject mapBuilder;
+    // Object containing the Object Displacer script.
+    [SerializeField] private GameObject objectDisplacer;
 
     // Do I have to create a .txt output?
     [SerializeField] private bool createTextFile = false;
@@ -100,10 +102,15 @@ public class MapGenerator : MonoBehaviour {
 
         if (createMesh) {
             if (mapBuilder != null) {
-                IMapBuilderFromText mapBuilderFromText = mapBuilder.GetComponent<IMapBuilderFromText>();
-                mapBuilderFromText.BuildMap(borderedMap, wallChar, squareSize, wallHeight);
+                IMapBuilderFromText mapBuilderFromTextScript = mapBuilder.GetComponent<IMapBuilderFromText>();
+                mapBuilderFromTextScript.BuildMap(borderedMap, wallChar, squareSize, wallHeight);
             } else
                 Debug.LogError("Error while trying to display the map, no Map Builder is attached to the script.");
+            if (objectDisplacer != null) {
+                ObjectDisplacer objectDisplacerScript = objectDisplacer.GetComponent<ObjectDisplacer>();
+                objectDisplacerScript.DisplaceObjects(borderedMap, squareSize, wallHeight);
+            } else
+                Debug.LogError("Error while trying to displace the objects map, no Object Displacer is attached to the script.");
         }
 
         if (createTextFile)
