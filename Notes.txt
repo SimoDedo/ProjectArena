@@ -16,3 +16,15 @@ I've finished implementing the example, now I need to modify it. I can:
 - Library script which contains the list of all the extra tile with interactive elements.
 - Extra char menaged by a separate script?
 - Create the PrefabGenerator builder.
+
+27/09/2107
+
+Rocket launcher, AK47, shotgun and rifle models done.
+
+28/09/2107
+
+I've added normals to the map mesh. Medkit, spawner and target models done. Some models need some fixes tho.
+
+29/09/2017
+
+I've learned a lot of stuff about meshes, models, ecc., I've solved the (fake) ligthing problem and I've implemented the possibility to add custom tiles.
