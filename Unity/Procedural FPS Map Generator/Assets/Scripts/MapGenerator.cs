@@ -16,10 +16,12 @@ public class MapGenerator : MonoBehaviour {
     [SerializeField] private int height = 100;
     // Border size.
     [SerializeField] private int borderSize = 5;
-    // Wall height.
-    [SerializeField] private int wallHeight = 5;
     // Passage width.
     [SerializeField] private int passageWidth = 5;
+    // Wall height.
+    [SerializeField] private float wallHeight = 5f;
+    // Wall height.
+    [SerializeField] private float squareSize = 1f;
     // Minimum size of a wall region.
     [SerializeField] private int wallThresholdSize = 50;
     // Minimum size of a room region.
@@ -40,459 +42,458 @@ public class MapGenerator : MonoBehaviour {
 
     // Char that denotes a room;
     [SerializeField] private char roomChar = 'v';
-   // Char that denotes a wall;
-   [SerializeField] private char wallChar = 'w';
-   // Custom objects that will be added to the map.
-   [SerializeField] private MapObject[] mapObjects;
+    // Char that denotes a wall;
+    [SerializeField] private char wallChar = 'w';
+    // Custom objects that will be added to the map.
+    [SerializeField] private MapObject[] mapObjects;
 
-   // Do I have to create a  mesh representation?
-   [SerializeField] private bool createMesh = false;
-   // Object containing the Map Builder script.
-   [SerializeField] private GameObject mapBuilder;
+    // Do I have to create a  mesh representation?
+    [SerializeField] private bool createMesh = false;
+    // Object containing the Map Builder script.
+    [SerializeField] private GameObject mapBuilder;
 
-   // Do I have to create a .txt output?
-   [SerializeField] private bool createTextFile = false;
-   // Path where to save the text map.
-   [SerializeField] private string textFilePath = null;
+    // Do I have to create a .txt output?
+    [SerializeField] private bool createTextFile = false;
+    // Path where to save the text map.
+    [SerializeField] private string textFilePath = null;
 
-   // Map, defined as a grid of chars.
-   private char[,] map;
-   // Hash of the seed.
-   private int hash;
-   // List of arrays containing character masks.
-   /* private List<char[]> characterMasks; */
-
+    // Map, defined as a grid of chars.
+    private char[,] map;
+    // Hash of the seed.
+    private int hash;
+    // List of arrays containing character masks.
+    /* private List<char[]> characterMasks; */
 
     void Start() {
-       GenerateMap();
-   }
-
-   void Update() {
-       if (Input.GetMouseButtonDown(0))
-           GenerateMap();
-   }
-
-   // Generates the map.
-   private void GenerateMap() {
-       map = new char[width, height];
-
-       /* if (useCustomRules)
-           TranslateMasks(); */
-
-       RandomFillMap();
-
-       for (int i = 0; i < smoothingIterations; i++)
-           SmoothMap();
-
-       ProcessMap();
-
-       char[,] borderedMap = new char[width + borderSize * 2, height + borderSize * 2];
-
-       for (int x = 0; x < borderedMap.GetLength(0); x++) {
-           for (int y = 0; y < borderedMap.GetLength(1); y++) {
-               if (x >= borderSize && x < width + borderSize && y >= borderSize && y < height + borderSize)
-                   borderedMap[x, y] = map[x - borderSize, y - borderSize];
-               else
-                   borderedMap[x, y] = wallChar;
-           }
-       }
-
-       if (createMesh) {
-           if (mapBuilder != null) {
-               IMapBuilderFromText mapBuilderFromText = mapBuilder.GetComponent<IMapBuilderFromText>();
-               mapBuilderFromText.BuildMap(borderedMap, wallChar, 1, wallHeight);
-           } else
-               Debug.LogError("Error while trying to display the map, no Map Builder is attached to the script.");
-       }
-
-       if (createTextFile)
-           SaveMapAsText();
-   }
-
-   // Checks if the masks are valid and translates them from binary strings to arrays of characters.
-   /* private void TranslateMasks() {
-       characterMasks = new List<char[]>();
-
-       for (int i = 0; i < binaryMasks.GetLength(0); i++) {
-           if (binaryMasks[i].Length != 8) {
-               Debug.LogError("Error while translating the mask " + i + ", masks must be binary strings of length 8. Further masks will be ignored.");
-               useCustomRules = false;
-               return;
-           } else {
-               characterMasks.Add(new char[8]);
-
-               for (int j = 0; j < 8; j++) {
-                   char currentChar = binaryMasks[i][j];
-
-                   if (currentChar == '0') {
-                       characterMasks[i][j] = roomChar;
-                   } else if (currentChar == '1') {
-                       characterMasks[i][j] = wallChar;
-                   } else {
-                       Debug.LogError("Error while translating the character " + currentChar + ", masks must be binary strings of length 8. Further masks will be ignored.");
-                       useCustomRules = false;
-                       return;
-                   }
-               }
-           }
-       }
-   } */
-
-   // Processes the map.
-   private void ProcessMap() {
-       List<List<Coord>> wallRegions = GetRegions(wallChar);
-
-       foreach (List<Coord> wallRegion in wallRegions) {
-           if (wallRegion.Count < wallThresholdSize) {
-               foreach (Coord tile in wallRegion) {
-                   map[tile.tileX, tile.tileY] = roomChar;
-               }
-           }
-       }
-
-       List<List<Coord>> roomRegions = GetRegions(roomChar);
-       List<Room> survivingRooms = new List<Room>();
-
-       foreach (List<Coord> roomRegion in roomRegions) {
-           if (roomRegion.Count < roomThresholdSize) {
-               foreach (Coord tile in roomRegion) {
-                   map[tile.tileX, tile.tileY] = wallChar;
-               }
-           } else {
-               survivingRooms.Add(new Room(roomRegion, map, wallChar));
-           }
-       }
-
-       // If there are at least two rooms.
-       if (survivingRooms.Count > 0) {
-           survivingRooms.Sort();
-           survivingRooms[0].isMainRoom = true;
-           survivingRooms[0].isAccessibleFromMainRoom = true;
-
-           ConnectClosestRooms(survivingRooms);
-       }
-
-       PopulateMap();
-   }
-
-   // Connects each room which the closest one.
-   private void ConnectClosestRooms(List<Room> allRooms, bool forceAccessibilityFromMainRoom = false) {
-       // Accessible rooms.
-       List<Room> roomListA = new List<Room>();
-       // Not accessible rooms.
-       List<Room> roomListB = new List<Room>();
-
-       if (forceAccessibilityFromMainRoom) {
-           foreach (Room room in allRooms) {
-               if (room.isAccessibleFromMainRoom)
-                   roomListB.Add(room);
-               else
-                   roomListA.Add(room);
-           }
-       } else {
-           roomListA = allRooms;
-           roomListB = allRooms;
-       }
-
-       int bestDistance = 0;
-       Coord bestTileA = new Coord();
-       Coord bestTileB = new Coord();
-       Room bestRoomA = new Room();
-       Room bestRoomB = new Room();
-       bool possibleConnectionFound = false;
-
-       foreach (Room roomA in roomListA) {
-           if (!forceAccessibilityFromMainRoom) {
-               possibleConnectionFound = false;
-               if (roomA.connectedRooms.Count > 0)
-                   continue;
-           }
-
-           foreach (Room roomB in roomListB) {
-               if (roomA == roomB || roomA.IsConnected(roomB))
-                   continue;
-
-               for (int tileIndexA = 0; tileIndexA < roomA.edgeTiles.Count; tileIndexA++) {
-                   for (int tileIndexB = 0; tileIndexB < roomB.edgeTiles.Count; tileIndexB++) {
-                       Coord tileA = roomA.edgeTiles[tileIndexA];
-                       Coord tileB = roomB.edgeTiles[tileIndexB];
-                       int distanceBetweenRooms = (int)(Mathf.Pow(tileA.tileX - tileB.tileX, 2) + Mathf.Pow(tileA.tileY - tileB.tileY, 2));
-
-                       if (distanceBetweenRooms < bestDistance || !possibleConnectionFound) {
-                           bestDistance = distanceBetweenRooms;
-                           possibleConnectionFound = true;
-                           bestTileA = tileA;
-                           bestTileB = tileB;
-                           bestRoomA = roomA;
-                           bestRoomB = roomB;
-                       }
-                   }
-               }
-           }
-
-           if (possibleConnectionFound && !forceAccessibilityFromMainRoom) {
-               CreatePassage(bestRoomA, bestRoomB, bestTileA, bestTileB);
-           }
-       }
-
-       if (possibleConnectionFound && forceAccessibilityFromMainRoom) {
-           CreatePassage(bestRoomA, bestRoomB, bestTileA, bestTileB);
-           ConnectClosestRooms(allRooms, true);
-       }
-       if (!forceAccessibilityFromMainRoom) {
-           ConnectClosestRooms(allRooms, true);
-       }
-   }
-
-   // Creates a passage between two rooms.
-   private void CreatePassage(Room roomA, Room roomB, Coord tileA, Coord tileB) {
-       Room.ConnectRooms(roomA, roomB);
-
-       List<Coord> line = GetLine(tileA, tileB);
-
-       foreach (Coord c in line)
-           DrawCircle(c, passageWidth);
-   }
-
-   // Adds custom objects to the map.
-   private void PopulateMap() {
-       if (mapObjects.Length > 0) {
-           List<Coord> roomTiles = GetFreeTiles();
-
-           foreach (MapObject o in mapObjects) {
-               for (int i = 0; i < o.numObjPerMap; i++) {
-                   if (roomTiles.Count > 0) {
-                       int selected = UnityEngine.Random.Range(0, roomTiles.Count);
-                       map[roomTiles[selected].tileX, roomTiles[selected].tileY] = o.objectChar;
-                       roomTiles.RemoveAt(selected);
-                   } else {
-                       Debug.LogError("Error while populating the map, no more free tiles are availabe.");
-                       return;
-                   }
-               }
-           }
-       }
-   }
-
-   // Returns a list of the free tiles.
-   private List<Coord> GetFreeTiles() {
-       List<Coord> roomTiles = new List<Coord>();
-
-       for (int x = 0; x < width; x++) {
-           for (int y = 0; y < height; y++) {
-               if (map[x, y] == roomChar)
-                   roomTiles.Add(new Coord(x, y));
-           }
-       }
-
-       return roomTiles;
-   }
-
-   // Draws a circe of a given radius around a point.
-   private void DrawCircle(Coord c, int r) {
-       for (int x = -r; x <= r; x++) {
-           for (int y = -r; y <= r; y++) {
-               if (x * x + y * y <= r) {
-                   int drawX = c.tileX + x;
-                   int drawY = c.tileY + y;
-
-                   if (IsInMapRange(drawX, drawY))
-                       map[drawX, drawY] = roomChar;
-               }
-           }
-       }
-   }
-
-   // Returns a list of coordinates for each point in the line.
-   private List<Coord> GetLine(Coord from, Coord to) {
-       List<Coord> line = new List<Coord>();
-
-       int x = from.tileX;
-       int y = from.tileY;
-
-       int dx = to.tileX - from.tileX;
-       int dy = to.tileY - from.tileY;
-
-       bool inverted = false;
-       int step = Math.Sign(dx);
-       int gradientStep = Math.Sign(dy);
-
-       int longest = Mathf.Abs(dx);
-       int shortest = Mathf.Abs(dy);
-
-       if (longest < shortest) {
-           inverted = true;
-           longest = Mathf.Abs(dy);
-           shortest = Mathf.Abs(dx);
-
-           step = Math.Sign(dy);
-           gradientStep = Math.Sign(dx);
-       }
-
-       int gradientAccumulation = longest / 2;
-       for (int i = 0; i < longest; i++) {
-           line.Add(new Coord(x, y));
-
-           if (inverted) {
-               y += step;
-           } else {
-               x += step;
-           }
-
-           gradientAccumulation += shortest;
-           if (gradientAccumulation >= longest) {
-               if (inverted) {
-                   x += gradientStep;
-               } else {
-                   y += gradientStep;
-               }
-               gradientAccumulation -= longest;
-           }
-       }
-
-       return line;
-   }
-
-   // Converts coordinates to world position.
-   private Vector3 CoordToWorldPoint(Coord tile) {
-       return new Vector3(-width / 2 + .5f + tile.tileX, 2, -height / 2 + .5f + tile.tileY);
-   }
-
-   // Given a certain "general" (full/room) tile type it returns all the regions of that type.
-   private List<List<Coord>> GetRegions(char tileType) {
-       List<List<Coord>> regions = new List<List<Coord>>();
-       int[,] mapFlags = new int[width, height];
-
-       for (int x = 0; x < width; x++) {
-           for (int y = 0; y < height; y++) {
-               if (mapFlags[x, y] == 0 && IsSameGeneralType(tileType, map[x, y])) {
-                   List<Coord> newRegion = GetRegionTiles(x, y);
-                   regions.Add(newRegion);
-
-                   foreach (Coord tile in newRegion) {
-                       mapFlags[tile.tileX, tile.tileY] = 1;
-                   }
-               }
-           }
-       }
-
-       return regions;
-   }
-
-   // Return the tiles of the region the parameter coordinates belong too using the flood-fill algorithm.
-   private List<Coord> GetRegionTiles(int startX, int startY) {
-       List<Coord> tiles = new List<Coord>();
-       int[,] mapFlags = new int[width, height];
-       char tileType = map[startX, startY];
-
-       Queue<Coord> queue = new Queue<Coord>();
-       queue.Enqueue(new Coord(startX, startY));
-       mapFlags[startX, startY] = 1;
-
-       while (queue.Count > 0) {
-           Coord tile = queue.Dequeue();
-           tiles.Add(tile);
-
-           for (int x = tile.tileX - 1; x <= tile.tileX + 1; x++) {
-               for (int y = tile.tileY - 1; y <= tile.tileY + 1; y++) {
-                   if (IsInMapRange(x, y) && (y == tile.tileY || x == tile.tileX)) {
-                       if (mapFlags[x, y] == 0 && map[x, y] == tileType) {
-                           mapFlags[x, y] = 1;
-                           queue.Enqueue(new Coord(x, y));
-                       }
-                   }
-               }
-           }
-       }
-
-       return tiles;
-   }
-
-   // Tells if the "general" (full/room) type of two tiles is the same.
-   private bool IsSameGeneralType(char tyleType, char t) {
-       if (tyleType == wallChar)
-           return t == wallChar;
-       else
-           return t != wallChar;
-   }
-
-   // Tells if a tile is in the map.
-   private bool IsInMapRange(int x, int y) {
-       return x >= 0 && x < width && y >= 0 && y < height;
-   }
-
-   // Randomly fills the map based on a seed.
-   private void RandomFillMap() {
-       if (useRandomSeed)
-           seed = GetDateString();
-
-       hash = seed.GetHashCode();
-
-       System.Random pseudoRandomGen = new System.Random(hash);
-
-       // Loop on each tile and assign a value;
-       for (int x = 0; x < width; x++) {
-           for (int y = 0; y < height; y++) {
-               if (x == 0 || x == width - 1 || y == 0 || y == height - 1)
-                   map[x, y] = wallChar;
-               else
-                   map[x, y] = (pseudoRandomGen.Next(0, 100) < ramdomFillPercent) ? wallChar : roomChar;
-           }
-       }
-   }
-
-   // Smooths the map.
-   private void SmoothMap() {
-       for (int x = 0; x < width; x++) {
-           for (int y = 0; y < height; y++) {
-               /* char[] neighbours = GetNeighbours(x, y);
-               int neighbourWallTiles = GetNeighboursWallCount(neighbours); */
-               int neighbourWallTiles = GetSurroundingWallCount(x, y);
-
-               if (neighbourWallTiles > neighbourTileLimitHigh)
-                   map[x, y] = wallChar;
-               else if (neighbourWallTiles < neighbourTileLimitLow)
-                   map[x, y] = roomChar;
+        GenerateMap();
+    }
+
+    /* void Update() {
+        if (Input.GetMouseButtonDown(0))
+            GenerateMap();
+    } */
+
+    // Generates the map.
+    private void GenerateMap() {
+        map = new char[width, height];
+
+        /* if (useCustomRules)
+            TranslateMasks(); */
+
+        RandomFillMap();
+
+        for (int i = 0; i < smoothingIterations; i++)
+            SmoothMap();
+
+        ProcessMap();
+
+        char[,] borderedMap = new char[width + borderSize * 2, height + borderSize * 2];
+
+        for (int x = 0; x < borderedMap.GetLength(0); x++) {
+            for (int y = 0; y < borderedMap.GetLength(1); y++) {
+                if (x >= borderSize && x < width + borderSize && y >= borderSize && y < height + borderSize)
+                    borderedMap[x, y] = map[x - borderSize, y - borderSize];
+                else
+                    borderedMap[x, y] = wallChar;
+            }
+        }
+
+        if (createMesh) {
+            if (mapBuilder != null) {
+                IMapBuilderFromText mapBuilderFromText = mapBuilder.GetComponent<IMapBuilderFromText>();
+                mapBuilderFromText.BuildMap(borderedMap, wallChar, squareSize, wallHeight);
+            } else
+                Debug.LogError("Error while trying to display the map, no Map Builder is attached to the script.");
+        }
+
+        if (createTextFile)
+            SaveMapAsText();
+    }
+
+    // Checks if the masks are valid and translates them from binary strings to arrays of characters.
+    /* private void TranslateMasks() {
+        characterMasks = new List<char[]>();
+
+        for (int i = 0; i < binaryMasks.GetLength(0); i++) {
+            if (binaryMasks[i].Length != 8) {
+                Debug.LogError("Error while translating the mask " + i + ", masks must be binary strings of length 8. Further masks will be ignored.");
+                useCustomRules = false;
+                return;
+            } else {
+                characterMasks.Add(new char[8]);
+
+                for (int j = 0; j < 8; j++) {
+                    char currentChar = binaryMasks[i][j];
+
+                    if (currentChar == '0') {
+                        characterMasks[i][j] = roomChar;
+                    } else if (currentChar == '1') {
+                        characterMasks[i][j] = wallChar;
+                    } else {
+                        Debug.LogError("Error while translating the character " + currentChar + ", masks must be binary strings of length 8. Further masks will be ignored.");
+                        useCustomRules = false;
+                        return;
+                    }
+                }
+            }
+        }
+    } */
+
+    // Processes the map.
+    private void ProcessMap() {
+        List<List<Coord>> wallRegions = GetRegions(wallChar);
+
+        foreach (List<Coord> wallRegion in wallRegions) {
+            if (wallRegion.Count < wallThresholdSize) {
+                foreach (Coord tile in wallRegion) {
+                    map[tile.tileX, tile.tileY] = roomChar;
+                }
+            }
+        }
+
+        List<List<Coord>> roomRegions = GetRegions(roomChar);
+        List<Room> survivingRooms = new List<Room>();
+
+        foreach (List<Coord> roomRegion in roomRegions) {
+            if (roomRegion.Count < roomThresholdSize) {
+                foreach (Coord tile in roomRegion) {
+                    map[tile.tileX, tile.tileY] = wallChar;
+                }
+            } else {
+                survivingRooms.Add(new Room(roomRegion, map, wallChar));
+            }
+        }
+
+        // If there are at least two rooms.
+        if (survivingRooms.Count > 0) {
+            survivingRooms.Sort();
+            survivingRooms[0].isMainRoom = true;
+            survivingRooms[0].isAccessibleFromMainRoom = true;
+
+            ConnectClosestRooms(survivingRooms);
+        }
+
+        PopulateMap();
+    }
+
+    // Connects each room which the closest one.
+    private void ConnectClosestRooms(List<Room> allRooms, bool forceAccessibilityFromMainRoom = false) {
+        // Accessible rooms.
+        List<Room> roomListA = new List<Room>();
+        // Not accessible rooms.
+        List<Room> roomListB = new List<Room>();
+
+        if (forceAccessibilityFromMainRoom) {
+            foreach (Room room in allRooms) {
+                if (room.isAccessibleFromMainRoom)
+                    roomListB.Add(room);
+                else
+                    roomListA.Add(room);
+            }
+        } else {
+            roomListA = allRooms;
+            roomListB = allRooms;
+        }
+
+        int bestDistance = 0;
+        Coord bestTileA = new Coord();
+        Coord bestTileB = new Coord();
+        Room bestRoomA = new Room();
+        Room bestRoomB = new Room();
+        bool possibleConnectionFound = false;
+
+        foreach (Room roomA in roomListA) {
+            if (!forceAccessibilityFromMainRoom) {
+                possibleConnectionFound = false;
+                if (roomA.connectedRooms.Count > 0)
+                    continue;
+            }
+
+            foreach (Room roomB in roomListB) {
+                if (roomA == roomB || roomA.IsConnected(roomB))
+                    continue;
+
+                for (int tileIndexA = 0; tileIndexA < roomA.edgeTiles.Count; tileIndexA++) {
+                    for (int tileIndexB = 0; tileIndexB < roomB.edgeTiles.Count; tileIndexB++) {
+                        Coord tileA = roomA.edgeTiles[tileIndexA];
+                        Coord tileB = roomB.edgeTiles[tileIndexB];
+                        int distanceBetweenRooms = (int)(Mathf.Pow(tileA.tileX - tileB.tileX, 2) + Mathf.Pow(tileA.tileY - tileB.tileY, 2));
+
+                        if (distanceBetweenRooms < bestDistance || !possibleConnectionFound) {
+                            bestDistance = distanceBetweenRooms;
+                            possibleConnectionFound = true;
+                            bestTileA = tileA;
+                            bestTileB = tileB;
+                            bestRoomA = roomA;
+                            bestRoomB = roomB;
+                        }
+                    }
+                }
+            }
+
+            if (possibleConnectionFound && !forceAccessibilityFromMainRoom) {
+                CreatePassage(bestRoomA, bestRoomB, bestTileA, bestTileB);
+            }
+        }
+
+        if (possibleConnectionFound && forceAccessibilityFromMainRoom) {
+            CreatePassage(bestRoomA, bestRoomB, bestTileA, bestTileB);
+            ConnectClosestRooms(allRooms, true);
+        }
+        if (!forceAccessibilityFromMainRoom) {
+            ConnectClosestRooms(allRooms, true);
+        }
+    }
+
+    // Creates a passage between two rooms.
+    private void CreatePassage(Room roomA, Room roomB, Coord tileA, Coord tileB) {
+        Room.ConnectRooms(roomA, roomB);
+
+        List<Coord> line = GetLine(tileA, tileB);
+
+        foreach (Coord c in line)
+            DrawCircle(c, passageWidth);
+    }
+
+    // Adds custom objects to the map.
+    private void PopulateMap() {
+        if (mapObjects.Length > 0) {
+            List<Coord> roomTiles = GetFreeTiles();
+
+            foreach (MapObject o in mapObjects) {
+                for (int i = 0; i < o.numObjPerMap; i++) {
+                    if (roomTiles.Count > 0) {
+                        int selected = UnityEngine.Random.Range(0, roomTiles.Count);
+                        map[roomTiles[selected].tileX, roomTiles[selected].tileY] = o.objectChar;
+                        roomTiles.RemoveAt(selected);
+                    } else {
+                        Debug.LogError("Error while populating the map, no more free tiles are availabe.");
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    // Returns a list of the free tiles.
+    private List<Coord> GetFreeTiles() {
+        List<Coord> roomTiles = new List<Coord>();
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (map[x, y] == roomChar)
+                    roomTiles.Add(new Coord(x, y));
+            }
+        }
+
+        return roomTiles;
+    }
+
+    // Draws a circe of a given radius around a point.
+    private void DrawCircle(Coord c, int r) {
+        for (int x = -r; x <= r; x++) {
+            for (int y = -r; y <= r; y++) {
+                if (x * x + y * y <= r) {
+                    int drawX = c.tileX + x;
+                    int drawY = c.tileY + y;
+
+                    if (IsInMapRange(drawX, drawY))
+                        map[drawX, drawY] = roomChar;
+                }
+            }
+        }
+    }
+
+    // Returns a list of coordinates for each point in the line.
+    private List<Coord> GetLine(Coord from, Coord to) {
+        List<Coord> line = new List<Coord>();
+
+        int x = from.tileX;
+        int y = from.tileY;
+
+        int dx = to.tileX - from.tileX;
+        int dy = to.tileY - from.tileY;
+
+        bool inverted = false;
+        int step = Math.Sign(dx);
+        int gradientStep = Math.Sign(dy);
+
+        int longest = Mathf.Abs(dx);
+        int shortest = Mathf.Abs(dy);
+
+        if (longest < shortest) {
+            inverted = true;
+            longest = Mathf.Abs(dy);
+            shortest = Mathf.Abs(dx);
+
+            step = Math.Sign(dy);
+            gradientStep = Math.Sign(dx);
+        }
+
+        int gradientAccumulation = longest / 2;
+        for (int i = 0; i < longest; i++) {
+            line.Add(new Coord(x, y));
+
+            if (inverted) {
+                y += step;
+            } else {
+                x += step;
+            }
+
+            gradientAccumulation += shortest;
+            if (gradientAccumulation >= longest) {
+                if (inverted) {
+                    x += gradientStep;
+                } else {
+                    y += gradientStep;
+                }
+                gradientAccumulation -= longest;
+            }
+        }
+
+        return line;
+    }
+
+    // Converts coordinates to world position.
+    private Vector3 CoordToWorldPoint(Coord tile) {
+        return new Vector3(-width / 2 + .5f + tile.tileX, 2, -height / 2 + .5f + tile.tileY);
+    }
+
+    // Given a certain "general" (full/room) tile type it returns all the regions of that type.
+    private List<List<Coord>> GetRegions(char tileType) {
+        List<List<Coord>> regions = new List<List<Coord>>();
+        int[,] mapFlags = new int[width, height];
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (mapFlags[x, y] == 0 && IsSameGeneralType(tileType, map[x, y])) {
+                    List<Coord> newRegion = GetRegionTiles(x, y);
+                    regions.Add(newRegion);
+
+                    foreach (Coord tile in newRegion) {
+                        mapFlags[tile.tileX, tile.tileY] = 1;
+                    }
+                }
+            }
+        }
+
+        return regions;
+    }
+
+    // Return the tiles of the region the parameter coordinates belong too using the flood-fill algorithm.
+    private List<Coord> GetRegionTiles(int startX, int startY) {
+        List<Coord> tiles = new List<Coord>();
+        int[,] mapFlags = new int[width, height];
+        char tileType = map[startX, startY];
+
+        Queue<Coord> queue = new Queue<Coord>();
+        queue.Enqueue(new Coord(startX, startY));
+        mapFlags[startX, startY] = 1;
+
+        while (queue.Count > 0) {
+            Coord tile = queue.Dequeue();
+            tiles.Add(tile);
+
+            for (int x = tile.tileX - 1; x <= tile.tileX + 1; x++) {
+                for (int y = tile.tileY - 1; y <= tile.tileY + 1; y++) {
+                    if (IsInMapRange(x, y) && (y == tile.tileY || x == tile.tileX)) {
+                        if (mapFlags[x, y] == 0 && map[x, y] == tileType) {
+                            mapFlags[x, y] = 1;
+                            queue.Enqueue(new Coord(x, y));
+                        }
+                    }
+                }
+            }
+        }
+
+        return tiles;
+    }
+
+    // Tells if the "general" (full/room) type of two tiles is the same.
+    private bool IsSameGeneralType(char tyleType, char t) {
+        if (tyleType == wallChar)
+            return t == wallChar;
+        else
+            return t != wallChar;
+    }
+
+    // Tells if a tile is in the map.
+    private bool IsInMapRange(int x, int y) {
+        return x >= 0 && x < width && y >= 0 && y < height;
+    }
+
+    // Randomly fills the map based on a seed.
+    private void RandomFillMap() {
+        if (useRandomSeed)
+            seed = GetDateString();
+
+        hash = seed.GetHashCode();
+
+        System.Random pseudoRandomGen = new System.Random(hash);
+
+        // Loop on each tile and assign a value;
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (x == 0 || x == width - 1 || y == 0 || y == height - 1)
+                    map[x, y] = wallChar;
+                else
+                    map[x, y] = (pseudoRandomGen.Next(0, 100) < ramdomFillPercent) ? wallChar : roomChar;
+            }
+        }
+    }
+
+    // Smooths the map.
+    private void SmoothMap() {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                /* char[] neighbours = GetNeighbours(x, y);
+                int neighbourWallTiles = GetNeighboursWallCount(neighbours); */
+                int neighbourWallTiles = GetSurroundingWallCount(x, y);
+
+                if (neighbourWallTiles > neighbourTileLimitHigh)
+                    map[x, y] = wallChar;
+                else if (neighbourWallTiles < neighbourTileLimitLow)
+                    map[x, y] = roomChar;
                 /* else if (useCustomRules)
                 [x, y] = ApplyMasks(x, y, neighbours); */
-           }
-       }
-   }
+            }
+        }
+    }
 
-   // Gets the number of walls surrounding a cell.
-   private int GetSurroundingWallCount(int gridX, int gridY) {
-       int wallCount = 0;
+    // Gets the number of walls surrounding a cell.
+    private int GetSurroundingWallCount(int gridX, int gridY) {
+        int wallCount = 0;
 
-       // Loop on 3x3 grid centered on [gridX, gridY].
-       for (int neighbourX = gridX - 1; neighbourX <= gridX + 1; neighbourX++) {
-           for (int neighbourY = gridY - 1; neighbourY <= gridY + 1; neighbourY++) {
-               if (IsInMapRange(neighbourX, neighbourY)) {
-                   if (neighbourX != gridX || neighbourY != gridY)
-                       wallCount += getMapTileAsNumber(neighbourX, neighbourY);
-               } else
-                   wallCount++;
-           }
-       }
+        // Loop on 3x3 grid centered on [gridX, gridY].
+        for (int neighbourX = gridX - 1; neighbourX <= gridX + 1; neighbourX++) {
+            for (int neighbourY = gridY - 1; neighbourY <= gridY + 1; neighbourY++) {
+                if (IsInMapRange(neighbourX, neighbourY)) {
+                    if (neighbourX != gridX || neighbourY != gridY)
+                        wallCount += getMapTileAsNumber(neighbourX, neighbourY);
+                } else
+                    wallCount++;
+            }
+        }
 
-       return wallCount;
-   }
+        return wallCount;
+    }
 
-   // Returns a room tile if a match is found, a wall tile otherwise.
-   /* private char ApplyMasks(int gridX, int gridY, char[] neighbours) {
-       foreach (char[] mask in characterMasks) {
-           int matchCount = 0;
+    // Returns a room tile if a match is found, a wall tile otherwise.
+    /* private char ApplyMasks(int gridX, int gridY, char[] neighbours) {
+        foreach (char[] mask in characterMasks) {
+            int matchCount = 0;
 
-           for (int i = 0; i < 8; i++) {
-               if (mask[i] == neighbours[i])
-                   matchCount++;
-           }
+            for (int i = 0; i < 8; i++) {
+                if (mask[i] == neighbours[i])
+                    matchCount++;
+            }
 
-           if (matchCount == 8)
-               return roomChar;
-       }
+            if (matchCount == 8)
+                return roomChar;
+        }
 
-       return wallChar;
-   } */
+        return wallChar;
+    } */
 
     // Gets the number of walls surrounding a cell.
     /* private int GetNeighboursWallCount(char[] neighbours) {
