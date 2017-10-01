@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class MapGenerator : MonoBehaviour {
 
@@ -18,6 +19,10 @@ public class MapGenerator : MonoBehaviour {
     [SerializeField] private int borderSize = 5;
     // Passage width.
     [SerializeField] private int passageWidth = 5;
+    // Minimum distance of an object w.r.t another object.
+    [SerializeField] private int objectToObjectDistance = 5;
+    // Minimum distance of an object w.r.t a wall.
+    [SerializeField,] private int objectToWallDistance = 2;
     // Wall height.
     [SerializeField] private float wallHeight = 5f;
     // Wall height.
@@ -59,25 +64,38 @@ public class MapGenerator : MonoBehaviour {
     // Path where to save the text map.
     [SerializeField] private string textFilePath = null;
 
+    // Do I have to update the map?
+    [SerializeField] private bool mustUpdate = false;
+
     // Map, defined as a grid of chars.
     private char[,] map;
     // Hash of the seed.
     private int hash;
+    // Pseudo random generator.
+    private System.Random pseudoRandomGen;
     // List of arrays containing character masks.
     /* private List<char[]> characterMasks; */
 
     void Start() {
+#if UNITY_EDITOR
+        UnityEditor.SceneView.FocusWindowIfItsOpen(typeof(UnityEditor.SceneView));
+#endif
+
         GenerateMap();
     }
 
-    /* void Update() {
-        if (Input.GetMouseButtonDown(0))
+    void Update() {
+        if (mustUpdate) {
             GenerateMap();
-    } */
+            mustUpdate = false;
+        }
+    }
 
     // Generates the map.
     private void GenerateMap() {
         map = new char[width, height];
+
+        pseudoRandomGen = new System.Random(hash);
 
         /* if (useCustomRules)
             TranslateMasks(); */
@@ -259,36 +277,100 @@ public class MapGenerator : MonoBehaviour {
         List<Coord> line = GetLine(tileA, tileB);
 
         foreach (Coord c in line)
-            DrawCircle(c, passageWidth);
+            DrawCircle(c.tileX, c.tileY, passageWidth, map, roomChar);
     }
 
-    // Adds custom objects to the map.
+    // Adds custom objects to the map. I erode the map once, then I place the objects that don't have placement restriction 
+    // (I erode once so that they want compenetrate che walls). Then I erode as many time as needed and I place the other
+    // objects.
     private void PopulateMap() {
         if (mapObjects.Length > 0) {
-            List<Coord> roomTiles = GetFreeTiles();
+            char[,] restrictedMap = map.Clone() as char[,];
 
+            ErodeMap(restrictedMap);
+            List<Coord> roomTiles = GetFreeTiles(restrictedMap);
+
+            bool mustRestrictFurther = false;
+
+            // Place the unrestricted objects and make unavailable the cells around.
             foreach (MapObject o in mapObjects) {
-                for (int i = 0; i < o.numObjPerMap; i++) {
-                    if (roomTiles.Count > 0) {
-                        int selected = UnityEngine.Random.Range(0, roomTiles.Count);
-                        map[roomTiles[selected].tileX, roomTiles[selected].tileY] = o.objectChar;
-                        roomTiles.RemoveAt(selected);
-                    } else {
-                        Debug.LogError("Error while populating the map, no more free tiles are availabe.");
-                        return;
+                if (o.placeAnywere) {
+                    for (int i = 0; i < o.numObjPerMap; i++) {
+                        if (roomTiles.Count > 0) {
+                            int selected = pseudoRandomGen.Next(0, roomTiles.Count);
+                            map[roomTiles[selected].tileX, roomTiles[selected].tileY] = o.objectChar;
+                            DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY, 1, restrictedMap, wallChar);
+                            roomTiles.RemoveAt(selected);
+                        } else {
+                            Debug.LogError("Error while populating the map, no more free tiles are availabe.");
+                            return;
+                        }
+                    }
+                } else if (mustRestrictFurther == false)
+                    mustRestrictFurther = true;
+            }
+
+            // Restrict again if there are object that need a further restriction.
+            if (objectToWallDistance > 1 && mustRestrictFurther) {
+                for (int i = 1; i < objectToWallDistance; i++) {
+                    ErodeMap(restrictedMap);
+                }
+                roomTiles = GetFreeTiles(restrictedMap);
+            }
+
+            // Place the restricted objects.
+            foreach (MapObject o in mapObjects) {
+                if (!o.placeAnywere) {
+                    for (int i = 0; i < o.numObjPerMap; i++) {
+                        if (roomTiles.Count > 0) {
+                            int selected = pseudoRandomGen.Next(0, roomTiles.Count);
+                            map[roomTiles[selected].tileX, roomTiles[selected].tileY] = o.objectChar;
+                            // Remove the tiles are around the choosen one from the vailable ones.
+                            DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY, objectToObjectDistance, restrictedMap, wallChar);
+                            roomTiles = GetFreeTiles(restrictedMap);
+                        } else {
+                            Debug.LogError("Error while populating the map, no more free tiles are availabe.");
+                            return;
+                        }
                     }
                 }
             }
         }
     }
 
+    // Erodes the map as many times as specified.
+    private void ErodeMap(char[,] toBeErodedMap) {
+        char[,] originalMap = CloneMap(toBeErodedMap);
+
+        for (int x = 0; x < originalMap.GetLength(0); x++) {
+            for (int y = 0; y < originalMap.GetLength(1); y++) {
+                if (GetSurroundingWallCount(x, y, originalMap) > 0) {
+                    toBeErodedMap[x, y] = wallChar;
+                }
+            }
+        }
+    }
+
+    // Clones a map.
+    private char[,] CloneMap(char[,] toBeClonedMap) {
+        char[,] clonedMap = new char[toBeClonedMap.GetLength(0), toBeClonedMap.GetLength(1)];
+
+        for (int x = 0; x < toBeClonedMap.GetLength(0); x++) {
+            for (int y = 0; y < toBeClonedMap.GetLength(1); y++) {
+                clonedMap[x, y] = toBeClonedMap[x, y];
+            }
+        }
+
+        return clonedMap;
+    }
+
     // Returns a list of the free tiles.
-    private List<Coord> GetFreeTiles() {
+    private List<Coord> GetFreeTiles(char[,] m) {
         List<Coord> roomTiles = new List<Coord>();
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                if (map[x, y] == roomChar)
+                if (m[x, y] == roomChar)
                     roomTiles.Add(new Coord(x, y));
             }
         }
@@ -297,15 +379,15 @@ public class MapGenerator : MonoBehaviour {
     }
 
     // Draws a circe of a given radius around a point.
-    private void DrawCircle(Coord c, int r) {
+    private void DrawCircle(int centerX, int centerY, int r, char[,] m, char t) {
         for (int x = -r; x <= r; x++) {
             for (int y = -r; y <= r; y++) {
-                if (x * x + y * y <= r) {
-                    int drawX = c.tileX + x;
-                    int drawY = c.tileY + y;
+                if (x * x + y * y <= r * r) {
+                    int drawX = centerX + x;
+                    int drawY = centerY + y;
 
                     if (IsInMapRange(drawX, drawY))
-                        map[drawX, drawY] = roomChar;
+                        m[drawX, drawY] = t;
                 }
             }
         }
@@ -432,12 +514,9 @@ public class MapGenerator : MonoBehaviour {
     // Randomly fills the map based on a seed.
     private void RandomFillMap() {
         if (useRandomSeed)
-            seed = GetDateString();
+            seed = GetDatestring();
 
         hash = seed.GetHashCode();
-
-        System.Random pseudoRandomGen = new System.Random(hash);
-
         // Loop on each tile and assign a value;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -455,7 +534,7 @@ public class MapGenerator : MonoBehaviour {
             for (int y = 0; y < height; y++) {
                 /* char[] neighbours = GetNeighbours(x, y);
                 int neighbourWallTiles = GetNeighboursWallCount(neighbours); */
-                int neighbourWallTiles = GetSurroundingWallCount(x, y);
+                int neighbourWallTiles = GetSurroundingWallCount(x, y, map);
 
                 if (neighbourWallTiles > neighbourTileLimitHigh)
                     map[x, y] = wallChar;
@@ -468,7 +547,7 @@ public class MapGenerator : MonoBehaviour {
     }
 
     // Gets the number of walls surrounding a cell.
-    private int GetSurroundingWallCount(int gridX, int gridY) {
+    private int GetSurroundingWallCount(int gridX, int gridY, char[,] gridMap) {
         int wallCount = 0;
 
         // Loop on 3x3 grid centered on [gridX, gridY].
@@ -476,7 +555,7 @@ public class MapGenerator : MonoBehaviour {
             for (int neighbourY = gridY - 1; neighbourY <= gridY + 1; neighbourY++) {
                 if (IsInMapRange(neighbourX, neighbourY)) {
                     if (neighbourX != gridX || neighbourY != gridY)
-                        wallCount += getMapTileAsNumber(neighbourX, neighbourY);
+                        wallCount += getMapTileAsNumber(neighbourX, neighbourY, gridMap);
                 } else
                     wallCount++;
             }
@@ -552,8 +631,8 @@ public class MapGenerator : MonoBehaviour {
     }
 
     // Return 1 if the tile is a wall, 0 otherwise.
-    private int getMapTileAsNumber(int x, int y) {
-        if (map[x, y] == wallChar)
+    private int getMapTileAsNumber(int x, int y, char[,] gridMap) {
+        if (gridMap[x, y] == wallChar)
             return 1;
         else
             return 0;
@@ -626,6 +705,8 @@ public class MapGenerator : MonoBehaviour {
         public char objectChar;
         // Number of objects to be put in the map.
         public int numObjPerMap;
+        // The object must respect placement restrictions?
+        public bool placeAnywere;
     }
 
     // Saves the map in a text file.
@@ -634,7 +715,7 @@ public class MapGenerator : MonoBehaviour {
             Debug.LogError("Error while retrieving the folder, please insert a valid path.");
         } else {
             try {
-                String textMap = "";
+                string textMap = "";
 
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
@@ -652,7 +733,7 @@ public class MapGenerator : MonoBehaviour {
     }
 
     // Gets the current date as string.
-    private string GetDateString() {
+    private string GetDatestring() {
         return System.DateTime.Now.ToString();
     }
 
