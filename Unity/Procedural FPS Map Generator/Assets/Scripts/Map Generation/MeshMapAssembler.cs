@@ -2,14 +2,18 @@
 using UnityEngine;
 using UnityEditor;
 
-public class MeshGenerator : MonoBehaviour, IMapBuilderFromText {
+public class MeshMapAssembler : MapAssebler {
 
-    public SquareGrid squareGrid;
-    public MeshFilter walls;
-    public MeshFilter top;
-    public MeshCollider wallsCollider;
-    public MeshFilter floor;
-    public MeshCollider floorCollider;
+    [SerializeField] private Material topMaterial;
+    [SerializeField] private Material wallMaterial;
+    [SerializeField] private Material floorMaterial;
+
+    private SquareGrid squareGrid;
+    private MeshFilter topMeshFilter;
+    private MeshFilter wallsMeshFilter;
+    private MeshFilter floorMeshFilter;
+    private MeshCollider wallsCollider;
+    private MeshCollider floorCollider;
 
     private List<Vector3> vertices;
     private List<int> triangles;
@@ -23,9 +27,48 @@ public class MeshGenerator : MonoBehaviour, IMapBuilderFromText {
 
     private float wallHeigth;
 
+    private void Start() {
+        GameObject childObject;
+
+        childObject = new GameObject("Top - Mesh Filter");
+        childObject.transform.parent = transform;
+        childObject.transform.localPosition = Vector3.zero;
+        topMeshFilter = childObject.AddComponent<MeshFilter>();
+        childObject.AddComponent<MeshRenderer>();
+        childObject.GetComponent<MeshRenderer>().material = topMaterial;
+
+        childObject = new GameObject("Walls - Mesh Filter");
+        childObject.transform.parent = transform;
+        childObject.transform.localPosition = Vector3.zero;
+        wallsMeshFilter = childObject.AddComponent<MeshFilter>();
+        childObject.AddComponent<MeshRenderer>();
+        childObject.GetComponent<MeshRenderer>().material = wallMaterial;
+
+        childObject = new GameObject("Floor - Mesh Filter");
+        childObject.transform.parent = transform;
+        childObject.transform.localPosition = Vector3.zero;
+        floorMeshFilter = childObject.AddComponent<MeshFilter>();
+        childObject.AddComponent<MeshRenderer>();
+        childObject.GetComponent<MeshRenderer>().material = floorMaterial;
+
+        childObject = new GameObject("Walls - Collider");
+        childObject.transform.parent = transform;
+        childObject.transform.localPosition = Vector3.zero;
+        wallsCollider = childObject.AddComponent<MeshCollider>();
+
+        childObject = new GameObject("Floor - Collider");
+        childObject.transform.parent = transform;
+        childObject.transform.localPosition = Vector3.zero;
+        floorCollider = childObject.AddComponent<MeshCollider>();
+
+        ready = true;
+    }
+
     // Generates the Mesh.
-    public void BuildMap(char[,] map, char charWall, float squareSize, float h) {
+    public override void AssembleMap(char[,] map, float squareSize, float h) {
         wallHeigth = h;
+
+        char charWall = map[0, 0];
 
         outlines.Clear();
         checkedVertices.Clear();
@@ -67,7 +110,7 @@ public class MeshGenerator : MonoBehaviour, IMapBuilderFromText {
 		}
 		topMesh.uv = uvs; */
 
-        top.mesh = topMesh;
+        topMeshFilter.mesh = topMesh;
     }
 
     // Creates the wall mesh.
@@ -77,7 +120,7 @@ public class MeshGenerator : MonoBehaviour, IMapBuilderFromText {
         List<Vector3> wallVertices = new List<Vector3>();
         List<int> wallTriangles = new List<int>();
 
-        Mesh wallMesh = new Mesh();
+        Mesh wallsMesh = new Mesh();
 
         foreach (List<int> outline in outlines) {
             for (int i = 0; i < outline.Count - 1; i++) {
@@ -102,15 +145,15 @@ public class MeshGenerator : MonoBehaviour, IMapBuilderFromText {
             }
         }
 
-        wallMesh.vertices = wallVertices.ToArray();
-        wallMesh.triangles = wallTriangles.ToArray();
-        wallMesh.RecalculateNormals();
+        wallsMesh.vertices = wallVertices.ToArray();
+        wallsMesh.triangles = wallTriangles.ToArray();
+        wallsMesh.RecalculateNormals();
 
-        Unwrapping.GenerateSecondaryUVSet(wallMesh);
+        Unwrapping.GenerateSecondaryUVSet(wallsMesh);
 
-        walls.mesh = wallMesh;
+        wallsMeshFilter.mesh = wallsMesh;
 
-        wallsCollider.sharedMesh = wallMesh;
+        wallsCollider.sharedMesh = wallsMesh;
     }
 
     // Creates the floor mesh.
@@ -130,7 +173,7 @@ public class MeshGenerator : MonoBehaviour, IMapBuilderFromText {
         floorMesh.triangles = floorTriangles;
         floorMesh.RecalculateNormals();
 
-        floor.mesh = floorMesh;
+        floorMeshFilter.mesh = floorMesh;
         floorCollider.sharedMesh = floorMesh;
     }
 

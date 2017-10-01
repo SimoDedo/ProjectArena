@@ -28,3 +28,7 @@ I've added normals to the map mesh. Medkit, spawner and target models done. Some
 29/09/2017
 
 I've learned a lot of stuff about meshes, models, ecc., I've solved the (fake) ligthing problem and I've implemented the possibility to add custom tiles.
+
+31/09/2017
+
+I've done to much stuff to write it down. Check the commits.

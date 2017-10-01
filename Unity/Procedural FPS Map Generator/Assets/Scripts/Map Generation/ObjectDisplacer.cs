@@ -14,8 +14,13 @@ public class ObjectDisplacer : MonoBehaviour {
     // Dictionary associating a char to a GameObject.
     private Dictionary<char, CustomObjectList> objectDictionary = new Dictionary<char, CustomObjectList>();
 
+    // Has the script completed the execution of the start method?
+    private bool ready = false;
+
     private void Start() {
         InitializeAll();
+
+        ready = true;
     }
 
     // Creates all the category objects and adds them to the dictionary. An object with no category is 
@@ -67,6 +72,11 @@ public class ObjectDisplacer : MonoBehaviour {
                 GameObject.Destroy(child.gameObject);
             }
         }
+    }
+
+    // Tells if the scipt is done loading.
+    public bool IsReady() {
+        return ready;
     }
 
     // Custom object. 
