@@ -1,62 +1,47 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-public class MapManager : MonoBehaviour {
+public class MapManager : CoreComponent {
 
     [SerializeField] private GameObject mapAssembler;
     [SerializeField] private GameObject mapGenerator;
     [SerializeField] private GameObject objectDisplacer;
-    [SerializeField] private GameObject spawnPointManager;
 
     // Do I have to load the map from a .txt?
     [SerializeField] protected bool loadMapFromFile = false;
     // Path of the map to be laoded.
     [SerializeField] protected string textFilePath = null;
 
-    // Do I have to assemble the map?
-    [SerializeField] private bool assembleMap = false;
-    // Do I have to update the map?
-    [SerializeField] private bool mustUpdate = false;
-
     // Size of a square.
     [SerializeField] private float squareSize;
     // Heigth of the map.
     [SerializeField] private float heigth;
+
     // Category of the spawn point gameobjects in the object displacer. 
     [SerializeField] private string spawnPointCategory;
-    
+
     private MapGenerator mapGeneratorScript;
     private MapAssebler mapAssemblerScript;
     private ObjectDisplacer objectDisplacerScript;
-    private SpawnPointManager spawnPointManagerScript;
-
-    private char charWall;
 
     char[,] map;
 
-    void Start() {
-        #if UNITY_EDITOR
-                UnityEditor.SceneView.FocusWindowIfItsOpen(typeof(UnityEditor.SceneView));
-        #endif
-
+    private void Start() {
         mapAssemblerScript = mapAssembler.GetComponent<MapAssebler>();
         mapGeneratorScript = mapGenerator.GetComponent<MapGenerator>();
         objectDisplacerScript = objectDisplacer.GetComponent<ObjectDisplacer>();
-        spawnPointManagerScript = spawnPointManager.GetComponent<SpawnPointManager>();
-
-        mustUpdate = true;
     }
 
-    void Update() {
-        if (mustUpdate && mapAssemblerScript.IsReady() && mapGeneratorScript.IsReady()
-            && objectDisplacerScript.IsReady() && spawnPointManagerScript.IsReady()) {
-            ManageMap();
-            mustUpdate = false;
+    private void Update() {
+        if (!IsReady() && mapAssemblerScript.IsReady() && mapGeneratorScript.IsReady()
+            && objectDisplacerScript.IsReady()) {
+            SetReady(true);
         }
     }
 
-    private void ManageMap() {
+    public void ManageMap(bool assembleMap) {
         if (loadMapFromFile) {
             // Load the map.
             LoadMapFromText();
@@ -70,9 +55,12 @@ public class MapManager : MonoBehaviour {
             mapAssemblerScript.AssembleMap(map, squareSize, heigth);
             // Displace the objects.
             objectDisplacerScript.DisplaceObjects(map, squareSize, heigth);
-            // Set the spawn points.
-            spawnPointManagerScript.SetSpawnPoints(objectDisplacerScript.GetObjectsByCategory(spawnPointCategory));
         }
+    }
+
+    // Returns the spawn points.
+    public List<GameObject> GetSpawnPoints() {
+        return objectDisplacerScript.GetObjectsByCategory(spawnPointCategory);
     }
 
     // Loads the map from a text file.

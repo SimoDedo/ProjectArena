@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 
 public class MeshMapAssembler : MapAssebler {
 
@@ -148,8 +147,6 @@ public class MeshMapAssembler : MapAssebler {
         wallsMesh.vertices = wallVertices.ToArray();
         wallsMesh.triangles = wallTriangles.ToArray();
         wallsMesh.RecalculateNormals();
-
-        Unwrapping.GenerateSecondaryUVSet(wallsMesh);
 
         wallsMeshFilter.mesh = wallsMesh;
 
