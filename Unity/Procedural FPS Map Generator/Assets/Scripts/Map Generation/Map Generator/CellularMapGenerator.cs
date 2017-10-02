@@ -43,10 +43,10 @@ public class CellularMapGenerator : MapGenerator {
     public override char[,] GenerateMap() {
         map = new char[width, height];
 
-        pseudoRandomGen = new System.Random(hash);
-
         /* if (useCustomRules)
             TranslateMasks(); */
+
+        InitializePseudoRandomGenerator();
 
         RandomFillMap();
 
@@ -319,10 +319,6 @@ public class CellularMapGenerator : MapGenerator {
 
     // Randomly fills the map based on a seed.
     private void RandomFillMap() {
-        if (useRandomSeed)
-            seed = GetDatestring();
-
-        hash = seed.GetHashCode();
         // Loop on each tile and assign a value;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {

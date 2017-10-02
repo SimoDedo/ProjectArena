@@ -42,6 +42,15 @@ public abstract class MapGenerator : CoreComponent {
     // Pseudo random generator.
     protected System.Random pseudoRandomGen;
 
+    // Initializes the pseudo random generator.
+    protected void InitializePseudoRandomGenerator() {
+        if (useRandomSeed)
+            seed = GetDatestring();
+
+        hash = seed.GetHashCode();
+        pseudoRandomGen = new System.Random(hash);
+    }
+
     // Generates the map and returns it.
     public abstract char[,] GenerateMap();
 
