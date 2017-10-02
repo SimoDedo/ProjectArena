@@ -14,12 +14,12 @@ public class CameraMouseLock : MonoBehaviour {
     // Smoothed value of the mouse
     private Vector2 smoothedDelta;
 
-    // Player object.
-    private GameObject player;
+    // Character object.
+    private GameObject character;
 
     void Start() {
-        // The script is attached to the camera, but we also need the player.
-        player = transform.parent.gameObject;
+        // The script is attached to the camera, but we also need the character.
+        character = transform.parent.gameObject;
     }
 
     void Update() {
@@ -36,7 +36,7 @@ public class CameraMouseLock : MonoBehaviour {
 
         // Apply the transformation.
         transform.localRotation = Quaternion.AngleAxis(- mouseLook.y, Vector3.right);
-        player.transform.localRotation = Quaternion.AngleAxis(mouseLook.x, player.transform.up);
+        character.transform.localRotation = Quaternion.AngleAxis(mouseLook.x, character.transform.up);
     }
 
 }

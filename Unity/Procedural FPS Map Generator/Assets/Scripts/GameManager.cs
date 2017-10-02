@@ -4,7 +4,6 @@ public class GameManager : CoreComponent {
 
     [SerializeField] private GameObject mapManager;
     [SerializeField] private GameObject spawnPointManager;
-
     [SerializeField] private GameObject player;
 
     // Do I have to assemble the map?
@@ -12,6 +11,7 @@ public class GameManager : CoreComponent {
 
     private MapManager mapManagerScript;
     private SpawnPointManager spawnPointManagerScript;
+    private PlayerController playerControllerScript;
 
     private void Start () {
         /* #if UNITY_EDITOR
@@ -20,6 +20,7 @@ public class GameManager : CoreComponent {
 
         mapManagerScript = mapManager.GetComponent<MapManager>();
         spawnPointManagerScript = spawnPointManager.GetComponent<SpawnPointManager>();
+        playerControllerScript = player.GetComponent<PlayerController>();
     }
 
     private void Update () {
@@ -32,6 +33,7 @@ public class GameManager : CoreComponent {
                 spawnPointManagerScript.SetSpawnPoints(mapManagerScript.GetSpawnPoints());
 
                 player.transform.position = spawnPointManagerScript.GetSpawnPosition() + Vector3.up * 3f;
+                playerControllerScript.LockCursor();
             }
 
             SetReady(true);
