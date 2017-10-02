@@ -37,7 +37,7 @@ public class CellularMapGenerator : MapGenerator {
     /* private List<char[]> characterMasks; */
 
     private void Start() {
-        ready = true;
+        SetReady(true);
     }
 
     public override char[,] GenerateMap() {

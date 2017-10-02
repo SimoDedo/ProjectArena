@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectDisplacer : MonoBehaviour {
+public class ObjectDisplacer : CoreComponent {
 
     // Object scale correction factor.
     [SerializeField] private float sizeCorrection = 1f;
@@ -11,21 +11,23 @@ public class ObjectDisplacer : MonoBehaviour {
     // Custom objects that will be added to the map.
     [SerializeField] private CustomObject[] customObjects;
 
-    // Dictionary associating a char to a GameObject.
-    private Dictionary<char, CustomObjectList> objectDictionary = new Dictionary<char, CustomObjectList>();
-
-    // Has the script completed the execution of the start method?
-    private bool ready = false;
+    // Dictionary associating a char to a list of objects.
+    private Dictionary<char, CustomObjectList> charObjectsDictionary;
+    // Dictionary associating a categoty to a list of objects.
+    private Dictionary<String, List<GameObject>> categoryObjectsDictionary;
 
     private void Start() {
         InitializeAll();
 
-        ready = true;
+        SetReady(true);
     }
 
     // Creates all the category objects and adds them to the dictionary. An object with no category is 
-    // assigned to the default one. Creates and adds the prefabs lists to the objectDictionary.
+    // assigned to the default one. Creates and adds the prefabs lists to the charObjectsDictionary.
     private void InitializeAll() {
+        charObjectsDictionary = new Dictionary<char, CustomObjectList>();
+        categoryObjectsDictionary = new Dictionary<String, List<GameObject>>();
+
         foreach (CustomObject c in customObjects) {
             if (transform.Find("Default") && (c.category == "" || c.category == null)) {
                 GameObject childObject = new GameObject("Default");
@@ -37,29 +39,38 @@ public class ObjectDisplacer : MonoBehaviour {
                 childObject.transform.localPosition = Vector3.zero;
             }
 
-            if (!objectDictionary.ContainsKey(c.objectChar)) {
-                objectDictionary.Add(c.objectChar, new CustomObjectList(c));
+            if (!charObjectsDictionary.ContainsKey(c.objectChar)) {
+                charObjectsDictionary.Add(c.objectChar, new CustomObjectList(c));
             } else {
-                objectDictionary[c.objectChar].AddObject(c);
+                charObjectsDictionary[c.objectChar].AddObject(c);
             }
         }
     }
 
     // Displace the custom objects inside the map.
     public void DisplaceObjects(char[,] map, float squareSize, float height) {
+        categoryObjectsDictionary.Clear();
         DestroyAllCustomObjects();
-
+    
         for (int x = 0; x < map.GetLength(0); x++) {
             for (int y = 0; y < map.GetLength(1); y++) {
-                if (objectDictionary.ContainsKey(map[x, y])) {
-                    CustomObject currentObject = objectDictionary[map[x, y]].GetObject();
+                if (charObjectsDictionary.ContainsKey(map[x, y])) {
+                    CustomObject currentObject = charObjectsDictionary[map[x, y]].GetObject();
 
                     GameObject childObject = (GameObject) Instantiate(currentObject.prefab);
+                    childObject.name = currentObject.prefab.name;
                     childObject.transform.parent = transform.Find(currentObject.category);
                     childObject.transform.localPosition = new Vector3(x * squareSize - map.GetLength(0) / 2,
                         heightDirCorrection * (height + currentObject.heightCorrection), 
                         y * squareSize - map.GetLength(1) / 2);
                     childObject.transform.localScale *= sizeCorrection;
+
+                    if (categoryObjectsDictionary.ContainsKey(currentObject.category)) {
+                        categoryObjectsDictionary[currentObject.category].Add(childObject);
+                    } else {
+                        categoryObjectsDictionary.Add(currentObject.category, new List<GameObject>());
+                        categoryObjectsDictionary[currentObject.category].Add(childObject);
+                    }
                 }
             }
         }
@@ -74,9 +85,9 @@ public class ObjectDisplacer : MonoBehaviour {
         }
     }
 
-    // Tells if the scipt is done loading.
-    public bool IsReady() {
-        return ready;
+    // Returns all the object which have the category passed as parameter.
+    public List<GameObject> GetObjectsByCategory(String category) {
+        return categoryObjectsDictionary[category];
     }
 
     // Custom object. 
@@ -94,7 +105,7 @@ public class ObjectDisplacer : MonoBehaviour {
 
     // List of custom objects which share the same char. 
     private class CustomObjectList {
-        private List<CustomObject> objs;
+        public List<CustomObject> objs;
 
         public CustomObjectList(CustomObject obj) {
             objs = new List<CustomObject>();
@@ -109,7 +120,6 @@ public class ObjectDisplacer : MonoBehaviour {
             int i = UnityEngine.Random.Range(0, objs.Count - 1);
             return objs[i];
         }
-
     }
 
 }

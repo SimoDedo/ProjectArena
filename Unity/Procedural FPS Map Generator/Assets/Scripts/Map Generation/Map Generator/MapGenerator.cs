@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-public abstract class MapGenerator : MonoBehaviour {
+public abstract class MapGenerator : CoreComponent {
 
     // Do I have to generate my seed?
     [SerializeField] protected bool useRandomSeed = true;
@@ -42,9 +42,6 @@ public abstract class MapGenerator : MonoBehaviour {
     // Pseudo random generator.
     protected System.Random pseudoRandomGen;
 
-    // Has the script completed the execution of the start method?
-    protected bool ready = false;
-
     // Generates the map and returns it.
     public abstract char[,] GenerateMap();
 
@@ -60,13 +57,14 @@ public abstract class MapGenerator : MonoBehaviour {
 
             bool mustRestrictFurther = false;
 
-            // Place the unrestricted objects and make unavailable the cells around.
+            // Place the unrestricted objects.
             foreach (MapObject o in mapObjects) {
                 if (o.placeAnywere) {
                     for (int i = 0; i < o.numObjPerMap; i++) {
                         if (roomTiles.Count > 0) {
                             int selected = pseudoRandomGen.Next(0, roomTiles.Count);
                             map[roomTiles[selected].tileX, roomTiles[selected].tileY] = o.objectChar;
+                            // Make unavailable the cells around for the restricted objects.
                             DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY, 1, restrictedMap, wallChar);
                             roomTiles.RemoveAt(selected);
                         } else {
@@ -83,6 +81,8 @@ public abstract class MapGenerator : MonoBehaviour {
                 for (int i = 1; i < objectToWallDistance; i++) {
                     ErodeMap(restrictedMap);
                 }
+                roomTiles = GetFreeTiles(restrictedMap);
+            } else {
                 roomTiles = GetFreeTiles(restrictedMap);
             }
 
@@ -239,11 +239,6 @@ public abstract class MapGenerator : MonoBehaviour {
             return width;
         else
             return height;
-    }
-
-    // Tells if the scipt is done loading.
-    public bool IsReady() {
-        return ready;
     }
 
     // Coordinates of a tile.

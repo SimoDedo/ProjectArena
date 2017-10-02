@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -9,6 +7,7 @@ public class MapManager : MonoBehaviour {
     [SerializeField] private GameObject mapAssembler;
     [SerializeField] private GameObject mapGenerator;
     [SerializeField] private GameObject objectDisplacer;
+    [SerializeField] private GameObject spawnPointManager;
 
     // Do I have to load the map from a .txt?
     [SerializeField] protected bool loadMapFromFile = false;
@@ -24,10 +23,13 @@ public class MapManager : MonoBehaviour {
     [SerializeField] private float squareSize;
     // Heigth of the map.
     [SerializeField] private float heigth;
-
+    // Category of the spawn point gameobjects in the object displacer. 
+    [SerializeField] private string spawnPointCategory;
+    
     private MapGenerator mapGeneratorScript;
     private MapAssebler mapAssemblerScript;
     private ObjectDisplacer objectDisplacerScript;
+    private SpawnPointManager spawnPointManagerScript;
 
     private char charWall;
 
@@ -41,12 +43,14 @@ public class MapManager : MonoBehaviour {
         mapAssemblerScript = mapAssembler.GetComponent<MapAssebler>();
         mapGeneratorScript = mapGenerator.GetComponent<MapGenerator>();
         objectDisplacerScript = objectDisplacer.GetComponent<ObjectDisplacer>();
+        spawnPointManagerScript = spawnPointManager.GetComponent<SpawnPointManager>();
 
         mustUpdate = true;
     }
 
     void Update() {
-        if (mustUpdate && mapAssemblerScript.IsReady() && mapGeneratorScript.IsReady() && objectDisplacerScript.IsReady()) {
+        if (mustUpdate && mapAssemblerScript.IsReady() && mapGeneratorScript.IsReady()
+            && objectDisplacerScript.IsReady() && spawnPointManagerScript.IsReady()) {
             ManageMap();
             mustUpdate = false;
         }
@@ -66,6 +70,8 @@ public class MapManager : MonoBehaviour {
             mapAssemblerScript.AssembleMap(map, squareSize, heigth);
             // Displace the objects.
             objectDisplacerScript.DisplaceObjects(map, squareSize, heigth);
+            // Set the spawn points.
+            spawnPointManagerScript.SetSpawnPoints(objectDisplacerScript.GetObjectsByCategory(spawnPointCategory));
         }
     }
 

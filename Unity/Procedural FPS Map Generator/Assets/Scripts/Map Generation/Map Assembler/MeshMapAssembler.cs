@@ -61,7 +61,7 @@ public class MeshMapAssembler : MapAssebler {
         childObject.transform.localPosition = Vector3.zero;
         floorCollider = childObject.AddComponent<MeshCollider>();
 
-        ready = true;
+        SetReady(true);
     }
 
     // Generates the Mesh.
