@@ -1,6 +1,7 @@
 AK47						-> 2
 AK47 - Ammo					-> 0.5 (+0.06)
 AK47 - Bullet				-> 1.5
+Ammo Crate					-> 
 Blood						-> 0.5
 Cactus						-> 10
 Explosion (1)				-> 0.2
