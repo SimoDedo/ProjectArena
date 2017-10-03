@@ -56,6 +56,8 @@ public class GameManager : CoreComponent {
             pastTime = (int) Time.time;
 
             SetReady(true);
+
+            playerControllerScript.SetMovementEnabled(true);
         } else if (IsReady()) {
             // Update the elapsed time.
         }

@@ -117,7 +117,7 @@ public class ObjectDisplacer : CoreComponent {
         }
 
         public CustomObject GetObject() {
-            int i = UnityEngine.Random.Range(0, objs.Count - 1);
+            int i = UnityEngine.Random.Range(0, objs.Count);
             return objs[i];
         }
     }

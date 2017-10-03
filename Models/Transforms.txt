@@ -1,0 +1,25 @@
+AK47						-> 2
+AK47 - Ammo					-> 0.5 (+0.06)
+AK47 - Bullet				-> 1.5
+Blood						-> 0.5
+Cactus						-> 10
+Explosion (1)				-> 0.2
+Explosion (2)				-> 0.3
+Explosion (3)				-> 0.5
+Medkit						-> 0.5 (+0.08)
+Rifle						-> 1
+Rifle - Ammo				-> 0.2 (+0.06)
+Rifle - Bullet				-> 1
+Rock (1)					-> 10
+Rock (2)					-> 10
+Rock (3)					-> 5
+Rocket Launcher				-> 5
+Rocket Launcher - Ammo		-> 0.8 (+0.075)
+Rocket Launcher - Bullet	-> 5
+Target						-> 1.5 (+0.2)
+Shotgun						-> 4
+Shotgun - Ammo				-> 1 (+0.06)
+Shotgun - Bullet			-> 1.25
+Spark						-> 0.5
+Spawnwer					-> 1
+Spawnwer + Object           -> 20
