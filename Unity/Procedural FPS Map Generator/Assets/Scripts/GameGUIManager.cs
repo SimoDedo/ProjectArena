@@ -1,6 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class GameGUIManager : CoreComponent {
 
@@ -11,6 +10,7 @@ public class GameGUIManager : CoreComponent {
     // Elements of the ready GUI.
     [SerializeField] private GameObject player1;
     [SerializeField] private GameObject player2;
+    [SerializeField] private GameObject countdown;
 
     // Elements of the figth GUI.
     [SerializeField] private GameObject health;
@@ -27,19 +27,24 @@ public class GameGUIManager : CoreComponent {
     private string namePlayer1;
     private string namePlayer2;
 
+    // Text fields of the ready GUI.
+    private Text countdownText;
+
     // Text fields of the figth GUI.
-    private GUIText healthText;
-    private GUIText ammoText;
-    private GUIText timeText;
-    private GUIText killsPlayer1Text;
-    private GUIText killsPlayer2Text;
+    private Text healthText;
+    private Text ammoText;
+    private Text timeText;
+    private Text killsPlayer1Text;
+    private Text killsPlayer2Text;
 
     void Start() {
-        healthText = health.GetComponent<GUIText>();
-        ammoText = ammo.GetComponent<GUIText>();
-        timeText = time.GetComponent<GUIText>();
-        killsPlayer1Text = killsPlayer1.GetComponent<GUIText>();
-        killsPlayer2Text = killsPlayer2.GetComponent<GUIText>();
+        healthText = health.GetComponent<Text>();
+        ammoText = ammo.GetComponent<Text>();
+        timeText = time.GetComponent<Text>();
+        killsPlayer1Text = killsPlayer1.GetComponent<Text>();
+        killsPlayer2Text = killsPlayer2.GetComponent<Text>();
+
+        countdownText = countdown.GetComponent<Text>();
 
         SetReady(true);
     }
@@ -71,26 +76,34 @@ public class GameGUIManager : CoreComponent {
         namePlayer2 = p2;
     }
 
-    // Sets the ready GUI.
-    public void SetReadyGUI() {
-        player1.GetComponent<GUIText>().text = namePlayer1;
-        player2.GetComponent<GUIText>().text = namePlayer1;
+    // Sets the countdown.
+    public void SetCountdown(int i) {
+        if (i > 0)
+            countdownText.text = i.ToString();
+        else
+            countdownText.text = "Figth!";
     }
 
     // Sets the ready GUI.
+    public void SetReadyGUI() {
+        player1.GetComponent<Text>().text = namePlayer1;
+        player2.GetComponent<Text>().text = namePlayer1;
+    }
+
+    // Sets the score GUI.
     public void SetScoreGUI(int s1, int s2) {
         if (s1 > s2) {
             player1Wins.SetActive(true);
             player2Wins.SetActive(false);
             tie.SetActive(false);
 
-            player1Wins.GetComponent<GUIText>().text = namePlayer1 + " wins!";
+            player1Wins.GetComponent<Text>().text = namePlayer1 + " wins!";
         } else if (s1 < s2) {
             player1Wins.SetActive(false);
             player2Wins.SetActive(true);
             tie.SetActive(false);
 
-            player2Wins.GetComponent<GUIText>().text = namePlayer2 + " wins!";
+            player2Wins.GetComponent<Text>().text = namePlayer2 + " wins!";
         } else {
             player1Wins.SetActive(false);
             player2Wins.SetActive(false);
@@ -110,8 +123,8 @@ public class GameGUIManager : CoreComponent {
 
     // Sets the remaining time.
     public void SetTime(int time) {
-        string minutes = TimeToString(time % 60);
-        string seconds = TimeToString(time / 60);
+        string minutes = TimeToString(time / 60);
+        string seconds = TimeToString(time % 60);
 
         timeText.text = minutes + ":" + seconds;
     }
@@ -130,7 +143,9 @@ public class GameGUIManager : CoreComponent {
     private string TimeToString(int t) {
         string s = t.ToString();
 
-        if (s.Length > 1)
+        if (t < 0)
+            return "00";
+        else if (s.Length > 1)
             return s;
         else
             return "0" + s;
