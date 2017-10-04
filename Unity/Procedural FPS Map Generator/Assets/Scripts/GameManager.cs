@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 // The game manager manages the game, it passes itself to the player.
 
@@ -16,6 +17,8 @@ public class GameManager : CoreComponent {
     [SerializeField] private int gameDuration = 600;
     [SerializeField] private int readyDuration = 3;
     [SerializeField] private int scoreDuration = 10;
+
+    [SerializeField] private bool[] activeWeaponsPlayer;
 
     // Do I have to assemble the map?
     [SerializeField] private bool assembleMap = true;
@@ -77,11 +80,11 @@ public class GameManager : CoreComponent {
         switch (gamePhase) {
             case 0:
                 // Update the countdown.
-                gameGUIManagerScript.SetCountdown((int) (startTime + readyDuration - Time.time));
+                gameGUIManagerScript.SetCountdown((int)(startTime + readyDuration - Time.time));
                 break;
             case 1:
                 // Update the time.
-                gameGUIManagerScript.SetTime((int) (startTime + readyDuration + gameDuration - Time.time));
+                gameGUIManagerScript.SetTime((int)(startTime + readyDuration + gameDuration - Time.time));
                 break;
             case 2:
                 // Do nothing.
@@ -105,8 +108,9 @@ public class GameManager : CoreComponent {
             playerControllerScript.SetMovementEnabled(true);
             gameGUIManagerScript.SetPlayer1Kills(0);
             gameGUIManagerScript.SetPlayer2Kills(0);
+            gameGUIManagerScript.SetActiveWeapons(activeWeaponsPlayer);
+            gameGUIManagerScript.SetCurrentWeapon(getLowestActiveWeapon());
             gameGUIManagerScript.ActivateFigthGUI();
-            gameGUIManagerScript.SetCooldown(10);
             gamePhase = 1;
         } else if (gamePhase == 1 && passedTime >= readyDuration + gameDuration) {
             // Disable the player movement, activate the score GUI, set the winner and set the phase.
@@ -117,6 +121,34 @@ public class GameManager : CoreComponent {
         } else if (gamePhase == 2 && passedTime >= readyDuration + gameDuration + scoreDuration) {
             Application.Quit();
         }
+    }
+
+    // Returns the index of the lowest active weapon.
+    private int getLowestActiveWeapon() {
+        for (int i = 0; i < activeWeaponsPlayer.GetLength(0); i++) {
+            if (activeWeaponsPlayer[i])
+                return i;
+        }
+
+        return -1;
+    }
+
+    // GAME UI MANAGER FACADE METHODS //
+
+    // Sets the current weapon in the UI calling the UI method.
+    public void SetCurrentWeapon(int currentWeaponIndex) {
+        gameGUIManagerScript.SetCurrentWeapon(currentWeaponIndex);
+    }
+
+    // Starts the reloading cooldown in the UI.
+    public void StartCooldown(float duration) {
+        gameGUIManagerScript.SetCooldown(duration);
+
+    }
+
+    // Sets the color of the crosshair.
+    public void SetCrosshairNeutral(bool isNeutral) {
+        gameGUIManagerScript.SetCrosshairNeutral(isNeutral);
     }
 
 }

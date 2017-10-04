@@ -51,17 +51,17 @@ public class ObjectDisplacer : CoreComponent {
     public void DisplaceObjects(char[,] map, float squareSize, float height) {
         categoryObjectsDictionary.Clear();
         DestroyAllCustomObjects();
-    
+
         for (int x = 0; x < map.GetLength(0); x++) {
             for (int y = 0; y < map.GetLength(1); y++) {
                 if (charObjectsDictionary.ContainsKey(map[x, y])) {
                     CustomObject currentObject = charObjectsDictionary[map[x, y]].GetObject();
 
-                    GameObject childObject = (GameObject) Instantiate(currentObject.prefab);
+                    GameObject childObject = (GameObject)Instantiate(currentObject.prefab);
                     childObject.name = currentObject.prefab.name;
                     childObject.transform.parent = transform.Find(currentObject.category);
                     childObject.transform.localPosition = new Vector3(x * squareSize - map.GetLength(0) / 2,
-                        heightDirCorrection * (height + currentObject.heightCorrection), 
+                        heightDirCorrection * (height + currentObject.heightCorrection),
                         y * squareSize - map.GetLength(1) / 2);
                     childObject.transform.localScale *= sizeCorrection;
 
