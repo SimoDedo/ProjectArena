@@ -37,6 +37,20 @@ public class GameGUIManager : CoreComponent {
     private Text killsPlayer1Text;
     private Text killsPlayer2Text;
 
+    // Variables for the cooldawn.
+    private float remainingCooldown = 0f;
+    private bool mustCooldown = false;
+
+    private void Update() {
+        if (mustCooldown) {
+            if (remainingCooldown <= 0) {
+                mustCooldown = false;
+            } else {
+
+            }
+        }
+    }
+
     void Start() {
         healthText = health.GetComponent<Text>();
         ammoText = ammo.GetComponent<Text>();
