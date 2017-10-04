@@ -90,6 +90,7 @@
     <Compile Include="Assets\Scripts\Map Generation\SpawnPointManager.cs" />
     <Compile Include="Assets\Scripts\Objects\RotateTranslateByAxis.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerController.cs" />
+    <Compile Include="Assets\Scripts\Weapons\Firearm.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

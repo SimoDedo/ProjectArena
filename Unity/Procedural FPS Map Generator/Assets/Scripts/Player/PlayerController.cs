@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour {
     // Smoothing factor.
     [SerializeField] private float smoothing = 2.0f;
 
-    // Character controller.
+    // Player controller.
     private CharacterController controller;
 
     // Tracks the movement the mouse has made.
@@ -42,12 +42,12 @@ public class PlayerController : MonoBehaviour {
 
         if (movementEnabled) {
             UpdateCameraPosition();
-            UpdateCharacterPosition();
+            UpdatePlayerPosition();
         }
     }
 
-    // Updates the character position.
-    private void UpdateCharacterPosition() {
+    // Updates the player position.
+    private void UpdatePlayerPosition() {
         // If grounded I can jump, if I'm not grounded my movement is penalized.
         if (controller.isGrounded) {
             // Read the inputs.

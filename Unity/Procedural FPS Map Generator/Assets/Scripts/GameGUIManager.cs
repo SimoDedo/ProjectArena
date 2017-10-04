@@ -24,6 +24,9 @@ public class GameGUIManager : CoreComponent {
     [SerializeField] private GameObject player2Wins;
     [SerializeField] private GameObject tie;
 
+    // Cooldown circular bar.
+    [SerializeField] private GameObject cooldown;
+
     private string namePlayer1;
     private string namePlayer2;
 
@@ -38,18 +41,10 @@ public class GameGUIManager : CoreComponent {
     private Text killsPlayer2Text;
 
     // Variables for the cooldawn.
-    private float remainingCooldown = 0f;
+    private Image cooldownImage;
+    private float cooldownDuration = 0f;
+    private float cooldownStart = 0f;
     private bool mustCooldown = false;
-
-    private void Update() {
-        if (mustCooldown) {
-            if (remainingCooldown <= 0) {
-                mustCooldown = false;
-            } else {
-
-            }
-        }
-    }
 
     void Start() {
         healthText = health.GetComponent<Text>();
@@ -60,7 +55,21 @@ public class GameGUIManager : CoreComponent {
 
         countdownText = countdown.GetComponent<Text>();
 
+        cooldownImage = cooldown.GetComponent<Image>();
+
         SetReady(true);
+    }
+
+    private void Update() {
+        // Update the cooldown bar if needed.
+        if (mustCooldown) {
+            if (Time.time >= cooldownStart + cooldownDuration) {
+                cooldownImage.fillAmount = 0;
+                mustCooldown = false;
+            } else {
+                cooldownImage.fillAmount = (Time.time - cooldownStart) / cooldownDuration;
+            }
+        }
     }
 
     // Activates the ready GUI.
@@ -163,6 +172,13 @@ public class GameGUIManager : CoreComponent {
             return s;
         else
             return "0" + s;
+    }
+
+    // Sets the cooldown.
+    public void SetCooldown(float d) {
+        cooldownDuration = d;
+        cooldownStart = Time.time;
+        mustCooldown = true;
     }
 
 }

@@ -106,6 +106,7 @@ public class GameManager : CoreComponent {
             gameGUIManagerScript.SetPlayer1Kills(0);
             gameGUIManagerScript.SetPlayer2Kills(0);
             gameGUIManagerScript.ActivateFigthGUI();
+            gameGUIManagerScript.SetCooldown(10);
             gamePhase = 1;
         } else if (gamePhase == 1 && passedTime >= readyDuration + gameDuration) {
             // Disable the player movement, activate the score GUI, set the winner and set the phase.
