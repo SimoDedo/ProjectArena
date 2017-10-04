@@ -30,7 +30,7 @@ public class RotateTranslateByAxis : MonoBehaviour {
     private bool zBack = false;
     private bool yBack = false;
 
-    void Start () {
+    void Start() {
         limitMax.x = transform.position.x + xLength / 2;
         limitMin.x = transform.position.x - xLength / 2;
         limitMax.y = transform.position.y + yLength / 2;

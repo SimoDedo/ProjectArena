@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Firearm : MonoBehaviour {
+public class Gun : MonoBehaviour {
 
     [SerializeField] private Camera headCamera;
 
@@ -10,70 +10,69 @@ public class Firearm : MonoBehaviour {
     [SerializeField] private GameObject projectile;
 
     [SerializeField] private int damage = 10;
-    [SerializeField] private float range = 100f;
-    [SerializeField] private float dispersion = 100f;
+    [SerializeField] private float dispersion = 1;
     [SerializeField] private int projectilesPerShot = 1;
-    [SerializeField] private int chargerSize = 12;
-    [SerializeField] private int maximumAmmo = 60;
+    [SerializeField] private int chargerSize;
+    [SerializeField] private int maximumAmmo;
     [SerializeField] private float reloadTime = 1f;
     [SerializeField] private float cooldownTime = 0.1f;
 
     private GameObject projectileStorage;
     private List<GameObject> availableProjectiles;
 
+    // Variables to manage ammo.
     private int ammoInCharger;
     private int totalAmmo;
 
+    // Variables to manage cooldown and reload.
     private float cooldownStart;
     private float reloadStart;
     private bool coolingDown;
     private bool reloading;
 
-    private bool enemyDetected = false;
-
     private GameManager gameManagerScript;
 
-    private void Start() {
-        ammoInCharger = chargerSize;
-        totalAmmo = maximumAmmo / 2 - chargerSize;
-    }
-
     private void Update() {
-        UpdateCrosshair();
-
         if (reloading || coolingDown)
             UpdateTimers();
 
-        if (Input.GetButtonDown("Fire1") && CanShoot()) {
+        if (Input.GetButton("Fire1") && CanShoot()) {
             if (ammoInCharger > 0)
                 Shoot();
-            else if (CanReload())
-                Reload();
-        } else if (Input.GetButtonDown("Reload") && CanReload()) {
+        } else if ((Input.GetButtonDown("Fire1") && CanReload() && ammoInCharger == 0) || (Input.GetButtonDown("Reload") && CanReload())) {
             Reload();
         }
     }
 
-    private void OnDisable() {
-        // When I switch weapons I stop the reloading, but not the cooldown.
-        reloading = false;
+    // Shows the gun info in the UI:
+    public void Wield() {
+        // Set the ammo in the UI.
+        gameManagerScript.SetAmmo(ammoInCharger, totalAmmo);
+    }
 
-        // TODO - Update the UI.
+    // Hides the gun info from the UI.
+    private void Stow() {
+        // When I switch guns I stop the reloading, but not the cooldown.
+        reloading = false;
+        gameManagerScript.StopReloading();
     }
 
     // Ends the reload or the cooldown phases if possible. 
     private void UpdateTimers() {
         if (reloading) {
             if (Time.time > reloadStart + reloadTime) {
+                // Stop the reloading.
                 reloading = false;
-                if (totalAmmo >= chargerSize) {
+                // Update charger and total ammo count.
+                if (totalAmmo >= chargerSize - ammoInCharger) {
+                    totalAmmo -= chargerSize - ammoInCharger;
                     ammoInCharger = chargerSize;
-                    totalAmmo -= chargerSize;
                 } else {
-                    ammoInCharger = totalAmmo;
+                    ammoInCharger = ammoInCharger + totalAmmo;
                     totalAmmo = 0;
                 }
-
+                // Set the ammo in the UI.
+                gameManagerScript.SetAmmo(ammoInCharger, totalAmmo);
             }
         } else if (coolingDown) {
             if (Time.time > cooldownStart + cooldownTime)
@@ -81,11 +80,12 @@ public class Firearm : MonoBehaviour {
         }
     }
 
-    // Sets the game manager reference.
-    public void SetupFirearm(GameManager gms) {
+    // Sets the game manager reference, the ammo and updates them in the UI.
+    public void SetupGun(GameManager gms) {
         gameManagerScript = gms;
 
-        gameManagerScript.SetAmmo(ammoInCharger, totalAmmo);
+        ammoInCharger = chargerSize;
+        totalAmmo = maximumAmmo / 2 - chargerSize;
     }
 
     // I can reload when I have ammo left, my charger isn't full and I'm not reloading.
@@ -97,21 +97,6 @@ public class Firearm : MonoBehaviour {
     // ammo because I check it later in order to recharge if possible.
     private bool CanShoot() {
         return !reloading && !coolingDown;
-    }
-
-    // Updates the crosshair if an enemy is detected.
-    private void UpdateCrosshair() {
-        RaycastHit hit;
-
-        if (Physics.Raycast(headCamera.transform.position, headCamera.transform.forward, out hit, range)) {
-            if (hit.transform.root.tag == "Opponent" && !enemyDetected) {
-                // TODO: set the crosshair to red.
-                enemyDetected = true;
-            } else if (enemyDetected) {
-                // TODO: set the crosshair to white.
-                enemyDetected = false;
-            }
-        }
     }
 
     // Shots.

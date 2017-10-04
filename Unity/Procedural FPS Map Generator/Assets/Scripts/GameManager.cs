@@ -19,10 +19,7 @@ public class GameManager : CoreComponent {
     [SerializeField] private string playerName = "Player 1";
     [SerializeField] private string opponentName = "Player 2";
     [SerializeField] private int totalHealth = 100;
-    [SerializeField] private bool[] activeWeaponsPlayer;
-
-    // Do I have to assemble the map?
-    [SerializeField] private bool assembleMap = true;
+    [SerializeField] private bool[] activeGunsPlayer;
 
     private MapManager mapManagerScript;
     private SpawnPointManager spawnPointManagerScript;
@@ -53,21 +50,22 @@ public class GameManager : CoreComponent {
     private void Update() {
         if (!IsReady() && mapManagerScript.IsReady() && spawnPointManagerScript.IsReady() && gameGUIManagerScript.IsReady()) {
             // Generate the map.
-            mapManagerScript.ManageMap(assembleMap);
+            mapManagerScript.ManageMap(true);
 
-            if (assembleMap) {
-                // Set the spawn points.
-                spawnPointManagerScript.SetSpawnPoints(mapManagerScript.GetSpawnPoints());
+            // Set the spawn points.
+            spawnPointManagerScript.SetSpawnPoints(mapManagerScript.GetSpawnPoints());
 
-                // Setup the player.
-                playerControllerScript.SetupPlayer(totalHealth, activeWeaponsPlayer, this);
+            // Spawn the player and the opponent.
+            player.transform.position = spawnPointManagerScript.GetSpawnPosition() + Vector3.up * 3f;
+            opponent.transform.position = spawnPointManagerScript.GetSpawnPosition() + Vector3.up * 3f;
 
-                // Spawn the player and the opponent.
-                player.transform.position = spawnPointManagerScript.GetSpawnPosition() + Vector3.up * 3f;
-                opponent.transform.position = spawnPointManagerScript.GetSpawnPosition() + Vector3.up * 3f;
+            // Setup the UI.
+            gameGUIManagerScript.SetActiveGuns(activeGunsPlayer);
 
-                playerControllerScript.LockCursor();
-            }
+            // Setup the player.
+            playerControllerScript.SetupPlayer(totalHealth, activeGunsPlayer, this);
+
+            playerControllerScript.LockCursor();
 
             startTime = Time.time;
 
@@ -112,8 +110,6 @@ public class GameManager : CoreComponent {
             playerControllerScript.SetMovementEnabled(true);
             gameGUIManagerScript.SetPlayer1Kills(0);
             gameGUIManagerScript.SetPlayer2Kills(0);
-            gameGUIManagerScript.SetActiveWeapons(activeWeaponsPlayer);
-            gameGUIManagerScript.SetCurrentWeapon(getLowestActiveWeapon());
             gameGUIManagerScript.ActivateFigthGUI();
             gamePhase = 1;
         } else if (gamePhase == 1 && passedTime >= readyDuration + gameDuration) {
@@ -127,32 +123,17 @@ public class GameManager : CoreComponent {
         }
     }
 
-    // Returns the index of the lowest active weapon.
-    private int getLowestActiveWeapon() {
-        for (int i = 0; i < activeWeaponsPlayer.GetLength(0); i++) {
-            if (activeWeaponsPlayer[i])
-                return i;
-        }
-
-        return -1;
-    }
-
     // GAME UI MANAGER FACADE METHODS //
 
-    // Sets the current weapon in the UI calling the UI method.
-    public void SetCurrentWeapon(int currentWeaponIndex) {
-        gameGUIManagerScript.SetCurrentWeapon(currentWeaponIndex);
+    // Sets the current gun in the UI calling the UI method.
+    public void SetCurrentGun(int currentGunIndex) {
+        gameGUIManagerScript.SetCurrentGun(currentGunIndex);
     }
 
     // Starts the reloading cooldown in the UI.
     public void StartReloading(float duration) {
         gameGUIManagerScript.SetCooldown(duration);
 
-    }
-
-    // Sets the color of the crosshair.
-    public void SetCrosshairNeutral(bool isNeutral) {
-        gameGUIManagerScript.SetCrosshairNeutral(isNeutral);
     }
 
     // Stops the reloading.

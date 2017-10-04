@@ -6,8 +6,8 @@ public class PlayerController : MonoBehaviour {
     // Head object containing the camera.
     [SerializeField] private GameObject head;
 
-    // Weapons.
-    [SerializeField] private List<GameObject> weapons;
+    // Guns.
+    [SerializeField] private List<GameObject> guns;
 
     [SerializeField] private float speed = 10f;
     [SerializeField] private float jumpSpeed = 8f;
@@ -36,15 +36,15 @@ public class PlayerController : MonoBehaviour {
     private GameManager gameManagerScript;
 
     // Informations about the player.
-    private bool[] activeWeaponsPlayer;
+    private bool[] activeGunsPlayer;
     private int totalHealth;
     private int health;
 
-    private void Start () {
+    private void Start() {
         controller = GetComponent<CharacterController>();
     }
 
-    private void Update () {
+    private void Update() {
         // If the cursor should be locked but it isn't, lock it when the user clicks.
         if (Input.GetMouseButtonDown(0)) {
             if (cursorLocked && Cursor.lockState != CursorLockMode.Locked)
@@ -58,21 +58,21 @@ public class PlayerController : MonoBehaviour {
     }
 
     // Sets all the player parameters.
-    public void SetupPlayer(int th, bool[] awp, GameManager gms) {
+    public void SetupPlayer(int th, bool[] agp, GameManager gms) {
         totalHealth = th;
-        activeWeaponsPlayer = awp;
+        activeGunsPlayer = agp;
         gameManagerScript = gms;
 
-        for (int i = 0; i < awp.GetLength(0); i++) {
-            weapons[i].GetComponent<Firearm>().SetupFirearm(gms);
-
-            if (awp[i])
-                weapons[i].SetActive(true);
-            else
-                weapons[i].SetActive(false);
-        } 
-
-
+        for (int i = 0; i < agp.GetLength(0); i++) {
+            // Setup the gun.
+            guns[i].GetComponent<Gun>().SetupGun(gms);
+            // Activate it if is one among the active ones which has the lowest rank.
+            if (i == GetLowestActiveGun()) {
+                guns[i].SetActive(true);
+                guns[i].GetComponent<Gun>().Wield();
+                gameManagerScript.SetCurrentGun(i);
+            }
+        }
     }
 
     // Updates the player position.
@@ -129,7 +129,17 @@ public class PlayerController : MonoBehaviour {
     public void SetMovementEnabled(bool b) {
         movementEnabled = b;
 
-        // TODO - Disable/enable the weapons too.
+        // TODO - Disable/enable the guns too.
+    }
+
+    // Returns the index of the lowest active gun.
+    private int GetLowestActiveGun() {
+        for (int i = 0; i < activeGunsPlayer.GetLength(0); i++) {
+            if (activeGunsPlayer[i])
+                return i;
+        }
+
+        return -1;
     }
 
 }

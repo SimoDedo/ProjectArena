@@ -28,14 +28,9 @@ public class GameGUIManager : CoreComponent {
     // Cooldown circular bar.
     [SerializeField] private GameObject cooldown;
 
-    // Weapon elements in the figth UI.
-    [SerializeField] private GameObject[] weaponNumbers;
-    [SerializeField] private GameObject[] weapons;
-
-    // Elements for menaging the crosshair.
-    [SerializeField] private GameObject crosshair;
-    [SerializeField] private Color crosshairColorNeutral;
-    [SerializeField] private Color crosshairColorHostile;
+    // Gun elements in the figth UI.
+    [SerializeField] private GameObject[] gunNumbers;
+    [SerializeField] private GameObject[] guns;
 
     private string namePlayer1;
     private string namePlayer2;
@@ -191,31 +186,31 @@ public class GameGUIManager : CoreComponent {
         mustCooldown = true;
     }
 
-    // Sets the active weapons.
-    public void SetActiveWeapons(bool[] activeWeapons) {
-        DeactivateAllWeapons();
+    // Sets the active guns.
+    public void SetActiveGuns(bool[] activeGuns) {
+        DeactivateAllGuns();
 
-        for (int i = 0; i < activeWeapons.GetLength(0); i++) {
-            if (activeWeapons[i]) {
-                SetTextAlpha(weaponNumbers[i], 1);
+        for (int i = 0; i < activeGuns.GetLength(0); i++) {
+            if (activeGuns[i]) {
+                SetTextAlpha(gunNumbers[i], 1);
             } else
-                SetTextAlpha(weaponNumbers[i], 0.3f);
+                SetTextAlpha(gunNumbers[i], 0.3f);
         }
     }
 
-    // Sets the current weapon.
-    public void SetCurrentWeapon(int weaponIndex) {
-        for (int i = 0; i < weapons.GetLength(0); i++) {
-            if (i == weaponIndex)
-                weapons[i].SetActive(true);
+    // Sets the current gun.
+    public void SetCurrentGun(int gunIndex) {
+        for (int i = 0; i < guns.GetLength(0); i++) {
+            if (i == gunIndex)
+                guns[i].SetActive(true);
             else
-                weapons[i].SetActive(false);
+                guns[i].SetActive(false);
         }
     }
 
-    // Deactivates all weapons.
-    private void DeactivateAllWeapons() {
-        foreach (GameObject w in weapons) {
+    // Deactivates all guns.
+    private void DeactivateAllGuns() {
+        foreach (GameObject w in guns) {
             w.SetActive(false);
         }
     }
@@ -225,15 +220,6 @@ public class GameGUIManager : CoreComponent {
         Color c = gameObject.GetComponent<Text>().color;
         c.a = alpha;
         gameObject.GetComponent<Text>().color = c;
-    }
-
-    // Sets the color of the crosshair.
-    public void SetCrosshairNeutral(bool isNeutral) {
-        if (isNeutral)
-            crosshair.GetComponent<Image>().color = crosshairColorNeutral;
-        else
-            crosshair.GetComponent<Image>().color = crosshairColorHostile;
-
     }
 
     // Stops the reloading.
