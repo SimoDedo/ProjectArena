@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class GameGUIManager : CoreComponent {
@@ -233,6 +234,12 @@ public class GameGUIManager : CoreComponent {
         else
             crosshair.GetComponent<Image>().color = crosshairColorHostile;
 
+    }
+
+    // Stops the reloading.
+    public void StopReloading() {
+        cooldownImage.fillAmount = 1;
+        mustCooldown = false;
     }
 
 }

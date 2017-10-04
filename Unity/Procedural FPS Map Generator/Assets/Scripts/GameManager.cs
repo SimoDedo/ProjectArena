@@ -12,12 +12,13 @@ public class GameManager : CoreComponent {
     [SerializeField] private GameObject player;
     [SerializeField] private GameObject opponent;
 
-    [SerializeField] private string playerName = "Player 1";
-    [SerializeField] private string opponentName = "Player 2";
     [SerializeField] private int gameDuration = 600;
     [SerializeField] private int readyDuration = 3;
     [SerializeField] private int scoreDuration = 10;
 
+    [SerializeField] private string playerName = "Player 1";
+    [SerializeField] private string opponentName = "Player 2";
+    [SerializeField] private int totalHealth = 100;
     [SerializeField] private bool[] activeWeaponsPlayer;
 
     // Do I have to assemble the map?
@@ -57,6 +58,9 @@ public class GameManager : CoreComponent {
             if (assembleMap) {
                 // Set the spawn points.
                 spawnPointManagerScript.SetSpawnPoints(mapManagerScript.GetSpawnPoints());
+
+                // Setup the player.
+                playerControllerScript.SetupPlayer(totalHealth, activeWeaponsPlayer, this);
 
                 // Spawn the player and the opponent.
                 player.transform.position = spawnPointManagerScript.GetSpawnPosition() + Vector3.up * 3f;
@@ -141,7 +145,7 @@ public class GameManager : CoreComponent {
     }
 
     // Starts the reloading cooldown in the UI.
-    public void StartCooldown(float duration) {
+    public void StartReloading(float duration) {
         gameGUIManagerScript.SetCooldown(duration);
 
     }
@@ -149,6 +153,21 @@ public class GameManager : CoreComponent {
     // Sets the color of the crosshair.
     public void SetCrosshairNeutral(bool isNeutral) {
         gameGUIManagerScript.SetCrosshairNeutral(isNeutral);
+    }
+
+    // Stops the reloading.
+    public void StopReloading() {
+        gameGUIManagerScript.StopReloading();
+    }
+
+    // Sets the ammo in the charger.
+    public void SetAmmo(int charger, int total) {
+        gameGUIManagerScript.SetAmmo(charger, total);
+    }
+
+    // Sets the health.
+    public void SetHealth(int health, int tot) {
+        gameGUIManagerScript.SetHealth(health, tot);
     }
 
 }

@@ -5,6 +5,7 @@ using UnityEngine;
 public class Firearm : MonoBehaviour {
 
     [SerializeField] private Camera headCamera;
+
     [SerializeField] private GameObject muzzleFlash;
     [SerializeField] private GameObject projectile;
 
@@ -30,6 +31,8 @@ public class Firearm : MonoBehaviour {
 
     private bool enemyDetected = false;
 
+    private GameManager gameManagerScript;
+
     private void Start() {
         ammoInCharger = chargerSize;
         totalAmmo = maximumAmmo / 2 - chargerSize;
@@ -51,15 +54,38 @@ public class Firearm : MonoBehaviour {
         }
     }
 
+    private void OnDisable() {
+        // When I switch weapons I stop the reloading, but not the cooldown.
+        reloading = false;
+
+        // TODO - Update the UI.
+    }
+
     // Ends the reload or the cooldown phases if possible. 
     private void UpdateTimers() {
         if (reloading) {
-            if (Time.time > reloadStart + reloadTime)
+            if (Time.time > reloadStart + reloadTime) {
                 reloading = false;
+                if (totalAmmo >= chargerSize) {
+                    ammoInCharger = chargerSize;
+                    totalAmmo -= chargerSize;
+                } else {
+                    ammoInCharger = totalAmmo;
+                    totalAmmo = 0;
+                }
+
+            }
         } else if (coolingDown) {
             if (Time.time > cooldownStart + cooldownTime)
-                reloading = false;
+                coolingDown = false;
         }
+    }
+
+    // Sets the game manager reference.
+    public void SetupFirearm(GameManager gms) {
+        gameManagerScript = gms;
+
+        gameManagerScript.SetAmmo(ammoInCharger, totalAmmo);
     }
 
     // I can reload when I have ammo left, my charger isn't full and I'm not reloading.
@@ -90,16 +116,18 @@ public class Firearm : MonoBehaviour {
 
     // Shots.
     private void Shoot() {
-        // TODO: shoot.
+        ammoInCharger -= 1;
+        gameManagerScript.SetAmmo(ammoInCharger, totalAmmo);
+
+        // TODO - Spawn projectiles.
 
         SetCooldown();
     }
 
     // Reloads.
     private void Reload() {
-        // TODO: reload.
-
         SetReload();
+        gameManagerScript.StartReloading(reloadTime);
     }
 
     // Starts the cooldown phase.

@@ -1,9 +1,13 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
     // Head object containing the camera.
     [SerializeField] private GameObject head;
+
+    // Weapons.
+    [SerializeField] private List<GameObject> weapons;
 
     [SerializeField] private float speed = 10f;
     [SerializeField] private float jumpSpeed = 8f;
@@ -29,6 +33,13 @@ public class PlayerController : MonoBehaviour {
     // Is the movement enabled?
     private bool movementEnabled = false;
 
+    private GameManager gameManagerScript;
+
+    // Informations about the player.
+    private bool[] activeWeaponsPlayer;
+    private int totalHealth;
+    private int health;
+
     private void Start () {
         controller = GetComponent<CharacterController>();
     }
@@ -46,6 +57,24 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
+    // Sets all the player parameters.
+    public void SetupPlayer(int th, bool[] awp, GameManager gms) {
+        totalHealth = th;
+        activeWeaponsPlayer = awp;
+        gameManagerScript = gms;
+
+        for (int i = 0; i < awp.GetLength(0); i++) {
+            weapons[i].GetComponent<Firearm>().SetupFirearm(gms);
+
+            if (awp[i])
+                weapons[i].SetActive(true);
+            else
+                weapons[i].SetActive(false);
+        } 
+
+
+    }
+
     // Updates the player position.
     private void UpdatePlayerPosition() {
         // If grounded I can jump, if I'm not grounded my movement is penalized.
@@ -58,7 +87,7 @@ public class PlayerController : MonoBehaviour {
             if (Input.GetButton("Jump"))
                 moveDirection.y = jumpSpeed;
         } else {
-
+            // TODO - ???
         }
 
         // Apply gravity to the direction and appy it using the controller.
@@ -99,6 +128,8 @@ public class PlayerController : MonoBehaviour {
     // Enables/disables the movement.
     public void SetMovementEnabled(bool b) {
         movementEnabled = b;
+
+        // TODO - Disable/enable the weapons too.
     }
 
 }
