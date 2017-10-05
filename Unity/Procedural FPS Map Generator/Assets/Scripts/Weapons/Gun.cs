@@ -39,7 +39,9 @@ public class Gun : MonoBehaviour {
         if (Input.GetButton("Fire1") && CanShoot()) {
             if (ammoInCharger > 0)
                 Shoot();
-        } else if ((Input.GetButtonDown("Fire1") && CanReload() && ammoInCharger == 0) || (Input.GetButtonDown("Reload") && CanReload())) {
+            else if (CanReload())
+                Reload();
+        } else if (Input.GetButtonDown("Reload") && CanReload()) {
             Reload();
         }
     }
@@ -51,7 +53,7 @@ public class Gun : MonoBehaviour {
     }
 
     // Hides the gun info from the UI.
-    private void Stow() {
+    public void Stow() {
         // When I switch guns I stop the reloading, but not the cooldown.
         reloading = false;
         gameManagerScript.StopReloading();
@@ -93,8 +95,7 @@ public class Gun : MonoBehaviour {
         return totalAmmo > 0 && ammoInCharger < chargerSize && !reloading;
     }
 
-    // I can shoot when I'm not reloading and I'm not in cooldown. I do't check the 
-    // ammo because I check it later in order to recharge if possible.
+    // I can shoot when I'm not reloading and I'm not in cooldown.
     private bool CanShoot() {
         return !reloading && !coolingDown;
     }

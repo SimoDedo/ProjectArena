@@ -123,30 +123,28 @@ public class GameManager : CoreComponent {
         }
     }
 
-    // GAME UI MANAGER FACADE METHODS //
-
-    // Sets the current gun in the UI calling the UI method.
+    // FACADE METHOD - Sets the current gun in the UI calling the UI method.
     public void SetCurrentGun(int currentGunIndex) {
         gameGUIManagerScript.SetCurrentGun(currentGunIndex);
     }
 
-    // Starts the reloading cooldown in the UI.
+    // FACADE METHOD - Starts the reloading cooldown in the UI.
     public void StartReloading(float duration) {
         gameGUIManagerScript.SetCooldown(duration);
 
     }
 
-    // Stops the reloading.
+    // FACADE METHOD - Stops the reloading.
     public void StopReloading() {
         gameGUIManagerScript.StopReloading();
     }
 
-    // Sets the ammo in the charger.
+    // FACADE METHOD - Sets the ammo in the charger.
     public void SetAmmo(int charger, int total) {
         gameGUIManagerScript.SetAmmo(charger, total);
     }
 
-    // Sets the health.
+    // FACADE METHOD - Sets the health.
     public void SetHealth(int health, int tot) {
         gameGUIManagerScript.SetHealth(health, tot);
     }

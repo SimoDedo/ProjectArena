@@ -224,7 +224,7 @@ public class GameGUIManager : CoreComponent {
 
     // Stops the reloading.
     public void StopReloading() {
-        cooldownImage.fillAmount = 1;
+        cooldownImage.fillAmount = 0;
         mustCooldown = false;
     }
 

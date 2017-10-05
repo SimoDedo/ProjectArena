@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
@@ -39,6 +40,24 @@ public class PlayerController : MonoBehaviour {
     private bool[] activeGunsPlayer;
     private int totalHealth;
     private int health;
+    private int currentGun;
+
+    // Codes of the numeric keys.
+    private KeyCode[] keyCodes = {
+         KeyCode.Alpha1,
+         KeyCode.Alpha2,
+         KeyCode.Alpha3,
+         KeyCode.Alpha4,
+         KeyCode.Alpha5,
+         KeyCode.Alpha6,
+         KeyCode.Alpha7,
+         KeyCode.Alpha8,
+         KeyCode.Alpha9,
+     };
+
+    // Variables to slow down the gun switchig.
+    private float lastSwitched = 0f;
+    private float switchWait = 0.05f;
 
     private void Start() {
         controller = GetComponent<CharacterController>();
@@ -51,10 +70,79 @@ public class PlayerController : MonoBehaviour {
                 Cursor.lockState = CursorLockMode.Locked;
         }
 
+        // If I can move update the player position depending on the inputs.
         if (movementEnabled) {
             UpdateCameraPosition();
             UpdatePlayerPosition();
+            UpdatePlayerGun();
         }
+    }
+
+    // Switches weapon if possible.
+    private void UpdatePlayerGun() {
+        if (Time.time > lastSwitched + switchWait) {
+            if (Input.GetAxisRaw("Mouse ScrollWheel") > 0) {
+                SwitchGuns(currentGun, GetActiveGun(currentGun, true));
+            } else if (Input.GetAxisRaw("Mouse ScrollWheel") < 0) {
+                SwitchGuns(currentGun, GetActiveGun(currentGun, false));
+            } else {
+                for (int i = 0; i < guns.Count; i++) {
+                    if (i != currentGun && activeGunsPlayer[i] && Input.GetKeyDown(keyCodes[i])) {
+                        SwitchGuns(currentGun, i);
+                    }
+                }
+            }
+        }
+    }
+
+    // Returns the next or the previous active gun.
+    private int GetActiveGun(int currentGun, bool next) {
+        if (next) {
+            // Try for the guns after it
+            for (int i = currentGun + 1; i < guns.Count; i++) {
+                if (activeGunsPlayer[i])
+                    return i;
+            }
+            // Try for the guns before it
+            for (int i = 0; i < currentGun; i++) {
+                if (activeGunsPlayer[i])
+                    return i;
+            }
+            // There's no other gun, return itself.
+            return currentGun;
+        } else {
+            // Try for the guns before it
+            for (int i = currentGun - 1; i >= 0; i--) {
+                if (activeGunsPlayer[i])
+                    return i;
+            }
+            // Try for the guns after it
+            for (int i = guns.Count - 1; i > currentGun; i--) {
+                if (activeGunsPlayer[i])
+                    return i;
+            }
+            // There's no other gun, return itself.
+            return currentGun;
+        }
+    }
+
+    // Deactivates a gun and actiates another.
+    private void SwitchGuns(int toDeactivate, int toActivate) {
+        lastSwitched = Time.time;
+
+        if (toDeactivate != toActivate) {
+            guns[toDeactivate].GetComponent<Gun>().Stow();
+            guns[toDeactivate].SetActive(false);
+            ActivateGun(toActivate);
+        }
+    }
+
+    // Activates a gun.
+    private void ActivateGun(int toActivate) {
+        guns[toActivate].SetActive(true);
+        guns[toActivate].GetComponent<Gun>().Wield();
+        gameManagerScript.SetCurrentGun(toActivate);
+        currentGun = toActivate;
     }
 
     // Sets all the player parameters.
@@ -67,7 +155,8 @@ public class PlayerController : MonoBehaviour {
             // Setup the gun.
             guns[i].GetComponent<Gun>().SetupGun(gms);
             // Activate it if is one among the active ones which has the lowest rank.
-            if (i == GetLowestActiveGun()) {
+            if (i == GetActiveGun(0, true)) {
+                currentGun = i;
                 guns[i].SetActive(true);
                 guns[i].GetComponent<Gun>().Wield();
                 gameManagerScript.SetCurrentGun(i);
@@ -130,16 +219,6 @@ public class PlayerController : MonoBehaviour {
         movementEnabled = b;
 
         // TODO - Disable/enable the guns too.
-    }
-
-    // Returns the index of the lowest active gun.
-    private int GetLowestActiveGun() {
-        for (int i = 0; i < activeGunsPlayer.GetLength(0); i++) {
-            if (activeGunsPlayer[i])
-                return i;
-        }
-
-        return -1;
     }
 
 }
