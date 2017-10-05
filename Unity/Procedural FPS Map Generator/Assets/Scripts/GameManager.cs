@@ -26,6 +26,7 @@ public class GameManager : CoreComponent {
     private GameGUIManager gameGUIManagerScript;
 
     private PlayerController playerControllerScript;
+    private Opponent opponentScript;
 
     private int playerKillCount = 0;
     private int opponentKillCount = 0;
@@ -45,6 +46,7 @@ public class GameManager : CoreComponent {
         gameGUIManagerScript = gameGUIManager.GetComponent<GameGUIManager>();
 
         playerControllerScript = player.GetComponent<PlayerController>();
+        opponentScript = opponent.GetComponent<Opponent>();
     }
 
     private void Update() {
@@ -64,6 +66,8 @@ public class GameManager : CoreComponent {
 
             // Setup the player.
             playerControllerScript.SetupPlayer(totalHealth, activeGunsPlayer, this);
+            // Setup the opponent.
+            opponentScript.SetupOpponent(totalHealth, this);
 
             playerControllerScript.LockCursor();
 
@@ -73,6 +77,12 @@ public class GameManager : CoreComponent {
         } else if (IsReady()) {
             ManageGame();
         }
+    }
+
+    // Moves a gameobject to a free spawn point.
+    public void Respawn(GameObject g) {
+        g.transform.position = spawnPointManagerScript.GetSpawnPosition() + Vector3.up * 3f;
+        // TODO - Reset life with abstract method, manage wait, respawn counter, ecc.
     }
 
     // Manages the gamed depending on the current time.

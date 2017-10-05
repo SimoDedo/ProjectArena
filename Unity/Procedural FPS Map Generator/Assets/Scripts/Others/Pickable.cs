@@ -9,6 +9,9 @@ public abstract class Pickable : MonoBehaviour {
     protected float pickedUpTime = 0f;
     protected bool isActive = true;
 
+    protected float lastCheck = 0f;
+    protected float checkWait = 0.1f;
+
     protected bool defaultShaderSet = false;
 
     // Use this for initialization
@@ -23,13 +26,15 @@ public abstract class Pickable : MonoBehaviour {
         }
     }
 
-    protected void OnTriggerEnter(Collider other) {
+    protected void OnTriggerStay(Collider other) {
         // Menage the interaction with the player.
-        if (other.gameObject.tag == "Player") {
+        if (other.gameObject.tag == "Player" && Time.time > lastCheck + checkWait) {
             if (CanBePicked(other.gameObject) && isActive) {
                 PickUp(other.gameObject);
                 DeactivatePickable();
             }
+
+            lastCheck = Time.time;
         }
     }
 

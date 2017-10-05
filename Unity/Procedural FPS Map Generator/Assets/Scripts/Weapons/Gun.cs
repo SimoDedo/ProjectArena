@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class Gun : MonoBehaviour {
@@ -14,6 +13,8 @@ public class Gun : MonoBehaviour {
     [SerializeField] private int projectilesPerShot = 1;
     [SerializeField] private int chargerSize;
     [SerializeField] private int maximumAmmo;
+    [SerializeField] private bool limitRange = false;
+    [SerializeField] private float range = 100f;
     [SerializeField] private float reloadTime = 1f;
     [SerializeField] private float cooldownTime = 0.1f;
 
@@ -105,7 +106,21 @@ public class Gun : MonoBehaviour {
         ammoInCharger -= 1;
         gameManagerScript.SetAmmo(ammoInCharger, totalAmmo);
 
-        // TODO - Spawn projectiles.
+        RaycastHit hit;
+        if (limitRange) {
+            // TODO - Implement dispersion and projectilesPerShot here, changing #raycast and their direction.
+            if (Physics.Raycast(headCamera.transform.position, headCamera.transform.forward, out hit, range)) {
+                // TODO - abstract here!
+                Opponent opp = hit.transform.GetComponent<Opponent>();
+                if (opp != null)
+                    opp.TakeDamage(damage);
+            }
+        } else if (Physics.Raycast(headCamera.transform.position, headCamera.transform.forward, out hit)) {
+            // TODO - abstract here!
+            Opponent opp = hit.transform.GetComponent<Opponent>();
+            if (opp != null)
+                opp.TakeDamage(damage);
+        }
 
         SetCooldown();
     }

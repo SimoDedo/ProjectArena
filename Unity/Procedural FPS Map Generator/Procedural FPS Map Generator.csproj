@@ -88,10 +88,11 @@
     <Compile Include="Assets\Scripts\Map Generation\MapManager.cs" />
     <Compile Include="Assets\Scripts\Map Generation\ObjectDisplacer.cs" />
     <Compile Include="Assets\Scripts\Map Generation\SpawnPointManager.cs" />
-    <Compile Include="Assets\Scripts\Objects\AmmoPickable.cs" />
-    <Compile Include="Assets\Scripts\Objects\MedkitPickable.cs" />
-    <Compile Include="Assets\Scripts\Objects\Pickable.cs" />
-    <Compile Include="Assets\Scripts\Objects\RotateTranslateByAxis.cs" />
+    <Compile Include="Assets\Scripts\Others\AmmoPickable.cs" />
+    <Compile Include="Assets\Scripts\Others\MedkitPickable.cs" />
+    <Compile Include="Assets\Scripts\Others\Opponent.cs" />
+    <Compile Include="Assets\Scripts\Others\Pickable.cs" />
+    <Compile Include="Assets\Scripts\Others\RotateTranslateByAxis.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerController.cs" />
     <Compile Include="Assets\Scripts\Weapons\Gun.cs" />
   </ItemGroup>
