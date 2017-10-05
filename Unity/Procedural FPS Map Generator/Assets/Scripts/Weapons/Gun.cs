@@ -128,4 +128,20 @@ public class Gun : MonoBehaviour {
         reloading = true;
     }
 
+    // Tells if the gun has the maximum number of ammo.
+    public bool IsFull() {
+        return totalAmmo == maximumAmmo;
+    }
+
+    // Adds ammo.
+    public void AddAmmo(int amount) {
+        if (totalAmmo + amount < maximumAmmo)
+            totalAmmo += amount;
+        else
+            totalAmmo = maximumAmmo;
+
+        if (gameObject.activeSelf)
+            gameManagerScript.SetAmmo(ammoInCharger, totalAmmo);
+    }
+
 }

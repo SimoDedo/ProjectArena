@@ -2,13 +2,14 @@
 
 public class MedkitPickable : Pickable {
 
+    [SerializeField] private int restoredHealth = 50;
+
     protected override bool CanBePicked(GameObject player) {
-        // TODO
-        return true;
+        return !player.GetComponent<PlayerController>().IsHealthFull();
     }
 
     protected override void PickUp(GameObject player) {
-        // TODO
+        player.GetComponent<PlayerController>().Heal(restoredHealth);
     }
 
 }

@@ -147,9 +147,12 @@ public class PlayerController : MonoBehaviour {
 
     // Sets all the player parameters.
     public void SetupPlayer(int th, bool[] agp, GameManager gms) {
-        totalHealth = th;
         activeGunsPlayer = agp;
         gameManagerScript = gms;
+
+        totalHealth = th;
+        health = th;
+        gameManagerScript.SetHealth(health, totalHealth);
 
         for (int i = 0; i < agp.GetLength(0); i++) {
             // Setup the gun.
@@ -219,6 +222,38 @@ public class PlayerController : MonoBehaviour {
         movementEnabled = b;
 
         // TODO - Disable/enable the guns too.
+    }
+
+    // Tess if any of the weapons passed as parameters hasn't the maximum ammo.
+    public bool IsAnyEmpty(bool[] suppliedGuns) {
+        for (int i = 0; i < suppliedGuns.GetLength(0); i++) {
+            if (suppliedGuns[i] && activeGunsPlayer[i] && !guns[i].GetComponent<Gun>().IsFull())
+                return true;
+        }
+        return false;
+    }
+
+    // Increases the ammo of the available guns.
+    public void SupplyGuns(bool[] suppliedGuns, int[] ammoAmounts) {
+        for (int i = 0; i < suppliedGuns.GetLength(0); i++) {
+            if (suppliedGuns[i] && activeGunsPlayer[i] && !guns[i].GetComponent<Gun>().IsFull())
+                guns[i].GetComponent<Gun>().AddAmmo(ammoAmounts[i]);
+        }
+    }
+
+    // Tells if the player has full health.
+    public bool IsHealthFull() {
+        return totalHealth == health;
+    }
+
+    // Heals the player.
+    public void Heal(int restoredHealth) {
+        if (health + restoredHealth > totalHealth)
+            health = totalHealth;
+        else
+            health += restoredHealth;
+
+        gameManagerScript.SetHealth(health, totalHealth);
     }
 
 }

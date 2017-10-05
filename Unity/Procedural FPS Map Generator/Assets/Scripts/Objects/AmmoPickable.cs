@@ -2,13 +2,15 @@
 
 public class AmmoPickable : Pickable {
 
+    [SerializeField] private bool[] suppliedGuns;
+    [SerializeField] private int[] ammoAmounts;
+
     protected override bool CanBePicked(GameObject player) {
-        // TODO
-        return true;
+        return player.GetComponent<PlayerController>().IsAnyEmpty(suppliedGuns);
     }
 
     protected override void PickUp(GameObject player) {
-        // TODO
+        player.GetComponent<PlayerController>().SupplyGuns(suppliedGuns, ammoAmounts);
     }
 
 }

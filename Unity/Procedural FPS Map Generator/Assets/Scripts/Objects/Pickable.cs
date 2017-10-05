@@ -29,7 +29,7 @@ public abstract class Pickable : MonoBehaviour {
             if (CanBePicked(other.gameObject) && isActive) {
                 PickUp(other.gameObject);
                 DeactivatePickable();
-            }            
+            }
         }
     }
 
@@ -38,7 +38,7 @@ public abstract class Pickable : MonoBehaviour {
 
     // Gives to the player the content of the pickable.
     abstract protected void PickUp(GameObject player);
-    
+
     // Activates the pickable.
     protected void ActivatePickable() {
         pickable.SetActive(true);
