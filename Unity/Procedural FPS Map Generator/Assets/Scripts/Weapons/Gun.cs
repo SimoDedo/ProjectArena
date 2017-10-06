@@ -138,13 +138,13 @@ public class Gun : MonoBehaviour {
                 // TODO - abstract here!
                 Opponent opp = hit.transform.GetComponent<Opponent>();
                 if (opp != null)
-                    opp.TakeDamage(damage);
+                    opp.TakeDamage(damage, ownerEntityScript.GetID());
             }
         } else if (Physics.Raycast(headCamera.transform.position, headCamera.transform.forward, out hit)) {
             // TODO - abstract here!
             Opponent opp = hit.transform.GetComponent<Opponent>();
             if (opp != null)
-                opp.TakeDamage(damage);
+                opp.TakeDamage(damage, ownerEntityScript.GetID());
         }
 
         SetCooldown();

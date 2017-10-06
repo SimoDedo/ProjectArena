@@ -93,7 +93,6 @@
     <Compile Include="Assets\Scripts\Map Generation\Map Generator\CellularMapGenerator.cs" />
     <Compile Include="Assets\Scripts\Map Generation\Map Generator\MapGenerator.cs" />
     <Compile Include="Assets\Scripts\Map Generation\ObjectDisplacer.cs" />
-    <Compile Include="Assets\Scripts\NewBehaviourScript.cs" />
     <Compile Include="Assets\Scripts\Others\RotateTranslateByAxis.cs" />
     <Compile Include="Assets\Scripts\UI\GameUIManager.cs" />
     <Compile Include="Assets\Scripts\UI\GunUIManager.cs" />

@@ -35,6 +35,9 @@ public class GameManager : CoreComponent {
     private int playerKillCount = 0;
     private int opponentKillCount = 0;
 
+    private int playerID = 1;
+    private int opponentID = 2;
+
     // Time at which the game started.
     private float startTime;
     // Current phase of the game: 0 = ready, 1 = figth, 2 = score.
@@ -66,8 +69,8 @@ public class GameManager : CoreComponent {
             Spawn(opponent);
 
             // Setup the contenders.
-            playerScript.SetupEntity(totalHealthPlayer, activeGunsPlayer, this);
-            opponentScript.SetupEntity(totalHealthOpponent, activeGunsOpponent, this);
+            playerScript.SetupEntity(totalHealthPlayer, activeGunsPlayer, this, playerID);
+            opponentScript.SetupEntity(totalHealthOpponent, activeGunsOpponent, this, opponentID);
 
             playerScript.LockCursor();
 
@@ -129,8 +132,7 @@ public class GameManager : CoreComponent {
             // Enable the contenders movement and interactions, activate the figth UI, set the kills to zero and set the phase.
             playerScript.SetInGame(true);
             opponentScript.SetInGame(true);
-            gameUIManagerScript.SetPlayer1Kills(0);
-            gameUIManagerScript.SetPlayer2Kills(0);
+            gameUIManagerScript.SetKills(0, 0);
             gameUIManagerScript.ActivateFigthUI();
             gamePhase = 1;
         } else if (gamePhase == 1 && passedTime >= readyDuration + gameDuration) {
@@ -143,6 +145,25 @@ public class GameManager : CoreComponent {
         } else if (gamePhase == 2 && passedTime >= readyDuration + gameDuration + scoreDuration) {
             Application.Quit();
         }
+    }
+
+    // Adds a kill to the kill counters.
+    public void AddKill(int killerIdentifier, int killedID) {
+        if (killerIdentifier == killedID) {
+            if (killerIdentifier == playerID)
+                playerKillCount--;
+            else
+                opponentKillCount--;
+        } else {
+            if (killerIdentifier == playerID)
+                playerKillCount++;
+            else
+                opponentKillCount++;
+        }
+
+        Debug.Log(playerKillCount + "/" + opponentKillCount);
+
+        gameUIManagerScript.SetKills(playerKillCount, opponentKillCount);
     }
 
 }

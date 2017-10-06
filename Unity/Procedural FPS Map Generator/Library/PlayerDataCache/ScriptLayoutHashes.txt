@@ -48,7 +48,7 @@ c63db43c730fa2cbb8ca07de15898cb6 UnityEngine.UI.dll:UnityEngine.UI.Toggle
 f61c0793411f10cf5fbfa1473fef5ef2 UnityEngine.UI.dll:UnityEngine.UI.ToggleGroup
 86d36c43c53541d667100dc90b89cfba UnityEngine.UI.dll:UnityEngine.EventSystems.TouchInputModule
 1b8c02d0aa82fbf036a2b9b2d713eec3 UnityEngine.UI.dll:UnityEngine.UI.VerticalLayoutGroup
-c4bc1692944b0ad73668b0e2f6271c51 Assembly-CSharp.dll:.GameUIManager
+a64d886e5e66a368aa74841def66efe9 Assembly-CSharp.dll:.GameUIManager
 a35dc9cca2faebc5f5f1aeb9e8e47bbe UnityEngine.UI.dll:UnityEngine.UI.AspectRatioFitter
 05524b8f659e7bfe5756d1335fec24ba UnityEngine.UI.dll:UnityEngine.EventSystems.BaseInput
 49cd62a578efc0a599b810a2b66cd49c UnityEngine.UI.dll:UnityEngine.UI.Button
@@ -108,12 +108,15 @@ e9bdabf9265d758d56f01bb188916fa8 UnityEngine.Networking.dll:UnityEngine.Networki
 3f32f08a64daf40b09ed864d96fe3840 UnityEngine.Networking.dll:UnityEngine.Networking.NetworkTransform
 73843688b51256aed059f049c540bca8 UnityEngine.Networking.dll:UnityEngine.Networking.NetworkTransformChild
 528ea1fd7c01796fc60c4e2f172ea229 UnityEngine.Networking.dll:UnityEngine.Networking.NetworkTransformVisualizer
+05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.RaycastGun
+6e139d667b8e73a7fd0400786eb7bda2 Assembly-CSharp.dll:.GunUIManager
 299a183d8fac3cd79eb0c4159d34c91d Assembly-CSharp.dll:.MapManager
 bc68edb0af574bf79f9550ead8ebae5c UnityEngine.HoloLens.dll:UnityEngine.Audio.AudioSpatializerMicrosoft
 05524b8f659e7bfe5756d1335fec24ba UnityEngine.HoloLens.dll:UnityEngine.EventSystems.HoloLensInput
 463516d5b5fe8e67a0a24c48f2095b04 UnityEngine.HoloLens.dll:UnityEngine.EventSystems.HoloLensInputModule
 c2275a8bfbb9f9942cad75ecdfded41d UnityEngine.HoloLens.dll:UnityEngine.VR.WSA.SpatialMappingCollider
 45f3431f0103c41611e8d4eec3d439df UnityEngine.HoloLens.dll:UnityEngine.VR.WSA.SpatialMappingRenderer
+05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.ProjectileGun
 8050733a6b44be80cf4065504de9bee3 Assembly-CSharp.dll:.RotateTranslateByAxis
 de14fb4c9a47c578229ef69eb0a2eea9 Assembly-CSharp.dll:.Opponent
 fc1e0f4d8439d9928083474691511a13 UnityEngine.Networking.dll:UnityEngine.Networking.NetworkAnimator
@@ -139,11 +142,7 @@ bc68edb0af574bf79f9550ead8ebae5c UnityEngine.HoloLens.dll:UnityEngine.Audio.Audi
 463516d5b5fe8e67a0a24c48f2095b04 UnityEngine.HoloLens.dll:UnityEngine.EventSystems.HoloLensInputModule
 c2275a8bfbb9f9942cad75ecdfded41d UnityEngine.HoloLens.dll:UnityEngine.VR.WSA.SpatialMappingCollider
 45f3431f0103c41611e8d4eec3d439df UnityEngine.HoloLens.dll:UnityEngine.VR.WSA.SpatialMappingRenderer
+db09acdeda3d1fa2cb6928739bfe3d49 Assembly-CSharp.dll:.PlayerUIManager
 39c5a54e069727b506e198eb4139bddc Assembly-CSharp.dll:.Gun
 b55816a6fd9ce267ac29c83e0a3540a4 Assembly-CSharp.dll:.MeshMapAssembler
 7fcbaffa2f5bb2d6df1c62b0891e002e Assembly-CSharp.dll:.GameManager
-05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.NewBehaviourScript
-05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.RaycastGun
-05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.ProjectileGun
-6e139d667b8e73a7fd0400786eb7bda2 Assembly-CSharp.dll:.GunUIManager
-db09acdeda3d1fa2cb6928739bfe3d49 Assembly-CSharp.dll:.PlayerUIManager

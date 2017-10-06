@@ -10,30 +10,33 @@ public abstract class Entity : MonoBehaviour {
     protected bool[] activeGuns;
     protected int totalHealth;
     protected int health;
+    protected int entityID;
     protected int currentGun;
     protected bool inGame = false;
 
     protected GameManager gameManagerScript;
 
     // Sets all the entity parameters.
-    public abstract void SetupEntity(int th, bool[] ag, GameManager gms);
+    public abstract void SetupEntity(int th, bool[] ag, GameManager gms, int id);
 
     // Applies damage to the entity and eventually manages its death.
-    public void TakeDamage(int damage) {
-        health -= damage;
+    public void TakeDamage(int damage, int killerID) {
+        if (inGame) {
+            health -= damage;
 
-        // If the health goes under 0, kill the entity and start the respawn process.
-        if (health <= 0f) {
-            health = 0;
-            // Kill the entity.
-            Die();
-            // Start the respawn process.
-            StartCoroutine(gameManagerScript.WaitForRespawn(gameObject, this));
+            // If the health goes under 0, kill the entity and start the respawn process.
+            if (health <= 0f) {
+                health = 0;
+                // Kill the entity.
+                Die(killerID);
+                // Start the respawn process.
+                StartCoroutine(gameManagerScript.WaitForRespawn(gameObject, this));
+            }
         }
     }
 
     // Kills the entity.
-    protected abstract void Die();
+    protected abstract void Die(int id);
 
     // Respawn the entity.
     public abstract void Respawn();
@@ -103,5 +106,19 @@ public abstract class Entity : MonoBehaviour {
 
     // Sets if the entity is in game, i.e. if it can move, shoot, interact with object and be hitten.
     abstract public void SetInGame(bool b);
+
+    // Returns the ID of the entity.
+    public int GetID() {
+        return entityID;
+    }
+
+    // Hides/shows the meshe.
+    protected void SetMeshVisible(Transform father, bool isVisible) {
+        foreach (Transform children in father) {
+            if (children.GetComponent<MeshRenderer>())
+                children.GetComponent<MeshRenderer>().enabled = isVisible;
+            SetMeshVisible(children, isVisible);
+        }
+    }
 
 }

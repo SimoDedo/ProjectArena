@@ -1,12 +1,13 @@
 ﻿public class Opponent : Entity {
 
     // Sets up all the player parameter and does the same with all its guns.
-    public override void SetupEntity(int th, bool[] ag, GameManager gms) {
+    public override void SetupEntity(int th, bool[] ag, GameManager gms, int id) {
         activeGuns = ag;
         gameManagerScript = gms;
 
         totalHealth = th;
         health = th;
+        entityID = id;
 
         for (int i = 0; i < ag.GetLength(0); i++) {
             // Setup the gun.
@@ -20,7 +21,8 @@
     }
 
     // Kills the opponent.
-    protected override void Die() {
+    protected override void Die(int id) {
+        gameManagerScript.AddKill(id, entityID);
         SetInGame(false);
     }
 
@@ -32,12 +34,7 @@
 
     // Sets if the opponent is in game.
     public override void SetInGame(bool b) {
-        if (b) {
-            // TODO - Show the mesh.
-        } else {
-            // Hide the mesh.
-        }
-
+        SetMeshVisible(transform, b);
         inGame = b;
     }
 

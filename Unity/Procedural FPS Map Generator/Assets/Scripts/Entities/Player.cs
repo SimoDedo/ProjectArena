@@ -68,12 +68,13 @@ public class Player : Entity {
     }
 
     // Sets up all the player parameter and does the same with all its guns.
-    public override void SetupEntity(int th, bool[] ag, GameManager gms) {
+    public override void SetupEntity(int th, bool[] ag, GameManager gms, int id) {
         activeGuns = ag;
         gameManagerScript = gms;
-
+    
         totalHealth = th;
         health = th;
+        entityID = id;
 
         playerUIManagerScript.SetActiveGuns(ag);
 
@@ -89,7 +90,8 @@ public class Player : Entity {
     }
 
     // Kills the player.
-    protected override void Die() {
+    protected override void Die(int id) {
+        gameManagerScript.AddKill(id, entityID);
         SetInGame(false);
     }
 
