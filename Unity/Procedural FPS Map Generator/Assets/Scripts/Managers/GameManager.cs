@@ -161,8 +161,6 @@ public class GameManager : CoreComponent {
                 opponentKillCount++;
         }
 
-        Debug.Log(playerKillCount + "/" + opponentKillCount);
-
         gameUIManagerScript.SetKills(playerKillCount, opponentKillCount);
     }
 

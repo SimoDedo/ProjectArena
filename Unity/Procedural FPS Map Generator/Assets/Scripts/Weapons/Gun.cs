@@ -135,13 +135,11 @@ public class Gun : MonoBehaviour {
         if (limitRange) {
             // TODO - Implement dispersion and projectilesPerShot here, changing #raycast and their direction.
             if (Physics.Raycast(headCamera.transform.position, headCamera.transform.forward, out hit, range)) {
-                // TODO - abstract here!
                 Opponent opp = hit.transform.GetComponent<Opponent>();
                 if (opp != null)
                     opp.TakeDamage(damage, ownerEntityScript.GetID());
             }
         } else if (Physics.Raycast(headCamera.transform.position, headCamera.transform.forward, out hit)) {
-            // TODO - abstract here!
             Opponent opp = hit.transform.GetComponent<Opponent>();
             if (opp != null)
                 opp.TakeDamage(damage, ownerEntityScript.GetID());
