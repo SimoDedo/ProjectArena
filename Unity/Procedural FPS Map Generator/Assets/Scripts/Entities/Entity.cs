@@ -16,26 +16,7 @@ public abstract class Entity : MonoBehaviour {
     protected GameManager gameManagerScript;
 
     // Sets all the entity parameters.
-    public void SetupEntity(int th, bool[] agp, GameManager gms) {
-        activeGuns = agp;
-        gameManagerScript = gms;
-
-        totalHealth = th;
-        health = th;
-        gameManagerScript.SetHealth(health, totalHealth);
-
-        for (int i = 0; i < agp.GetLength(0); i++) {
-            // Setup the gun.
-            guns[i].GetComponent<Gun>().SetupGun(gms);
-            // Activate it if is one among the active ones which has the lowest rank.
-            if (i == GetActiveGun(0, true)) {
-                currentGun = i;
-                guns[i].SetActive(true);
-                guns[i].GetComponent<Gun>().Wield();
-                gameManagerScript.SetCurrentGun(i);
-            }
-        }
-    }
+    public abstract void SetupEntity(int th, bool[] ag, GameManager gms);
 
     // Applies damage to the entity and eventually manages its death.
     public void TakeDamage(int damage) {
@@ -99,8 +80,6 @@ public abstract class Entity : MonoBehaviour {
             health = totalHealth;
         else
             health += restoredHealth;
-
-        gameManagerScript.SetHealth(health, totalHealth);
     }
 
     // If the entity is enabled, tells if any of the weapons passed as parameters hasn't the maximum ammo.

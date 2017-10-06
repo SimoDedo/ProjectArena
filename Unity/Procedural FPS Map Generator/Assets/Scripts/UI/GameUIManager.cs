@@ -11,14 +11,9 @@ public class GameUIManager : CoreComponent {
 
     // Elements of the figth UI.
     [Header("Figth UI")] [SerializeField] private GameObject figthUI;
-    [SerializeField] private GameObject health;
-    [SerializeField] private GameObject ammo;
     [SerializeField] private GameObject time;
     [SerializeField] private GameObject killsPlayer1;
     [SerializeField] private GameObject killsPlayer2;
-    [SerializeField] private GameObject cooldown;
-    [SerializeField] private GameObject[] gunNumbers;
-    [SerializeField] private GameObject[] guns;
 
     // Elements of the score UI.
     [Header("Score UI")] [SerializeField] private GameObject scoreUI;
@@ -33,42 +28,18 @@ public class GameUIManager : CoreComponent {
     private Text countdownText;
 
     // Text fields of the figth UI.
-    private Text healthText;
-    private Text ammoText;
     private Text timeText;
     private Text killsPlayer1Text;
     private Text killsPlayer2Text;
 
-    // Variables for the cooldawn.
-    private Image cooldownImage;
-    private float cooldownDuration = 0f;
-    private float cooldownStart = 0f;
-    private bool mustCooldown = false;
-
     void Start() {
-        healthText = health.GetComponent<Text>();
-        ammoText = ammo.GetComponent<Text>();
         timeText = time.GetComponent<Text>();
         killsPlayer1Text = killsPlayer1.GetComponent<Text>();
         killsPlayer2Text = killsPlayer2.GetComponent<Text>();
 
         countdownText = countdown.GetComponent<Text>();
 
-        cooldownImage = cooldown.GetComponent<Image>();
-
         SetReady(true);
-    }
-
-    private void Update() {
-        // Update the cooldown bar if needed.
-        if (mustCooldown) {
-            if (Time.time >= cooldownStart + cooldownDuration) {
-                cooldownImage.fillAmount = 0;
-                mustCooldown = false;
-            } else {
-                cooldownImage.fillAmount = (Time.time - cooldownStart) / cooldownDuration;
-            }
-        }
     }
 
     // Activates the ready UI.
@@ -133,16 +104,6 @@ public class GameUIManager : CoreComponent {
         }
     }
 
-    // Sets the health.
-    public void SetHealth(int health, int tot) {
-        healthText.text = health.ToString() + "/" + tot.ToString();
-    }
-
-    // Sets the ammo.
-    public void SetAmmo(int charger, int tot) {
-        ammoText.text = charger.ToString() + "/" + tot.ToString();
-    }
-
     // Sets the remaining time.
     public void SetTime(int time) {
         string minutes = TimeToString(time / 60);
@@ -171,55 +132,6 @@ public class GameUIManager : CoreComponent {
             return s;
         else
             return "0" + s;
-    }
-
-    // Sets the cooldown.
-    public void SetCooldown(float d) {
-        cooldownDuration = d;
-        cooldownStart = Time.time;
-        mustCooldown = true;
-    }
-
-    // Sets the active guns.
-    public void SetActiveGuns(bool[] activeGuns) {
-        DeactivateAllGuns();
-
-        for (int i = 0; i < activeGuns.GetLength(0); i++) {
-            if (activeGuns[i]) {
-                SetTextAlpha(gunNumbers[i], 1);
-            } else
-                SetTextAlpha(gunNumbers[i], 0.3f);
-        }
-    }
-
-    // Sets the current gun.
-    public void SetCurrentGun(int gunIndex) {
-        for (int i = 0; i < guns.GetLength(0); i++) {
-            if (i == gunIndex)
-                guns[i].SetActive(true);
-            else
-                guns[i].SetActive(false);
-        }
-    }
-
-    // Deactivates all guns.
-    private void DeactivateAllGuns() {
-        foreach (GameObject w in guns) {
-            w.SetActive(false);
-        }
-    }
-
-    // Sets the alpha of the text in the parameter object.
-    private void SetTextAlpha(GameObject gameObject, float alpha) {
-        Color c = gameObject.GetComponent<Text>().color;
-        c.a = alpha;
-        gameObject.GetComponent<Text>().color = c;
-    }
-
-    // Stops the reloading.
-    public void StopReloading() {
-        cooldownImage.fillAmount = 0;
-        mustCooldown = false;
     }
 
 }

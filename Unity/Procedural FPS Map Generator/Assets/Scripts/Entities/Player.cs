@@ -28,6 +28,8 @@ public class Player : Entity {
     // Is the cursor locked?
     private bool cursorLocked = false;
 
+    private PlayerUIManager playerUIManagerScript;
+
     // Codes of the numeric keys.
     private KeyCode[] keyCodes = {
          KeyCode.Alpha1,
@@ -47,6 +49,7 @@ public class Player : Entity {
 
     private void Start() {
         controller = GetComponent<CharacterController>();
+        playerUIManagerScript = GetComponent<PlayerUIManager>();
     }
 
     private void Update() {
@@ -61,6 +64,27 @@ public class Player : Entity {
             UpdateCameraPosition();
             UpdatePosition();
             UpdateGun();
+        }
+    }
+
+    // Sets up all the player parameter and does the same with all its guns.
+    public override void SetupEntity(int th, bool[] ag, GameManager gms) {
+        activeGuns = ag;
+        gameManagerScript = gms;
+
+        totalHealth = th;
+        health = th;
+
+        playerUIManagerScript.SetActiveGuns(ag);
+
+        for (int i = 0; i < ag.GetLength(0); i++) {
+            // Setup the gun.
+            guns[i].GetComponent<Gun>().SetupGun(gms, this, playerUIManagerScript);
+            // Activate it if is one among the active ones which has the lowest rank.
+            if (i == GetActiveGun(0, true)) {
+                currentGun = i;
+                guns[i].SetActive(true);
+            }
         }
     }
 
@@ -97,8 +121,7 @@ public class Player : Entity {
         lastSwitched = Time.time;
 
         if (toDeactivate != toActivate) {
-            guns[toDeactivate].GetComponent<Gun>().Stow();
-            guns[toDeactivate].SetActive(false);
+            DeactivateGun(toDeactivate);
             ActivateGun(toActivate);
         }
     }
@@ -106,9 +129,13 @@ public class Player : Entity {
     // Activates a gun.
     private void ActivateGun(int toActivate) {
         guns[toActivate].SetActive(true);
-        guns[toActivate].GetComponent<Gun>().Wield();
-        gameManagerScript.SetCurrentGun(toActivate);
         currentGun = toActivate;
+    }
+
+    // Deactivates a gun.
+    private void DeactivateGun(int toDeactivate) {
+        guns[toDeactivate].GetComponent<Gun>().Stow();
+        guns[toDeactivate].SetActive(false);
     }
 
     // Updates the position.
@@ -164,9 +191,11 @@ public class Player : Entity {
     // TODO - Sets if the player is in game.
     public override void SetInGame(bool b) {
         if (b) {
-            // TODO - Show the mesh, show player interface, show gun.
+            playerUIManagerScript.SetPlayerUIVisible(true);
+            ActivateGun(currentGun);
         } else {
-            // TODO - Hide the mesh, hide player interface, hide gun.
+            playerUIManagerScript.SetPlayerUIVisible(false);
+            DeactivateGun(currentGun);
         }
 
         inGame = b;

@@ -86,7 +86,6 @@
     <Compile Include="Assets\Scripts\Interactables\MedkitPickable.cs" />
     <Compile Include="Assets\Scripts\Interactables\Pickable.cs" />
     <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
-    <Compile Include="Assets\Scripts\Managers\GameUIManager.cs" />
     <Compile Include="Assets\Scripts\Managers\MapManager.cs" />
     <Compile Include="Assets\Scripts\Managers\SpawnPointManager.cs" />
     <Compile Include="Assets\Scripts\Map Generation\Map Assembler\MapAssembler.cs" />
@@ -94,8 +93,14 @@
     <Compile Include="Assets\Scripts\Map Generation\Map Generator\CellularMapGenerator.cs" />
     <Compile Include="Assets\Scripts\Map Generation\Map Generator\MapGenerator.cs" />
     <Compile Include="Assets\Scripts\Map Generation\ObjectDisplacer.cs" />
+    <Compile Include="Assets\Scripts\NewBehaviourScript.cs" />
     <Compile Include="Assets\Scripts\Others\RotateTranslateByAxis.cs" />
+    <Compile Include="Assets\Scripts\UI\GameUIManager.cs" />
+    <Compile Include="Assets\Scripts\UI\GunUIManager.cs" />
+    <Compile Include="Assets\Scripts\UI\PlayerUIManager.cs" />
     <Compile Include="Assets\Scripts\Weapons\Gun.cs" />
+    <Compile Include="Assets\Scripts\Weapons\ProjectileGun.cs" />
+    <Compile Include="Assets\Scripts\Weapons\RaycastGun.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

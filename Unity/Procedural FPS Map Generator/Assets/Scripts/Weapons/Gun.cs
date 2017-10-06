@@ -3,12 +3,11 @@ using UnityEngine;
 
 public class Gun : MonoBehaviour {
 
-    [SerializeField] private Camera headCamera;
-
+    [Header("Objects")] [SerializeField] private Camera headCamera;
     [SerializeField] private GameObject muzzleFlash;
     [SerializeField] private GameObject projectile;
 
-    [SerializeField] private int damage = 10;
+    [Header("Gun parameters")] [SerializeField] private int damage = 10;
     [SerializeField] private float dispersion = 1;
     [SerializeField] private int projectilesPerShot = 1;
     [SerializeField] private int chargerSize;
@@ -17,6 +16,8 @@ public class Gun : MonoBehaviour {
     [SerializeField] private float range = 100f;
     [SerializeField] private float reloadTime = 1f;
     [SerializeField] private float cooldownTime = 0.1f;
+
+    [Header("Gun UI")] [SerializeField] private bool hasUI = false;
 
     private GameObject projectileStorage;
     private List<GameObject> availableProjectiles;
@@ -32,6 +33,9 @@ public class Gun : MonoBehaviour {
     private bool reloading;
 
     private GameManager gameManagerScript;
+    private GunUIManager gunUIManagerScript;
+    private PlayerUIManager playerUIManagerScript;
+    private Entity ownerEntityScript;
 
     private void Update() {
         if (reloading || coolingDown)
@@ -47,17 +51,13 @@ public class Gun : MonoBehaviour {
         }
     }
 
-    // Shows the gun info in the UI:
-    public void Wield() {
-        // Set the ammo in the UI.
-        gameManagerScript.SetAmmo(ammoInCharger, totalAmmo);
-    }
-
-    // Hides the gun info from the UI.
+    // Stops reloading.
     public void Stow() {
         // When I switch guns I stop the reloading, but not the cooldown.
         reloading = false;
-        gameManagerScript.StopReloading();
+
+        if (hasUI)
+            playerUIManagerScript.StopReloading();
     }
 
     // Ends the reload or the cooldown phases if possible. 
@@ -75,7 +75,8 @@ public class Gun : MonoBehaviour {
                     totalAmmo = 0;
                 }
                 // Set the ammo in the UI.
-                gameManagerScript.SetAmmo(ammoInCharger, totalAmmo);
+                if (hasUI)
+                    gunUIManagerScript.SetAmmo(ammoInCharger, totalAmmo);
             }
         } else if (coolingDown) {
             if (Time.time > cooldownStart + cooldownTime)
@@ -83,12 +84,34 @@ public class Gun : MonoBehaviour {
         }
     }
 
-    // Sets the game manager reference, the ammo and updates them in the UI.
-    public void SetupGun(GameManager gms) {
+    // Called by player, sets references to the game manager, to the player script itself and to the player UI.
+    public void SetupGun(GameManager gms, Entity e, PlayerUIManager puims) {
         gameManagerScript = gms;
+        ownerEntityScript = e;
+        playerUIManagerScript = puims;
 
         ammoInCharger = chargerSize;
         totalAmmo = maximumAmmo / 2 - chargerSize;
+
+        if (hasUI) {
+            gunUIManagerScript = GetComponent<GunUIManager>();
+            gunUIManagerScript.SetAmmo(ammoInCharger, totalAmmo);
+        }
+    }
+
+    // Called by the opponent, sets references to the game manager and to the player script itself.
+    public void SetupGun(GameManager gms, Entity e) {
+        gameManagerScript = gms;
+        ownerEntityScript = e;
+
+        playerUIManagerScript = null;
+        hasUI = false;
+
+        ammoInCharger = chargerSize;
+        totalAmmo = maximumAmmo / 2 - chargerSize;
+
+        if (hasUI)
+            gunUIManagerScript.SetAmmo(ammoInCharger, totalAmmo);
     }
 
     // I can reload when I have ammo left, my charger isn't full and I'm not reloading.
@@ -104,7 +127,9 @@ public class Gun : MonoBehaviour {
     // Shots.
     private void Shoot() {
         ammoInCharger -= 1;
-        gameManagerScript.SetAmmo(ammoInCharger, totalAmmo);
+
+        if (hasUI)
+            gunUIManagerScript.SetAmmo(ammoInCharger, totalAmmo);
 
         RaycastHit hit;
         if (limitRange) {
@@ -128,7 +153,11 @@ public class Gun : MonoBehaviour {
     // Reloads.
     private void Reload() {
         SetReload();
-        gameManagerScript.StartReloading(reloadTime);
+
+        if (hasUI) {
+            gunUIManagerScript.SetAmmo(ammoInCharger, totalAmmo);
+            playerUIManagerScript.SetCooldown(reloadTime);
+        }
     }
 
     // Starts the cooldown phase.
@@ -155,8 +184,8 @@ public class Gun : MonoBehaviour {
         else
             totalAmmo = maximumAmmo;
 
-        if (gameObject.activeSelf)
-            gameManagerScript.SetAmmo(ammoInCharger, totalAmmo);
+        if (gameObject.activeSelf && hasUI)
+            gunUIManagerScript.SetAmmo(ammoInCharger, totalAmmo);
     }
 
 }

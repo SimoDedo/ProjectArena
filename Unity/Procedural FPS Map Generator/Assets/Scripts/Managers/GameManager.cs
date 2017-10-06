@@ -65,9 +65,6 @@ public class GameManager : CoreComponent {
             Spawn(player);
             Spawn(opponent);
 
-            // Setup the UI.
-            gameUIManagerScript.SetActiveGuns(activeGunsPlayer);
-
             // Setup the contenders.
             playerScript.SetupEntity(totalHealthPlayer, activeGunsPlayer, this);
             opponentScript.SetupEntity(totalHealthOpponent, activeGunsOpponent, this);
@@ -146,32 +143,6 @@ public class GameManager : CoreComponent {
         } else if (gamePhase == 2 && passedTime >= readyDuration + gameDuration + scoreDuration) {
             Application.Quit();
         }
-    }
-
-    // FACADE METHOD - Sets the current gun in the UI calling the UI method.
-    public void SetCurrentGun(int currentGunIndex) {
-        gameUIManagerScript.SetCurrentGun(currentGunIndex);
-    }
-
-    // FACADE METHOD - Starts the reloading cooldown in the UI.
-    public void StartReloading(float duration) {
-        gameUIManagerScript.SetCooldown(duration);
-
-    }
-
-    // FACADE METHOD - Stops the reloading.
-    public void StopReloading() {
-        gameUIManagerScript.StopReloading();
-    }
-
-    // FACADE METHOD - Sets the ammo in the charger.
-    public void SetAmmo(int charger, int total) {
-        gameUIManagerScript.SetAmmo(charger, total);
-    }
-
-    // FACADE METHOD - Sets the health.
-    public void SetHealth(int health, int tot) {
-        gameUIManagerScript.SetHealth(health, tot);
     }
 
 }
