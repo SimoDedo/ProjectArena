@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour {
+public class Player : Entity {
 
     // Head object containing the camera.
     [SerializeField] private GameObject head;
-
-    // Guns.
-    [SerializeField] private List<GameObject> guns;
 
     [SerializeField] private float speed = 10f;
     [SerializeField] private float jumpSpeed = 8f;
@@ -31,16 +27,6 @@ public class PlayerController : MonoBehaviour {
     private Vector3 moveDirection = Vector3.zero;
     // Is the cursor locked?
     private bool cursorLocked = false;
-    // Is the movement enabled?
-    private bool movementEnabled = false;
-
-    private GameManager gameManagerScript;
-
-    // Informations about the player.
-    private bool[] activeGunsPlayer;
-    private int totalHealth;
-    private int health;
-    private int currentGun;
 
     // Codes of the numeric keys.
     private KeyCode[] keyCodes = {
@@ -71,15 +57,26 @@ public class PlayerController : MonoBehaviour {
         }
 
         // If I can move update the player position depending on the inputs.
-        if (movementEnabled) {
+        if (inGame) {
             UpdateCameraPosition();
-            UpdatePlayerPosition();
-            UpdatePlayerGun();
+            UpdatePosition();
+            UpdateGun();
         }
     }
 
+    // Kills the player.
+    protected override void Die() {
+        SetInGame(false);
+    }
+
+    // Respawns the player.
+    public override void Respawn() {
+        SetInGame(true);
+        health = totalHealth;
+    }
+
     // Switches weapon if possible.
-    private void UpdatePlayerGun() {
+    private void UpdateGun() {
         if (Time.time > lastSwitched + switchWait) {
             if (Input.GetAxisRaw("Mouse ScrollWheel") > 0) {
                 SwitchGuns(currentGun, GetActiveGun(currentGun, true));
@@ -87,42 +84,11 @@ public class PlayerController : MonoBehaviour {
                 SwitchGuns(currentGun, GetActiveGun(currentGun, false));
             } else {
                 for (int i = 0; i < guns.Count; i++) {
-                    if (i != currentGun && activeGunsPlayer[i] && Input.GetKeyDown(keyCodes[i])) {
+                    if (i != currentGun && activeGuns[i] && Input.GetKeyDown(keyCodes[i])) {
                         SwitchGuns(currentGun, i);
                     }
                 }
             }
-        }
-    }
-
-    // Returns the next or the previous active gun.
-    private int GetActiveGun(int currentGun, bool next) {
-        if (next) {
-            // Try for the guns after it
-            for (int i = currentGun + 1; i < guns.Count; i++) {
-                if (activeGunsPlayer[i])
-                    return i;
-            }
-            // Try for the guns before it
-            for (int i = 0; i < currentGun; i++) {
-                if (activeGunsPlayer[i])
-                    return i;
-            }
-            // There's no other gun, return itself.
-            return currentGun;
-        } else {
-            // Try for the guns before it
-            for (int i = currentGun - 1; i >= 0; i--) {
-                if (activeGunsPlayer[i])
-                    return i;
-            }
-            // Try for the guns after it
-            for (int i = guns.Count - 1; i > currentGun; i--) {
-                if (activeGunsPlayer[i])
-                    return i;
-            }
-            // There's no other gun, return itself.
-            return currentGun;
         }
     }
 
@@ -145,30 +111,8 @@ public class PlayerController : MonoBehaviour {
         currentGun = toActivate;
     }
 
-    // Sets all the player parameters.
-    public void SetupPlayer(int th, bool[] agp, GameManager gms) {
-        activeGunsPlayer = agp;
-        gameManagerScript = gms;
-
-        totalHealth = th;
-        health = th;
-        gameManagerScript.SetHealth(health, totalHealth);
-
-        for (int i = 0; i < agp.GetLength(0); i++) {
-            // Setup the gun.
-            guns[i].GetComponent<Gun>().SetupGun(gms);
-            // Activate it if is one among the active ones which has the lowest rank.
-            if (i == GetActiveGun(0, true)) {
-                currentGun = i;
-                guns[i].SetActive(true);
-                guns[i].GetComponent<Gun>().Wield();
-                gameManagerScript.SetCurrentGun(i);
-            }
-        }
-    }
-
-    // Updates the player position.
-    private void UpdatePlayerPosition() {
+    // Updates the position.
+    private void UpdatePosition() {
         // If grounded I can jump, if I'm not grounded my movement is penalized.
         if (controller.isGrounded) {
             // Read the inputs.
@@ -217,43 +161,15 @@ public class PlayerController : MonoBehaviour {
         cursorLocked = false;
     }
 
-    // Enables/disables the movement.
-    public void SetMovementEnabled(bool b) {
-        movementEnabled = b;
-
-        // TODO - Disable/enable the guns too.
-    }
-
-    // Tess if any of the weapons passed as parameters hasn't the maximum ammo.
-    public bool IsAnyEmpty(bool[] suppliedGuns) {
-        for (int i = 0; i < suppliedGuns.GetLength(0); i++) {
-            if (suppliedGuns[i] && activeGunsPlayer[i] && !guns[i].GetComponent<Gun>().IsFull())
-                return true;
+    // TODO - Sets if the player is in game.
+    public override void SetInGame(bool b) {
+        if (b) {
+            // TODO - Show the mesh, show player interface, show gun.
+        } else {
+            // TODO - Hide the mesh, hide player interface, hide gun.
         }
-        return false;
-    }
 
-    // Increases the ammo of the available guns.
-    public void SupplyGuns(bool[] suppliedGuns, int[] ammoAmounts) {
-        for (int i = 0; i < suppliedGuns.GetLength(0); i++) {
-            if (suppliedGuns[i] && activeGunsPlayer[i] && !guns[i].GetComponent<Gun>().IsFull())
-                guns[i].GetComponent<Gun>().AddAmmo(ammoAmounts[i]);
-        }
-    }
-
-    // Tells if the player has full health.
-    public bool IsHealthFull() {
-        return totalHealth == health;
-    }
-
-    // Heals the player.
-    public void Heal(int restoredHealth) {
-        if (health + restoredHealth > totalHealth)
-            health = totalHealth;
-        else
-            health += restoredHealth;
-
-        gameManagerScript.SetHealth(health, totalHealth);
+        inGame = b;
     }
 
 }

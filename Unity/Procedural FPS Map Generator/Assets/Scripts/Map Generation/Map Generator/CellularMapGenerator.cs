@@ -1,27 +1,26 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CellularMapGenerator : MapGenerator {
-       
-    // Passage width.
-    [SerializeField] private int passageWidth = 5;
-    // Border size.
-    [SerializeField] private int borderSize = 5;
 
-    // Minimum size of a wall region.
-    [SerializeField] private int wallThresholdSize = 50;
-    // Minimum size of a room region.
-    [SerializeField] private int roomThresholdSize = 50;
     // How much the map will be randomly filled at the beginning.
-    [SerializeField, Range(0, 100)] private int ramdomFillPercent = 50;
+    [Header("Cellular generation")] [SerializeField, Range(0, 100)] private int ramdomFillPercent = 50;
     // Number of smoothing iterations to be done.
     [SerializeField, Range(0, 3)] private int smoothingIterations = 3;
     // You must have more than this number of neighbour to became wall.
     [SerializeField, Range(0, 9)] private int neighbourTileLimitHigh = 4;
     // You must have less than this number of neighbour to became room.
     [SerializeField, Range(0, 9)] private int neighbourTileLimitLow = 4;
+    // Minimum size of a wall region.
+    [SerializeField] private int wallThresholdSize = 50;
+    // Minimum size of a room region.
+    [SerializeField] private int roomThresholdSize = 50;
+    // Passage width.
+    [SerializeField] private int passageWidth = 5;
+    // Border size.
+    [SerializeField] private int borderSize = 5;
+
     // Do I have to use custom rules when the neighbour count falls outside the limits?
     /* [SerializeField] private bool useCustomRules = false; */
     // List of rules. Each rule is a string which decribes the neighbour tiles in the order 1a, 1b, 1c, 2a, 2c, 3a, 3b, 3c.
@@ -29,7 +28,7 @@ public class CellularMapGenerator : MapGenerator {
     /* [SerializeField] private string[] binaryMasks; */
 
     // Object containing the Map Builder script.
-    [SerializeField] private GameObject mapBuilder;
+    [Header("Building")] [SerializeField] private GameObject mapBuilder;
     // Object containing the Object Displacer script.
     [SerializeField] private GameObject objectDisplacer;
 

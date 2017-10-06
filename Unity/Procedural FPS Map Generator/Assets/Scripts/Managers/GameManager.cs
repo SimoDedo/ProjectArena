@@ -1,31 +1,35 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 
 // The game manager manages the game, it passes itself to the player.
 
 public class GameManager : CoreComponent {
 
-    [SerializeField] private GameObject mapManager;
+
+    [Header("Managers")] [SerializeField] private GameObject mapManager;
     [SerializeField] private GameObject spawnPointManager;
-    [SerializeField] private GameObject gameGUIManager;
+    [SerializeField] private GameObject gameUIManager;
 
-    [SerializeField] private GameObject player;
-    [SerializeField] private GameObject opponent;
-
-    [SerializeField] private int gameDuration = 600;
+    [Header("Game")] [SerializeField] private int gameDuration = 600;
     [SerializeField] private int readyDuration = 3;
     [SerializeField] private int scoreDuration = 10;
+    [SerializeField] private float respawnDuration = 3;
 
+    [Header("Contenders")] [SerializeField] private GameObject player;
+    [SerializeField] private GameObject opponent;
     [SerializeField] private string playerName = "Player 1";
     [SerializeField] private string opponentName = "Player 2";
-    [SerializeField] private int totalHealth = 100;
+    [SerializeField] private int totalHealthPlayer = 100;
+    [SerializeField] private int totalHealthOpponent = 100;
     [SerializeField] private bool[] activeGunsPlayer;
+    [SerializeField] private bool[] activeGunsOpponent;
 
     private MapManager mapManagerScript;
     private SpawnPointManager spawnPointManagerScript;
-    private GameGUIManager gameGUIManagerScript;
+    private GameUIManager gameUIManagerScript;
 
-    private PlayerController playerControllerScript;
+    private Player playerScript;
     private Opponent opponentScript;
 
     private int playerKillCount = 0;
@@ -43,14 +47,14 @@ public class GameManager : CoreComponent {
 
         mapManagerScript = mapManager.GetComponent<MapManager>();
         spawnPointManagerScript = spawnPointManager.GetComponent<SpawnPointManager>();
-        gameGUIManagerScript = gameGUIManager.GetComponent<GameGUIManager>();
+        gameUIManagerScript = gameUIManager.GetComponent<GameUIManager>();
 
-        playerControllerScript = player.GetComponent<PlayerController>();
+        playerScript = player.GetComponent<Player>();
         opponentScript = opponent.GetComponent<Opponent>();
     }
 
     private void Update() {
-        if (!IsReady() && mapManagerScript.IsReady() && spawnPointManagerScript.IsReady() && gameGUIManagerScript.IsReady()) {
+        if (!IsReady() && mapManagerScript.IsReady() && spawnPointManagerScript.IsReady() && gameUIManagerScript.IsReady()) {
             // Generate the map.
             mapManagerScript.ManageMap(true);
 
@@ -58,18 +62,17 @@ public class GameManager : CoreComponent {
             spawnPointManagerScript.SetSpawnPoints(mapManagerScript.GetSpawnPoints());
 
             // Spawn the player and the opponent.
-            player.transform.position = spawnPointManagerScript.GetSpawnPosition() + Vector3.up * 3f;
-            opponent.transform.position = spawnPointManagerScript.GetSpawnPosition() + Vector3.up * 3f;
+            Spawn(player);
+            Spawn(opponent);
 
             // Setup the UI.
-            gameGUIManagerScript.SetActiveGuns(activeGunsPlayer);
+            gameUIManagerScript.SetActiveGuns(activeGunsPlayer);
 
-            // Setup the player.
-            playerControllerScript.SetupPlayer(totalHealth, activeGunsPlayer, this);
-            // Setup the opponent.
-            opponentScript.SetupOpponent(totalHealth, this);
+            // Setup the contenders.
+            playerScript.SetupEntity(totalHealthPlayer, activeGunsPlayer, this);
+            opponentScript.SetupEntity(totalHealthOpponent, activeGunsOpponent, this);
 
-            playerControllerScript.LockCursor();
+            playerScript.LockCursor();
 
             startTime = Time.time;
 
@@ -80,9 +83,18 @@ public class GameManager : CoreComponent {
     }
 
     // Moves a gameobject to a free spawn point.
-    public void Respawn(GameObject g) {
+    public void Spawn(GameObject g) {
         g.transform.position = spawnPointManagerScript.GetSpawnPosition() + Vector3.up * 3f;
-        // TODO - Reset life with abstract method, manage wait, respawn counter, ecc.
+    }
+
+    // Respawns an entity, but only if the game phase is still figth.
+    public IEnumerator WaitForRespawn(GameObject g, Entity e) {
+        yield return new WaitForSeconds(respawnDuration);
+
+        if (gamePhase == 1) {
+            Spawn(g);
+            e.Respawn();
+        }
     }
 
     // Manages the gamed depending on the current time.
@@ -92,11 +104,11 @@ public class GameManager : CoreComponent {
         switch (gamePhase) {
             case 0:
                 // Update the countdown.
-                gameGUIManagerScript.SetCountdown((int)(startTime + readyDuration - Time.time));
+                gameUIManagerScript.SetCountdown((int)(startTime + readyDuration - Time.time));
                 break;
             case 1:
                 // Update the time.
-                gameGUIManagerScript.SetTime((int)(startTime + readyDuration + gameDuration - Time.time));
+                gameUIManagerScript.SetTime((int)(startTime + readyDuration + gameDuration - Time.time));
                 break;
             case 2:
                 // Do nothing.
@@ -109,24 +121,27 @@ public class GameManager : CoreComponent {
         int passedTime = (int)(Time.time - startTime);
 
         if (gamePhase == -1) {
-            // Disable the player movement, activate the ready GUI, set the name of the players and set the phase.
-            playerControllerScript.SetMovementEnabled(false);
-            gameGUIManagerScript.ActivateReadyGUI();
-            gameGUIManagerScript.SetPlayersName(playerName, opponentName);
-            gameGUIManagerScript.SetReadyGUI();
+            // Disable the contenders movement and interactions, activate the ready UI, set the name of the players and set the phase.
+            playerScript.SetInGame(false);
+            opponentScript.SetInGame(false);
+            gameUIManagerScript.ActivateReadyUI();
+            gameUIManagerScript.SetPlayersName(playerName, opponentName);
+            gameUIManagerScript.SetReadyUI();
             gamePhase = 0;
         } else if (gamePhase == 0 && passedTime >= readyDuration) {
-            // Enable the player movement, activate the figth GUI, set the kills to zero and set the phase.
-            playerControllerScript.SetMovementEnabled(true);
-            gameGUIManagerScript.SetPlayer1Kills(0);
-            gameGUIManagerScript.SetPlayer2Kills(0);
-            gameGUIManagerScript.ActivateFigthGUI();
+            // Enable the contenders movement and interactions, activate the figth UI, set the kills to zero and set the phase.
+            playerScript.SetInGame(true);
+            opponentScript.SetInGame(true);
+            gameUIManagerScript.SetPlayer1Kills(0);
+            gameUIManagerScript.SetPlayer2Kills(0);
+            gameUIManagerScript.ActivateFigthUI();
             gamePhase = 1;
         } else if (gamePhase == 1 && passedTime >= readyDuration + gameDuration) {
-            // Disable the player movement, activate the score GUI, set the winner and set the phase.
-            playerControllerScript.SetMovementEnabled(false);
-            gameGUIManagerScript.ActivateScoreGUI();
-            gameGUIManagerScript.SetScoreGUI(playerKillCount, opponentKillCount);
+            // Disable the contenders movement and interactions, activate the score UI, set the winner and set the phase.
+            playerScript.SetInGame(false);
+            opponentScript.SetInGame(false);
+            gameUIManagerScript.ActivateScoreUI();
+            gameUIManagerScript.SetScoreUI(playerKillCount, opponentKillCount);
             gamePhase = 2;
         } else if (gamePhase == 2 && passedTime >= readyDuration + gameDuration + scoreDuration) {
             Application.Quit();
@@ -135,28 +150,28 @@ public class GameManager : CoreComponent {
 
     // FACADE METHOD - Sets the current gun in the UI calling the UI method.
     public void SetCurrentGun(int currentGunIndex) {
-        gameGUIManagerScript.SetCurrentGun(currentGunIndex);
+        gameUIManagerScript.SetCurrentGun(currentGunIndex);
     }
 
     // FACADE METHOD - Starts the reloading cooldown in the UI.
     public void StartReloading(float duration) {
-        gameGUIManagerScript.SetCooldown(duration);
+        gameUIManagerScript.SetCooldown(duration);
 
     }
 
     // FACADE METHOD - Stops the reloading.
     public void StopReloading() {
-        gameGUIManagerScript.StopReloading();
+        gameUIManagerScript.StopReloading();
     }
 
     // FACADE METHOD - Sets the ammo in the charger.
     public void SetAmmo(int charger, int total) {
-        gameGUIManagerScript.SetAmmo(charger, total);
+        gameUIManagerScript.SetAmmo(charger, total);
     }
 
     // FACADE METHOD - Sets the health.
     public void SetHealth(int health, int tot) {
-        gameGUIManagerScript.SetHealth(health, tot);
+        gameUIManagerScript.SetHealth(health, tot);
     }
 
 }

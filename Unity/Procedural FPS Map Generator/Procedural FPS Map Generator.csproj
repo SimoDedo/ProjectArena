@@ -78,22 +78,23 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\GameGUIManager.cs" />
-    <Compile Include="Assets\Scripts\GameManager.cs" />
-    <Compile Include="Assets\Scripts\Map Generation\CoreComponent.cs" />
+    <Compile Include="Assets\Scripts\CoreComponent.cs" />
+    <Compile Include="Assets\Scripts\Entities\Entity.cs" />
+    <Compile Include="Assets\Scripts\Entities\Opponent.cs" />
+    <Compile Include="Assets\Scripts\Entities\Player.cs" />
+    <Compile Include="Assets\Scripts\Interactables\AmmoPickable.cs" />
+    <Compile Include="Assets\Scripts\Interactables\MedkitPickable.cs" />
+    <Compile Include="Assets\Scripts\Interactables\Pickable.cs" />
+    <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
+    <Compile Include="Assets\Scripts\Managers\GameUIManager.cs" />
+    <Compile Include="Assets\Scripts\Managers\MapManager.cs" />
+    <Compile Include="Assets\Scripts\Managers\SpawnPointManager.cs" />
     <Compile Include="Assets\Scripts\Map Generation\Map Assembler\MapAssembler.cs" />
     <Compile Include="Assets\Scripts\Map Generation\Map Assembler\MeshMapAssembler.cs" />
     <Compile Include="Assets\Scripts\Map Generation\Map Generator\CellularMapGenerator.cs" />
     <Compile Include="Assets\Scripts\Map Generation\Map Generator\MapGenerator.cs" />
-    <Compile Include="Assets\Scripts\Map Generation\MapManager.cs" />
     <Compile Include="Assets\Scripts\Map Generation\ObjectDisplacer.cs" />
-    <Compile Include="Assets\Scripts\Map Generation\SpawnPointManager.cs" />
-    <Compile Include="Assets\Scripts\Others\AmmoPickable.cs" />
-    <Compile Include="Assets\Scripts\Others\MedkitPickable.cs" />
-    <Compile Include="Assets\Scripts\Others\Opponent.cs" />
-    <Compile Include="Assets\Scripts\Others\Pickable.cs" />
     <Compile Include="Assets\Scripts\Others\RotateTranslateByAxis.cs" />
-    <Compile Include="Assets\Scripts\Player\PlayerController.cs" />
     <Compile Include="Assets\Scripts\Weapons\Gun.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,44 +1,38 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class GameGUIManager : CoreComponent {
+public class GameUIManager : CoreComponent {
 
-    [SerializeField] private GameObject readyGUI;
-    [SerializeField] private GameObject figthGUI;
-    [SerializeField] private GameObject scoreGUI;
-
-    // Elements of the ready GUI.
+    // Elements of the ready UI.
+    [Header("Ready UI")] [SerializeField] private GameObject readyUI;
     [SerializeField] private GameObject player1;
     [SerializeField] private GameObject player2;
     [SerializeField] private GameObject countdown;
 
-    // Elements of the figth GUI.
+    // Elements of the figth UI.
+    [Header("Figth UI")] [SerializeField] private GameObject figthUI;
     [SerializeField] private GameObject health;
     [SerializeField] private GameObject ammo;
     [SerializeField] private GameObject time;
     [SerializeField] private GameObject killsPlayer1;
     [SerializeField] private GameObject killsPlayer2;
+    [SerializeField] private GameObject cooldown;
+    [SerializeField] private GameObject[] gunNumbers;
+    [SerializeField] private GameObject[] guns;
 
-    // Elements of the score GUI.
+    // Elements of the score UI.
+    [Header("Score UI")] [SerializeField] private GameObject scoreUI;
     [SerializeField] private GameObject player1Wins;
     [SerializeField] private GameObject player2Wins;
     [SerializeField] private GameObject tie;
 
-    // Cooldown circular bar.
-    [SerializeField] private GameObject cooldown;
-
-    // Gun elements in the figth UI.
-    [SerializeField] private GameObject[] gunNumbers;
-    [SerializeField] private GameObject[] guns;
-
     private string namePlayer1;
     private string namePlayer2;
 
-    // Text fields of the ready GUI.
+    // Text fields of the ready UI.
     private Text countdownText;
 
-    // Text fields of the figth GUI.
+    // Text fields of the figth UI.
     private Text healthText;
     private Text ammoText;
     private Text timeText;
@@ -77,25 +71,25 @@ public class GameGUIManager : CoreComponent {
         }
     }
 
-    // Activates the ready GUI.
-    public void ActivateReadyGUI() {
-        readyGUI.SetActive(true);
-        figthGUI.SetActive(false);
-        scoreGUI.SetActive(false);
+    // Activates the ready UI.
+    public void ActivateReadyUI() {
+        readyUI.SetActive(true);
+        figthUI.SetActive(false);
+        scoreUI.SetActive(false);
     }
 
-    // Activates the figth GUI.
-    public void ActivateFigthGUI() {
-        readyGUI.SetActive(false);
-        figthGUI.SetActive(true);
-        scoreGUI.SetActive(false);
+    // Activates the figth UI.
+    public void ActivateFigthUI() {
+        readyUI.SetActive(false);
+        figthUI.SetActive(true);
+        scoreUI.SetActive(false);
     }
 
-    // Activates the score GUI.
-    public void ActivateScoreGUI() {
-        readyGUI.SetActive(false);
-        figthGUI.SetActive(false);
-        scoreGUI.SetActive(true);
+    // Activates the score UI.
+    public void ActivateScoreUI() {
+        readyUI.SetActive(false);
+        figthUI.SetActive(false);
+        scoreUI.SetActive(true);
     }
 
     // Sets the player names.
@@ -112,14 +106,14 @@ public class GameGUIManager : CoreComponent {
             countdownText.text = "Figth!";
     }
 
-    // Sets the ready GUI.
-    public void SetReadyGUI() {
+    // Sets the ready UI.
+    public void SetReadyUI() {
         player1.GetComponent<Text>().text = namePlayer1;
-        player2.GetComponent<Text>().text = namePlayer1;
+        player2.GetComponent<Text>().text = namePlayer2;
     }
 
-    // Sets the score GUI.
-    public void SetScoreGUI(int s1, int s2) {
+    // Sets the score UI.
+    public void SetScoreUI(int s1, int s2) {
         if (s1 > s2) {
             player1Wins.SetActive(true);
             player2Wins.SetActive(false);

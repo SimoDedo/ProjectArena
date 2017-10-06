@@ -5,20 +5,19 @@ using UnityEngine;
 
 public class MapManager : CoreComponent {
 
-    [SerializeField] private GameObject mapAssembler;
+    [Header("Core components")] [SerializeField] private GameObject mapAssembler;
     [SerializeField] private GameObject mapGenerator;
     [SerializeField] private GameObject objectDisplacer;
 
     // Do I have to load the map from a .txt?
-    [SerializeField] protected bool loadMapFromFile = false;
+    [Header("Import")] [SerializeField] protected bool loadMapFromFile = false;
     // Path of the map to be laoded.
     [SerializeField] protected string textFilePath = null;
 
     // Size of a square.
-    [SerializeField] private float squareSize;
+    [Header("Building")] [SerializeField] private float squareSize;
     // Heigth of the map.
     [SerializeField] private float heigth;
-
     // Category of the spawn point gameobjects in the object displacer. 
     [SerializeField] private string spawnPointCategory;
 

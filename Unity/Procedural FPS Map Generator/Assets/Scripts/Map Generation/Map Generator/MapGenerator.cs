@@ -6,12 +6,12 @@ using UnityEngine;
 public abstract class MapGenerator : CoreComponent {
 
     // Do I have to generate my seed?
-    [SerializeField] protected bool useRandomSeed = true;
+    [Header("Seed")] [SerializeField] protected bool useRandomSeed = true;
     // Seed used to generate the map.
     [SerializeField] protected string seed = null;
 
     // Map width.
-    [SerializeField] protected int width = 100;
+    [Header("Generation")] [SerializeField] protected int width = 100;
     // Map height.
     [SerializeField] protected int height = 100;
     // Wall height.
@@ -24,14 +24,14 @@ public abstract class MapGenerator : CoreComponent {
     [SerializeField,] protected int objectToWallDistance = 2;
 
     // Char that denotes a room;
-    [SerializeField] protected char roomChar = 'v';
+    [Header("Representation")] [SerializeField] protected char roomChar = 'v';
     // Char that denotes a wall;
     [SerializeField] protected char wallChar = 'w';
     // Custom objects that will be added to the map.
     [SerializeField] protected MapObject[] mapObjects;
 
     // Do I have to create a .txt output?
-    [SerializeField] protected bool createTextFile = false;
+    [Header("Export")] [SerializeField] protected bool createTextFile = false;
     // Path where to save the text map.
     [SerializeField] protected string textFilePath = null;
 
