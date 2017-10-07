@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Player : Entity {
 
@@ -71,7 +70,7 @@ public class Player : Entity {
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id) {
         activeGuns = ag;
         gameManagerScript = gms;
-    
+
         totalHealth = th;
         health = th;
         entityID = id;
@@ -82,9 +81,8 @@ public class Player : Entity {
             // Setup the gun.
             guns[i].GetComponent<Gun>().SetupGun(gms, this, playerUIManagerScript);
             // Activate it if is one among the active ones which has the lowest rank.
-            if (i == GetActiveGun(0, true)) {
-                currentGun = i;
-                guns[i].SetActive(true);
+            if (i == GetActiveGun(-1, true)) {
+                ActivateGun(i);
             }
         }
     }
@@ -130,14 +128,13 @@ public class Player : Entity {
 
     // Activates a gun.
     private void ActivateGun(int toActivate) {
-        guns[toActivate].SetActive(true);
+        guns[toActivate].GetComponent<Gun>().Wield();
         currentGun = toActivate;
     }
 
     // Deactivates a gun.
     private void DeactivateGun(int toDeactivate) {
         guns[toDeactivate].GetComponent<Gun>().Stow();
-        guns[toDeactivate].SetActive(false);
     }
 
     // Updates the position.

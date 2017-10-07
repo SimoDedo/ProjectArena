@@ -13,7 +13,7 @@
             // Setup the gun.
             guns[i].GetComponent<Gun>().SetupGun(gms, this);
             // Activate it if is one among the active ones which has the lowest rank.
-            if (i == GetActiveGun(0, true)) {
+            if (i == GetActiveGun(-1, true)) {
                 currentGun = i;
                 guns[i].SetActive(true);
             }
@@ -34,6 +34,7 @@
 
     // Sets if the opponent is in game.
     public override void SetInGame(bool b) {
+        SetIgnoreRaycast(!b);
         SetMeshVisible(transform, b);
         inGame = b;
     }

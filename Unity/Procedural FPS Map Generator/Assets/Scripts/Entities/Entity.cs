@@ -13,6 +13,7 @@ public abstract class Entity : MonoBehaviour {
     protected int entityID;
     protected int currentGun;
     protected bool inGame = false;
+    protected int originalLayer;
 
     protected GameManager gameManagerScript;
 
@@ -118,6 +119,17 @@ public abstract class Entity : MonoBehaviour {
             if (children.GetComponent<MeshRenderer>())
                 children.GetComponent<MeshRenderer>().enabled = isVisible;
             SetMeshVisible(children, isVisible);
+        }
+    }
+
+    // Sets if the entity must be ignored by raycast.
+    protected void SetIgnoreRaycast(bool mustIgnore) {
+        if (mustIgnore) {
+            originalLayer = gameObject.layer;
+            // 2 stands for the ignore raycast layer.
+            gameObject.layer = 2;
+        } else {
+            gameObject.layer = originalLayer;
         }
     }
 

@@ -7,20 +7,20 @@ public abstract class Gun : MonoBehaviour {
     [SerializeField] protected GameObject muzzleFlash;
 
     [Header("Gun parameters")] [SerializeField] protected int damage = 10;
-    [SerializeField] protected float dispersion = 1;
+    [SerializeField] protected float dispersion = 0f;
     [SerializeField] protected int projectilesPerShot = 1;
     [SerializeField] protected int chargerSize;
     [SerializeField] protected int maximumAmmo;
     [SerializeField] protected float reloadTime = 1f;
     [SerializeField] protected float cooldownTime = 0.1f;
 
-
     [Header("Appearence")] [SerializeField] protected float muzzleFlashDuration = 0.05f;
+    [SerializeField] protected float sparkDuration = 0.01f;
     [SerializeField] protected float recoil = 0.05f;
 
     [Header("UI")]
-    [SerializeField] protected bool hasUI = false;
-    
+    [SerializeField]
+    protected bool hasUI = false;
 
     // Variables to manage ammo.
     protected int ammoInCharger;
@@ -37,27 +37,47 @@ public abstract class Gun : MonoBehaviour {
     protected PlayerUIManager playerUIManagerScript;
     protected Entity ownerEntityScript;
 
-    protected void Update() {
-        if (reloading || coolingDown)
-            UpdateTimers();
+    // Is teh gun being used?
+    protected bool used = false;
 
-        if (Input.GetButton("Fire1") && CanShoot()) {
-            if (ammoInCharger > 0)
-                Shoot();
-            else if (CanReload())
+    protected void Update() {
+        if (used) {
+            if (reloading || coolingDown)
+                UpdateTimers();
+
+            if (Input.GetButton("Fire1") && CanShoot()) {
+                if (ammoInCharger > 0)
+                    Shoot();
+                else if (CanReload())
+                    Reload();
+            } else if (Input.GetButtonDown("Reload") && CanReload()) {
                 Reload();
-        } else if (Input.GetButtonDown("Reload") && CanReload()) {
-            Reload();
+            }
         }
     }
 
-    // Stops reloading.
+    protected void OnDisable() {
+        if (muzzleFlash.activeSelf)
+            muzzleFlash.SetActive(false);
+    }
+
+    // Allows accepting input and enables all the childrens.
+    public void Wield() {
+        SetChildrenEnabled(true);
+        muzzleFlash.SetActive(false);
+        used = true;
+    }
+
+    // Stops reloading, disallows accepting input and disables all the childrens.
     public void Stow() {
         // When I switch guns I stop the reloading, but not the cooldown.
         reloading = false;
 
         if (hasUI)
             playerUIManagerScript.StopReloading();
+
+        SetChildrenEnabled(false);
+        used = false;
     }
 
     // Ends the reload or the cooldown phases if possible. 
@@ -177,6 +197,21 @@ public abstract class Gun : MonoBehaviour {
         // Move the gun upwards and hide the muzzle flash.
         transform.position = new Vector3(transform.position.x, transform.position.y - recoil, transform.position.z);
         muzzleFlash.SetActive(false);
+    }
+
+    // Activates/deactivates the children objects, with the exception of muzzle flashed which must always be deactivated.
+    private void SetChildrenEnabled(bool active) {
+        foreach (Transform child in transform) {
+            child.gameObject.SetActive(active);
+        }
+    }
+
+    // Deviates the direction randomly inside a cone with the given aperture.
+    protected Vector3 GetDeviatedDirection(Vector3 direction, float deviation) {
+        direction = headCamera.transform.eulerAngles;
+        direction.x += Random.Range(-dispersion / 2, dispersion / 2);
+        direction.y += Random.Range(-dispersion / 2, dispersion / 2);
+        return Quaternion.Euler(direction) * Vector3.forward;
     }
 
 }
