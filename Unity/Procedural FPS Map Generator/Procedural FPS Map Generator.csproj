@@ -82,6 +82,9 @@
     <Compile Include="Assets\Scripts\Entities\Entity.cs" />
     <Compile Include="Assets\Scripts\Entities\Opponent.cs" />
     <Compile Include="Assets\Scripts\Entities\Player.cs" />
+    <Compile Include="Assets\Scripts\Guns\Gun.cs" />
+    <Compile Include="Assets\Scripts\Guns\ProjectileGun.cs" />
+    <Compile Include="Assets\Scripts\Guns\RaycastGun.cs" />
     <Compile Include="Assets\Scripts\Interactables\AmmoPickable.cs" />
     <Compile Include="Assets\Scripts\Interactables\MedkitPickable.cs" />
     <Compile Include="Assets\Scripts\Interactables\Pickable.cs" />
@@ -97,9 +100,6 @@
     <Compile Include="Assets\Scripts\UI\GameUIManager.cs" />
     <Compile Include="Assets\Scripts\UI\GunUIManager.cs" />
     <Compile Include="Assets\Scripts\UI\PlayerUIManager.cs" />
-    <Compile Include="Assets\Scripts\Weapons\Gun.cs" />
-    <Compile Include="Assets\Scripts\Weapons\ProjectileGun.cs" />
-    <Compile Include="Assets\Scripts\Weapons\RaycastGun.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

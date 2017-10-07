@@ -1,43 +1,37 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class Gun : MonoBehaviour {
+public abstract class Gun : MonoBehaviour {
 
-    [Header("Objects")] [SerializeField] private Camera headCamera;
-    [SerializeField] private GameObject muzzleFlash;
-    [SerializeField] private GameObject projectile;
+    [Header("Objects")] [SerializeField] protected Camera headCamera;
+    [SerializeField] protected GameObject muzzleFlash;
 
-    [Header("Gun parameters")] [SerializeField] private int damage = 10;
-    [SerializeField] private float dispersion = 1;
-    [SerializeField] private int projectilesPerShot = 1;
-    [SerializeField] private int chargerSize;
-    [SerializeField] private int maximumAmmo;
-    [SerializeField] private bool limitRange = false;
-    [SerializeField] private float range = 100f;
-    [SerializeField] private float reloadTime = 1f;
-    [SerializeField] private float cooldownTime = 0.1f;
+    [Header("Gun parameters")] [SerializeField] protected int damage = 10;
+    [SerializeField] protected float dispersion = 1;
+    [SerializeField] protected int projectilesPerShot = 1;
+    [SerializeField] protected int chargerSize;
+    [SerializeField] protected int maximumAmmo;
+    [SerializeField] protected float reloadTime = 1f;
+    [SerializeField] protected float cooldownTime = 0.1f;
 
-    [Header("Gun UI")] [SerializeField] private bool hasUI = false;
-
-    private GameObject projectileStorage;
-    private List<GameObject> availableProjectiles;
+    [Header("Gun UI")] [SerializeField] protected bool hasUI = false;
 
     // Variables to manage ammo.
-    private int ammoInCharger;
-    private int totalAmmo;
+    protected int ammoInCharger;
+    protected int totalAmmo;
 
     // Variables to manage cooldown and reload.
-    private float cooldownStart;
-    private float reloadStart;
-    private bool coolingDown;
-    private bool reloading;
+    protected float cooldownStart;
+    protected float reloadStart;
+    protected bool coolingDown;
+    protected bool reloading;
 
-    private GameManager gameManagerScript;
-    private GunUIManager gunUIManagerScript;
-    private PlayerUIManager playerUIManagerScript;
-    private Entity ownerEntityScript;
+    protected GameManager gameManagerScript;
+    protected GunUIManager gunUIManagerScript;
+    protected PlayerUIManager playerUIManagerScript;
+    protected Entity ownerEntityScript;
 
-    private void Update() {
+    protected void Update() {
         if (reloading || coolingDown)
             UpdateTimers();
 
@@ -61,7 +55,7 @@ public class Gun : MonoBehaviour {
     }
 
     // Ends the reload or the cooldown phases if possible. 
-    private void UpdateTimers() {
+    protected void UpdateTimers() {
         if (reloading) {
             if (Time.time > reloadStart + reloadTime) {
                 // Stop the reloading.
@@ -115,41 +109,20 @@ public class Gun : MonoBehaviour {
     }
 
     // I can reload when I have ammo left, my charger isn't full and I'm not reloading.
-    private bool CanReload() {
+    protected bool CanReload() {
         return totalAmmo > 0 && ammoInCharger < chargerSize && !reloading;
     }
 
     // I can shoot when I'm not reloading and I'm not in cooldown.
-    private bool CanShoot() {
+    protected bool CanShoot() {
         return !reloading && !coolingDown;
     }
 
     // Shots.
-    private void Shoot() {
-        ammoInCharger -= 1;
-
-        if (hasUI)
-            gunUIManagerScript.SetAmmo(ammoInCharger, totalAmmo);
-
-        RaycastHit hit;
-        if (limitRange) {
-            // TODO - Implement dispersion and projectilesPerShot here, changing #raycast and their direction.
-            if (Physics.Raycast(headCamera.transform.position, headCamera.transform.forward, out hit, range)) {
-                Opponent opp = hit.transform.GetComponent<Opponent>();
-                if (opp != null)
-                    opp.TakeDamage(damage, ownerEntityScript.GetID());
-            }
-        } else if (Physics.Raycast(headCamera.transform.position, headCamera.transform.forward, out hit)) {
-            Opponent opp = hit.transform.GetComponent<Opponent>();
-            if (opp != null)
-                opp.TakeDamage(damage, ownerEntityScript.GetID());
-        }
-
-        SetCooldown();
-    }
+    protected abstract void Shoot();
 
     // Reloads.
-    private void Reload() {
+    protected void Reload() {
         SetReload();
 
         if (hasUI) {
@@ -159,13 +132,13 @@ public class Gun : MonoBehaviour {
     }
 
     // Starts the cooldown phase.
-    private void SetCooldown() {
+    protected void SetCooldown() {
         cooldownStart = Time.time;
         coolingDown = true;
     }
 
     // Starts the reload phase.
-    private void SetReload() {
+    protected void SetReload() {
         reloadStart = Time.time;
         reloading = true;
     }
