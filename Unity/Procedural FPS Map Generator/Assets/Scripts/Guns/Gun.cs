@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
 
 public abstract class Gun : MonoBehaviour {
@@ -14,7 +14,13 @@ public abstract class Gun : MonoBehaviour {
     [SerializeField] protected float reloadTime = 1f;
     [SerializeField] protected float cooldownTime = 0.1f;
 
-    [Header("Gun UI")] [SerializeField] protected bool hasUI = false;
+
+    [Header("Appearence")] [SerializeField] protected float muzzleFlashDuration = 0.05f;
+    [SerializeField] protected float recoil = 0.05f;
+
+    [Header("UI")]
+    [SerializeField] protected bool hasUI = false;
+    
 
     // Variables to manage ammo.
     protected int ammoInCharger;
@@ -157,6 +163,20 @@ public abstract class Gun : MonoBehaviour {
 
         if (gameObject.activeSelf && hasUI)
             gunUIManagerScript.SetAmmo(ammoInCharger, totalAmmo);
+    }
+
+    // Show muzzle flash.
+    protected IEnumerator ShowMuzzleFlash() {
+        // Move the gun downwards.
+        transform.position = new Vector3(transform.position.x, transform.position.y + recoil, transform.position.z);
+        // Rotate the muzzle flesh and show it.
+        muzzleFlash.transform.RotateAround(muzzleFlash.transform.position, transform.forward, Random.Range(0f, 360f));
+        muzzleFlash.SetActive(true);
+        // Wait.
+        yield return new WaitForSeconds(muzzleFlashDuration);
+        // Move the gun upwards and hide the muzzle flash.
+        transform.position = new Vector3(transform.position.x, transform.position.y - recoil, transform.position.z);
+        muzzleFlash.SetActive(false);
     }
 
 }

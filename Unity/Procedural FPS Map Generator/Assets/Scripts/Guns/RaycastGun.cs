@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class RaycastGun : Gun {
 
@@ -8,6 +6,7 @@ public class RaycastGun : Gun {
     [SerializeField] private float range = 100f;
 
     protected override void Shoot() {
+        StartCoroutine(ShowMuzzleFlash());
         ammoInCharger -= 1;
 
         if (hasUI)
