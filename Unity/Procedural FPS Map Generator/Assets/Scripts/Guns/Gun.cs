@@ -15,7 +15,6 @@ public abstract class Gun : MonoBehaviour {
     [SerializeField] protected float cooldownTime = 0.1f;
 
     [Header("Appearence")] [SerializeField] protected float muzzleFlashDuration = 0.05f;
-    [SerializeField] protected float sparkDuration = 0.01f;
     [SerializeField] protected float recoil = 0.05f;
 
     [Header("UI")]
@@ -204,14 +203,6 @@ public abstract class Gun : MonoBehaviour {
         foreach (Transform child in transform) {
             child.gameObject.SetActive(active);
         }
-    }
-
-    // Deviates the direction randomly inside a cone with the given aperture.
-    protected Vector3 GetDeviatedDirection(Vector3 direction, float deviation) {
-        direction = headCamera.transform.eulerAngles;
-        direction.x += Random.Range(-dispersion / 2, dispersion / 2);
-        direction.y += Random.Range(-dispersion / 2, dispersion / 2);
-        return Quaternion.Euler(direction) * Vector3.forward;
     }
 
 }

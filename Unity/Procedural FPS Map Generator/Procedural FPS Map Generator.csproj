@@ -82,7 +82,9 @@
     <Compile Include="Assets\Scripts\Entities\Entity.cs" />
     <Compile Include="Assets\Scripts\Entities\Opponent.cs" />
     <Compile Include="Assets\Scripts\Entities\Player.cs" />
+    <Compile Include="Assets\Scripts\Guns\ExplosiveProjectile.cs" />
     <Compile Include="Assets\Scripts\Guns\Gun.cs" />
+    <Compile Include="Assets\Scripts\Guns\Projectile.cs" />
     <Compile Include="Assets\Scripts\Guns\ProjectileGun.cs" />
     <Compile Include="Assets\Scripts\Guns\RaycastGun.cs" />
     <Compile Include="Assets\Scripts\Interactables\AmmoPickable.cs" />
