@@ -20,7 +20,7 @@ MonoBehaviour:
   m_ShowMode: 4
   m_Title: 
   m_RootView: {fileID: 4}
-  m_MinSize: {x: 950, y: 542}
+  m_MinSize: {x: 950, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
 --- !u!114 &2
 MonoBehaviour:
@@ -36,9 +36,9 @@ MonoBehaviour:
   m_Children: []
   m_Position:
     serializedVersion: 2
-    x: 1061
+    x: 406
     y: 0
-    width: 308
+    width: 963
     height: 671
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 4000, y: 4000}
@@ -61,12 +61,12 @@ MonoBehaviour:
   m_Children: []
   m_Position:
     serializedVersion: 2
-    x: 200
+    x: 202
     y: 0
-    width: 861
+    width: 204
     height: 671
-  m_MinSize: {x: 200, y: 200}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 204, y: 221}
+  m_MaxSize: {x: 4004, y: 4021}
   m_ActualView: {fileID: 15}
   m_Panes:
   - {fileID: 15}
@@ -159,7 +159,7 @@ MonoBehaviour:
   m_MinSize: {x: 885, y: 492}
   m_MaxSize: {x: 16010, y: 14042}
   vertical: 0
-  controlID: 48
+  controlID: 73
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -183,7 +183,7 @@ MonoBehaviour:
   m_MinSize: {x: 610, y: 492}
   m_MaxSize: {x: 12010, y: 14042}
   vertical: 1
-  controlID: 49
+  controlID: 74
 --- !u!114 &9
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -208,7 +208,7 @@ MonoBehaviour:
   m_MinSize: {x: 610, y: 221}
   m_MaxSize: {x: 12010, y: 4021}
   vertical: 0
-  controlID: 50
+  controlID: 75
 --- !u!114 &10
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -225,7 +225,7 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 200
+    width: 202
     height: 671
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 4000, y: 4000}
@@ -308,9 +308,9 @@ MonoBehaviour:
   m_DepthBufferBits: 32
   m_Pos:
     serializedVersion: 2
-    x: 1063
+    x: 408
     y: 92
-    width: 304
+    width: 959
     height: 650
   m_MaximizeOnPlay: 0
   m_Gizmos: 0
@@ -320,10 +320,10 @@ MonoBehaviour:
   m_ZoomArea:
     m_HRangeLocked: 0
     m_VRangeLocked: 0
-    m_HBaseRangeMin: -152
-    m_HBaseRangeMax: 152
-    m_VBaseRangeMin: -85.5
-    m_VBaseRangeMax: 85.5
+    m_HBaseRangeMin: -479.5
+    m_HBaseRangeMax: 479.5
+    m_VBaseRangeMin: -269.71875
+    m_VBaseRangeMax: 269.71875
     m_HAllowExceedBaseRangeMin: 1
     m_HAllowExceedBaseRangeMax: 1
     m_VAllowExceedBaseRangeMin: 1
@@ -340,25 +340,25 @@ MonoBehaviour:
       serializedVersion: 2
       x: 0
       y: 17
-      width: 304
+      width: 959
       height: 633
     m_Scale: {x: 1, y: 1}
-    m_Translation: {x: 152, y: 316.5}
+    m_Translation: {x: 479.5, y: 316.5}
     m_MarginLeft: 0
     m_MarginRight: 0
     m_MarginTop: 0
     m_MarginBottom: 0
     m_LastShownAreaInsideMargins:
       serializedVersion: 2
-      x: -152
+      x: -479.5
       y: -316.5
-      width: 304
+      width: 959
       height: 633
     m_MinimalGUI: 1
   m_defaultScale: 1
   m_TargetTexture: {fileID: 0}
   m_CurrentColorSpace: 0
-  m_LastWindowPixelSize: {x: 304, y: 650}
+  m_LastWindowPixelSize: {x: 959, y: 650}
   m_ClearInEditMode: 1
   m_NoCameraWarning: 1
   m_LowResolutionForAspectRatios: 01000000000100000100
@@ -386,27 +386,27 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 92
-    width: 198
+    width: 200
     height: 650
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 822c0100
-    m_LastClickedID: 76930
-    m_ExpandedIDs: d847f8ffae48f8ffb849f8ff605df8ff365ef8ff405ff8ffdc63f8ffb264f8ffbc65f8ff4e6af8ffe66af8fff06bf8ff8e9df8ff629ef8ff6c9ff8ffbca5f8ff54a6f8ff5ea7f8ffd0eeffff1afcffff00000000a42b0000622c0000a62c0000b22c0000222d00006a2d000010e90000d2e90000b6ea000028eb000042eb000056eb00007cec0000a2ec0000c8180100d2180100041b01008a1b01003e1c01003c2a01006e2c0100a82d0100
+    m_SelectedIDs: c6af0000
+    m_LastClickedID: 44998
+    m_ExpandedIDs: 3c08fdfff008fdfff809fdff9435fdff4836fdff5037fdff10cafdffc620feff3a22feffe441feffead8feff12aeffff72f6ffff1afcffff00000000642b0000582c0000642d0000de9600006e9900007a990000849a0000969a0000cc9a00002aad0000baaf00002eb00000d0b00000e2b0000018b10000d0b10000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: Rocket Launcher
-      m_OriginalName: Rocket Launcher
+      m_Name: 
+      m_OriginalName: 
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: 60246
+      m_UserData: 0
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 0
+      m_OriginalEventType: 11
       m_IsRenamingFilename: 0
       m_ClientGUIView: {fileID: 10}
     m_SearchString: 
@@ -437,19 +437,19 @@ MonoBehaviour:
   m_DepthBufferBits: 32
   m_Pos:
     serializedVersion: 2
-    x: 202
+    x: 204
     y: 92
-    width: 857
+    width: 200
     height: 650
   m_SceneLighting: 1
-  lastFramingTime: 6806.104643786369
+  lastFramingTime: 2907.822266426076
   m_2DMode: 0
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 0.7090556, y: 1.1906505, z: 1.018395}
+    m_Target: {x: 0.15761137, y: 8.265103, z: -5.2855415}
     speed: 2
-    m_Value: {x: 0.7090556, y: 1.1906505, z: 1.018395}
+    m_Value: {x: 0.15761137, y: 8.265103, z: -5.2855415}
   m_RenderMode: 0
   m_ValidateTrueMetals: 0
   m_SceneViewState:
@@ -464,25 +464,25 @@ MonoBehaviour:
       speed: 2
       m_Value: 0
     yGrid:
-      m_Target: 0
+      m_Target: 1
       speed: 2
-      m_Value: 0
+      m_Value: 1
     zGrid:
       m_Target: 0
       speed: 2
       m_Value: 0
   m_Rotation:
-    m_Target: {x: 0.026970658, y: 0.74522954, z: -0.03019831, w: 0.665578}
+    m_Target: {x: 0.032511506, y: 0.94126856, z: -0.09491743, w: 0.32240826}
     speed: 2
-    m_Value: {x: 0.026970653, y: 0.74522936, z: -0.030198302, w: 0.6655778}
+    m_Value: {x: 0.03251151, y: 0.9412686, z: -0.09491744, w: 0.3224083}
   m_Size:
-    m_Target: 4.758413
+    m_Target: 22
     speed: 2
-    m_Value: 4.758413
+    m_Value: 22
   m_Ortho:
-    m_Target: 1
+    m_Target: 0
     speed: 2
-    m_Value: 1
+    m_Value: 0
   m_LastSceneViewRotation: {x: 0.01481094, y: 0.9723366, z: 0.06426728, w: -0.22408038}
   m_LastSceneViewOrtho: 0
   m_ReplacementShader: {fileID: 0}
@@ -527,19 +527,19 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 0
     m_Folders:
-    - Assets/Scripts/Guns
+    - Assets/Scripts/Entities
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Scripts/Guns
+  - Assets/Scripts/Entities
   m_LastFoldersGridSize: -1
   m_LastProjectPath: C:\Users\Marco\Documents\Thesis\Unity\Procedural FPS Map Generator
   m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 114}
-    m_SelectedIDs: 8a260000
-    m_LastClickedID: 9866
-    m_ExpandedIDs: 000000003a26000056260000802700008e27000038290000c629000000ca9a3bffffff7f
+    scrollPos: {x: 0, y: 246}
+    m_SelectedIDs: f6270000
+    m_LastClickedID: 10230
+    m_ExpandedIDs: 000000003e26000054260000882700009627000036290000be29000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -567,7 +567,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 000000003a26000056260000802700008e27000038290000c6290000
+    m_ExpandedIDs: 000000003e26000054260000882700009627000036290000be290000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -645,9 +645,9 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 0
-    y: 768
+    y: 763
     width: 1367
-    height: 250
+    height: 255
 --- !u!114 &18
 MonoBehaviour:
   m_ObjectHideFlags: 52

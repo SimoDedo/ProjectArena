@@ -48,7 +48,7 @@ public class ProjectileGun : Gun {
             projectile = (GameObject)Instantiate(projectilePrefab);
             projectile.transform.parent = projectiles.transform;
             projectile.name = projectilePrefab.name;
-            projectile.GetComponent<Projectile>().SetupProjectile(projectileLifeTime, projectileSpeed, this);
+            projectile.GetComponent<Projectile>().SetupProjectile(projectileLifeTime, projectileSpeed, this, damage, ownerEntityScript.GetID());
         }
         // Place and fire the projectile.
         projectile.GetComponent<Projectile>().Fire(projectilePosition.transform.position, rotation);

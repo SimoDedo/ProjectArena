@@ -20,6 +20,30 @@
         }
     }
 
+    // Applies damage to the opponent and eventually manages its death.
+    public override void TakeDamage(int damage, int killerID) {
+        if (inGame) {
+            health -= damage;
+
+            // If the health goes under 0, kill the entity and start the respawn process.
+            if (health <= 0f) {
+                health = 0;
+                // Kill the entity.
+                Die(killerID);
+                // Start the respawn process.
+                StartCoroutine(gameManagerScript.WaitForRespawn(gameObject, this));
+            }
+        }
+    }
+
+    // Heals the opponent.
+    public override void Heal(int restoredHealth) {
+        if (health + restoredHealth > totalHealth)
+            health = totalHealth;
+        else
+            health += restoredHealth;
+    }
+
     // Kills the opponent.
     protected override void Die(int id) {
         gameManagerScript.AddKill(id, entityID);
@@ -29,6 +53,7 @@
     // Respawns the opponent.
     public override void Respawn() {
         health = totalHealth;
+        ResetAllAmmo();
         SetInGame(true);
     }
 

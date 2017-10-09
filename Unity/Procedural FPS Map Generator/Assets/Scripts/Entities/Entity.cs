@@ -21,20 +21,7 @@ public abstract class Entity : MonoBehaviour {
     public abstract void SetupEntity(int th, bool[] ag, GameManager gms, int id);
 
     // Applies damage to the entity and eventually manages its death.
-    public void TakeDamage(int damage, int killerID) {
-        if (inGame) {
-            health -= damage;
-
-            // If the health goes under 0, kill the entity and start the respawn process.
-            if (health <= 0f) {
-                health = 0;
-                // Kill the entity.
-                Die(killerID);
-                // Start the respawn process.
-                StartCoroutine(gameManagerScript.WaitForRespawn(gameObject, this));
-            }
-        }
-    }
+    public abstract void TakeDamage(int damage, int killerID);
 
     // Kills the entity.
     protected abstract void Die(int id);
@@ -79,12 +66,7 @@ public abstract class Entity : MonoBehaviour {
     }
 
     // Heals the entity.
-    public void Heal(int restoredHealth) {
-        if (health + restoredHealth > totalHealth)
-            health = totalHealth;
-        else
-            health += restoredHealth;
-    }
+    public abstract void Heal(int restoredHealth);
 
     // If the entity is enabled, tells if any of the weapons passed as parameters hasn't the maximum ammo.
     public bool CanBeSupllied(bool[] suppliedGuns) {
@@ -130,6 +112,14 @@ public abstract class Entity : MonoBehaviour {
             gameObject.layer = 2;
         } else {
             gameObject.layer = originalLayer;
+        }
+    }
+
+    // Resets the ammo of all the weapons.
+    protected void ResetAllAmmo() {
+        for (int i = 0; i < guns.Count; i++) {
+            if (activeGuns[i])
+                guns[i].GetComponent<Gun>().ResetAmmo();
         }
     }
 

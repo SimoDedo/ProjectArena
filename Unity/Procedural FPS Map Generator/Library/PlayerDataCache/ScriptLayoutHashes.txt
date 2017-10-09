@@ -145,4 +145,4 @@ c2275a8bfbb9f9942cad75ecdfded41d UnityEngine.HoloLens.dll:UnityEngine.VR.WSA.Spa
 db09acdeda3d1fa2cb6928739bfe3d49 Assembly-CSharp.dll:.PlayerUIManager
 b55816a6fd9ce267ac29c83e0a3540a4 Assembly-CSharp.dll:.MeshMapAssembler
 7fcbaffa2f5bb2d6df1c62b0891e002e Assembly-CSharp.dll:.GameManager
-033a3ae692e0de11f5d2574d6e90ae7d Assembly-CSharp.dll:.ExplosiveProjectile
+efa652125874ef97ce75361ba193bd4f Assembly-CSharp.dll:.ExplosiveProjectile

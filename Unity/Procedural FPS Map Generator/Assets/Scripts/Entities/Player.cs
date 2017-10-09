@@ -87,6 +87,34 @@ public class Player : Entity {
         }
     }
 
+    // Applies damage to the player and eventually manages its death.
+    public override void TakeDamage(int damage, int killerID) {
+        if (inGame) {
+            health -= damage;
+
+            // If the health goes under 0, kill the entity and start the respawn process.
+            if (health <= 0f) {
+                health = 0;
+                // Kill the entity.
+                Die(killerID);
+                // Start the respawn process.
+                StartCoroutine(gameManagerScript.WaitForRespawn(gameObject, this));
+            }
+
+            playerUIManagerScript.SetHealth(health, totalHealth);
+        }
+    }
+
+    // Heals the player.
+    public override void Heal(int restoredHealth) {
+        if (health + restoredHealth > totalHealth)
+            health = totalHealth;
+        else
+            health += restoredHealth;
+
+        playerUIManagerScript.SetHealth(health, totalHealth);
+    }
+
     // Kills the player.
     protected override void Die(int id) {
         gameManagerScript.AddKill(id, entityID);
@@ -95,8 +123,11 @@ public class Player : Entity {
 
     // Respawns the player.
     public override void Respawn() {
-        SetInGame(true);
         health = totalHealth;
+        ResetAllAmmo();
+        SetInGame(true);
+
+        playerUIManagerScript.SetHealth(health, totalHealth);
     }
 
     // Switches weapon if possible.

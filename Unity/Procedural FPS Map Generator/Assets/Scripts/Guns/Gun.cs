@@ -21,6 +21,10 @@ public abstract class Gun : MonoBehaviour {
     [SerializeField]
     protected bool hasUI = false;
 
+    // Default ammo.
+    protected int defaultAmmoInCharger;
+    protected int defaultTotalAmmo;
+
     // Variables to manage ammo.
     protected int ammoInCharger;
     protected int totalAmmo;
@@ -112,6 +116,9 @@ public abstract class Gun : MonoBehaviour {
         ammoInCharger = chargerSize;
         totalAmmo = maximumAmmo / 2 - chargerSize;
 
+        defaultAmmoInCharger = ammoInCharger;
+        defaultTotalAmmo = totalAmmo;
+
         if (hasUI) {
             gunUIManagerScript = GetComponent<GunUIManager>();
             gunUIManagerScript.SetAmmo(ammoInCharger, totalAmmo);
@@ -128,6 +135,9 @@ public abstract class Gun : MonoBehaviour {
 
         ammoInCharger = chargerSize;
         totalAmmo = maximumAmmo / 2 - chargerSize;
+
+        defaultAmmoInCharger = ammoInCharger;
+        defaultTotalAmmo = totalAmmo;
 
         if (hasUI)
             gunUIManagerScript.SetAmmo(ammoInCharger, totalAmmo);
@@ -203,6 +213,15 @@ public abstract class Gun : MonoBehaviour {
         foreach (Transform child in transform) {
             child.gameObject.SetActive(active);
         }
+    }
+
+    // Resets the ammo.
+    public void ResetAmmo() {
+        ammoInCharger = defaultAmmoInCharger;
+        totalAmmo = defaultTotalAmmo;
+
+        if (hasUI)
+            gunUIManagerScript.SetAmmo(ammoInCharger, totalAmmo);
     }
 
 }
