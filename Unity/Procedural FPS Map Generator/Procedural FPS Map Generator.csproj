@@ -96,6 +96,7 @@
     <Compile Include="Assets\Scripts\Map Generation\Map Assembler\MapAssembler.cs" />
     <Compile Include="Assets\Scripts\Map Generation\Map Assembler\MeshMapAssembler.cs" />
     <Compile Include="Assets\Scripts\Map Generation\Map Generator\CellularMapGenerator.cs" />
+    <Compile Include="Assets\Scripts\Map Generation\Map Generator\DivisiveMapGenerator.cs" />
     <Compile Include="Assets\Scripts\Map Generation\Map Generator\MapGenerator.cs" />
     <Compile Include="Assets\Scripts\Map Generation\ObjectDisplacer.cs" />
     <Compile Include="Assets\Scripts\Others\RotateTranslateByAxis.cs" />

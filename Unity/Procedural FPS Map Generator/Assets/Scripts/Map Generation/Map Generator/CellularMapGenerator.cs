@@ -27,11 +27,6 @@ public class CellularMapGenerator : MapGenerator {
     // Rules are binary strings of length 8 and specified only for 0 cases.
     /* [SerializeField] private string[] binaryMasks; */
 
-    // Object containing the Map Builder script.
-    [Header("Building")] [SerializeField] private GameObject mapBuilder;
-    // Object containing the Object Displacer script.
-    [SerializeField] private GameObject objectDisplacer;
-
     // List of arrays containing character masks.
     /* private List<char[]> characterMasks; */
 

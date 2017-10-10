@@ -87,7 +87,12 @@ public class ObjectDisplacer : CoreComponent {
 
     // Returns all the object which have the category passed as parameter.
     public List<GameObject> GetObjectsByCategory(String category) {
-        return categoryObjectsDictionary[category];
+        try {
+            return categoryObjectsDictionary[category];
+        } catch (KeyNotFoundException) {
+            Debug.LogError("Error while populating the map, no object of category " + category + " found in the dictionary.");
+            return null;
+        }
     }
 
     // Custom object. 

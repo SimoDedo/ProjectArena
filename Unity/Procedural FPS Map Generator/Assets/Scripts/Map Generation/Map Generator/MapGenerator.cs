@@ -16,7 +16,7 @@ public abstract class MapGenerator : CoreComponent {
     [SerializeField] protected int height = 100;
     // Wall height.
     [SerializeField] protected float wallHeight = 5f;
-    // Wall square size.
+    // Square size.
     [SerializeField] protected float squareSize = 1f;
     // Minimum distance of an object w.r.t another object.
     [SerializeField] protected int objectToObjectDistance = 5;
