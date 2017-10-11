@@ -11,7 +11,8 @@ public class GameManager : CoreComponent {
     [SerializeField] private GameObject spawnPointManager;
     [SerializeField] private GameObject gameUIManager;
 
-    [Header("Game")] [SerializeField] private int gameDuration = 600;
+    [Header("Game")] [SerializeField] private bool generateOnly;
+    [SerializeField] private int gameDuration = 600;
     [SerializeField] private int readyDuration = 3;
     [SerializeField] private int scoreDuration = 10;
     [SerializeField] private float respawnDuration = 3;
@@ -62,22 +63,24 @@ public class GameManager : CoreComponent {
             mapManagerScript.ManageMap(true);
 
             // Set the spawn points.
-            spawnPointManagerScript.SetSpawnPoints(mapManagerScript.GetSpawnPoints());
+            if (!generateOnly)
+                generateOnly = spawnPointManagerScript.SetSpawnPoints(mapManagerScript.GetSpawnPoints());
 
-            // Spawn the player and the opponent.
-            Spawn(player);
-            Spawn(opponent);
+            if (!generateOnly) {
+                // Spawn the player and the opponent.
+                Spawn(player);
+                Spawn(opponent);
 
-            // Setup the contenders.
-            playerScript.SetupEntity(totalHealthPlayer, activeGunsPlayer, this, playerID);
-            opponentScript.SetupEntity(totalHealthOpponent, activeGunsOpponent, this, opponentID);
+                // Setup the contenders.
+                playerScript.SetupEntity(totalHealthPlayer, activeGunsPlayer, this, playerID);
+                opponentScript.SetupEntity(totalHealthOpponent, activeGunsOpponent, this, opponentID);
 
-            playerScript.LockCursor();
-
-            startTime = Time.time;
+                playerScript.LockCursor();
+                startTime = Time.time;
+            }
 
             SetReady(true);
-        } else if (IsReady()) {
+        } else if (IsReady() && !generateOnly) {
             ManageGame();
         }
     }

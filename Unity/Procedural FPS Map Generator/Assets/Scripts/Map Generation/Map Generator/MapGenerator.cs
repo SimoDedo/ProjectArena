@@ -22,6 +22,8 @@ public abstract class MapGenerator : CoreComponent {
     [SerializeField] protected int objectToObjectDistance = 5;
     // Minimum distance of an object w.r.t a wall.
     [SerializeField,] protected int objectToWallDistance = 2;
+    // Border size.
+    [SerializeField] protected int borderSize = 5;
 
     // Char that denotes a room;
     [Header("Representation")] [SerializeField] protected char roomChar = 'v';
@@ -137,7 +139,7 @@ public abstract class MapGenerator : CoreComponent {
             for (int neighbourY = gridY - 1; neighbourY <= gridY + 1; neighbourY++) {
                 if (IsInMapRange(neighbourX, neighbourY)) {
                     if (neighbourX != gridX || neighbourY != gridY)
-                        wallCount += getMapTileAsNumber(neighbourX, neighbourY, gridMap);
+                        wallCount += GetMapTileAsNumber(neighbourX, neighbourY, gridMap);
                 } else
                     wallCount++;
             }
@@ -207,7 +209,7 @@ public abstract class MapGenerator : CoreComponent {
     }
 
     // Return 1 if the tile is a wall, 0 otherwise.
-    protected int getMapTileAsNumber(int x, int y, char[,] gridMap) {
+    protected int GetMapTileAsNumber(int x, int y, char[,] gridMap) {
         if (gridMap[x, y] == wallChar)
             return 1;
         else
@@ -248,6 +250,22 @@ public abstract class MapGenerator : CoreComponent {
             return width;
         else
             return height;
+    }
+
+    // Adds borders to the map.
+    protected void AddBorders() {
+        char[,] borderedMap = new char[width + borderSize * 2, height + borderSize * 2];
+
+        for (int x = 0; x < borderedMap.GetLength(0); x++) {
+            for (int y = 0; y < borderedMap.GetLength(1); y++) {
+                if (x >= borderSize && x < width + borderSize && y >= borderSize && y < height + borderSize)
+                    borderedMap[x, y] = map[x - borderSize, y - borderSize];
+                else
+                    borderedMap[x, y] = wallChar;
+            }
+        }
+
+        map = borderedMap;
     }
 
     // Coordinates of a tile.

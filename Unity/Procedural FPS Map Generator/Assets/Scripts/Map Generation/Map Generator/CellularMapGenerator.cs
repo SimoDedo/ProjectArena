@@ -18,8 +18,6 @@ public class CellularMapGenerator : MapGenerator {
     [SerializeField] private int roomThresholdSize = 50;
     // Passage width.
     [SerializeField] private int passageWidth = 5;
-    // Border size.
-    [SerializeField] private int borderSize = 5;
 
     // Do I have to use custom rules when the neighbour count falls outside the limits?
     /* [SerializeField] private bool useCustomRules = false; */
@@ -49,21 +47,9 @@ public class CellularMapGenerator : MapGenerator {
 
         ProcessMap();
 
-        char[,] borderedMap = new char[width + borderSize * 2, height + borderSize * 2];
+        AddBorders();
 
-        for (int x = 0; x < borderedMap.GetLength(0); x++) {
-            for (int y = 0; y < borderedMap.GetLength(1); y++) {
-                if (x >= borderSize && x < width + borderSize && y >= borderSize && y < height + borderSize)
-                    borderedMap[x, y] = map[x - borderSize, y - borderSize];
-                else
-                    borderedMap[x, y] = wallChar;
-            }
-        }
-
-        if (createTextFile)
-            SaveMapAsText();
-
-        return borderedMap;
+        return map;
     }
 
     // Checks if the masks are valid and translates them from binary strings to arrays of characters.
