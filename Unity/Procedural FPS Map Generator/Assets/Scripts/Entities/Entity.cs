@@ -110,8 +110,18 @@ public abstract class Entity : MonoBehaviour {
             originalLayer = gameObject.layer;
             // 2 stands for the ignore raycast layer.
             gameObject.layer = 2;
+            ChangeLayersRecursively(transform, 2);
         } else {
             gameObject.layer = originalLayer;
+            ChangeLayersRecursively(transform, originalLayer);
+        }
+    }
+
+    // Changes the layer recursively.
+    protected void ChangeLayersRecursively(Transform t, int l) {
+        foreach (Transform child in t) {
+            child.gameObject.layer = l;
+            ChangeLayersRecursively(child, l);
         }
     }
 

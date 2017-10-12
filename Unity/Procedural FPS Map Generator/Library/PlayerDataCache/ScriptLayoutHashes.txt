@@ -1,4 +1,5 @@
 WindowsStandalone
+c744a031a7c585fa5864fb961eb63cf6 Assembly-CSharp.dll:.DivisiveMapGenerator
 8740974f9956b0ea17a19da5ce913d72 Assembly-CSharp.dll:.Player
 dc07d7ad69b399a46e92c483bf1c04ca UnityEngine.Analytics.dll:UnityEngine.Analytics.AnalyticsTracker
 05524b8f659e7bfe5756d1335fec24ba UnityEngine.Timeline.dll:UnityEngine.Timeline.ActivationPlayableAsset
@@ -14,7 +15,7 @@ ff05dcdf90651c3d98a9cad3df5e471e UnityEngine.Timeline.dll:UnityEngine.Timeline.C
 7b848b7feaa524953d09fc1851efa6da UnityEngine.Timeline.dll:UnityEngine.Timeline.PlayableTrack
 c24a21b131bfa67be1162db2cba4b52b UnityEngine.Timeline.dll:UnityEngine.Timeline.TimelineAsset
 ebbd7b65067d24248581e297954c0126 Assembly-CSharp.dll:.ObjectDisplacer
-d5a20f7a1e6ee9b97197bf7ace990f98 Assembly-CSharp.dll:.CellularMapGenerator
+cd5b0f911d655890d1170e225a575d7e Assembly-CSharp.dll:.CellularMapGenerator
 98632e90495fd44cc91bea0ece3f9eb2 Assembly-CSharp.dll:.AmmoPickable
 a35dc9cca2faebc5f5f1aeb9e8e47bbe UnityEngine.UI.dll:UnityEngine.UI.AspectRatioFitter
 05524b8f659e7bfe5756d1335fec24ba UnityEngine.UI.dll:UnityEngine.EventSystems.BaseInput
@@ -144,5 +145,5 @@ c2275a8bfbb9f9942cad75ecdfded41d UnityEngine.HoloLens.dll:UnityEngine.VR.WSA.Spa
 45f3431f0103c41611e8d4eec3d439df UnityEngine.HoloLens.dll:UnityEngine.VR.WSA.SpatialMappingRenderer
 db09acdeda3d1fa2cb6928739bfe3d49 Assembly-CSharp.dll:.PlayerUIManager
 b55816a6fd9ce267ac29c83e0a3540a4 Assembly-CSharp.dll:.MeshMapAssembler
-7fcbaffa2f5bb2d6df1c62b0891e002e Assembly-CSharp.dll:.GameManager
+60c3a40816d9c980ba151605ae7f2a20 Assembly-CSharp.dll:.GameManager
 efa652125874ef97ce75361ba193bd4f Assembly-CSharp.dll:.ExplosiveProjectile
