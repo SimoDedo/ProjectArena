@@ -47,7 +47,7 @@ public abstract class MapGenerator : CoreComponent {
     // Initializes the pseudo random generator.
     protected void InitializePseudoRandomGenerator() {
         if (useRandomSeed)
-            seed = GetDatestring();
+            seed = GetDateString();
 
         hash = seed.GetHashCode();
         pseudoRandomGen = new System.Random(hash);
@@ -240,7 +240,7 @@ public abstract class MapGenerator : CoreComponent {
     }
 
     // Gets the current date as string.
-    protected string GetDatestring() {
+    protected string GetDateString() {
         return System.DateTime.Now.ToString();
     }
 
@@ -266,6 +266,14 @@ public abstract class MapGenerator : CoreComponent {
         }
 
         map = borderedMap;
+    }
+
+    public char GetWallChar() {
+        return wallChar;
+    }
+
+    public char GetRoomChar() {
+        return roomChar;
     }
 
     // Coordinates of a tile.

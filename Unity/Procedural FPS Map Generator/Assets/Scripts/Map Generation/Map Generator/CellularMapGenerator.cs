@@ -19,15 +19,6 @@ public class CellularMapGenerator : MapGenerator {
     // Passage width.
     [SerializeField] private int passageWidth = 5;
 
-    // Do I have to use custom rules when the neighbour count falls outside the limits?
-    /* [SerializeField] private bool useCustomRules = false; */
-    // List of rules. Each rule is a string which decribes the neighbour tiles in the order 1a, 1b, 1c, 2a, 2c, 3a, 3b, 3c.
-    // Rules are binary strings of length 8 and specified only for 0 cases.
-    /* [SerializeField] private string[] binaryMasks; */
-
-    // List of arrays containing character masks.
-    /* private List<char[]> characterMasks; */
-
     private void Start() {
         SetReady(true);
     }
@@ -51,35 +42,6 @@ public class CellularMapGenerator : MapGenerator {
 
         return map;
     }
-
-    // Checks if the masks are valid and translates them from binary strings to arrays of characters.
-    /* private void TranslateMasks() {
-        characterMasks = new List<char[]>();
-
-        for (int i = 0; i < binaryMasks.GetLength(0); i++) {
-            if (binaryMasks[i].Length != 8) {
-                Debug.LogError("Error while translating the mask " + i + ", masks must be binary strings of length 8. Further masks will be ignored.");
-                useCustomRules = false;
-                return;
-            } else {
-                characterMasks.Add(new char[8]);
-
-                for (int j = 0; j < 8; j++) {
-                    char currentChar = binaryMasks[i][j];
-
-                    if (currentChar == '0') {
-                        characterMasks[i][j] = roomChar;
-                    } else if (currentChar == '1') {
-                        characterMasks[i][j] = wallChar;
-                    } else {
-                        Debug.LogError("Error while translating the character " + currentChar + ", masks must be binary strings of length 8. Further masks will be ignored.");
-                        useCustomRules = false;
-                        return;
-                    }
-                }
-            }
-        }
-    } */
 
     // Processes the map.
     private void ProcessMap() {
@@ -327,61 +289,6 @@ public class CellularMapGenerator : MapGenerator {
             }
         }
     }
-
-    // Returns a room tile if a match is found, a wall tile otherwise.
-    /* private char ApplyMasks(int gridX, int gridY, char[] neighbours) {
-        foreach (char[] mask in characterMasks) {
-            int matchCount = 0;
-
-            for (int i = 0; i < 8; i++) {
-                if (mask[i] == neighbours[i])
-                    matchCount++;
-            }
-
-            if (matchCount == 8)
-                return roomChar;
-        }
-
-        return wallChar;
-    } */
-
-    // Gets the number of walls surrounding a cell.
-    /* private int GetNeighboursWallCount(char[] neighbours) {
-        int wallCount = 0;
-
-        for (int i = 0; i < 8; i++) {
-            if (neighbours[i] == wallChar)
-                wallCount++;
-        }
-
-        return wallCount;
-    } */
-
-    // Gets the neighbours of a cell.
-    /* private char[] GetNeighbours(int gridX, int gridY) {
-        char[] neighbours = new char[8];
-        int i = 0;
-
-        // Loop on 3x3 grid centered on [gridX, gridY].
-        for (int neighbourX = gridX - 1; neighbourX <= gridX + 1; neighbourX++) {
-            for (int neighbourY = gridY - 1; neighbourY <= gridY + 1; neighbourY++) {
-                if (IsInMapRange(neighbourX, neighbourY)) {
-                    if (neighbourX != gridX || neighbourY != gridY) {
-                        if (map[neighbourX, neighbourY] == roomChar)
-                            neighbours[i] = roomChar;
-                        else
-                            neighbours[i] = wallChar;
-                        i++;
-                    }
-                } else {
-                    neighbours[i] = wallChar;
-                    i++;
-                }
-            }
-        }
-
-        return neighbours;
-    } */
 
     // Stores all information about a room.
     private class Room : IComparable<Room> {

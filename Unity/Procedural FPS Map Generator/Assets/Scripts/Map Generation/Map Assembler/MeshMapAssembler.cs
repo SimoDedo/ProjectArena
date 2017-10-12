@@ -64,16 +64,14 @@ public class MeshMapAssembler : MapAssebler {
     }
 
     // Generates the Mesh.
-    public override void AssembleMap(char[,] map, float squareSize, float h) {
+    public override void AssembleMap(char[,] map, char wallChar, char roomChar, float squareSize, float h) {
         wallHeigth = h;
-
-        char charWall = map[0, 0];
 
         outlines.Clear();
         checkedVertices.Clear();
         triangleDictionary.Clear();
 
-        squareGrid = new SquareGrid(map, charWall, squareSize);
+        squareGrid = new SquareGrid(map, wallChar, squareSize);
 
         vertices = new List<Vector3>();
         triangles = new List<int>();

@@ -51,7 +51,7 @@ public class MapManager : CoreComponent {
 
         if (assembleMap) {
             // Assemble the map.
-            mapAssemblerScript.AssembleMap(map, squareSize, heigth);
+            mapAssemblerScript.AssembleMap(map, mapGeneratorScript.GetWallChar(), mapGeneratorScript.GetRoomChar(), squareSize, heigth);
             // Displace the objects.
             objectDisplacerScript.DisplaceObjects(map, squareSize, heigth);
         }
