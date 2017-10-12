@@ -64,12 +64,12 @@ public class PrefabMapAssembler : MapAssebler {
         foreach (TilePrefab t in tilePrefabs) {
             string convertedMask = ConvertMask(t.binaryMask);
             processedTilePrefabs.Add(new ProcessedTilePrefab(convertedMask, t.prefab, 0));
-            Debug.Log("Added mask " + convertedMask + ".");
+            // Debug.Log("Added mask " + convertedMask + ".");
             if (t.binaryMask != "0000" && t.binaryMask != "1111") {
                 for (int i = 1; i < 4; i++) {
                     convertedMask = CircularShiftMask(convertedMask);
                     processedTilePrefabs.Add(new ProcessedTilePrefab(convertedMask, t.prefab, 90 * i));
-                    Debug.Log("Added mask " + convertedMask + ".");
+                    // Debug.Log("Added mask " + convertedMask + ".");
                 }
             }
         }
