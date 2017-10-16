@@ -76,7 +76,7 @@ public class DivisiveMapGenerator : MapGenerator {
     // Fills the map with wall cells.
     private void FillMap() {
         for (int x = 0; x < width; x++) {
-            for (int y = 0; y < width; y++) {
+            for (int y = 0; y < height; y++) {
                 map[x, y] = wallChar;
             }
         }

@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class PrefabMapAssembler : MapAssebler {
 
+    // Rotation correction angle.
+    [SerializeField] private int rotationCorrection = 0;
     // List of prefabs.
     [SerializeField] private List<TilePrefab> tilePrefabs;
 
@@ -35,13 +37,13 @@ public class PrefabMapAssembler : MapAssebler {
         // Process all the tiles.
         ProcessTiles();
 
-        for (int x = 0; x < map.GetLength(0); x++) {
-            for (int y = 0; y < map.GetLength(0); y++) {
-                if (map[x, y] == rChar) {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (map[x, y] != wallChar) {
                     string currentMask = GetNeighbourhoodMask(x, y);
                     foreach (ProcessedTilePrefab p in processedTilePrefabs) {
                         if (p.mask == currentMask)
-                            AddPrefab(p.prefab, x, y, squareSize, h);
+                            AddPrefab(p.prefab, x, y, squareSize, h, p.rotation);
                     }
                 }
             }
@@ -49,11 +51,12 @@ public class PrefabMapAssembler : MapAssebler {
     }
 
     // Adds a prefab to the map.
-    private void AddPrefab(GameObject gameObject, int x, int y, float squareSize, float h) {
+    private void AddPrefab(GameObject gameObject, int x, int y, float squareSize, float h, float rotation) {
         GameObject childObject = (GameObject)Instantiate(gameObject);
         childObject.name = gameObject.name;
         childObject.transform.parent = transform;
-        childObject.transform.localPosition = new Vector3(x * squareSize - width / 2, h, y * squareSize - height / 2);
+        childObject.transform.position = new Vector3(x * squareSize - width / 2, h, y * squareSize - height / 2);
+        childObject.transform.eulerAngles = new Vector3(0, rotation, 0);
     }
 
     // For each tile, converts its binary mask into a char array and creates three rotated copies.
@@ -63,12 +66,12 @@ public class PrefabMapAssembler : MapAssebler {
         // For each tile create three rotated copies.
         foreach (TilePrefab t in tilePrefabs) {
             string convertedMask = ConvertMask(t.binaryMask);
-            processedTilePrefabs.Add(new ProcessedTilePrefab(convertedMask, t.prefab, 0));
+            processedTilePrefabs.Add(new ProcessedTilePrefab(convertedMask, t.prefab, rotationCorrection));
             // Debug.Log("Added mask " + convertedMask + ".");
             if (t.binaryMask != "0000" && t.binaryMask != "1111") {
                 for (int i = 1; i < 4; i++) {
                     convertedMask = CircularShiftMask(convertedMask);
-                    processedTilePrefabs.Add(new ProcessedTilePrefab(convertedMask, t.prefab, 90 * i));
+                    processedTilePrefabs.Add(new ProcessedTilePrefab(convertedMask, t.prefab, 90 * i + rotationCorrection));
                     // Debug.Log("Added mask " + convertedMask + ".");
                 }
             }
