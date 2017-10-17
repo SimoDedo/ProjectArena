@@ -5,6 +5,10 @@ using UnityEngine;
 
 public class PrefabMapAssembler : MapAssebler {
 
+    // Floor height.
+    [SerializeField] private float floorHeigth = 0;
+    // Ceil height.
+    [SerializeField] private float ceilHeigth = 0;
     // Rotation correction angle.
     [SerializeField] private int rotationCorrection = 0;
     // List of prefabs.
@@ -23,7 +27,22 @@ public class PrefabMapAssembler : MapAssebler {
     // Map.
     char[,] map;
 
+    private MeshCollider floorCollider;
+    private MeshCollider ceilCollider;
+
     void Start() {
+        GameObject childObject;
+
+        childObject = new GameObject("Floor - Collider");
+        childObject.transform.parent = transform;
+        childObject.transform.localPosition = Vector3.zero;
+        floorCollider = childObject.AddComponent<MeshCollider>();
+
+        childObject = new GameObject("Ceil - Collider");
+        childObject.transform.parent = transform;
+        childObject.transform.localPosition = Vector3.zero;
+        ceilCollider = childObject.AddComponent<MeshCollider>();
+
         SetReady(true);
     }
 
@@ -48,6 +67,9 @@ public class PrefabMapAssembler : MapAssebler {
                 }
             }
         }
+
+        floorCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, floorHeigth, false);
+        ceilCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, ceilHeigth, true);
     }
 
     // Adds a prefab to the map.
@@ -55,7 +77,7 @@ public class PrefabMapAssembler : MapAssebler {
         GameObject childObject = (GameObject)Instantiate(gameObject);
         childObject.name = gameObject.name;
         childObject.transform.parent = transform;
-        childObject.transform.position = new Vector3(x * squareSize - width / 2, h, y * squareSize - height / 2);
+        childObject.transform.position = new Vector3(squareSize * (x - width / 2), h, squareSize * (y - width / 2));
         childObject.transform.eulerAngles = new Vector3(0, rotation, 0);
     }
 
@@ -112,6 +134,31 @@ public class PrefabMapAssembler : MapAssebler {
     // Tells if a tile is in the map.
     private bool IsInMapRange(int x, int y) {
         return x >= 0 && x < width && y >= 0 && y < height;
+    }
+
+    // Creates a flat mesh.
+    private Mesh CreateFlatMesh(int sizeX, int sizeY, float squareSize, float height, bool inverted) {
+        Mesh flatMesh = new Mesh();
+
+        Vector3[] floorVertices = new Vector3[4];
+
+        floorVertices[0] = new Vector3(-sizeX / 2 * squareSize, -height, -sizeY / 2 * squareSize);
+        floorVertices[1] = new Vector3(-sizeX / 2 * squareSize, -height, sizeY / 2 * squareSize);
+        floorVertices[2] = new Vector3(sizeX / 2 * squareSize, -height, -sizeY / 2 * squareSize);
+        floorVertices[3] = new Vector3(sizeX / 2 * squareSize, -height, sizeY / 2 * squareSize);
+
+        int[] floorTriangles;
+
+        if (inverted)
+            floorTriangles = new int[] { 3, 1, 2, 2, 1, 0 };
+        else
+            floorTriangles = new int[] { 0, 1, 2, 2, 1, 3 };
+
+        flatMesh.vertices = floorVertices;
+        flatMesh.triangles = floorTriangles;
+        flatMesh.RecalculateNormals();
+
+        return flatMesh;
     }
 
     // Custom prefab. 

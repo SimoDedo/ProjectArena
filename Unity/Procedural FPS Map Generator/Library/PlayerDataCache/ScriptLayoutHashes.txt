@@ -137,7 +137,7 @@ e9bdabf9265d758d56f01bb188916fa8 UnityEngine.Networking.dll:UnityEngine.Networki
 05524b8f659e7bfe5756d1335fec24ba UnityEngine.TestRunner.dll:UnityEngine.TestTools.TestRunner.Callbacks.PlayModeRunnerCallback
 5f2ad81aa8994e8fbe25d1e57afe6773 UnityEngine.TestRunner.dll:UnityEngine.TestTools.TestRunner.PlaymodeTestsController
 64eb32cc721b1cc68a91ed57461e188c UnityEngine.TestRunner.dll:UnityEngine.TestTools.TestRunner.Callbacks.RemoteTestResultSender
-36cd773b716e1dcf21ba4975bcdb3335 Assembly-CSharp.dll:.PrefabMapAssembler
+282ce2cee01bfc06946db2cf579f5651 Assembly-CSharp.dll:.PrefabMapAssembler
 c804c4501e94b27c133697fbddb8170a Assembly-CSharp.dll:.SpawnPointManager
 bc68edb0af574bf79f9550ead8ebae5c UnityEngine.HoloLens.dll:UnityEngine.Audio.AudioSpatializerMicrosoft
 05524b8f659e7bfe5756d1335fec24ba UnityEngine.HoloLens.dll:UnityEngine.EventSystems.HoloLensInput
@@ -148,3 +148,5 @@ db09acdeda3d1fa2cb6928739bfe3d49 Assembly-CSharp.dll:.PlayerUIManager
 b55816a6fd9ce267ac29c83e0a3540a4 Assembly-CSharp.dll:.MeshMapAssembler
 60c3a40816d9c980ba151605ae7f2a20 Assembly-CSharp.dll:.GameManager
 efa652125874ef97ce75361ba193bd4f Assembly-CSharp.dll:.ExplosiveProjectile
+dcf3ed76442c48e3a57dd27e6f2fecc5 Assembly-CSharp.dll:.MainMenuUIManager
+05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.Quitter

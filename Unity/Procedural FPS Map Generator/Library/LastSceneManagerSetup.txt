@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/Deathmatch - Canyon.unity
+- path: Assets/Scenes/Deathmatch - Industrial.unity
   isLoaded: 1
   isActive: 1

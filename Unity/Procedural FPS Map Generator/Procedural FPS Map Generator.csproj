@@ -100,9 +100,11 @@
     <Compile Include="Assets\Scripts\Map Generation\Map Generator\DivisiveMapGenerator.cs" />
     <Compile Include="Assets\Scripts\Map Generation\Map Generator\MapGenerator.cs" />
     <Compile Include="Assets\Scripts\Map Generation\ObjectDisplacer.cs" />
+    <Compile Include="Assets\Scripts\Others\Quitter.cs" />
     <Compile Include="Assets\Scripts\Others\RotateTranslateByAxis.cs" />
     <Compile Include="Assets\Scripts\UI\GameUIManager.cs" />
     <Compile Include="Assets\Scripts\UI\GunUIManager.cs" />
+    <Compile Include="Assets\Scripts\UI\MainMenuUIManager.cs" />
     <Compile Include="Assets\Scripts\UI\PlayerUIManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

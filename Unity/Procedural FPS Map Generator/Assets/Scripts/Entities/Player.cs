@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class Player : Entity {
 
@@ -80,10 +81,6 @@ public class Player : Entity {
         for (int i = 0; i < ag.GetLength(0); i++) {
             // Setup the gun.
             guns[i].GetComponent<Gun>().SetupGun(gms, this, playerUIManagerScript);
-            // Activate it if is one among the active ones which has the lowest rank.
-            if (i == GetActiveGun(-1, true)) {
-                ActivateGun(i);
-            }
         }
     }
 
@@ -125,9 +122,20 @@ public class Player : Entity {
     public override void Respawn() {
         health = totalHealth;
         ResetAllAmmo();
+        ActivateLowestGun();
         SetInGame(true);
 
         playerUIManagerScript.SetHealth(health, totalHealth);
+    }
+
+    // Activates the lowest ranked gun.
+    private void ActivateLowestGun() {
+        for (int i = 0; i < activeGuns.GetLength(0); i++) {
+            // Activate it if is one among the active ones which has the lowest rank.
+            if (i == GetActiveGun(-1, true)) {
+                ActivateGun(i);
+            }
+        }
     }
 
     // Switches weapon if possible.

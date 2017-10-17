@@ -62,9 +62,9 @@ public class ObjectDisplacer : CoreComponent {
                     GameObject childObject = (GameObject)Instantiate(currentObject.prefab);
                     childObject.name = currentObject.prefab.name;
                     childObject.transform.parent = transform.Find(currentObject.category);
-                    childObject.transform.localPosition = new Vector3(x * squareSize - map.GetLength(0) / 2,
+                    childObject.transform.localPosition = new Vector3(squareSize * (x - map.GetLength(0) / 2),
                         heightDirCorrection * (heightCorrection + height + currentObject.heightCorrection),
-                        y * squareSize - map.GetLength(1) / 2);
+                        squareSize * (y - map.GetLength(1) / 2));
                     childObject.transform.localScale *= sizeCorrection;
 
                     if (categoryObjectsDictionary.ContainsKey(currentObject.category)) {
