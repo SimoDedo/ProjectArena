@@ -8,8 +8,6 @@ public class ObjectDisplacer : CoreComponent {
     [SerializeField] private float sizeCorrection = 1f;
     // Height direction correction factor.
     [SerializeField] private float heightDirCorrection = 1f;
-    // Height correction factor.
-    [SerializeField] private float heightCorrection = 0f;
     // Custom objects that will be added to the map.
     [SerializeField] private CustomObject[] customObjects;
 
@@ -63,7 +61,7 @@ public class ObjectDisplacer : CoreComponent {
                     childObject.name = currentObject.prefab.name;
                     childObject.transform.parent = transform.Find(currentObject.category);
                     childObject.transform.localPosition = new Vector3(squareSize * (x - map.GetLength(0) / 2),
-                        heightDirCorrection * (heightCorrection + height + currentObject.heightCorrection),
+                        heightDirCorrection * (height + currentObject.heightCorrection),
                         squareSize * (y - map.GetLength(1) / 2));
                     childObject.transform.localScale *= sizeCorrection;
 

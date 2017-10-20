@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PrefabMapAssembler : MapAssebler {
 
-    // Floor height.
-    [SerializeField] private float floorHeigth = 0;
     // Ceil height.
-    [SerializeField] private float ceilHeigth = 0;
+    [SerializeField] private float ceilHeight = 0;
     // Rotation correction angle.
     [SerializeField] private int rotationCorrection = 0;
     // List of prefabs.
@@ -46,7 +43,7 @@ public class PrefabMapAssembler : MapAssebler {
         SetReady(true);
     }
 
-    public override void AssembleMap(char[,] m, char wChar, char rChar, float squareSize, float h) {
+    public override void AssembleMap(char[,] m, char wChar, char rChar, float squareSize, float floorHeight) {
         wallChar = wChar;
         roomChar = rChar;
         width = m.GetLength(0);
@@ -62,22 +59,22 @@ public class PrefabMapAssembler : MapAssebler {
                     string currentMask = GetNeighbourhoodMask(x, y);
                     foreach (ProcessedTilePrefab p in processedTilePrefabs) {
                         if (p.mask == currentMask)
-                            AddPrefab(p.prefab, x, y, squareSize, h, p.rotation);
+                            AddPrefab(p.prefab, x, y, squareSize, p.rotation);
                     }
                 }
             }
         }
 
-        floorCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, floorHeigth, false);
-        ceilCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, ceilHeigth, true);
+        floorCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, floorHeight, false);
+        ceilCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, ceilHeight, true);
     }
 
     // Adds a prefab to the map.
-    private void AddPrefab(GameObject gameObject, int x, int y, float squareSize, float h, float rotation) {
+    private void AddPrefab(GameObject gameObject, int x, int y, float squareSize, float rotation) {
         GameObject childObject = (GameObject)Instantiate(gameObject);
         childObject.name = gameObject.name;
         childObject.transform.parent = transform;
-        childObject.transform.position = new Vector3(squareSize * (x - width / 2), h, squareSize * (y - width / 2));
+        childObject.transform.position = new Vector3(squareSize * (x - width / 2), 0, squareSize * (y - height / 2));
         childObject.transform.eulerAngles = new Vector3(0, rotation, 0);
     }
 
@@ -142,10 +139,10 @@ public class PrefabMapAssembler : MapAssebler {
 
         Vector3[] floorVertices = new Vector3[4];
 
-        floorVertices[0] = new Vector3(-sizeX / 2 * squareSize, -height, -sizeY / 2 * squareSize);
-        floorVertices[1] = new Vector3(-sizeX / 2 * squareSize, -height, sizeY / 2 * squareSize);
-        floorVertices[2] = new Vector3(sizeX / 2 * squareSize, -height, -sizeY / 2 * squareSize);
-        floorVertices[3] = new Vector3(sizeX / 2 * squareSize, -height, sizeY / 2 * squareSize);
+        floorVertices[0] = new Vector3(-sizeX / 2 * squareSize, height, -sizeY / 2 * squareSize);
+        floorVertices[1] = new Vector3(-sizeX / 2 * squareSize, height, sizeY / 2 * squareSize);
+        floorVertices[2] = new Vector3(sizeX / 2 * squareSize, height, -sizeY / 2 * squareSize);
+        floorVertices[3] = new Vector3(sizeX / 2 * squareSize, height, sizeY / 2 * squareSize);
 
         int[] floorTriangles;
 

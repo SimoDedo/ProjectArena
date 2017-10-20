@@ -1,22 +1,22 @@
 fileFormatVersion: 2
-guid: 44ceb90dec9160646984633a73c757ea
-timeCreated: 1508158091
+guid: 3c111e32623bd6341bdfdc43295e02e9
+timeCreated: 1508250508
 licenseType: Free
 ModelImporter:
   serializedVersion: 21
   fileIDToRecycleName:
     100000: //RootNode
-    100002: mesh_232527364
-    100004: mesh_595323087
+    100002: mesh_595323087
+    100004: mesh_756052679
     400000: //RootNode
-    400002: mesh_232527364
-    400004: mesh_595323087
-    2300000: mesh_232527364
-    2300002: mesh_595323087
-    3300000: mesh_232527364
-    3300002: mesh_595323087
-    4300000: mesh_232527364
-    4300002: mesh_595323087
+    400002: mesh_595323087
+    400004: mesh_756052679
+    2300000: mesh_595323087
+    2300002: mesh_756052679
+    3300000: mesh_595323087
+    3300002: mesh_756052679
+    4300000: mesh_595323087
+    4300002: mesh_756052679
   materials:
     importMaterials: 1
     materialName: 0
