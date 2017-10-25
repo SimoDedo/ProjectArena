@@ -243,7 +243,7 @@ public abstract class MapGenerator : CoreComponent {
                         textMap = textMap + "\n";
                 }
 
-                System.IO.File.WriteAllText(@textFilePath + "/" + hash.ToString() + "_map.txt", textMap);
+                System.IO.File.WriteAllText(@textFilePath + "/" + seed.ToString() + "_map.txt", textMap);
             } catch (Exception) {
                 Debug.LogError("Error while saving the map, please insert a valid path and check its permissions.");
             }

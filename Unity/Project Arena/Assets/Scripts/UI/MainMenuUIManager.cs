@@ -49,7 +49,7 @@ public class MainMenuUIManager : MonoBehaviour {
 
     private bool allowIO;
 
-    public void Start() {
+    public void Start() { 
         openSection = main;
 
         if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.LinuxPlayer) {
@@ -86,10 +86,9 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Loads the rigth scene.
     public void LoadScene() {
-        parameterContainer.SetExport(exportData);
         parameterContainer.SetGenerationMode(generationIndex);
         parameterContainer.SetMapDNA(mapDNA);
-        parameterContainer.SetExport(exportData);
+        parameterContainer.SetExport(exportData && allowIO);
         parameterContainer.SetExportPath(Application.persistentDataPath + "/Export");
 
         if (sceneIndex < singleplayerScenes.GetLength(0))
@@ -140,6 +139,7 @@ public class MainMenuUIManager : MonoBehaviour {
     private void ResetValues() {
         mapIndex = 0;
         generationIndex = 0;
+        exportData = true;
     }
 
     // Shows the next maps in the singleplayer menu.
@@ -198,7 +198,6 @@ public class MainMenuUIManager : MonoBehaviour {
             generation.GetComponent<Text>().text = "Generation: genetic";
             input.GetComponent<InputField>().placeholder.GetComponent<Text>().text = "Insert genome...";
             input.GetComponent<InputField>().text = "";
-            exportData = false;
         } else {
             next.GetComponent<Button>().interactable = true;
             previous.GetComponent<Button>().interactable = true;
@@ -207,7 +206,6 @@ public class MainMenuUIManager : MonoBehaviour {
             generation.GetComponent<Text>().text = "Generation: random";
             input.GetComponent<InputField>().placeholder.GetComponent<Text>().text = GetSeed();
             input.GetComponent<InputField>().text = "";
-            exportData = true;
         }
     }
 

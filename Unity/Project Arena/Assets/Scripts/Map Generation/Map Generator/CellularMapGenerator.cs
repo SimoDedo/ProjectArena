@@ -37,6 +37,9 @@ public class CellularMapGenerator : MapGenerator {
 
         AddBorders();
 
+        if (createTextFile)
+            SaveMapAsText();
+
         return map;
     }
 
