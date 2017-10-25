@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -12,40 +13,72 @@ public class MainMenuUIManager : MonoBehaviour {
     [Header("UI Sections")] [SerializeField] private GameObject main;
     [SerializeField] private GameObject singleplayer;
     [SerializeField] private GameObject multiplayer;
-    [SerializeField] private GameObject settings;
+    [SerializeField] private GameObject about;
 
     [Header("Singleplayer Fields")] [SerializeField] private GameObject mapSP;
-    [SerializeField] private GameObject nextGenrationSP;
+    [SerializeField] private GameObject nextGenerationSP;
     [SerializeField] private GameObject previousGenerationSP;
     [SerializeField] private GameObject generationSP;
     [SerializeField] private GameObject inputSP;
 
     [Header("Multiplayer Fields")] [SerializeField] private GameObject mapMP;
-    [SerializeField] private GameObject nextGenrationMP;
+    [SerializeField] private GameObject nextGenerationMP;
     [SerializeField] private GameObject previousGenerationMP;
     [SerializeField] private GameObject generationMP;
     [SerializeField] private GameObject inputMP;
+
+    [Header("About Fields")] [SerializeField] private GameObject import;
+    [SerializeField] private GameObject export;
+    [SerializeField] private GameObject importButton;
+    [SerializeField] private GameObject exportButton;
 
     private int currentOption;
     private GameObject openSection;
 
     private int mapIndex;
+    private int sceneIndex;
     private int generationIndex;
     private bool exportData;
     private String mapDNA;
 
+    private bool allowIO;
+
     public void Start() {
         openSection = main;
+
+        if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.LinuxPlayer)
+            allowIO = true;
+        else
+            allowIO = false;
+
+        // Create the import directory if needed.
+        if (!Directory.Exists(Application.persistentDataPath + "/Import")) {
+            Directory.CreateDirectory(Application.persistentDataPath + "/Import");
+        }
+        // Create the export directory if needed.
+        if (!Directory.Exists(Application.persistentDataPath + "/Export")) {
+            Directory.CreateDirectory(Application.persistentDataPath + "/Export");
+        }
+
+        if (Application.platform == RuntimePlatform.WindowsPlayer) {
+            importButton.SetActive(true);
+            exportButton.SetActive(true);
+        } else {
+            import.SetActive(true);
+            export.SetActive(true);
+            import.GetComponent<Text>().text = "Import folder: " + Application.persistentDataPath + "/Import";
+            export.GetComponent<Text>().text = "Export folder: " + Application.persistentDataPath + "/Export";
+        }
     }
 
     // Loads the rigth scene.
     public void LoadScene() {
-        if (mapIndex < singleplayerScenes.GetLength(0))
-            SceneManager.LoadScene(singleplayerScenes[mapIndex].sceneName);
-        else if (mapIndex < singleplayerScenes.GetLength(0))
-            SceneManager.LoadScene(multiplayerScenes[mapIndex - multiplayerScenes.GetLength(0)].sceneName);
-        else if (mapIndex < singleplayerScenes.GetLength(0) - singleplayerScenes.GetLength(0) - multiplayerScenes.GetLength(0))
-            SceneManager.LoadScene(otherScenes[mapIndex].sceneName);
+        if (sceneIndex < singleplayerScenes.GetLength(0))
+            SceneManager.LoadScene(singleplayerScenes[sceneIndex].sceneName);
+        else if (sceneIndex < singleplayerScenes.GetLength(0) + multiplayerScenes.GetLength(0))
+            SceneManager.LoadScene(multiplayerScenes[sceneIndex - singleplayerScenes.GetLength(0)].sceneName);
+        else
+            SceneManager.LoadScene(otherScenes[sceneIndex - singleplayerScenes.GetLength(0) - multiplayerScenes.GetLength(0)].sceneName);
     }
 
     // Quits the game.
@@ -65,9 +98,9 @@ public class MainMenuUIManager : MonoBehaviour {
         ResetValues();
     }
 
-    // Opens the settings menu.
-    public void OpenSettings() {
-        OpenSection(settings);
+    // Opens the about menu.
+    public void OpenAbout() {
+        OpenSection(about);
     }
 
     // Opens the main menu.
@@ -92,14 +125,32 @@ public class MainMenuUIManager : MonoBehaviour {
     public void SingleplayerNextMap() {
         IncreaseMapIndex();
         mapSP.GetComponent<Text>().text = "Map: " + singleplayerScenes[mapIndex].fieldName;
-        UpdateGenerationField(singleplayerScenes[mapIndex].isGenetic, inputSP, generationSP, nextGenrationSP, previousGenerationSP);
+        UpdateGenerationField(singleplayerScenes[mapIndex].isGenetic, inputSP, generationSP, nextGenerationSP, previousGenerationSP);
+        sceneIndex = mapIndex;
     }
 
     // Shows the previous maps in the singleplayer menu.
     public void SingleplayerPreviousMap() {
         DecreaseMapIndex();
         mapSP.GetComponent<Text>().text = "Map: " + singleplayerScenes[mapIndex].fieldName;
-        UpdateGenerationField(singleplayerScenes[mapIndex].isGenetic, inputSP, generationSP, nextGenrationSP, previousGenerationSP);
+        UpdateGenerationField(singleplayerScenes[mapIndex].isGenetic, inputSP, generationSP, nextGenerationSP, previousGenerationSP);
+        sceneIndex = mapIndex;
+    }
+
+    // Shows the next maps in the multiplayer menu.
+    public void MultiplayerNextMap() {
+        IncreaseMapIndex();
+        mapMP.GetComponent<Text>().text = "Map: " + singleplayerScenes[mapIndex].fieldName;
+        UpdateGenerationField(multiplayerScenes[mapIndex].isGenetic, inputMP, generationMP, nextGenerationMP, previousGenerationMP);
+        sceneIndex = mapIndex + singleplayerScenes.GetLength(0);
+    }
+
+    // Shows the previous maps in the multiplayer menu.
+    public void MultiplayerPreviousMap() {
+        DecreaseMapIndex();
+        mapMP.GetComponent<Text>().text = "Map: " + singleplayerScenes[mapIndex].fieldName;
+        UpdateGenerationField(multiplayerScenes[mapIndex].isGenetic, inputMP, generationMP, nextGenerationMP, previousGenerationMP);
+        sceneIndex = mapIndex + singleplayerScenes.GetLength(0);
     }
 
     // Increases by one the circular current map index.
@@ -155,6 +206,18 @@ public class MainMenuUIManager : MonoBehaviour {
         UpdateGeneration(inputSP, generationSP);
     }
 
+    // Shows the next generation method in the multiplayer menu.
+    public void MultiplayerNextGeneration() {
+        IncreaseGenerationIndex();
+        UpdateGeneration(inputMP, generationMP);
+    }
+
+    // Shows the previous generation method in the multiplayer menu.
+    public void MultiplayerPreviousGeneration() {
+        DecreaseGenerationIndex();
+        UpdateGeneration(inputMP, generationMP);
+    }
+
     // Updates the generation mode depending on the current index.
     private void UpdateGeneration(GameObject input, GameObject generation) {
         switch (generationIndex) {
@@ -201,6 +264,22 @@ public class MainMenuUIManager : MonoBehaviour {
     // Sets the export data flag.
     public void SetExportData(GameObject toggle) {
         exportData = toggle.GetComponent<Toggle>().isOn;
+    }
+
+    // Opens the import data fodler.
+    public void OpenImportFolder() {
+        ShowExplorer(Application.persistentDataPath + "/Import");
+    }
+
+    // Opens the export data fodler.
+    public void OpenExportFolder() {
+        ShowExplorer(Application.persistentDataPath + "/Export");
+    }
+
+    // Opens an explorer in Windows.
+    public void ShowExplorer(string path) {
+        path = path.Replace(@"/", @"\");
+        System.Diagnostics.Process.Start("explorer.exe", "/select," + path);
     }
 
     [Serializable]
