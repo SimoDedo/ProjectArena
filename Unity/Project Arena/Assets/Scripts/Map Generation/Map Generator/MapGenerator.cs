@@ -53,6 +53,17 @@ public abstract class MapGenerator : CoreComponent {
         pseudoRandomGen = new System.Random(hash);
     }
 
+    // Sets the parmaters, generates a map and returns it.
+    public char[,] GenerateMap(string s, bool ctf, string e) {
+        useRandomSeed = false;
+        seed = s;
+
+        createTextFile = ctf;
+        textFilePath = e;
+
+        return GenerateMap();
+    }
+
     // Generates the map and returns it.
     public abstract char[,] GenerateMap();
 
@@ -232,7 +243,7 @@ public abstract class MapGenerator : CoreComponent {
                         textMap = textMap + "\n";
                 }
 
-                System.IO.File.WriteAllText(@textFilePath + "/map_" + hash.ToString() + ".txt", textMap);
+                System.IO.File.WriteAllText(@textFilePath + "/" + hash.ToString() + "_map.txt", textMap);
             } catch (Exception) {
                 Debug.LogError("Error while saving the map, please insert a valid path and check its permissions.");
             }

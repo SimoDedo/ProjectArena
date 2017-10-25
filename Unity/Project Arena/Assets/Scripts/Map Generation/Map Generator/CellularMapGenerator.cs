@@ -26,9 +26,6 @@ public class CellularMapGenerator : MapGenerator {
     public override char[,] GenerateMap() {
         map = new char[width, height];
 
-        /* if (useCustomRules)
-            TranslateMasks(); */
-
         InitializePseudoRandomGenerator();
 
         RandomFillMap();

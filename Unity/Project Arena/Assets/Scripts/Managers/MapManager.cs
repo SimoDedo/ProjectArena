@@ -25,9 +25,15 @@ public class MapManager : CoreComponent {
     private MapAssebler mapAssemblerScript;
     private ObjectDisplacer objectDisplacerScript;
 
-    char[,] map;
+    private string seed;
+    private bool export;
+    private string exportPath;
 
+    private char[,] map;
+    
     private void Start() {
+        ExtractParametersFromContainer();
+
         mapAssemblerScript = mapAssembler.GetComponent<MapAssebler>();
         mapGeneratorScript = mapGenerator.GetComponent<MapGenerator>();
         objectDisplacerScript = objectDisplacer.GetComponent<ObjectDisplacer>();
@@ -46,7 +52,10 @@ public class MapManager : CoreComponent {
             LoadMapFromText();
         } else {
             // Generate the map.
-            map = mapGeneratorScript.GenerateMap();
+            if (GetParameterContainer() != null)
+                map = mapGeneratorScript.GenerateMap(seed, export, exportPath);
+            else
+                map = mapGeneratorScript.GenerateMap();
         }
 
         if (assembleMap) {
@@ -81,6 +90,38 @@ public class MapManager : CoreComponent {
                 Debug.LogError("Error while loading the map, the supplied file is not valid.");
             }
         }
+    }
+
+    // Extracts the parameters from the parameter container, if any.
+    private void ExtractParametersFromContainer() {
+        if (GetParameterContainer() != null) {
+            export = GetParameterContainer().GetExport();
+            exportPath = GetParameterContainer().GetExportPath();
+
+            switch (GetParameterContainer().GetGenerationMode()) {
+                case 0:
+                    loadMapFromFile = false;
+                    seed = GetParameterContainer().GetMapDNA();
+                    break;
+                case 1:
+                    loadMapFromFile = false;
+                    seed = GetParameterContainer().GetMapDNA();
+                    break;
+                case 2:
+                    seed = null;
+                    loadMapFromFile = true;
+                    textFilePath = GetParameterContainer().GetMapDNA();
+                    break;
+            }
+        }
+    }
+
+    // Returns the parameter container.
+    protected ParameterContainer GetParameterContainer() {
+        if (GameObject.Find("Parameter Container") != null)
+            return GameObject.Find("Parameter Container").GetComponent<ParameterContainer>();
+        else
+            return null;
     }
 
 }

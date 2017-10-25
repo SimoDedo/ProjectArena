@@ -20,17 +20,23 @@ public class MainMenuUIManager : MonoBehaviour {
     [SerializeField] private GameObject previousGenerationSP;
     [SerializeField] private GameObject generationSP;
     [SerializeField] private GameObject inputSP;
+    [SerializeField] private GameObject exportSP;
+    [SerializeField] private GameObject exportTextSP;
 
     [Header("Multiplayer Fields")] [SerializeField] private GameObject mapMP;
     [SerializeField] private GameObject nextGenerationMP;
     [SerializeField] private GameObject previousGenerationMP;
     [SerializeField] private GameObject generationMP;
     [SerializeField] private GameObject inputMP;
+    [SerializeField] private GameObject exportMP;
+    [SerializeField] private GameObject exportTextMP;
 
     [Header("About Fields")] [SerializeField] private GameObject import;
     [SerializeField] private GameObject export;
     [SerializeField] private GameObject importButton;
     [SerializeField] private GameObject exportButton;
+
+    [Header("Other")] [SerializeField] private ParameterContainer parameterContainer;
 
     private int currentOption;
     private GameObject openSection;
@@ -46,10 +52,17 @@ public class MainMenuUIManager : MonoBehaviour {
     public void Start() {
         openSection = main;
 
-        if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.LinuxPlayer)
+        if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.LinuxPlayer) {
             allowIO = true;
-        else
+        } else {
             allowIO = false;
+            exportSP.GetComponent<Toggle>().isOn = false;
+            exportSP.GetComponent<Toggle>().interactable = false;
+            exportTextSP.GetComponent<Text>().color = exportSP.GetComponent<Toggle>().colors.disabledColor;
+            exportMP.GetComponent<Toggle>().isOn = false;
+            exportMP.GetComponent<Toggle>().interactable = false;
+            exportTextMP.GetComponent<Text>().color = exportMP.GetComponent<Toggle>().colors.disabledColor;
+        }
 
         // Create the import directory if needed.
         if (!Directory.Exists(Application.persistentDataPath + "/Import")) {
@@ -73,6 +86,12 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Loads the rigth scene.
     public void LoadScene() {
+        parameterContainer.SetExport(exportData);
+        parameterContainer.SetGenerationMode(generationIndex);
+        parameterContainer.SetMapDNA(mapDNA);
+        parameterContainer.SetExport(exportData);
+        parameterContainer.SetExportPath(Application.persistentDataPath + "/Export");
+
         if (sceneIndex < singleplayerScenes.GetLength(0))
             SceneManager.LoadScene(singleplayerScenes[sceneIndex].sceneName);
         else if (sceneIndex < singleplayerScenes.GetLength(0) + multiplayerScenes.GetLength(0))
@@ -90,12 +109,14 @@ public class MainMenuUIManager : MonoBehaviour {
     public void OpenSingleplayer() {
         OpenSection(singleplayer);
         ResetValues();
+        UpdateGenerationField(singleplayerScenes[mapIndex].isGenetic, inputSP, generationSP, nextGenerationSP, previousGenerationSP);
     }
 
     // Opens the multiplayer menu.
     public void OpenMultiplayer() {
         OpenSection(multiplayer);
         ResetValues();
+        UpdateGenerationField(multiplayerScenes[mapIndex].isGenetic, inputMP, generationMP, nextGenerationMP, previousGenerationMP);
     }
 
     // Opens the about menu.
@@ -177,6 +198,7 @@ public class MainMenuUIManager : MonoBehaviour {
             generation.GetComponent<Text>().text = "Generation: genetic";
             input.GetComponent<InputField>().placeholder.GetComponent<Text>().text = "Insert genome...";
             input.GetComponent<InputField>().text = "";
+            exportData = false;
         } else {
             next.GetComponent<Button>().interactable = true;
             previous.GetComponent<Button>().interactable = true;
@@ -185,6 +207,7 @@ public class MainMenuUIManager : MonoBehaviour {
             generation.GetComponent<Text>().text = "Generation: random";
             input.GetComponent<InputField>().placeholder.GetComponent<Text>().text = GetSeed();
             input.GetComponent<InputField>().text = "";
+            exportData = true;
         }
     }
 
@@ -245,15 +268,21 @@ public class MainMenuUIManager : MonoBehaviour {
     // Increases by one the circular current generation index.
     private void IncreaseGenerationIndex() {
         generationIndex++;
-        if (generationIndex > 2)
+        if (!allowIO && generationIndex > 1)
+            generationIndex = 0;
+        else if (generationIndex > 2)
             generationIndex = 0;
     }
 
     // Decreases by one the circular current generation index.
     private void DecreaseGenerationIndex() {
         generationIndex--;
-        if (generationIndex < 0)
-            generationIndex = 2;
+        if (generationIndex < 0) {
+            if (!allowIO)
+                generationIndex = 1;
+            else
+                generationIndex = 2;
+        }
     }
 
     // Sets the map DNA.
