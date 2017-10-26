@@ -1,16 +1,25 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerUIManager : MonoBehaviour {
 
     [SerializeField] private GameObject health;
     [SerializeField] private GameObject cooldown;
+    [SerializeField] private GameObject damage;
     [SerializeField] private GameObject[] gunNumbers;
+    [SerializeField] private Color[] gunColors;
 
     // Variables for the cooldawn.
     private float cooldownDuration = 0f;
     private float cooldownStart = 0f;
     private bool mustCooldown = false;
+
+    // Variables for the damage.
+    private float damageDuration = 0.25f;
+    private float damageWait = 0.5f;
+    private float damageStart = 0f;
 
     private void Update() {
         // Update the cooldown bar if needed.
@@ -67,4 +76,29 @@ public class PlayerUIManager : MonoBehaviour {
             g.SetActive(b);
     }
 
+    // Returns the color of a gun.
+    public Color GetGunColor(int i) {
+        return gunColors[i];
+    }
+
+    // Sets the color of all the UI elements (except health).
+    public void SetColorAll(Color c) {
+        cooldown.GetComponent<Image>().color = c;
+        foreach (GameObject gn in gunNumbers)
+            gn.GetComponent<Text>().color = c;
+    }
+
+    // Shows the damage indicator.
+    public void ShowDamage() {
+        if (Time.time > damageStart + damageWait + damageDuration) {
+            damageStart = Time.time;
+            StartCoroutine(DamageAnimation());
+        }
+    }
+
+    private IEnumerator DamageAnimation() {
+        damage.SetActive(true);
+        yield return new WaitForSeconds(damageDuration);
+        damage.SetActive(false);
+    }
 }

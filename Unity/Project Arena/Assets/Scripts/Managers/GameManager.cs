@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // The game manager manages the game, it passes itself to the player.
 
@@ -21,6 +22,8 @@ public abstract class GameManager : CoreComponent {
     protected float startTime;
     // Current phase of the game: 0 = ready, 1 = figth, 2 = score.
     protected int gamePhase = -1;
+    // Is the game paused?
+    protected bool isPaused = false;
 
     // Moves a gameobject to a free spawn point.
     public void Spawn(GameObject g) {
@@ -44,5 +47,13 @@ public abstract class GameManager : CoreComponent {
     public abstract void AddScore(int score);
 
     public abstract void AddScore(int killerIdentifier, int killedID);
+
+    public abstract void SetUIColor(Color c);
+
+    public abstract void Pause();
+
+    public void Quit() {
+        SceneManager.LoadScene("Menu");
+    }
 
 }

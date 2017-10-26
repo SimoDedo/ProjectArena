@@ -43,8 +43,11 @@ public abstract class Gun : MonoBehaviour {
     // Is teh gun being used?
     protected bool used = false;
 
+    // Is the input enabled?
+    private bool inputEnabled = true;
+
     protected void Update() {
-        if (used) {
+        if (used && inputEnabled) {
             if (reloading || coolingDown)
                 UpdateTimers();
 
@@ -222,6 +225,11 @@ public abstract class Gun : MonoBehaviour {
 
         if (hasUI)
             gunUIManagerScript.SetAmmo(ammoInCharger, totalAmmo);
+    }
+
+    // Enables or disables the input.
+    public void EnableInput(bool b) {
+        inputEnabled = b;
     }
 
 }

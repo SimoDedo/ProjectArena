@@ -12,6 +12,7 @@ public class DuelGameUIManager : GameUIManager {
     [Header("Figth UI")] [SerializeField] private GameObject time;
     [SerializeField] private GameObject playerKills;
     [SerializeField] private GameObject opponentKills;
+    [SerializeField] private GameObject separator;
 
     // Elements of the score UI.
     [Header("Score UI")] [SerializeField] private GameObject playerWins;
@@ -92,6 +93,14 @@ public class DuelGameUIManager : GameUIManager {
     public void SetKills(int pk, int ok) {
         playerKillsText.text = pk.ToString();
         opponentKillsText.text = ok.ToString();
+    }
+
+    // Sets the color of all the UI elements.
+    public override void SetColorAll(Color c) {
+        timeText.color = c;
+        playerKillsText.color = c;
+        opponentKillsText.color = c;
+        separator.GetComponent<Text>().color = c;
     }
 
 }

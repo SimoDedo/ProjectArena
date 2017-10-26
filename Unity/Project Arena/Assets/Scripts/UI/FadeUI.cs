@@ -48,9 +48,10 @@ public class FadeUI : MonoBehaviour {
     }
 
     // Sets the maximum and minimum values and fades.
-    public void StartFade(float min, float max, bool ml) {
+    public void StartFade(float min, float max, bool ml, float d) {
         minimum = min;
         maximum = max;
+        duration = d;
 
         StartFade(ml);
     }

@@ -15,7 +15,6 @@ public abstract class GameUIManager : CoreComponent {
         readyUI.SetActive(true);
         figthUI.SetActive(false);
         scoreUI.SetActive(false);
-        pauseUI.SetActive(false);
     }
 
     // Activates the figth UI.
@@ -23,7 +22,6 @@ public abstract class GameUIManager : CoreComponent {
         readyUI.SetActive(false);
         figthUI.SetActive(true);
         scoreUI.SetActive(false);
-        pauseUI.SetActive(false);
     }
 
     // Activates the score UI.
@@ -31,17 +29,11 @@ public abstract class GameUIManager : CoreComponent {
         readyUI.SetActive(false);
         figthUI.SetActive(false);
         scoreUI.SetActive(true);
-        pauseUI.SetActive(false);
     }
 
-    // Activates the pause UI.
-    public void ActivatePauseUI() {
-        readyUI.SetActive(false);
-        figthUI.SetActive(false);
-        scoreUI.SetActive(false);
-        pauseUI.SetActive(true);
-
-        // TODO.
+    // Activates or deactivates the pause UI.
+    public void ActivatePauseUI(bool b) {
+        pauseUI.SetActive(b);
     }
 
     // Converts seconds and minutes to text and adds extra 0 if needed.
@@ -56,16 +48,10 @@ public abstract class GameUIManager : CoreComponent {
             return "0" + s;
     }
 
-    public void CompleteDefade() {
-        fadeUIScript.StartFade(true);
+    public void Fade(float min, float max, bool mustLigthen, float duration) {
+        fadeUIScript.StartFade(min, max, mustLigthen, duration);
     }
 
-    public void PartialFade() {
-        fadeUIScript.StartFade(0f, 0.3f, false);
-    }
-
-    public void PartialDefade() {
-        fadeUIScript.StartFade(0f, 0.3f, true);
-    }
+    public abstract void SetColorAll(Color c);
 
 }

@@ -36,7 +36,7 @@ public class DuelGameManager : GameManager {
         playerScript = player.GetComponent<Player>();
         opponentScript = opponent.GetComponent<Opponent>();
 
-        duelGameUIManagerScript.CompleteDefade();
+        duelGameUIManagerScript.Fade(0.5f, 1f, true, 0.5f);
     }
 
     private void Update() {
@@ -81,6 +81,7 @@ public class DuelGameManager : GameManager {
             gamePhase = 0;
         } else if (gamePhase == 0 && passedTime >= readyDuration) {
             // Enable the contenders movement and interactions, activate the figth UI, set the kills to zero and set the phase.
+            duelGameUIManagerScript.Fade(0.5f, 0f, false, 0.25f);
             playerScript.SetInGame(true);
             opponentScript.SetInGame(true);
             duelGameUIManagerScript.SetKills(0, 0);
@@ -110,6 +111,9 @@ public class DuelGameManager : GameManager {
             case 1:
                 // Update the time.
                 duelGameUIManagerScript.SetTime((int)(startTime + readyDuration + gameDuration - Time.time));
+                // Pause or unpause if needed.
+                if (Input.GetKeyDown(KeyCode.Escape))
+                    Pause();
                 break;
             case 2:
                 // Do nothing.
@@ -135,5 +139,25 @@ public class DuelGameManager : GameManager {
     }
 
     public override void AddScore(int score) { }
+
+    // Sets the color of the UI.
+    public override void SetUIColor(Color c) {
+        duelGameUIManagerScript.SetColorAll(c);
+    }
+
+    // Pauses and unpauses the game.
+    public override void Pause() {
+        if (isPaused) {
+            duelGameUIManagerScript.Fade(0f, 0.5f, true, 0.25f);
+            duelGameUIManagerScript.ActivatePauseUI(false);
+            playerScript.EnableInput(true);
+        } else {
+            duelGameUIManagerScript.Fade(0f, 0.5f, false, 0.25f);
+            duelGameUIManagerScript.ActivatePauseUI(true);
+            playerScript.EnableInput(false);
+        }
+
+        isPaused = !isPaused;
+    }
 
 }

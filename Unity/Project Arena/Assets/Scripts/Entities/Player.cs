@@ -27,6 +27,8 @@ public class Player : Entity {
     private Vector3 moveDirection = Vector3.zero;
     // Is the cursor locked?
     private bool cursorLocked = false;
+    // Is the input enabled?
+    private bool inputEnabled = true;
 
     private PlayerUIManager playerUIManagerScript;
 
@@ -54,16 +56,18 @@ public class Player : Entity {
 
     private void Update() {
         // If the cursor should be locked but it isn't, lock it when the user clicks.
-        if (Input.GetMouseButtonDown(0)) {
+        if (Input.GetMouseButtonDown(0) && inputEnabled) {
             if (cursorLocked && Cursor.lockState != CursorLockMode.Locked)
                 Cursor.lockState = CursorLockMode.Locked;
         }
 
         // If I can move update the player position depending on the inputs.
-        if (inGame) {
-            UpdateCameraPosition();
-            UpdatePosition();
+        if (inGame && inputEnabled) {
+                UpdateCameraPosition();
+                UpdatePosition();
             UpdateGun();
+        } else {
+            UpdateVerticalPosition();
         }
     }
 
@@ -99,6 +103,7 @@ public class Player : Entity {
             }
 
             playerUIManagerScript.SetHealth(health, totalHealth);
+            playerUIManagerScript.ShowDamage();
         }
     }
 
@@ -169,6 +174,7 @@ public class Player : Entity {
     private void ActivateGun(int toActivate) {
         guns[toActivate].GetComponent<Gun>().Wield();
         currentGun = toActivate;
+        SetUIColor();
     }
 
     // Deactivates a gun.
@@ -191,9 +197,30 @@ public class Player : Entity {
             // TODO - ???
         }
 
-        // Apply gravity to the direction and appy it using the controller.
+        // Apply gravity to the direction and apply it using the controller.
         moveDirection.y -= gravity * Time.deltaTime;
         controller.Move(moveDirection * Time.deltaTime);
+    }
+
+    // Updates the vertical position.
+    private void UpdateVerticalPosition() {
+        if (controller.isGrounded) {
+            moveDirection = new Vector3(0, 0, 0);
+        } else {
+            moveDirection.y -= gravity * Time.deltaTime;
+            controller.Move(moveDirection * Time.deltaTime);
+        }
+    }
+
+    // Enables or disables the input.
+    internal void EnableInput(bool b) {
+        inputEnabled = b;
+        guns[currentGun].GetComponent<Gun>().EnableInput(b);
+
+        if (b)
+            Cursor.lockState = CursorLockMode.Locked;
+        else
+            Cursor.lockState = CursorLockMode.None;
     }
 
     // Updates the camera position.
@@ -226,7 +253,7 @@ public class Player : Entity {
         cursorLocked = false;
     }
 
-    // TODO - Sets if the player is in game.
+    // Sets if the player is in game.
     public override void SetInGame(bool b) {
         if (b) {
             playerUIManagerScript.SetPlayerUIVisible(true);
@@ -237,6 +264,12 @@ public class Player : Entity {
         }
 
         inGame = b;
+    }
+
+    // Sets the UI colors.
+    private void SetUIColor() {
+        playerUIManagerScript.SetColorAll(playerUIManagerScript.GetGunColor(currentGun));
+        gameManagerScript.SetUIColor(playerUIManagerScript.GetGunColor(currentGun));
     }
 
 }
