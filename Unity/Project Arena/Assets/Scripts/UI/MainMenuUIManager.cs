@@ -109,6 +109,7 @@ public class MainMenuUIManager : MonoBehaviour {
         OpenSection(singleplayer);
         ResetValues();
         UpdateGenerationField(singleplayerScenes[mapIndex].isGenetic, inputSP, generationSP, nextGenerationSP, previousGenerationSP);
+        sceneIndex = 0;
     }
 
     // Opens the multiplayer menu.
@@ -116,6 +117,7 @@ public class MainMenuUIManager : MonoBehaviour {
         OpenSection(multiplayer);
         ResetValues();
         UpdateGenerationField(multiplayerScenes[mapIndex].isGenetic, inputMP, generationMP, nextGenerationMP, previousGenerationMP);
+        sceneIndex = singleplayerScenes.GetLength(0);
     }
 
     // Opens the about menu.

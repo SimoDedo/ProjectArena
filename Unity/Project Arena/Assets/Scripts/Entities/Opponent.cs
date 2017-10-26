@@ -46,7 +46,7 @@
 
     // Kills the opponent.
     protected override void Die(int id) {
-        gameManagerScript.AddKill(id, entityID);
+        gameManagerScript.AddScore(id, entityID);
         SetInGame(false);
     }
 
