@@ -5,6 +5,7 @@ public abstract class Entity : MonoBehaviour {
 
     // Guns.
     [SerializeField] protected List<GameObject> guns;
+    [SerializeField] protected int disabledLayer;
 
     // Informations about the entity.
     protected bool[] activeGuns;
@@ -108,9 +109,8 @@ public abstract class Entity : MonoBehaviour {
     protected void SetIgnoreRaycast(bool mustIgnore) {
         if (mustIgnore) {
             originalLayer = gameObject.layer;
-            // 2 stands for the ignore raycast layer.
-            gameObject.layer = 2;
-            ChangeLayersRecursively(transform, 2);
+            gameObject.layer = disabledLayer;
+            ChangeLayersRecursively(transform, disabledLayer);
         } else {
             gameObject.layer = originalLayer;
             ChangeLayersRecursively(transform, originalLayer);

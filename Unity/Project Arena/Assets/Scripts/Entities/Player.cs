@@ -4,7 +4,7 @@ using UnityEngine;
 public class Player : Entity {
 
     // Head object containing the camera.
-    [SerializeField] private GameObject head;
+    [Header("Player")] [SerializeField] private GameObject head;
 
     [SerializeField] private float speed = 10f;
     [SerializeField] private float jumpSpeed = 8f;

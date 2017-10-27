@@ -16,8 +16,11 @@ public class ExplosiveProjectile : Projectile {
 
             Collider[] hitColliders = Physics.OverlapSphere(transform.position, explosionRadius);
             foreach (Collider c in hitColliders) {
-                if (c.gameObject.GetComponent<Entity>())
-                    c.gameObject.GetComponent<Entity>().TakeDamage((int)(damage - Vector3.Distance(c.transform.position, transform.position) / explosionRadius), shooterID);
+                if (c.gameObject.GetComponent<Entity>()) {
+                    int scaledDamage = (int)(damage * (1 - Vector3.Distance(c.transform.position, transform.position) / explosionRadius));
+                    if (scaledDamage > 0)
+                        c.gameObject.GetComponent<Entity>().TakeDamage(scaledDamage, shooterID);
+                }
             }
 
             StartCoroutine(AnimateExplosion());

@@ -1,4 +1,6 @@
-﻿public class Opponent : Entity {
+﻿using UnityEngine;
+
+public class Opponent : Entity {
 
     // Sets up all the player parameter and does the same with all its guns.
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id) {
