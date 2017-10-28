@@ -44,15 +44,14 @@ public abstract class GameManager : CoreComponent {
 
     protected abstract void ManageGame();
 
-    public abstract void AddScore(int score);
-
-    public abstract void AddScore(int killerIdentifier, int killedID);
+    public abstract void AddScore(int i, int j);
 
     public abstract void SetUIColor(Color c);
 
     public abstract void Pause();
 
     public void Quit() {
+        Cursor.lockState = CursorLockMode.None;
         SceneManager.LoadScene("Menu");
     }
 

@@ -91,11 +91,12 @@ public class DuelGameManager : GameManager {
             // Disable the contenders movement and interactions, activate the score UI, set the winner and set the phase.
             playerScript.SetInGame(false);
             opponentScript.SetInGame(false);
+            duelGameUIManagerScript.Fade(0.5f, 0, true, 0.5f);
             duelGameUIManagerScript.ActivateScoreUI();
             duelGameUIManagerScript.SetScoreUI(playerKillCount, opponentKillCount);
             gamePhase = 2;
         } else if (gamePhase == 2 && passedTime >= readyDuration + gameDuration + scoreDuration) {
-            Application.Quit();
+            Quit();
         }
     }
 
@@ -138,8 +139,6 @@ public class DuelGameManager : GameManager {
         duelGameUIManagerScript.SetKills(playerKillCount, opponentKillCount);
     }
 
-    public override void AddScore(int score) { }
-
     // Sets the color of the UI.
     public override void SetUIColor(Color c) {
         duelGameUIManagerScript.SetColorAll(c);
@@ -147,14 +146,14 @@ public class DuelGameManager : GameManager {
 
     // Pauses and unpauses the game.
     public override void Pause() {
-        if (isPaused) {
-            duelGameUIManagerScript.Fade(0f, 0.5f, true, 0.25f);
-            duelGameUIManagerScript.ActivatePauseUI(false);
-            playerScript.EnableInput(true);
-        } else {
+        if (!isPaused) {
             duelGameUIManagerScript.Fade(0f, 0.5f, false, 0.25f);
             duelGameUIManagerScript.ActivatePauseUI(true);
             playerScript.EnableInput(false);
+        } else {
+            duelGameUIManagerScript.Fade(0f, 0.5f, true, 0.25f);
+            duelGameUIManagerScript.ActivatePauseUI(false);
+            playerScript.EnableInput(true);
         }
 
         isPaused = !isPaused;
