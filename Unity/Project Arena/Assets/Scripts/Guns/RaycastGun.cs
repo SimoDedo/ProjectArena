@@ -7,12 +7,18 @@ public class RaycastGun : Gun {
     [Header("Raycast parameters")] [SerializeField] private bool limitRange = false;
     [SerializeField] private float range = 100f;
     [SerializeField] private GameObject sparkPrefab;
-    [SerializeField] protected float sparkDuration = 0.01f; 
+    [SerializeField] private float sparkDuration = 0.01f;
+    [SerializeField] private LayerMask ignoredLayers;
 
     private Queue<GameObject> sparkList = new Queue<GameObject>();
     private GameObject sparks;
 
     private void Start() {
+        if (!limitRange)
+            range = Mathf.Infinity;
+
+        ignoredLayers = ~ignoredLayers;
+
         sparks = new GameObject("Sparks - " + transform.gameObject.name);
         sparks.transform.localPosition = Vector3.zero;
     }
@@ -33,11 +39,11 @@ public class RaycastGun : Gun {
             else
                 direction = headCamera.transform.forward;
 
-            if ((limitRange && Physics.Raycast(headCamera.transform.position, direction, out hit, range)) || (!limitRange && Physics.Raycast(headCamera.transform.position, direction, out hit))) {
+            if (Physics.Raycast(headCamera.transform.position, direction, out hit, range, ignoredLayers)) {
                 StartCoroutine(ShowSpark(hit));
-                Opponent opp = hit.transform.GetComponent<Opponent>();
-                if (opp != null)
-                    opp.TakeDamage(damage, ownerEntityScript.GetID());
+                Entity entityScript = hit.transform.root.GetComponent<Entity>();
+                if (entityScript != null)
+                    entityScript.TakeDamage(damage, ownerEntityScript.GetID());
             }
         }
 

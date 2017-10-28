@@ -37,9 +37,9 @@ public class TargetRushGameUIManager : GameUIManager {
         if (figthUI.activeSelf) {
             // Menage the time adder.
             if (addedTimeDisplayed) {
-                if (Time.time > addedTimeTime + 1f) {
-                    additiveTime = "";
+                if (Time.time > addedTimeTime + 0.5f) {
                     time.text.Replace(additiveTime, "");
+                    additiveTime = "";
                     addedTimeDisplayed = false;
                 }
             } else if (additiveTimeQueue.Count > 0) {
@@ -50,9 +50,9 @@ public class TargetRushGameUIManager : GameUIManager {
             }
             // Menage the score adder.
             if (addedScoreDisplayed) {
-                if (Time.time > +1f) {
-                    additiveScore = "";
+                if (Time.time > addedScoreTime + 0.5f) {
                     score.text.Replace(additiveScore, "");
+                    additiveScore = "";
                     addedScoreDisplayed = false;
                 }
             } else if (additiveScoreQueue.Count > 0) {
@@ -115,11 +115,11 @@ public class TargetRushGameUIManager : GameUIManager {
     }
 
     public void AddTime(int t) {
-        additiveTimeQueue.Enqueue(" + " + t);
+        additiveTimeQueue.Enqueue(" +" + t);
     }
 
     public void AddScore(int s) {
-        additiveScoreQueue.Enqueue(" + " + s);
+        additiveScoreQueue.Enqueue(" +" + s);
     }
 
 }

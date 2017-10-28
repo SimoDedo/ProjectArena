@@ -180,6 +180,7 @@ public class TargetRushGameManager : GameManager {
                 GameObject newTarget = (GameObject)Instantiate(target.prefab);
                 newTarget.name = target.prefab.name;
                 newTarget.transform.position = spawnPointManagerScript.GetSpawnPosition();
+                newTarget.GetComponent<Entity>().SetupEntity(0, null, this, 0);
                 IncreaseTargets(1);
             }
         }
@@ -195,7 +196,7 @@ public class TargetRushGameManager : GameManager {
 
     // Increases time.
     private void IncreaseTime(int i) {
-        startTime -= i;
+        startTime += i;
         targetRushGameUIManagerScript.SetTime((int)(startTime + readyDuration + gameDuration - Time.time));
         targetRushGameUIManagerScript.AddTime(i);
     }
