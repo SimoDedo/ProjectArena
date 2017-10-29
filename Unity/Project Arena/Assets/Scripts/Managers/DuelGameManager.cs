@@ -159,4 +159,10 @@ public class DuelGameManager : GameManager {
         isPaused = !isPaused;
     }
 
+    // Menages the death of an entity.
+    public override void MenageEntityDeath(GameObject g, Entity e) {
+        // Start the respawn process.
+        StartCoroutine(WaitForRespawn(g, e));
+    }
+
 }

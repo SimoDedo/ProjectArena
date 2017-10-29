@@ -28,6 +28,8 @@ public class TargetRushGameUIManager : GameUIManager {
     private bool addedScoreDisplayed = false;
     private string additiveTime = "";
     private string additiveScore = "";
+    private string timeValue = "";
+    private string scoreValue = "";
 
     public void Start() {
         SetReady(true);
@@ -38,11 +40,11 @@ public class TargetRushGameUIManager : GameUIManager {
             // Menage the time adder.
             if (addedTimeDisplayed) {
                 if (Time.time > addedTimeTime + 0.5f) {
-                    time.text.Replace(additiveTime, "");
+                    time.text = "Time: " + timeValue;
                     additiveTime = "";
                     addedTimeDisplayed = false;
                 }
-            } else if (additiveTimeQueue.Count > 0) {
+            } else if (additiveTimeQueue.Count > 0 && Time.time > addedTimeTime + 1f) {
                 additiveTime = additiveTimeQueue.Dequeue();
                 time.text += additiveTime;
                 addedTimeDisplayed = true;
@@ -51,11 +53,11 @@ public class TargetRushGameUIManager : GameUIManager {
             // Menage the score adder.
             if (addedScoreDisplayed) {
                 if (Time.time > addedScoreTime + 0.5f) {
-                    score.text.Replace(additiveScore, "");
+                    score.text = "Score: " + scoreValue;
                     additiveScore = "";
                     addedScoreDisplayed = false;
                 }
-            } else if (additiveScoreQueue.Count > 0) {
+            } else if (additiveScoreQueue.Count > 0 && Time.time > addedScoreTime + 1f) {
                 additiveScore = additiveScoreQueue.Dequeue();
                 score.text += additiveScore;
                 addedScoreDisplayed = true;
@@ -74,10 +76,8 @@ public class TargetRushGameUIManager : GameUIManager {
 
     // Sets the remaining time.
     public void SetTime(int t) {
-        string minutes = TimeToString(t / 60);
-        string seconds = TimeToString(t % 60);
-
-        time.text = minutes + ":" + seconds + additiveTime;
+        timeValue = TimeToString(t / 60) + ":" + TimeToString(t % 60);
+        time.text = "Time: " + timeValue + additiveTime;
     }
 
     public override void SetColorAll(Color c) {
@@ -88,7 +88,8 @@ public class TargetRushGameUIManager : GameUIManager {
     }
 
     public void SetScore(int s) {
-        score.text = "Score: " + s + additiveScore;
+        scoreValue = s.ToString();
+        score.text = "Score: " + scoreValue + additiveScore;
     }
 
     public void SetTargets(int t) {

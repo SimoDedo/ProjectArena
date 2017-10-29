@@ -15,7 +15,7 @@ public class TargetRushGameManager : GameManager {
 
     private Player playerScript;
     private int playerScore = 0;
-    private int playerID = 1;
+    private int playerID = 0;
 
     private int currentWave = 1;
     private int targetsCount = 0;
@@ -113,11 +113,6 @@ public class TargetRushGameManager : GameManager {
         }
     }
 
-    // Menages the waves and the spawn of targets.
-    private void ManageWaves() {
-
-    }
-
     // Sets the color of the UI.
     public override void SetUIColor(Color c) {
         targetRushGameUIManagerScript.SetColorAll(c);
@@ -128,9 +123,10 @@ public class TargetRushGameManager : GameManager {
         IncreaseTime(timeIncrease);
         IncreaseScore(scoreIncrease);
 
-        IncreaseTargets(-1);
+        targetsCount--;
+        targetRushGameUIManagerScript.SetTargets(targetsCount);
 
-        if (targetsCount < 1) {
+        if (targetsCount == 0) {
             EndWave();
         }
     }
@@ -152,7 +148,7 @@ public class TargetRushGameManager : GameManager {
 
     // Ends a wave, gives extra points and time, starts a new wave or ends the game.
     private void EndWave() {
-        IncreaseTime(currentWave * 5);
+        IncreaseTime(10);
         IncreaseScore(currentWave * 100);
 
         if (currentWave == waveList.Length) {
@@ -174,17 +170,24 @@ public class TargetRushGameManager : GameManager {
     private void SpawnWave() {
         targetRushGameUIManagerScript.SetWave(currentWave);
 
-        // Spawn the targets
+        // Set the target count.
+        foreach (Target target in waveList[currentWave - 1].targetList) 
+            targetsCount += target.count;        
+        targetRushGameUIManagerScript.SetTargets(targetsCount);
+        // Debug.Log("Going to spawn " + targetsCount + " targets in wave " + currentWave + ".");
+
+        // Spawn the targets.
         foreach (Target target in waveList[currentWave - 1].targetList) {
+            // Debug.Log("Spawning " + target.count + " " + target.prefab.name + " in wave " + currentWave + ".");
             for (int i = 0; i < target.count; i++) {
                 GameObject newTarget = (GameObject)Instantiate(target.prefab);
                 newTarget.name = target.prefab.name;
                 newTarget.transform.position = spawnPointManagerScript.GetSpawnPosition();
                 newTarget.GetComponent<Entity>().SetupEntity(0, null, this, 0);
-                IncreaseTargets(1);
             }
         }
-        
+
+        // Debug.Log("Spawned " + targetsCount + " targets in wave " + currentWave + ".");
     }
 
     // Increases score.
@@ -201,10 +204,9 @@ public class TargetRushGameManager : GameManager {
         targetRushGameUIManagerScript.AddTime(i);
     }
 
-    // Increases the targets.
-    private void IncreaseTargets(int i) {
-        targetsCount += i;
-        targetRushGameUIManagerScript.SetTargets(targetsCount);
+    // Ends the game.
+    public override void MenageEntityDeath(GameObject g, Entity e) {
+        startTime = Time.time - readyDuration - gameDuration;
     }
 
     // Target object. 

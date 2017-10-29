@@ -13,20 +13,22 @@ public class Target : Entity {
         originalScale = target.transform.localScale;
         gameManagerScript = gms;
         health = totalHealthTarget;
+        inGame = true;
     }
 
     public override void TakeDamage(int damage, int killerID) {
-        health -= damage;
+        if (inGame) {
+            health -= damage;
 
-        Vector3 decreasedScale = target.transform.localScale;
-        decreasedScale = originalScale * (health / totalHealthTarget / 4 + 0.75f);
-        target.transform.localScale = decreasedScale;
+            target.transform.localScale = originalScale * ((float)health / (float)totalHealthTarget / 4f + 0.75f);
 
-        if (health < 1)
-            Die(killerID);
+            if (health < 1)
+                Die(killerID);
+        }
     }
 
     protected override void Die(int id) {
+        inGame = false;
         gameManagerScript.AddScore(bonusScore, bonusTime);
         Destroy(gameObject);
     }

@@ -98,8 +98,6 @@ public class Player : Entity {
                 health = 0;
                 // Kill the entity.
                 Die(killerID);
-                // Start the respawn process.
-                StartCoroutine(gameManagerScript.WaitForRespawn(gameObject, this));
             }
 
             playerUIManagerScript.SetHealth(health, totalHealth);
@@ -121,6 +119,8 @@ public class Player : Entity {
     protected override void Die(int id) {
         gameManagerScript.AddScore(id, entityID);
         SetInGame(false);
+        // Start the respawn process.
+        gameManagerScript.MenageEntityDeath(gameObject, this);
     }
 
     // Respawns the player.

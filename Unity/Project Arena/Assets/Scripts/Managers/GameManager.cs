@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -30,8 +31,11 @@ public abstract class GameManager : CoreComponent {
         g.transform.position = spawnPointManagerScript.GetSpawnPosition() + Vector3.up * 3f;
     }
 
+    // Menages the death of an entity.
+    public abstract void MenageEntityDeath(GameObject g, Entity e);
+
     // Respawns an entity, but only if the game phase is still figth.
-    public IEnumerator WaitForRespawn(GameObject g, Entity e) {
+    protected IEnumerator WaitForRespawn(GameObject g, Entity e) {
         yield return new WaitForSeconds(respawnDuration);
 
         if (gamePhase == 1) {
