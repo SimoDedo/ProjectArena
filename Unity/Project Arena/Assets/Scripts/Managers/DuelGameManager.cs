@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class DuelGameManager : GameManager {
 
@@ -36,7 +37,7 @@ public class DuelGameManager : GameManager {
         playerScript = player.GetComponent<Player>();
         opponentScript = opponent.GetComponent<Opponent>();
 
-        duelGameUIManagerScript.Fade(0.5f, 1f, true, 0.5f);
+        duelGameUIManagerScript.Fade(0.7f, 1f, true, 0.5f);
     }
 
     private void Update() {
@@ -80,18 +81,18 @@ public class DuelGameManager : GameManager {
             duelGameUIManagerScript.SetReadyUI();
             gamePhase = 0;
         } else if (gamePhase == 0 && passedTime >= readyDuration) {
-            // Enable the contenders movement and interactions, activate the figth UI, set the kills to zero and set the phase.
-            duelGameUIManagerScript.Fade(0.5f, 0f, false, 0.25f);
+            // Enable the contenders movement and interactions, activate the fight UI, set the kills to zero and set the phase.
+            duelGameUIManagerScript.Fade(0.7f, 0f, false, 0.25f);
             playerScript.SetInGame(true);
             opponentScript.SetInGame(true);
             duelGameUIManagerScript.SetKills(0, 0);
-            duelGameUIManagerScript.ActivateFigthUI();
+            duelGameUIManagerScript.ActivateFightUI();
             gamePhase = 1;
         } else if (gamePhase == 1 && passedTime >= readyDuration + gameDuration) {
             // Disable the contenders movement and interactions, activate the score UI, set the winner and set the phase.
             playerScript.SetInGame(false);
             opponentScript.SetInGame(false);
-            duelGameUIManagerScript.Fade(0.5f, 0, true, 0.5f);
+            duelGameUIManagerScript.Fade(0.7f, 0, true, 0.5f);
             duelGameUIManagerScript.ActivateScoreUI();
             duelGameUIManagerScript.SetScoreUI(playerKillCount, opponentKillCount);
             gamePhase = 2;
@@ -147,11 +148,11 @@ public class DuelGameManager : GameManager {
     // Pauses and unpauses the game.
     public override void Pause() {
         if (!isPaused) {
-            duelGameUIManagerScript.Fade(0f, 0.5f, false, 0.25f);
+            duelGameUIManagerScript.Fade(0f, 0.7f, false, 0.25f);
             duelGameUIManagerScript.ActivatePauseUI(true);
             playerScript.EnableInput(false);
         } else {
-            duelGameUIManagerScript.Fade(0f, 0.5f, true, 0.25f);
+            duelGameUIManagerScript.Fade(0f, 0.7f, true, 0.25f);
             duelGameUIManagerScript.ActivatePauseUI(false);
             playerScript.EnableInput(true);
         }
@@ -163,6 +164,16 @@ public class DuelGameManager : GameManager {
     public override void MenageEntityDeath(GameObject g, Entity e) {
         // Start the respawn process.
         StartCoroutine(WaitForRespawn(g, e));
+    }
+
+    // Respawns an entity, but only if the game phase is still figth.
+    private  IEnumerator WaitForRespawn(GameObject g, Entity e) {
+        yield return new WaitForSeconds(respawnDuration);
+
+        if (gamePhase == 1) {
+            Spawn(g);
+            e.Respawn();
+        }
     }
 
 }

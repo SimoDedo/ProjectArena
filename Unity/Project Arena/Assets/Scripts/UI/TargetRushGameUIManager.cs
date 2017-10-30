@@ -8,9 +8,11 @@ public class TargetRushGameUIManager : GameUIManager {
     // Elements of the ready UI.
     [Header("Ready UI")] [SerializeField] private Text countdown;
 
-    // Elements of the figth UI.
-    [Header("Figth UI")] [SerializeField] private Text time;
+    // Elements of the fight UI.
+    [Header("Fight UI")] [SerializeField] private Text time;
+    [SerializeField] private Text additiveTimeText;
     [SerializeField] private Text score;
+    [SerializeField] private Text additiveScoreText;
     [SerializeField] private Text wave;
     [SerializeField] private Text targets;
 
@@ -36,34 +38,42 @@ public class TargetRushGameUIManager : GameUIManager {
     }
 
     public void Update() {
-        if (figthUI.activeSelf) {
+        if (fightUI.activeSelf) {
             // Menage the time adder.
             if (addedTimeDisplayed) {
                 if (Time.time > addedTimeTime + 0.5f) {
-                    time.text = "Time: " + timeValue;
-                    additiveTime = "";
+                    additiveTimeText.text = "";
                     addedTimeDisplayed = false;
                 }
             } else if (additiveTimeQueue.Count > 0 && Time.time > addedTimeTime + 1f) {
-                additiveTime = additiveTimeQueue.Dequeue();
-                time.text += additiveTime;
+                String additive = additiveTimeQueue.Dequeue();
+                additiveTimeText.text = GetSpacesString((additive.Length + time.text.Length) * 2 - 1) + additive;
                 addedTimeDisplayed = true;
                 addedTimeTime = Time.time;
             }
             // Menage the score adder.
             if (addedScoreDisplayed) {
                 if (Time.time > addedScoreTime + 0.5f) {
-                    score.text = "Score: " + scoreValue;
-                    additiveScore = "";
+                    additiveScoreText.text = "";
                     addedScoreDisplayed = false;
                 }
             } else if (additiveScoreQueue.Count > 0 && Time.time > addedScoreTime + 1f) {
-                additiveScore = additiveScoreQueue.Dequeue();
-                score.text += additiveScore;
+                String additive = additiveScoreQueue.Dequeue();
+                additiveScoreText.text = GetSpacesString((additive.Length + score.text.Length) * 2 - 1) + additive; ;
                 addedScoreDisplayed = true;
                 addedScoreTime = Time.time;
             }
         }
+    }
+
+    private string GetSpacesString(int n) {
+        string spaces = "";
+
+        for (int i = 0; i < n; i++) {
+            spaces += " ";
+        }
+
+        return spaces;
     }
 
     // Sets the countdown.
@@ -71,13 +81,13 @@ public class TargetRushGameUIManager : GameUIManager {
         if (i > 0)
             countdown.text = i.ToString();
         else
-            countdown.text = "Figth!";
+            countdown.text = "Fight!";
     }
 
     // Sets the remaining time.
     public void SetTime(int t) {
         timeValue = TimeToString(t / 60) + ":" + TimeToString(t % 60);
-        time.text = "Time: " + timeValue + additiveTime;
+        time.text = timeValue + additiveTime;
     }
 
     public override void SetColorAll(Color c) {
@@ -85,11 +95,13 @@ public class TargetRushGameUIManager : GameUIManager {
         score.color = c;
         wave.color = c;
         targets.color = c;
+        additiveScoreText.color = c;
+        additiveTimeText.color = c;
     }
 
     public void SetScore(int s) {
         scoreValue = s.ToString();
-        score.text = "Score: " + scoreValue + additiveScore;
+        score.text = scoreValue + additiveScore;
     }
 
     public void SetTargets(int t) {

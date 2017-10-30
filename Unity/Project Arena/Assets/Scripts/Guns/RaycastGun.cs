@@ -35,9 +35,9 @@ public class RaycastGun : Gun {
             Vector3 direction;
 
             if (dispersion != 0)
-                direction = GetDeviatedDirection(headCamera.transform.forward, dispersion);
+                direction = GetDeviatedDirection(headCamera.transform.forward, dispersion) * 1.1f;
             else
-                direction = headCamera.transform.forward;
+                direction = headCamera.transform.forward * 1.1f;
 
             if (Physics.Raycast(headCamera.transform.position, direction, out hit, range, ignoredLayers)) {
                 StartCoroutine(ShowSpark(hit));

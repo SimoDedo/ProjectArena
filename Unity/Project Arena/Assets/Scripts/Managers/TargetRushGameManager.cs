@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 
 public class TargetRushGameManager : GameManager {
@@ -31,7 +32,7 @@ public class TargetRushGameManager : GameManager {
 
         playerScript = player.GetComponent<Player>();
 
-        targetRushGameUIManagerScript.Fade(0.5f, 1f, true, 0.5f);
+        targetRushGameUIManagerScript.Fade(0.7f, 1f, true, 0.5f);
     }
 
     private void Update() {
@@ -70,17 +71,17 @@ public class TargetRushGameManager : GameManager {
             targetRushGameUIManagerScript.ActivateReadyUI();
             gamePhase = 0;
         } else if (gamePhase == 0 && passedTime >= readyDuration) {
-            // Enable the player movement and interactions, activate the figth UI, set the score to zero, the wave to 1 and set the phase.
-            targetRushGameUIManagerScript.Fade(0.5f, 0f, false, 0.25f);
+            // Enable the player movement and interactions, activate the fight UI, set the score to zero, the wave to 1 and set the phase.
+            targetRushGameUIManagerScript.Fade(0.7f, 0f, false, 0.25f);
             targetRushGameUIManagerScript.SetScore(0);
-            SpawnWave();
+            StartCoroutine(SpawnWave());
             playerScript.SetInGame(true);
-            targetRushGameUIManagerScript.ActivateFigthUI();
+            targetRushGameUIManagerScript.ActivateFightUI();
             gamePhase = 1;
         } else if (gamePhase == 1 && passedTime >= readyDuration + gameDuration) {
             // Disable the player movement and interactions, activate the score UI, set the winner and set the phase.
             playerScript.SetInGame(false);
-            targetRushGameUIManagerScript.Fade(0.5f, 0, true, 0.5f);
+            targetRushGameUIManagerScript.Fade(0.7f, 0, true, 0.5f);
             targetRushGameUIManagerScript.SetFinalScore(playerScore);
             targetRushGameUIManagerScript.SetFinalWave(currentWave);
             targetRushGameUIManagerScript.SetVictory(false);
@@ -134,11 +135,11 @@ public class TargetRushGameManager : GameManager {
     // Pauses and unpauses the game.
     public override void Pause() {
         if (!isPaused) {
-            targetRushGameUIManagerScript.Fade(0f, 0.5f, false, 0.25f);
+            targetRushGameUIManagerScript.Fade(0f, 0.7f, false, 0.25f);
             targetRushGameUIManagerScript.ActivatePauseUI(true);
             playerScript.EnableInput(false);
         } else {
-            targetRushGameUIManagerScript.Fade(0f, 0.5f, true, 0.25f);
+            targetRushGameUIManagerScript.Fade(0f, 0.7f, true, 0.25f);
             targetRushGameUIManagerScript.ActivatePauseUI(false);
             playerScript.EnableInput(true);
         }
@@ -148,26 +149,26 @@ public class TargetRushGameManager : GameManager {
 
     // Ends a wave, gives extra points and time, starts a new wave or ends the game.
     private void EndWave() {
-        IncreaseTime(10);
+        IncreaseTime(5);
         IncreaseScore(currentWave * 100);
 
         if (currentWave == waveList.Length) {
             // Disable the player movement and interactions, activate the score UI, set the winner and set the phase.
             playerScript.SetInGame(false);
-            targetRushGameUIManagerScript.Fade(0.5f, 0, true, 0.5f);
-            targetRushGameUIManagerScript.SetFinalScore(playerScore);
+            targetRushGameUIManagerScript.Fade(0.7f, 0, true, 0.5f);
+            targetRushGameUIManagerScript.SetFinalScore(playerScore + (int) (Time.time - startTime) * 10);
             targetRushGameUIManagerScript.SetFinalWave(currentWave);
             targetRushGameUIManagerScript.SetVictory(true);
             targetRushGameUIManagerScript.ActivateScoreUI();
             gamePhase = 2;
         } else {
             currentWave++;
-            SpawnWave();
+            StartCoroutine(SpawnWave());
         }
     }
 
     // Spawns a wake of targets.
-    private void SpawnWave() {
+    private IEnumerator SpawnWave() {
         targetRushGameUIManagerScript.SetWave(currentWave);
 
         // Set the target count.
@@ -175,6 +176,8 @@ public class TargetRushGameManager : GameManager {
             targetsCount += target.count;        
         targetRushGameUIManagerScript.SetTargets(targetsCount);
         // Debug.Log("Going to spawn " + targetsCount + " targets in wave " + currentWave + ".");
+
+        yield return new WaitForSeconds(2f);
 
         // Spawn the targets.
         foreach (Target target in waveList[currentWave - 1].targetList) {

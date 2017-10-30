@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Player : Entity {
 
@@ -63,8 +62,8 @@ public class Player : Entity {
 
         // If I can move update the player position depending on the inputs.
         if (inGame && inputEnabled) {
-                UpdateCameraPosition();
-                UpdatePosition();
+            UpdateCameraPosition();
+            UpdatePosition();
             UpdateGun();
         } else {
             UpdateVerticalPosition();
@@ -125,6 +124,9 @@ public class Player : Entity {
 
     // Respawns the player.
     public override void Respawn() {
+        if (!inputEnabled)
+            guns[currentGun].GetComponent<Gun>().EnableInput(true);
+
         health = totalHealth;
         ResetAllAmmo();
         ActivateLowestGun();
@@ -258,6 +260,9 @@ public class Player : Entity {
         if (b) {
             playerUIManagerScript.SetPlayerUIVisible(true);
             ActivateGun(currentGun);
+            // Disable the input of the gun I just activated if the input is disabled.
+            if (!inputEnabled)
+                guns[currentGun].GetComponent<Gun>().EnableInput(false);
         } else {
             playerUIManagerScript.SetPlayerUIVisible(false);
             DeactivateGun(currentGun);

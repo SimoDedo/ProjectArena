@@ -1,10 +1,9 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 
 public abstract class GameUIManager : CoreComponent {
 
     [SerializeField] protected GameObject readyUI;
-    [SerializeField] protected GameObject figthUI;
+    [SerializeField] protected GameObject fightUI;
     [SerializeField] protected GameObject scoreUI;
     [SerializeField] protected GameObject pauseUI;
 
@@ -13,21 +12,21 @@ public abstract class GameUIManager : CoreComponent {
     // Activates the ready UI.
     public void ActivateReadyUI() {
         readyUI.SetActive(true);
-        figthUI.SetActive(false);
+        fightUI.SetActive(false);
         scoreUI.SetActive(false);
     }
 
-    // Activates the figth UI.
-    public void ActivateFigthUI() {
+    // Activates the fight UI.
+    public void ActivateFightUI() {
         readyUI.SetActive(false);
-        figthUI.SetActive(true);
+        fightUI.SetActive(true);
         scoreUI.SetActive(false);
     }
 
     // Activates the score UI.
     public void ActivateScoreUI() {
         readyUI.SetActive(false);
-        figthUI.SetActive(false);
+        fightUI.SetActive(false);
         scoreUI.SetActive(true);
     }
 

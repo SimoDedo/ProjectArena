@@ -34,16 +34,6 @@ public abstract class GameManager : CoreComponent {
     // Menages the death of an entity.
     public abstract void MenageEntityDeath(GameObject g, Entity e);
 
-    // Respawns an entity, but only if the game phase is still figth.
-    protected IEnumerator WaitForRespawn(GameObject g, Entity e) {
-        yield return new WaitForSeconds(respawnDuration);
-
-        if (gamePhase == 1) {
-            Spawn(g);
-            e.Respawn();
-        }
-    }
-
     protected abstract void UpdateGamePhase();
 
     protected abstract void ManageGame();

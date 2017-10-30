@@ -11,26 +11,31 @@ public class Laser : MonoBehaviour {
     private LineRenderer laserLine;
     private float lastHit;
 
+    private bool active = false;
+
     private void Start() {
         ignoredLayers = ~ignoredLayers;
-
+        
         laserLine = GetComponent<LineRenderer>();
         laserLine.startWidth = laserWidth;
         laserLine.endWidth = laserWidth;
+        laserLine.enabled = false;
     }
 
     private void Update() {
-        RaycastHit hit;
+        if (active) {
+            RaycastHit hit;
 
-        if (Physics.Raycast(transform.position, -transform.right, out hit, Mathf.Infinity, ignoredLayers)) {
-            Entity entityScript = hit.transform.root.GetComponent<Entity>();
-            if (entityScript != null && Time.time > lastHit + 1f) {
-                entityScript.TakeDamage(dps, -1);
-                lastHit = Time.time;
+            if (Physics.Raycast(transform.position, -transform.right, out hit, Mathf.Infinity, ignoredLayers)) {
+                Entity entityScript = hit.transform.root.GetComponent<Entity>();
+                if (entityScript != null && Time.time > lastHit + 1f) {
+                    entityScript.TakeDamage(dps, -1);
+                    lastHit = Time.time;
+                }
+                DrawLaser(hit.point, true);
+            } else {
+                DrawLaser(-transform.right * 100f, false);
             }
-            DrawLaser(hit.point, true);
-        } else {
-            DrawLaser(-transform.right * 100f, false);
         }
     }
 
@@ -39,4 +44,9 @@ public class Laser : MonoBehaviour {
         laserLine.SetPosition(1, laserEnd);
     }
 
+    public void SetActive(bool b) {
+        laserLine.enabled = b;
+        active = b;
+    }
+   
 }

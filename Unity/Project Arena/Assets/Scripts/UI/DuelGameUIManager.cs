@@ -8,8 +8,8 @@ public class DuelGameUIManager : GameUIManager {
     [SerializeField] private GameObject opponent;
     [SerializeField] private GameObject countdown;
 
-    // Elements of the figth UI.
-    [Header("Figth UI")] [SerializeField] private GameObject time;
+    // Elements of the fight UI.
+    [Header("Fight UI")] [SerializeField] private GameObject time;
     [SerializeField] private GameObject playerKills;
     [SerializeField] private GameObject opponentKills;
     [SerializeField] private GameObject separator;
@@ -25,7 +25,7 @@ public class DuelGameUIManager : GameUIManager {
     // Text fields of the ready UI.
     private Text countdownText;
 
-    // Text fields of the figth UI.
+    // Text fields of the fight UI.
     private Text timeText;
     private Text playerKillsText;
     private Text opponentKillsText;
@@ -51,7 +51,7 @@ public class DuelGameUIManager : GameUIManager {
         if (i > 0)
             countdownText.text = i.ToString();
         else
-            countdownText.text = "Figth!";
+            countdownText.text = "Fight!";
     }
 
     // Sets the ready UI.
