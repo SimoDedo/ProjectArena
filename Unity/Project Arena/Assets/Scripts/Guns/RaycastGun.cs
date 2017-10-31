@@ -35,15 +35,17 @@ public class RaycastGun : Gun {
             Vector3 direction;
 
             if (dispersion != 0)
-                direction = GetDeviatedDirection(headCamera.transform.forward, dispersion) * 1.1f;
+                direction = GetDeviatedDirection(headCamera.transform.forward, dispersion);
             else
-                direction = headCamera.transform.forward * 1.1f;
+                direction = headCamera.transform.forward;
 
             if (Physics.Raycast(headCamera.transform.position, direction, out hit, range, ignoredLayers)) {
-                StartCoroutine(ShowSpark(hit));
-                Entity entityScript = hit.transform.root.GetComponent<Entity>();
-                if (entityScript != null)
-                    entityScript.TakeDamage(damage, ownerEntityScript.GetID());
+                if (!hit.transform.root.GetComponent<Player>()) {
+                    StartCoroutine(ShowSpark(hit));
+                    Entity entityScript = hit.transform.root.GetComponent<Entity>();
+                    if (entityScript != null)
+                        entityScript.TakeDamage(damage, ownerEntityScript.GetID());
+                }
             }
         }
 
