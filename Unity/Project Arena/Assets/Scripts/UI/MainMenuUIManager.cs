@@ -53,7 +53,6 @@ public class MainMenuUIManager : MonoBehaviour {
     private int currentMap = 0;
     private int currentGeneration = 0;
 
-    private int generationIndex;
     private bool exportData;
     private bool allowIO;
     private String mapDNA;
@@ -96,7 +95,7 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Loads the rigth scene.
     public void LoadScene() {
-        parameterContainer.SetGenerationMode(generationIndex);
+        parameterContainer.SetGenerationMode(currentGeneration);
         parameterContainer.SetMapDNA(mapDNA);
         parameterContainer.SetExport(exportData && allowIO);
         parameterContainer.SetExportPath(Application.persistentDataPath + "/Export");
@@ -147,8 +146,6 @@ public class MainMenuUIManager : MonoBehaviour {
         currentMode = 0;
         currentMap = 0;
         currentGeneration = 0;
-
-        generationIndex = 0;
         exportData = true;
     }
 
@@ -213,19 +210,21 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Shows the next generation method in the singleplayer menu.
     public void SingleplayerNextGeneration() {
-
+        currentGeneration = GetCiruclarIndex(currentGeneration, singleplayerModes[currentMode].maps[currentMap].enabledGenerations, true);
+        ActivateCurrentGenerationSP();
     }
 
     // Shows the previous generation method in the singleplayer menu.
     public void SingleplayerPreviousGeneration() {
-
+        currentGeneration = GetCiruclarIndex(currentGeneration, singleplayerModes[currentMode].maps[currentMap].enabledGenerations, false);
+        ActivateCurrentGenerationSP();
     }
 
     private void ActivateCurrentModeSP() {
         modeTextSP.text = singleplayerModes[currentMode].modeName;
 
         currentMap = 0;
-        currentGeneration = GetMinSPGeneration();
+        currentGeneration = GetMinGenerationIndex(singleplayerModes[currentMode].maps[currentMap].enabledGenerations);
 
         UpdateSingleplayerMaps();
         ActivateCurrentMapSP();
@@ -234,7 +233,7 @@ public class MainMenuUIManager : MonoBehaviour {
     private void ActivateCurrentMapSP() {
         mapTextSP.text = singleplayerModes[currentMode].maps[currentMap].mapName;
 
-        currentGeneration = GetMinSPGeneration();
+        currentGeneration = GetMinGenerationIndex(singleplayerModes[currentMode].maps[currentMap].enabledGenerations);
 
         UpdateSingleplayerGenerations();
         ActivateCurrentGenerationSP();
@@ -244,31 +243,121 @@ public class MainMenuUIManager : MonoBehaviour {
         generationTextSP.text = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].generationName;
         currentScene = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].scene;
 
-        if (generationIndex == 0) {
+        if (currentGeneration == 0) {
             inputSP.interactable = false;
+            inputSP.text = "";
             inputSP.placeholder.GetComponent<Text>().text = GetSeed();
         } else {
             inputSP.interactable = true;
+            inputSP.text = "";
             inputSP.placeholder.GetComponent<Text>().text = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].placeholder;
         }
     }
 
-    private int GetMinSPGeneration() {
-        int i = 0;
-
-        foreach (Generation g in singleplayerModes[currentMode].maps[currentMap].enabledGenerations) {
-            if (g.enabled)
-                break;
-            else
-                i++;
-        }
-
-        return i;
-    }
-
     /* MULTIPLAYER */
 
-    
+    // Enables or disbales the change mode buttons
+    private void UpdateMultiplayerModes() {
+        if (multiplayerModes.Length > 1) {
+            previousModeMP.GetComponent<Button>().interactable = true;
+            nextModeMP.GetComponent<Button>().interactable = true;
+        } else {
+            previousModeMP.GetComponent<Button>().interactable = false;
+            nextModeMP.GetComponent<Button>().interactable = false;
+        }
+    }
+
+    // Enables or disbales the change map buttons
+    private void UpdateMultiplayerMaps() {
+        if (multiplayerModes[currentMode].maps.Length > 1) {
+            previousMapMP.GetComponent<Button>().interactable = true;
+            nextMapMP.GetComponent<Button>().interactable = true;
+        } else {
+            previousMapMP.GetComponent<Button>().interactable = false;
+            nextMapMP.GetComponent<Button>().interactable = false;
+        }
+    }
+
+    // Enables or disbales the change generation buttons
+    private void UpdateMultiplayerGenerations() {
+        if (multiplayerModes[currentMode].maps[currentMap].enabledGenerations.Length > 1) {
+            previousGenerationMP.GetComponent<Button>().interactable = true;
+            nextGenerationMP.GetComponent<Button>().interactable = true;
+        } else {
+            previousGenerationMP.GetComponent<Button>().interactable = false;
+            nextGenerationMP.GetComponent<Button>().interactable = false;
+        }
+    }
+
+    // Shows the next mode in the multiplayer menu.
+    public void MultiplayerNextMode() {
+        currentMode = GetCiruclarIndex(currentMode, multiplayerModes.Length - 1, true);
+        ActivateCurrentModeMP();
+    }
+
+    // Shows the previous mode in the multiplayer menu.
+    public void MultiplayerPreviousMode() {
+        currentMode = GetCiruclarIndex(currentMode, multiplayerModes.Length - 1, false);
+        ActivateCurrentModeMP();
+    }
+
+    // Shows the next maps in the multiplayer menu.
+    public void MultiplayerNextMap() {
+        currentMap = GetCiruclarIndex(currentMap, multiplayerModes[currentMode].maps.Length - 1, true);
+        ActivateCurrentMapMP();
+    }
+
+    // Shows the previous maps in the multiplayer menu.
+    public void MultiplayerPreviousMap() {
+        currentMap = GetCiruclarIndex(currentMap, multiplayerModes[currentMode].maps.Length - 1, false);
+        ActivateCurrentMapMP();
+    }
+
+    // Shows the next generation method in the multiplayer menu.
+    public void MultiplayerNextGeneration() {
+        currentGeneration = GetCiruclarIndex(currentGeneration, multiplayerModes[currentMode].maps[currentMap].enabledGenerations, true);
+        ActivateCurrentGenerationMP();
+    }
+
+    // Shows the previous generation method in the multiplayer menu.
+    public void MultiplayerPreviousGeneration() {
+        currentGeneration = GetCiruclarIndex(currentGeneration, multiplayerModes[currentMode].maps[currentMap].enabledGenerations, false);
+        ActivateCurrentGenerationMP();
+    }
+
+    private void ActivateCurrentModeMP() {
+        modeTextMP.text = multiplayerModes[currentMode].modeName;
+
+        currentMap = 0;
+        currentGeneration = GetMinGenerationIndex(multiplayerModes[currentMode].maps[currentMap].enabledGenerations);
+
+        UpdateMultiplayerMaps();
+        ActivateCurrentMapMP();
+    }
+
+    private void ActivateCurrentMapMP() {
+        mapTextMP.text = multiplayerModes[currentMode].maps[currentMap].mapName;
+
+        currentGeneration = GetMinGenerationIndex(multiplayerModes[currentMode].maps[currentMap].enabledGenerations);
+
+        UpdateMultiplayerGenerations();
+        ActivateCurrentGenerationMP();
+    }
+
+    private void ActivateCurrentGenerationMP() {
+        generationTextMP.text = multiplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].generationName;
+        currentScene = multiplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].scene;
+
+        if (currentGeneration == 0) {
+            inputMP.interactable = false;
+            inputMP.text = "";
+            inputMP.placeholder.GetComponent<Text>().text = GetSeed();
+        } else {
+            inputMP.interactable = true;
+            inputMP.text = "";
+            inputMP.placeholder.GetComponent<Text>().text = multiplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].placeholder;
+        }
+    }
 
     /* HELPERS */
 
@@ -286,6 +375,40 @@ public class MainMenuUIManager : MonoBehaviour {
                 return current - 1;
         }
 
+    }
+
+    // Returns the previous or the next circular index.
+    private int GetCiruclarIndex(int current, Generation[] mask, bool next) {
+        if (next) {
+            for (int i = current; i < mask.Length; i++)
+                if (mask[i].enabled && i != current)
+                    return i;
+            for (int i = 0; i < current; i++)
+                if (mask[i].enabled && i != current)
+                    return i;
+        } else {
+            for (int i = current; i >= 0; i--)
+                if (mask[i].enabled && i != current)
+                    return i;
+            for (int i = mask.Length - 1; i > current; i--)
+                if (mask[i].enabled && i != current)
+                    return i;
+        }
+
+        return current;
+    }
+
+    private int GetMinGenerationIndex(Generation[] mask) {
+        int i = 0;
+
+        foreach (Generation g in mask) {
+            if (g.enabled)
+                break;
+            else
+                i++;
+        }
+
+        return i;
     }
 
     // Gets a seed and stores it.
