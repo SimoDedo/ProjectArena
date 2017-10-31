@@ -6,30 +6,39 @@ using UnityEngine.UI;
 
 public class MainMenuUIManager : MonoBehaviour {
 
-    [Header("Scenes")] [SerializeField] Scene[] singleplayerScenes;
-    [SerializeField] Scene[] multiplayerScenes;
-    [SerializeField] Scene[] otherScenes;
+    [Header("Scenes")] [SerializeField] Mode[] singleplayerModes;
+    [SerializeField] Mode[] multiplayerModes;
 
     [Header("UI Sections")] [SerializeField] private GameObject main;
     [SerializeField] private GameObject singleplayer;
     [SerializeField] private GameObject multiplayer;
     [SerializeField] private GameObject about;
 
-    [Header("Singleplayer Fields")] [SerializeField] private GameObject mapSP;
+    [Header("Singleplayer Fields")] [SerializeField] private GameObject nextModeSP;
+    [SerializeField] private GameObject previousModeSP;
+    [SerializeField] private GameObject nextMapSP;
+    [SerializeField] private GameObject previousMapSP;
     [SerializeField] private GameObject nextGenerationSP;
     [SerializeField] private GameObject previousGenerationSP;
-    [SerializeField] private GameObject generationSP;
-    [SerializeField] private GameObject inputSP;
-    [SerializeField] private GameObject exportSP;
-    [SerializeField] private GameObject exportTextSP;
+    [SerializeField] private Text generationTextSP;
+    [SerializeField] private Text modeTextSP;
+    [SerializeField] private Text exportTextSP;
+    [SerializeField] private Text mapTextSP;
+    [SerializeField] private InputField inputSP;
+    [SerializeField] private Toggle exportSP;
 
-    [Header("Multiplayer Fields")] [SerializeField] private GameObject mapMP;
+    [Header("Multiplayer Fields")] [SerializeField] private GameObject nextModeMP;
+    [SerializeField] private GameObject previousModeMP;
+    [SerializeField] private GameObject nextMapMP;
+    [SerializeField] private GameObject previousMapMP;
     [SerializeField] private GameObject nextGenerationMP;
     [SerializeField] private GameObject previousGenerationMP;
-    [SerializeField] private GameObject generationMP;
-    [SerializeField] private GameObject inputMP;
-    [SerializeField] private GameObject exportMP;
-    [SerializeField] private GameObject exportTextMP;
+    [SerializeField] private Text generationTextMP;
+    [SerializeField] private Text modeTextMP;
+    [SerializeField] private Text exportTextMP;
+    [SerializeField] private Text mapTextMP;
+    [SerializeField] private InputField inputMP;
+    [SerializeField] private Toggle exportMP;
 
     [Header("About Fields")] [SerializeField] private GameObject import;
     [SerializeField] private GameObject export;
@@ -38,30 +47,31 @@ public class MainMenuUIManager : MonoBehaviour {
 
     [Header("Other")] [SerializeField] private ParameterContainer parameterContainer;
 
-    private int currentOption;
-    private GameObject openSection;
+    private GameObject openedSection;
 
-    private int mapIndex;
-    private int sceneIndex;
+    private int currentMode = 0;
+    private int currentMap = 0;
+    private int currentGeneration = 0;
+
     private int generationIndex;
     private bool exportData;
-    private String mapDNA;
-
     private bool allowIO;
+    private String mapDNA;
+    private String currentScene;
 
-    public void Start() { 
-        openSection = main;
+    public void Start() {
+        openedSection = main;
 
         if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.LinuxPlayer) {
             allowIO = true;
         } else {
             allowIO = false;
-            exportSP.GetComponent<Toggle>().isOn = false;
-            exportSP.GetComponent<Toggle>().interactable = false;
-            exportTextSP.GetComponent<Text>().color = exportSP.GetComponent<Toggle>().colors.disabledColor;
-            exportMP.GetComponent<Toggle>().isOn = false;
-            exportMP.GetComponent<Toggle>().interactable = false;
-            exportTextMP.GetComponent<Text>().color = exportMP.GetComponent<Toggle>().colors.disabledColor;
+            exportSP.isOn = false;
+            exportSP.interactable = false;
+            exportTextSP.color = exportSP.GetComponent<Toggle>().colors.disabledColor;
+            exportMP.isOn = false;
+            exportMP.interactable = false;
+            exportTextMP.color = exportMP.GetComponent<Toggle>().colors.disabledColor;
         }
 
         // Create the import directory if needed.
@@ -91,12 +101,7 @@ public class MainMenuUIManager : MonoBehaviour {
         parameterContainer.SetExport(exportData && allowIO);
         parameterContainer.SetExportPath(Application.persistentDataPath + "/Export");
 
-        if (sceneIndex < singleplayerScenes.GetLength(0))
-            SceneManager.LoadScene(singleplayerScenes[sceneIndex].sceneName);
-        else if (sceneIndex < singleplayerScenes.GetLength(0) + multiplayerScenes.GetLength(0))
-            SceneManager.LoadScene(multiplayerScenes[sceneIndex - singleplayerScenes.GetLength(0)].sceneName);
-        else
-            SceneManager.LoadScene(otherScenes[sceneIndex - singleplayerScenes.GetLength(0) - multiplayerScenes.GetLength(0)].sceneName);
+        SceneManager.LoadScene(currentScene);
     }
 
     // Quits the game.
@@ -108,16 +113,16 @@ public class MainMenuUIManager : MonoBehaviour {
     public void OpenSingleplayer() {
         OpenSection(singleplayer);
         ResetValues();
-        UpdateGenerationField(singleplayerScenes[mapIndex].isGenetic, inputSP, generationSP, nextGenerationSP, previousGenerationSP);
-        sceneIndex = 0;
+        UpdateSingleplayerModes();
+        ActivateCurrentModeSP();
     }
 
     // Opens the multiplayer menu.
     public void OpenMultiplayer() {
         OpenSection(multiplayer);
         ResetValues();
-        UpdateGenerationField(multiplayerScenes[mapIndex].isGenetic, inputMP, generationMP, nextGenerationMP, previousGenerationMP);
-        sceneIndex = singleplayerScenes.GetLength(0);
+        // UpdateMultiplayerModes();
+        // ActivateCurrentModeMP();
     }
 
     // Opens the about menu.
@@ -132,157 +137,161 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Opens a menu.
     private void OpenSection(GameObject section) {
-        openSection.SetActive(false);
+        openedSection.SetActive(false);
         section.SetActive(true);
-        openSection = section;
+        openedSection = section;
     }
 
     // Resets all the indices.
     private void ResetValues() {
-        mapIndex = 0;
+        currentMode = 0;
+        currentMap = 0;
+        currentGeneration = 0;
+
         generationIndex = 0;
         exportData = true;
     }
 
+    /* SINGLEPLAYER */
+
+    // Enables or disbales the change mode buttons
+    private void UpdateSingleplayerModes() {
+        if (singleplayerModes.Length > 1) {
+            previousModeSP.GetComponent<Button>().interactable = true;
+            nextModeSP.GetComponent<Button>().interactable = true;
+        } else {
+            previousModeSP.GetComponent<Button>().interactable = false;
+            nextModeSP.GetComponent<Button>().interactable = false;
+        }
+    }
+
+    // Enables or disbales the change map buttons
+    private void UpdateSingleplayerMaps() {
+        if (singleplayerModes[currentMode].maps.Length > 1) {
+            previousMapSP.GetComponent<Button>().interactable = true;
+            nextMapSP.GetComponent<Button>().interactable = true;
+        } else {
+            previousMapSP.GetComponent<Button>().interactable = false;
+            nextMapSP.GetComponent<Button>().interactable = false;
+        }
+    }
+
+    // Enables or disbales the change generation buttons
+    private void UpdateSingleplayerGenerations() {
+        if (singleplayerModes[currentMode].maps[currentMap].enabledGenerations.Length > 1) {
+            previousGenerationSP.GetComponent<Button>().interactable = true;
+            nextGenerationSP.GetComponent<Button>().interactable = true;
+        } else {
+            previousGenerationSP.GetComponent<Button>().interactable = false;
+            nextGenerationSP.GetComponent<Button>().interactable = false;
+        }
+    }
+
+    // Shows the next mode in the singleplayer menu.
+    public void SingleplayerNextMode() {
+        currentMode = GetCiruclarIndex(currentMode, singleplayerModes.Length - 1, true);
+        ActivateCurrentModeSP();
+    }
+
+    // Shows the previous mode in the singleplayer menu.
+    public void SingleplayerPreviousMode() {
+        currentMode = GetCiruclarIndex(currentMode, singleplayerModes.Length - 1, false);
+        ActivateCurrentModeSP();
+    }
+
     // Shows the next maps in the singleplayer menu.
     public void SingleplayerNextMap() {
-        IncreaseMapIndex();
-        mapSP.GetComponent<Text>().text = "Map: " + singleplayerScenes[mapIndex].fieldName;
-        UpdateGenerationField(singleplayerScenes[mapIndex].isGenetic, inputSP, generationSP, nextGenerationSP, previousGenerationSP);
-        sceneIndex = mapIndex;
+        currentMap = GetCiruclarIndex(currentMap, singleplayerModes[currentMode].maps.Length - 1, true);
+        ActivateCurrentMapSP();
     }
 
     // Shows the previous maps in the singleplayer menu.
     public void SingleplayerPreviousMap() {
-        DecreaseMapIndex();
-        mapSP.GetComponent<Text>().text = "Map: " + singleplayerScenes[mapIndex].fieldName;
-        UpdateGenerationField(singleplayerScenes[mapIndex].isGenetic, inputSP, generationSP, nextGenerationSP, previousGenerationSP);
-        sceneIndex = mapIndex;
+        currentMap = GetCiruclarIndex(currentMap, singleplayerModes[currentMode].maps.Length - 1, false);
+        ActivateCurrentMapSP();
     }
 
-    // Shows the next maps in the multiplayer menu.
-    public void MultiplayerNextMap() {
-        IncreaseMapIndex();
-        mapMP.GetComponent<Text>().text = "Map: " + singleplayerScenes[mapIndex].fieldName;
-        UpdateGenerationField(multiplayerScenes[mapIndex].isGenetic, inputMP, generationMP, nextGenerationMP, previousGenerationMP);
-        sceneIndex = mapIndex + singleplayerScenes.GetLength(0);
+    // Shows the next generation method in the singleplayer menu.
+    public void SingleplayerNextGeneration() {
+
     }
 
-    // Shows the previous maps in the multiplayer menu.
-    public void MultiplayerPreviousMap() {
-        DecreaseMapIndex();
-        mapMP.GetComponent<Text>().text = "Map: " + singleplayerScenes[mapIndex].fieldName;
-        UpdateGenerationField(multiplayerScenes[mapIndex].isGenetic, inputMP, generationMP, nextGenerationMP, previousGenerationMP);
-        sceneIndex = mapIndex + singleplayerScenes.GetLength(0);
+    // Shows the previous generation method in the singleplayer menu.
+    public void SingleplayerPreviousGeneration() {
+
     }
 
-    // Increases by one the circular current map index.
-    private void IncreaseMapIndex() {
-        mapIndex++;
-        if (mapIndex > singleplayerScenes.GetLength(0) - 1)
-            mapIndex = 0;
+    private void ActivateCurrentModeSP() {
+        modeTextSP.text = singleplayerModes[currentMode].modeName;
+
+        currentMap = 0;
+        currentGeneration = GetMinSPGeneration();
+
+        UpdateSingleplayerMaps();
+        ActivateCurrentMapSP();
     }
 
-    // Decreases by one the circular current map index.
-    private void DecreaseMapIndex() {
-        mapIndex--;
-        if (mapIndex < 0)
-            mapIndex = singleplayerScenes.GetLength(0) - 1;
+    private void ActivateCurrentMapSP() {
+        mapTextSP.text = singleplayerModes[currentMode].maps[currentMap].mapName;
+
+        currentGeneration = GetMinSPGeneration();
+
+        UpdateSingleplayerGenerations();
+        ActivateCurrentGenerationSP();
     }
 
-    // Sets the generation field depending if the map is genetic or not.
-    private void UpdateGenerationField(bool isGenetic, GameObject input, GameObject generation, GameObject next, GameObject previous) {
-        if (isGenetic) {
-            next.GetComponent<Button>().interactable = false;
-            previous.GetComponent<Button>().interactable = false;
-            generationIndex = -1;
-            input.GetComponent<InputField>().interactable = true;
-            generation.GetComponent<Text>().text = "Generation: genetic";
-            input.GetComponent<InputField>().placeholder.GetComponent<Text>().text = "Insert genome...";
-            input.GetComponent<InputField>().text = "";
+    private void ActivateCurrentGenerationSP() {
+        generationTextSP.text = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].generationName;
+        currentScene = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].scene;
+
+        if (generationIndex == 0) {
+            inputSP.interactable = false;
+            inputSP.placeholder.GetComponent<Text>().text = GetSeed();
         } else {
-            next.GetComponent<Button>().interactable = true;
-            previous.GetComponent<Button>().interactable = true;
-            generationIndex = 0;
-            input.GetComponent<InputField>().interactable = false;
-            generation.GetComponent<Text>().text = "Generation: random";
-            input.GetComponent<InputField>().placeholder.GetComponent<Text>().text = GetSeed();
-            input.GetComponent<InputField>().text = "";
+            inputSP.interactable = true;
+            inputSP.placeholder.GetComponent<Text>().text = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].placeholder;
         }
+    }
+
+    private int GetMinSPGeneration() {
+        int i = 0;
+
+        foreach (Generation g in singleplayerModes[currentMode].maps[currentMap].enabledGenerations) {
+            if (g.enabled)
+                break;
+            else
+                i++;
+        }
+
+        return i;
+    }
+
+    /* MULTIPLAYER */
+
+    
+
+    /* HELPERS */
+
+    // Returns the previous or the next circular index.
+    private int GetCiruclarIndex(int current, int max, bool next) {
+        if (next) {
+            if (current == max)
+                return 0;
+            else
+                return current + 1;
+        } else {
+            if (current == 0)
+                return max;
+            else
+                return current - 1;
+        }
+
     }
 
     // Gets a seed and stores it.
     private string GetSeed() {
         mapDNA = System.DateTime.Now.GetHashCode().ToString();
         return mapDNA;
-    }
-
-    // Shows the next generation method in the singleplayer menu.
-    public void SingleplayerNextGeneration() {
-        IncreaseGenerationIndex();
-        UpdateGeneration(inputSP, generationSP);
-    }
-
-    // Shows the previous generation method in the singleplayer menu.
-    public void SingleplayerPreviousGeneration() {
-        DecreaseGenerationIndex();
-        UpdateGeneration(inputSP, generationSP);
-    }
-
-    // Shows the next generation method in the multiplayer menu.
-    public void MultiplayerNextGeneration() {
-        IncreaseGenerationIndex();
-        UpdateGeneration(inputMP, generationMP);
-    }
-
-    // Shows the previous generation method in the multiplayer menu.
-    public void MultiplayerPreviousGeneration() {
-        DecreaseGenerationIndex();
-        UpdateGeneration(inputMP, generationMP);
-    }
-
-    // Updates the generation mode depending on the current index.
-    private void UpdateGeneration(GameObject input, GameObject generation) {
-        switch (generationIndex) {
-            case 0:
-                input.GetComponent<InputField>().interactable = false;
-                generation.GetComponent<Text>().text = "Generation: random";
-                input.GetComponent<InputField>().placeholder.GetComponent<Text>().text = GetSeed();
-                input.GetComponent<InputField>().text = "";
-                break;
-            case 1:
-                input.GetComponent<InputField>().interactable = true;
-                generation.GetComponent<Text>().text = "Generation: seed";
-                input.GetComponent<InputField>().placeholder.GetComponent<Text>().text = "Insert seed...";
-                input.GetComponent<InputField>().text = "";
-                break;
-            case 2:
-                input.GetComponent<InputField>().interactable = true;
-                generation.GetComponent<Text>().text = "Generation: file";
-                input.GetComponent<InputField>().placeholder.GetComponent<Text>().text = "Insert file name...";
-                input.GetComponent<InputField>().text = "";
-                break;
-        }
-    }
-
-    // Increases by one the circular current generation index.
-    private void IncreaseGenerationIndex() {
-        generationIndex++;
-        if (!allowIO && generationIndex > 1)
-            generationIndex = 0;
-        else if (generationIndex > 2)
-            generationIndex = 0;
-    }
-
-    // Decreases by one the circular current generation index.
-    private void DecreaseGenerationIndex() {
-        generationIndex--;
-        if (generationIndex < 0) {
-            if (!allowIO)
-                generationIndex = 1;
-            else
-                generationIndex = 2;
-        }
     }
 
     // Sets the map DNA.
@@ -312,10 +321,23 @@ public class MainMenuUIManager : MonoBehaviour {
     }
 
     [Serializable]
-    private struct Scene {
-        public string sceneName;
-        public string fieldName;
-        public bool isGenetic;
+    private struct Mode {
+        public string modeName;
+        public Map[] maps;
+    }
+
+    [Serializable]
+    private struct Map {
+        public string mapName;
+        public Generation[] enabledGenerations;
+    }
+
+    [Serializable]
+    private struct Generation {
+        public bool enabled;
+        public string generationName;
+        public string placeholder;
+        public string scene;
     }
 
 }
