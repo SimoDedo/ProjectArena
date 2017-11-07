@@ -64,4 +64,6 @@
         inGame = b;
     }
 
+    public override void SlowEntity(float penalty) { }
+
 }

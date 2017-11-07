@@ -44,7 +44,7 @@ public class Target : Entity {
             }
         }
 
-        if (laserList != null) { 
+        if (laserList != null) {
             foreach (Laser l in laserList) {
                 l.SetActive(true);
             }
@@ -81,5 +81,7 @@ public class Target : Entity {
     public override void Respawn() { }
 
     public override void SetInGame(bool b) { }
+
+    public override void SlowEntity(float penalty) { }
 
 }

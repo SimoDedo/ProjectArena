@@ -67,5 +67,4 @@ public class ProjectileGun : Gun {
         return Quaternion.Euler(eulerRotation);
     }
 
-
 }

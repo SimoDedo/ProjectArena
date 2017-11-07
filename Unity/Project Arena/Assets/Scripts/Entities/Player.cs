@@ -24,6 +24,8 @@ public class Player : Entity {
 
     // Vector used to apply the movement.
     private Vector3 moveDirection = Vector3.zero;
+    // Penalty applied to mouse and keyboard movement.
+    private float inputPenalty = 1f;
     // Is the cursor locked?
     private bool cursorLocked = false;
     // Is the input enabled?
@@ -191,7 +193,7 @@ public class Player : Entity {
             // Read the inputs.
             moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
             moveDirection = transform.TransformDirection(moveDirection);
-            moveDirection *= speed;
+            moveDirection *= speed * inputPenalty;
             // Jump if needed.
             if (Input.GetButton("Jump"))
                 moveDirection.y = jumpSpeed;
@@ -230,7 +232,7 @@ public class Player : Entity {
         Vector2 mouseDelta = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
 
         // Extract the delta of the mouse.
-        mouseDelta = Vector2.Scale(mouseDelta, new Vector2(sensitivity * smoothing, sensitivity * smoothing));
+        mouseDelta = Vector2.Scale(mouseDelta, new Vector2(sensitivity * smoothing * inputPenalty, sensitivity * smoothing * inputPenalty));
         smoothedDelta.x = Mathf.Lerp(smoothedDelta.x, mouseDelta.x, 1f / smoothing);
         smoothedDelta.y = Mathf.Lerp(smoothedDelta.y, mouseDelta.y, 1f / smoothing);
         mouseLook += smoothedDelta;
@@ -275,6 +277,10 @@ public class Player : Entity {
     private void SetUIColor() {
         playerUIManagerScript.SetColorAll(playerUIManagerScript.GetGunColor(currentGun));
         gameManagerScript.SetUIColor(playerUIManagerScript.GetGunColor(currentGun));
+    }
+
+    public override void SlowEntity(float penalty) {
+        inputPenalty = penalty;
     }
 
 }

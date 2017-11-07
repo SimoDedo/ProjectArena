@@ -27,8 +27,11 @@ public abstract class Entity : MonoBehaviour {
     // Kills the entity.
     protected abstract void Die(int id);
 
-    // Respawn the entity.
+    // Respawns the entity.
     public abstract void Respawn();
+
+    // Slows down the entity.
+    public abstract void SlowEntity(float penalty);
 
     // Returns the next or the previous active gun.
     protected int GetActiveGun(int currentGun, bool next) {

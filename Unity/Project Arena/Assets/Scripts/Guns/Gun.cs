@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public abstract class Gun : MonoBehaviour {
 
@@ -16,6 +17,13 @@ public abstract class Gun : MonoBehaviour {
 
     [Header("Appearence")] [SerializeField] protected float muzzleFlashDuration = 0.05f;
     [SerializeField] protected float recoil = 0.05f;
+
+    [Header("Aim")] [SerializeField] protected bool aimEnabled = false;
+    [SerializeField] protected bool overlayEnabled = false;
+    [SerializeField] protected float zoom = 1f;
+    [SerializeField] protected Camera weaponCamera;
+    [SerializeField] protected Vector3 aimPosition;
+    [SerializeField] protected Image aimOverlay;
 
     [Header("UI")]
     [SerializeField]
@@ -35,6 +43,12 @@ public abstract class Gun : MonoBehaviour {
     protected bool coolingDown;
     protected bool reloading;
 
+    // Variables to meange the aim.
+    protected bool aiming;
+    protected bool animatingAim;
+    protected float aimStart;
+    protected float originalFOV;
+
     protected GameManager gameManagerScript;
     protected GunUIManager gunUIManagerScript;
     protected PlayerUIManager playerUIManagerScript;
@@ -46,10 +60,24 @@ public abstract class Gun : MonoBehaviour {
     // Is the input enabled?
     private bool inputEnabled = true;
 
+    protected void Awake() {
+        if (aimEnabled)
+            originalFOV = headCamera.fieldOfView;
+    }
+
     protected void Update() {
         if (used && inputEnabled) {
             if (reloading || coolingDown)
                 UpdateTimers();
+
+            if (aimEnabled) {
+                if (Input.GetButtonDown("Fire2"))
+                    Aim(true);
+                if (Input.GetButtonUp("Fire2"))
+                    Aim(false);
+                if (animatingAim)
+                    AnimateAim();
+            }
 
             if (Input.GetButton("Fire1") && CanShoot()) {
                 if (ammoInCharger > 0)
@@ -63,6 +91,8 @@ public abstract class Gun : MonoBehaviour {
     }
 
     protected void OnDisable() {
+        if (aimEnabled)
+            ResetAim();
         if (muzzleFlash.activeSelf)
             muzzleFlash.SetActive(false);
     }
@@ -74,13 +104,16 @@ public abstract class Gun : MonoBehaviour {
         used = true;
     }
 
-    // Stops reloading, disallows accepting input and disables all the childrens.
+    // Stops reloading, stops aiming, disallows accepting input and disables all the childrens.
     public void Stow() {
         // When I switch guns I stop the reloading, but not the cooldown.
         reloading = false;
 
         if (hasUI)
             playerUIManagerScript.StopReloading();
+
+        if (aimEnabled)
+            ResetAim();
 
         SetChildrenEnabled(false);
         used = false;
@@ -158,6 +191,52 @@ public abstract class Gun : MonoBehaviour {
 
     // Shots.
     protected abstract void Shoot();
+
+    // Aims.
+    protected void Aim(bool aim) {
+        aiming = aim;
+        animatingAim = true;
+        aimStart = Time.time;
+
+        if (!aim) {
+            EnableAimOverlay(false);
+            ownerEntityScript.SlowEntity(1);
+            headCamera.fieldOfView = originalFOV;
+        }
+    }
+
+    // Animates the aim.
+    protected void AnimateAim() {
+        if (aiming)
+            transform.localPosition = Vector3.Lerp(transform.localPosition, aimPosition, (Time.time - aimStart) * 10f);
+        else
+            transform.localPosition = Vector3.Lerp(transform.localPosition, Vector3.zero, (Time.time - aimStart) * 10f);
+
+        if (transform.localPosition == aimPosition && aiming) {
+            EnableAimOverlay(true);
+            ownerEntityScript.SlowEntity(0.4f);
+            headCamera.fieldOfView = originalFOV / zoom;
+            animatingAim = false;
+        } else if (transform.localPosition == Vector3.zero && !aiming) {
+            animatingAim = false;
+        }
+    }
+
+    // Enables or disables the aim overlay.
+    protected void EnableAimOverlay(bool enabled) {
+        if (overlayEnabled) {
+            weaponCamera.enabled = !enabled;
+            aimOverlay.enabled = enabled;
+        }
+    }
+
+    // Resets the aim.
+    protected void ResetAim() {
+        EnableAimOverlay(false);
+        headCamera.fieldOfView = originalFOV;
+        transform.localPosition = Vector3.zero;
+        ownerEntityScript.SlowEntity(1);
+    }
 
     // Reloads.
     protected void Reload() {
