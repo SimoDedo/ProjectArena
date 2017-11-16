@@ -1,15 +1,28 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class ParameterContainer : MonoBehaviour {
+public class ParameterManager : MonoBehaviour {
 
+    // Parameters to tranfert data between scenes.
     private int generationMode;
     private string mapDNA;
     private bool export;
     private string exportPath;
+    private int errorCode = 0;
 
     void Awake() {
         DontDestroyOnLoad(transform.gameObject);
     }
+
+    /* SUPPORT FUNCTIONS */
+
+    // Menages errors going back to the main menu.
+    public void ErrorBackToMenu(int errorCode) {
+        SetErrorCode(errorCode);
+        SceneManager.LoadScene("Menu");
+    }
+
+    /* GETTERS AND SETTERS */
 
     public int GetGenerationMode() {
         return generationMode;
@@ -41,6 +54,14 @@ public class ParameterContainer : MonoBehaviour {
 
     public string GetExportPath() {
         return exportPath;
+    }
+
+    public int GetErrorCode() {
+        return errorCode;
+    }
+
+    public void SetErrorCode(int code) {
+        errorCode = code;
     }
 
 }

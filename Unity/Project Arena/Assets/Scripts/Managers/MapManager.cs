@@ -32,7 +32,7 @@ public class MapManager : CoreComponent {
     private char[,] map;
     
     private void Start() {
-        ExtractParametersFromContainer();
+        ExtractParametersFromManager();
 
         mapAssemblerScript = mapAssembler.GetComponent<MapAssebler>();
         mapGeneratorScript = mapGenerator.GetComponent<MapGenerator>();
@@ -52,7 +52,7 @@ public class MapManager : CoreComponent {
             LoadMapFromText();
         } else {
             // Generate the map.
-            if (GetParameterContainer() != null)
+            if (GetParameterManager() != null)
                 map = mapGeneratorScript.GenerateMap(seed, export, exportPath);
             else
                 map = mapGeneratorScript.GenerateMap();
@@ -73,53 +73,55 @@ public class MapManager : CoreComponent {
 
     // Loads the map from a text file.
     protected void LoadMapFromText() {
-        if (textFilePath == null && !Directory.Exists(textFilePath)) {
-            Debug.LogError("Error while retrieving the folder, please insert a valid path.");
+        if (textFilePath == null) {
+            GetParameterManager().ErrorBackToMenu(-1);
+        } else if (!File.Exists(textFilePath)) {
+            GetParameterManager().ErrorBackToMenu(-1);
         } else {
             try {
-                string[] lines = System.IO.File.ReadAllLines(@textFilePath);
+                string[] lines = File.ReadAllLines(@textFilePath);
 
                 map = new char[lines[0].Length, lines.GetLength(0)];
 
                 for (int x = 0; x < map.GetLength(0); x++) {
-                    for (int y = 0; y < map.GetLength(1); y++) {
+                    for (int y = 0; y < map.GetLength(1); y++) {                     
                         map[x, y] = lines[y][x];
                     }
                 }
             } catch (Exception) {
-                Debug.LogError("Error while loading the map, the supplied file is not valid.");
+                GetParameterManager().ErrorBackToMenu(-1);
             }
         }
     }
 
-    // Extracts the parameters from the parameter container, if any.
-    private void ExtractParametersFromContainer() {
-        if (GetParameterContainer() != null) {
-            export = GetParameterContainer().GetExport();
-            exportPath = GetParameterContainer().GetExportPath();
+    // Extracts the parameters from the parameter Manager, if any.
+    private void ExtractParametersFromManager() {
+        if (GetParameterManager() != null) {
+            export = GetParameterManager().GetExport();
+            exportPath = GetParameterManager().GetExportPath();
 
-            switch (GetParameterContainer().GetGenerationMode()) {
+            switch (GetParameterManager().GetGenerationMode()) {
                 case 0:
                     loadMapFromFile = false;
-                    seed = GetParameterContainer().GetMapDNA();
+                    seed = GetParameterManager().GetMapDNA();
                     break;
                 case 1:
                     loadMapFromFile = false;
-                    seed = GetParameterContainer().GetMapDNA();
+                    seed = GetParameterManager().GetMapDNA();
                     break;
                 case 2:
                     seed = null;
                     loadMapFromFile = true;
-                    textFilePath = GetParameterContainer().GetMapDNA();
+                    textFilePath = GetParameterManager().GetMapDNA();
                     break;
             }
         }
     }
 
-    // Returns the parameter container.
-    protected ParameterContainer GetParameterContainer() {
-        if (GameObject.Find("Parameter Container") != null)
-            return GameObject.Find("Parameter Container").GetComponent<ParameterContainer>();
+    // Returns the parameter Manager.
+    protected ParameterManager GetParameterManager() {
+        if (GameObject.Find("Parameter Manager") != null)
+            return GameObject.Find("Parameter Manager").GetComponent<ParameterManager>();
         else
             return null;
     }

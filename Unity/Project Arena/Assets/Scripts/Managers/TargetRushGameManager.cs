@@ -5,7 +5,6 @@ using UnityEngine;
 public class TargetRushGameManager : GameManager {
 
     [Header("Contenders")] [SerializeField] private GameObject player;
-    [SerializeField] private string playerName = "Player 1";
     [SerializeField] private int totalHealthPlayer = 100;
     [SerializeField] private bool[] activeGunsPlayer;
     [SerializeField] private Wave[] waveList;
@@ -35,7 +34,7 @@ public class TargetRushGameManager : GameManager {
         targetRushGameUIManagerScript.Fade(0.7f, 1f, true, 0.5f);
     }
 
-    private void Update() {
+    private void Update() { 
         if (!IsReady() && mapManagerScript.IsReady() && spawnPointManagerScript.IsReady() && targetRushGameUIManagerScript.IsReady()) {
             // Generate the map.
             mapManagerScript.ManageMap(true);

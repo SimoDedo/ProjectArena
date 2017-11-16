@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -13,6 +14,8 @@ public class MainMenuUIManager : MonoBehaviour {
     [SerializeField] private GameObject singleplayer;
     [SerializeField] private GameObject multiplayer;
     [SerializeField] private GameObject about;
+    [SerializeField] private GameObject error;
+    [SerializeField] private GameObject loading;
 
     [Header("Singleplayer Fields")] [SerializeField] private GameObject nextModeSP;
     [SerializeField] private GameObject previousModeSP;
@@ -45,7 +48,12 @@ public class MainMenuUIManager : MonoBehaviour {
     [SerializeField] private GameObject importButton;
     [SerializeField] private GameObject exportButton;
 
-    [Header("Other")] [SerializeField] private ParameterContainer parameterContainer;
+    [Header("Error Fields")] [SerializeField] private Text errorText;
+
+    [Header("Loading Fields")] [SerializeField] private Text loadingText;
+
+    [Header("Other")] [SerializeField] private GameObject parameterManagerPrefab;
+    [SerializeField] private MapValidator mapValidator;
 
     private GameObject openedSection;
 
@@ -58,11 +66,29 @@ public class MainMenuUIManager : MonoBehaviour {
     private String mapDNA;
     private String currentScene;
 
+    private String importPath;
+    private String exportPath;
+
+    private ParameterManager parameterManagerScript;
+
     public void Start() {
+        if (!GameObject.Find("Parameter Manager"))
+            InstantiateParameterManager();
+        else
+            parameterManagerScript = GameObject.Find("Parameter Manager").GetComponent<ParameterManager>();
+
         openedSection = main;
+
+        if (parameterManagerScript.GetErrorCode() != 0) {
+            OpenSection(error);
+            SetErrorMessage(parameterManagerScript.GetErrorCode());
+            parameterManagerScript.SetErrorCode(0);
+        }
 
         if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.LinuxPlayer) {
             allowIO = true;
+            importPath = Application.persistentDataPath + "/Import";
+            exportPath = Application.persistentDataPath + "/Export";
         } else {
             allowIO = false;
             exportSP.isOn = false;
@@ -74,12 +100,12 @@ public class MainMenuUIManager : MonoBehaviour {
         }
 
         // Create the import directory if needed.
-        if (!Directory.Exists(Application.persistentDataPath + "/Import")) {
-            Directory.CreateDirectory(Application.persistentDataPath + "/Import");
+        if (!Directory.Exists(importPath)) {
+            Directory.CreateDirectory(importPath);
         }
         // Create the export directory if needed.
-        if (!Directory.Exists(Application.persistentDataPath + "/Export")) {
-            Directory.CreateDirectory(Application.persistentDataPath + "/Export");
+        if (!Directory.Exists(exportPath)) {
+            Directory.CreateDirectory(exportPath);
         }
 
         if (Application.platform == RuntimePlatform.WindowsPlayer) {
@@ -88,19 +114,36 @@ public class MainMenuUIManager : MonoBehaviour {
         } else {
             import.SetActive(true);
             export.SetActive(true);
-            import.GetComponent<Text>().text = "Import folder: " + Application.persistentDataPath + "/Import";
-            export.GetComponent<Text>().text = "Export folder: " + Application.persistentDataPath + "/Export";
+            import.GetComponent<Text>().text = "Import folder: " + importPath;
+            export.GetComponent<Text>().text = "Export folder: " + exportPath;
         }
     }
 
-    // Loads the rigth scene.
+    // Starts the loading of the rigth scene.
     public void LoadScene() {
-        parameterContainer.SetGenerationMode(currentGeneration);
-        parameterContainer.SetMapDNA(mapDNA);
-        parameterContainer.SetExport(exportData && allowIO);
-        parameterContainer.SetExportPath(Application.persistentDataPath + "/Export");
+        parameterManagerScript.SetGenerationMode(currentGeneration);
+        parameterManagerScript.SetMapDNA(mapDNA);
+        parameterManagerScript.SetExport(exportData && allowIO);
+        parameterManagerScript.SetExportPath(exportPath);
 
-        SceneManager.LoadScene(currentScene);
+        Loading();
+    }
+
+    // Shows the loading animation and loads.
+    void Loading() {
+        loadingText.text = "Loading";
+        OpenSection(loading);
+        if (currentGeneration == 2) {
+            loadingText.text = "Validating the map";
+            int errorCode = mapValidator.ValidateMap(parameterManagerScript.GetMapDNA());
+            if (errorCode == 0) {
+                SceneManager.LoadScene(currentScene);
+            } else {
+                SetErrorMessage(errorCode);
+                OpenSection(error);
+            }
+        } else
+            SceneManager.LoadScene(currentScene);
     }
 
     // Quits the game.
@@ -120,8 +163,6 @@ public class MainMenuUIManager : MonoBehaviour {
     public void OpenMultiplayer() {
         OpenSection(multiplayer);
         ResetValues();
-        // UpdateMultiplayerModes();
-        // ActivateCurrentModeMP();
     }
 
     // Opens the about menu.
@@ -147,6 +188,21 @@ public class MainMenuUIManager : MonoBehaviour {
         currentMap = 0;
         currentGeneration = 0;
         exportData = true;
+    }
+
+    // Sets the error message.
+    private void SetErrorMessage(int errorCode) {
+        switch (errorCode) {
+            case -1:
+                errorText.text = "Something really bad just happened.";
+                break;
+            case 1:
+                errorText.text = "Error while loading the map.\nThe specified file was not found.\nPlease put the file in the rigth folder.";
+                break;
+            case 2:
+                errorText.text = "Error while loading the map.\nThe map must be rectangular, with at least one spawn point and walls around its border.";
+                break;
+        }
     }
 
     /* SINGLEPLAYER */
@@ -419,7 +475,7 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Sets the map DNA.
     public void SetMapDNA(GameObject field) {
-        mapDNA = field.GetComponent<InputField>().text;
+        mapDNA = importPath + "/" + field.GetComponent<InputField>().text;
     }
 
     // Sets the export data flag.
@@ -429,18 +485,25 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Opens the import data fodler.
     public void OpenImportFolder() {
-        ShowExplorer(Application.persistentDataPath + "/Import");
+        ShowExplorer(importPath);
     }
 
     // Opens the export data fodler.
     public void OpenExportFolder() {
-        ShowExplorer(Application.persistentDataPath + "/Export");
+        ShowExplorer(exportPath);
     }
 
     // Opens an explorer in Windows.
     public void ShowExplorer(string path) {
         path = path.Replace(@"/", @"\");
         System.Diagnostics.Process.Start("explorer.exe", "/select," + path);
+    }
+
+    // Instantiates the Parameter Manager.
+    private void InstantiateParameterManager() {
+        GameObject instance = Instantiate(parameterManagerPrefab);
+        instance.name = parameterManagerPrefab.name;
+        parameterManagerScript = instance.GetComponent<ParameterManager>();
     }
 
     [Serializable]
