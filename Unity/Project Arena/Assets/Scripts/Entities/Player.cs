@@ -283,4 +283,12 @@ public class Player : Entity {
         inputPenalty = penalty;
     }
 
+    // Shows current guns
+    public void ShowGun(bool b) {
+        if (b)
+            ActivateGun(currentGun);
+        else
+            DeactivateGun(currentGun);
+    }
+
 }

@@ -32,6 +32,7 @@ public abstract class GameUIManager : CoreComponent {
 
     // Activates or deactivates the pause UI.
     public void ActivatePauseUI(bool b) {
+        fightUI.SetActive(!b);
         pauseUI.SetActive(b);
     }
 

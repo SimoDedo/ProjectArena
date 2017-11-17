@@ -135,10 +135,14 @@ public class TargetRushGameManager : GameManager {
     public override void Pause() {
         if (!isPaused) {
             targetRushGameUIManagerScript.Fade(0f, 0.7f, false, 0.25f);
+            player.GetComponent<PlayerUIManager>().SetPlayerUIVisible(false);
+            playerScript.ShowGun(false);
             targetRushGameUIManagerScript.ActivatePauseUI(true);
             playerScript.EnableInput(false);
         } else {
             targetRushGameUIManagerScript.Fade(0f, 0.7f, true, 0.25f);
+            player.GetComponent<PlayerUIManager>().SetPlayerUIVisible(true);
+            playerScript.ShowGun(true);
             targetRushGameUIManagerScript.ActivatePauseUI(false);
             playerScript.EnableInput(true);
         }
