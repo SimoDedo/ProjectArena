@@ -81,7 +81,7 @@ public class MainMenuUIManager : MonoBehaviour {
 
         if (parameterManagerScript.GetErrorCode() != 0) {
             OpenSection(error);
-            SetErrorMessage(parameterManagerScript.GetErrorCode());
+            SetErrorMessage(parameterManagerScript.GetErrorCode(), parameterManagerScript.GetErrorMessage());
             parameterManagerScript.SetErrorCode(0);
         }
 
@@ -89,6 +89,12 @@ public class MainMenuUIManager : MonoBehaviour {
             allowIO = true;
             importPath = Application.persistentDataPath + "/Import";
             exportPath = Application.persistentDataPath + "/Export";
+            // Create the import directory if needed.
+            if (!Directory.Exists(importPath))
+                Directory.CreateDirectory(importPath);
+            // Create the export directory if needed.
+            if (!Directory.Exists(exportPath))
+                Directory.CreateDirectory(exportPath);
         } else {
             allowIO = false;
             exportSP.isOn = false;
@@ -97,15 +103,6 @@ public class MainMenuUIManager : MonoBehaviour {
             exportMP.isOn = false;
             exportMP.interactable = false;
             exportTextMP.color = exportMP.GetComponent<Toggle>().colors.disabledColor;
-        }
-
-        // Create the import directory if needed.
-        if (!Directory.Exists(importPath)) {
-            Directory.CreateDirectory(importPath);
-        }
-        // Create the export directory if needed.
-        if (!Directory.Exists(exportPath)) {
-            Directory.CreateDirectory(exportPath);
         }
 
         if (Application.platform == RuntimePlatform.WindowsPlayer) {
@@ -139,7 +136,17 @@ public class MainMenuUIManager : MonoBehaviour {
             if (errorCode == 0) {
                 SceneManager.LoadScene(currentScene);
             } else {
-                SetErrorMessage(errorCode);
+                SetErrorMessage(errorCode, null);
+                OpenSection(error);
+            }
+        } else if (currentGeneration == 3) {
+            loadingText.text = "Validating the map";
+            int errorCode = mapValidator.ValidateGeneticMap(parameterManagerScript.GetMapDNA());
+            if (errorCode == 0) {
+                SetErrorMessage(1, "Everything went fine, time to implement the generation.");
+                OpenSection(error);
+            } else {
+                SetErrorMessage(errorCode, null);
                 OpenSection(error);
             }
         } else
@@ -191,16 +198,25 @@ public class MainMenuUIManager : MonoBehaviour {
     }
 
     // Sets the error message.
-    private void SetErrorMessage(int errorCode) {
+    private void SetErrorMessage(int errorCode, string errorMessage) {
         switch (errorCode) {
-            case -1:
-                errorText.text = "Something really bad just happened.";
-                break;
             case 1:
-                errorText.text = "Error while loading the map.\nThe specified file was not found.\nPlease put the file in the rigth folder.";
+                errorText.text = errorMessage;
                 break;
             case 2:
+                errorText.text = "Error while loading the map.\nThe specified file was not found.\nPlease put the file in the rigth folder.";
+                break;
+            case 3:
                 errorText.text = "Error while loading the map.\nThe map must be rectangular, with at least one spawn point and walls around its border.";
+                break;
+            case 4:
+                errorText.text = "Error while loading the map.\nThe map exceeds the maximum dimension.";
+                break;
+            case 5:
+                errorText.text = "Error while loading the map.\nThe genome doesn't follow the expected convention.";
+                break;
+            default:
+                errorText.text = "Something really bad just happened.";
                 break;
         }
     }

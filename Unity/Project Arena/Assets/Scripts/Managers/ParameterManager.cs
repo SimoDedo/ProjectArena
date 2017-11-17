@@ -3,12 +3,17 @@ using UnityEngine.SceneManagement;
 
 public class ParameterManager : MonoBehaviour {
 
-    // Parameters to tranfert data between scenes.
+    // Map data.
     private int generationMode;
     private string mapDNA;
+
+    // Export data.
     private bool export;
     private string exportPath;
+
+    // Error data.
     private int errorCode = 0;
+    private string errorMessage;
 
     void Awake() {
         DontDestroyOnLoad(transform.gameObject);
@@ -24,12 +29,12 @@ public class ParameterManager : MonoBehaviour {
 
     /* GETTERS AND SETTERS */
 
-    public int GetGenerationMode() {
-        return generationMode;
-    }
-
     public void SetGenerationMode(int gm) {
         generationMode = gm;
+    }
+
+    public int GetGenerationMode() {
+        return generationMode;
     }
 
     public void SetMapDNA(string mDNA) {
@@ -40,12 +45,12 @@ public class ParameterManager : MonoBehaviour {
         return mapDNA;
     }
 
-    public bool GetExport() {
-        return export;
-    }
-
     public void SetExport(bool e) {
         export = e;
+    }
+
+    public bool GetExport() {
+        return export;
     }
 
     public void SetExportPath(string ep) {
@@ -56,12 +61,20 @@ public class ParameterManager : MonoBehaviour {
         return exportPath;
     }
 
+    public void SetErrorCode(int code) {
+        errorCode = code;
+    }
+
     public int GetErrorCode() {
         return errorCode;
     }
 
-    public void SetErrorCode(int code) {
-        errorCode = code;
+    public void SetErrorMessage(string em) {
+        errorMessage = em;
+    }
+
+    public string GetErrorMessage() {
+        return errorMessage;
     }
 
 }

@@ -1,22 +1,28 @@
 ﻿using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public class MapValidator : MonoBehaviour {
+
+    [SerializeField] private int maxSize = 200;
 
     // Validates the imported map.
     public int ValidateMap(string path) {
         if (path == null) {
             Debug.Log(path + " is null.");
-            return 1;
+            return 2;
         } else if (!File.Exists(path)) {
             Debug.Log(path + " doesn't exist.");
-            return 1;
+            return 2;
         } else {
             try {
                 string[] lines = File.ReadAllLines(path);
                 int xLenght = lines[0].Length;
                 int yLenght = lines.GetLength(0);
+
+                if (xLenght > maxSize || yLenght > maxSize)
+                    return 4;
 
                 int spawnPointCount = 0;
 
@@ -30,13 +36,22 @@ public class MapValidator : MonoBehaviour {
                 }
 
                 if (spawnPointCount == 0)
-                    return 2;
+                    return 3;
                 else
                     return 0;
             } catch (Exception) {
-                return 2;
+                return 3;
             }
         }
+    }
+
+    public int ValidateGeneticMap(string genome) {
+        Regex rgx = new Regex(@"(\<\d+,\d+,[1-9]\d*\>)+(\|(\<\d+,\d+,-?[1-9]\d*\>)*)?$");
+
+        if (rgx.IsMatch(genome))
+            return 0;
+        else
+            return 5;
     }
 
 }

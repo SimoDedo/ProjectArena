@@ -34,7 +34,7 @@ public class TargetRushGameManager : GameManager {
         targetRushGameUIManagerScript.Fade(0.7f, 1f, true, 0.5f);
     }
 
-    private void Update() { 
+    private void Update() {
         if (!IsReady() && mapManagerScript.IsReady() && spawnPointManagerScript.IsReady() && targetRushGameUIManagerScript.IsReady()) {
             // Generate the map.
             mapManagerScript.ManageMap(true);
@@ -159,7 +159,7 @@ public class TargetRushGameManager : GameManager {
             // Disable the player movement and interactions, activate the score UI, set the winner and set the phase.
             playerScript.SetInGame(false);
             targetRushGameUIManagerScript.Fade(0.7f, 0, true, 0.5f);
-            targetRushGameUIManagerScript.SetFinalScore(playerScore + (int) (Time.time - startTime) * 10);
+            targetRushGameUIManagerScript.SetFinalScore(playerScore + (int)(Time.time - startTime) * 10);
             targetRushGameUIManagerScript.SetFinalWave(currentWave);
             targetRushGameUIManagerScript.SetVictory(true);
             targetRushGameUIManagerScript.ActivateScoreUI();
@@ -175,8 +175,8 @@ public class TargetRushGameManager : GameManager {
         targetRushGameUIManagerScript.SetWave(currentWave);
 
         // Set the target count.
-        foreach (Target target in waveList[currentWave - 1].targetList) 
-            targetsCount += target.count;        
+        foreach (Target target in waveList[currentWave - 1].targetList)
+            targetsCount += target.count;
         targetRushGameUIManagerScript.SetTargets(targetsCount);
         // Debug.Log("Going to spawn " + targetsCount + " targets in wave " + currentWave + ".");
 

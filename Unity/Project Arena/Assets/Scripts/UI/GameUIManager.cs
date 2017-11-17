@@ -25,6 +25,7 @@ public abstract class GameUIManager : CoreComponent {
 
     // Activates the score UI.
     public void ActivateScoreUI() {
+        pauseUI.SetActive(false);
         readyUI.SetActive(false);
         fightUI.SetActive(false);
         scoreUI.SetActive(true);
