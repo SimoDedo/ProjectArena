@@ -26,7 +26,7 @@ public abstract class MapGenerator : CoreComponent {
     [SerializeField] protected int borderSize = 5;
 
     // Char that denotes a room;
-    [Header("Representation")] [SerializeField] protected char roomChar = 'v';
+    [Header("Representation")] [SerializeField] protected char roomChar = 'r';
     // Char that denotes a wall;
     [SerializeField] protected char wallChar = 'w';
     // Custom objects that will be added to the map.
@@ -277,6 +277,9 @@ public abstract class MapGenerator : CoreComponent {
         }
 
         map = borderedMap;
+
+        width = borderedMap.GetLength(0);
+        height = borderedMap.GetLength(1);
     }
 
     public char GetWallChar() {

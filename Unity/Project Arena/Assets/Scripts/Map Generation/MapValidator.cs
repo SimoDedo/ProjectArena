@@ -29,7 +29,7 @@ public class MapValidator : MonoBehaviour {
                 for (int x = 0; x < xLenght; x++) {
                     for (int y = 0; y < yLenght; y++) {
                         if ((x == 0 || y == 0 || x == xLenght - 1 || y == yLenght - 1) && lines[y][x] != 'w')
-                            return 2;
+                            return 3;
                         if (lines[y][x] == 's')
                             spawnPointCount++;
                     }

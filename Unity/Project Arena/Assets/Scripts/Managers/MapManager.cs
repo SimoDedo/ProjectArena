@@ -110,8 +110,13 @@ public class MapManager : CoreComponent {
                     seed = GetParameterManager().GetMapDNA();
                     break;
                 case 2:
-                    seed = null;
                     loadMapFromFile = true;
+                    seed = null;
+                    textFilePath = GetParameterManager().GetMapDNA();
+                    break;
+                case 3:
+                    loadMapFromFile = false;
+                    seed = GetParameterManager().GetMapDNA();
                     textFilePath = GetParameterManager().GetMapDNA();
                     break;
             }
