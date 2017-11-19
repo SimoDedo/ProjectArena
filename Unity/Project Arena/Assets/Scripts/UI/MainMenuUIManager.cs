@@ -85,7 +85,7 @@ public class MainMenuUIManager : MonoBehaviour {
             parameterManagerScript.SetErrorCode(0);
         }
 
-        if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.LinuxPlayer) {
+        if (true || Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.LinuxPlayer) {
             allowIO = true;
             importPath = Application.persistentDataPath + "/Import";
             exportPath = Application.persistentDataPath + "/Export";
@@ -118,6 +118,9 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Starts the loading of the rigth scene.
     public void LoadScene() {
+        if (currentGeneration == 2)
+            mapDNA = importPath + "/" + mapDNA;
+
         parameterManagerScript.SetGenerationMode(currentGeneration);
         parameterManagerScript.SetMapDNA(mapDNA);
         parameterManagerScript.SetExport(exportData && allowIO);
@@ -143,8 +146,7 @@ public class MainMenuUIManager : MonoBehaviour {
             loadingText.text = "Validating the map";
             int errorCode = mapValidator.ValidateGeneticMap(parameterManagerScript.GetMapDNA());
             if (errorCode == 0) {
-                SetErrorMessage(1, "Everything went fine, time to implement the generation.");
-                OpenSection(error);
+                SceneManager.LoadScene(currentScene);
             } else {
                 SetErrorMessage(errorCode, null);
                 OpenSection(error);
@@ -491,7 +493,7 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Sets the map DNA.
     public void SetMapDNA(GameObject field) {
-        mapDNA = importPath + "/" + field.GetComponent<InputField>().text;
+        mapDNA = field.GetComponent<InputField>().text;
     }
 
     // Sets the export data flag.

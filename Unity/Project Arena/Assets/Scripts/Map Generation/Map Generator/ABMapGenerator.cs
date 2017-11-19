@@ -3,13 +3,28 @@ using System.Collections.Generic;
 
 public class ABMapGenerator : MapGenerator {
 
+    private int originalWidth;
+    private int originalHeigth;
+
     private Room mainRoom;
     private List<Room> arenas;
     private List<Room> corridors;
 
-    public override char[,] GenerateMap() {
+    private void Start() {
+        originalWidth = width;
+        originalHeigth = height;
+
         width = 0;
         height = 0;
+
+        arenas = new List<Room>();
+        corridors = new List<Room>();
+
+        SetReady(true);
+    }
+
+    public override char[,] GenerateMap() {
+        InitializePseudoRandomGenerator();
 
         // Decode the genome.
         ParseGenome();
@@ -23,8 +38,10 @@ public class ABMapGenerator : MapGenerator {
         // Add borders to the map.
         AddBorders();
 
-        if (createTextFile)
+        if (createTextFile) {
+            seed = seed.GetHashCode().ToString();
             SaveMapAsText();
+        }
 
         return map;
     }
@@ -151,7 +168,7 @@ public class ABMapGenerator : MapGenerator {
         map = new char[width, height];
 
         for (int x = 0; x < width; x++)
-            for (int y = 0; y < width; y++)
+            for (int y = 0; y < height; y++)
                 map[x, y] = wallChar;
 
         foreach (Room a in arenas) {
@@ -159,7 +176,7 @@ public class ABMapGenerator : MapGenerator {
             int max = (int)Math.Ceiling(a.dimension / 2f);
 
             for (int x = a.originX - min; x < a.originX + max; x++)
-                for (int y = a.originY - min; y < a.originY + max; y++)
+                for (int y = a.originY - min; y <= a.originY + max; y++)
                     if (IsInMapRange(x, y))
                         map[x, y] = roomChar;
 
@@ -167,13 +184,13 @@ public class ABMapGenerator : MapGenerator {
 
         foreach (Room c in corridors) {
             if (c.dimension > 0) {
-                for (int x = c.originX; x < c.originX + c.dimension; x++)
-                    for (int y = c.originY - 1; y < c.originY + 1; y++)
+                for (int x = c.originX; x <= c.originX + c.dimension; x++)
+                    for (int y = c.originY - 1; y <= c.originY + 1; y++)
                         if (IsInMapRange(x, y))
                             map[x, y] = roomChar;
             } else {
-                for (int x = c.originX - 1; x < c.originX + 1; x++)
-                    for (int y = c.originY; y < c.originY + c.dimension; y++)
+                for (int x = c.originX - 1; x <= c.originX + 1; x++)
+                    for (int y = c.originY; y <= c.originY + c.dimension; y++)
                         if (IsInMapRange(x, y))
                             map[x, y] = roomChar;
             }
@@ -182,10 +199,58 @@ public class ABMapGenerator : MapGenerator {
 
     // Removes rooms that are not reachable from the main one and adds objects.
     private void ProcessMap() {
+        // Get the reachability mask.
+        bool[,] reachabilityMask = ComputeReachabilityMask();
+
         // Remove rooms not connected to the main one.
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+                if (!reachabilityMask[x, y])
+                    map[x, y] = wallChar;
 
         // Add objects;
         PopulateMap();
+    }
+
+    // Computes a mask of the tiles reachable by the main arena and scales the number of objects to be displaced..
+    private bool[,] ComputeReachabilityMask() {
+        bool[,] reachabilityMask = new bool[width, height];
+        int floorCount = 0;
+
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+                reachabilityMask[x, y] = false;
+
+        Queue<Coord> queue = new Queue<Coord>();
+        queue.Enqueue(new Coord(mainRoom.originX, mainRoom.originY));
+
+        while (queue.Count > 0) {
+            Coord tile = queue.Dequeue();
+
+            for (int x = tile.tileX - 1; x <= tile.tileX + 1; x++) {
+                for (int y = tile.tileY - 1; y <= tile.tileY + 1; y++) {
+                    if (IsInMapRange(x, y) && (y == tile.tileY || x == tile.tileX)) {
+                        if (reachabilityMask[x, y] == false && map[x, y] == roomChar) {
+                            reachabilityMask[x, y] = true;
+                            queue.Enqueue(new Coord(x, y));
+                            floorCount++;
+                        }
+                    }
+                }
+            }
+        }
+
+        ScaleObjectsPopulation(floorCount);
+
+        return reachabilityMask;
+    }
+
+    // Scales the number of instance of each object depending on the size of the map w.r.t. the original one.
+    private void ScaleObjectsPopulation(int floorCount) {
+        float scaleFactor = floorCount / (originalHeigth * originalWidth / 3f);
+
+        for (int i = 0; i < mapObjects.Length; i++)
+            mapObjects[i].numObjPerMap = (int)Math.Ceiling(scaleFactor * mapObjects[i].numObjPerMap);
     }
 
     // Stores all information about a room.
@@ -195,12 +260,6 @@ public class ABMapGenerator : MapGenerator {
         public int dimension;
 
         public Room() {
-        }
-
-        public Room(int x, int y, int d) {
-            originX = x;
-            originY = y;
-            dimension = d;
         }
     }
 
