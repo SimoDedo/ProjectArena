@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -60,6 +59,7 @@ public class MainMenuUIManager : MonoBehaviour {
     private int currentMode = 0;
     private int currentMap = 0;
     private int currentGeneration = 0;
+    private bool currentIsMultilevel = false;
 
     private bool exportData;
     private bool allowIO;
@@ -135,7 +135,7 @@ public class MainMenuUIManager : MonoBehaviour {
         OpenSection(loading);
         if (currentGeneration == 2) {
             loadingText.text = "Validating the map";
-            int errorCode = mapValidator.ValidateMap(parameterManagerScript.GetMapDNA());
+            int errorCode = currentIsMultilevel ? mapValidator.ValidateMLMap(parameterManagerScript.GetMapDNA()) : mapValidator.ValidateMap(parameterManagerScript.GetMapDNA());
             if (errorCode == 0) {
                 SceneManager.LoadScene(currentScene);
             } else {
@@ -144,7 +144,7 @@ public class MainMenuUIManager : MonoBehaviour {
             }
         } else if (currentGeneration == 3) {
             loadingText.text = "Validating the map";
-            int errorCode = mapValidator.ValidateGeneticMap(parameterManagerScript.GetMapDNA());
+            int errorCode = currentIsMultilevel ? mapValidator.ValidateGeneticMLMap(parameterManagerScript.GetMapDNA()) : mapValidator.ValidateGeneticMap(parameterManagerScript.GetMapDNA());
             if (errorCode == 0) {
                 SceneManager.LoadScene(currentScene);
             } else {
@@ -216,6 +216,9 @@ public class MainMenuUIManager : MonoBehaviour {
                 break;
             case 5:
                 errorText.text = "Error while loading the map.\nThe genome doesn't follow the expected convention.";
+                break;
+            case 6:
+                errorText.text = "Error while loading the map.\nEach level must be rectangular and have the same size, with at least one spawn point and walls around its border.";
                 break;
             default:
                 errorText.text = "Something really bad just happened.";
@@ -308,6 +311,7 @@ public class MainMenuUIManager : MonoBehaviour {
         mapTextSP.text = singleplayerModes[currentMode].maps[currentMap].mapName;
 
         currentGeneration = GetMinGenerationIndex(singleplayerModes[currentMode].maps[currentMap].enabledGenerations);
+        currentIsMultilevel = singleplayerModes[currentMode].maps[currentMap].isMultilevel;
 
         UpdateSingleplayerGenerations();
         ActivateCurrentGenerationSP();
@@ -413,6 +417,7 @@ public class MainMenuUIManager : MonoBehaviour {
         mapTextMP.text = multiplayerModes[currentMode].maps[currentMap].mapName;
 
         currentGeneration = GetMinGenerationIndex(multiplayerModes[currentMode].maps[currentMap].enabledGenerations);
+        currentIsMultilevel = multiplayerModes[currentMode].maps[currentMap].isMultilevel;
 
         UpdateMultiplayerGenerations();
         ActivateCurrentGenerationMP();
@@ -533,6 +538,7 @@ public class MainMenuUIManager : MonoBehaviour {
     [Serializable]
     private struct Map {
         public string mapName;
+        public bool isMultilevel;
         public Generation[] enabledGenerations;
     }
 
