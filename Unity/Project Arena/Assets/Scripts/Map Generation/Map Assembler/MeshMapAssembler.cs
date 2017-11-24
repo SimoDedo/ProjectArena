@@ -63,6 +63,8 @@ public class MeshMapAssembler : MapAssebler {
         SetReady(true);
     }
 
+    public override void AssembleMap(char[,] map, char wallChar, char roomChar, float squareSize, float h, bool b) { }
+
     // Generates the Mesh.
     public override void AssembleMap(char[,] map, char wallChar, char roomChar, float squareSize, float h) {
         wallHeigth = h;

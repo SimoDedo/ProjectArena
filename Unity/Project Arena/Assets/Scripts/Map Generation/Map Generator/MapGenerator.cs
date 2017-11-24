@@ -44,6 +44,9 @@ public abstract class MapGenerator : CoreComponent {
     // Pseudo random generator.
     protected System.Random pseudoRandomGen;
 
+    protected int originalWidth = 0;
+    protected int originalHeight = 0;
+
     // Initializes the pseudo random generator.
     protected void InitializePseudoRandomGenerator() {
         if (useRandomSeed)
@@ -280,6 +283,33 @@ public abstract class MapGenerator : CoreComponent {
 
         width = borderedMap.GetLength(0);
         height = borderedMap.GetLength(1);
+    }
+
+    // Saves the original size of the map.
+    public void SaveMapSize() {
+        originalWidth = width;
+        originalHeight = height;
+    }
+
+    // Resets the size of the map.
+    public void ResetMapSize() {
+        width = originalWidth;
+        height = originalHeight;
+    }
+
+    public bool GetRandomBoolean() {
+        if (pseudoRandomGen.Next(0, 1) == 0)
+            return false;
+        else
+            return true;
+    }
+
+    public int GetRandomInteger() {
+        return pseudoRandomGen.Next();
+    }
+
+    public int GetRandomInteger(int min, int max) {
+        return pseudoRandomGen.Next(min, max);
     }
 
     public char GetWallChar() {

@@ -6,6 +6,8 @@ public class PrefabMapAssembler : MapAssebler {
 
     // Ceil height.
     [SerializeField] private float ceilHeight = 0;
+    // Floor height.
+    [SerializeField] private float floorHeight = 0;
     // Rotation correction angle.
     [SerializeField] private int rotationCorrection = 0;
     // List of prefabs.
@@ -43,7 +45,7 @@ public class PrefabMapAssembler : MapAssebler {
         SetReady(true);
     }
 
-    public override void AssembleMap(char[,] m, char wChar, char rChar, float squareSize, float floorHeight) {
+    public override void AssembleMap(char[,] m, char wChar, char rChar, float squareSize, float prefabHeight, bool generateMeshes) {
         wallChar = wChar;
         roomChar = rChar;
         width = m.GetLength(0);
@@ -59,22 +61,28 @@ public class PrefabMapAssembler : MapAssebler {
                     string currentMask = GetNeighbourhoodMask(x, y);
                     foreach (ProcessedTilePrefab p in processedTilePrefabs) {
                         if (p.mask == currentMask)
-                            AddPrefab(p.prefab, x, y, squareSize, p.rotation);
+                            AddPrefab(p.prefab, x, y, squareSize, p.rotation, prefabHeight);
                     }
                 }
             }
         }
 
-        floorCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, floorHeight, false);
-        ceilCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, ceilHeight, true);
+        if (generateMeshes) {
+            floorCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, prefabHeight + floorHeight, false);
+            ceilCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, prefabHeight + ceilHeight, true);
+        }
+    }
+
+    public override void AssembleMap(char[,] m, char wChar, char rChar, float squareSize, float floorHeight) {
+        AssembleMap(m, wChar, rChar, squareSize, floorHeight, true);
     }
 
     // Adds a prefab to the map.
-    private void AddPrefab(GameObject gameObject, int x, int y, float squareSize, float rotation) {
+    private void AddPrefab(GameObject gameObject, int x, int y, float squareSize, float rotation, float prefabHeight) {
         GameObject childObject = (GameObject)Instantiate(gameObject);
         childObject.name = gameObject.name;
         childObject.transform.parent = transform;
-        childObject.transform.position = new Vector3(squareSize * (x - width / 2), 0, squareSize * (y - height / 2));
+        childObject.transform.position = new Vector3(squareSize * (x - width / 2), prefabHeight, squareSize * (y - height / 2));
         childObject.transform.eulerAngles = new Vector3(0, rotation, 0);
     }
 

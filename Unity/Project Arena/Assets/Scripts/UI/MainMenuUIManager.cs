@@ -9,14 +9,14 @@ public class MainMenuUIManager : MonoBehaviour {
     [Header("Scenes")] [SerializeField] Mode[] singleplayerModes;
     [SerializeField] Mode[] multiplayerModes;
 
-    [Header("UI Sections")] [SerializeField] private GameObject main;
+    [Header("UI sections")] [SerializeField] private GameObject main;
     [SerializeField] private GameObject singleplayer;
     [SerializeField] private GameObject multiplayer;
     [SerializeField] private GameObject about;
     [SerializeField] private GameObject error;
     [SerializeField] private GameObject loading;
 
-    [Header("Singleplayer Fields")] [SerializeField] private GameObject nextModeSP;
+    [Header("Singleplayer fields")] [SerializeField] private GameObject nextModeSP;
     [SerializeField] private GameObject previousModeSP;
     [SerializeField] private GameObject nextMapSP;
     [SerializeField] private GameObject previousMapSP;
@@ -29,7 +29,7 @@ public class MainMenuUIManager : MonoBehaviour {
     [SerializeField] private InputField inputSP;
     [SerializeField] private Toggle exportSP;
 
-    [Header("Multiplayer Fields")] [SerializeField] private GameObject nextModeMP;
+    [Header("Multiplayer fields")] [SerializeField] private GameObject nextModeMP;
     [SerializeField] private GameObject previousModeMP;
     [SerializeField] private GameObject nextMapMP;
     [SerializeField] private GameObject previousMapMP;
@@ -42,14 +42,14 @@ public class MainMenuUIManager : MonoBehaviour {
     [SerializeField] private InputField inputMP;
     [SerializeField] private Toggle exportMP;
 
-    [Header("About Fields")] [SerializeField] private GameObject import;
+    [Header("About fields")] [SerializeField] private GameObject import;
     [SerializeField] private GameObject export;
     [SerializeField] private GameObject importButton;
     [SerializeField] private GameObject exportButton;
 
-    [Header("Error Fields")] [SerializeField] private Text errorText;
+    [Header("Error fields")] [SerializeField] private Text errorText;
 
-    [Header("Loading Fields")] [SerializeField] private Text loadingText;
+    [Header("Loading fields")] [SerializeField] private Text loadingText;
 
     [Header("Other")] [SerializeField] private GameObject parameterManagerPrefab;
     [SerializeField] private MapValidator mapValidator;

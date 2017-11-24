@@ -49,8 +49,8 @@ public class ObjectDisplacer : CoreComponent {
 
     // Displace the custom objects inside the map.
     public void DisplaceObjects(char[,] map, float squareSize, float height) {
-        categoryObjectsDictionary.Clear();
-        DestroyAllCustomObjects();
+        // categoryObjectsDictionary.Clear();
+        // DestroyAllCustomObjects();
 
         for (int x = 0; x < map.GetLength(0); x++) {
             for (int y = 0; y < map.GetLength(1); y++) {

@@ -2,4 +2,6 @@
 
     public abstract void AssembleMap(char[,] map, char wallChar, char roomChar, float squareSize, float h);
 
+    public abstract void AssembleMap(char[,] map, char wallChar, char roomChar, float squareSize, float h, bool b);
+
 }

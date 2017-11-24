@@ -20,7 +20,6 @@ public class DivisiveMapGenerator : MapGenerator {
     [SerializeField] private int passageWidth = 5;
     // Passage width.
     [SerializeField] private int maxRandomPassages = 5;
-
     private List<Room> rooms;
 
     private int minimumDividableRoomDimension;
