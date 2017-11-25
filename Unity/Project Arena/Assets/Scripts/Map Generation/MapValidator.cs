@@ -55,7 +55,7 @@ public class MapValidator : MonoBehaviour {
             return 2;
         } else {
             try {
-                int mapsCount = 0;
+                int mapsCount = 1;
 
                 string[] lines = File.ReadAllLines(path);
 
@@ -65,9 +65,11 @@ public class MapValidator : MonoBehaviour {
                 foreach (string s in lines) {
                     if (s.Length == 0) {
                         mapsCount++;
-                    } else if (mapsCount == 0)
+                    } else if (mapsCount == 1)
                         yLenght++;
                 }
+
+                // Debug.Log("Found " + mapsCount + " " + xLenght + "x" + yLenght + " maps.");
 
                 if (xLenght > maxSize || yLenght > maxSize)
                     return 4;
