@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class ObjectDisplacer : CoreComponent {
 
+    // Tells if the expected height is negative.
+    [SerializeField] private bool negativeHeight = false;
+    // Height correction factor.
+    [SerializeField] private float heightCorrection = 0f;
     // Object scale correction factor.
     [SerializeField] private float sizeCorrection = 1f;
-    // Height direction correction factor.
-    [SerializeField] private float heightDirCorrection = 1f;
     // Custom objects that will be added to the map.
     [SerializeField] private CustomObject[] customObjects;
 
@@ -15,6 +17,9 @@ public class ObjectDisplacer : CoreComponent {
     private Dictionary<char, CustomObjectList> charObjectsDictionary;
     // Dictionary associating a categoty to a list of objects.
     private Dictionary<String, List<GameObject>> categoryObjectsDictionary;
+
+    // Height direction correction factor.
+    private float heightDirCorrection = 1f;
 
     private void Start() {
         InitializeAll();
@@ -24,6 +29,7 @@ public class ObjectDisplacer : CoreComponent {
 
     // Creates all the category objects and adds them to the dictionary. An object with no category is 
     // assigned to the default one. Creates and adds the prefabs lists to the charObjectsDictionary.
+    // Sets the height direction correction value.
     private void InitializeAll() {
         charObjectsDictionary = new Dictionary<char, CustomObjectList>();
         categoryObjectsDictionary = new Dictionary<String, List<GameObject>>();
@@ -45,6 +51,11 @@ public class ObjectDisplacer : CoreComponent {
                 charObjectsDictionary[c.objectChar].AddObject(c);
             }
         }
+
+        if (negativeHeight)
+            heightDirCorrection = -1f;
+        else
+            heightDirCorrection = 1f;
     }
 
     // Displace the custom objects inside the map.
@@ -61,7 +72,7 @@ public class ObjectDisplacer : CoreComponent {
                     childObject.name = currentObject.prefab.name;
                     childObject.transform.parent = transform.Find(currentObject.category);
                     childObject.transform.localPosition = new Vector3(squareSize * (x - map.GetLength(0) / 2),
-                        heightDirCorrection * (height + currentObject.heightCorrection),
+                        heightDirCorrection * (heightCorrection + height + currentObject.heightCorrection),
                         squareSize * (y - map.GetLength(1) / 2));
                     childObject.transform.localScale *= sizeCorrection;
 

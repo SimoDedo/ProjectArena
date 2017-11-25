@@ -14,12 +14,8 @@ public abstract class MapManager : CoreComponent {
     // Path of the map to be laoded.
     [SerializeField] protected string textFilePath = null;
 
-    // Size of a square.
-    [Header("Building")] [SerializeField] protected float squareSize;
-    // Heigth of the map.
-    [SerializeField] protected float heigth;
     // Category of the spawn point gameobjects in the object displacer. 
-    [SerializeField] protected string spawnPointCategory;
+    [Header("Other")] [SerializeField] protected string spawnPointCategory;
 
     protected MapGenerator mapGeneratorScript;
     protected MapAssebler mapAssemblerScript;

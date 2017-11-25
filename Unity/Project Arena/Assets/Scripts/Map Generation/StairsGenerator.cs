@@ -38,30 +38,30 @@ public class StairsGenerator : MonoBehaviour {
         bool[,] bottomMapBool = GetBoolMap(maps[bottomMap]);
         bool[,] topMapBool = GetBoolMap(maps[topMap]);
 
-        for (int x = 0; x < bottomMapBool.GetLength(0) - stairLength; x++) {
-            for (int y = 0; y < bottomMapBool.GetLength(1) - stairLength; y++) {
+        for (int x = 0; x < bottomMapBool.GetLength(0); x++) {
+            for (int y = 0; y < bottomMapBool.GetLength(1); y++) {
                 if (bottomMapBool[x, y] && topMapBool[x, y]) {
                     // Check if an horizontal stair can be placed.
-                    for (int i = 0; i < stairLength; i++) {
-                        if (!(bottomMapBool[x + i, y] && topMapBool[x + i, y]))
+                    for (int i = 1; i < stairLength; i++) {
+                        if (!(bottomMapBool[x + i, y] && topMapBool[x + i, y])) {
                             break;
-                        else if (i == stairLength - 1) {
+                        } else if (i == stairLength - 1) {
                             stairList.Add(InstantiatePossibleStair(x, x + i, y, y, mapGeneratorScript.GetRandomBoolean()));
                             for (int j = 0; j < stairLength; j++) {
-                                bottomMapBool[x + i, y] = false;
-                                topMapBool[x + i, y] = false;
+                                bottomMapBool[x + j, y] = false;
+                                topMapBool[x + j, y] = false;
                             }
                         }
                     }
                     // Check if a vertical stair can be placed.
-                    for (int i = 0; i < stairLength; i++) {
+                    for (int i = 1; i < stairLength; i++) {
                         if (!(bottomMapBool[x, y + i] && topMapBool[x, y + i]))
                             break;
                         else if (i == stairLength - 1) {
                             stairList.Add(InstantiatePossibleStair(x, x, y, y + i, mapGeneratorScript.GetRandomBoolean()));
                             for (int j = 0; j < stairLength; j++) {
-                                bottomMapBool[x, y + i] = false;
-                                topMapBool[x, y + i] = false;
+                                bottomMapBool[x, y + j] = false;
+                                topMapBool[x, y + j] = false;
                             }
                         }
                     }
@@ -74,7 +74,7 @@ public class StairsGenerator : MonoBehaviour {
 
     // Returns a boolean version of the map where only room tiles are true.
     private bool[,] GetBoolMap(char[,] charMap) {
-        bool[,] boolMap = new bool[charMap.GetLength(1), charMap.GetLength(1)];
+        bool[,] boolMap = new bool[charMap.GetLength(0), charMap.GetLength(1)];
 
         char roomChar = mapGeneratorScript.GetRoomChar();
 
@@ -92,21 +92,27 @@ public class StairsGenerator : MonoBehaviour {
     private void PlaceStair(Stair stair, int bottomMap, int topMap) {
         if (stair.originY == stair.endY) {
             if (stair.originX > stair.endX)
-                maps[bottomMap][stair.originX + 1, stair.originY] = stairCharRigth;
+                maps[bottomMap][stair.originX - 1, stair.originY] = stairCharRigth;
             else
-                maps[bottomMap][stair.originX - 1, stair.originY] = stairCharLeft;
+                maps[bottomMap][stair.originX + 1, stair.originY] = stairCharLeft;
         } else {
             if (stair.originY > stair.endY)
-                maps[bottomMap][stair.originX, stair.originY + 1] = stairCharDown;
+                maps[bottomMap][stair.originX, stair.originY - 1] = stairCharDown;
             else
-                maps[bottomMap][stair.originX, stair.originY - 1] = stairCharUp;
+                maps[bottomMap][stair.originX, stair.originY + 1] = stairCharUp;
         }
 
         for (int j = 0; j < stairLength - 2; j++)
             if (stair.originY == stair.endY) {
-                maps[topMap][stair.originX + 1 + j, stair.originY] = voidChar;
+                if (stair.originX > stair.endX)
+                    maps[topMap][stair.originX - 1 - j, stair.originY] = voidChar;
+                else
+                    maps[topMap][stair.originX + 1 + j, stair.originY] = voidChar;
             } else {
-                maps[topMap][stair.originX, stair.originY + 1 + j] = voidChar;
+                if (stair.originY > stair.endY)
+                    maps[bottomMap][stair.originX, stair.originY - 1 - j] = stairCharDown;
+                else
+                    maps[bottomMap][stair.originX, stair.originY + 1 + j] = stairCharUp;
             }
     }
 

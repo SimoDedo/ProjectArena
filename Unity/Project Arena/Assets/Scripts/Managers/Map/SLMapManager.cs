@@ -25,9 +25,9 @@ public class SLMapManager : MapManager {
 
         if (assembleMap) {
             // Assemble the map.
-            mapAssemblerScript.AssembleMap(map, mapGeneratorScript.GetWallChar(), mapGeneratorScript.GetRoomChar(), squareSize, heigth);
+            mapAssemblerScript.AssembleMap(map, mapGeneratorScript.GetWallChar(), mapGeneratorScript.GetRoomChar(), mapGeneratorScript.GetSquareSize(), mapGeneratorScript.GetWallHeight());
             // Displace the objects.
-            objectDisplacerScript.DisplaceObjects(map, squareSize, heigth);
+            objectDisplacerScript.DisplaceObjects(map, mapGeneratorScript.GetSquareSize(), mapGeneratorScript.GetWallHeight());
         }
     }
 

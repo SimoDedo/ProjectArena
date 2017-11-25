@@ -320,6 +320,14 @@ public abstract class MapGenerator : CoreComponent {
         return roomChar;
     }
 
+    public float GetSquareSize() {
+        return squareSize;
+    }
+
+    public float GetWallHeight() {
+        return wallHeight;
+    }
+
     // Coordinates of a tile.
     protected struct Coord {
         public int tileX;

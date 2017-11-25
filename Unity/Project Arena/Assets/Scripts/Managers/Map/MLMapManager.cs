@@ -43,9 +43,9 @@ public class MLMapManager : MapManager {
         if (assembleMap) {
             for (int i = 0; i < maps.Count; i++) {
                 // Assemble the map.
-                mapAssemblerScript.AssembleMap(maps[i], mapGeneratorScript.GetWallChar(), mapGeneratorScript.GetRoomChar(), squareSize, heigth * i, false);
+                mapAssemblerScript.AssembleMap(maps[i], mapGeneratorScript.GetWallChar(), mapGeneratorScript.GetRoomChar(), mapGeneratorScript.GetSquareSize(), mapGeneratorScript.GetWallHeight() * i, false);
                 // Displace the objects.
-                objectDisplacerScript.DisplaceObjects(maps[i], squareSize, heigth * i + heightCorrection);
+                objectDisplacerScript.DisplaceObjects(maps[i], mapGeneratorScript.GetSquareSize(), mapGeneratorScript.GetWallHeight() * i + heightCorrection);
             }
         }
     }
