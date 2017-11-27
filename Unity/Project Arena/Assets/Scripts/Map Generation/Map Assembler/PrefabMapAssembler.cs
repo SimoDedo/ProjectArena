@@ -2,86 +2,30 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PrefabMapAssembler : MapAssebler {
+public abstract class PrefabMapAssembler : MapAssebler {
 
     // Ceil height.
-    [SerializeField] private float ceilHeight = 0;
+    [SerializeField] protected float ceilHeight = 0;
     // Floor height.
-    [SerializeField] private float floorHeight = 0;
+    [SerializeField] protected float floorHeight = 0;
     // Rotation correction angle.
-    [SerializeField] private int rotationCorrection = 0;
+    [SerializeField] protected int rotationCorrection = 0;
     // List of prefabs.
-    [SerializeField] private List<TilePrefab> tilePrefabs;
+    [SerializeField] protected List<TilePrefab> tilePrefabs;
 
     // List of processed prefabs.
-    private List<ProcessedTilePrefab> processedTilePrefabs;
+    protected List<ProcessedTilePrefab> processedTilePrefabs;
     // Char that denotes a wall tile.
-    private char wallChar;
+    protected char wallChar;
     // Char that denotes a room tile.
-    private char roomChar;
-    // Char that denotes a void tile.
-    private char voidChar;
+    protected char roomChar;
     // Map width.
-    private int width;
+    protected int width;
     // Map heigth.
-    private int height;
-    // Map.
-    char[,] map;
-
-    private MeshCollider floorCollider;
-    private MeshCollider ceilCollider;
-
-    void Start() {
-        GameObject childObject;
-
-        childObject = new GameObject("Floor - Collider");
-        childObject.transform.parent = transform;
-        childObject.transform.localPosition = Vector3.zero;
-        floorCollider = childObject.AddComponent<MeshCollider>();
-
-        childObject = new GameObject("Ceil - Collider");
-        childObject.transform.parent = transform;
-        childObject.transform.localPosition = Vector3.zero;
-        ceilCollider = childObject.AddComponent<MeshCollider>();
-
-        SetReady(true);
-    }
-
-    public override void AssembleMap(char[,] m, char wChar, char rChar, char vChar, float squareSize, float prefabHeight, bool generateMeshes) {
-        wallChar = wChar;
-        roomChar = rChar;
-        voidChar = vChar;
-        width = m.GetLength(0);
-        height = m.GetLength(1);
-        map = m;
-
-        // Process all the tiles.
-        ProcessTiles();
-
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                if (map[x, y] != wallChar && map[x, y] != voidChar) {
-                    string currentMask = GetNeighbourhoodMask(x, y);
-                    foreach (ProcessedTilePrefab p in processedTilePrefabs) {
-                        if (p.mask == currentMask)
-                            AddPrefab(p.prefab, x, y, squareSize, p.rotation, prefabHeight);
-                    }
-                }
-            }
-        }
-
-        if (generateMeshes) {
-            floorCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, prefabHeight + floorHeight, false);
-            ceilCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, prefabHeight + ceilHeight, true);
-        }
-    }
-
-    public override void AssembleMap(char[,] m, char wChar, char rChar, float squareSize, float floorHeight) {
-        AssembleMap(m, wChar, rChar, ' ', squareSize, floorHeight, true);
-    }
+    protected int height;
 
     // Adds a prefab to the map.
-    private void AddPrefab(GameObject gameObject, int x, int y, float squareSize, float rotation, float prefabHeight) {
+    protected void AddPrefab(GameObject gameObject, int x, int y, float squareSize, float rotation, float prefabHeight) {
         GameObject childObject = (GameObject)Instantiate(gameObject);
         childObject.name = gameObject.name;
         childObject.transform.parent = transform;
@@ -90,7 +34,7 @@ public class PrefabMapAssembler : MapAssebler {
     }
 
     // For each tile, converts its binary mask into a char array and creates three rotated copies.
-    private void ProcessTiles() {
+    protected void ProcessTiles() {
         processedTilePrefabs = new List<ProcessedTilePrefab>();
 
         // For each tile create three rotated copies.
@@ -109,43 +53,25 @@ public class PrefabMapAssembler : MapAssebler {
     }
 
     // Converts the mask form a binary string to char array.
-    private string ConvertMask(string binaryMask) {
+    protected string ConvertMask(string binaryMask) {
         binaryMask = binaryMask.Replace('0', roomChar);
         binaryMask = binaryMask.Replace('1', wallChar);
         return binaryMask;
     }
 
     // Performs a circular shift of the mask.
-    private string CircularShiftMask(string mask) {
+    protected string CircularShiftMask(string mask) {
         char[] shiftedMask = { mask[3], mask[0], mask[1], mask[2] };
         return new string(shiftedMask);
     }
 
-    // Gets the neighbours of a cell as a mask.
-    private string GetNeighbourhoodMask(int gridX, int gridY) {
-        char[] mask = new char[4];
-        mask[0] = GetTileChar(gridX, gridY + 1);
-        mask[1] = GetTileChar(gridX + 1, gridY);
-        mask[2] = GetTileChar(gridX, gridY - 1);
-        mask[3] = GetTileChar(gridX - 1, gridY);
-        return new string(mask);
-    }
-
-    // Returns the char of a tile.
-    private char GetTileChar(int x, int y) {
-        if (IsInMapRange(x, y))
-            return map[x, y] == wallChar ? wallChar : roomChar;
-        else
-            return wallChar;
-    }
-
     // Tells if a tile is in the map.
-    private bool IsInMapRange(int x, int y) {
+    protected bool IsInMapRange(int x, int y) {
         return x >= 0 && x < width && y >= 0 && y < height;
     }
 
     // Creates a flat mesh.
-    private Mesh CreateFlatMesh(int sizeX, int sizeY, float squareSize, float height, bool inverted) {
+    protected Mesh CreateFlatMesh(int sizeX, int sizeY, float squareSize, float height, bool inverted) {
         Mesh flatMesh = new Mesh();
 
         Vector3[] floorVertices = new Vector3[4];
@@ -171,7 +97,7 @@ public class PrefabMapAssembler : MapAssebler {
 
     // Custom prefab. 
     [Serializable]
-    private struct TilePrefab {
+    protected struct TilePrefab {
         // Mask of the tile.
         public string binaryMask;
         // Prefab of the tile.

@@ -41,12 +41,11 @@ public class MLMapManager : MapManager {
 
 
         if (assembleMap) {
-            for (int i = 0; i < maps.Count; i++) {
-                // Assemble the map.
-                mapAssemblerScript.AssembleMap(maps[i], mapGeneratorScript.GetWallChar(), mapGeneratorScript.GetRoomChar(), stairsGeneratorScript.GetVoidChar(), mapGeneratorScript.GetSquareSize(), mapGeneratorScript.GetWallHeight() * i, false);
-                // Displace the objects.
+            // Assemble the map.
+            mapAssemblerScript.AssembleMap(maps, mapGeneratorScript.GetWallChar(), mapGeneratorScript.GetRoomChar(), stairsGeneratorScript.GetVoidChar(), mapGeneratorScript.GetSquareSize(), mapGeneratorScript.GetWallHeight());
+            // Displace the objects.
+            for (int i = 0; i < maps.Count; i++)
                 objectDisplacerScript.DisplaceObjects(maps[i], mapGeneratorScript.GetSquareSize(), mapGeneratorScript.GetWallHeight() * i);
-            }
         }
     }
 

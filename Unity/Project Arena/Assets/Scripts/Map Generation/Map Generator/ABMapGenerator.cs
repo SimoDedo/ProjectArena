@@ -3,16 +3,13 @@ using System.Collections.Generic;
 
 public class ABMapGenerator : MapGenerator {
 
-    private int originalWidth;
-    private int originalHeigth;
-
     private Room mainRoom;
     private List<Room> arenas;
     private List<Room> corridors;
 
     private void Start() {
         originalWidth = width;
-        originalHeigth = height;
+        originalHeight = height;
 
         width = 0;
         height = 0;
@@ -247,7 +244,7 @@ public class ABMapGenerator : MapGenerator {
 
     // Scales the number of instance of each object depending on the size of the map w.r.t. the original one.
     private void ScaleObjectsPopulation(int floorCount) {
-        float scaleFactor = floorCount / (originalHeigth * originalWidth / 3f);
+        float scaleFactor = floorCount / (originalHeight * originalWidth / 3f);
 
         for (int i = 0; i < mapObjects.Length; i++)
             mapObjects[i].numObjPerMap = (int)Math.Ceiling(scaleFactor * mapObjects[i].numObjPerMap);

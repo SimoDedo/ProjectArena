@@ -62,11 +62,7 @@ public class MeshMapAssembler : MapAssebler {
 
         SetReady(true);
     }
-
-    public override void AssembleMap(char[,] map, char wallChar, char roomChar, char voidChar, float squareSize, float h, bool generateMeshes) {
-        AssembleMap(map, wallChar, roomChar, squareSize, h);
-    }
-
+    
     // Generates the Mesh.
     public override void AssembleMap(char[,] map, char wallChar, char roomChar, float squareSize, float h) {
         wallHeigth = h;
@@ -92,6 +88,8 @@ public class MeshMapAssembler : MapAssebler {
 
         CreateFloorMesh(map.GetLength(0), map.GetLength(1), squareSize, h);
     }
+
+    public override void AssembleMap(List<char[,]> maps, char wallChar, char roomChar, char voidChar, float squareSize, float h) { }
 
     // Creates the top mesh.
     private void CreateTopMesh() {
