@@ -6,7 +6,6 @@ using UnityEngine;
 public class MLMapManager : MapManager {
 
     [Header("ML generation")] [SerializeField] private int levelsCount;
-    [SerializeField] private float heightCorrection = 0;
     [SerializeField] private StairsGenerator stairsGeneratorScript;
 
     private List<char[,]> maps;
@@ -35,17 +34,18 @@ public class MLMapManager : MapManager {
             }
             // Add the stairs.
             stairsGeneratorScript.GenerateStairs(maps, mapGeneratorScript);
+            // Save the map.
+            if (export)
+                SaveMLMapAsText();
         }
 
-        if (export)
-            SaveMLMapAsText();
 
         if (assembleMap) {
             for (int i = 0; i < maps.Count; i++) {
                 // Assemble the map.
-                mapAssemblerScript.AssembleMap(maps[i], mapGeneratorScript.GetWallChar(), mapGeneratorScript.GetRoomChar(), mapGeneratorScript.GetSquareSize(), mapGeneratorScript.GetWallHeight() * i, false);
+                mapAssemblerScript.AssembleMap(maps[i], mapGeneratorScript.GetWallChar(), mapGeneratorScript.GetRoomChar(), stairsGeneratorScript.GetVoidChar(), mapGeneratorScript.GetSquareSize(), mapGeneratorScript.GetWallHeight() * i, false);
                 // Displace the objects.
-                objectDisplacerScript.DisplaceObjects(maps[i], mapGeneratorScript.GetSquareSize(), mapGeneratorScript.GetWallHeight() * i + heightCorrection);
+                objectDisplacerScript.DisplaceObjects(maps[i], mapGeneratorScript.GetSquareSize(), mapGeneratorScript.GetWallHeight() * i);
             }
         }
     }
@@ -58,25 +58,24 @@ public class MLMapManager : MapManager {
             GetParameterManager().ErrorBackToMenu(-1);
         } else {
             try {
-                int mapsCount = 0;
-                int heigth = 0;
+                int mapsCount = 1;
+                int height = 0;
 
                 string[] lines = File.ReadAllLines(@textFilePath);
 
-                foreach (string s in lines)
-                    if (s != "") {
-                        heigth++;
-                    } else {
+                foreach (string s in lines) {
+                    if (s.Length == 0) {
                         mapsCount++;
-                        break;
-                    }
+                    } else if (mapsCount == 1)
+                        height++;
+                }
 
                 for (int i = 0; i < mapsCount; i++) {
-                    maps[i] = new char[lines[0].Length, heigth];
+                    maps.Add(new char[lines[0].Length, height]);
 
                     for (int x = 0; x < maps[i].GetLength(0); x++) {
                         for (int y = 0; y < maps[i].GetLength(1); y++) {
-                            maps[0][x, y] = lines[y + i * (heigth + 1)][x];
+                            maps[i][x, y] = lines[y + i * (height + 1)][x];
                         }
                     }
                 }

@@ -53,6 +53,7 @@ public class MainMenuUIManager : MonoBehaviour {
 
     [Header("Other")] [SerializeField] private GameObject parameterManagerPrefab;
     [SerializeField] private MapValidator mapValidator;
+    [SerializeField] private bool forceInput;
 
     private GameObject openedSection;
 
@@ -85,7 +86,7 @@ public class MainMenuUIManager : MonoBehaviour {
             parameterManagerScript.SetErrorCode(0);
         }
 
-        if (true || Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.LinuxPlayer) {
+        if (forceInput || Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.LinuxPlayer) {
             allowIO = true;
             importPath = Application.persistentDataPath + "/Import";
             exportPath = Application.persistentDataPath + "/Export";

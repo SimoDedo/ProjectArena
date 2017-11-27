@@ -19,6 +19,8 @@ public class PrefabMapAssembler : MapAssebler {
     private char wallChar;
     // Char that denotes a room tile.
     private char roomChar;
+    // Char that denotes a void tile.
+    private char voidChar;
     // Map width.
     private int width;
     // Map heigth.
@@ -45,9 +47,10 @@ public class PrefabMapAssembler : MapAssebler {
         SetReady(true);
     }
 
-    public override void AssembleMap(char[,] m, char wChar, char rChar, float squareSize, float prefabHeight, bool generateMeshes) {
+    public override void AssembleMap(char[,] m, char wChar, char rChar, char vChar, float squareSize, float prefabHeight, bool generateMeshes) {
         wallChar = wChar;
         roomChar = rChar;
+        voidChar = vChar;
         width = m.GetLength(0);
         height = m.GetLength(1);
         map = m;
@@ -57,7 +60,7 @@ public class PrefabMapAssembler : MapAssebler {
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                if (map[x, y] != wallChar) {
+                if (map[x, y] != wallChar && map[x, y] != voidChar) {
                     string currentMask = GetNeighbourhoodMask(x, y);
                     foreach (ProcessedTilePrefab p in processedTilePrefabs) {
                         if (p.mask == currentMask)
@@ -74,7 +77,7 @@ public class PrefabMapAssembler : MapAssebler {
     }
 
     public override void AssembleMap(char[,] m, char wChar, char rChar, float squareSize, float floorHeight) {
-        AssembleMap(m, wChar, rChar, squareSize, floorHeight, true);
+        AssembleMap(m, wChar, rChar, ' ', squareSize, floorHeight, true);
     }
 
     // Adds a prefab to the map.

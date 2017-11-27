@@ -69,8 +69,6 @@ public class MapValidator : MonoBehaviour {
                         yLenght++;
                 }
 
-                // Debug.Log("Found " + mapsCount + " " + xLenght + "x" + yLenght + " maps.");
-
                 if (xLenght > maxSize || yLenght > maxSize)
                     return 4;
                 if (mapsCount < 2)

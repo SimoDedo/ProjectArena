@@ -116,6 +116,10 @@ public class StairsGenerator : MonoBehaviour {
             }
     }
 
+    public char GetVoidChar() {
+        return voidChar;
+    }
+
     // Instantiates a new possible stair.
     private Stair InstantiatePossibleStair(int originX, int endX, int originY, int endY, bool reverse) {
         if (reverse)
