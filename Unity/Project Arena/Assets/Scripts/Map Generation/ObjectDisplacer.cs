@@ -101,7 +101,7 @@ public class ObjectDisplacer : CoreComponent {
         try {
             return categoryObjectsDictionary[category];
         } catch (KeyNotFoundException) {
-            Debug.LogError("Error while populating the map, no object of category " + category + " found in the dictionary.");
+            ManageError(Error.HARD_ERROR, "Error while populating the map, no object of category " + category + " found in the dictionary.");
             return null;
         }
     }

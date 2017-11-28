@@ -44,6 +44,14 @@ public class Target : Entity {
             }
         }
 
+        if (currentAlpha != 1) {
+            yield return new WaitForSeconds(0.01f);
+            currentAlpha = 1;
+            foreach (MeshRenderer mr in meshList) {
+                mr.material.color = SetAlpha(mr.material.color, currentAlpha);
+            }
+        }
+
         if (laserList != null) {
             foreach (Laser l in laserList) {
                 l.SetActive(true);

@@ -25,7 +25,17 @@ public class ParameterManager : MonoBehaviour {
     public void ErrorBackToMenu(int errorCode) {
         SetErrorCode(errorCode);
         SceneManager.LoadScene("Menu");
+        Cursor.lockState = CursorLockMode.None;
     }
+
+    // Menages errors going back to the main menu.
+    public void ErrorBackToMenu(string errorMessage) {
+        SetErrorCode(1);
+        SetErrorMessage(errorMessage);
+        SceneManager.LoadScene("Menu");
+        Cursor.lockState = CursorLockMode.None;
+    }
+
 
     /* GETTERS AND SETTERS */
 

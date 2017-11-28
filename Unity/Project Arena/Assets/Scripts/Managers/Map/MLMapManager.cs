@@ -52,9 +52,9 @@ public class MLMapManager : MapManager {
     // Loads the map from a text file.
     protected override void LoadMapFromText() {
         if (textFilePath == null) {
-            GetParameterManager().ErrorBackToMenu(-1);
+            ManageError(Error.HARD_ERROR, -1);
         } else if (!File.Exists(textFilePath)) {
-            GetParameterManager().ErrorBackToMenu(-1);
+            ManageError(Error.HARD_ERROR, -1);
         } else {
             try {
                 int mapsCount = 1;
@@ -79,7 +79,7 @@ public class MLMapManager : MapManager {
                     }
                 }
             } catch (Exception) {
-                GetParameterManager().ErrorBackToMenu(-1);
+                ManageError(Error.HARD_ERROR, -1);
             }
         }
     }

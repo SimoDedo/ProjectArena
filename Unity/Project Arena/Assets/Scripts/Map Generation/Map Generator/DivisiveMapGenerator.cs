@@ -195,7 +195,7 @@ public class DivisiveMapGenerator : MapGenerator {
             maxY = roomA.centerY;
         }
 
-        if (pseudoRandomGen.Next(0, 1) == 1) {
+        if (pseudoRandomGen.Next(100) < 50) {
             connectionX = maxX;
             connectionY = maxY;
         } else {
@@ -211,7 +211,7 @@ public class DivisiveMapGenerator : MapGenerator {
             }
         }
 
-        // Create the vertical segment.
+        // Create the horizontal segment.
         for (int x = minX; x <= maxX; x++) {
             for (int y = connectionY - passageWidth / 2; y <= connectionY + passageWidth / 2; y++) {
                 if (IsInMapRange(x, y))

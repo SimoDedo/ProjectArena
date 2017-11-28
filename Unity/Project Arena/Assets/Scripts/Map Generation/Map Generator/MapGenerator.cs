@@ -93,7 +93,7 @@ public abstract class MapGenerator : CoreComponent {
                             DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY, 1, restrictedMap, wallChar);
                             roomTiles.RemoveAt(selected);
                         } else {
-                            Debug.LogError("Error while populating the map, no more free tiles are availabe.");
+                            ManageError(Error.SOFT_ERROR, "Error while populating the map, no more free tiles are availabe.");
                             return;
                         }
                     }
@@ -122,7 +122,7 @@ public abstract class MapGenerator : CoreComponent {
                             DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY, objectToObjectDistance, restrictedMap, wallChar);
                             roomTiles = GetFreeTiles(restrictedMap);
                         } else {
-                            Debug.LogError("Error while populating the map, no more free tiles are availabe.");
+                            ManageError(Error.SOFT_ERROR, "Error while populating the map, no more free tiles are availabe.");
                             return;
                         }
                     }

@@ -27,7 +27,7 @@ public class SpawnPointManager : CoreComponent {
             }
             generateOnly = false;
         } else {
-            Debug.LogError("Error while setting the spawn points, no spawn point was found.");
+            ManageError(Error.HARD_ERROR, "Error while setting the spawn points, no spawn point was found.");
             generateOnly = true;
         }
 
@@ -45,7 +45,7 @@ public class SpawnPointManager : CoreComponent {
         else
             return GetRandomSpawnPoint(availableSpawnPoints).spawnPosition;
     }
-
+    
     // Returns a random spawn point from a list.
     private SpawnPoint GetRandomSpawnPoint(List<SpawnPoint> SPs) {
         SpawnPoint sp = SPs[UnityEngine.Random.Range(0, SPs.Count)];

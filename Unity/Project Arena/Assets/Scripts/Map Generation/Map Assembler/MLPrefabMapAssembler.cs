@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class MLPrefabMapAssembler : PrefabMapAssembler {
 
-    [SerializeField] private GameObject floorPrefab;
+    [Header("ML parameters")] [SerializeField] private GameObject floorPrefab;
+    [SerializeField] private int additionalWallLevels = 0;
 
     // Maps.
     private List<char[,]> maps;
@@ -92,6 +93,9 @@ public class MLPrefabMapAssembler : PrefabMapAssembler {
             AddPrefab(currentPrefab.prefab, x, y, squareSize, currentPrefab.rotation, levelHeight * currentLevel);
             if (currentLevel < maps.Count - 1)
                 AddWallRecursevely(currentLevel + 1, x, y, squareSize, currentMask);
+            else if (currentLevel == maps.Count - 1 && additionalWallLevels > 0)
+                for (int i = 1; i <= additionalWallLevels; i++)
+                    AddPrefab(currentPrefab.prefab, x, y, squareSize, currentPrefab.rotation, levelHeight * (currentLevel + i));
         }
     }
 

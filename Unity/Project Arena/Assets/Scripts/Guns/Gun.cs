@@ -82,8 +82,6 @@ public abstract class Gun : MonoBehaviour {
             if (Input.GetButton("Fire1") && CanShoot()) {
                 if (ammoInCharger > 0)
                     Shoot();
-                else if (CanReload())
-                    Reload();
             } else if (Input.GetButtonDown("Reload") && CanReload()) {
                 Reload();
             }
@@ -102,6 +100,9 @@ public abstract class Gun : MonoBehaviour {
         SetChildrenEnabled(true);
         muzzleFlash.SetActive(false);
         used = true;
+
+        if (ammoInCharger == 0 && CanReload())
+            Reload();
     }
 
     // Stops reloading, stops aiming, disallows accepting input and disables all the childrens.
@@ -272,8 +273,11 @@ public abstract class Gun : MonoBehaviour {
         else
             totalAmmo = maximumAmmo;
 
-        if (gameObject.activeSelf && hasUI)
+        if (gameObject.activeSelf && hasUI) {
             gunUIManagerScript.SetAmmo(ammoInCharger, totalAmmo);
+            if (used && ammoInCharger == 0 && CanReload())
+                Reload();
+        }
     }
 
     // Show muzzle flash.
@@ -288,6 +292,9 @@ public abstract class Gun : MonoBehaviour {
         // Move the gun upwards and hide the muzzle flash.
         transform.position = new Vector3(transform.position.x, transform.position.y - recoil, transform.position.z);
         muzzleFlash.SetActive(false);
+        // Reload if needed.
+        if (ammoInCharger == 0 && CanReload())
+            Reload();
     }
 
     // Activates/deactivates the children objects, with the exception of muzzle flashed which must always be deactivated.

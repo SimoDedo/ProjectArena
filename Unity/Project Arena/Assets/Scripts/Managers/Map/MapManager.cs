@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class MapManager : CoreComponent {
@@ -24,7 +22,7 @@ public abstract class MapManager : CoreComponent {
     protected string seed;
     protected bool export;
     protected string exportPath;
-    
+
     private void Start() {
         ExtractParametersFromManager();
 

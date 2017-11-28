@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class StairsGenerator : MonoBehaviour {
+public class StairsGenerator : CoreComponent {
 
     [SerializeField] private int stairsPerLevel = 4;
     [SerializeField] private int stairLength = 4;
@@ -13,6 +13,10 @@ public class StairsGenerator : MonoBehaviour {
 
     private MapGenerator mapGeneratorScript = null;
     private List<char[,]> maps = null;
+
+    private void Start() {
+        SetReady(true);
+    }
 
     // Places stairs connecting adjacent levels of the map.
     public void GenerateStairs(List<char[,]> ms, MapGenerator mg) {
@@ -28,6 +32,9 @@ public class StairsGenerator : MonoBehaviour {
                         PlaceStair(stairList[mapGeneratorScript.GetRandomInteger(stairList.Count / stairsPerLevel * j, (stairList.Count / stairsPerLevel * (j + 1) - 1))], i - 1, i);
                 else if (stairList.Count == 1)
                     PlaceStair(stairList[0], i - 1, i);
+                else {
+                    ManageError(Error.HARD_ERROR, "Error while populating the map, stairs could not be placed.\nPlease use another seed.");
+                }
             }
         }
     }
