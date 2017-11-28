@@ -23,12 +23,13 @@ public class StairsGenerator : MonoBehaviour {
             if (i > 0) {
                 List<Stair> stairList = GetPossibleStairs(i - 1, i);
                 // Place the stairs.
-                for (int j = 0; j < stairsPerLevel; j++) {
-                    // Debug.Log("Extracting a stair from " + stairList.Count / stairsPerLevel * j + " to " + (stairList.Count / stairsPerLevel * (j + 1) - 1) + " out of " + stairList.Count + " stairs.");
-                    PlaceStair(stairList[mapGeneratorScript.GetRandomInteger(stairList.Count / stairsPerLevel * j, (stairList.Count / stairsPerLevel * (j + 1) - 1))], i - 1, i);
-                }
+                if (stairList.Count > 2)
+                    for (int j = 0; j < stairsPerLevel; j++)
+                        PlaceStair(stairList[mapGeneratorScript.GetRandomInteger(stairList.Count / stairsPerLevel * j, (stairList.Count / stairsPerLevel * (j + 1) - 1))], i - 1, i);
+                else if (stairList.Count == 1)
+                    PlaceStair(stairList[0], i - 1, i);
             }
-        }        
+        }
     }
 
     // Returns a list of the possible stairs that can be placed between the two levels passed as parameter.
@@ -97,9 +98,9 @@ public class StairsGenerator : MonoBehaviour {
                 maps[bottomMap][stair.originX + 1, stair.originY] = stairCharLeft;
         } else {
             if (stair.originY > stair.endY)
-                maps[bottomMap][stair.originX, stair.originY - 1] = stairCharDown;
+                maps[bottomMap][stair.originX, stair.originY - 2] = stairCharDown;
             else
-                maps[bottomMap][stair.originX, stair.originY + 1] = stairCharUp;
+                maps[bottomMap][stair.originX, stair.originY + 2] = stairCharUp;
         }
 
         for (int j = 0; j < stairLength - 2; j++)
@@ -110,9 +111,9 @@ public class StairsGenerator : MonoBehaviour {
                     maps[topMap][stair.originX + 1 + j, stair.originY] = voidChar;
             } else {
                 if (stair.originY > stair.endY)
-                    maps[bottomMap][stair.originX, stair.originY - 1 - j] = stairCharDown;
+                    maps[topMap][stair.originX, stair.originY - 1 - j] = voidChar;
                 else
-                    maps[bottomMap][stair.originX, stair.originY + 1 + j] = stairCharUp;
+                    maps[topMap][stair.originX, stair.originY + 1 + j] = voidChar;
             }
     }
 

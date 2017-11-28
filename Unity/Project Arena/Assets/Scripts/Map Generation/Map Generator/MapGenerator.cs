@@ -298,10 +298,7 @@ public abstract class MapGenerator : CoreComponent {
     }
 
     public bool GetRandomBoolean() {
-        if (pseudoRandomGen.Next(0, 1) == 0)
-            return false;
-        else
-            return true;
+        return (pseudoRandomGen.Next(100) < 50) ? true : false;
     }
 
     public int GetRandomInteger() {
