@@ -5,10 +5,10 @@ using UnityEngine;
 
 public class MLMapManager : MapManager {
 
-    [Header("ML generation")] [SerializeField] private int levelsCount;
-    [SerializeField] private StairsGenerator stairsGeneratorScript;
+    [Header("ML generation")] [SerializeField] protected int levelsCount;
+    [SerializeField] protected StairsGenerator stairsGeneratorScript;
 
-    private List<char[,]> maps;
+    protected List<char[,]> maps;
 
     protected override void InitializeAll() {
         mapAssemblerScript = mapAssembler.GetComponent<MapAssebler>();
@@ -85,7 +85,7 @@ public class MLMapManager : MapManager {
     }
 
     // Saves the map in a text file.
-    private void SaveMLMapAsText() {
+    protected void SaveMLMapAsText() {
         if (exportPath == null && !Directory.Exists(exportPath)) {
             Debug.LogError("Error while retrieving the folder, please insert a valid path.");
         } else {

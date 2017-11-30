@@ -70,15 +70,6 @@ public class DivisiveMapGenerator : MapGenerator {
         PopulateMap();
     }
 
-    // Fills the map with wall cells.
-    private void FillMap() {
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                map[x, y] = wallChar;
-            }
-        }
-    }
-
     // Divides a room in subrooms or stops there.
     private void DivideRoom(int originX, int originY, int roomWidth, int roomHeigth, bool horizontal, int depth) {
         if ((pseudoRandomGen.Next(0, 100) < roomDivideProbability && roomWidth > minimumDividableRoomDimension && roomHeigth > minimumDividableRoomDimension) || depth < minimumDepth) {

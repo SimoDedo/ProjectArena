@@ -77,7 +77,8 @@ public abstract class MapGenerator : CoreComponent {
         if (mapObjects.Length > 0) {
             char[,] restrictedMap = map.Clone() as char[,];
 
-            ErodeMap(restrictedMap);
+            if (objectToWallDistance > 0)
+                ErodeMap(restrictedMap);
             List<Coord> roomTiles = GetFreeTiles(restrictedMap);
 
             bool mustRestrictFurther = false;
@@ -283,6 +284,15 @@ public abstract class MapGenerator : CoreComponent {
 
         width = borderedMap.GetLength(0);
         height = borderedMap.GetLength(1);
+    }
+
+    // Fills the map with wall cells.
+    protected void FillMap() {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                map[x, y] = wallChar;
+            }
+        }
     }
 
     // Saves the original size of the map.

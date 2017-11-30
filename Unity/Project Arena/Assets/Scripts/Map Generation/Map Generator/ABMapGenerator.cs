@@ -11,17 +11,14 @@ public class ABMapGenerator : MapGenerator {
         originalWidth = width;
         originalHeight = height;
 
-        width = 0;
-        height = 0;
-
-        arenas = new List<Room>();
-        corridors = new List<Room>();
-
         SetReady(true);
     }
 
     public override char[,] GenerateMap() {
         InitializePseudoRandomGenerator();
+
+        width = 0;
+        height = 0;
 
         // Decode the genome.
         ParseGenome();
@@ -45,6 +42,9 @@ public class ABMapGenerator : MapGenerator {
 
     // Decodes the genome populating the lists of arenas and corridors.
     private void ParseGenome() {
+        arenas = new List<Room>();
+        corridors = new List<Room>();
+
         string currentValue = "";
         int currentChar = 0;
 
