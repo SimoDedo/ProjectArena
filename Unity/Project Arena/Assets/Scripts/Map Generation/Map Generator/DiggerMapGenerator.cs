@@ -40,8 +40,7 @@ public class DiggerMapGenerator : MapGenerator {
 
         DigMap();
 
-        if (!useABGeneration)
-            PopulateMap();
+        PopulateMap();
 
         AddBorders();
 
@@ -81,8 +80,6 @@ public class DiggerMapGenerator : MapGenerator {
                 map[currentX, currentY] = CircularIncrease(direction, 1, 4, GetRandomBoolean()).ToString()[0];
             }
         }
-
-        Debug.Log("Visited: " + visitedTiles);
     }
 
     // Moves the digger forward.
@@ -177,7 +174,7 @@ public class DiggerMapGenerator : MapGenerator {
             currentValue += seed[currentChar];
             currentChar++;
         }
-        forwardProbability = (int)float.Parse(currentValue) * 100;
+        forwardProbability = Mathf.FloorToInt(float.Parse(currentValue) * 100);
 
         currentValue = "";
         currentChar++;
@@ -187,7 +184,7 @@ public class DiggerMapGenerator : MapGenerator {
             currentValue += seed[currentChar];
             currentChar++;
         }
-        leftProbability = (int)float.Parse(currentValue) * 100;
+        leftProbability = Mathf.FloorToInt(float.Parse(currentValue) * 100);
 
         currentValue = "";
         currentChar++;
@@ -197,7 +194,7 @@ public class DiggerMapGenerator : MapGenerator {
             currentValue += seed[currentChar];
             currentChar++;
         }
-        rigthProbability = (int)float.Parse(currentValue) * 100;
+        rigthProbability = Mathf.FloorToInt(float.Parse(currentValue) * 100);
 
         currentValue = "";
         currentChar++;
@@ -207,7 +204,7 @@ public class DiggerMapGenerator : MapGenerator {
             currentValue += seed[currentChar];
             currentChar++;
         }
-        visitedProbability = (int)float.Parse(currentValue) * 100;
+        visitedProbability = Mathf.FloorToInt(float.Parse(currentValue) * 100);
 
         currentValue = "";
         currentChar++;
@@ -217,7 +214,7 @@ public class DiggerMapGenerator : MapGenerator {
             currentValue += seed[currentChar];
             currentChar++;
         }
-        stairProbability = (int)float.Parse(currentValue) * 100;
+        stairProbability = Mathf.FloorToInt(float.Parse(currentValue) * 100);
     }
 
 }

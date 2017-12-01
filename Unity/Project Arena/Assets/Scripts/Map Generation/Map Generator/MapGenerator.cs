@@ -57,6 +57,14 @@ public abstract class MapGenerator : CoreComponent {
     }
 
     // Sets the parmaters, generates a map and returns it.
+    public char[,] GenerateMap(string s, int w, int h, bool ctf, string e) {
+        width = w;
+        height = h;
+
+        return GenerateMap(s, ctf, e);
+    }
+
+    // Sets the parmaters, generates a map and returns it.
     public char[,] GenerateMap(string s, bool ctf, string e) {
         useRandomSeed = false;
         seed = s;
@@ -234,7 +242,7 @@ public abstract class MapGenerator : CoreComponent {
     // Saves the map in a text file.
     protected void SaveMapAsText() {
         if (textFilePath == null && !Directory.Exists(textFilePath)) {
-            Debug.LogError("Error while retrieving the folder, please insert a valid path.");
+            ManageError(Error.SOFT_ERROR, "Error while retrieving the folder, please insert a valid path.");
         } else {
             try {
                 string textMap = "";
@@ -249,7 +257,7 @@ public abstract class MapGenerator : CoreComponent {
 
                 System.IO.File.WriteAllText(@textFilePath + "/" + seed.ToString() + "_map.txt", textMap);
             } catch (Exception) {
-                Debug.LogError("Error while saving the map, please insert a valid path and check its permissions.");
+                ManageError(Error.SOFT_ERROR, "Error while saving the map, please insert a valid path and check its permissions.");
             }
         }
     }

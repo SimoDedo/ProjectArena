@@ -157,6 +157,7 @@ public class StairsGenerator : CoreComponent {
         for (int x = 0; x < maps[currentLevel].GetLength(0); x++) {
             for (int y = 0; y < maps[currentLevel].GetLength(1); y++) {
                 if (maps[currentLevel][x, y] == stairCharUp) {
+                    maps[currentLevel][x, y] = roomChar;
                     if (CanPlaceStair(x, y, currentLevel, stairCharUp))
                         stairList.Add(new Stair {
                             originX = x,
@@ -164,8 +165,8 @@ public class StairsGenerator : CoreComponent {
                             endX = x,
                             endY = y - (stairLength - 1)
                         });
-                    maps[currentLevel][x, y] = roomChar;
                 } else if (maps[currentLevel][x, y] == stairCharRigth) {
+                    maps[currentLevel][x, y] = roomChar;
                     if (CanPlaceStair(x, y, currentLevel, stairCharRigth))
                         stairList.Add(new Stair {
                             originX = x,
@@ -173,17 +174,17 @@ public class StairsGenerator : CoreComponent {
                             endX = x + (stairLength - 1),
                             endY = y
                         });
-                    maps[currentLevel][x, y] = roomChar;
                 } else if (maps[currentLevel][x, y] == stairCharDown) {
+                    maps[currentLevel][x, y] = roomChar;
                     if (CanPlaceStair(x, y, currentLevel, stairCharDown))
                         stairList.Add(new Stair {
                             originX = x,
                             originY = y,
                             endX = x,
-                            endY = y - (stairLength - 1)
+                            endY = y + (stairLength - 1)
                         });
-                    maps[currentLevel][x, y] = roomChar;
                 } else if (maps[currentLevel][x, y] == stairCharLeft) {
+                    maps[currentLevel][x, y] = roomChar;
                     if (CanPlaceStair(x, y, currentLevel, stairCharLeft))
                         stairList.Add(new Stair {
                             originX = x,
@@ -191,7 +192,6 @@ public class StairsGenerator : CoreComponent {
                             endX = x - (stairLength - 1),
                             endY = y
                         });
-                    maps[currentLevel][x, y] = roomChar;
                 }
             }
         }
@@ -211,8 +211,6 @@ public class StairsGenerator : CoreComponent {
                 }
             }
         }
-
-        Debug.Log("Found " + stairList.Count + " possible stairs in level " + currentLevel + ".");
 
         return stairList;
     }
@@ -271,7 +269,7 @@ public class StairsGenerator : CoreComponent {
                     originX = x,
                     originY = y,
                     endX = x,
-                    endY = y - (stairLength - 1)
+                    endY = y + (stairLength - 1)
                 });
             maps[currentLevel][x, y] = roomChar;
         } else if (direction == stairCharLeft) {

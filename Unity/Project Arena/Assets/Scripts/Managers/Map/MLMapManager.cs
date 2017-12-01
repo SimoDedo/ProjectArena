@@ -87,7 +87,7 @@ public class MLMapManager : MapManager {
     // Saves the map in a text file.
     protected void SaveMLMapAsText() {
         if (exportPath == null && !Directory.Exists(exportPath)) {
-            Debug.LogError("Error while retrieving the folder, please insert a valid path.");
+            ManageError(Error.SOFT_ERROR, "Error while retrieving the folder, please insert a valid path.");
         } else {
             int width = maps[0].GetLength(0);
             int height = maps[0].GetLength(1);
@@ -109,7 +109,7 @@ public class MLMapManager : MapManager {
 
                 System.IO.File.WriteAllText(exportPath + "/" + seed.ToString() + "_map.txt", textMap);
             } catch (Exception) {
-                Debug.LogError("Error while saving the map, please insert a valid path and check its permissions.");
+                ManageError(Error.SOFT_ERROR, "Error while saving the map, please insert a valid path and check its permissions.");
             }
 
         }

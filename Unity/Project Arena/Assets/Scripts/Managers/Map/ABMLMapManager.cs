@@ -6,8 +6,7 @@ public class ABMLMapManager : MLMapManager {
 
     [Header("AB generation")] [SerializeField] private MapGenerator diggerGeneratorScript;
 
-    // Does at least one genome need the digger generator?
-    private bool usingDiggerGenerator = false;
+    private List<bool> usesDiggerGeneratorList;
 
     public override void ManageMap(bool assembleMap) {
         if (loadMapFromFile) {
@@ -16,14 +15,19 @@ public class ABMLMapManager : MLMapManager {
         } else {
             // Extract the genomes.
             List<Genome> genomes = ExtractGenomes(seed);
+            // Initialize the generation mode list.
+            usesDiggerGeneratorList = new List<bool>();
             // Generate the map.
-            foreach (Genome g in genomes) {
+            for (int i = 0; i < genomes.Count; i++) {
                 mapGeneratorScript.ResetMapSize();
                 if (GetParameterManager() != null) {
-                    if (g.useDefaultGenerator)
-                        maps.Add(mapGeneratorScript.GenerateMap(g.genome, false, null));
+                    if (genomes[i].useDefaultGenerator)
+                        maps.Add(mapGeneratorScript.GenerateMap(genomes[i].genome, false, null));
+                    else if (i > 0)
+                        maps.Add(diggerGeneratorScript.GenerateMap(genomes[i].genome, maps[i - 1].GetLength(0), maps[i - 1].GetLength(1), false, null));
                     else
-                        maps.Add(diggerGeneratorScript.GenerateMap(g.genome, false, null));
+                        maps.Add(diggerGeneratorScript.GenerateMap(genomes[i].genome, false, null));
+                    usesDiggerGeneratorList.Add(!genomes[i].useDefaultGenerator);
                 } else
                     maps.Add(mapGeneratorScript.GenerateMap());
                 mapGeneratorScript.ResetMapSize();
@@ -31,12 +35,12 @@ public class ABMLMapManager : MLMapManager {
             // Resize all the maps.
             ResizeAllMaps();
             // Add the stairs.
-            if (!usingDiggerGenerator) {
-                stairsGeneratorScript.GenerateStairs(maps, mapGeneratorScript);
-            } else { }
+            stairsGeneratorScript.GenerateStairs(maps, usesDiggerGeneratorList, mapGeneratorScript);
             // Save the map.
-            if (export)
+            if (export) {
+                seed = seed.GetHashCode().ToString();
                 SaveMLMapAsText();
+            }
         }
 
         if (assembleMap) {
