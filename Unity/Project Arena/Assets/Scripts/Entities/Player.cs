@@ -197,9 +197,7 @@ public class Player : Entity {
             // Jump if needed.
             if (Input.GetButton("Jump"))
                 moveDirection.y = jumpSpeed;
-        } else {
-            // TODO - ???
-        }
+        } 
 
         // Apply gravity to the direction and apply it using the controller.
         moveDirection.y -= gravity * Time.deltaTime;

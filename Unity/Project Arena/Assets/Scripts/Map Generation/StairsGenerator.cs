@@ -70,7 +70,7 @@ public class StairsGenerator : CoreComponent {
             if (y - (stairLength - 1) > 0) {
                 if (maps[currentLevel][x, y] == roomChar && maps[currentLevel - 1][x, y - (stairLength - 1)] == roomChar) {
                     for (int i = 1; i < stairLength - 1; i++) {
-                        if (!((maps[currentLevel][x, y - i] == roomChar || maps[currentLevel][x, y - i] == wallChar) && (maps[currentLevel - 1][x, y - i] == roomChar || maps[currentLevel - 1][x, y - i] == wallChar)))
+                        if (!((maps[currentLevel][x, y - i] == roomChar || maps[currentLevel][x, y - i] == wallChar) && maps[currentLevel - 1][x, y - i] == roomChar))
                             return false;
                     }
                     return true;
@@ -81,7 +81,7 @@ public class StairsGenerator : CoreComponent {
             if (x + (stairLength - 1) < maps[currentLevel].GetLength(0)) {
                 if (maps[currentLevel][x, y] == roomChar && maps[currentLevel - 1][x + (stairLength - 1), y] == roomChar) {
                     for (int i = 1; i < stairLength - 1; i++) {
-                        if (!((maps[currentLevel][x + i, y] == roomChar || maps[currentLevel][x + i, y] == wallChar) && (maps[currentLevel - 1][x + i, y] == roomChar || maps[currentLevel - 1][x + i, y] == wallChar)))
+                        if (!((maps[currentLevel][x + i, y] == roomChar || maps[currentLevel][x + i, y] == wallChar) && maps[currentLevel - 1][x + i, y] == roomChar))
                             return false;
                     }
                     return true;
@@ -92,7 +92,7 @@ public class StairsGenerator : CoreComponent {
             if (y + (stairLength - 1) < maps[currentLevel].GetLength(1)) {
                 if (maps[currentLevel][x, y] == roomChar && maps[currentLevel - 1][x, y + (stairLength - 1)] == roomChar) {
                     for (int i = 1; i < stairLength - 1; i++) {
-                        if (!((maps[currentLevel][x, y + i] == roomChar || maps[currentLevel][x, y + i] == wallChar) && (maps[currentLevel - 1][x, y + i] == roomChar || maps[currentLevel - 1][x, y + i] == wallChar)))
+                        if (!((maps[currentLevel][x, y + i] == roomChar || maps[currentLevel][x, y + i] == wallChar) && maps[currentLevel - 1][x, y + i] == roomChar))
                             return false;
                     }
                     return true;
@@ -103,7 +103,7 @@ public class StairsGenerator : CoreComponent {
             if (x - (stairLength - 1) > 0) {
                 if (maps[currentLevel][x, y] == roomChar && maps[currentLevel - 1][x - (stairLength - 1), y] == roomChar) {
                     for (int i = 1; i < stairLength - 1; i++) {
-                        if (!((maps[currentLevel][x - i, y] == roomChar || maps[currentLevel][x - i, y] == wallChar) && (maps[currentLevel - 1][x - i, y] == roomChar || maps[currentLevel - 1][x - i, y] == wallChar)))
+                        if (!((maps[currentLevel][x - i, y] == roomChar || maps[currentLevel][x - i, y] == wallChar) && maps[currentLevel - 1][x - i, y] == roomChar))
                             return false;
                     }
                     return true;
@@ -221,14 +221,14 @@ public class StairsGenerator : CoreComponent {
     private void PlaceStair(Stair stair, int currentLevel) {
         if (stair.originY == stair.endY) {
             if (stair.originX > stair.endX)
-                maps[currentLevel - 1][stair.originX - 1, stair.originY] = stairCharRigth;
+                maps[currentLevel][stair.originX, stair.originY] = stairCharLeft;
             else
-                maps[currentLevel - 1][stair.originX + 1, stair.originY] = stairCharLeft;
+                maps[currentLevel][stair.originX, stair.originY] = stairCharRigth;
         } else {
             if (stair.originY > stair.endY)
-                maps[currentLevel - 1][stair.originX, stair.originY - 1] = stairCharDown;
+                maps[currentLevel][stair.originX, stair.originY] = stairCharUp;
             else
-                maps[currentLevel - 1][stair.originX, stair.originY + 1] = stairCharUp;
+                maps[currentLevel][stair.originX, stair.originY] = stairCharDown;
         }
 
         for (int j = 1; j < stairLength - 1; j++)
@@ -239,9 +239,9 @@ public class StairsGenerator : CoreComponent {
                     maps[currentLevel][stair.originX + j, stair.originY] = voidChar;
             } else {
                 if (stair.originY > stair.endY)
-                    maps[currentLevel][stair.originX, stair.originY - j] = voidChar;
-                else
                     maps[currentLevel][stair.originX, stair.originY + j] = voidChar;
+                else
+                    maps[currentLevel][stair.originX, stair.originY - j] = voidChar;
             }
     }
 
