@@ -121,10 +121,13 @@ public class TargetRushGameUIManager : GameUIManager {
     }
 
     public void SetVictory(bool b) {
-        if (b)
+        if (b) {
             victory.SetActive(true);
-        else
+            gameover.SetActive(false);
+        } else {
+            victory.SetActive(false);
             gameover.SetActive(true);
+        }
     }
 
     public void AddTime(int t) {

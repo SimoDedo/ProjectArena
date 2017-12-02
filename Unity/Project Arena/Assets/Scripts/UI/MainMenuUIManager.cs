@@ -73,6 +73,8 @@ public class MainMenuUIManager : MonoBehaviour {
     private ParameterManager parameterManagerScript;
 
     public void Start() {
+        Cursor.lockState = CursorLockMode.None;
+
         if (!GameObject.Find("Parameter Manager"))
             InstantiateParameterManager();
         else
