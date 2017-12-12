@@ -47,14 +47,7 @@ public abstract class MapGenerator : CoreComponent {
     protected int originalWidth = 0;
     protected int originalHeight = 0;
 
-    // Initializes the pseudo random generator.
-    protected void InitializePseudoRandomGenerator() {
-        if (useRandomSeed)
-            seed = GetDateString();
-
-        hash = seed.GetHashCode();
-        pseudoRandomGen = new System.Random(hash);
-    }
+    /* MAP GENERATION */
 
     // Sets the parmaters, generates a map and returns it.
     public char[,] GenerateMap(string s, int w, int h, bool ctf, string e) {
@@ -78,79 +71,97 @@ public abstract class MapGenerator : CoreComponent {
     // Generates the map and returns it.
     public abstract char[,] GenerateMap();
 
-    // Adds custom objects to the map. I erode the map once, then I place the objects that don't have placement restriction 
-    // (I erode once so that they want compenetrate che walls). Then I erode as many time as needed and I place the other
-    // objects.
+    /* OBJECT GENERATION */
+
+    // Erodes the map once, scans the custom objects and adds them to the map using the rigth method.
     protected void PopulateMap() {
         if (mapObjects.Length > 0) {
             char[,] restrictedMap = map.Clone() as char[,];
 
             if (objectToWallDistance > 0)
                 ErodeMap(restrictedMap);
-            List<Coord> roomTiles = GetFreeTiles(restrictedMap);
 
-            bool mustRestrictFurther = false;
-
-            // Place the unrestricted objects.
+            // Place the objects.
             foreach (MapObject o in mapObjects) {
-                if (o.placeAnywere) {
-                    for (int i = 0; i < o.numObjPerMap; i++) {
-                        if (roomTiles.Count > 0) {
-                            int selected = pseudoRandomGen.Next(0, roomTiles.Count);
-                            map[roomTiles[selected].tileX, roomTiles[selected].tileY] = o.objectChar;
-                            // Make unavailable the cells around for the restricted objects.
-                            DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY, 1, restrictedMap, wallChar);
-                            roomTiles.RemoveAt(selected);
-                        } else {
-                            ManageError(Error.SOFT_ERROR, "Error while populating the map, no more free tiles are availabe.");
-                            return;
-                        }
-                    }
-                } else if (mustRestrictFurther == false)
-                    mustRestrictFurther = true;
-            }
-
-            // Restrict again if there are object that need a further restriction.
-            if (objectToWallDistance > 1 && mustRestrictFurther) {
-                for (int i = 1; i < objectToWallDistance; i++) {
-                    ErodeMap(restrictedMap);
-                }
-                roomTiles = GetFreeTiles(restrictedMap);
-            } else {
-                roomTiles = GetFreeTiles(restrictedMap);
-            }
-
-            // Place the restricted objects.
-            foreach (MapObject o in mapObjects) {
-                if (!o.placeAnywere) {
-                    for (int i = 0; i < o.numObjPerMap; i++) {
-                        if (roomTiles.Count > 0) {
-                            int selected = pseudoRandomGen.Next(0, roomTiles.Count);
-                            map[roomTiles[selected].tileX, roomTiles[selected].tileY] = o.objectChar;
-                            // Remove the tiles are around the choosen one from the vailable ones.
-                            DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY, objectToObjectDistance, restrictedMap, wallChar);
-                            roomTiles = GetFreeTiles(restrictedMap);
-                        } else {
-                            ManageError(Error.SOFT_ERROR, "Error while populating the map, no more free tiles are availabe.");
-                            return;
-                        }
-                    }
+                switch (o.generationMethod) {
+                    case ObjectGenerationMethods.Rain:
+                        GenerateObjectsRain(o, restrictedMap);
+                        break;
+                    case ObjectGenerationMethods.RainDistanced:
+                        GenerateObjectsRainDistanced(o, restrictedMap);
+                        break;
+                    case ObjectGenerationMethods.RainDistributed:
+                        GenerateObjectsRainDistributed(o, restrictedMap);
+                        break;
                 }
             }
         }
     }
 
-    // Erodes the map as many times as specified.
-    protected void ErodeMap(char[,] toBeErodedMap) {
-        char[,] originalMap = CloneMap(toBeErodedMap);
+    protected void GenerateObjectsRain(MapObject o, char[,] restrictedMap) {
+        char[,] supportMap = restrictedMap.Clone() as char[,];
 
-        for (int x = 0; x < originalMap.GetLength(0); x++) {
-            for (int y = 0; y < originalMap.GetLength(1); y++) {
-                if (GetSurroundingWallCount(x, y, originalMap) > 0) {
-                    toBeErodedMap[x, y] = wallChar;
-                }
+        // Restrict again if there are object that need a further restriction.
+        if (!o.placeAnywere && objectToWallDistance > 1) {
+            for (int i = 1; i < objectToWallDistance; i++) {
+                ErodeMap(supportMap);
             }
         }
+
+        List<Coord> roomTiles = GetFreeTiles(supportMap);
+
+        for (int i = 0; i < o.numObjPerMap; i++) {
+            if (roomTiles.Count > 0) {
+                int selected = pseudoRandomGen.Next(0, roomTiles.Count);
+                map[roomTiles[selected].tileX, roomTiles[selected].tileY] = o.objectChar;
+                restrictedMap[roomTiles[selected].tileX, roomTiles[selected].tileY] = wallChar;
+                roomTiles.RemoveAt(selected);
+            } else {
+                ManageError(Error.SOFT_ERROR, "Error while populating the map, no more free tiles are availabe.");
+                return;
+            }
+        }
+    }
+
+    protected void GenerateObjectsRainDistanced(MapObject o, char[,] restrictedMap) {
+        char[,] supportMap = restrictedMap.Clone() as char[,];
+
+        // Restrict again if there are object that need a further restriction.
+        if (!o.placeAnywere && objectToWallDistance > 1) {
+            for (int i = 1; i < objectToWallDistance; i++) {
+                ErodeMap(supportMap);
+            }
+        }
+
+        List<Coord> roomTiles = GetFreeTiles(supportMap);
+
+        for (int i = 0; i < o.numObjPerMap; i++) {
+            if (roomTiles.Count > 0) {
+                int selected = pseudoRandomGen.Next(0, roomTiles.Count);
+                map[roomTiles[selected].tileX, roomTiles[selected].tileY] = o.objectChar;
+                restrictedMap[roomTiles[selected].tileX, roomTiles[selected].tileY] = wallChar;
+                DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY, objectToObjectDistance, supportMap, wallChar);
+                roomTiles = GetFreeTiles(supportMap);
+            } else {
+                ManageError(Error.SOFT_ERROR, "Error while populating the map, no more free tiles are availabe.");
+                return;
+            }
+        }
+    }
+
+    protected void GenerateObjectsRainDistributed(MapObject o, char[,] restrictedMap) {
+
+    }
+
+    /* HELPERS */
+
+    // Initializes the pseudo random generator.
+    protected void InitializePseudoRandomGenerator() {
+        if (useRandomSeed)
+            seed = GetDateString();
+
+        hash = seed.GetHashCode();
+        pseudoRandomGen = new System.Random(hash);
     }
 
     // Gets the number of walls surrounding a cell.
@@ -169,6 +180,19 @@ public abstract class MapGenerator : CoreComponent {
         }
 
         return wallCount;
+    }
+
+    // Erodes the map as many times as specified.
+    protected void ErodeMap(char[,] toBeErodedMap) {
+        char[,] originalMap = CloneMap(toBeErodedMap);
+
+        for (int x = 0; x < originalMap.GetLength(0); x++) {
+            for (int y = 0; y < originalMap.GetLength(1); y++) {
+                if (GetSurroundingWallCount(x, y, originalMap) > 0) {
+                    toBeErodedMap[x, y] = wallChar;
+                }
+            }
+        }
     }
 
     // Clones a map.
@@ -303,6 +327,8 @@ public abstract class MapGenerator : CoreComponent {
         }
     }
 
+    /* GETTERS */
+
     // Saves the original size of the map.
     public void SaveMapSize() {
         originalWidth = width;
@@ -343,6 +369,14 @@ public abstract class MapGenerator : CoreComponent {
         return wallHeight;
     }
 
+    /* CUSTOM DEFINITIONS */
+
+    public enum ObjectGenerationMethods {
+        Rain,
+        RainDistanced,
+        RainDistributed
+    }
+
     // Coordinates of a tile.
     protected struct Coord {
         public int tileX;
@@ -363,6 +397,8 @@ public abstract class MapGenerator : CoreComponent {
         public int numObjPerMap;
         // The object must respect placement restrictions?
         public bool placeAnywere;
+        // Generation method used for the object.
+        public ObjectGenerationMethods generationMethod;
     }
 
 }
