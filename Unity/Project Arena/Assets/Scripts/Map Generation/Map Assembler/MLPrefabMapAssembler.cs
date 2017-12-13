@@ -46,7 +46,6 @@ public class MLPrefabMapAssembler : PrefabMapAssembler {
                         string currentMask = GetComulativeNeighbourhoodMask(x, y);
                         foreach (ProcessedTilePrefab p in processedTilePrefabs) {
                             if (p.mask == currentMask) {
-                                AddPrefab(p.prefab, x, y, squareSize, p.rotation, levelHeight * i);
                                 AddWallRecursevely(i, x, y, squareSize, currentMask);
                                 break;
                             }
@@ -91,7 +90,7 @@ public class MLPrefabMapAssembler : PrefabMapAssembler {
         if (currentMask != roomMask) {
             ProcessedTilePrefab currentPrefab = GetPrefabFromMask(currentMask);
             AddPrefab(currentPrefab.prefab, x, y, squareSize, currentPrefab.rotation, levelHeight * currentLevel);
-            if (currentLevel < maps.Count - 1)
+            if (currentLevel < maps.Count - 1 && maps[currentLevel + 1][x, y] != roomChar)
                 AddWallRecursevely(currentLevel + 1, x, y, squareSize, currentMask);
             else if (currentLevel == maps.Count - 1 && additionalWallLevels > 0)
                 for (int i = 1; i <= additionalWallLevels; i++)

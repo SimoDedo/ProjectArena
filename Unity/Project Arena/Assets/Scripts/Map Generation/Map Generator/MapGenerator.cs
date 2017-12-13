@@ -84,13 +84,13 @@ public abstract class MapGenerator : CoreComponent {
             // Place the objects.
             foreach (MapObject o in mapObjects) {
                 switch (o.generationMethod) {
-                    case ObjectGenerationMethods.Rain:
+                    case ObjectGenerationMethod.Rain:
                         GenerateObjectsRain(o, restrictedMap);
                         break;
-                    case ObjectGenerationMethods.RainDistanced:
+                    case ObjectGenerationMethod.RainDistanced:
                         GenerateObjectsRainDistanced(o, restrictedMap);
                         break;
-                    case ObjectGenerationMethods.RainDistributed:
+                    case ObjectGenerationMethod.RainDistributed:
                         GenerateObjectsRainDistributed(o, restrictedMap);
                         break;
                 }
@@ -371,7 +371,7 @@ public abstract class MapGenerator : CoreComponent {
 
     /* CUSTOM DEFINITIONS */
 
-    public enum ObjectGenerationMethods {
+    public enum ObjectGenerationMethod {
         Rain,
         RainDistanced,
         RainDistributed
@@ -398,7 +398,7 @@ public abstract class MapGenerator : CoreComponent {
         // The object must respect placement restrictions?
         public bool placeAnywere;
         // Generation method used for the object.
-        public ObjectGenerationMethods generationMethod;
+        public ObjectGenerationMethod generationMethod;
     }
 
 }

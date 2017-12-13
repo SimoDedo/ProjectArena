@@ -255,7 +255,7 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Enables or disbales the change generation buttons
     private void UpdateSingleplayerGenerations() {
-        if (singleplayerModes[currentMode].maps[currentMap].enabledGenerations.Length > 1) {
+        if (GetGeneratorsCount(singleplayerModes[currentMode].maps[currentMap].enabledGenerations) > 1) {
             previousGenerationSP.GetComponent<Button>().interactable = true;
             nextGenerationSP.GetComponent<Button>().interactable = true;
         } else {
@@ -361,7 +361,7 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Enables or disbales the change generation buttons
     private void UpdateMultiplayerGenerations() {
-        if (multiplayerModes[currentMode].maps[currentMap].enabledGenerations.Length > 1) {
+        if (GetGeneratorsCount(multiplayerModes[currentMode].maps[currentMap].enabledGenerations) > 1) {
             previousGenerationMP.GetComponent<Button>().interactable = true;
             nextGenerationMP.GetComponent<Button>().interactable = true;
         } else {
@@ -530,6 +530,17 @@ public class MainMenuUIManager : MonoBehaviour {
         GameObject instance = Instantiate(parameterManagerPrefab);
         instance.name = parameterManagerPrefab.name;
         parameterManagerScript = instance.GetComponent<ParameterManager>();
+    }
+
+    // Returns the number of enables generators.
+    private int GetGeneratorsCount(Generation[] generators) {
+        int activeCount = 0;
+
+        foreach (Generation g in generators)
+            if (g.enabled)
+                activeCount++;
+
+        return activeCount;
     }
 
     [Serializable]
