@@ -48,6 +48,9 @@ public class DivisiveMapGenerator : MapGenerator {
 
         AddBorders();
 
+        if (flipMap)
+            FlipMap();
+
         if (createTextFile)
             SaveMapAsText();
 

@@ -44,7 +44,7 @@ public class PlayerUIManager : MonoBehaviour {
             if (activeGuns[i]) {
                 SetTextAlpha(gunNumbers[i], 1);
             } else
-                SetTextAlpha(gunNumbers[i], 0.3f);
+                SetTextAlpha(gunNumbers[i], 0.5f);
         }
     }
 
@@ -85,7 +85,7 @@ public class PlayerUIManager : MonoBehaviour {
     public void SetColorAll(Color c) {
         cooldown.GetComponent<Image>().color = c;
         foreach (GameObject gn in gunNumbers)
-            gn.GetComponent<Text>().color = c;
+            gn.GetComponent<Text>().color = new Color(c.r, c.g, c.b, gn.GetComponent<Text>().color.a);
     }
 
     // Shows the damage indicator.

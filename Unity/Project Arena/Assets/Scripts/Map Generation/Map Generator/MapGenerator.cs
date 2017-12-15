@@ -25,12 +25,15 @@ public abstract class MapGenerator : CoreComponent {
     // Border size.
     [SerializeField] protected int borderSize = 5;
 
-    // Char that denotes a room;
-    [Header("Representation")] [SerializeField] protected char roomChar = 'r';
+    // The map must be flipped?
+    [Header("Representation")] [SerializeField] protected bool flipMap;
+    // Char that denotes a room
+    [SerializeField] protected char roomChar = 'r';
     // Char that denotes a wall;
     [SerializeField] protected char wallChar = 'w';
     // Custom objects that will be added to the map.
     [SerializeField] protected MapObject[] mapObjects;
+
 
     // Do I have to create a .txt output?
     [Header("Export")] [SerializeField] protected bool createTextFile = false;
@@ -154,6 +157,17 @@ public abstract class MapGenerator : CoreComponent {
     }
 
     /* HELPERS */
+
+    // Flips the map.
+    protected void FlipMap() {
+        char[,] clonedMap = CloneMap(map);
+        
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                map[x, y] = clonedMap[height - y - 1, width - x - 1];
+            }
+        }
+    }
 
     // Initializes the pseudo random generator.
     protected void InitializePseudoRandomGenerator() {
