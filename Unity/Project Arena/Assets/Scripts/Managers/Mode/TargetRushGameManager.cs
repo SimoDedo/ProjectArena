@@ -9,7 +9,7 @@ public class TargetRushGameManager : GameManager {
     [SerializeField] private bool[] activeGunsPlayer;
     [SerializeField] private Wave[] waveList;
 
-    [Header("Target Rush variables")] [SerializeField] protected GameObject targetRushGameUIManager;
+    [Header("Target hunt variables")] [SerializeField] protected GameObject targetRushGameUIManager;
 
     private TargetRushGameUIManager targetRushGameUIManagerScript;
 
