@@ -7,7 +7,7 @@ public class DivisiveMapGenerator : MapGenerator {
     // Probability of a room being divided again.
     [Header("Divisive generation")] [SerializeField, Range(0, 100)] private int roomDivideProbability;
     // Probability of a room not being erased.
-    [SerializeField, Range(0, 100)] private int roomSurviveProbability;
+    [SerializeField, Range(0, 100)] private int mapRoomPercentage;
     // Percentual lower bound of where a room can be divided.
     [SerializeField, Range(10, 90)] private int divideLowerBound;
     // Percentual upper bound of where a room can be divided.
@@ -20,12 +20,17 @@ public class DivisiveMapGenerator : MapGenerator {
     [SerializeField] private int passageWidth = 5;
     // Passage width.
     [SerializeField] private int maxRandomPassages = 5;
+
     private List<Room> rooms;
+    private List<Room> placedRooms;
+    private List<Room> placedCorridors;
 
     private int minimumDividableRoomDimension;
+    private int minimumFilledTiles;
 
     private void Start() {
         minimumDividableRoomDimension = minimumRoomDimension * 2;
+        minimumFilledTiles = width * height * mapRoomPercentage / 100;
 
         SetReady(true);
     }
@@ -38,11 +43,15 @@ public class DivisiveMapGenerator : MapGenerator {
         FillMap();
 
         rooms = new List<Room>();
+        placedRooms = new List<Room>();
+        placedCorridors = new List<Room>();
 
         if (width > height)
             DivideRoom(0, 0, width, height, true, 0);
         else
             DivideRoom(0, 0, width, height, false, 0);
+
+        ProcessRooms();
 
         ProcessMap();
 
@@ -51,8 +60,10 @@ public class DivisiveMapGenerator : MapGenerator {
         if (flipMap)
             FlipMap();
 
-        if (createTextFile)
+        if (createTextFile) {
             SaveMapAsText();
+            // SameMapAsAB();
+        }
 
         return map;
     }
@@ -60,12 +71,12 @@ public class DivisiveMapGenerator : MapGenerator {
     // Processes the map.
     private void ProcessMap() {
         // If there are at least two rooms.
-        if (rooms.Count > 1) {
-            rooms.Sort();
-            rooms[0].isMainRoom = true;
-            rooms[0].isAccessibleFromMainRoom = true;
+        if (placedRooms.Count > 1) {
+            placedRooms.Sort();
+            placedRooms[0].isMainRoom = true;
+            placedRooms[0].isAccessibleFromMainRoom = true;
 
-            ConnectClosestRooms(rooms);
+            ConnectClosestRooms(placedRooms);
         }
 
         AddRandomConnections();
@@ -89,14 +100,20 @@ public class DivisiveMapGenerator : MapGenerator {
                 DivideRoom(originX + division + 1, originY, roomWidth - division - 1, roomHeigth, true, depth + 1);
             }
         } else {
-            if (pseudoRandomGen.Next(0, 100) < roomSurviveProbability) {
-                // Make the room effective and add it to the rooms list.
-                // Debug.Log("Creating a " + roomWidth + "x" + roomHeigth + "room in [" + originX + ", " + originY + "].");
-                AddRoom(originX, originY, roomWidth, roomHeigth);
-            } else {
-                // Delete the room, i.e. do nothing.
-                // Debug.Log("Deleting a " + roomWidth + "x" + roomHeigth + "room in [" + originX + ", " + originY + "].");
-            }
+            AddRoom(originX, originY, roomWidth, roomHeigth);
+        }
+    }
+
+    private void ProcessRooms() {
+        int currentFill = 0;
+
+        while (currentFill < minimumFilledTiles && rooms.Count > 1) {
+            int current = pseudoRandomGen.Next(0, rooms.Count);
+            // Debug.Log("Selected room " + current + " out of " + rooms.Count + ".");
+            PlaceRoom(rooms[current].originX, rooms[current].originY, rooms[current].width, rooms[current].height);
+            currentFill += rooms[current].roomSize;
+            placedRooms.Add(rooms[current]);
+            rooms.RemoveAt(current);
         }
     }
 
@@ -165,51 +182,58 @@ public class DivisiveMapGenerator : MapGenerator {
     private void CreatePassage(Room roomA, Room roomB) {
         Room.ConnectRooms(roomA, roomB);
 
-        int minX;
-        int minY;
-        int maxX;
-        int maxY;
-
+        int extremeX;
+        int extremeY;
         int connectionX;
         int connectionY;
 
-        if (roomA.centerX < roomB.centerX) {
-            minX = roomA.centerX;
-            maxX = roomB.centerX;
-        } else {
-            minX = roomB.centerX;
-            maxX = roomA.centerX;
-        }
-
-        if (roomA.centerY < roomB.centerY) {
-            minY = roomA.centerY;
-            maxY = roomB.centerY;
-        } else {
-            minY = roomB.centerY;
-            maxY = roomA.centerY;
-        }
-
         if (pseudoRandomGen.Next(100) < 50) {
-            connectionX = maxX;
-            connectionY = maxY;
+            connectionX = roomA.centerX;
+            connectionY = roomB.centerY;
         } else {
-            connectionX = minX;
-            connectionY = minY;
+            connectionX = roomB.centerX;
+            connectionY = roomA.centerY;
         }
 
-        // Create the vertical segment.
-        for (int y = minY; y <= maxY; y++) {
-            for (int x = connectionX - passageWidth / 2; x <= connectionX + passageWidth / 2; x++) {
-                if (IsInMapRange(x, y))
-                    map[x, y] = roomChar;
+        if (roomA.centerX != connectionX)
+            extremeX = roomA.centerX;
+        else
+            extremeX = roomB.centerX;
+
+        if (roomA.centerY != connectionY)
+            extremeY = roomA.centerY;
+        else
+            extremeY = roomB.centerY;
+
+        if (extremeX > connectionX) {
+            for (int x = connectionX; x <= extremeX; x++) {
+                for (int y = connectionY - passageWidth / 2; y <= connectionY + passageWidth / 2; y++) {
+                    if (IsInMapRange(x, y))
+                        map[x, y] = roomChar;
+                }
+            }
+        } else {
+            for (int x = extremeX; x <= connectionX; x++) {
+                for (int y = connectionY - passageWidth / 2; y <= connectionY + passageWidth / 2; y++) {
+                    if (IsInMapRange(x, y))
+                        map[x, y] = roomChar;
+                }
             }
         }
 
-        // Create the horizontal segment.
-        for (int x = minX; x <= maxX; x++) {
-            for (int y = connectionY - passageWidth / 2; y <= connectionY + passageWidth / 2; y++) {
-                if (IsInMapRange(x, y))
-                    map[x, y] = roomChar;
+        if (extremeY > connectionY) {
+            for (int y = connectionY; y <= extremeY; y++) {
+                for (int x = connectionX - passageWidth / 2; x <= connectionX + passageWidth / 2; x++) {
+                    if (IsInMapRange(x, y))
+                        map[x, y] = roomChar;
+                }
+            }
+        } else {
+            for (int y = extremeY; y <= connectionY; y++) {
+                for (int x = connectionX - passageWidth / 2; x <= connectionX + passageWidth / 2; x++) {
+                    if (IsInMapRange(x, y))
+                        map[x, y] = roomChar;
+                }
             }
         }
     }
@@ -217,34 +241,30 @@ public class DivisiveMapGenerator : MapGenerator {
     // Adds random connections between the rooms.
     private void AddRandomConnections() {
         for (int i = 0; i < maxRandomPassages; i++) {
-            Room roomA = rooms[pseudoRandomGen.Next(0, rooms.Count)];
-            Room roomB = rooms[pseudoRandomGen.Next(0, rooms.Count)];
+            Room roomA = placedRooms[pseudoRandomGen.Next(0, placedRooms.Count)];
+            Room roomB = placedRooms[pseudoRandomGen.Next(0, placedRooms.Count)];
             if (!roomA.connectedRooms.Contains(roomB))
                 CreatePassage(roomA, roomB);
         }
     }
 
-    // Adds a room in the map.
+    // Adds a room to the list.
     private void AddRoom(int originX, int originY, int roomWidth, int roomHeigth) {
-        // Restrict the room by one tile.
-        originX++;
-        originY++;
-        roomWidth -= 2;
-        roomHeigth -= 2;
-
-        // If the restricted room still makes sense.
-        if (IsInMapRange(originX, originY) && IsInMapRange(originX + roomWidth, originY + roomHeigth) && roomWidth > 0 && roomHeigth > 0) {
-            // Draw the room in the map.
-            for (int x = originX; x < roomWidth + originX; x++) {
-                for (int y = originY; y < roomHeigth + originY; y++) {
-                    map[x, y] = roomChar;
-                }
-            }
-
+        // If the room makes sense.
+        if (IsInMapRange(originX, originY) && IsInMapRange(originX + roomWidth, originY + roomHeigth) && roomWidth > passageWidth && roomHeigth > passageWidth) {
             // Add it to the room list.
             rooms.Add(new Room(originX, originY, roomWidth, roomHeigth));
         } else {
             // Debug.Log("The room is too small or placed outside the map, removing it.");
+        }
+    }
+
+    // Places a room.
+    private void PlaceRoom(int originX, int originY, int roomWidth, int roomHeigth) {
+        for (int x = originX; x < roomWidth + originX; x++) {
+            for (int y = originY; y < roomHeigth + originY; y++) {
+                map[x, y] = roomChar;
+            }
         }
     }
 

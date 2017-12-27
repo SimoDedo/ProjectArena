@@ -93,8 +93,8 @@ public abstract class MapGenerator : CoreComponent {
                     case ObjectGenerationMethod.RainDistanced:
                         GenerateObjectsRainDistanced(o, restrictedMap);
                         break;
-                    case ObjectGenerationMethod.RainDistributed:
-                        GenerateObjectsRainDistributed(o, restrictedMap);
+                    case ObjectGenerationMethod.RainShared:
+                        GenerateObjectsRainShared(o, restrictedMap);
                         break;
                 }
             }
@@ -152,8 +152,30 @@ public abstract class MapGenerator : CoreComponent {
         }
     }
 
-    protected void GenerateObjectsRainDistributed(MapObject o, char[,] restrictedMap) {
+    protected void GenerateObjectsRainShared(MapObject o, char[,] restrictedMap) {
+        char[,] supportMap = restrictedMap.Clone() as char[,];
 
+        // Restrict again if there are object that need a further restriction.
+        if (!o.placeAnywere && objectToWallDistance > 1) {
+            for (int i = 1; i < objectToWallDistance; i++) {
+                ErodeMap(supportMap);
+            }
+        }
+
+        List<Coord> roomTiles = GetFreeTiles(supportMap);
+
+        for (int i = 0; i < o.numObjPerMap; i++) {
+            if (roomTiles.Count > 0) {
+                int selected = pseudoRandomGen.Next(0, roomTiles.Count);
+                map[roomTiles[selected].tileX, roomTiles[selected].tileY] = o.objectChar;
+                DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY, (o.placeAnywere) ? 1 : objectToObjectDistance, supportMap, wallChar);
+                DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY, (o.placeAnywere) ? 1 : objectToObjectDistance, restrictedMap, wallChar);
+                roomTiles = GetFreeTiles(supportMap);
+            } else {
+                ManageError(Error.SOFT_ERROR, "Error while populating the map, no more free tiles are availabe.");
+                return;
+            }
+        }
     }
 
     /* HELPERS */
@@ -161,7 +183,7 @@ public abstract class MapGenerator : CoreComponent {
     // Flips the map.
     protected void FlipMap() {
         char[,] clonedMap = CloneMap(map);
-        
+
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 map[x, y] = clonedMap[height - y - 1, width - x - 1];
@@ -388,7 +410,7 @@ public abstract class MapGenerator : CoreComponent {
     public enum ObjectGenerationMethod {
         Rain,
         RainDistanced,
-        RainDistributed
+        RainShared
     }
 
     // Coordinates of a tile.
