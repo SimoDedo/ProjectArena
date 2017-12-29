@@ -12,7 +12,7 @@ public class MainMenuUIManager : MonoBehaviour {
     [Header("UI sections")] [SerializeField] private GameObject main;
     [SerializeField] private GameObject singleplayer;
     [SerializeField] private GameObject multiplayer;
-    [SerializeField] private GameObject about;
+    [SerializeField] private GameObject settings;
     [SerializeField] private GameObject error;
     [SerializeField] private GameObject loading;
 
@@ -42,7 +42,7 @@ public class MainMenuUIManager : MonoBehaviour {
     [SerializeField] private InputField inputMP;
     [SerializeField] private Toggle exportMP;
 
-    [Header("About fields")] [SerializeField] private GameObject import;
+    [Header("Settings fields")] [SerializeField] private GameObject import;
     [SerializeField] private GameObject export;
     [SerializeField] private GameObject importButton;
     [SerializeField] private GameObject exportButton;
@@ -114,8 +114,13 @@ public class MainMenuUIManager : MonoBehaviour {
         } else {
             import.SetActive(true);
             export.SetActive(true);
-            import.GetComponent<Text>().text = "Import folder: " + importPath;
-            export.GetComponent<Text>().text = "Export folder: " + exportPath;
+            if (allowIO) {
+                import.GetComponent<Text>().text = "Import folder: " + importPath;
+                export.GetComponent<Text>().text = "Export folder: " + exportPath;
+            } else {
+                import.GetComponent<Text>().text = "The import folder is not available.";
+                export.GetComponent<Text>().text = "The export folder is not available.";
+            }
         }
     }
 
@@ -177,9 +182,9 @@ public class MainMenuUIManager : MonoBehaviour {
         ResetValues();
     }
 
-    // Opens the about menu.
-    public void OpenAbout() {
-        OpenSection(about);
+    // Opens the settings menu.
+    public void OpenSettings() {
+        OpenSection(settings);
     }
 
     // Opens the main menu.
