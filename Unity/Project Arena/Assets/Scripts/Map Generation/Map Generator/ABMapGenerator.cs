@@ -173,7 +173,7 @@ public class ABMapGenerator : MapGenerator {
             int max = (int)Math.Ceiling(a.dimension / 2f);
 
             for (int x = a.originX - min; x < a.originX + max; x++)
-                for (int y = a.originY - min; y <= a.originY + max; y++)
+                for (int y = a.originY - min; y < a.originY + max; y++)
                     if (IsInMapRange(x, y))
                         map[x, y] = roomChar;
 
@@ -187,7 +187,7 @@ public class ABMapGenerator : MapGenerator {
                             map[x, y] = roomChar;
             } else {
                 for (int x = c.originX - 1; x <= c.originX + 1; x++)
-                    for (int y = c.originY; y <= c.originY + c.dimension; y++)
+                    for (int y = c.originY; y <= c.originY - c.dimension; y++)
                         if (IsInMapRange(x, y))
                             map[x, y] = roomChar;
             }
@@ -197,13 +197,13 @@ public class ABMapGenerator : MapGenerator {
     // Removes rooms that are not reachable from the main one and adds objects.
     private void ProcessMap() {
         // Get the reachability mask.
-        bool[,] reachabilityMask = ComputeReachabilityMask();
+        /* bool[,] reachabilityMask = ComputeReachabilityMask();
 
         // Remove rooms not connected to the main one.
         for (int x = 0; x < width; x++)
             for (int y = 0; y < height; y++)
                 if (!reachabilityMask[x, y])
-                    map[x, y] = wallChar;
+                    map[x, y] = wallChar; */
 
         // Add objects;
         PopulateMap();
