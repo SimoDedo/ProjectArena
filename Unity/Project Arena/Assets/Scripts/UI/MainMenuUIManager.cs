@@ -16,6 +16,8 @@ public class MainMenuUIManager : MonoBehaviour {
     [SerializeField] private GameObject error;
     [SerializeField] private GameObject loading;
 
+    [Header("Main menu fields")] [SerializeField] private GameObject quit;
+
     [Header("Singleplayer fields")] [SerializeField] private GameObject nextModeSP;
     [SerializeField] private GameObject previousModeSP;
     [SerializeField] private GameObject nextMapSP;
@@ -46,6 +48,7 @@ public class MainMenuUIManager : MonoBehaviour {
     [SerializeField] private GameObject export;
     [SerializeField] private GameObject importButton;
     [SerializeField] private GameObject exportButton;
+    [SerializeField] private Slider volumeSlider;
 
     [Header("Error fields")] [SerializeField] private Text errorText;
 
@@ -99,6 +102,9 @@ public class MainMenuUIManager : MonoBehaviour {
             if (!Directory.Exists(exportPath))
                 Directory.CreateDirectory(exportPath);
         } else {
+            // Hide the quit button.
+            quit.SetActive(false);
+            // Disable all the import/export.
             allowIO = false;
             exportSP.isOn = false;
             exportSP.interactable = false;
@@ -107,6 +113,12 @@ public class MainMenuUIManager : MonoBehaviour {
             exportMP.interactable = false;
             exportTextMP.color = exportMP.GetComponent<Toggle>().colors.disabledColor;
         }
+
+        // Get the mouse sensitivity.
+        if (PlayerPrefs.HasKey("MouseSensibility"))
+            volumeSlider.value = PlayerPrefs.GetFloat("MouseSensibility");
+        else
+            PlayerPrefs.SetFloat("MouseSensibility", volumeSlider.value);
 
         if (Application.platform == RuntimePlatform.WindowsPlayer) {
             importButton.SetActive(true);
@@ -546,6 +558,16 @@ public class MainMenuUIManager : MonoBehaviour {
                 activeCount++;
 
         return activeCount;
+    }
+
+    // Sets the mouse sensibility in the preferences.
+    public void SetMouseSensibility() {
+        PlayerPrefs.SetFloat("MouseSensibility", volumeSlider.value);
+    }
+
+    // Sets the mouse sensibility in the preferences.
+    private float GetMouseSensibility() {
+        return PlayerPrefs.GetFloat("MouseSensibility");
     }
 
     [Serializable]

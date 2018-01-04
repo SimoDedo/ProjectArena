@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class ABMapGenerator : MapGenerator {
+
+    [SerializeField] private int passageWidth = 3;
 
     private Room mainRoom;
     private List<Room> arenas;
@@ -140,20 +143,19 @@ public class ABMapGenerator : MapGenerator {
     // Updates the map size.
     private void UpdateMapSize(int originX, int originY, int dimension, bool isArena) {
         if (isArena) {
-            int halvedDimension = (int)Math.Ceiling(dimension / 2f);
-            if (originX + halvedDimension > width)
-                width = originX + halvedDimension;
-            if (originY + dimension / 2 > height)
-                height = originY + halvedDimension;
+            if (originX + dimension > width)
+                width = originX + dimension;
+            if (originY + dimension > height)
+                height = originY + dimension;
         } else {
             if (dimension > 0) {
                 if (originX + dimension > width)
                     width = originX + dimension;
-                if (originY + 2 > height)
-                    height = originY + 2;
+                if (originY + passageWidth > height)
+                    height = originY + passageWidth;
             } else {
-                if (originX + 2 > width)
-                    width = originX + 2;
+                if (originX + passageWidth > width)
+                    width = originX + passageWidth;
                 if (originY + dimension > height)
                     height = originY + dimension;
             }
@@ -169,25 +171,21 @@ public class ABMapGenerator : MapGenerator {
                 map[x, y] = wallChar;
 
         foreach (Room a in arenas) {
-            int min = (int)Math.Floor(a.dimension / 2f);
-            int max = (int)Math.Ceiling(a.dimension / 2f);
-
-            for (int x = a.originX - min; x < a.originX + max; x++)
-                for (int y = a.originY - min; y < a.originY + max; y++)
+            for (int x = a.originX; x < a.originX + a.dimension; x++)
+                for (int y = a.originY; y < a.originY + a.dimension; y++)
                     if (IsInMapRange(x, y))
                         map[x, y] = roomChar;
-
         }
 
         foreach (Room c in corridors) {
             if (c.dimension > 0) {
-                for (int x = c.originX; x <= c.originX + c.dimension; x++)
-                    for (int y = c.originY - 1; y <= c.originY + 1; y++)
+                for (int x = c.originX; x < c.originX + c.dimension; x++)
+                    for (int y = c.originY; y < c.originY + passageWidth; y++)
                         if (IsInMapRange(x, y))
                             map[x, y] = roomChar;
             } else {
-                for (int x = c.originX - 1; x <= c.originX + 1; x++)
-                    for (int y = c.originY; y <= c.originY - c.dimension; y++)
+                for (int x = c.originX; x < c.originX + passageWidth; x++)
+                    for (int y = c.originY; y < c.originY - c.dimension; y++)
                         if (IsInMapRange(x, y))
                             map[x, y] = roomChar;
             }
@@ -197,13 +195,13 @@ public class ABMapGenerator : MapGenerator {
     // Removes rooms that are not reachable from the main one and adds objects.
     private void ProcessMap() {
         // Get the reachability mask.
-        /* bool[,] reachabilityMask = ComputeReachabilityMask();
+        bool[,] reachabilityMask = ComputeReachabilityMask();
 
         // Remove rooms not connected to the main one.
         for (int x = 0; x < width; x++)
             for (int y = 0; y < height; y++)
                 if (!reachabilityMask[x, y])
-                    map[x, y] = wallChar; */
+                    map[x, y] = wallChar;
 
         // Add objects;
         PopulateMap();

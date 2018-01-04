@@ -9,8 +9,6 @@ public class Player : Entity {
     [SerializeField] private float jumpSpeed = 8f;
     [SerializeField] private float gravity = 100f;
 
-    // Sensitivity of the mouse.
-    [SerializeField] private float sensitivity = 5.0f;
     // Smoothing factor.
     [SerializeField] private float smoothing = 2.0f;
 
@@ -21,6 +19,8 @@ public class Player : Entity {
     private Vector2 mouseLook;
     // Smoothed value of the mouse
     private Vector2 smoothedDelta;
+    // Sensitivity of the mouse.
+    private float sensitivity = 2f;
 
     // Vector used to apply the movement.
     private Vector3 moveDirection = Vector3.zero;
@@ -53,6 +53,12 @@ public class Player : Entity {
     private void Start() {
         controller = GetComponent<CharacterController>();
         playerUIManagerScript = GetComponent<PlayerUIManager>();
+
+        // Get the mouse sensitivity.
+        if (PlayerPrefs.HasKey("MouseSensibility"))
+            sensitivity = PlayerPrefs.GetFloat("MouseSensibility");
+        else
+            PlayerPrefs.SetFloat("MouseSensibility", sensitivity);
     }
 
     private void Update() {
