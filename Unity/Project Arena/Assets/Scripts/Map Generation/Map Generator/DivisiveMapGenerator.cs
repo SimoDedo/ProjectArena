@@ -70,7 +70,7 @@ public class DivisiveMapGenerator : MapGenerator {
         if (createTextFile) {
             PopulateABRooms();
             SaveMapAsText();
-            SameMapAsAB();
+            SaveMapAsAB();
         }
 
         return map;
@@ -85,11 +85,13 @@ public class DivisiveMapGenerator : MapGenerator {
             placedRooms[0].isAccessibleFromMainRoom = true;
 
             ConnectClosestRooms(placedRooms);
+
+            AddRandomConnections();
+
+            PopulateMap();
+        } else {
+            ManageError(Error.HARD_ERROR, "Error while creating the map. Please try again.");
         }
-
-        AddRandomConnections();
-
-        PopulateMap();
     }
 
     // Divides a room in subrooms or stops there.
@@ -311,7 +313,7 @@ public class DivisiveMapGenerator : MapGenerator {
     }
 
     // Saves the map using AB notation.
-    private void SameMapAsAB() {
+    private void SaveMapAsAB() {
         if (textFilePath == null && !Directory.Exists(textFilePath)) {
             ManageError(Error.SOFT_ERROR, "Error while retrieving the folder, please insert a valid path.");
         } else {

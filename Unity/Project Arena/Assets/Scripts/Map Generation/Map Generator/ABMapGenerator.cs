@@ -117,7 +117,7 @@ public class ABMapGenerator : MapGenerator {
                 currentValue = "";
                 currentChar++;
 
-                // Get the size of the arena.
+                // Get the size of the corridor.
                 if (seed[currentChar] == '-') {
                     currentValue += seed[currentChar];
                     currentChar++;
