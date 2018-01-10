@@ -221,45 +221,37 @@ public class DivisiveMapGenerator : MapGenerator {
 
             // Create the horizontal section.
             if (extremeX > connectionX) {
-                for (int x = connectionX; x <= extremeX; x++)
+                for (int x = connectionX - Mathf.FloorToInt(passageWidth / 2f); x <= extremeX; x++)
                     for (int y = connectionY - passageWidth / 2; y <= connectionY + passageWidth / 2; y++)
                         if (IsInMapRange(x, y))
                             map[x, y] = roomChar;
                 if (createTextFile && (extremeX != connectionX))
-                    ABCorridors.Add(new ABRoom(connectionX, connectionY - Mathf.FloorToInt(passageWidth / 2f), extremeX - connectionX));
+                    ABCorridors.Add(new ABRoom(connectionX - Mathf.FloorToInt(passageWidth / 2f), connectionY - Mathf.FloorToInt(passageWidth / 2f), extremeX - connectionX + Mathf.FloorToInt(passageWidth / 2f)));
             } else {
-                for (int x = extremeX; x <= connectionX; x++)
+                for (int x = extremeX; x <= connectionX + Mathf.FloorToInt(passageWidth / 2f); x++)
                     for (int y = connectionY - passageWidth / 2; y <= connectionY + passageWidth / 2; y++)
                         if (IsInMapRange(x, y))
                             map[x, y] = roomChar;
                 if (createTextFile && (extremeX != connectionX))
-                    ABCorridors.Add(new ABRoom(extremeX, connectionY - Mathf.FloorToInt(passageWidth / 2f), connectionX - extremeX));
+                    ABCorridors.Add(new ABRoom(extremeX - Mathf.FloorToInt(passageWidth / 2f), connectionY - Mathf.FloorToInt(passageWidth / 2f), connectionX - extremeX + Mathf.FloorToInt(passageWidth / 2f)));
             }
 
             // Create the vertical section.
             if (extremeY > connectionY) {
-                for (int y = connectionY; y <= extremeY; y++)
+                for (int y = connectionY - Mathf.FloorToInt(passageWidth / 2f); y <= extremeY; y++)
                     for (int x = connectionX - passageWidth / 2; x <= connectionX + passageWidth / 2; x++)
                         if (IsInMapRange(x, y))
                             map[x, y] = roomChar;
                 if (createTextFile && (extremeY != connectionY))
-                    ABCorridors.Add(new ABRoom(connectionX - Mathf.FloorToInt(passageWidth / 2f), connectionY, connectionY - extremeY));
+                    ABCorridors.Add(new ABRoom(connectionX - Mathf.FloorToInt(passageWidth / 2f), connectionY - Mathf.FloorToInt(passageWidth / 2f), connectionY - extremeY - Mathf.FloorToInt(passageWidth / 2f)));
             } else {
-                for (int y = extremeY; y <= connectionY; y++)
+                for (int y = extremeY; y <= connectionY + Mathf.FloorToInt(passageWidth / 2f); y++)
                     for (int x = connectionX - passageWidth / 2; x <= connectionX + passageWidth / 2; x++)
                         if (IsInMapRange(x, y))
                             map[x, y] = roomChar;
                 if (createTextFile && (extremeY != connectionY))
-                    ABCorridors.Add(new ABRoom(connectionX - Mathf.FloorToInt(passageWidth / 2f), extremeY, extremeY - connectionY));
+                    ABCorridors.Add(new ABRoom(connectionX - Mathf.FloorToInt(passageWidth / 2f), extremeY - Mathf.FloorToInt(passageWidth / 2f), extremeY - connectionY - Mathf.FloorToInt(passageWidth / 2f)));
             }
-
-            // Make the corner fancy.
-            for (int x = connectionX - passageWidth / 2; x <= connectionX + passageWidth / 2; x++)
-                for (int y = connectionY - passageWidth / 2; y <= connectionY + passageWidth / 2; y++)
-                    if (IsInMapRange(x, y))
-                        map[x, y] = roomChar;
-            if (createTextFile)
-                ABRooms.Add(new ABRoom(connectionX - passageWidth / 2, connectionY - passageWidth / 2, passageWidth));
         }
     }
 
