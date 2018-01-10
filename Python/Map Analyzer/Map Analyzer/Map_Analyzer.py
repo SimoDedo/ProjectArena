@@ -136,10 +136,14 @@ def mergeRooms(rooms):
         if not room.isCorridor:
             nextRoom = next((nextRoom for nextRoom in rooms if (nextRoom.originX > room.originX and nextRoom.originX <= room.endX + 1 and \
                                                                 nextRoom.originY == room.originY and nextRoom.endY == room.endY and \
-                                                                nextRoom.endY - nextRoom.originY == room.endY - room.originY )), None)
+                                                                nextRoom.endY - nextRoom.originY == room.endY - room.originY)), None)
             if nextRoom is not None and not nextRoom.isCorridor:
-                # print("Merging room <" + str(room.originX) + "," + str(room.originY) + ">" + "<" + str(room.endX) + "," + str(room.endY) + ">" + " and <" + \
-                #       str(nextRoom.originX) + "," + str(nextRoom.originY) + ">" + "<" + str(nextRoom.endX) + "," + str(nextRoom.endY) + ">.")
+                # print("Merging room <" + str(room.originX) + "," +
+                # str(room.originY) + ">" + "<" + str(room.endX) + "," +
+                # str(room.endY) + ">" + " and <" + \
+                #       str(nextRoom.originX) + "," + str(nextRoom.originY) +
+                #       ">" + "<" + str(nextRoom.endX) + "," +
+                #       str(nextRoom.endY) + ">.")
                 room.endX = nextRoom.endX
                 room.endY = nextRoom.endY
                 rooms.remove(nextRoom)
@@ -147,10 +151,14 @@ def mergeRooms(rooms):
             else:
                 nextRoom = next((nextRoom for nextRoom in rooms if (nextRoom.originY > room.originY and nextRoom.originY <= room.endY + 1 and \
                                                                     nextRoom.originX == room.originX and nextRoom.endX == room.endX and \
-                                                                    nextRoom.endX - nextRoom.originX == room.endX - room.originX )), None) 
+                                                                    nextRoom.endX - nextRoom.originX == room.endX - room.originX)), None) 
                 if nextRoom is not None and not nextRoom.isCorridor:
-                    # print("Merging room <" + str(room.originX) + "," + str(room.originY) + ">" + "<" + str(room.endX) + "," + str(room.endY) + ">" + " and <" + \
-                    #       str(nextRoom.originX) + "," + str(nextRoom.originY) + ">" + "<" + str(nextRoom.endX) + "," + str(nextRoom.endY) + ">.")
+                    # print("Merging room <" + str(room.originX) + "," +
+                    # str(room.originY) + ">" + "<" + str(room.endX) + "," +
+                    # str(room.endY) + ">" + " and <" + \
+                    #       str(nextRoom.originX) + "," + str(nextRoom.originY)
+                    #       + ">" + "<" + str(nextRoom.endX) + "," +
+                    #       str(nextRoom.endY) + ">.")
                     room.endX = nextRoom.endX
                     room.endY = nextRoom.endY
                     rooms.remove(nextRoom)
@@ -215,6 +223,34 @@ def getRoomsCorridorsGraph(rooms):
     print("%i edges." % (nx.number_of_edges(G)))
     return G
 
+# Computes the graph of the room outlines.
+def GetRoomsOutlineGraph(rooms):
+    print("\nCreating the graph... ", end='')
+
+    G = nx.Graph()
+    
+    i = 0
+
+    for room in rooms:
+        G.add_node(i, x = room.originX, y = room.originY)
+        i = i + 1
+        G.add_node(i, x = room.endX, y = room.originY)
+        G.add_edge(i, i - 1)
+        i = i + 1
+        G.add_node(i, x = room.endX, y = room.endY)
+        G.add_edge(i, i - 1)
+        i = i + 1
+        G.add_node(i, x = room.originX, y = room.endY)
+        G.add_edge(i, i - 1)
+        G.add_edge(i, i - 3)
+        i = i + 1
+        
+    print("Done.\n")
+    print("The tiles graph has:")
+    print("%i nodes." % (nx.number_of_nodes(G)))
+    print("%i edges." % (nx.number_of_edges(G)))
+    return G
+
 # Tells if a tile is inside the map bounds.
 def isInMapRange(x, y, map):
     if (x < len(map[0]) and y < len(map)):
@@ -253,7 +289,7 @@ map = readMap(mapFilePath)
 
 # Read the AB file.
 rooms = readAB(ABFilePath)
-print("\Refining the AB rooms... ", end='')
+print("Refining the AB rooms... ", end='')
 mergeRooms(rooms)
 print("Done")
 
@@ -269,29 +305,38 @@ while option != "1" and option != "2":
 if option == "1":
     print("\nSelect the kind of rechability graph to generate:")
     print("[1] Tiles graph")
-    print("[2] Room and corridors graph")
-    print("[3] Room, corridors and resources graph\n")
+    print("[2] Outlines graph")
+    print("[3] Room and corridors graph")
+    print("[4] Room, corridors and resources graph\n")
 
     option = input("Graph: ")
 
     while option != "1" and option != "2" and option != "3":
         option = input("Invalid choice. Graph: ")
-
+    
     if option == "1":
         G = getTileGraph(map)
         nx.draw(G, dict([ (node, (data["x"], data["y"])) for node, data  in G.nodes(data=True)]), node_color = '#f44242', node_size = 75)
-        plt.gca().invert_yaxis()
-        plt.gca().invert_xaxis()
-        plt.show()
+        plt.axis('equal')
+        plt.show(block = False)
     elif option == "2":
+        G = GetRoomsOutlineGraph(rooms)
+        nx.draw(G, dict([ (node, (data["x"], data["y"])) for node, data  in G.nodes(data=True)]), node_color = '#f44242', node_size = 75)
+        plt.axis('equal')
+        plt.show(block = False)
+    elif option == "3":
         G = getRoomsCorridorsGraph(rooms)
         nx.draw(G, dict([ (node, (data["originX"] / 2 + data["endX"] / 2, data["originY"] / 2 + data["endY"] / 2)) for node, data  in G.nodes(data=True)]), node_color = '#f44242', node_size = 75)
-        plt.gca().invert_yaxis()
-        plt.gca().invert_xaxis()
-        plt.show()
-    elif option == "3":
+        plt.axis('equal')
+        plt.show(block = False)
+    elif option == "4":
         print("\nThis has not been implemented yet.")
 else:
     print("\nThis has not been implemented yet.")
+
+# Use this to show multiple graphs.
+# plt.figure()
+
+plt.show()
 
 print();
