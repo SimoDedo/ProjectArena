@@ -1,4 +1,5 @@
 import os
+import math
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -215,8 +216,8 @@ def getRoomsCorridorsGraph(rooms):
         for j in range(i, len(rooms)):
             if j != i and not (rooms[i].originX >= rooms[j].endX + 1 or rooms[j].originX >= rooms[i].endX + 1) and \
                not (rooms[i].originY >= rooms[j].endY + 1 or rooms[j].originY >= rooms[i].endY + 1):
-                G.add_edge(i, j)
-    
+                G.add_edge(i, j, weight = eulerianDistance((rooms[i].originX / 2 + rooms[i].endX / 2), (rooms[j].originX / 2 + rooms[j].endX / 2), \
+                                                           (rooms[i].originY / 2 + rooms[i].endY / 2), (rooms[j].originY / 2 + rooms[j].endY / 2)))
     print("Done.\n")
     print("The tiles graph has:")
     print("%i nodes." % (nx.number_of_nodes(G)))
@@ -251,6 +252,35 @@ def GetRoomsOutlineGraph(rooms):
     print("%i edges." % (nx.number_of_edges(G)))
     return G
 
+# Computes the visibility graph.
+def getVisibilityGraph(map):
+    print("\nCreating the graph... ", end='')
+
+    G = nx.Graph()
+    width = len(map[0])
+    height = len(map)
+
+    # Add the nodes.
+    for x in range(width): 
+        for y in range(height): 
+            if not map[x][y] == "w":
+                G.add_node(subToInd(width, x, y), x = x, y = y, char = map[x][y], visibility = 0)
+     
+    # Add the edges.
+    for node1 in G.nodes(data=True):
+        for node2 in G.nodes(data=True):
+            if node1 is not node2 and isNodeVisible(node1[1]['x'], node1[1]['y'], node2[1]['x'], node2[1]['y'], map):
+                G.add_edge(node1[0], node2[0])
+
+    for node in G.nodes(data = True):
+        node[1]['visibility'] = G.degree(node[0])
+
+    print("Done.\n")
+    print("The tiles graph has:")
+    print("%i nodes." % (nx.number_of_nodes(G)))
+    print("%i edges." % (nx.number_of_edges(G)))
+    return G
+
 # Tells if a tile is inside the map bounds.
 def isInMapRange(x, y, map):
     if (x < len(map[0]) and y < len(map)):
@@ -267,6 +297,71 @@ def indToSub(width, ind):
     rows = (ind.astype('int') / width)
     cols = (ind.astype('int') % width)
     return (rows, cols)
+
+# Computes the eulerian distance.
+def eulerianDistance(x1, x2, y1, y2):
+    return math.sqrt(math.pow(x1 - x2, 2) + math.pow(y1 - y2, 2))
+
+# Tells if a node is visible from another node. The method is not perfect, but provides a good approximation.
+def isNodeVisible(x1, y1, x2, y2, map):
+    dy = (y2 - y1) 
+    dx = (x2 - x1)
+
+    if dx == 0:
+        for y in range(y1, y2) if y1 < y2 else range(y2, y1):
+            if map[x1][y] == 'w':
+                return False
+    elif dy == 0:
+        for x in range(x1, x2) if x1 < x2 else range(x2, x1):
+            if map[x][y1] == 'w':
+                return False
+    else:
+        m = dy / dx
+        c = y1 - m * x1
+
+        if abs(dx) > abs(dy):
+            for x in range (x1, x2) if x1 < x2 else range(x2, x1):
+                if map[x][int(c + m * x)] == 'w':
+                    return False
+        else:
+            for y in range(y1, y2) if y1 < y2 else range(y2, y1):
+                if map[int(y / m - c / m)][y] == 'w':
+                    return False
+    
+    return True
+
+# Blends from a value to another.
+def blend(a, b, alpha):
+  return (1 - alpha) * a + alpha * b
+
+# Coverts from hex to RGB.
+def RGBToHex(r, g, b):
+    return '#%02x%02x%02x' % (int(r), int(g), int(b))
+
+# Converts from RGB to hex.
+def hexToRGB(hex):
+    h = hex.lstrip('#')
+    RGB = tuple(int(h[i : i + 2], 16) for i in (0, 2 ,4))
+    return RGB[0], RGB[1], RGB[2]
+
+# Blends a color.
+def blendColor(h1, h2, alpha):
+    r1, g1, b1 = hexToRGB(h1)
+    r2, g2, b2 = hexToRGB(h2)
+    return RGBToHex(blend(r1, r2, alpha), blend(g1, g2, alpha), blend(b1, b2, alpha))
+
+# Returns the maximum and the minimum visibility.
+def minMaxVisibility(G):
+    min = float("inf")
+    max = 0
+
+    for node in G.nodes(data = True):
+        if node[1]["visibility"] > max:
+            max = node[1]["visibility"]
+        elif node[1]["visibility"] < min:
+            min = node[1]["visibility"] 
+
+    return min, max
 
 # MAIN #
 
@@ -295,19 +390,19 @@ print("Done")
 
 print("\nSelect the kind of graph to generate:")
 print("[1] Reachability graph")
-print("[2] Visibility graph\n")
+print("[2] Visibility graph")
+print("[3] Outlines graph\n")
 
 option = input("Graph: ")
 
-while option != "1" and option != "2":
+while option != "1" and option != "2" and option != "3":
     option = input("Invalid choice. Graph: ")
 
 if option == "1":
     print("\nSelect the kind of rechability graph to generate:")
     print("[1] Tiles graph")
-    print("[2] Outlines graph")
-    print("[3] Room and corridors graph")
-    print("[4] Room, corridors and resources graph\n")
+    print("[2] Room and corridors graph")
+    print("[3] Room, corridors and resources graph\n")
 
     option = input("Graph: ")
 
@@ -320,23 +415,33 @@ if option == "1":
         plt.axis('equal')
         plt.show(block = False)
     elif option == "2":
-        G = GetRoomsOutlineGraph(rooms)
-        nx.draw(G, dict([ (node, (data["x"], data["y"])) for node, data  in G.nodes(data=True)]), node_color = '#f44242', node_size = 75)
+        G = getRoomsCorridorsGraph(rooms)
+        pos = dict([(node, (data["originX"] / 2 + data["endX"] / 2, data["originY"] / 2 + data["endY"] / 2)) for node, data  in G.nodes(data=True)])
+        edge_labels = dict([(key, "{:.2f}".format(value)) for key, value in nx.get_edge_attributes(G,'weight').items()])
+        nx.draw(G, pos, node_color = '#f44242', node_size = 75)
+        nx.draw_networkx_edge_labels(G, pos, edge_labels = edge_labels)
         plt.axis('equal')
         plt.show(block = False)
     elif option == "3":
-        G = getRoomsCorridorsGraph(rooms)
-        nx.draw(G, dict([ (node, (data["originX"] / 2 + data["endX"] / 2, data["originY"] / 2 + data["endY"] / 2)) for node, data  in G.nodes(data=True)]), node_color = '#f44242', node_size = 75)
-        plt.axis('equal')
-        plt.show(block = False)
-    elif option == "4":
         print("\nThis has not been implemented yet.")
+elif option == '2':
+    G = getVisibilityGraph(map)
+    minC, maxC = minMaxVisibility(G)
+    colors = [(blendColor("#0000ff", "#ff0000", (data["visibility"] - minC) / (maxC - minC))) for node, data in G.nodes(data=True)]
+    pos = dict([ (node, (data["x"], data["y"])) for node, data in G.nodes(data=True)])
+    nx.draw_networkx_nodes(G, pos, node_color = colors, node_size = 75)
+    # node_labels = nx.get_node_attributes(G,'visibility')
+    # nx.draw_networkx_labels(G, pos, labels = node_labels)
+    plt.axis('equal')
+    plt.show(block = False)
 else:
-    print("\nThis has not been implemented yet.")
+    G = GetRoomsOutlineGraph(rooms)
+    nx.draw(G, dict([ (node, (data["x"], data["y"])) for node, data  in G.nodes(data=True)]), node_color = '#f44242', node_size = 75)
+    plt.axis('equal')
+    plt.show(block = False)
 
 # Use this to show multiple graphs.
 # plt.figure()
-
 plt.show()
 
 print();
