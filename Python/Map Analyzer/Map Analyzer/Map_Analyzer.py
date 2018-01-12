@@ -17,7 +17,7 @@ class Room:
 # Gets the name of the map and get the files path.
 def getFiles():
     inputAcquired = False
-    text = input("Insert the MAPNAME value: ")
+    text = input("\nInsert the MAPNAME value: ")
     while inputAcquired == False:
         mapFileName = text + "_map.txt"
         ABFileName = text + "_AB.txt"
@@ -412,6 +412,22 @@ def graphMenuReachability():
         elif option == "0":
             return
 
+# Menages the file menu.
+def filesMenu():
+    # Get the name of the map and get the files path.
+    mapFileName, ABFileName, mapFilePath, ABFilePath = getFiles()
+
+    # Read the map.
+    map = readMap(mapFilePath)
+
+    # Read the AB file.
+    rooms = readAB(ABFilePath)
+    print("Refining the AB rooms... ", end='')
+    mergeRooms(rooms)
+    print("Done")
+
+    return mapFileName, ABFileName, mapFilePath, ABFilePath, map, rooms
+
 # PLOT FUNCTIONS #
 
 # Plots the graph.
@@ -454,19 +470,10 @@ if not os.path.exists(outputDir):
     os.makedirs(outputDir)
 
 print("MAP ANALYZER\n")
-print("This script expects a MAPNAME_map.txt file and MAPNAME_AB.txt file in the input folder.\n")
+print("This script expects a MAPNAME_map.txt file and MAPNAME_AB.txt file in the input folder.")
 
-# Get the name of the map and get the files path.
-mapFileName, ABFileName, mapFilePath, ABFilePath = getFiles()
-
-# Read the map.
-map = readMap(mapFilePath)
-
-# Read the AB file.
-rooms = readAB(ABFilePath)
-print("Refining the AB rooms... ", end='')
-mergeRooms(rooms)
-print("Done")
+# Get the files and process them.
+mapFileName, ABFileName, mapFilePath, ABFilePath, map, rooms = filesMenu()
 
 while True:
     print("\n[MENU] Select an option:")
@@ -485,7 +492,7 @@ while True:
     elif option == "2":
         graphMenu()
     elif option == "3":
-        print("\nThis has not been implemented yet.")
+        mapFileName, ABFileName, mapFilePath, ABFilePath, map, rooms = filesMenu()
     elif option == "0":
         print()
         break
