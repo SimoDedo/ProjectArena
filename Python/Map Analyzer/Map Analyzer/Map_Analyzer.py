@@ -1,5 +1,6 @@
 import os
 import math
+import threading
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -363,6 +364,85 @@ def minMaxVisibility(G):
 
     return min, max
 
+# MENU FUNCTIONS #
+
+# Manages the graph menu.
+def graphMenu():
+    while True:
+        print("\n[GRAPH GENERATION] Select an option:")
+        print("[1] Generate reachability graph")
+        print("[2] Generate visibility graph")
+        print("[0] Back\n")
+
+        quit = False
+        option = input("Option: ")
+
+        while option != "1" and option != "2" and option != "0":
+            option = input("Invalid choice. Option: ")
+        if option == "1":
+            graphMenuReachability()
+        elif option == "2":
+            G = getVisibilityGraph(map)
+            plotVisibilityGraph(G)
+        elif option == "0":
+            return
+
+# Manages the reachability graph menu.
+def graphMenuReachability():
+    while True:
+        print("\n[REACHABILITY GRAPH GENERATION] Select an option:")
+        print("[1] Generate tiles graph")
+        print("[2] Generate rooms and corridors graph")
+        print("[3] Generate rooms, corridors and resources graph")
+        print("[0] Back\n")
+
+        option = input("Option: ")
+    
+        while option != "1" and option != "2" and option != "3" and option != "0":
+            option = input("Invalid choice. Option: ")
+    
+        if option == "1":
+            G = getTileGraph(map)
+            plotTilesGraph(G)
+        elif option == "2":
+            G = getRoomsCorridorsGraph(rooms)
+            plotRoomsCorridorsGraph(G)
+        elif option == "3":
+            print("\nThis has not been implemented yet.")
+        elif option == "0":
+            return
+
+# PLOT FUNCTIONS #
+
+# Plots the graph.
+def plotRoomsCorridorsGraph(G):
+    print("\n[CLOSE THE GRAPH TO CONTNUE]")
+    pos = dict([(node, (data["originX"] / 2 + data["endX"] / 2, data["originY"] / 2 + data["endY"] / 2)) for node, data  in G.nodes(data=True)])
+    edge_labels = dict([(key, "{:.2f}".format(value)) for key, value in nx.get_edge_attributes(G,'weight').items()])
+    nx.draw(G, pos, node_color = '#f44242', node_size = 75)
+    nx.draw_networkx_edge_labels(G, pos, edge_labels = edge_labels)
+    plt.axis('equal')
+    plt.show()
+
+# Plots the graph.
+def plotTilesGraph(G):
+    print("\n[CLOSE THE GRAPH TO CONTNUE]")
+    nx.draw(G, dict([ (node, (data["x"], data["y"])) for node, data  in G.nodes(data=True)]), node_color = '#f44242', node_size = 75)
+    plt.axis('equal')
+    plt.show()
+
+# Plots the graph.
+def plotVisibilityGraph(G):
+    print("\n[CLOSE THE GRAPH TO CONTNUE]")
+    minC, maxC = minMaxVisibility(G)
+    colors = [(blendColor("#0000ff", "#ff0000", (data["visibility"] - minC) / (maxC - minC))) for node, data in G.nodes(data=True)]
+    pos = dict([ (node, (data["x"], data["y"])) for node, data in G.nodes(data=True)])
+    nx.draw_networkx_nodes(G, pos, node_color = colors, node_size = 75)
+    # node_labels = nx.get_node_attributes(G,'visibility')
+    # nx.draw_networkx_labels(G, pos, labels = node_labels)
+    plt.axis('equal')
+    plt.show()
+
 # MAIN #
 
 # Create the input and the output folder if needed.
@@ -388,60 +468,24 @@ print("Refining the AB rooms... ", end='')
 mergeRooms(rooms)
 print("Done")
 
-print("\nSelect the kind of graph to generate:")
-print("[1] Reachability graph")
-print("[2] Visibility graph")
-print("[3] Outlines graph\n")
+while True:
+    print("\n[MENU] Select an option:")
+    print("[1] Decorate map")
+    print("[2] Generate graphs")
+    print("[3] Change files")
+    print("[0] Quit\n")
 
-option = input("Graph: ")
+    option = input("Option: ")
 
-while option != "1" and option != "2" and option != "3":
-    option = input("Invalid choice. Graph: ")
+    while option != "1" and option != "2" and option != "3" and option != "0":
+        option = input("Invalid choice. Option: ")
 
-if option == "1":
-    print("\nSelect the kind of rechability graph to generate:")
-    print("[1] Tiles graph")
-    print("[2] Room and corridors graph")
-    print("[3] Room, corridors and resources graph\n")
-
-    option = input("Graph: ")
-
-    while option != "1" and option != "2" and option != "3":
-        option = input("Invalid choice. Graph: ")
-    
     if option == "1":
-        G = getTileGraph(map)
-        nx.draw(G, dict([ (node, (data["x"], data["y"])) for node, data  in G.nodes(data=True)]), node_color = '#f44242', node_size = 75)
-        plt.axis('equal')
-        plt.show(block = False)
+        print("\nThis has not been implemented yet.")
     elif option == "2":
-        G = getRoomsCorridorsGraph(rooms)
-        pos = dict([(node, (data["originX"] / 2 + data["endX"] / 2, data["originY"] / 2 + data["endY"] / 2)) for node, data  in G.nodes(data=True)])
-        edge_labels = dict([(key, "{:.2f}".format(value)) for key, value in nx.get_edge_attributes(G,'weight').items()])
-        nx.draw(G, pos, node_color = '#f44242', node_size = 75)
-        nx.draw_networkx_edge_labels(G, pos, edge_labels = edge_labels)
-        plt.axis('equal')
-        plt.show(block = False)
+        graphMenu()
     elif option == "3":
         print("\nThis has not been implemented yet.")
-elif option == '2':
-    G = getVisibilityGraph(map)
-    minC, maxC = minMaxVisibility(G)
-    colors = [(blendColor("#0000ff", "#ff0000", (data["visibility"] - minC) / (maxC - minC))) for node, data in G.nodes(data=True)]
-    pos = dict([ (node, (data["x"], data["y"])) for node, data in G.nodes(data=True)])
-    nx.draw_networkx_nodes(G, pos, node_color = colors, node_size = 75)
-    # node_labels = nx.get_node_attributes(G,'visibility')
-    # nx.draw_networkx_labels(G, pos, labels = node_labels)
-    plt.axis('equal')
-    plt.show(block = False)
-else:
-    G = GetRoomsOutlineGraph(rooms)
-    nx.draw(G, dict([ (node, (data["x"], data["y"])) for node, data  in G.nodes(data=True)]), node_color = '#f44242', node_size = 75)
-    plt.axis('equal')
-    plt.show(block = False)
-
-# Use this to show multiple graphs.
-# plt.figure()
-plt.show()
-
-print();
+    elif option == "0":
+        print()
+        break
