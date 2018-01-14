@@ -129,6 +129,24 @@ def readAB(filePath):
     print("Done.")
     return rooms
 
+# Exports the map.
+def exportMap(filePath):
+    print("Exporting the map... ", end='')
+
+    mapString = ""
+
+    for x in range(len(map[0])):
+        for y in range(len(map)):
+            mapString = mapString + map[x][y]
+        if (x < len(map[0]) - 1):
+            mapString = mapString + "\n"
+
+    file = open(filePath, "w")
+    file.write(mapString)
+    file.close()
+
+    print("Done.")
+
 # Merges AB rooms.
 def mergeRooms(rooms):
     mergedCount = 0
@@ -171,9 +189,9 @@ def mergeRooms(rooms):
         mergeRooms(rooms)
 
 # Computes the tile graph.
-def getTileGraph(map, verbose = True):
+def getTileGraph(map, verbose=True):
     if verbose:
-        print("\nCreating the graph... ", end='')
+        print("\nGenerating the graph... ", end='')
 
     G = nx.Graph()
     width = len(map[0])
@@ -206,9 +224,9 @@ def getTileGraph(map, verbose = True):
     return G
 
 # Computes the rooms and corridors graph.
-def getRoomsCorridorsGraph(rooms, verbose = True):
+def getRoomsCorridorsGraph(rooms, verbose=True):
     if verbose:
-        print("\nCreating the graph... ", end='')
+        print("\nGenerating the graph... ", end='')
 
     G = nx.Graph()
 
@@ -230,9 +248,9 @@ def getRoomsCorridorsGraph(rooms, verbose = True):
     return G
 
 # Computes the rooms, corridors and resources graph.
-def getRoomsCorridorsResourcesGraph(rooms, map, verbose = True):
+def getRoomsCorridorsResourcesGraph(rooms, map, verbose=True):
     if verbose:
-        print("\nCreating the graph... ", end='')
+        print("\nGenerating the graph... ", end='')
 
     G = getRoomsCorridorsGraph(rooms, False)
 
@@ -255,9 +273,9 @@ def getRoomsCorridorsResourcesGraph(rooms, map, verbose = True):
     return G
 
 # Computes the visibility graph.
-def getVisibilityGraph(map, verbose = True):
+def getVisibilityGraph(map, verbose=True):
     if verbose:
-        print("\nCreating the graph... ", end='')
+        print("\nGenerating the graph... ", end='')
 
     G = nx.Graph()
     width = len(map[0])
@@ -287,7 +305,7 @@ def getVisibilityGraph(map, verbose = True):
 
 # Computes the room outlines graph.
 def GetRoomsOutlineGraph(rooms):
-    print("\nCreating the graph... ", end='')
+    print("\nGenerating the graph... ", end='')
 
     G = nx.Graph()
     
@@ -312,7 +330,7 @@ def GetRoomsOutlineGraph(rooms):
     print("%i nodes." % (nx.number_of_nodes(G)))
     print("%i edges." % (nx.number_of_edges(G)))
     return G
-	
+
 # Tells if a tile is inside the map bounds.
 def isInMapRange(x, y, map):
     if (x < len(map[0]) and y < len(map)):
@@ -334,7 +352,8 @@ def indToSub(width, ind):
 def eulerianDistance(x1, x2, y1, y2):
     return math.sqrt(math.pow(x1 - x2, 2) + math.pow(y1 - y2, 2))
 
-# Tells if a node is visible from another node. The method is not perfect, but provides a good approximation.
+# Tells if a node is visible from another node.  The method is not perfect, but
+# it provides a good approximation.
 def isNodeVisible(x1, y1, x2, y2, map):
     dy = (y2 - y1) 
     dx = (x2 - x1)
@@ -352,7 +371,7 @@ def isNodeVisible(x1, y1, x2, y2, map):
         c = y1 - m * x1
 
         if abs(dx) > abs(dy):
-            for x in range (x1, x2) if x1 < x2 else range(x2, x1):
+            for x in range(x1, x2) if x1 < x2 else range(x2, x1):
                 if map[x][int(c + m * x)] == 'w':
                     return False
         else:
@@ -384,7 +403,7 @@ def blendColor(h1, h2, alpha):
 
 # Returns the maximum and the minimum visibility.
 def minMaxVisibility(G):
-    min = float("inf")
+    min = math.inf
     max = 0
 
     for node in G.nodes(data = True):
@@ -409,16 +428,22 @@ def populateMap(map, rooms, spawnPoint, medkit, ammo):
     print("Done.")
 
     roomGraph = getRoomsCorridorsGraph(rooms, False)
-    # visibilityGraph = getVisibilityGraph(map, False)
+    visibilityMatrix = getVisibilityMatrix(map)
 
     # Place the spawn points.
-    print("Placing the spawn points... ", end='')
+    print("Placing the spawn points... ")
 
     processedRooms = []
     spawnPoints = []
 
-    candidateRooms = [(node, intervalFit(2, 3, nx.degree(roomGraph, node)), nx.degree(roomGraph, node)) for node in roomGraph.nodes]
-    candidateRooms.sort(key = lambda x: x[1], reverse = False)
+    for i in range(spawnPoint[1]):
+        candidateRooms = [(node, spawnPointRoomFit(roomGraph, node, spawnPoint[0])) for node, data in roomGraph.nodes(data = True) if not "resource" in data]
+        bestRoom = roomGraph.node[max(candidateRooms, key = lambda x: x[1])[0]]
+        candidateTiles = [(x, y, spawnPointTileFit(x, y, bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], visibilityMatrix[x][y])) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]
+        bestTile = max(candidateTiles, key = lambda x: x[2])
+        addResource(bestTile[0], bestTile[1], spawnPoint[0], roomGraph, map)
+        print("Added spawn point in " + max(candidateRooms, key = lambda x: x[1])[0] + " at [" + str(bestTile[0]) + ", " + str(bestTile[1]) + "].")
+
     print("Done.")
 
     # Place the medkits.
@@ -430,9 +455,84 @@ def populateMap(map, rooms, spawnPoint, medkit, ammo):
     print("Placing the ammo... ", end='')
 
     print("Done.")
-
+    
+# Tells how well a value fits in an interval.
 def intervalFit(min, max, value):
     return abs(min - value) + abs(max - value)
+
+# Tells how well a room fits for a spawn point.
+def spawnPointRoomFit(roomGraph, node, spawnPointChar):
+    # Compute how much the room degree fits in the desired interval.
+    intervalFitness = intervalFit(2, 3, nx.degree(roomGraph, node))
+
+    # Compute how much the room is distant from the other spawns.
+    spawnDistance = min([(nx.shortest_path_length(roomGraph, node, sNode, "weight")) if "resource" in data and data["resource"] == spawnPointChar \
+                     else math.inf for sNode, data in roomGraph.nodes(data=True)]) 
+    if spawnDistance == math.inf:
+        spawnDistance = 0
+
+    # nx.diameter(roomGraph) / 
+    # Penilize the room if it already contans a spawn point.
+    # spawnRedundancy = 0
+    # for neighbor in roomGraph[node]:
+    #     if "resource" in roomGraph.node[neighbor] and roomGraph.node[neighbor]["resource"] is spawnPointChar:
+    #         spawnRedundancy = spawnRedundancy + 5
+    # + spawnRedundancy
+
+    print(node + " has interval fitness of " + "{:.2f}".format(intervalFitness) + " and spawn distance of " + "{:.2f}".format(spawnDistance) + " for a fitness of " + "{:.2f}".format((1 / intervalFitness) + spawnDistance) + ".")
+
+    return (1 / intervalFitness) + spawnDistance
+
+# Tells how well a tile fits for a spwan point.
+def spawnPointTileFit(x, y, originX, originY, endX, endY, visibility):
+    wallDistance = min([abs(originX - x), abs(endX - x)]) + min([abs(originY - y), abs(endY - y)])
+    return visibility * 10 + wallDistance / ((endX - originX) / 2 + (endY - originY))
+
+# Computes a matrix where each cell is the visibility of that cell in the map
+# with respect to the visibility of the other cells.
+def getVisibilityMatrix(map):
+    width = len(map[0])
+    height = len(map)
+
+    min = math.inf
+    max = 0
+
+    visibilityMap = [[0 for x in range(width)] for y in range(height)] 
+     
+    for x1 in range(width):
+        for y1 in range(height):
+            if not map[x1][y1] == "w":
+                visibility = 0
+                for x2 in range(x1, width):
+                    for y2 in range(height):
+                        if not map[x2][y2] == "w" and (not x1 == x2 or not y1 == y2) and isNodeVisible(x1, y1, x2, y2, map):
+                            visibility = visibility + 1
+                visibilityMap[x1][y1] = visibility
+                if visibility > max:
+                    max = visibility
+                elif visibility < min:
+                    min = visibility
+    
+    reboundMax = max - min
+
+    for x in range(width):
+        for y in range(height):
+            visibilityMap[x][y] = (visibilityMap[x][y] - min) / reboundMax
+
+    return visibilityMap
+
+# Adds a resource to the map.
+def addResource(x, y, resource, roomGraph, map):
+    width = len(map[0])
+
+    roomGraph.add_node(subToInd(width, x, y), x = x, y = y, resource = resource)
+
+    for node in roomGraph.nodes(data=True):
+        if "originX" in node[1] and x >= node[1]["originX"] and x <= node[1]["endX"] and y >= node[1]["originY"] and y <= node[1]["endY"]:
+            roomGraph.add_edge(node[0], subToInd(width, x, y), weight = eulerianDistance(node[1]["originX"] / 2 + node[1]["endX"] / 2, node[1]["originY"] / 2 + node[1]["endY"] / 2, \
+                                                           x, y))
+
+    map[x][y] = resource
 
 # PLOT FUNCTIONS #
 
@@ -440,7 +540,8 @@ def intervalFit(min, max, value):
 def plotRoomsCorridorsGraph(G):
     print("\n[CLOSE THE GRAPH TO CONTNUE]")
     pos = dict([(node, (data["originX"] / 2 + data["endX"] / 2, data["originY"] / 2 + data["endY"] / 2)) for node, data in G.nodes(data=True)])
-    # edge_labels = dict([(key, "{:.2f}".format(value)) for key, value in nx.get_edge_attributes(G,'weight').items()])
+    # edge_labels = dict([(key, "{:.2f}".format(value)) for key, value in
+    # nx.get_edge_attributes(G,'weight').items()])
     node_labels = dict([(node, node) for node in G.nodes(data = False)])
     nx.draw_networkx_labels(G, pos, labels = node_labels)
     nx.draw(G, pos, node_color = '#f44242', node_size = 75)
@@ -454,7 +555,7 @@ def plotRoomsCorridorsResourcesGraph(G):
     pos = dict([(node, (data["originX"] / 2 + data["endX"] / 2, data["originY"] / 2 + data["endY"] / 2) if "originX" in data else (data["x"], data["y"])) for node, data  in G.nodes(data=True)])
     edge_labels = dict([(key, "{:.2f}".format(value)) for key, value in nx.get_edge_attributes(G,'weight').items()])
     colors = [('#f44242' if "originX" in data else "#0079a2") for node, data  in G.nodes(data=True)]
-    node_labels = nx.get_node_attributes(G,'resource')
+    node_labels = dict([(node, node) if "resource" not in data else (node, data["resource"]) for node, data in G.nodes(data = True)])
     nx.draw_networkx_labels(G, pos, labels = node_labels)
     nx.draw(G, pos, node_color = colors, node_size = 75)
     nx.draw_networkx_edge_labels(G, pos, edge_labels = edge_labels)
@@ -480,6 +581,13 @@ def plotVisibilityGraph(G):
     plt.axis('equal')
     plt.show()
 
+# Plots the graph.
+def plotOutlinesGraph(G):
+    print("\n[CLOSE THE GRAPH TO CONTNUE]")
+    nx.draw(G, dict([ (node, (data["x"], data["y"])) for node, data  in G.nodes(data=True)]), node_color = '#f44242', node_size = 75)
+    plt.axis('equal')
+    plt.show()
+
 # MENU FUNCTIONS #
 
 # Manages the graph menu.
@@ -488,18 +596,22 @@ def graphMenu():
         print("\n[GRAPH GENERATION] Select an option:")
         print("[1] Generate reachability graph")
         print("[2] Generate visibility graph")
+        print("[3] Generate outlines graph")
         print("[0] Back\n")
 
         quit = False
         option = input("Option: ")
 
-        while option != "1" and option != "2" and option != "0":
+        while option != "1" and option != "2" and option != "3" and option != "0":
             option = input("Invalid choice. Option: ")
         if option == "1":
             graphMenuReachability()
         elif option == "2":
             G = getVisibilityGraph(map)
             plotVisibilityGraph(G)
+        elif option == "3":
+            G = GetRoomsOutlineGraph(rooms)
+            plotOutlinesGraph(G)
         elif option == "0":
             return
 
@@ -575,6 +687,7 @@ while True:
 
     if option == "1":
         populateMap(map, rooms, ["s", 5], ["h", 3], ["a", 3])
+        exportMap(outputDir + "/" + mapFileName)
     elif option == "2":
         graphMenu()
     elif option == "3":
