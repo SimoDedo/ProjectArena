@@ -1,6 +1,5 @@
 import os
 import math
-import threading
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -172,8 +171,9 @@ def mergeRooms(rooms):
         mergeRooms(rooms)
 
 # Computes the tile graph.
-def getTileGraph(map):
-    print("\nCreating the graph... ", end='')
+def getTileGraph(map, verbose = True):
+    if verbose:
+        print("\nCreating the graph... ", end='')
 
     G = nx.Graph()
     width = len(map[0])
@@ -197,35 +197,95 @@ def getTileGraph(map):
                     G.add_edge(subToInd(width, x, y + 1), subToInd(width, x, y))
                 if subToInd(width, x - 1, y + 1) in G:
                     G.add_edge(subToInd(width, x - 1, y + 1), subToInd(width, x, y))
-
-    print("Done.\n")
-    print("The tiles graph has:")
-    print("%i nodes." % (nx.number_of_nodes(G)))
-    print("%i edges." % (nx.number_of_edges(G)))
+    
+    if verbose:
+        print("Done.\n")
+        print("The tiles graph has:")
+        print("%i nodes." % (nx.number_of_nodes(G)))
+        print("%i edges." % (nx.number_of_edges(G)))
     return G
 
 # Computes the rooms and corridors graph.
-def getRoomsCorridorsGraph(rooms):
-    print("\nCreating the graph... ", end='')
+def getRoomsCorridorsGraph(rooms, verbose = True):
+    if verbose:
+        print("\nCreating the graph... ", end='')
 
     G = nx.Graph()
 
     for i in range(len(rooms)):
-        G.add_node(i, originX = rooms[i].originX, originY = rooms[i].originY, endX = rooms[i].endX, endY = rooms[i].endY, isCorridor = rooms[i].isCorridor)
+        G.add_node("r" + str(i), originX = rooms[i].originX, originY = rooms[i].originY, endX = rooms[i].endX, endY = rooms[i].endY, isCorridor = rooms[i].isCorridor)
     
     for i in range(len(rooms)):
         for j in range(i, len(rooms)):
             if j != i and not (rooms[i].originX >= rooms[j].endX + 1 or rooms[j].originX >= rooms[i].endX + 1) and \
                not (rooms[i].originY >= rooms[j].endY + 1 or rooms[j].originY >= rooms[i].endY + 1):
-                G.add_edge(i, j, weight = eulerianDistance((rooms[i].originX / 2 + rooms[i].endX / 2), (rooms[j].originX / 2 + rooms[j].endX / 2), \
+                G.add_edge("r" + str(i), "r" + str(j), weight = eulerianDistance((rooms[i].originX / 2 + rooms[i].endX / 2), (rooms[j].originX / 2 + rooms[j].endX / 2), \
                                                            (rooms[i].originY / 2 + rooms[i].endY / 2), (rooms[j].originY / 2 + rooms[j].endY / 2)))
-    print("Done.\n")
-    print("The tiles graph has:")
-    print("%i nodes." % (nx.number_of_nodes(G)))
-    print("%i edges." % (nx.number_of_edges(G)))
+
+    if verbose:
+        print("Done.\n")
+        print("The rooms and corridor graph has:")
+        print("%i nodes." % (nx.number_of_nodes(G)))
+        print("%i edges." % (nx.number_of_edges(G)))
     return G
 
-# Computes the graph of the room outlines.
+# Computes the rooms, corridors and resources graph.
+def getRoomsCorridorsResourcesGraph(rooms, map, verbose = True):
+    if verbose:
+        print("\nCreating the graph... ", end='')
+
+    G = getRoomsCorridorsGraph(rooms, False)
+
+    width = len(map[0])
+    height = len(map)
+
+    for x in range(width): 
+        for y in range(height): 
+            if not map[x][y] == "w" and not map[x][y] == "r" and not map[x][y] == "d":
+                G.add_node(subToInd(width, x, y), x = x, y = y, resource = map[x][y])
+                for node in G.nodes(data=True):
+                    if "originX" in node[1] and x >= node[1]["originX"] and x <= node[1]["endX"] and y >= node[1]["originY"] and y <= node[1]["endY"]:
+                        G.add_edge(node[0], subToInd(width, x, y), weight = eulerianDistance(node[1]["originX"] / 2 + node[1]["endX"] / 2, node[1]["originY"] / 2 + node[1]["endY"] / 2, \
+                                                           x, y))
+    if verbose:
+        print("Done.\n")
+        print("The rooms, corridors and resources graph has:")
+        print("%i nodes." % (nx.number_of_nodes(G)))
+        print("%i edges." % (nx.number_of_edges(G)))
+    return G
+
+# Computes the visibility graph.
+def getVisibilityGraph(map, verbose = True):
+    if verbose:
+        print("\nCreating the graph... ", end='')
+
+    G = nx.Graph()
+    width = len(map[0])
+    height = len(map)
+
+    # Add the nodes.
+    for x in range(width): 
+        for y in range(height): 
+            if not map[x][y] == "w":
+                G.add_node(subToInd(width, x, y), x = x, y = y, char = map[x][y], visibility = 0)
+     
+    # Add the edges.
+    for node1 in G.nodes(data=True):
+        for node2 in G.nodes(data=True):
+            if node1 is not node2 and isNodeVisible(node1[1]['x'], node1[1]['y'], node2[1]['x'], node2[1]['y'], map):
+                G.add_edge(node1[0], node2[0])
+
+    for node in G.nodes(data = True):
+        node[1]['visibility'] = G.degree(node[0])
+
+    if verbose:
+        print("Done.\n")
+        print("The tiles graph has:")
+        print("%i nodes." % (nx.number_of_nodes(G)))
+        print("%i edges." % (nx.number_of_edges(G)))
+    return G
+
+# Computes the room outlines graph.
 def GetRoomsOutlineGraph(rooms):
     print("\nCreating the graph... ", end='')
 
@@ -252,36 +312,7 @@ def GetRoomsOutlineGraph(rooms):
     print("%i nodes." % (nx.number_of_nodes(G)))
     print("%i edges." % (nx.number_of_edges(G)))
     return G
-
-# Computes the visibility graph.
-def getVisibilityGraph(map):
-    print("\nCreating the graph... ", end='')
-
-    G = nx.Graph()
-    width = len(map[0])
-    height = len(map)
-
-    # Add the nodes.
-    for x in range(width): 
-        for y in range(height): 
-            if not map[x][y] == "w":
-                G.add_node(subToInd(width, x, y), x = x, y = y, char = map[x][y], visibility = 0)
-     
-    # Add the edges.
-    for node1 in G.nodes(data=True):
-        for node2 in G.nodes(data=True):
-            if node1 is not node2 and isNodeVisible(node1[1]['x'], node1[1]['y'], node2[1]['x'], node2[1]['y'], map):
-                G.add_edge(node1[0], node2[0])
-
-    for node in G.nodes(data = True):
-        node[1]['visibility'] = G.degree(node[0])
-
-    print("Done.\n")
-    print("The tiles graph has:")
-    print("%i nodes." % (nx.number_of_nodes(G)))
-    print("%i edges." % (nx.number_of_edges(G)))
-    return G
-
+	
 # Tells if a tile is inside the map bounds.
 def isInMapRange(x, y, map):
     if (x < len(map[0]) and y < len(map)):
@@ -364,6 +395,91 @@ def minMaxVisibility(G):
 
     return min, max
 
+# Populates the map with resources.
+def populateMap(map, rooms, spawnPoint, medkit, ammo):
+    width = len(map[0])
+    height = len(map)
+
+    # Removing the resources.
+    print("\nRemoving the pre-existing resources... ", end='')
+    for x in range(width): 
+        for y in range(height): 
+            if not map[x][y] == "w" and not map[x][y] == "r" :
+                map[x][y] = "r"
+    print("Done.")
+
+    roomGraph = getRoomsCorridorsGraph(rooms, False)
+    # visibilityGraph = getVisibilityGraph(map, False)
+
+    # Place the spawn points.
+    print("Placing the spawn points... ", end='')
+
+    processedRooms = []
+    spawnPoints = []
+
+    candidateRooms = [(node, intervalFit(2, 3, nx.degree(roomGraph, node)), nx.degree(roomGraph, node)) for node in roomGraph.nodes]
+    candidateRooms.sort(key = lambda x: x[1], reverse = False)
+    print("Done.")
+
+    # Place the medkits.
+    print("Placing the medkits... ", end='')
+
+    print("Done.")
+
+    # Palce the ammo.
+    print("Placing the ammo... ", end='')
+
+    print("Done.")
+
+def intervalFit(min, max, value):
+    return abs(min - value) + abs(max - value)
+
+# PLOT FUNCTIONS #
+
+# Plots the graph.
+def plotRoomsCorridorsGraph(G):
+    print("\n[CLOSE THE GRAPH TO CONTNUE]")
+    pos = dict([(node, (data["originX"] / 2 + data["endX"] / 2, data["originY"] / 2 + data["endY"] / 2)) for node, data in G.nodes(data=True)])
+    # edge_labels = dict([(key, "{:.2f}".format(value)) for key, value in nx.get_edge_attributes(G,'weight').items()])
+    node_labels = dict([(node, node) for node in G.nodes(data = False)])
+    nx.draw_networkx_labels(G, pos, labels = node_labels)
+    nx.draw(G, pos, node_color = '#f44242', node_size = 75)
+    # nx.draw_networkx_edge_labels(G, pos, edge_labels = edge_labels)
+    plt.axis('equal')
+    plt.show()
+
+# Plots the graph.
+def plotRoomsCorridorsResourcesGraph(G):
+    print("\n[CLOSE THE GRAPH TO CONTNUE]")
+    pos = dict([(node, (data["originX"] / 2 + data["endX"] / 2, data["originY"] / 2 + data["endY"] / 2) if "originX" in data else (data["x"], data["y"])) for node, data  in G.nodes(data=True)])
+    edge_labels = dict([(key, "{:.2f}".format(value)) for key, value in nx.get_edge_attributes(G,'weight').items()])
+    colors = [('#f44242' if "originX" in data else "#0079a2") for node, data  in G.nodes(data=True)]
+    node_labels = nx.get_node_attributes(G,'resource')
+    nx.draw_networkx_labels(G, pos, labels = node_labels)
+    nx.draw(G, pos, node_color = colors, node_size = 75)
+    nx.draw_networkx_edge_labels(G, pos, edge_labels = edge_labels)
+    plt.axis('equal')
+    plt.show()
+
+# Plots the graph.
+def plotTilesGraph(G):
+    print("\n[CLOSE THE GRAPH TO CONTNUE]")
+    nx.draw(G, dict([ (node, (data["x"], data["y"])) for node, data  in G.nodes(data=True)]), node_color = '#f44242', node_size = 75)
+    plt.axis('equal')
+    plt.show()
+
+# Plots the graph.
+def plotVisibilityGraph(G):
+    print("\n[CLOSE THE GRAPH TO CONTNUE]")
+    minC, maxC = minMaxVisibility(G)
+    colors = [(blendColor("#0000ff", "#ff0000", (data["visibility"] - minC) / (maxC - minC))) for node, data in G.nodes(data=True)]
+    pos = dict([ (node, (data["x"], data["y"])) for node, data in G.nodes(data=True)])
+    nx.draw_networkx_nodes(G, pos, node_color = colors, node_size = 75)
+    # node_labels = nx.get_node_attributes(G,'visibility')
+    # nx.draw_networkx_labels(G, pos, labels = node_labels)
+    plt.axis('equal')
+    plt.show()
+
 # MENU FUNCTIONS #
 
 # Manages the graph menu.
@@ -408,7 +524,8 @@ def graphMenuReachability():
             G = getRoomsCorridorsGraph(rooms)
             plotRoomsCorridorsGraph(G)
         elif option == "3":
-            print("\nThis has not been implemented yet.")
+            G = getRoomsCorridorsResourcesGraph(rooms, map)
+            plotRoomsCorridorsResourcesGraph(G)
         elif option == "0":
             return
 
@@ -428,37 +545,6 @@ def filesMenu():
 
     return mapFileName, ABFileName, mapFilePath, ABFilePath, map, rooms
 
-# PLOT FUNCTIONS #
-
-# Plots the graph.
-def plotRoomsCorridorsGraph(G):
-    print("\n[CLOSE THE GRAPH TO CONTNUE]")
-    pos = dict([(node, (data["originX"] / 2 + data["endX"] / 2, data["originY"] / 2 + data["endY"] / 2)) for node, data  in G.nodes(data=True)])
-    edge_labels = dict([(key, "{:.2f}".format(value)) for key, value in nx.get_edge_attributes(G,'weight').items()])
-    nx.draw(G, pos, node_color = '#f44242', node_size = 75)
-    nx.draw_networkx_edge_labels(G, pos, edge_labels = edge_labels)
-    plt.axis('equal')
-    plt.show()
-
-# Plots the graph.
-def plotTilesGraph(G):
-    print("\n[CLOSE THE GRAPH TO CONTNUE]")
-    nx.draw(G, dict([ (node, (data["x"], data["y"])) for node, data  in G.nodes(data=True)]), node_color = '#f44242', node_size = 75)
-    plt.axis('equal')
-    plt.show()
-
-# Plots the graph.
-def plotVisibilityGraph(G):
-    print("\n[CLOSE THE GRAPH TO CONTNUE]")
-    minC, maxC = minMaxVisibility(G)
-    colors = [(blendColor("#0000ff", "#ff0000", (data["visibility"] - minC) / (maxC - minC))) for node, data in G.nodes(data=True)]
-    pos = dict([ (node, (data["x"], data["y"])) for node, data in G.nodes(data=True)])
-    nx.draw_networkx_nodes(G, pos, node_color = colors, node_size = 75)
-    # node_labels = nx.get_node_attributes(G,'visibility')
-    # nx.draw_networkx_labels(G, pos, labels = node_labels)
-    plt.axis('equal')
-    plt.show()
-
 # MAIN #
 
 # Create the input and the output folder if needed.
@@ -477,7 +563,7 @@ mapFileName, ABFileName, mapFilePath, ABFilePath, map, rooms = filesMenu()
 
 while True:
     print("\n[MENU] Select an option:")
-    print("[1] Decorate map")
+    print("[1] Populate map")
     print("[2] Generate graphs")
     print("[3] Change files")
     print("[0] Quit\n")
@@ -488,11 +574,10 @@ while True:
         option = input("Invalid choice. Option: ")
 
     if option == "1":
-        print("\nThis has not been implemented yet.")
+        populateMap(map, rooms, ["s", 5], ["h", 3], ["a", 3])
     elif option == "2":
         graphMenu()
     elif option == "3":
         mapFileName, ABFileName, mapFilePath, ABFilePath, map, rooms = filesMenu()
     elif option == "0":
-        print()
         break

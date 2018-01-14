@@ -1,1 +1,0 @@
-import networkxG = networkx.Graph()# G.add_node(2, tile = 4)if not G.node[2]:    print("Tile not found")else:    print("Found tile %s." % (G.node[2]['tile']))
