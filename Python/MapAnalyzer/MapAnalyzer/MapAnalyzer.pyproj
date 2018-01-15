@@ -2,15 +2,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>fc3a2571-2505-435a-a30e-6719204350e0</ProjectGuid>
+    <ProjectGuid>11501dde-e5cc-42b3-a72d-81072b7d5e4b</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Map_Analyzer.py</StartupFile>
+    <StartupFile>MapAnalyzer.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>Map Analyzer</Name>
-    <RootNamespace>Map Analyzer</RootNamespace>
+    <Name>MapAnalyzer</Name>
+    <RootNamespace>MapAnalyzer</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,10 +21,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Map_Analyzer.py" />
-    <Compile Include="Test.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="MapAnalyzer.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

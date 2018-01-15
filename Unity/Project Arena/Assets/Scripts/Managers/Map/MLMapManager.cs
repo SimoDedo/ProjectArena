@@ -58,7 +58,7 @@ public class MLMapManager : MapManager {
         } else {
             try {
                 int mapsCount = 1;
-                int height = 0;
+                int width = 0;
 
                 string[] lines = File.ReadAllLines(@textFilePath);
 
@@ -66,15 +66,15 @@ public class MLMapManager : MapManager {
                     if (s.Length == 0) {
                         mapsCount++;
                     } else if (mapsCount == 1)
-                        height++;
+                        width++;
                 }
 
                 for (int i = 0; i < mapsCount; i++) {
-                    maps.Add(new char[lines[0].Length, height]);
+                    maps.Add(new char[width, lines[0].Length]);
 
                     for (int x = 0; x < maps[i].GetLength(0); x++) {
                         for (int y = 0; y < maps[i].GetLength(1); y++) {
-                            maps[i][x, y] = lines[y + i * (height + 1)][x];
+                            maps[i][x, y] = lines[x + i * (width + 1)][y];
                         }
                     }
                 }

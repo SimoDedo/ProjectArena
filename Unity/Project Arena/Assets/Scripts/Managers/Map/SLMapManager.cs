@@ -41,11 +41,11 @@ public class SLMapManager : MapManager {
             try {
                 string[] lines = File.ReadAllLines(@textFilePath);
 
-                map = new char[lines[0].Length, lines.GetLength(0)];
+                map = new char[lines.GetLength(0), lines[0].Length];
 
                 for (int x = 0; x < map.GetLength(0); x++) {
                     for (int y = 0; y < map.GetLength(1); y++) {
-                        map[x, y] = lines[y][x];
+                        map[x, y] = lines[x][y];
                     }
                 }
             } catch (Exception) {
