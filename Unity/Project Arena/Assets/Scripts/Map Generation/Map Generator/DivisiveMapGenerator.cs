@@ -69,6 +69,7 @@ public class DivisiveMapGenerator : MapGenerator {
 
         if (createTextFile) {
             PopulateABRooms();
+            AddBorderToAB(borderSize);
             SaveMapAsText();
             SaveMapAsAB();
         }
@@ -301,6 +302,18 @@ public class DivisiveMapGenerator : MapGenerator {
                 if (r.height % r.width != 0)
                     ABRooms.Add(new ABRoom(r.originX, r.originY + r.height - r.width, r.width));
             }
+        }
+    }
+
+    // Adds the border to the AB notation.
+    private void AddBorderToAB(int border) {
+        foreach (ABRoom a in ABRooms) {
+            a.originX += border;
+            a.originY += border;
+        }
+        foreach (ABRoom c in ABCorridors) {
+            c.originX += border;
+            c.originY += border;
         }
     }
 
