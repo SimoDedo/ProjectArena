@@ -3,7 +3,7 @@ import math
 import networkx as nx
 import matplotlib.pyplot as plt
 
-### STRUCTS ################################################################
+### STRUCTS ##################################################################
 
 class Room:
     originX = None
@@ -154,7 +154,7 @@ def mergeRooms(rooms):
 
     for room in rooms:
         if not room.isCorridor:
-            nextRoom = next((nextRoom for nextRoom in rooms if (nextRoom.originX > room.originX and nextRoom.originX <= room.endX + 1 and \
+            nextRoom = next((nextRoom for nextRoom in rooms if (nextRoom.originX > room.originX and nextRoom.originX <= room.endX and \
                                                                 nextRoom.originY == room.originY and nextRoom.endY == room.endY and \
                                                                 nextRoom.endY - nextRoom.originY == room.endY - room.originY)), None)
             if nextRoom is not None and not nextRoom.isCorridor:
@@ -169,7 +169,7 @@ def mergeRooms(rooms):
                 rooms.remove(nextRoom)
                 mergedCount = mergedCount + 1
             else:
-                nextRoom = next((nextRoom for nextRoom in rooms if (nextRoom.originY > room.originY and nextRoom.originY <= room.endY + 1 and \
+                nextRoom = next((nextRoom for nextRoom in rooms if (nextRoom.originY > room.originY and nextRoom.originY <= room.endY and \
                                                                     nextRoom.originX == room.originX and nextRoom.endX == room.endX and \
                                                                     nextRoom.endX - nextRoom.originX == room.endX - room.originX)), None) 
                 if nextRoom is not None and not nextRoom.isCorridor:
@@ -189,7 +189,7 @@ def mergeRooms(rooms):
     else:
         mergeRooms(rooms)
 
-### GENERATION FUNCTIONS ###################################################
+### GENERATION FUNCTIONS ######################################################
 
 # Populates the map with resources.
 def populateMap(map, rooms, spawnPoint, medkit, ammo):
@@ -211,6 +211,10 @@ def populateMap(map, rooms, spawnPoint, medkit, ammo):
 
     degreeFit = getDegreeFit(roomGraph, 2, 3)
     diameter = getDiameterLength(roomGraph)
+    mapDiagonal = math.sqrt(math.pow(width, 2) + math.pow(height, 2))
+
+    placedSpawnPoints = []
+    placedResources = []
 
     print("Done.")
 
@@ -220,22 +224,31 @@ def populateMap(map, rooms, spawnPoint, medkit, ammo):
     for i in range(spawnPoint[1]):
         candidateRooms = [(node, getSpawnPointRoomFit(roomGraph, node, degreeFit[node], diameter, spawnPoint)) for node, data in roomGraph.nodes(data = True) if not "resource" in data]
         bestRoom = roomGraph.node[max(candidateRooms, key = lambda x: x[1])[0]]
-        candidateTiles = [(x, y, getSpawnPointTileFit(x, y, bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], visibilityMatrix[x][y])) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]
+        candidateTiles = [(x, y, getSpawnPointTileFit(x, y, bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], visibilityMatrix[x][y], placedSpawnPoints, mapDiagonal)) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]
         bestTile = max(candidateTiles, key = lambda x: x[2])
         addResource(bestTile[0], bestTile[1], spawnPoint[0], roomGraph, map)
-        print("Added spawn point in " + max(candidateRooms, key = lambda x:
-        x[1])[0] + " at [" + str(bestTile[0]) + ", " + str(bestTile[1]) +
-        "].")
+        placedSpawnPoints.append([bestTile[0], bestTile[1]])
+        # print("Added spawn point in " + max(candidateRooms, key = lambda x:
+        # x[1])[0] + " at [" + str(bestTile[0]) + ", " + str(bestTile[1]) +
+        # "].")
 
     print("Done.")
 
     # Place the medkits.
     print("Placing the medkits... ", end='', flush=True)
 
+    for i in range(medkit[1]):
+        # candidateRooms = [(node, getMedkitRoomFit(roomGraph, node, degreeFit[node], diameter, spawnPoint)) for node, data in roomGraph.nodes(data = True) if not "resource" in data]
+        # bestRoom = roomGraph.node[max(candidateRooms, key = lambda x: x[1])[0]]
+        print("TODO")
+
     print("Done.")
 
     # Place the ammo.
     print("Placing the ammo... ", end='', flush=True)
+
+    for i in range(ammo[1]):
+        print("TODO")
 
     print("Done.")
  
@@ -264,27 +277,10 @@ def minMaxVisibility(G):
 
     return min, max    
 
-# Tells how well a room fits for a spawn point.
-def getSpawnPointRoomFit(roomGraph, node, intervalFitness, diameter, spawnPoint):
-    # Compute how much the room is distant from the spawns.
-    spawnDistance = min([(nx.shortest_path_length(roomGraph, node, sNode, "weight")) if "resource" in data and data["resource"] == spawnPoint[0] \
-                     else math.inf for sNode, data in roomGraph.nodes(data=True)]) / diameter
-    if spawnDistance == math.inf:
-        spawnDistance = 0
-
-    # Penilize the room if it already contans a spawn point.
-    spawnRedundancy = 0
-    for neighbor in roomGraph[node]:
-        if "resource" in roomGraph.node[neighbor] and roomGraph.node[neighbor]["resource"] is spawnPoint[0]:
-            spawnRedundancy = spawnRedundancy + 1 / spawnPoint[1]
-
-    # print(node + " has fitness " + "{:.2f}".format(intervalFitness) + " + " +
-    # "{:.2f}".format(diameter) + " - " + \
-    #       "{:.2f}".format(spawnDistance) + " = " +
-    #       "{:.2f}".format(intervalFitness + spawnDistance - spawnRedundancy)
-    #       + ".")
-
-    return intervalFitness + spawnDistance - spawnRedundancy
+# Computes the diameter length.
+def getDiameterLength(roomGraph):
+    shortestPaths = nx.shortest_path_length(roomGraph, None, None, "weight")
+    return max([(max(paths[1].values())) for paths in shortestPaths])
 
 # Computes how much each node degree fits the fits the specified interval.
 def getDegreeFit(roomGraph, minimum, maximum):
@@ -292,16 +288,6 @@ def getDegreeFit(roomGraph, minimum, maximum):
     minFit = min(fitness, key = lambda x: x[1])[1]
     maxFit = max(fitness, key = lambda x: x[1])[1]
     return dict([(fit[0], 1 - (fit[1] - minFit) / (maxFit - minFit)) for fit in fitness])
-
-# Tells how well a tile fits for a spwan point.
-def getSpawnPointTileFit(x, y, originX, originY, endX, endY, visibility):
-    wallDistance = min([abs(originX - x), abs(endX - x)]) + min([abs(originY - y), abs(endY - y)])
-    return visibility * 10 + wallDistance / ((endX - originX) / 2 + (endY - originY))
-
-# Computes the diameter length.
-def getDiameterLength(roomGraph):
-    shortestPaths = nx.shortest_path_length(roomGraph, None, None, "weight")
-    return max([(max(paths[1].values())) for paths in shortestPaths])
 
 # Computes a matrix where each cell is the visibility of that cell in the map
 # with respect to the visibility of the other cells.
@@ -335,6 +321,39 @@ def getVisibilityMatrix(map):
             visibilityMap[x][y] = (visibilityMap[x][y] - min) / reboundMax
 
     return visibilityMap
+    
+# Tells how well a room fits for a spawn point.
+def getSpawnPointRoomFit(roomGraph, node, intervalFitness, diameter, spawnPoint):
+    # Compute how much the room is distant from the spawns.
+    spawnDistance = min([(nx.shortest_path_length(roomGraph, node, sNode, "weight")) if "resource" in data and data["resource"] == spawnPoint[0] \
+                     else math.inf for sNode, data in roomGraph.nodes(data=True)]) / diameter
+    if spawnDistance == math.inf:
+        spawnDistance = 0
+
+    # Penilize the room if it already contans a spawn point.
+    spawnRedundancy = 0
+    for neighbor in roomGraph[node]:
+        if "resource" in roomGraph.node[neighbor] and roomGraph.node[neighbor]["resource"] is spawnPoint[0]:
+            spawnRedundancy = spawnRedundancy + 1 / spawnPoint[1]
+
+    # print(node + " has fitness " + "{:.2f}".format(intervalFitness) + " + " +
+    # "{:.2f}".format(diameter) + " - " + \
+    #       "{:.2f}".format(spawnDistance) + " = " +
+    #       "{:.2f}".format(intervalFitness + spawnDistance - spawnRedundancy)
+    #       + ".")
+
+    return intervalFitness + spawnDistance - spawnRedundancy
+
+# Tells how well a tile fits for a spawn point.
+def getSpawnPointTileFit(x, y, originX, originY, endX, endY, visibility, placedSpawnPoints, mapDiagonal):
+    roomSize = [endX - originX, endY - originY]
+    spawnPointDistance = min([(eulerianDistance(x, y, spawn[0], spawn[1])) for spawn in placedSpawnPoints]) / mapDiagonal if len(placedSpawnPoints) > 0 else 0
+    wallDistance = min([abs(originX - x), abs(endX - x)]) + min([abs(originY - y), abs(endY - y)])
+    return visibility + wallDistance / (roomSize[0] / 2 + roomSize[1] / 2) * 0.25 + spawnPointDistance * 0.25
+
+# Tells how well a room fits for a medkit.
+def getMedkitRoomFit(roomGraph, node, intervalFitness, diameter, spawnPoint):
+    print("")
 
 ### GRAPH FUNCTIONS ###########################################################
 
@@ -575,7 +594,8 @@ def plotRoomsCorridorsGraph(G):
 def plotRoomsCorridorsResourcesGraph(G):
     print("\n[CLOSE THE GRAPH TO CONTNUE]")
     pos = dict([(node, (data["originX"] / 2 + data["endX"] / 2, data["originY"] / 2 + data["endY"] / 2) if "originX" in data else (data["x"], data["y"])) for node, data  in G.nodes(data=True)])
-    # edge_labels = dict([(key, "{:.2f}".format(value)) for key, value in nx.get_edge_attributes(G,'weight').items()])
+    # edge_labels = dict([(key, "{:.2f}".format(value)) for key, value in
+    # nx.get_edge_attributes(G,'weight').items()])
     colors = [('#f44242' if "originX" in data else "#0079a2") for node, data  in G.nodes(data=True)]
     node_labels = dict([(node, node) if "resource" not in data else (node, data["resource"]) for node, data in G.nodes(data = True)])
     nx.draw_networkx_labels(G, pos, labels = node_labels)
@@ -694,7 +714,6 @@ if not os.path.exists(outputDir):
 
 # plt.gca().invert_xaxis()
 # plt.gca().invert_yaxis()
-
 print("MAP ANALYZER\n")
 print("This script expects a MAPNAME_map.txt file and MAPNAME_AB.txt file in the input folder.")
 
