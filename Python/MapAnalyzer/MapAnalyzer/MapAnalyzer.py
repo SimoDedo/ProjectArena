@@ -153,7 +153,7 @@ def mergeRooms(rooms):
 
     for room in rooms:
         if not room.isCorridor:
-            nextRoom = next((nextRoom for nextRoom in rooms if (nextRoom.originX > room.originX and nextRoom.originX <= room.endX and \
+            nextRoom = next((nextRoom for nextRoom in rooms if (nextRoom.originX > room.originX and nextRoom.originX <= room.endX + 1 and \
                                                                 nextRoom.originY == room.originY and nextRoom.endY == room.endY and \
                                                                 nextRoom.endY - nextRoom.originY == room.endY - room.originY)), None)
             if nextRoom is not None and not nextRoom.isCorridor:
@@ -168,7 +168,7 @@ def mergeRooms(rooms):
                 rooms.remove(nextRoom)
                 mergedCount = mergedCount + 1
             else:
-                nextRoom = next((nextRoom for nextRoom in rooms if (nextRoom.originY > room.originY and nextRoom.originY <= room.endY and \
+                nextRoom = next((nextRoom for nextRoom in rooms if (nextRoom.originY > room.originY and nextRoom.originY <= room.endY + 1 and \
                                                                     nextRoom.originX == room.originX and nextRoom.endX == room.endX and \
                                                                     nextRoom.endX - nextRoom.originX == room.endX - room.originX)), None) 
                 if nextRoom is not None and not nextRoom.isCorridor:
@@ -252,7 +252,7 @@ def populateMap(map, rooms, spawnPoint, medkit, ammo):
     print("Placing the ammo... ", end='', flush=True)
 
     for i in range(ammo[1]):
-        print("TODO")
+        print("")
 
     print("Done.")
  
@@ -330,7 +330,7 @@ def getVisibilityMatrix(map):
 def getSpawnPointRoomFit(roomGraph, node, intervalFitness, diameter, spawnPoint):
     # Compute how much the room is distant from the already placed spawn
     # points.
-    spawnDistance = min([(nx.shortest_path_length(roomGraph, node, sNode, "weight")) if "resource" in data and data["resource"] == spawnPoint[0] \
+    spawnDistance = min([(shortestPathLength(roomGraph, node, sNode)) if "resource" in data and data["resource"] == spawnPoint[0] \
                      else math.inf for sNode, data in roomGraph.nodes(data=True)]) / diameter
     if spawnDistance == math.inf:
         spawnDistance = 0
@@ -348,7 +348,7 @@ def getSpawnPointRoomFit(roomGraph, node, intervalFitness, diameter, spawnPoint)
     #       spawnRedundancy)
     #       + ".")
 
-    return intervalFitness + spawnDistance / 2 - spawnRedundancy
+    return intervalFitness + spawnDistance * 0.25 - spawnRedundancy * 0.25
 
 # Tells how well a tile fits for a spawn point.
 def getSpawnPointTileFit(x, y, originX, originY, endX, endY, visibility, placedObjects, mapDiagonal):
@@ -361,7 +361,7 @@ def getSpawnPointTileFit(x, y, originX, originY, endX, endY, visibility, placedO
 def getMedkitRoomFit(roomGraph, node, intervalFitness, diameter, medkit, spawnPoint):
     # Compute how much the room is distant from the already placed spawn points
     # and medkits.
-    resourceDistance = min([(nx.shortest_path_length(roomGraph, node, sNode, "weight")) if "resource" in data and (data["resource"] == spawnPoint[0] \
+    resourceDistance = min([(shortestPathLength(roomGraph, node, sNode)) if "resource" in data and (data["resource"] == spawnPoint[0] \
                      or data["resource"] == medkit[0]) else math.inf for sNode, data in roomGraph.nodes(data=True)]) / diameter
     if resourceDistance == math.inf:
         resourceDistance = 0
@@ -608,6 +608,13 @@ def blendColor(h1, h2, alpha):
 def intervalFit(min, max, value):
     return abs(min - value) + abs(max - value)
 
+# Computes the shortest path length between two nodes menaging the exception.
+def shortestPathLength(graph, n1, n2):
+    try: 
+        return nx.shortest_path_length(graph, n1, n2, "weight")
+    except:
+        return 0
+
 ### PLOT FUNCTIONS ############################################################
 
 # Plots the graph.
@@ -745,8 +752,8 @@ if not os.path.exists(inputDir):
 if not os.path.exists(outputDir):
     os.makedirs(outputDir)
 
-# plt.gca().invert_xaxis()
-# plt.gca().invert_yaxis()
+plt.gca().invert_xaxis()
+plt.gca().invert_yaxis()
 print("MAP ANALYZER\n")
 print("This script expects a MAPNAME_map.txt file and MAPNAME_AB.txt file in the input folder.")
 
