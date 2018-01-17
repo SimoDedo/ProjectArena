@@ -75,8 +75,8 @@ def readAB(filePath):
             while genome[currentChar].isdigit():
                 currentValue = currentValue + genome[currentChar]
                 currentChar = currentChar + 1
-            room.endX = int(room.originX) + int(currentValue)
-            room.endY = int(room.originY) + int(currentValue)
+            room.endX = int(room.originX) + int(currentValue) - 1
+            room.endY = int(room.originY) + int(currentValue) - 1
             rooms.append(room)
 
             currentValue = ""
@@ -116,11 +116,11 @@ def readAB(filePath):
                     currentValue = currentValue + genome[currentChar]
                     currentChar = currentChar + 1
                 if int(currentValue) > 0:
-                    room.endX = int(room.originX) + int(currentValue)
-                    room.endY = int(room.originY) + 3
+                    room.endX = int(room.originX) + int(currentValue) - 1
+                    room.endY = int(room.originY) + 3 - 1
                 else:
-                    room.endX = int(room.originX) + 3
-                    room.endY = int(room.originY) - int(currentValue)
+                    room.endX = int(room.originX) + 3 - 1
+                    room.endY = int(room.originY) - int(currentValue) - 1
                 rooms.append(room)
 
                 currentValue = ""
@@ -226,9 +226,9 @@ def populateMap(map, rooms, spawnPoint, medkit, ammo):
         bestTile = max(candidateTiles, key = lambda x: x[2])
         addResource(bestTile[0], bestTile[1], spawnPoint[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], spawnPoint[0]])
-        print("Added spawn point in " + max(candidateRooms, key = lambda x:
-        x[1])[0] + " at [" + str(bestTile[0]) + ", " + str(bestTile[1]) +
-        "].")
+        # print("Added spawn point in " + max(candidateRooms, key = lambda x:
+        # x[1])[0] + " at [" + str(bestTile[0]) + ", " + str(bestTile[1]) +
+        # "].")
 
     print("Done.")
 
@@ -242,7 +242,9 @@ def populateMap(map, rooms, spawnPoint, medkit, ammo):
         bestTile = max(candidateTiles, key = lambda x: x[2])
         addResource(bestTile[0], bestTile[1], medkit[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], medkit[0]])
-        print("Added medkit in " + max(candidateRooms, key = lambda x: x[1])[0] + " at [" + str(bestTile[0]) + ", " + str(bestTile[1]) + "].")
+        # print("Added medkit in " + max(candidateRooms, key = lambda x:
+        # x[1])[0] + " at [" + str(bestTile[0]) + ", " + str(bestTile[1]) +
+        # "].")
 
     print("Done.")
 
@@ -370,8 +372,11 @@ def getMedkitRoomFit(roomGraph, node, intervalFitness, diameter, medkit, spawnPo
         if "resource" in roomGraph.node[neighbor] and roomGraph.node[neighbor]["resource"] is medkit[0]:
             medkitRedundancy = medkitRedundancy + 1 / medkit[1]
 
-    # print(node + " has fitness " + "{:.2f}".format(intervalFitness) + " + " + "{:.2f}".format(resourceDistance) + " / 2 - " + \
-    #       "{:.2f}".format(medkitRedundancy) + " = " + "{:.2f}".format(intervalFitness + resourceDistance - medkitRedundancy) + ".")
+    # print(node + " has fitness " + "{:.2f}".format(intervalFitness) + " + " +
+    # "{:.2f}".format(resourceDistance) + " / 2 - " + \
+    #       "{:.2f}".format(medkitRedundancy) + " = " +
+    #       "{:.2f}".format(intervalFitness + resourceDistance -
+    #       medkitRedundancy) + ".")
 
     return intervalFitness + resourceDistance - medkitRedundancy
 
@@ -380,7 +385,7 @@ def getMedkitTileFit(x, y, originX, originY, endX, endY, visibility, placedObjec
     roomSize = [endX - originX, endY - originY]
     objectDistance = min([(eulerianDistance(x, y, object[0], object[1])) for object in placedObjects]) / mapDiagonal if len(placedObjects) > 0 else 0
     wallDistance = min([abs(originX - x), abs(endX - x)]) + min([abs(originY - y), abs(endY - y)])
-    reboundedVisibility = 1  - abs(0.5 - visibility) * 2
+    reboundedVisibility = 1 - abs(0.5 - visibility) * 2
     return reboundedVisibility + wallDistance / (roomSize[0] / 2 + roomSize[1] / 2) * 0.25 + objectDistance * 0.5
 
 ### GRAPH FUNCTIONS ###########################################################
@@ -725,7 +730,7 @@ def filesMenu():
     # Read the AB file.
     rooms = readAB(ABFilePath)
     print("Refining the AB rooms... ", end='', flush=True)
-    mergeRooms(rooms)
+    # mergeRooms(rooms)
     print("Done.")
 
     return mapFileName, ABFileName, mapFilePath, ABFilePath, map, rooms
