@@ -252,7 +252,7 @@ def populateMap(map, rooms, spawnPoint, medkit, ammo):
     print("Placing the ammo... ", end='', flush=True)
 
     for i in range(ammo[1]):
-        print("")
+        pass
 
     print("Done.")
  
@@ -286,9 +286,9 @@ def getDiameterLength(roomGraph):
     shortestPaths = nx.shortest_path_length(roomGraph, None, None, "weight")
     return max([(max(paths[1].values())) for paths in shortestPaths])
 
-# Computes how much each node degree fits the fits the specified interval.
+# Computes how much each node degree fits the specified interval.
 def getDegreeFit(roomGraph, minimum, maximum):
-    fitness = [(deg[0], intervalFit(minimum, maximum, deg[1])) for deg in roomGraph.degree]
+    fitness = [(deg[0], intervalDistance(minimum, maximum, deg[1])) for deg in roomGraph.degree]
     minFit = min(fitness, key = lambda x: x[1])[1]
     maxFit = max(fitness, key = lambda x: x[1])[1]
     return dict([(fit[0], 1 - (fit[1] - minFit) / (maxFit - minFit)) for fit in fitness])
@@ -335,7 +335,7 @@ def getSpawnPointRoomFit(roomGraph, node, intervalFitness, diameter, spawnPoint)
     if spawnDistance == math.inf:
         spawnDistance = 0
 
-    # Penilize the room if it already contans a spawn point.
+    # Penilize the room if it already contains a spawn point.
     spawnRedundancy = 0
     for neighbor in roomGraph[node]:
         if "resource" in roomGraph.node[neighbor] and roomGraph.node[neighbor]["resource"] is spawnPoint[0]:
@@ -355,7 +355,7 @@ def getSpawnPointTileFit(x, y, originX, originY, endX, endY, visibility, placedO
     roomSize = [endX - originX, endY - originY]
     objectDistance = min([(eulerianDistance(x, y, object[0], object[1])) for object in placedObjects]) / mapDiagonal if len(placedObjects) > 0 else 0
     wallDistance = min([abs(originX - x), abs(endX - x)]) + min([abs(originY - y), abs(endY - y)])
-    return (1 - visibility) + wallDistance / (roomSize[0] / 2 + roomSize[1] / 2) * 0.25 + objectDistance * 0.25
+    return (1 - visibility) + wallDistance / (roomSize[0] / 2 + roomSize[1] / 2) * 0.5 + objectDistance * 0.5
 
 # Tells how well a room fits for a medkit.
 def getMedkitRoomFit(roomGraph, node, intervalFitness, diameter, medkit, spawnPoint):
@@ -366,7 +366,7 @@ def getMedkitRoomFit(roomGraph, node, intervalFitness, diameter, medkit, spawnPo
     if resourceDistance == math.inf:
         resourceDistance = 0
 
-    # Penilize the room if it already contans a spawn point.
+    # Penilize the room if it already contains an object.
     medkitRedundancy = 0
     for neighbor in roomGraph[node]:
         if "resource" in roomGraph.node[neighbor] and roomGraph.node[neighbor]["resource"] is medkit[0]:
@@ -605,8 +605,8 @@ def blendColor(h1, h2, alpha):
     return RGBToHex(blend(r1, r2, alpha), blend(g1, g2, alpha), blend(b1, b2, alpha))
 
 # Tells how well a value fits in an interval.
-def intervalFit(min, max, value):
-    return abs(min - value) + abs(max - value)
+def intervalDistance(min, max, value):
+    return abs(abs(min) - abs(value)) + abs(abs(max) - abs(value))
 
 # Computes the shortest path length between two nodes menaging the exception.
 def shortestPathLength(graph, n1, n2):
@@ -737,7 +737,7 @@ def filesMenu():
     # Read the AB file.
     rooms = readAB(ABFilePath)
     print("Refining the AB rooms... ", end='', flush=True)
-    # mergeRooms(rooms)
+    mergeRooms(rooms)
     print("Done.")
 
     return mapFileName, ABFileName, mapFilePath, ABFilePath, map, rooms

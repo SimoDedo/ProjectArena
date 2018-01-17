@@ -119,9 +119,9 @@ public class DivisiveMapGenerator : MapGenerator {
     private void ProcessRooms() {
         int currentFill = 0;
 
-        while (currentFill < minimumFilledTiles && rooms.Count > 1) {
+        while (currentFill < minimumFilledTiles && rooms.Count > 0) {
             int current = pseudoRandomGen.Next(0, rooms.Count);
-            // Debug.Log("Selected room " + current + " out of " + rooms.Count + ".");
+            Debug.Log("Selected room " + current + " out of " + rooms.Count + " of size " + rooms[current].roomSize  + ".");
             PlaceRoom(rooms[current].originX, rooms[current].originY, rooms[current].width, rooms[current].height);
             currentFill += rooms[current].roomSize;
             placedRooms.Add(rooms[current]);
@@ -269,7 +269,7 @@ public class DivisiveMapGenerator : MapGenerator {
     // Adds a room to the list.
     private void AddRoom(int originX, int originY, int roomWidth, int roomHeigth) {
         // If the room makes sense.
-        if (IsInMapRange(originX, originY) && IsInMapRange(originX + roomWidth, originY + roomHeigth) && roomWidth > passageWidth && roomHeigth > passageWidth) {
+        if (IsInMapRange(originX, originY) && IsInMapRange(originX + roomWidth, originY + roomHeigth) && roomWidth > minimumRoomDimension && roomHeigth > minimumRoomDimension) {
             // Add it to the room list.
             rooms.Add(new Room(originX, originY, roomWidth, roomHeigth));
         } else {
