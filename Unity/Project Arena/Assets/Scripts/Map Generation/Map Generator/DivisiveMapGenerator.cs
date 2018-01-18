@@ -98,7 +98,7 @@ public class DivisiveMapGenerator : MapGenerator {
     // Divides a room in subrooms or stops there.
     private void DivideRoom(int originX, int originY, int roomWidth, int roomHeigth, bool horizontal, int depth) {
         if ((pseudoRandomGen.Next(0, 100) < roomDivideProbability && roomWidth > minimumDividableRoomDimension && roomHeigth > minimumDividableRoomDimension) || depth < minimumDepth) {
-            // Divivde the room.
+            // Divide the room.
             if (horizontal) {
                 int division = GetDivisionPoint(roomHeigth);
                 // Debug.Log("Dividing vertically in " + division + " a " + roomWidth + "x" + roomHeigth + "room in [" + originX + ", " + originY + "].");
@@ -227,14 +227,14 @@ public class DivisiveMapGenerator : MapGenerator {
                         if (IsInMapRange(x, y))
                             map[x, y] = roomChar;
                 if (createTextFile && (extremeX != connectionX))
-                    ABCorridors.Add(new ABRoom(connectionX - Mathf.FloorToInt(passageWidth / 2f), connectionY - Mathf.FloorToInt(passageWidth / 2f), extremeX - connectionX + Mathf.FloorToInt(passageWidth / 2f)));
+                    ABCorridors.Add(new ABRoom(connectionX - Mathf.FloorToInt(passageWidth / 2f), connectionY - Mathf.FloorToInt(passageWidth / 2f), extremeX - connectionX + passageWidth));
             } else {
                 for (int x = extremeX; x <= connectionX + Mathf.FloorToInt(passageWidth / 2f); x++)
                     for (int y = connectionY - passageWidth / 2; y <= connectionY + passageWidth / 2; y++)
                         if (IsInMapRange(x, y))
                             map[x, y] = roomChar;
                 if (createTextFile && (extremeX != connectionX))
-                    ABCorridors.Add(new ABRoom(extremeX - Mathf.FloorToInt(passageWidth / 2f), connectionY - Mathf.FloorToInt(passageWidth / 2f), connectionX - extremeX + Mathf.FloorToInt(passageWidth / 2f)));
+                    ABCorridors.Add(new ABRoom(extremeX - Mathf.FloorToInt(passageWidth / 2f), connectionY - Mathf.FloorToInt(passageWidth / 2f), connectionX - extremeX + passageWidth));
             }
 
             // Create the vertical section.
@@ -244,14 +244,14 @@ public class DivisiveMapGenerator : MapGenerator {
                         if (IsInMapRange(x, y))
                             map[x, y] = roomChar;
                 if (createTextFile && (extremeY != connectionY))
-                    ABCorridors.Add(new ABRoom(connectionX - Mathf.FloorToInt(passageWidth / 2f), connectionY - Mathf.FloorToInt(passageWidth / 2f), connectionY - extremeY - Mathf.FloorToInt(passageWidth / 2f)));
+                    ABCorridors.Add(new ABRoom(connectionX - Mathf.FloorToInt(passageWidth / 2f), connectionY - Mathf.FloorToInt(passageWidth / 2f), connectionY - extremeY - passageWidth));
             } else {
                 for (int y = extremeY; y <= connectionY + Mathf.FloorToInt(passageWidth / 2f); y++)
                     for (int x = connectionX - passageWidth / 2; x <= connectionX + passageWidth / 2; x++)
                         if (IsInMapRange(x, y))
                             map[x, y] = roomChar;
                 if (createTextFile && (extremeY != connectionY))
-                    ABCorridors.Add(new ABRoom(connectionX - Mathf.FloorToInt(passageWidth / 2f), extremeY - Mathf.FloorToInt(passageWidth / 2f), extremeY - connectionY - Mathf.FloorToInt(passageWidth / 2f)));
+                    ABCorridors.Add(new ABRoom(connectionX - Mathf.FloorToInt(passageWidth / 2f), extremeY - Mathf.FloorToInt(passageWidth / 2f), extremeY - connectionY - passageWidth));
             }
         }
     }

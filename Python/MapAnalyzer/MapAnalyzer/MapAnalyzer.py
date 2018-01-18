@@ -189,6 +189,17 @@ def mergeRooms(rooms):
     else:
         mergeRooms(rooms)
 
+# Removes useless rooms.
+def removeRooms(rooms):
+    toBeRemoved = []
+
+    for r1 in rooms:
+        for r2 in rooms:
+            if r1 is not r2 and r1.originX <= r2.originX and r1.originY <= r2.originY and r1.endX >= r2.endX and r1.endY >= r2.endY:
+                toBeRemoved.append(r2)
+
+    return [r for r in rooms if r not in toBeRemoved]
+
 ### GENERATION FUNCTIONS ######################################################
 
 # Populates the map with objects.
@@ -213,9 +224,9 @@ def populateMap(map, rooms, spawnPoint, medkit, ammo):
     mapDiagonal = math.sqrt(math.pow(width, 2) + math.pow(height, 2))
 
     normalizedDegree = getNormalizedDegree(roomGraph)
-    spawnPointDegreeFit = getNormalizedDegreeFit(normalizedDegree, 0.15, 0.3)
+    spawnPointDegreeFit = getNormalizedDegreeFit(normalizedDegree, 0.1, 0.3)
     medkitDegreeFit = getNormalizedDegreeFit(normalizedDegree, 0.3, 0.5)
-    downAmmoDegreeFit = getNormalizedDegreeFit(normalizedDegree, 0.2, 0.35)
+    downAmmoDegreeFit = getNormalizedDegreeFit(normalizedDegree, 0.2, 0.4)
     upAmmoDegreeFit = getNormalizedDegreeFit(normalizedDegree, 0.8, 0.9)
 
     placedObjects = []
@@ -803,6 +814,7 @@ def filesMenu():
     rooms = readAB(ABFilePath)
     print("Refining the AB rooms... ", end='', flush=True)
     mergeRooms(rooms)
+    rooms = removeRooms(rooms)
     print("Done.")
 
     return mapFileName, ABFileName, mapFilePath, ABFilePath, map, rooms
@@ -817,8 +829,6 @@ if not os.path.exists(inputDir):
 if not os.path.exists(outputDir):
     os.makedirs(outputDir)
 
-plt.gca().invert_xaxis()
-plt.gca().invert_yaxis()
 print("MAP ANALYZER\n")
 print("This script expects a MAPNAME_map.txt file and MAPNAME_AB.txt file in the input folder.")
 
