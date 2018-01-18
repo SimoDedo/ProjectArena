@@ -392,11 +392,11 @@ def getSpawnPointRoomFit(roomGraph, node, intervalFitness, diameter, spawnPoint)
 
     # print(node + " has fitness " + "{:.2f}".format(intervalFitness) + " + " +
     # "{:.2f}".format(spawnDistance) + " * 0.25 - " +
-    # "{:.2f}".format(spawnRedundancy) + " = " +
+    # "{:.2f}".format(spawnRedundancy) + " * 2 = " +
     # "{:.2f}".format(intervalFitness + spawnDistance * 0.25 - spawnRedundancy)
     #  + ".")
 
-    return intervalFitness + spawnDistance * 0.25 - spawnRedundancy
+    return intervalFitness + spawnDistance * 0.25 - spawnRedundancy * 2
 
 # Tells how well a tile fits for a spawn point.
 def getSpawnPointTileFit(x, y, originX, originY, endX, endY, visibility, placedObjects, mapDiagonal):
@@ -421,11 +421,11 @@ def getMedkitRoomFit(roomGraph, node, intervalFitness, diameter, medkit, spawnPo
 
     # print(node + " has fitness " + "{:.2f}".format(intervalFitness) + " + " +
     # "{:.2f}".format(resourceDistance) + " * 0.25 - " +
-    # "{:.2f}".format(medkitRedundancy) + " = " +
+    # "{:.2f}".format(medkitRedundancy) + " * 2 = " +
     # "{:.2f}".format(intervalFitness + resourceDistance * 0.25 -
     # medkitRedundancy) + ".")
 
-    return intervalFitness + resourceDistance * 0.25 - medkitRedundancy
+    return intervalFitness + resourceDistance * 0.25 - medkitRedundancy * 2
 
 # Tells how well a tile fits for a medkit.
 def getMedkitTileFit(x, y, originX, originY, endX, endY, visibility, placedObjects, mapDiagonal):
@@ -451,11 +451,11 @@ def getAmmoRoomFit(roomGraph, node, intervalFitness, diameter, medkit, ammo):
 
     # print(node + " has fitness " + "{:.2f}".format(intervalFitness) + " + " +
     # "{:.2f}".format(resourceDistance) + " * 0.25 - " +
-    # "{:.2f}".format(ammoRedundancy) + " = " +
+    # "{:.2f}".format(ammoRedundancy) + " * 2 = " +
     # "{:.2f}".format(intervalFitness + resourceDistance * 0.25 -
     # ammoRedundancy) + ".")
 
-    return intervalFitness + resourceDistance * 0.25 - ammoRedundancy
+    return intervalFitness + resourceDistance * 0.25 - ammoRedundancy * 2
 
 # Tells how well a tile fits for ammo.
 def getAmmoTileFit(x, y, originX, originY, endX, endY, visibility, placedObjects, mapDiagonal):
