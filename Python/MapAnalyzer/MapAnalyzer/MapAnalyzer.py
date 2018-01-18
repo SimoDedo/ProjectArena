@@ -4,6 +4,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 ### STRUCTS ##################################################################
+
 class Room:
     originX = None
     originY = None
@@ -208,9 +209,14 @@ def populateMap(map, rooms, spawnPoint, medkit, ammo):
     roomGraph = getRoomsCorridorsGraph(rooms, False)
     visibilityMatrix = getVisibilityMatrix(map)
 
-    degreeFit = getDegreeFit(roomGraph, 2, 3)
     diameter = getDiameterLength(roomGraph)
     mapDiagonal = math.sqrt(math.pow(width, 2) + math.pow(height, 2))
+
+    normalizedDegree = getNormalizedDegree(roomGraph)
+    spawnPointDegreeFit = getNormalizedDegreeFit(normalizedDegree, 0.15, 0.3)
+    medkitDegreeFit = getNormalizedDegreeFit(normalizedDegree, 0.3, 0.5)
+    downAmmoDegreeFit = getNormalizedDegreeFit(normalizedDegree, 0.2, 0.35)
+    upAmmoDegreeFit = getNormalizedDegreeFit(normalizedDegree, 0.8, 0.9)
 
     placedObjects = []
 
@@ -220,7 +226,7 @@ def populateMap(map, rooms, spawnPoint, medkit, ammo):
     print("Placing the spawn points... ", end='', flush=True)
 
     for i in range(spawnPoint[1]):
-        candidateRooms = [(node, getSpawnPointRoomFit(roomGraph, node, degreeFit[node], diameter, spawnPoint)) for node, data in roomGraph.nodes(data = True) if not "resource" in data]
+        candidateRooms = [(node, getSpawnPointRoomFit(roomGraph, node, spawnPointDegreeFit[node], diameter, spawnPoint)) for node, data in roomGraph.nodes(data = True) if not "resource" in data]
         bestRoom = roomGraph.node[max(candidateRooms, key = lambda x: x[1])[0]]
         candidateTiles = [(x, y, getSpawnPointTileFit(x, y, bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], visibilityMatrix[x][y], placedObjects, mapDiagonal)) for x in range(bestRoom["originX"], bestRoom["endX"] + 1) for y in range(bestRoom["originY"], bestRoom["endY"] + 1)]
         bestTile = max(candidateTiles, key = lambda x: x[2])
@@ -236,7 +242,7 @@ def populateMap(map, rooms, spawnPoint, medkit, ammo):
     print("Placing the medkits... ", end='', flush=True)
 
     for i in range(medkit[1]):
-        candidateRooms = [(node, getMedkitRoomFit(roomGraph, node, degreeFit[node], diameter, medkit, spawnPoint)) for node, data in roomGraph.nodes(data = True) if not "resource" in data]
+        candidateRooms = [(node, getMedkitRoomFit(roomGraph, node, medkitDegreeFit[node], diameter, medkit, spawnPoint)) for node, data in roomGraph.nodes(data = True) if not "resource" in data]
         bestRoom = roomGraph.node[max(candidateRooms, key = lambda x: x[1])[0]]
         candidateTiles = [(x, y, getMedkitTileFit(x, y, bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], visibilityMatrix[x][y], placedObjects, mapDiagonal)) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]
         bestTile = max(candidateTiles, key = lambda x: x[2])
@@ -251,8 +257,27 @@ def populateMap(map, rooms, spawnPoint, medkit, ammo):
     # Place the ammo.
     print("Placing the ammo... ", end='', flush=True)
 
-    for i in range(ammo[1]):
-        pass
+    for i in range(math.floor(ammo[1] / 2)):
+        candidateRooms = [(node, getAmmoRoomFit(roomGraph, node, downAmmoDegreeFit[node], diameter, medkit, ammo)) for node, data in roomGraph.nodes(data = True) if not "resource" in data]
+        bestRoom = roomGraph.node[max(candidateRooms, key = lambda x: x[1])[0]]
+        candidateTiles = [(x, y, getAmmoTileFit(x, y, bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], visibilityMatrix[x][y], placedObjects, mapDiagonal)) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]
+        bestTile = max(candidateTiles, key = lambda x: x[2])
+        addResource(bestTile[0], bestTile[1], ammo[0], roomGraph, map)
+        placedObjects.append([bestTile[0], bestTile[1], ammo[0]])
+        # print("Added ammo in " + max(candidateRooms, key = lambda x:
+        # x[1])[0] + " at [" + str(bestTile[0]) + ", " + str(bestTile[1]) +
+        # "].")
+
+    for i in range(math.ceil(ammo[1] / 2)):
+        candidateRooms = [(node, getAmmoRoomFit(roomGraph, node, upAmmoDegreeFit[node], diameter, medkit, ammo)) for node, data in roomGraph.nodes(data = True) if not "resource" in data]
+        bestRoom = roomGraph.node[max(candidateRooms, key = lambda x: x[1])[0]]
+        candidateTiles = [(x, y, getAmmoTileFit(x, y, bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], visibilityMatrix[x][y], placedObjects, mapDiagonal)) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]
+        bestTile = max(candidateTiles, key = lambda x: x[2])
+        addResource(bestTile[0], bestTile[1], ammo[0], roomGraph, map)
+        placedObjects.append([bestTile[0], bestTile[1], ammo[0]])
+        # print("Added ammo in " + max(candidateRooms, key = lambda x:
+        # x[1])[0] + " at [" + str(bestTile[0]) + ", " + str(bestTile[1]) +
+        # "].")
 
     print("Done.")
  
@@ -293,6 +318,20 @@ def getDegreeFit(roomGraph, minimum, maximum):
     maxFit = max(fitness, key = lambda x: x[1])[1]
     return dict([(fit[0], 1 - (fit[1] - minFit) / (maxFit - minFit)) for fit in fitness])
 
+# Computes how much each normalized degree fits the specified interval.
+def getNormalizedDegreeFit(normalizedDegree, minimum, maximum):
+    fitness = [(deg[0], intervalDistance(minimum, maximum, deg[1])) for deg in normalizedDegree]
+    minFit = min(fitness, key = lambda x: x[1])[1]
+    maxFit = max(fitness, key = lambda x: x[1])[1]
+    return dict([(fit[0], 1 - (fit[1] - minFit) / (maxFit - minFit)) for fit in fitness])
+
+# Computes the normalized degree.
+def getNormalizedDegree(roomGraph):
+    degree = roomGraph.degree
+    minDeg = min(degree, key = lambda x: x[1])[1]
+    maxDeg = max(degree, key = lambda x: x[1])[1]
+    return [(deg[0], deg[1] / (maxDeg + minDeg)) for deg in roomGraph.degree]
+
 # Computes a matrix where each cell is the visibility of that cell in the map
 # with respect to the visibility of the other cells.
 def getVisibilityMatrix(map):
@@ -328,8 +367,7 @@ def getVisibilityMatrix(map):
     
 # Tells how well a room fits for a spawn point.
 def getSpawnPointRoomFit(roomGraph, node, intervalFitness, diameter, spawnPoint):
-    # Compute how much the room is distant from the already placed spawn
-    # points.
+    # Compute how much the room is distant from the already placed objects.
     spawnDistance = min([(shortestPathLength(roomGraph, node, sNode)) if "resource" in data and data["resource"] == spawnPoint[0] \
                      else math.inf for sNode, data in roomGraph.nodes(data=True)]) / diameter
     if spawnDistance == math.inf:
@@ -342,13 +380,12 @@ def getSpawnPointRoomFit(roomGraph, node, intervalFitness, diameter, spawnPoint)
             spawnRedundancy = spawnRedundancy + 1 / spawnPoint[1]
 
     # print(node + " has fitness " + "{:.2f}".format(intervalFitness) + " + " +
-    # "{:.2f}".format(diameter) + " / 2 - " + \
-    #       "{:.2f}".format(spawnDistance) + " = " +
-    #       "{:.2f}".format(intervalFitness + spawnDistance / 2 -
-    #       spawnRedundancy)
-    #       + ".")
+    # "{:.2f}".format(spawnDistance) + " * 0.25 - " +
+    # "{:.2f}".format(spawnRedundancy) + " = " +
+    # "{:.2f}".format(intervalFitness + spawnDistance * 0.25 - spawnRedundancy)
+    #  + ".")
 
-    return intervalFitness + spawnDistance * 0.25 - spawnRedundancy * 0.25
+    return intervalFitness + spawnDistance * 0.25 - spawnRedundancy
 
 # Tells how well a tile fits for a spawn point.
 def getSpawnPointTileFit(x, y, originX, originY, endX, endY, visibility, placedObjects, mapDiagonal):
@@ -359,8 +396,7 @@ def getSpawnPointTileFit(x, y, originX, originY, endX, endY, visibility, placedO
 
 # Tells how well a room fits for a medkit.
 def getMedkitRoomFit(roomGraph, node, intervalFitness, diameter, medkit, spawnPoint):
-    # Compute how much the room is distant from the already placed spawn points
-    # and medkits.
+    # Compute how much the room is distant from the already placed objects.
     resourceDistance = min([(shortestPathLength(roomGraph, node, sNode)) if "resource" in data and (data["resource"] == spawnPoint[0] \
                      or data["resource"] == medkit[0]) else math.inf for sNode, data in roomGraph.nodes(data=True)]) / diameter
     if resourceDistance == math.inf:
@@ -373,12 +409,12 @@ def getMedkitRoomFit(roomGraph, node, intervalFitness, diameter, medkit, spawnPo
             medkitRedundancy = medkitRedundancy + 1 / medkit[1]
 
     # print(node + " has fitness " + "{:.2f}".format(intervalFitness) + " + " +
-    # "{:.2f}".format(resourceDistance) + " / 2 - " + \
-    #       "{:.2f}".format(medkitRedundancy) + " = " +
-    #       "{:.2f}".format(intervalFitness + resourceDistance -
-    #       medkitRedundancy) + ".")
+    # "{:.2f}".format(resourceDistance) + " * 0.25 - " +
+    # "{:.2f}".format(medkitRedundancy) + " = " +
+    # "{:.2f}".format(intervalFitness + resourceDistance * 0.25 -
+    # medkitRedundancy) + ".")
 
-    return intervalFitness + resourceDistance - medkitRedundancy
+    return intervalFitness + resourceDistance * 0.25 - medkitRedundancy
 
 # Tells how well a tile fits for a medkit.
 def getMedkitTileFit(x, y, originX, originY, endX, endY, visibility, placedObjects, mapDiagonal):
@@ -387,6 +423,35 @@ def getMedkitTileFit(x, y, originX, originY, endX, endY, visibility, placedObjec
     wallDistance = min([abs(originX - x), abs(endX - x)]) + min([abs(originY - y), abs(endY - y)])
     reboundedVisibility = 1 - abs(0.5 - visibility) * 2
     return reboundedVisibility + wallDistance / (roomSize[0] / 2 + roomSize[1] / 2) * 0.25 + objectDistance * 0.5
+
+# Tells how well a room fits for ammo.
+def getAmmoRoomFit(roomGraph, node, intervalFitness, diameter, medkit, ammo):
+    # Compute how much the room is distant from the already placed objects.
+    resourceDistance = min([(shortestPathLength(roomGraph, node, sNode)) if "resource" in data and (data["resource"] == ammo[0] \
+                     or data["resource"] == medkit[0]) else math.inf for sNode, data in roomGraph.nodes(data=True)]) / diameter
+    if resourceDistance == math.inf:
+        resourceDistance = 0
+
+    # Penilize the room if it already contains an object.
+    ammoRedundancy = 0
+    for neighbor in roomGraph[node]:
+        if "resource" in roomGraph.node[neighbor] and roomGraph.node[neighbor]["resource"] is ammo[0]:
+            ammoRedundancy = ammoRedundancy + 1 / ammo[1]
+
+    # print(node + " has fitness " + "{:.2f}".format(intervalFitness) + " + " +
+    # "{:.2f}".format(resourceDistance) + " * 0.25 - " +
+    # "{:.2f}".format(ammoRedundancy) + " = " +
+    # "{:.2f}".format(intervalFitness + resourceDistance * 0.25 -
+    # ammoRedundancy) + ".")
+
+    return intervalFitness + resourceDistance * 0.25 - ammoRedundancy
+
+# Tells how well a tile fits for ammo.
+def getAmmoTileFit(x, y, originX, originY, endX, endY, visibility, placedObjects, mapDiagonal):
+    roomSize = [endX - originX, endY - originY]
+    objectDistance = min([(eulerianDistance(x, y, object[0], object[1])) for object in placedObjects]) / mapDiagonal if len(placedObjects) > 0 else 0
+    wallDistance = min([abs(originX - x), abs(endX - x)]) + min([abs(originY - y), abs(endY - y)])
+    return visibility + wallDistance / (roomSize[0] / 2 + roomSize[1] / 2) * 0.25 + objectDistance * 0.5
 
 ### GRAPH FUNCTIONS ###########################################################
 
@@ -625,7 +690,7 @@ def plotRoomsCorridorsGraph(G):
     # nx.get_edge_attributes(G,'weight').items()])
     node_labels = dict([(node, node) for node in G.nodes(data = False)])
     nx.draw_networkx_labels(G, pos, labels = node_labels)
-    nx.draw(G, pos, node_color = '#f44242', node_size = 75)
+    nx.draw(G, pos, node_color = '#f44242', node_size = 75, node_shape = ",")
     # nx.draw_networkx_edge_labels(G, pos, edge_labels = edge_labels)
     plt.axis('equal')
     plt.show()
@@ -639,7 +704,7 @@ def plotRoomsCorridorsObjectsGraph(G):
     colors = [('#f44242' if "originX" in data else "#0079a2") for node, data  in G.nodes(data=True)]
     node_labels = dict([(node, node) if "resource" not in data else (node, data["resource"]) for node, data in G.nodes(data = True)])
     nx.draw_networkx_labels(G, pos, labels = node_labels)
-    nx.draw(G, pos, node_color = colors, node_size = 75)
+    nx.draw(G, pos, node_color = colors, node_size = 75, node_shape = ",")
     # nx.draw_networkx_edge_labels(G, pos, edge_labels = edge_labels)
     plt.axis('equal')
     plt.show()
@@ -650,7 +715,7 @@ def plotTilesGraph(G):
     pos = dict([ (node, (data["x"], data["y"])) for node, data  in G.nodes(data=True)])
     node_labels = dict([(node, data["char"]) for node, data in G.nodes(data = True) if data["char"] != "w" and data["char"] != "r"])
     nx.draw_networkx_labels(G, pos, labels = node_labels)
-    nx.draw(G, pos, node_color = '#f44242', node_size = 75)
+    nx.draw(G, pos, node_color = '#f44242', node_size = 75, node_shape = ",")
     plt.axis('equal')
     plt.show()
 
@@ -660,7 +725,7 @@ def plotVisibilityGraph(G):
     minC, maxC = minMaxVisibility(G)
     colors = [(blendColor("#0000ff", "#ff0000", (data["visibility"] - minC) / (maxC - minC))) for node, data in G.nodes(data=True)]
     pos = dict([ (node, (data["x"], data["y"])) for node, data in G.nodes(data=True)])
-    nx.draw_networkx_nodes(G, pos, node_color = colors, node_size = 75)
+    nx.draw_networkx_nodes(G, pos, node_color = colors, node_size = 75, node_shape = ",")
     # node_labels = nx.get_node_attributes(G,'visibility')
     # nx.draw_networkx_labels(G, pos, labels = node_labels)
     plt.axis('equal')
@@ -669,7 +734,7 @@ def plotVisibilityGraph(G):
 # Plots the graph.
 def plotOutlinesGraph(G):
     print("\n[CLOSE THE GRAPH TO CONTNUE]")
-    nx.draw(G, dict([ (node, (data["x"], data["y"])) for node, data  in G.nodes(data=True)]), node_color = '#f44242', node_size = 75)
+    nx.draw(G, dict([ (node, (data["x"], data["y"])) for node, data  in G.nodes(data=True)]), node_color = '#f44242', node_size = 75, node_shape = ",")
     plt.axis('equal')
     plt.show()
 
@@ -773,7 +838,7 @@ while True:
         option = input("Invalid choice. Option: ")
 
     if option == "1":
-        populateMap(map, rooms, ["s", 5], ["h", 3], ["a", 3])
+        populateMap(map, rooms, ["s", 5], ["h", 4], ["a", 4])
         exportMap(outputDir + "/" + mapFileName)
     elif option == "2":
         graphMenu()
