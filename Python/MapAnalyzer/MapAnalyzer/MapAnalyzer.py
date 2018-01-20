@@ -202,8 +202,8 @@ def removeRooms(rooms):
 
 ### GENERATION FUNCTIONS ######################################################
 
-# Populates the map with objects.
-def populateMap(map, rooms, spawnPoint, medkit, ammo):
+# Adds all the objects to the map.
+def addEverything(map, rooms, spawnPoint, medkit, ammo):
     width = len(map)
     height = len(map[0])
 
@@ -237,9 +237,11 @@ def populateMap(map, rooms, spawnPoint, medkit, ammo):
     print("Placing the spawn points... ", end='', flush=True)
 
     for i in range(spawnPoint[1]):
-        candidateRooms = [(node, getSpawnPointRoomFit(roomGraph, node, spawnPointDegreeFit[node], diameter, spawnPoint)) for node, data in roomGraph.nodes(data = True) if not "resource" in data]
+        candidateRooms = [(node, roomFitness(roomGraph, diameter, node, spawnPointDegreeFit[node], spawnPoint, [spawnPoint[0]], [1, 0.25, -2])) \
+                          for node, data in roomGraph.nodes(data = True) if not "resource" in data]
         bestRoom = roomGraph.node[max(candidateRooms, key = lambda x: x[1])[0]]
-        candidateTiles = [(x, y, getSpawnPointTileFit(x, y, bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], visibilityMatrix[x][y], placedObjects, mapDiagonal)) for x in range(bestRoom["originX"], bestRoom["endX"] + 1) for y in range(bestRoom["originY"], bestRoom["endY"] + 1)]
+        candidateTiles = [(x, y, tileFitness(x, y, 1 - visibilityMatrix[x][y], bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], \
+                          placedObjects, mapDiagonal, [1, 0.5, 0.5])) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]
         bestTile = max(candidateTiles, key = lambda x: x[2])
         addResource(bestTile[0], bestTile[1], spawnPoint[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], spawnPoint[0]])
@@ -253,9 +255,11 @@ def populateMap(map, rooms, spawnPoint, medkit, ammo):
     print("Placing the medkits... ", end='', flush=True)
 
     for i in range(medkit[1]):
-        candidateRooms = [(node, getMedkitRoomFit(roomGraph, node, medkitDegreeFit[node], diameter, medkit, spawnPoint)) for node, data in roomGraph.nodes(data = True) if not "resource" in data]
+        candidateRooms = [(node, roomFitness(roomGraph, diameter, node, medkitDegreeFit[node], medkit, [spawnPoint[0], medkit[0]], [1, 0.25, -2])) \
+                          for node, data in roomGraph.nodes(data = True) if not "resource" in data]
         bestRoom = roomGraph.node[max(candidateRooms, key = lambda x: x[1])[0]]
-        candidateTiles = [(x, y, getMedkitTileFit(x, y, bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], visibilityMatrix[x][y], placedObjects, mapDiagonal)) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]
+        candidateTiles = [(x, y, tileFitness(x, y, 1 - abs(0.5 - visibilityMatrix[x][y]), bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], \
+                          placedObjects, mapDiagonal, [1, 0.25, 0.5])) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]   
         bestTile = max(candidateTiles, key = lambda x: x[2])
         addResource(bestTile[0], bestTile[1], medkit[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], medkit[0]])
@@ -269,9 +273,11 @@ def populateMap(map, rooms, spawnPoint, medkit, ammo):
     print("Placing the ammo... ", end='', flush=True)
 
     for i in range(math.floor(ammo[1] / 2)):
-        candidateRooms = [(node, getAmmoRoomFit(roomGraph, node, downAmmoDegreeFit[node], diameter, medkit, ammo)) for node, data in roomGraph.nodes(data = True) if not "resource" in data]
+        candidateRooms = [(node, roomFitness(roomGraph, diameter, node, downAmmoDegreeFit[node], ammo, [ammo[0], medkit[0]], [1, 0.25, -2])) \
+                          for node, data in roomGraph.nodes(data = True) if not "resource" in data]
         bestRoom = roomGraph.node[max(candidateRooms, key = lambda x: x[1])[0]]
-        candidateTiles = [(x, y, getAmmoTileFit(x, y, bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], visibilityMatrix[x][y], placedObjects, mapDiagonal)) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]
+        candidateTiles = [(x, y, tileFitness(x, y, visibilityMatrix[x][y], bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], \
+                          placedObjects, mapDiagonal, [1, 0.25, 0.5])) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]   
         bestTile = max(candidateTiles, key = lambda x: x[2])
         addResource(bestTile[0], bestTile[1], ammo[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], ammo[0]])
@@ -280,9 +286,11 @@ def populateMap(map, rooms, spawnPoint, medkit, ammo):
         # "].")
 
     for i in range(math.ceil(ammo[1] / 2)):
-        candidateRooms = [(node, getAmmoRoomFit(roomGraph, node, upAmmoDegreeFit[node], diameter, medkit, ammo)) for node, data in roomGraph.nodes(data = True) if not "resource" in data]
+        candidateRooms = [(node, roomFitness(roomGraph, diameter, node, upAmmoDegreeFit[node], ammo, [ammo[0], medkit[0]], [1, 0.25, -2])) \
+                          for node, data in roomGraph.nodes(data = True) if not "resource" in data]       
         bestRoom = roomGraph.node[max(candidateRooms, key = lambda x: x[1])[0]]
-        candidateTiles = [(x, y, getAmmoTileFit(x, y, bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], visibilityMatrix[x][y], placedObjects, mapDiagonal)) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]
+        candidateTiles = [(x, y, tileFitness(x, y, visibilityMatrix[x][y], bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], \
+                          placedObjects, mapDiagonal, [1, 0.25, 0.5])) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]   
         bestTile = max(candidateTiles, key = lambda x: x[2])
         addResource(bestTile[0], bestTile[1], ammo[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], ammo[0]])
@@ -376,93 +384,36 @@ def getVisibilityMatrix(map):
 
     return visibilityMap
     
-# Tells how well a room fits for a spawn point.
-def getSpawnPointRoomFit(roomGraph, node, intervalFitness, diameter, spawnPoint):
-    # Compute how much the room is distant from the already placed objects.
-    spawnDistance = min([(shortestPathLength(roomGraph, node, sNode)) if "resource" in data and data["resource"] == spawnPoint[0] \
-                     else math.inf for sNode, data in roomGraph.nodes(data=True)]) / diameter
-    if spawnDistance == math.inf:
-        spawnDistance = 0
+# Returns the distance of the closest room to the specified node which contains
+# one of the specified resources.
+def resourceDistance(graph, diameter, node, resources):
+    return min([(shortestPathLength(graph, node, sNode)) if "resource" in data and data["resource"] in resources \
+                     else math.inf for sNode, data in graph.nodes(data=True)]) / diameter
 
-    # Penilize the room if it already contains a spawn point.
-    spawnRedundancy = 0
-    for neighbor in roomGraph[node]:
-        if "resource" in roomGraph.node[neighbor] and roomGraph.node[neighbor]["resource"] is spawnPoint[0]:
-            spawnRedundancy = spawnRedundancy + 1 / spawnPoint[1]
+# Returns how many resource of a give type are in the neighbourhood of the
+# node.
+def resourceRedundancy(graph, node, resource):
+    redundancy = 0
+    for neighbor in graph[node]:
+        if "resource" in graph.node[neighbor] and graph.node[neighbor]["resource"] is resource[0]:
+            redundancy = redundancy + 1 / resource[1]
+    return redundancy
 
-    # print(node + " has fitness " + "{:.2f}".format(intervalFitness) + " + " +
-    # "{:.2f}".format(spawnDistance) + " * 0.25 - " +
-    # "{:.2f}".format(spawnRedundancy) + " * 2 = " +
-    # "{:.2f}".format(intervalFitness + spawnDistance * 0.25 - spawnRedundancy)
-    #  + ".")
+# Returns the fitness of a room.
+def roomFitness(graph, diameter, node, intervalFitness, object, objectList, weigths):
+    return weigths[0] * intervalFitness + weigths[1] * resourceDistance(graph, diameter, node, objectList) + weigths[2] * resourceRedundancy(graph, node, object)
 
-    return intervalFitness + spawnDistance * 0.25 - spawnRedundancy * 2
+# Returns the distance of a tile from the walls.
+def wallDistace(originX, originY, endX, endY, x, y):
+    return (min([abs(originX - x), abs(endX - x)]) + min([abs(originY - y), abs(endY - y)])) / ((endX - originX) / 2 + (endY - originY) / 2)
 
-# Tells how well a tile fits for a spawn point.
-def getSpawnPointTileFit(x, y, originX, originY, endX, endY, visibility, placedObjects, mapDiagonal):
-    roomSize = [endX - originX, endY - originY]
-    objectDistance = min([(eulerianDistance(x, y, object[0], object[1])) for object in placedObjects]) / mapDiagonal if len(placedObjects) > 0 else 0
-    wallDistance = min([abs(originX - x), abs(endX - x)]) + min([abs(originY - y), abs(endY - y)])
-    return (1 - visibility) + wallDistance / (roomSize[0] / 2 + roomSize[1] / 2) * 0.5 + objectDistance * 0.5
+# Returns the distance of a tile from the closest placed object.
+def objectDistance(x, y, placedObjects, mapDiagonal):
+    return min([(eulerianDistance(x, y, object[0], object[1])) for object in placedObjects]) / mapDiagonal if len(placedObjects) > 0 else 0
 
-# Tells how well a room fits for a medkit.
-def getMedkitRoomFit(roomGraph, node, intervalFitness, diameter, medkit, spawnPoint):
-    # Compute how much the room is distant from the already placed objects.
-    resourceDistance = min([(shortestPathLength(roomGraph, node, sNode)) if "resource" in data and (data["resource"] == spawnPoint[0] \
-                     or data["resource"] == medkit[0]) else math.inf for sNode, data in roomGraph.nodes(data=True)]) / diameter
-    if resourceDistance == math.inf:
-        resourceDistance = 0
-
-    # Penilize the room if it already contains an object.
-    medkitRedundancy = 0
-    for neighbor in roomGraph[node]:
-        if "resource" in roomGraph.node[neighbor] and roomGraph.node[neighbor]["resource"] is medkit[0]:
-            medkitRedundancy = medkitRedundancy + 1 / medkit[1]
-
-    # print(node + " has fitness " + "{:.2f}".format(intervalFitness) + " + " +
-    # "{:.2f}".format(resourceDistance) + " * 0.25 - " +
-    # "{:.2f}".format(medkitRedundancy) + " * 2 = " +
-    # "{:.2f}".format(intervalFitness + resourceDistance * 0.25 -
-    # medkitRedundancy) + ".")
-
-    return intervalFitness + resourceDistance * 0.25 - medkitRedundancy * 2
-
-# Tells how well a tile fits for a medkit.
-def getMedkitTileFit(x, y, originX, originY, endX, endY, visibility, placedObjects, mapDiagonal):
-    roomSize = [endX - originX, endY - originY]
-    objectDistance = min([(eulerianDistance(x, y, object[0], object[1])) for object in placedObjects]) / mapDiagonal if len(placedObjects) > 0 else 0
-    wallDistance = min([abs(originX - x), abs(endX - x)]) + min([abs(originY - y), abs(endY - y)])
-    reboundedVisibility = 1 - abs(0.5 - visibility) * 2
-    return reboundedVisibility + wallDistance / (roomSize[0] / 2 + roomSize[1] / 2) * 0.25 + objectDistance * 0.5
-
-# Tells how well a room fits for ammo.
-def getAmmoRoomFit(roomGraph, node, intervalFitness, diameter, medkit, ammo):
-    # Compute how much the room is distant from the already placed objects.
-    resourceDistance = min([(shortestPathLength(roomGraph, node, sNode)) if "resource" in data and (data["resource"] == ammo[0] \
-                     or data["resource"] == medkit[0]) else math.inf for sNode, data in roomGraph.nodes(data=True)]) / diameter
-    if resourceDistance == math.inf:
-        resourceDistance = 0
-
-    # Penilize the room if it already contains an object.
-    ammoRedundancy = 0
-    for neighbor in roomGraph[node]:
-        if "resource" in roomGraph.node[neighbor] and roomGraph.node[neighbor]["resource"] is ammo[0]:
-            ammoRedundancy = ammoRedundancy + 1 / ammo[1]
-
-    # print(node + " has fitness " + "{:.2f}".format(intervalFitness) + " + " +
-    # "{:.2f}".format(resourceDistance) + " * 0.25 - " +
-    # "{:.2f}".format(ammoRedundancy) + " * 2 = " +
-    # "{:.2f}".format(intervalFitness + resourceDistance * 0.25 -
-    # ammoRedundancy) + ".")
-
-    return intervalFitness + resourceDistance * 0.25 - ammoRedundancy * 2
-
-# Tells how well a tile fits for ammo.
-def getAmmoTileFit(x, y, originX, originY, endX, endY, visibility, placedObjects, mapDiagonal):
-    roomSize = [endX - originX, endY - originY]
-    objectDistance = min([(eulerianDistance(x, y, object[0], object[1])) for object in placedObjects]) / mapDiagonal if len(placedObjects) > 0 else 0
-    wallDistance = min([abs(originX - x), abs(endX - x)]) + min([abs(originY - y), abs(endY - y)])
-    return visibility + wallDistance / (roomSize[0] / 2 + roomSize[1] / 2) * 0.25 + objectDistance * 0.5
+# Returns the fitness of a tile.
+def tileFitness(x, y, visibility, originX, originY, endX, endY, placedObjects, mapDiagonal, weigths):
+    return weigths[0] * visibility + weigths[1] * wallDistace(originX, originY, endX, endY, x, y) + weigths[2] * objectDistance(x, y, placedObjects, mapDiagonal)
 
 ### GRAPH FUNCTIONS ###########################################################
 
@@ -819,6 +770,33 @@ def filesMenu():
 
     return mapFileName, ABFileName, mapFilePath, ABFilePath, map, rooms
 
+# Mengaes the map population menu.
+def populateMenu():
+    while True:
+        print("\n[MAP POPULATION] Select an option:")
+        print("[1] Add spawn points with low risk heuristic")
+        print("[2] Add spawn points with high risk heuristic")
+        print("[3] Add spawn points randomly")
+        print("[4] Add everything")
+        print("[0] Back\n")
+
+        option = input("Option: ")
+    
+        while option != "1" and option != "2" and option != "3" and option != "4" and option != "0":
+            option = input("Invalid choice. Option: ")
+    
+        if option == "1":
+            print("This has not been implemented yet.")
+        elif option == "2":
+            print("This has not been implemented yet.")
+        elif option == "3":
+            print("This has not been implemented yet.")
+        elif option == "4":
+            addEverything(map, rooms, ["s", 5], ["h", 4], ["a", 4])
+            exportMap(outputDir + "/" + mapFileName)    
+        elif option == "0":
+            return
+
 ### MAIN ######################################################################
 
 # Create the input and the output folder if needed.
@@ -848,8 +826,7 @@ while True:
         option = input("Invalid choice. Option: ")
 
     if option == "1":
-        populateMap(map, rooms, ["s", 5], ["h", 4], ["a", 4])
-        exportMap(outputDir + "/" + mapFileName)
+        populateMenu()
     elif option == "2":
         graphMenu()
     elif option == "3":
