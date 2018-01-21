@@ -121,7 +121,7 @@ public class DivisiveMapGenerator : MapGenerator {
 
         while (currentFill < minimumFilledTiles && rooms.Count > 0) {
             int current = pseudoRandomGen.Next(0, rooms.Count);
-            Debug.Log("Selected room " + current + " out of " + rooms.Count + " of size " + rooms[current].roomSize  + ".");
+            // Debug.Log("Selected room " + current + " out of " + rooms.Count + " of size " + rooms[current].roomSize  + ".");
             PlaceRoom(rooms[current].originX, rooms[current].originY, rooms[current].width, rooms[current].height);
             currentFill += rooms[current].roomSize;
             placedRooms.Add(rooms[current]);

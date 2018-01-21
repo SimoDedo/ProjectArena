@@ -7,7 +7,10 @@ public class GunUIManager : MonoBehaviour {
 
     // Sets the ammo.
     public void SetAmmo(int charger, int tot) {
-        ammo.GetComponent<Text>().text = charger.ToString() + "/" + tot.ToString();
+        if (tot == -1)
+            ammo.GetComponent<Text>().text = charger.ToString() + "/∞";
+        else
+            ammo.GetComponent<Text>().text = charger.ToString() + "/" + tot.ToString();
     }
 
 }

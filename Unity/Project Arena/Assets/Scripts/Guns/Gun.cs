@@ -10,6 +10,7 @@ public abstract class Gun : MonoBehaviour {
     [Header("Gun parameters")] [SerializeField] protected int damage = 10;
     [SerializeField] protected float dispersion = 0f;
     [SerializeField] protected int projectilesPerShot = 1;
+    [SerializeField] protected bool infinteAmmo = false;
     [SerializeField] protected int chargerSize;
     [SerializeField] protected int maximumAmmo;
     [SerializeField] protected float reloadTime = 1f;
@@ -127,7 +128,9 @@ public abstract class Gun : MonoBehaviour {
                 // Stop the reloading.
                 reloading = false;
                 // Update charger and total ammo count.
-                if (totalAmmo >= chargerSize - ammoInCharger) {
+                if (infinteAmmo)
+                    ammoInCharger = chargerSize;
+                else if (totalAmmo >= chargerSize - ammoInCharger) {
                     totalAmmo -= chargerSize - ammoInCharger;
                     ammoInCharger = chargerSize;
                 } else {
@@ -136,7 +139,7 @@ public abstract class Gun : MonoBehaviour {
                 }
                 // Set the ammo in the UI.
                 if (hasUI)
-                    gunUIManagerScript.SetAmmo(ammoInCharger, totalAmmo);
+                    gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
             }
         } else if (coolingDown) {
             if (Time.time > cooldownStart + cooldownTime)
@@ -158,8 +161,8 @@ public abstract class Gun : MonoBehaviour {
 
         if (hasUI) {
             gunUIManagerScript = GetComponent<GunUIManager>();
-            gunUIManagerScript.SetAmmo(ammoInCharger, totalAmmo);
-        }
+            gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
+        }       
     }
 
     // Called by the opponent, sets references to the game manager and to the player script itself.
@@ -177,12 +180,12 @@ public abstract class Gun : MonoBehaviour {
         defaultTotalAmmo = totalAmmo;
 
         if (hasUI)
-            gunUIManagerScript.SetAmmo(ammoInCharger, totalAmmo);
+            gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
     }
 
     // I can reload when I have ammo left, my charger isn't full and I'm not reloading.
     protected bool CanReload() {
-        return totalAmmo > 0 && ammoInCharger < chargerSize && !reloading;
+        return (totalAmmo > 0 || infinteAmmo) && ammoInCharger < chargerSize && !reloading;
     }
 
     // I can shoot when I'm not reloading and I'm not in cooldown.
@@ -244,7 +247,7 @@ public abstract class Gun : MonoBehaviour {
         SetReload();
 
         if (hasUI) {
-            gunUIManagerScript.SetAmmo(ammoInCharger, totalAmmo);
+            gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
             playerUIManagerScript.SetCooldown(reloadTime);
         }
     }
@@ -263,7 +266,7 @@ public abstract class Gun : MonoBehaviour {
 
     // Tells if the gun has the maximum number of ammo.
     public bool IsFull() {
-        return totalAmmo == maximumAmmo;
+        return totalAmmo == maximumAmmo || infinteAmmo;
     }
 
     // Adds ammo.
@@ -274,7 +277,7 @@ public abstract class Gun : MonoBehaviour {
             totalAmmo = maximumAmmo;
 
         if (gameObject.activeSelf && hasUI) {
-            gunUIManagerScript.SetAmmo(ammoInCharger, totalAmmo);
+            gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
             if (used && ammoInCharger == 0 && CanReload())
                 Reload();
         }

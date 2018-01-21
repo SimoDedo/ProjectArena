@@ -18,10 +18,9 @@ public class ProjectileGun : Gun {
 
     protected override void Shoot() {
         StartCoroutine(ShowMuzzleFlash());
-        ammoInCharger -= 1;
 
         if (hasUI)
-            gunUIManagerScript.SetAmmo(ammoInCharger, totalAmmo);
+            gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
 
         for (int i = 0; i < projectilesPerShot; i++) {
             Quaternion rotation;
