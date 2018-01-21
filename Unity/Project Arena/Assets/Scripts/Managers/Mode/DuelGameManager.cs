@@ -158,6 +158,8 @@ public class DuelGameManager : GameManager {
         }
 
         isPaused = !isPaused;
+
+        StartCoroutine(FreezeTime(0.25f, isPaused));
     }
 
     // Menages the death of an entity.

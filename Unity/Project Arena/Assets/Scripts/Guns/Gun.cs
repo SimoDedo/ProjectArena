@@ -55,7 +55,7 @@ public abstract class Gun : MonoBehaviour {
     protected PlayerUIManager playerUIManagerScript;
     protected Entity ownerEntityScript;
 
-    // Is teh gun being used?
+    // Is the gun being used?
     protected bool used = false;
 
     // Is the input enabled?
@@ -313,7 +313,7 @@ public abstract class Gun : MonoBehaviour {
         totalAmmo = defaultTotalAmmo;
 
         if (hasUI)
-            gunUIManagerScript.SetAmmo(ammoInCharger, totalAmmo);
+            gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
     }
 
     // Enables or disables the input.

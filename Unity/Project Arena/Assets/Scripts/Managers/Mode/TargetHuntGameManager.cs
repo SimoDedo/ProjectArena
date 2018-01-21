@@ -146,6 +146,8 @@ public class TargetHuntGameManager : GameManager {
         }
 
         isPaused = !isPaused;
+
+        StartCoroutine(FreezeTime(0.25f, isPaused));
     }
 
     // Spawns a targets.

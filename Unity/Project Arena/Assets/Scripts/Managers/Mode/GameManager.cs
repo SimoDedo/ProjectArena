@@ -44,7 +44,14 @@ public abstract class GameManager : CoreComponent {
 
     public abstract void Pause();
 
+    public IEnumerator FreezeTime(float wait, bool mustPause) {
+        if (mustPause)
+            yield return new WaitForSeconds(wait);
+        Time.timeScale = isPaused ? 0f : 1f;            
+    }
+
     public void Quit() {
+        Time.timeScale = 1f;
         Cursor.lockState = CursorLockMode.None;
         SceneManager.LoadScene("Menu");
     }

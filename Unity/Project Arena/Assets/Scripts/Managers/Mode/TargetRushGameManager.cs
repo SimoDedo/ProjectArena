@@ -148,6 +148,8 @@ public class TargetRushGameManager : GameManager {
         }
 
         isPaused = !isPaused;
+
+        StartCoroutine(FreezeTime(0.25f, isPaused));
     }
 
     // Ends a wave, gives extra points and time, starts a new wave or ends the game.
