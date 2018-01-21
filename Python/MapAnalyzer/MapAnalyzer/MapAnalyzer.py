@@ -221,28 +221,21 @@ def addEverything(map, rooms, spawnPoint, medkit, ammo):
     visibilityMatrix = getVisibilityMatrix(map)
 
     diameter = getDiameterLength(roomGraph)
-    mapDiagonal = math.sqrt(math.pow(width, 2) + math.pow(height, 2))
+    diagonal = math.sqrt(math.pow(width, 2) + math.pow(height, 2))
 
     normalizedDegree = getNormalizedDegree(roomGraph)
-    spawnPointDegreeFit = getNormalizedDegreeFit(normalizedDegree, 0.1, 0.3)
-    medkitDegreeFit = getNormalizedDegreeFit(normalizedDegree, 0.3, 0.5)
-    downAmmoDegreeFit = getNormalizedDegreeFit(normalizedDegree, 0.2, 0.4)
-    upAmmoDegreeFit = getNormalizedDegreeFit(normalizedDegree, 0.8, 0.9)
 
-    placedObjects = []
-
+    placedObjects = [] 
     print("Done.")
 
     # Place the spawn points.
     print("Placing the spawn points... ", end='', flush=True)
 
+    degreeFit = getNormalizedDegreeFit(normalizedDegree, 0.1, 0.3)
+    visibilityFit = [[(1 - visibilityMatrix[x][y]) for y in range(len(visibilityMatrix[0]))] for x in range(len(visibilityMatrix))]
+
     for i in range(spawnPoint[1]):
-        candidateRooms = [(node, roomFitness(roomGraph, diameter, node, spawnPointDegreeFit[node], spawnPoint, [spawnPoint[0]], [1, 0.25, -2])) \
-                          for node, data in roomGraph.nodes(data = True) if not "resource" in data]
-        bestRoom = roomGraph.node[max(candidateRooms, key = lambda x: x[1])[0]]
-        candidateTiles = [(x, y, tileFitness(x, y, 1 - visibilityMatrix[x][y], bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], \
-                          placedObjects, mapDiagonal, [1, 0.5, 0.5])) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]
-        bestTile = max(candidateTiles, key = lambda x: x[2])
+        bestTile = getBestTile(roomGraph, diameter, diagonal, spawnPoint, [spawnPoint[0]], placedObjects, degreeFit, visibilityFit, [1, 0.25, -2], [1, 0.5, 0.5])
         addResource(bestTile[0], bestTile[1], spawnPoint[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], spawnPoint[0]])
         # print("Added spawn point in " + max(candidateRooms, key = lambda x:
@@ -254,13 +247,11 @@ def addEverything(map, rooms, spawnPoint, medkit, ammo):
     # Place the medkits.
     print("Placing the medkits... ", end='', flush=True)
 
+    degreeFit = getNormalizedDegreeFit(normalizedDegree, 0.3, 0.5)
+    visibilityFit = [[(1 - abs(0.5 - visibilityMatrix[x][y])) for y in range(len(visibilityMatrix[0]))] for x in range(len(visibilityMatrix))]
+
     for i in range(medkit[1]):
-        candidateRooms = [(node, roomFitness(roomGraph, diameter, node, medkitDegreeFit[node], medkit, [spawnPoint[0], medkit[0]], [1, 0.25, -2])) \
-                          for node, data in roomGraph.nodes(data = True) if not "resource" in data]
-        bestRoom = roomGraph.node[max(candidateRooms, key = lambda x: x[1])[0]]
-        candidateTiles = [(x, y, tileFitness(x, y, 1 - abs(0.5 - visibilityMatrix[x][y]), bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], \
-                          placedObjects, mapDiagonal, [1, 0.25, 0.5])) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]   
-        bestTile = max(candidateTiles, key = lambda x: x[2])
+        bestTile = getBestTile(roomGraph, diameter, diagonal, medkit, [spawnPoint[0], medkit[0]], placedObjects, degreeFit, visibilityFit, [1, 0.25, -2], [1, 0.25, 0.5])
         addResource(bestTile[0], bestTile[1], medkit[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], medkit[0]])
         # print("Added medkit in " + max(candidateRooms, key = lambda x:
@@ -272,26 +263,21 @@ def addEverything(map, rooms, spawnPoint, medkit, ammo):
     # Place the ammo.
     print("Placing the ammo... ", end='', flush=True)
 
+    degreeFit = getNormalizedDegreeFit(normalizedDegree, 0.2, 0.4)
+    visibilityFit = visibilityMatrix
+
     for i in range(math.floor(ammo[1] / 2)):
-        candidateRooms = [(node, roomFitness(roomGraph, diameter, node, downAmmoDegreeFit[node], ammo, [ammo[0], medkit[0]], [1, 0.25, -2])) \
-                          for node, data in roomGraph.nodes(data = True) if not "resource" in data]
-        bestRoom = roomGraph.node[max(candidateRooms, key = lambda x: x[1])[0]]
-        candidateTiles = [(x, y, tileFitness(x, y, visibilityMatrix[x][y], bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], \
-                          placedObjects, mapDiagonal, [1, 0.25, 0.5])) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]   
-        bestTile = max(candidateTiles, key = lambda x: x[2])
+        bestTile = getBestTile(roomGraph, diameter, diagonal, ammo, [ammo[0], medkit[0]], placedObjects, degreeFit, visibilityFit, [1, 0.25, -2], [1, 0.25, 0.5])
         addResource(bestTile[0], bestTile[1], ammo[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], ammo[0]])
         # print("Added ammo in " + max(candidateRooms, key = lambda x:
         # x[1])[0] + " at [" + str(bestTile[0]) + ", " + str(bestTile[1]) +
         # "].")
 
+    degreeFit = getNormalizedDegreeFit(normalizedDegree, 0.8, 0.9)
+
     for i in range(math.ceil(ammo[1] / 2)):
-        candidateRooms = [(node, roomFitness(roomGraph, diameter, node, upAmmoDegreeFit[node], ammo, [ammo[0], medkit[0]], [1, 0.25, -2])) \
-                          for node, data in roomGraph.nodes(data = True) if not "resource" in data]       
-        bestRoom = roomGraph.node[max(candidateRooms, key = lambda x: x[1])[0]]
-        candidateTiles = [(x, y, tileFitness(x, y, visibilityMatrix[x][y], bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], \
-                          placedObjects, mapDiagonal, [1, 0.25, 0.5])) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]   
-        bestTile = max(candidateTiles, key = lambda x: x[2])
+        bestTile = getBestTile(roomGraph, diameter, diagonal, ammo, [ammo[0], medkit[0]], placedObjects, degreeFit, visibilityFit, [1, 0.25, -2], [1, 0.25, 0.5])
         addResource(bestTile[0], bestTile[1], ammo[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], ammo[0]])
         # print("Added ammo in " + max(candidateRooms, key = lambda x:
@@ -400,20 +386,29 @@ def resourceRedundancy(graph, node, resource):
     return redundancy
 
 # Returns the fitness of a room.
-def roomFitness(graph, diameter, node, intervalFitness, object, objectList, weigths):
-    return weigths[0] * intervalFitness + weigths[1] * resourceDistance(graph, diameter, node, objectList) + weigths[2] * resourceRedundancy(graph, node, object)
+def roomFit(graph, diameter, node, intervalFit, object, objectList, weigths):
+    return weigths[0] * intervalFit + weigths[1] * resourceDistance(graph, diameter, node, objectList) + weigths[2] * resourceRedundancy(graph, node, object)
 
 # Returns the distance of a tile from the walls.
 def wallDistace(originX, originY, endX, endY, x, y):
     return (min([abs(originX - x), abs(endX - x)]) + min([abs(originY - y), abs(endY - y)])) / ((endX - originX) / 2 + (endY - originY) / 2)
 
 # Returns the distance of a tile from the closest placed object.
-def objectDistance(x, y, placedObjects, mapDiagonal):
-    return min([(eulerianDistance(x, y, object[0], object[1])) for object in placedObjects]) / mapDiagonal if len(placedObjects) > 0 else 0
+def objectDistance(x, y, placedObjects, diagonal):
+    return min([(eulerianDistance(x, y, object[0], object[1])) for object in placedObjects]) / diagonal if len(placedObjects) > 0 else 0
 
 # Returns the fitness of a tile.
-def tileFitness(x, y, visibility, originX, originY, endX, endY, placedObjects, mapDiagonal, weigths):
-    return weigths[0] * visibility + weigths[1] * wallDistace(originX, originY, endX, endY, x, y) + weigths[2] * objectDistance(x, y, placedObjects, mapDiagonal)
+def tileFit(x, y, visibility, originX, originY, endX, endY, placedObjects, diagonal, weigths):
+    return weigths[0] * visibility + weigths[1] * wallDistace(originX, originY, endX, endY, x, y) + weigths[2] * objectDistance(x, y, placedObjects, diagonal)
+
+# Returns the best tile.
+def getBestTile(graph, diameter, diagonal, object, objects, placedObjects, degreeFit, visibilityFit, roomWeigths, tileWeigths):
+    candidateRooms = [(node, roomFit(graph, diameter, node, degreeFit[node], object, objects, roomWeigths)) \
+                      for node, data in graph.nodes(data = True) if not "resource" in data]
+    bestRoom = graph.node[max(candidateRooms, key = lambda x: x[1])[0]]
+    candidateTiles = [(x, y, tileFit(x, y, visibilityFit[x][y], bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], \
+                      placedObjects, diagonal, tileWeigths)) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]
+    return max(candidateTiles, key = lambda x: x[2])
 
 ### GRAPH FUNCTIONS ###########################################################
 
