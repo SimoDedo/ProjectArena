@@ -4,7 +4,6 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 ### STRUCTS ##################################################################
-
 class Room:
     originX = None
     originY = None
@@ -28,7 +27,7 @@ def getFiles(inputDir):
             inputAcquired = True
         else:
             text = input("Files not found. Insert the MAPNAME value: ")
-    return mapFileName, ABFileName, mapFilePath, ABFilePath
+    return text, mapFileName, ABFileName, mapFilePath, ABFilePath
 
 # Reads the map.
 def readMap(filePath):
@@ -218,14 +217,13 @@ def addEverything(map, rooms, spawnPoint, medkit, ammo):
     print("Initializing the variables... ", end='', flush=True)
 
     roomGraph = getRoomsCorridorsGraph(rooms, False)
-    visibilityMatrix = getVisibilityMatrix(map)
-
     diameter = getDiameterLength(roomGraph)
     diagonal = math.sqrt(math.pow(width, 2) + math.pow(height, 2))
 
+    visibilityMatrix = getVisibilityMatrix(map)
     normalizedDegree = getNormalizedDegree(roomGraph)
+    placedObjects = []
 
-    placedObjects = [] 
     print("Done.")
 
     # Place the spawn points.
@@ -238,9 +236,6 @@ def addEverything(map, rooms, spawnPoint, medkit, ammo):
         bestTile = getBestTile(roomGraph, diameter, diagonal, spawnPoint, [spawnPoint[0]], placedObjects, degreeFit, visibilityFit, [1, 0.25, -2], [1, 0.5, 0.5])
         addResource(bestTile[0], bestTile[1], spawnPoint[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], spawnPoint[0]])
-        # print("Added spawn point in " + max(candidateRooms, key = lambda x:
-        # x[1])[0] + " at [" + str(bestTile[0]) + ", " + str(bestTile[1]) +
-        # "].")
 
     print("Done.")
 
@@ -254,9 +249,6 @@ def addEverything(map, rooms, spawnPoint, medkit, ammo):
         bestTile = getBestTile(roomGraph, diameter, diagonal, medkit, [spawnPoint[0], medkit[0]], placedObjects, degreeFit, visibilityFit, [1, 0.25, -2], [1, 0.25, 0.5])
         addResource(bestTile[0], bestTile[1], medkit[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], medkit[0]])
-        # print("Added medkit in " + max(candidateRooms, key = lambda x:
-        # x[1])[0] + " at [" + str(bestTile[0]) + ", " + str(bestTile[1]) +
-        # "].")
 
     print("Done.")
 
@@ -270,9 +262,6 @@ def addEverything(map, rooms, spawnPoint, medkit, ammo):
         bestTile = getBestTile(roomGraph, diameter, diagonal, ammo, [ammo[0], medkit[0]], placedObjects, degreeFit, visibilityFit, [1, 0.25, -2], [1, 0.25, 0.5])
         addResource(bestTile[0], bestTile[1], ammo[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], ammo[0]])
-        # print("Added ammo in " + max(candidateRooms, key = lambda x:
-        # x[1])[0] + " at [" + str(bestTile[0]) + ", " + str(bestTile[1]) +
-        # "].")
 
     degreeFit = getNormalizedDegreeFit(normalizedDegree, 0.8, 0.9)
 
@@ -280,12 +269,94 @@ def addEverything(map, rooms, spawnPoint, medkit, ammo):
         bestTile = getBestTile(roomGraph, diameter, diagonal, ammo, [ammo[0], medkit[0]], placedObjects, degreeFit, visibilityFit, [1, 0.25, -2], [1, 0.25, 0.5])
         addResource(bestTile[0], bestTile[1], ammo[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], ammo[0]])
-        # print("Added ammo in " + max(candidateRooms, key = lambda x:
-        # x[1])[0] + " at [" + str(bestTile[0]) + ", " + str(bestTile[1]) +
-        # "].")
 
     print("Done.")
  
+# Adds the spawn points in safe locations.
+def addSpawnPointsSafe(map, rooms, spawnPoint):
+    width = len(map)
+    height = len(map[0])
+
+    # Removing the objects.
+    print("\nRemoving the pre-existing objects... ", end='', flush=True)
+    for x in range(width): 
+        for y in range(height): 
+            if not map[x][y] == "w" and not map[x][y] == "r" :
+                map[x][y] = "r"
+    print("Done.")
+
+    print("Initializing the variables... ", end='', flush=True)
+
+    roomGraph = getRoomsCorridorsGraph(rooms, False)
+    diameter = getDiameterLength(roomGraph)
+    diagonal = math.sqrt(math.pow(width, 2) + math.pow(height, 2))
+
+    visibilityMatrix = getVisibilityMatrix(map)
+    normalizedDegree = getNormalizedDegree(roomGraph)
+    placedObjects = []
+
+    print("Done.")
+
+    # Place the spawn points.
+    print("Placing the spawn points... ", end='', flush=True)
+
+    degreeFit = getNormalizedDegreeFit(normalizedDegree, 0.1, 0.3)
+    visibilityFit = [[(1 - visibilityMatrix[x][y]) for y in range(len(visibilityMatrix[0]))] for x in range(len(visibilityMatrix))]
+
+    for i in range(spawnPoint[1]):
+        bestTile = getBestTile(roomGraph, diameter, diagonal, spawnPoint, [spawnPoint[0]], placedObjects, degreeFit, visibilityFit, [1, 0.25, -2], [1, 0.5, 0.5])
+        addResource(bestTile[0], bestTile[1], spawnPoint[0], roomGraph, map)
+        placedObjects.append([bestTile[0], bestTile[1], spawnPoint[0]])
+
+    print("Done.")
+
+# Adds the spawn points in unsafe locations.
+def addSpawnPointsUnsafe(map, rooms, spawnPoint):
+    width = len(map)
+    height = len(map[0])
+
+    # Removing the objects.
+    print("\nRemoving the pre-existing objects... ", end='', flush=True)
+    for x in range(width): 
+        for y in range(height): 
+            if not map[x][y] == "w" and not map[x][y] == "r" :
+                map[x][y] = "r"
+    print("Done.")
+
+    print("Initializing the variables... ", end='', flush=True)
+
+    roomGraph = getRoomsCorridorsGraph(rooms, False)
+    diameter = getDiameterLength(roomGraph)
+    diagonal = math.sqrt(math.pow(width, 2) + math.pow(height, 2))
+
+    visibilityMatrix = getVisibilityMatrix(map)
+    normalizedDegree = getNormalizedDegree(roomGraph)
+    placedObjects = []
+    deadEndCount = 0
+
+    print("Done.")
+
+    # Place the spawn points.
+    print("Placing the spawn points... ", end='', flush=True)
+
+    degreeFit = getNormalizedDegreeFit(normalizedDegree, 0.8, 0.9)
+    visibilityFit = visibilityMatrix
+
+    for node in list(roomGraph.nodes(data = True)):
+        if roomGraph.degree(node[0]) == 1 and deadEndCount < spawnPoint[1] / 2:
+            candidateTiles = [(x, y, visibilityFit[x][y]) for x in range(node[1]["originX"], node[1]["endX"]) for y in range(node[1]["originY"], node[1]["endY"])]
+            bestTile = max(candidateTiles, key = lambda x: x[2])
+            addResource(bestTile[0], bestTile[1], spawnPoint[0], roomGraph, map)
+            placedObjects.append([bestTile[0], bestTile[1], spawnPoint[0]])
+            deadEndCount = deadEndCount + 1
+
+    for i in range(spawnPoint[1] - deadEndCount):
+        bestTile = getBestTile(roomGraph, diameter, diagonal, spawnPoint, [spawnPoint[0]], placedObjects, degreeFit, visibilityFit, [1, 1, -2], [1, 0.75, 0.75])
+        addResource(bestTile[0], bestTile[1], spawnPoint[0], roomGraph, map)
+        placedObjects.append([bestTile[0], bestTile[1], spawnPoint[0]])
+
+    print("Done.")
+
 # Adds a resource to the map.
 def addResource(x, y, resource, roomGraph, map):
     width = len(map)
@@ -637,6 +708,10 @@ def shortestPathLength(graph, n1, n2):
     except:
         return 0
 
+# Clears the terminal.
+def cls():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
 ### PLOT FUNCTIONS ############################################################
 
 # Plots the graph.
@@ -751,7 +826,7 @@ def graphMenuReachability():
 # Menages the file menu.
 def filesMenu():
     # Get the name of the map and get the files path.
-    mapFileName, ABFileName, mapFilePath, ABFilePath = getFiles(inputDir)
+    mapName, mapFileName, ABFileName, mapFilePath, ABFilePath = getFiles(inputDir)
 
     # Read the map.
     map = readMap(mapFilePath)
@@ -763,7 +838,7 @@ def filesMenu():
     rooms = removeRooms(rooms)
     print("Done.")
 
-    return mapFileName, ABFileName, mapFilePath, ABFilePath, map, rooms
+    return mapName, mapFileName, ABFileName, mapFilePath, ABFilePath, map, rooms
 
 # Mengaes the map population menu.
 def populateMenu():
@@ -781,14 +856,16 @@ def populateMenu():
             option = input("Invalid choice. Option: ")
     
         if option == "1":
-            print("This has not been implemented yet.")
+            addSpawnPointsSafe(map, rooms, ["s", 5])
+            exportMap(outputDir + "/" + mapName + "_SS_map.txt")    
         elif option == "2":
-            print("This has not been implemented yet.")
+            addSpawnPointsUnsafe(map, rooms, ["s", 5])
+            exportMap(outputDir + "/" + mapName + "_SU_map.txt")    
         elif option == "3":
             print("This has not been implemented yet.")
         elif option == "4":
             addEverything(map, rooms, ["s", 5], ["h", 4], ["a", 4])
-            exportMap(outputDir + "/" + mapFileName)    
+            exportMap(outputDir + "/" + mapName + "_E_map.txt")    
         elif option == "0":
             return
 
@@ -806,7 +883,7 @@ print("MAP ANALYZER\n")
 print("This script expects a MAPNAME_map.txt file and MAPNAME_AB.txt file in the input folder.")
 
 # Get the files and process them.
-mapFileName, ABFileName, mapFilePath, ABFilePath, map, rooms = filesMenu()
+mapName, mapFileName, ABFileName, mapFilePath, ABFilePath, map, rooms = filesMenu()
 
 while True:
     print("\n[MENU] Select an option:")
