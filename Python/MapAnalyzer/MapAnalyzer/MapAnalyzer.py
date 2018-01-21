@@ -1,5 +1,6 @@
 import os
 import math
+import random
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -272,7 +273,7 @@ def addEverything(map, rooms, spawnPoint, medkit, ammo):
 
     print("Done.")
  
-# Adds the spawn points in safe locations.
+# Adds spawn points in safe locations.
 def addSpawnPointsSafe(map, rooms, spawnPoint):
     width = len(map)
     height = len(map[0])
@@ -310,7 +311,7 @@ def addSpawnPointsSafe(map, rooms, spawnPoint):
 
     print("Done.")
 
-# Adds the spawn points in unsafe locations.
+# Adds spawn points in unsafe locations.
 def addSpawnPointsUnsafe(map, rooms, spawnPoint):
     width = len(map)
     height = len(map[0])
@@ -354,6 +355,35 @@ def addSpawnPointsUnsafe(map, rooms, spawnPoint):
         bestTile = getBestTile(roomGraph, diameter, diagonal, spawnPoint, [spawnPoint[0]], placedObjects, degreeFit, visibilityFit, [1, 1, -2], [1, 0.75, 0.75])
         addResource(bestTile[0], bestTile[1], spawnPoint[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], spawnPoint[0]])
+
+    print("Done.")
+
+# Adds spawn points in random locations.
+def addSpawnPointsRandom(map, rooms, spawnPoint):
+    width = len(map)
+    height = len(map[0])
+
+    # Removing the objects.
+    print("\nRemoving the pre-existing objects... ", end='', flush=True)
+    for x in range(width): 
+        for y in range(height): 
+            if not map[x][y] == "w" and not map[x][y] == "r" :
+                map[x][y] = "r"
+    print("Done.")
+
+    print("Initializing the variables... ", end='', flush=True)
+
+    roomGraph = getRoomsCorridorsGraph(rooms, False)
+
+    print("Done.")
+
+    # Place the spawn points.
+    print("Placing the spawn points... ", end='', flush=True)
+
+    for i in range(spawnPoint[1]):
+        room = roomGraph.node[random.choice(list(roomGraph.nodes()))]
+        tile = [random.randint(room["originX"], room["endX"]), random.randint(room["originY"], room["endY"])]
+        addResource(tile[0], tile[1], spawnPoint[0], roomGraph, map)
 
     print("Done.")
 
@@ -862,7 +892,8 @@ def populateMenu():
             addSpawnPointsUnsafe(map, rooms, ["s", 5])
             exportMap(outputDir + "/" + mapName + "_SU_map.txt")    
         elif option == "3":
-            print("This has not been implemented yet.")
+            addSpawnPointsRandom(map, rooms, ["s", 5])
+            exportMap(outputDir + "/" + mapName + "_SR_map.txt")         
         elif option == "4":
             addEverything(map, rooms, ["s", 5], ["h", 4], ["a", 4])
             exportMap(outputDir + "/" + mapName + "_E_map.txt")    
@@ -902,6 +933,6 @@ while True:
     elif option == "2":
         graphMenu()
     elif option == "3":
-        mapFileName, ABFileName, mapFilePath, ABFilePath, map, rooms = filesMenu()
+        mapName, mapFileName, ABFileName, mapFilePath, ABFilePath, map, rooms = filesMenu()
     elif option == "0":
         break
