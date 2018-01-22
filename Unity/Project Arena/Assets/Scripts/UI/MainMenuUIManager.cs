@@ -48,7 +48,7 @@ public class MainMenuUIManager : MonoBehaviour {
     [SerializeField] private GameObject export;
     [SerializeField] private GameObject importButton;
     [SerializeField] private GameObject exportButton;
-    [SerializeField] private Slider volumeSlider;
+    [SerializeField] private Slider sensibilitySlider;
 
     [Header("Error fields")] [SerializeField] private Text errorText;
 
@@ -114,11 +114,11 @@ public class MainMenuUIManager : MonoBehaviour {
             exportTextMP.color = exportMP.GetComponent<Toggle>().colors.disabledColor;
         }
 
-        // Get the mouse sensitivity.
+        // Get the mouse sensibility.
         if (PlayerPrefs.HasKey("MouseSensibility"))
-            volumeSlider.value = PlayerPrefs.GetFloat("MouseSensibility");
+            sensibilitySlider.value = PlayerPrefs.GetFloat("MouseSensibility");
         else
-            PlayerPrefs.SetFloat("MouseSensibility", volumeSlider.value);
+            PlayerPrefs.SetFloat("MouseSensibility", sensibilitySlider.value);
 
         if (Application.platform == RuntimePlatform.WindowsPlayer) {
             importButton.SetActive(true);
@@ -341,13 +341,12 @@ public class MainMenuUIManager : MonoBehaviour {
         generationTextSP.text = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].generationName;
         currentScene = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].scene;
 
+        inputSP.interactable = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].inputEnabled;
+        inputSP.text = "";
+
         if (currentGeneration == 0) {
-            inputSP.interactable = false;
-            inputSP.text = "";
             inputSP.placeholder.GetComponent<Text>().text = GetSeed();
         } else {
-            inputSP.interactable = true;
-            inputSP.text = "";
             inputSP.placeholder.GetComponent<Text>().text = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].placeholder;
         }
     }
@@ -444,17 +443,16 @@ public class MainMenuUIManager : MonoBehaviour {
     }
 
     private void ActivateCurrentGenerationMP() {
-        generationTextMP.text = multiplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].generationName;
-        currentScene = multiplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].scene;
+        generationTextMP.text = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].generationName;
+        currentScene = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].scene;
+
+        inputMP.interactable = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].inputEnabled;
+        inputMP.text = "";
 
         if (currentGeneration == 0) {
-            inputMP.interactable = false;
-            inputMP.text = "";
             inputMP.placeholder.GetComponent<Text>().text = GetSeed();
         } else {
-            inputMP.interactable = true;
-            inputMP.text = "";
-            inputMP.placeholder.GetComponent<Text>().text = multiplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].placeholder;
+            inputMP.placeholder.GetComponent<Text>().text = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].placeholder;
         }
     }
 
@@ -562,12 +560,7 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Sets the mouse sensibility in the preferences.
     public void SetMouseSensibility() {
-        PlayerPrefs.SetFloat("MouseSensibility", volumeSlider.value);
-    }
-
-    // Sets the mouse sensibility in the preferences.
-    private float GetMouseSensibility() {
-        return PlayerPrefs.GetFloat("MouseSensibility");
+        PlayerPrefs.SetFloat("MouseSensibility", sensibilitySlider.value);
     }
 
     [Serializable]
@@ -586,6 +579,7 @@ public class MainMenuUIManager : MonoBehaviour {
     [Serializable]
     private struct Generation {
         public bool enabled;
+        public bool inputEnabled;
         public string generationName;
         public string placeholder;
         public string scene;

@@ -19,8 +19,8 @@ public class Player : Entity {
     private Vector2 mouseLook;
     // Smoothed value of the mouse
     private Vector2 smoothedDelta;
-    // Sensitivity of the mouse.
-    private float sensitivity = 2f;
+    // Sensibility of the mouse.
+    private float sensibility = 2f;
 
     // Vector used to apply the movement.
     private Vector3 moveDirection = Vector3.zero;
@@ -54,11 +54,11 @@ public class Player : Entity {
         controller = GetComponent<CharacterController>();
         playerUIManagerScript = GetComponent<PlayerUIManager>();
 
-        // Get the mouse sensitivity.
+        // Get the mouse sensibility.
         if (PlayerPrefs.HasKey("MouseSensibility"))
-            sensitivity = PlayerPrefs.GetFloat("MouseSensibility");
+            sensibility = PlayerPrefs.GetFloat("MouseSensibility");
         else
-            PlayerPrefs.SetFloat("MouseSensibility", sensitivity);
+            PlayerPrefs.SetFloat("MouseSensibility", sensibility);
     }
 
     private void Update() {
@@ -236,7 +236,7 @@ public class Player : Entity {
         Vector2 mouseDelta = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
 
         // Extract the delta of the mouse.
-        mouseDelta = Vector2.Scale(mouseDelta, new Vector2(sensitivity * smoothing * inputPenalty, sensitivity * smoothing * inputPenalty));
+        mouseDelta = Vector2.Scale(mouseDelta, new Vector2(sensibility * smoothing * inputPenalty, sensibility * smoothing * inputPenalty));
         smoothedDelta.x = Mathf.Lerp(smoothedDelta.x, mouseDelta.x, 1f / smoothing);
         smoothedDelta.y = Mathf.Lerp(smoothedDelta.y, mouseDelta.y, 1f / smoothing);
         mouseLook += smoothedDelta;
@@ -293,6 +293,11 @@ public class Player : Entity {
             ActivateGun(currentGun);
         else
             DeactivateGun(currentGun);
+    }
+
+    // Updates the sensibility.
+    public void SetSensibility(float s) {
+        sensibility = s;
     }
 
 }
