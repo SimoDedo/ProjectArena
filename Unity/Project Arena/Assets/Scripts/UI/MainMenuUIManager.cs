@@ -56,6 +56,7 @@ public class MainMenuUIManager : MonoBehaviour {
 
     [Header("Other")] [SerializeField] private GameObject parameterManagerPrefab;
     [SerializeField] private MapValidator mapValidator;
+    [SerializeField] private RotateTranslateByAxis backgroundScript;
     [SerializeField] private bool forceInput;
 
     private GameObject openedSection;
@@ -78,10 +79,13 @@ public class MainMenuUIManager : MonoBehaviour {
     public void Start() {
         Cursor.lockState = CursorLockMode.None;
 
-        if (!GameObject.Find("Parameter Manager"))
+        if (!GameObject.Find("Parameter Manager")) {
             InstantiateParameterManager();
-        else
+            parameterManagerScript.SetBackgroundRotation(backgroundScript.GetRotation());
+        } else {
             parameterManagerScript = GameObject.Find("Parameter Manager").GetComponent<ParameterManager>();
+            backgroundScript.SetRotation(parameterManagerScript.GetBackgroundRotation());
+        }
 
         openedSection = main;
 
@@ -157,7 +161,7 @@ public class MainMenuUIManager : MonoBehaviour {
             loadingText.text = "Validating the map";
             int errorCode = currentIsMultilevel ? mapValidator.ValidateMLMap(parameterManagerScript.GetMapDNA()) : mapValidator.ValidateMap(parameterManagerScript.GetMapDNA());
             if (errorCode == 0) {
-                SceneManager.LoadScene(currentScene);
+                Load(currentScene);
             } else {
                 SetErrorMessage(errorCode, null);
                 OpenSection(error);
@@ -166,13 +170,19 @@ public class MainMenuUIManager : MonoBehaviour {
             loadingText.text = "Validating the map";
             int errorCode = currentIsMultilevel ? mapValidator.ValidateGeneticMLMap(parameterManagerScript.GetMapDNA()) : mapValidator.ValidateGeneticMap(parameterManagerScript.GetMapDNA());
             if (errorCode == 0) {
-                SceneManager.LoadScene(currentScene);
+                Load(currentScene);
             } else {
                 SetErrorMessage(errorCode, null);
                 OpenSection(error);
             }
         } else
-            SceneManager.LoadScene(currentScene);
+            Load(currentScene);
+    }
+
+    // Loads a scene.
+    private void Load(string scene) {
+        parameterManagerScript.SetBackgroundRotation(backgroundScript.GetRotation());
+        SceneManager.LoadScene(scene);
     }
 
     // Quits the game.

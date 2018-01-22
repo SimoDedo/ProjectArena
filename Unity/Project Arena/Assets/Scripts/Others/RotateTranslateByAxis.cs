@@ -84,4 +84,12 @@ public class RotateTranslateByAxis : MonoBehaviour {
             transform.Rotate(Vector3.up * Time.deltaTime * yRotSpeed);
     }
 
+    public Quaternion GetRotation() {
+        return transform.rotation;
+    }
+
+    public void SetRotation(Quaternion rotation) {
+        transform.rotation = rotation;
+    }
+
 }

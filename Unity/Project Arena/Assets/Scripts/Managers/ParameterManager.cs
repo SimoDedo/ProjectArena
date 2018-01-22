@@ -15,6 +15,9 @@ public class ParameterManager : MonoBehaviour {
     private int errorCode = 0;
     private string errorMessage;
 
+    // Other data.
+    private Quaternion backgroundRotation;
+
     void Awake() {
         DontDestroyOnLoad(transform.gameObject);
     }
@@ -82,6 +85,14 @@ public class ParameterManager : MonoBehaviour {
 
     public string GetErrorMessage() {
         return errorMessage;
+    }
+
+    public void SetBackgroundRotation(Quaternion br) {
+        backgroundRotation = br;
+    }
+
+    public Quaternion GetBackgroundRotation() {
+        return backgroundRotation;
     }
 
 }

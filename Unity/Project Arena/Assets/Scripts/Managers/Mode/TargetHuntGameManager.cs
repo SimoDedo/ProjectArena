@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -116,7 +117,6 @@ public class TargetHuntGameManager : GameManager {
     }
 
     // Called when a target is destroyed, adds score and time and changes wave if the target is the last one.
-
     public override void AddScore(int scoreIncrease, int timeIncrease) {
         // I need to ignore the targets call to decrease score.
         if (scoreIncrease > 0) {
