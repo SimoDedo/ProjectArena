@@ -51,35 +51,42 @@ public class MLMapManager : MapManager {
 
     // Loads the map from a text file.
     protected override void LoadMapFromText() {
-        if (textFilePath == null) {
-            ManageError(Error.HARD_ERROR, -1);
-        } else if (!File.Exists(textFilePath)) {
-            ManageError(Error.HARD_ERROR, -1);
-        } else {
-            try {
-                int mapsCount = 1;
-                int width = 0;
-
-                string[] lines = File.ReadAllLines(@textFilePath);
-
-                foreach (string s in lines) {
-                    if (s.Length == 0) {
-                        mapsCount++;
-                    } else if (mapsCount == 1)
-                        width++;
-                }
-
-                for (int i = 0; i < mapsCount; i++) {
-                    maps.Add(new char[width, lines[0].Length]);
-
-                    for (int x = 0; x < maps[i].GetLength(0); x++) {
-                        for (int y = 0; y < maps[i].GetLength(1); y++) {
-                            maps[i][x, y] = lines[x + i * (width + 1)][y];
-                        }
-                    }
-                }
-            } catch (Exception) {
+        if (seed == null) {
+            if (textFilePath == null) {
                 ManageError(Error.HARD_ERROR, -1);
+            } else if (!File.Exists(textFilePath)) {
+                ManageError(Error.HARD_ERROR, -1);
+            } else {
+                try {
+                    ConvertToMatrices(File.ReadAllLines(@textFilePath));
+                } catch (Exception) {
+                    ManageError(Error.HARD_ERROR, -1);
+                }
+            }
+        } else {
+            ConvertToMatrices(seed.Split(new string[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries));
+        }
+    }
+
+    // Converts the map from a list of lines to a list of matrices.
+    private void ConvertToMatrices(string[] lines) {
+        int mapsCount = 1;
+        int width = 0;
+
+        foreach (string s in lines) {
+            if (s.Length == 0) {
+                mapsCount++;
+            } else if (mapsCount == 1)
+                width++;
+        }
+
+        for (int i = 0; i < mapsCount; i++) {
+            maps.Add(new char[width, lines[0].Length]);
+
+            for (int x = 0; x < maps[i].GetLength(0); x++) {
+                for (int y = 0; y < maps[i].GetLength(1); y++) {
+                    maps[i][x, y] = lines[x + i * (width + 1)][y];
+                }
             }
         }
     }

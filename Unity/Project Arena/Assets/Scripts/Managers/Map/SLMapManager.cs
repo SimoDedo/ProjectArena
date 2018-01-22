@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using UnityEngine;
 
 public class SLMapManager : MapManager {
 
@@ -33,23 +34,30 @@ public class SLMapManager : MapManager {
 
     // Loads the map from a text file.
     protected override void LoadMapFromText() {
-        if (textFilePath == null) {
-            GetParameterManager().ErrorBackToMenu(-1);
-        } else if (!File.Exists(textFilePath)) {
-            GetParameterManager().ErrorBackToMenu(-1);
-        } else {
-            try {
-                string[] lines = File.ReadAllLines(@textFilePath);
-
-                map = new char[lines.GetLength(0), lines[0].Length];
-
-                for (int x = 0; x < map.GetLength(0); x++) {
-                    for (int y = 0; y < map.GetLength(1); y++) {
-                        map[x, y] = lines[x][y];
-                    }
-                }
-            } catch (Exception) {
+        if (seed == null) {
+            if (textFilePath == null) {
                 GetParameterManager().ErrorBackToMenu(-1);
+            } else if (!File.Exists(textFilePath)) {
+                GetParameterManager().ErrorBackToMenu(-1);
+            } else {
+                try {
+                    ConvertToMatrix(File.ReadAllLines(@textFilePath));
+                } catch (Exception) {
+                    GetParameterManager().ErrorBackToMenu(-1);
+                }
+            }
+        } else {
+            ConvertToMatrix(seed.Split(new string[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries));
+        }
+    }
+
+    // Converts the map from a list of lines to a matrix.
+    private void ConvertToMatrix(string[] lines) {
+        map = new char[lines.GetLength(0), lines[0].Length];
+
+        for (int x = 0; x < map.GetLength(0); x++) {
+            for (int y = 0; y < map.GetLength(1); y++) {
+                map[x, y] = lines[x][y];
             }
         }
     }

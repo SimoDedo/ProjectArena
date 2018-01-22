@@ -7,22 +7,24 @@ public class ExperimentManager : MonoBehaviour {
     [Header("Experiment")] [SerializeField] private List<Study> studies;
     [SerializeField] private int casesPerUsers;
 
-    [Header("Tutorial")] [SerializeField] private string tutorialScene;
+    [Header("Tutorial")] [SerializeField] private Case tutorial;
     [SerializeField] private bool playTutorial;
 
     // List of cases the current player has to play.
     private Queue<Case> caseQueue;
 
-    void Start () {
+    void Start() {
         caseQueue = new Queue<Case>();
     }
-	
+
+    void Awake() {
+        DontDestroyOnLoad(transform.gameObject);
+    }
+
     // Creates a new list of cases for the player to play.
     private void CreateNewQueue() {
         if (playTutorial) {
-            caseQueue.Enqueue(new Case {
-                scene = tutorialScene
-            });
+            caseQueue.Enqueue(tutorial);
         }
 
         for (int i = 0; i < casesPerUsers; i++) {
@@ -59,12 +61,15 @@ public class ExperimentManager : MonoBehaviour {
         return studies[minIndex].cases[minMinIndex];
     }
 
-    // Get the next scene to be played.
-    public string GetNextScene() {
+    // Retuns the next scene to be played.
+    public string GetNextScene(ParameterManager pm) {
         if (caseQueue.Count == 0)
             CreateNewQueue();
-        
+
         Case currentCase = caseQueue.Dequeue();
+
+        pm.SetGenerationMode(4);
+        pm.SetMapDNA(currentCase.map.text);
 
         return currentCase.scene;
     }
@@ -78,7 +83,7 @@ public class ExperimentManager : MonoBehaviour {
 
     [Serializable]
     private class Case {
-        public string fileName;
+        public TextAsset map;
         public string scene;
         [NonSerialized] public int completion;
     }

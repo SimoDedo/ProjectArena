@@ -73,6 +73,11 @@ public abstract class MapManager : CoreComponent {
                     seed = GetParameterManager().GetMapDNA();
                     textFilePath = GetParameterManager().GetMapDNA();
                     break;
+                case 4:
+                    loadMapFromFile = true;
+                    seed = GetParameterManager().GetMapDNA();
+                    textFilePath = null;
+                    break;
             }
         }
     }
