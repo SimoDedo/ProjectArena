@@ -41,6 +41,7 @@ public class ExperimentMenuUIManager : MonoBehaviour {
 
     // Loads the level indicated by the Experiment Manager.
     public void Play() {
+        Debug.Log("Loading " + experimentManagerScript.GetNextScene() + "...");
         // SceneManager.LoadScene("Menu");
     }
 
