@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ExperimentManager : MonoBehaviour {
 
@@ -34,6 +35,10 @@ public class ExperimentManager : MonoBehaviour {
 
         if (playSurvey)
             caseQueue.Enqueue(survey);
+
+        caseQueue.Enqueue(new Case {
+            scene = SceneManager.GetActiveScene().name
+        });
     }
 
     // Gets the next case to add in a round-robin fashion.

@@ -12,6 +12,7 @@ public class TutorialGameManager : GameManager {
 
     private Player playerScript;
     private bool tutorialCompleted = false;
+    private float completionTime;
 
     void Start() {
         /* #if UNITY_EDITOR
@@ -92,8 +93,9 @@ public class TutorialGameManager : GameManager {
             playerScript.SetInGame(false);
             tutorialGameUIManagerScript.Fade(0.7f, 0, true, 0.5f);
             tutorialGameUIManagerScript.ActivateScoreUI();
+            completionTime = Time.time;
             gamePhase = 2;
-        } else if (gamePhase == 2 && passedTime >= readyDuration + gameDuration + scoreDuration) {
+        } else if (gamePhase == 2 && Time.time >= completionTime + scoreDuration) {
             Quit();
         }
     }
