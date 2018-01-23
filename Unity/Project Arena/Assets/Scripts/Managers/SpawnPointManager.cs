@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -23,7 +22,7 @@ public class SpawnPointManager : CoreComponent {
 
         if (SPs != null && SPs.Count > 0) {
             foreach (GameObject s in SPs) {
-                spawnPoints.Add(new SpawnPoint(s.transform.position, Time.time - spawnCooldown));
+                spawnPoints.Add(new SpawnPoint(s.transform.position, -1 * Mathf.Infinity));
             }
             generateOnly = false;
         } else {
@@ -34,10 +33,17 @@ public class SpawnPointManager : CoreComponent {
         return generateOnly;
     }
 
+    // Updates the last used field of all the spawn points that have already been used.
+    public void UpdateLastUsed() {
+        foreach (SpawnPoint s in spawnPoints)
+            if (s.lastUsed > -1 * Mathf.Infinity)
+                s.lastUsed = Time.time;
+    }
+
     // Returns an available spawn position.
     public Vector3 GetSpawnPosition() {
         List<SpawnPoint> availableSpawnPoints = spawnPoints
-            .Where(spawnPoints => Time.time - spawnPoints.lastUsed >= spawnCooldown)
+            .Where(spawnPoint => Time.time - spawnPoint.lastUsed >= spawnCooldown)
             .ToList();
 
         if (availableSpawnPoints.Count == 0)
@@ -48,9 +54,9 @@ public class SpawnPointManager : CoreComponent {
     
     // Returns a random spawn point from a list.
     private SpawnPoint GetRandomSpawnPoint(List<SpawnPoint> SPs) {
-        SpawnPoint sp = SPs[UnityEngine.Random.Range(0, SPs.Count)];
-        sp.lastUsed = Time.time;
-        return sp;
+        int index = UnityEngine.Random.Range(0, SPs.Count);
+        SPs[index].lastUsed = Time.time;
+        return SPs[index];
     }
 
     private class SpawnPoint {

@@ -73,6 +73,7 @@ public class TargetHuntGameManager : GameManager {
             // Enable the player movement and interactions, activate the fight UI, set the score to zero, the wave to 1 and set the phase.
             targetHuntGameUIManagerScript.Fade(0.7f, 0f, false, 0.25f);
             targetHuntGameUIManagerScript.SetScore(0);
+            spawnPointManagerScript.UpdateLastUsed();
             SpawnTarget();
             playerScript.SetInGame(true);
             targetHuntGameUIManagerScript.ActivateFightUI();

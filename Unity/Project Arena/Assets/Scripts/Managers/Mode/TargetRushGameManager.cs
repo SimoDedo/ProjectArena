@@ -73,6 +73,7 @@ public class TargetRushGameManager : GameManager {
             // Enable the player movement and interactions, activate the fight UI, set the score to zero, the wave to 1 and set the phase.
             targetRushGameUIManagerScript.Fade(0.7f, 0f, false, 0.25f);
             targetRushGameUIManagerScript.SetScore(0);
+            spawnPointManagerScript.UpdateLastUsed();
             StartCoroutine(SpawnWave());
             playerScript.SetInGame(true);
             targetRushGameUIManagerScript.ActivateFightUI();
