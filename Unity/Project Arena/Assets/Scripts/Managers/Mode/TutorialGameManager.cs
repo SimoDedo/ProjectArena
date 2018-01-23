@@ -132,6 +132,7 @@ public class TutorialGameManager : GameManager {
     }
 
     public override void SetUIColor(Color c) {
+        tutorialGameUIManagerScript.SetColorAll(c);
     }
 
     public override void AddScore(int i, int j) {
