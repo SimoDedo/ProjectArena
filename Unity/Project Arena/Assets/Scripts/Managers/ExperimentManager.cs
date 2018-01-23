@@ -4,11 +4,14 @@ using UnityEngine;
 
 public class ExperimentManager : MonoBehaviour {
 
+    [Header("Tutorial")] [SerializeField] private Case tutorial;
+    [SerializeField] private bool playTutorial;
+
     [Header("Experiment")] [SerializeField] private List<Study> studies;
     [SerializeField] private int casesPerUsers;
 
-    [Header("Tutorial")] [SerializeField] private Case tutorial;
-    [SerializeField] private bool playTutorial;
+    [Header("Survey")] [SerializeField] private Case survey;
+    [SerializeField] private bool playSurvey;
 
     // List of cases the current player has to play.
     private Queue<Case> caseQueue;
@@ -23,13 +26,14 @@ public class ExperimentManager : MonoBehaviour {
 
     // Creates a new list of cases for the player to play.
     private void CreateNewQueue() {
-        if (playTutorial) {
+        if (playTutorial)
             caseQueue.Enqueue(tutorial);
-        }
 
-        for (int i = 0; i < casesPerUsers; i++) {
+        for (int i = 0; i < casesPerUsers; i++)
             caseQueue.Enqueue(GetCase());
-        }
+
+        if (playSurvey)
+            caseQueue.Enqueue(survey);
     }
 
     // Gets the next case to add in a round-robin fashion.
@@ -69,22 +73,22 @@ public class ExperimentManager : MonoBehaviour {
         Case currentCase = caseQueue.Dequeue();
 
         pm.SetGenerationMode(4);
-        pm.SetMapDNA(currentCase.map.text);
+        pm.SetMapDNA(currentCase.map == null ? "" : currentCase.map.text);
 
         return currentCase.scene;
     }
 
     [Serializable]
     private class Study {
-        public string studyName;
-        public List<Case> cases;
+        [SerializeField] public string studyName;
+        [SerializeField] public List<Case> cases;
         [NonSerialized] public int completion;
     }
 
     [Serializable]
     private class Case {
-        public TextAsset map;
-        public string scene;
+        [SerializeField] public TextAsset map;
+        [SerializeField] public string scene;
         [NonSerialized] public int completion;
     }
 

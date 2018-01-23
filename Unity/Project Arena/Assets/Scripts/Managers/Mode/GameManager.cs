@@ -53,7 +53,18 @@ public abstract class GameManager : CoreComponent {
     public void Quit() {
         Time.timeScale = 1f;
         Cursor.lockState = CursorLockMode.None;
-        SceneManager.LoadScene("Menu");
+        LoadNextScene("Menu");
+    }
+
+    // Loads the next scene
+    private void LoadNextScene(string def) {
+        if (GameObject.Find("Experiment Manager") && GameObject.Find("Parameter Manager")) {
+            ParameterManager pm = GameObject.Find("Parameter Manager").GetComponent<ParameterManager>();
+            ExperimentManager em = GameObject.Find("Experiment Manager").GetComponent<ExperimentManager>();
+            SceneManager.LoadScene(em.GetNextScene(pm));
+        } else {
+            SceneManager.LoadScene(def);
+        }
     }
 
 }
