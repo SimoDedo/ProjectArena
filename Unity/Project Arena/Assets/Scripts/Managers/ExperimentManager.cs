@@ -51,6 +51,7 @@ public class ExperimentManager : MonoBehaviour {
     // Creates a new list of cases for the player to play.
     private void CreateNewList() {
         currentTimestamp = GetTimeStamp();
+        caseList.Clear();
 
         if (playTutorial)
             caseList.Add(tutorial);
