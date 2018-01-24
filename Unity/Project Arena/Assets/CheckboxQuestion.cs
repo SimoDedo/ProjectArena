@@ -9,8 +9,14 @@ public class CheckboxQuestion : MonoBehaviour {
     [SerializeField] private Option[] options;
     [SerializeField] private Button submit;
     [SerializeField] private bool exclusive;
+    [SerializeField] private bool compulsory;
 
     private int activeCount = 0;
+
+    private void Start() {
+        if (!compulsory)
+            submit.interactable = true;
+    }
 
     // Updates the active answers.
     public void UpdateAnswer(int id) {
@@ -24,10 +30,7 @@ public class CheckboxQuestion : MonoBehaviour {
                     o.toggle.isOn = false;
 
         activeCount = activated ? activeCount + 1 : activeCount - 1;
-        submit.interactable = activeCount > 0 ? true : false;
-
-        Debug.Log(GetJsonQuestion());
-        Debug.Log(GetJsonAnwer());
+        submit.interactable = activeCount > 0 || !compulsory ? true : false;
     }
 
     // Returns the oprion given its id.
