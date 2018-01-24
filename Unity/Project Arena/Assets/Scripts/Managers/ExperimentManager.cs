@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,15 +11,32 @@ public class ExperimentManager : MonoBehaviour {
 
     [Header("Experiment")] [SerializeField] private List<Study> studies;
     [SerializeField] private int casesPerUsers;
+    [SerializeField] private string experimentName;
 
     [Header("Survey")] [SerializeField] private Case survey;
     [SerializeField] private bool playSurvey;
 
     // List of cases the current player has to play.
-    private Queue<Case> caseQueue;
+    private List<Case> caseList;
+    // Directory for this esperiment files.
+    private string experimentDirectory;
+
+    private int currentCase = 0;
 
     void Start() {
-        caseQueue = new Queue<Case>();
+        caseList = new List<Case>();
+
+        // Create the experiment directory if needed.
+        experimentDirectory = Application.persistentDataPath + "/Export/" + experimentName;
+        CreateDirectory(experimentDirectory);
+        // Create the maps directory if needed.
+        foreach (Study s in studies)
+            foreach (Case c in s.cases) {
+                CreateDirectory(experimentDirectory + "/" + c.map.name);
+                System.IO.File.WriteAllText(@experimentDirectory + "/" + c.map.name + "/" + c.map.name + ".txt", c.map.text);
+            }
+        // Create the survey directory if needed.
+        CreateDirectory(experimentDirectory + "/Surveys");
     }
 
     void Awake() {
@@ -26,19 +44,21 @@ public class ExperimentManager : MonoBehaviour {
     }
 
     // Creates a new list of cases for the player to play.
-    private void CreateNewQueue() {
+    private void CreateNewList() {
         if (playTutorial)
-            caseQueue.Enqueue(tutorial);
+            caseList.Add(tutorial);
 
         for (int i = 0; i < casesPerUsers; i++)
-            caseQueue.Enqueue(GetCase());
+            caseList.Add(GetCase());
 
         if (playSurvey)
-            caseQueue.Enqueue(survey);
+            caseList.Add(survey);
 
-        caseQueue.Enqueue(new Case {
+        caseList.Add(new Case {
             scene = SceneManager.GetActiveScene().name
         });
+
+        currentCase = 0;
     }
 
     // Gets the next case to add in a round-robin fashion.
@@ -72,15 +92,22 @@ public class ExperimentManager : MonoBehaviour {
 
     // Retuns the next scene to be played.
     public string GetNextScene(ParameterManager pm) {
-        if (caseQueue.Count == 0)
-            CreateNewQueue();
+        if (currentCase == caseList.Count || caseList.Count == 0)
+            CreateNewList();
 
-        Case currentCase = caseQueue.Dequeue();
+        Case c = caseList[currentCase];
+        currentCase++;
 
         pm.SetGenerationMode(4);
-        pm.SetMapDNA(currentCase.map == null ? "" : currentCase.map.text);
+        pm.SetMapDNA(c.map == null ? "" : c.map.text);
 
-        return currentCase.scene;
+        return c.scene;
+    }
+
+    // Creates a directory if needed.
+    private void CreateDirectory(string directory) {
+        if (!Directory.Exists(directory))
+            Directory.CreateDirectory(directory);
     }
 
     [Serializable]
