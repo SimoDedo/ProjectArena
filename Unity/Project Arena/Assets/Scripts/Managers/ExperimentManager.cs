@@ -50,7 +50,7 @@ public class ExperimentManager : MonoBehaviour {
 
     // Creates a new list of cases for the player to play.
     private void CreateNewList() {
-        currentTimestamp = System.DateTime.Now.ToString(new CultureInfo("de-DE"));
+        currentTimestamp = GetTimeStamp();
 
         if (playTutorial)
             caseList.Add(tutorial);
@@ -66,6 +66,12 @@ public class ExperimentManager : MonoBehaviour {
         });
 
         currentCase = 0;
+    }
+
+    // Returns a well formatted timestamp.
+    private string GetTimeStamp() {
+        DateTime now = System.DateTime.Now;
+        return now.Year + "-" + now.Month + "-" + now.Day + "-" + now.Hour + "-" + now.Minute + "-" + now.Second;
     }
 
     // Gets the next case to add in a round-robin fashion.
