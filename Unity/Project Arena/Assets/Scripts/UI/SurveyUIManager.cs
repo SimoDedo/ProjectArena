@@ -10,21 +10,40 @@ public class SurveyUIManager : MonoBehaviour {
     [Header("Other")] [SerializeField] private RotateTranslateByAxis backgroundScript;
 
     private ParameterManager parameterManagerScript;
+    private ExperimentManager experimentManagerScript;
+
     private int currentQuestion = 0;
+    private string survey = "";
+    private string answers = "";
 
     private void Start() {
         parameterManagerScript = GameObject.Find("Parameter Manager").GetComponent<ParameterManager>();
+        experimentManagerScript = GameObject.Find("Experiment Manager").GetComponent<ExperimentManager>();
         backgroundScript.SetRotation(parameterManagerScript.GetBackgroundRotation());
     }
 
     public void Submit() {
-        StoreValues();
+        SaveValues();
         Quit();
     }
 
-    // Stores the values of the survey.
-    private void StoreValues() {
-        // TODO.
+    // Updates the values of the survey.
+    private void UpdateValues() {
+        if (experimentManagerScript.MustSaveSurvey()) {
+            survey += questions[currentQuestion].GetComponent<CheckboxQuestion>().GetJsonQuestion();
+            if (currentQuestion < questions.Length - 1)
+                survey += "\n";
+        }
+        answers += questions[currentQuestion].GetComponent<CheckboxQuestion>().GetJsonAnswer();
+        if (currentQuestion < questions.Length - 1)
+            answers += "\n";
+    }
+
+    // Saves the values of the survey.
+    private void SaveValues() {
+        if (experimentManagerScript.MustSaveSurvey())
+            experimentManagerScript.SaveSurvey(survey);
+        experimentManagerScript.SaveAnswers(answers);
     }
 
     // Shows the first question.
@@ -35,6 +54,8 @@ public class SurveyUIManager : MonoBehaviour {
 
     // Shows the next question.
     public void NextQuestion() {
+        UpdateValues();
+
         questions[currentQuestion].SetActive(false);
 
         if (currentQuestion < questions.Length - 1) {
@@ -48,7 +69,7 @@ public class SurveyUIManager : MonoBehaviour {
     // Returns to the experiment menu.
     private void Quit() {
         parameterManagerScript.SetBackgroundRotation(backgroundScript.GetRotation());
-        SceneManager.LoadScene(GameObject.Find("Experiment Manager").GetComponent<ExperimentManager>().GetNextScene(parameterManagerScript));
+        SceneManager.LoadScene(experimentManagerScript.GetNextScene(parameterManagerScript));
     }
 
 }

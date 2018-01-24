@@ -56,15 +56,15 @@ public class CheckboxQuestion : MonoBehaviour {
     }
 
     // Converts the answe in Json format.
-    private string GetJsonAnwer() {
+    public string GetJsonAnswer() {
         return JsonUtility.ToJson(new JsonAnswer {
             questionId = questionId,
-            anwers = GetActiveAnswers()
+            answers = GetActiveAnswers()
         });
     }
 
     // Converts the question and the options in Json format.
-    private string GetJsonQuestion() {
+    public string GetJsonQuestion() {
         string jq = JsonUtility.ToJson(new JsonQuestion {
             questionId = questionId,
             questionText = transform.GetComponentInChildren<Text>().text,
@@ -102,7 +102,7 @@ public class CheckboxQuestion : MonoBehaviour {
 
     private class JsonAnswer {
         public int questionId;
-        public int[] anwers;
+        public int[] answers;
     }
 
     [Serializable]

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -20,8 +21,11 @@ public class ExperimentManager : MonoBehaviour {
     private List<Case> caseList;
     // Directory for this esperiment files.
     private string experimentDirectory;
+    // Directory for the surveys.
+    private string surveysDirectory;
 
-    private int currentCase = 0;
+    private int currentCase = -1;
+    private string currentTimestamp;
 
     void Start() {
         caseList = new List<Case>();
@@ -36,7 +40,8 @@ public class ExperimentManager : MonoBehaviour {
                 System.IO.File.WriteAllText(@experimentDirectory + "/" + c.map.name + "/" + c.map.name + ".txt", c.map.text);
             }
         // Create the survey directory if needed.
-        CreateDirectory(experimentDirectory + "/Surveys");
+        surveysDirectory = experimentDirectory + "/Surveys";
+        CreateDirectory(surveysDirectory);
     }
 
     void Awake() {
@@ -45,6 +50,8 @@ public class ExperimentManager : MonoBehaviour {
 
     // Creates a new list of cases for the player to play.
     private void CreateNewList() {
+        currentTimestamp = System.DateTime.Now.ToString(new CultureInfo("de-DE"));
+
         if (playTutorial)
             caseList.Add(tutorial);
 
@@ -92,11 +99,12 @@ public class ExperimentManager : MonoBehaviour {
 
     // Retuns the next scene to be played.
     public string GetNextScene(ParameterManager pm) {
+        currentCase++;
+
         if (currentCase == caseList.Count || caseList.Count == 0)
             CreateNewList();
 
         Case c = caseList[currentCase];
-        currentCase++;
 
         pm.SetGenerationMode(4);
         pm.SetMapDNA(c.map == null ? "" : c.map.text);
@@ -108,6 +116,38 @@ public class ExperimentManager : MonoBehaviour {
     private void CreateDirectory(string directory) {
         if (!Directory.Exists(directory))
             Directory.CreateDirectory(directory);
+    }
+
+    // Tells if I need to save the survey.
+    public bool MustSaveSurvey() {
+        return !File.Exists(surveysDirectory + "/survey.json");
+    }
+
+    // Save survey. This has to be done once.
+    public void SaveSurvey(string survey) {
+        System.IO.File.WriteAllText(surveysDirectory + "/survey.json", survey);
+    }
+
+    // Saves answers and informations about the experiment.
+    public void SaveAnswers(string answers) {
+        string info = JsonUtility.ToJson(new JsonInfo {
+            experimentName = experimentName,
+            playedMaps = GetCurrentCasesArray()
+        });
+        System.IO.File.WriteAllText(surveysDirectory + "/" + currentTimestamp + "_survey.json", info + "\n" + answers);
+    }
+
+    // Returns the played cases in an array.
+    public string[] GetCurrentCasesArray() {
+        string[] maps = new string[casesPerUsers];
+        for (int i = 0; i < casesPerUsers; i++)
+            maps[i] = playTutorial ? caseList[i + 1].map.name : caseList[i].map.name;
+        return maps;
+    }
+
+    private class JsonInfo {
+        public string experimentName;
+        public string[] playedMaps;
     }
 
     [Serializable]
