@@ -363,8 +363,6 @@ public abstract class MapGenerator : CoreComponent {
         }
     }
 
-    /* GETTERS */
-
     // Saves the original size of the map.
     public void SaveMapSize() {
         originalWidth = width;
@@ -376,6 +374,8 @@ public abstract class MapGenerator : CoreComponent {
         width = originalWidth;
         height = originalHeight;
     }
+
+    /* GETTERS */
 
     public bool GetRandomBoolean() {
         return (pseudoRandomGen.Next(100) < 50) ? true : false;
@@ -403,6 +403,14 @@ public abstract class MapGenerator : CoreComponent {
 
     public float GetWallHeight() {
         return wallHeight;
+    }
+
+    public float GetHeight() {
+        return height;
+    }
+
+    public float GetWidth() {
+        return width;
     }
 
     /* CUTSOM OBJECTS */

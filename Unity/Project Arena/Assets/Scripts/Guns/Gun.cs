@@ -178,7 +178,7 @@ public abstract class Gun : MonoBehaviour, ILoggable {
         if (hasUI) {
             gunUIManagerScript = GetComponent<GunUIManager>();
             gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
-        }       
+        }
     }
 
     // Called by the opponent, sets references to the game manager and to the player script itself.
@@ -340,7 +340,6 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     // Setups stuff for the logging.
     public void SetupLogging(ExperimentManager em) {
         experimentManagerScript = em;
-        logging = true;
 
         jLog = new JsonLog {
             log = ""
@@ -348,15 +347,17 @@ public abstract class Gun : MonoBehaviour, ILoggable {
 
         jShoot = new JsonShoot();
         jReload = new JsonReload();
+
+        logging = true;
     }
 
     // Logs reload.
     protected void LogRelaod() {
         jLog.time = Time.time.ToString("n4");
         jLog.type = "player_reload";
-        jReload.weapon = gunId + "";
-        jReload.ammoInCharger = ammoInCharger + "";
-        jReload.totalAmmo = totalAmmo + "";
+        jReload.weapon = gunId.ToString();
+        jReload.ammoInCharger = ammoInCharger.ToString();
+        jReload.totalAmmo = totalAmmo.ToString();
         string log = JsonUtility.ToJson(jLog);
         experimentManagerScript.WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jReload) + "}");
     }
@@ -368,9 +369,9 @@ public abstract class Gun : MonoBehaviour, ILoggable {
         jShoot.x = transform.root.position.x.ToString("n4");
         jShoot.y = transform.root.position.z.ToString("n4");
         jShoot.direction = transform.root.rotation.y.ToString("n4");
-        jShoot.weapon = gunId + "";
-        jShoot.ammoInCharger = ammoInCharger + "";
-        jShoot.totalAmmo = totalAmmo + "";
+        jShoot.weapon = gunId.ToString();
+        jShoot.ammoInCharger = ammoInCharger.ToString();
+        jShoot.totalAmmo = totalAmmo.ToString();
         string log = JsonUtility.ToJson(jLog);
         experimentManagerScript.WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jShoot) + "}");
     }

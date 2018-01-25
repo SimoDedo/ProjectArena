@@ -1,10 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 // The game manager manages the game, it passes itself to the player.
 
-public abstract class GameManager : CoreComponent {
+public abstract class GameManager : CoreComponent, ILoggable {
 
     [Header("Managers")] [SerializeField] protected GameObject mapManager;
     [SerializeField] protected GameObject spawnPointManager;
@@ -25,9 +26,23 @@ public abstract class GameManager : CoreComponent {
     // Is the game paused?
     protected bool isPaused = false;
 
+    // Do I have to log?
+    protected bool logging = false;
+    // Experiment manager.
+    private ExperimentManager experimentManagerScript;
+    // Support object to format the log.
+    private JsonLog jLog;
+    // Support object to format the log.
+    private JsonKill jKill;
+    // Support object to format the log.
+    private JsonSpawn jSpawn;
+
     // Moves a gameobject to a free spawn point.
     public void Spawn(GameObject g) {
         g.transform.position = spawnPointManagerScript.GetSpawnPosition() + Vector3.up * 3f;
+        // Log if needed.
+        if (logging)
+            LogSpawn(g.transform.position.x, g.transform.position.z, g.gameObject.name);
     }
 
     // Menages the death of an entity.
@@ -46,7 +61,7 @@ public abstract class GameManager : CoreComponent {
     public IEnumerator FreezeTime(float wait, bool mustPause) {
         if (mustPause)
             yield return new WaitForSeconds(wait);
-        Time.timeScale = isPaused ? 0f : 1f;            
+        Time.timeScale = isPaused ? 0f : 1f;
     }
 
     public void Quit() {
@@ -64,6 +79,74 @@ public abstract class GameManager : CoreComponent {
         } else {
             SceneManager.LoadScene(def);
         }
+    }
+
+    // Setups stuff for the logging.
+    public void SetupLogging(ExperimentManager em) {
+        experimentManagerScript = em;
+
+        experimentManagerScript.WriteLog(JsonUtility.ToJson(new JsonInfo {
+            height = mapManagerScript.GetMapGenerator().GetHeight().ToString(),
+            width = mapManagerScript.GetMapGenerator().GetHeight().ToString(),
+            tileSize = mapManagerScript.GetMapGenerator().GetSquareSize().ToString(),
+        }));
+
+        jLog = new JsonLog {
+            log = ""
+        };
+
+        jKill = new JsonKill();
+        jSpawn = new JsonSpawn();
+
+        logging = true;
+    }
+
+    // Logs spawn.
+    private void LogSpawn(float x, float z, string name) {
+        jLog.time = Time.time.ToString("n4");
+        jLog.type = "spawn";
+        jSpawn.x = x.ToString();
+        jSpawn.y = z.ToString();
+        jSpawn.spawnedEntity = name;
+        string log = JsonUtility.ToJson(jLog);
+        experimentManagerScript.WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jSpawn) + "}");
+    }
+
+    // Logs a kill.
+    protected void LogKill() {
+        jLog.time = Time.time.ToString("n4");
+        jLog.type = "kill";
+        jKill.x = "";
+        jKill.y = "";
+        jKill.killedEntity = "";
+        jKill.killerEntity = "";
+        string log = JsonUtility.ToJson(jLog);
+        experimentManagerScript.WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jKill) + "}");
+    }
+
+    private class JsonLog {
+        public string time;
+        public string type;
+        public string log;
+    }
+
+    private class JsonInfo {
+        public string height;
+        public string width;
+        public string tileSize;
+    }
+
+    private class JsonKill {
+        public string x;
+        public string y;
+        public string killedEntity;
+        public string killerEntity;
+    }
+
+    private class JsonSpawn {
+        public string x;
+        public string y;
+        public string spawnedEntity;
     }
 
 }

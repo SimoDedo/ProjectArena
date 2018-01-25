@@ -90,4 +90,9 @@ public abstract class MapManager : CoreComponent {
             return null;
     }
 
+    // Returns the Map Generator.
+    public MapGenerator GetMapGenerator() {
+        return mapGeneratorScript;
+    }
+
 }

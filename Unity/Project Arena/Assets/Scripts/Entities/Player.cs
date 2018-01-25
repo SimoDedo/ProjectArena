@@ -317,13 +317,14 @@ public class Player : Entity, ILoggable {
     // Setups stuff for the logging.
     public void SetupLogging(ExperimentManager em) {
         experimentManagerScript = em;
-        logging = true;
 
         jLog = new JsonLog {
             log = ""
         };
 
         jPosition = new JsonPosition();
+
+        logging = true;
     }
 
     // Logs the position.
