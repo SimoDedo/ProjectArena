@@ -162,14 +162,21 @@ public class ExperimentManager : MonoBehaviour {
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
         if (logGame && !(playTutorial && currentCase == 0) && !(playSurvey && currentCase == caseList.Count - 2) && currentCase != caseList.Count - 1)
-            StartLogging();
+            SetupLogging();
     }
 
-    // Starts logging.
-    private void StartLogging() {
+    // Sets up logging.
+    private void SetupLogging() {
         logStream = File.CreateText(experimentDirectory + "/" + caseList[currentCase].map.name + "/" + caseList[currentCase].map.name + "_" + currentTimestamp + "_log.json");
         logStream.AutoFlush = true;
 
+        GameManager gm = FindObjectOfType(typeof(GameManager)) as GameManager;
+        if (gm != null)
+            gm.LoggingHandshake(this);
+    }
+
+    // Starts logging.
+    public void StartLogging() {
         foreach (MonoBehaviour monoBehaviour in FindObjectsOfType(typeof(MonoBehaviour))) {
             ILoggable logger = monoBehaviour as ILoggable;
             if (logger != null)

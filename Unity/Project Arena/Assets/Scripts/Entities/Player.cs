@@ -329,8 +329,7 @@ public class Player : Entity, ILoggable {
 
     // Logs the position.
     private void LogPosition() {
-        lastPositionLog = Time.time;
-        jLog.time = lastPositionLog.ToString("n4");
+        jLog.time = Time.time.ToString("n4");
         jLog.type = "player_position";
         jPosition.x = transform.position.x.ToString("n4");
         jPosition.y = transform.position.z.ToString("n4");

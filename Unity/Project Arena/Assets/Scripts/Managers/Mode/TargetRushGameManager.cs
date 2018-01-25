@@ -54,6 +54,10 @@ public class TargetRushGameManager : GameManager {
                 startTime = Time.time;
             }
 
+            // If needed, tell the Experiment Manager it can start logging.
+            if (handshaking)
+                experimentManagerScript.StartLogging();
+
             SetReady(true);
         } else if (IsReady() && !generateOnly) {
             ManageGame();

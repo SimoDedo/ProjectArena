@@ -26,23 +26,16 @@ public abstract class GameManager : CoreComponent, ILoggable {
     // Is the game paused?
     protected bool isPaused = false;
 
+    // Do I have to handshake with the Experiment Manager?
+    protected bool handshaking = false;
     // Do I have to log?
     protected bool logging = false;
     // Experiment manager.
-    private ExperimentManager experimentManagerScript;
-    // Support object to format the log.
-    private JsonLog jLog;
-    // Support object to format the log.
-    private JsonKill jKill;
-    // Support object to format the log.
-    private JsonSpawn jSpawn;
+    protected ExperimentManager experimentManagerScript;
 
     // Moves a gameobject to a free spawn point.
     public void Spawn(GameObject g) {
         g.transform.position = spawnPointManagerScript.GetSpawnPosition() + Vector3.up * 3f;
-        // Log if needed.
-        if (logging)
-            LogSpawn(g.transform.position.x, g.transform.position.z, g.gameObject.name);
     }
 
     // Menages the death of an entity.
@@ -81,72 +74,38 @@ public abstract class GameManager : CoreComponent, ILoggable {
         }
     }
 
+    // Allows the Game Manager to tell the Experiment Manager when it can start to log.
+    public void LoggingHandshake(ExperimentManager em) {
+        experimentManagerScript = em;
+        handshaking = true;
+    }
+
     // Setups stuff for the logging.
     public void SetupLogging(ExperimentManager em) {
-        experimentManagerScript = em;
-
         experimentManagerScript.WriteLog(JsonUtility.ToJson(new JsonInfo {
             height = mapManagerScript.GetMapGenerator().GetHeight().ToString(),
-            width = mapManagerScript.GetMapGenerator().GetHeight().ToString(),
+            width = mapManagerScript.GetMapGenerator().GetWidth().ToString(),
             tileSize = mapManagerScript.GetMapGenerator().GetSquareSize().ToString(),
         }));
-
-        jLog = new JsonLog {
-            log = ""
-        };
-
-        jKill = new JsonKill();
-        jSpawn = new JsonSpawn();
 
         logging = true;
     }
 
-    // Logs spawn.
-    private void LogSpawn(float x, float z, string name) {
-        jLog.time = Time.time.ToString("n4");
-        jLog.type = "spawn";
-        jSpawn.x = x.ToString();
-        jSpawn.y = z.ToString();
-        jSpawn.spawnedEntity = name;
-        string log = JsonUtility.ToJson(jLog);
-        experimentManagerScript.WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jSpawn) + "}");
+    // Tells if it is logging.
+    public bool IsLogging() {
+        return logging;
     }
 
-    // Logs a kill.
-    protected void LogKill() {
-        jLog.time = Time.time.ToString("n4");
-        jLog.type = "kill";
-        jKill.x = "";
-        jKill.y = "";
-        jKill.killedEntity = "";
-        jKill.killerEntity = "";
-        string log = JsonUtility.ToJson(jLog);
-        experimentManagerScript.WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jKill) + "}");
+    // Returns the experiment manager.
+    public ExperimentManager GetExperimentManager() {
+        return experimentManagerScript;
     }
 
-    private class JsonLog {
-        public string time;
-        public string type;
-        public string log;
-    }
 
     private class JsonInfo {
         public string height;
         public string width;
         public string tileSize;
-    }
-
-    private class JsonKill {
-        public string x;
-        public string y;
-        public string killedEntity;
-        public string killerEntity;
-    }
-
-    private class JsonSpawn {
-        public string x;
-        public string y;
-        public string spawnedEntity;
     }
 
 }
