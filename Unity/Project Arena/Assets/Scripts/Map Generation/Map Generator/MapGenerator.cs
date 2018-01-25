@@ -405,7 +405,7 @@ public abstract class MapGenerator : CoreComponent {
         return wallHeight;
     }
 
-    /* CUSTOM DEFINITIONS */
+    /* CUTSOM OBJECTS */
 
     public enum ObjectGenerationMethod {
         Rain,

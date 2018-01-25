@@ -21,6 +21,10 @@ public class ProjectileGun : Gun {
 
         ammoInCharger -= 1;
 
+        // Log if needed.
+        if (logging)
+            LogShot();
+
         if (hasUI)
             gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
 

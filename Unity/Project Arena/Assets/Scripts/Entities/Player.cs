@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Player : Entity {
+public class Player : Entity, ILoggable {
 
     // Head object containing the camera.
     [Header("Player")] [SerializeField] private GameObject head;
@@ -30,6 +30,17 @@ public class Player : Entity {
     private bool cursorLocked = false;
     // Is the input enabled?
     private bool inputEnabled = true;
+
+    // Do I have to log?
+    private bool logging = false;
+    // Experiment manager.
+    private ExperimentManager experimentManagerScript;
+    // Time of the last position log.
+    private float lastPositionLog;
+    // Support object to format the log.
+    private JsonLog jLog;
+    // Support object to fromat the position log.
+    private JsonPosition jPosition;
 
     private PlayerUIManager playerUIManagerScript;
 
@@ -73,6 +84,9 @@ public class Player : Entity {
             UpdateCameraPosition();
             UpdatePosition();
             UpdateGun();
+            // Log if needed.
+            if (logging && Time.time > lastPositionLog + 0.5)
+                LogPosition();
         } else {
             UpdateVerticalPosition();
         }
@@ -91,7 +105,7 @@ public class Player : Entity {
 
         for (int i = 0; i < ag.GetLength(0); i++) {
             // Setup the gun.
-            guns[i].GetComponent<Gun>().SetupGun(gms, this, playerUIManagerScript);
+            guns[i].GetComponent<Gun>().SetupGun(gms, this, playerUIManagerScript, i + 1);
         }
     }
 
@@ -203,7 +217,7 @@ public class Player : Entity {
             // Jump if needed.
             if (Input.GetButton("Jump"))
                 moveDirection.y = jumpSpeed;
-        } 
+        }
 
         // Apply gravity to the direction and apply it using the controller.
         moveDirection.y -= gravity * Time.deltaTime;
@@ -298,6 +312,42 @@ public class Player : Entity {
     // Updates the sensibility.
     public void SetSensibility(float s) {
         sensibility = s;
+    }
+
+    // Setups stuff for the logging.
+    public void SetupLogging(ExperimentManager em) {
+        experimentManagerScript = em;
+        logging = true;
+
+        jLog = new JsonLog {
+            log = ""
+        };
+
+        jPosition = new JsonPosition();
+    }
+
+    // Logs the position.
+    private void LogPosition() {
+        lastPositionLog = Time.time;
+        jLog.time = lastPositionLog.ToString("n4");
+        jLog.type = "player_position";
+        jPosition.x = transform.position.x.ToString("n4");
+        jPosition.y = transform.position.z.ToString("n4");
+        jPosition.direction = transform.rotation.y.ToString("n4");
+        string log = JsonUtility.ToJson(jLog);
+        experimentManagerScript.WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jPosition) + "}");
+    }
+
+    private class JsonLog {
+        public string time;
+        public string type;
+        public string log;
+    }
+
+    private class JsonPosition {
+        public string x;
+        public string y;
+        public string direction;
     }
 
 }

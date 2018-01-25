@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public abstract class Gun : MonoBehaviour {
+public abstract class Gun : MonoBehaviour, ILoggable {
 
     [Header("Objects")] [SerializeField] protected Camera headCamera;
     [SerializeField] protected GameObject muzzleFlash;
@@ -57,9 +57,21 @@ public abstract class Gun : MonoBehaviour {
 
     // Is the gun being used?
     protected bool used = false;
-
     // Is the input enabled?
     private bool inputEnabled = true;
+    // Gun identifier.
+    private int gunId;
+
+    // Do I have to log?
+    protected bool logging = false;
+    // Experiment manager.
+    private ExperimentManager experimentManagerScript;
+    // Support object to format the log.
+    private JsonLog jLog;
+    // Support object to fromat the position log.
+    private JsonShoot jShoot;
+    // Support object to fromat the position log.
+    private JsonReload jReload;
 
     protected void Awake() {
         if (aimEnabled)
@@ -125,6 +137,9 @@ public abstract class Gun : MonoBehaviour {
     protected void UpdateTimers() {
         if (reloading) {
             if (Time.time > reloadStart + reloadTime) {
+                // Log if needed.
+                if (logging)
+                    LogRelaod();
                 // Stop the reloading.
                 reloading = false;
                 // Update charger and total ammo count.
@@ -148,16 +163,17 @@ public abstract class Gun : MonoBehaviour {
     }
 
     // Called by player, sets references to the game manager, to the player script itself and to the player UI.
-    public void SetupGun(GameManager gms, Entity e, PlayerUIManager puims) {
+    public void SetupGun(GameManager gms, Entity e, PlayerUIManager puims, int id) {
         gameManagerScript = gms;
         ownerEntityScript = e;
         playerUIManagerScript = puims;
 
         ammoInCharger = chargerSize;
         totalAmmo = maximumAmmo / 2 - chargerSize;
-
         defaultAmmoInCharger = ammoInCharger;
         defaultTotalAmmo = totalAmmo;
+
+        gunId = id;
 
         if (hasUI) {
             gunUIManagerScript = GetComponent<GunUIManager>();
@@ -319,6 +335,65 @@ public abstract class Gun : MonoBehaviour {
     // Enables or disables the input.
     public void EnableInput(bool b) {
         inputEnabled = b;
+    }
+
+    // Setups stuff for the logging.
+    public void SetupLogging(ExperimentManager em) {
+        experimentManagerScript = em;
+        logging = true;
+
+        jLog = new JsonLog {
+            log = ""
+        };
+
+        jShoot = new JsonShoot();
+        jReload = new JsonReload();
+    }
+
+    // Logs reload.
+    protected void LogRelaod() {
+        jLog.time = Time.time.ToString("n4");
+        jLog.type = "player_reload";
+        jReload.weapon = gunId + "";
+        jReload.ammoInCharger = ammoInCharger + "";
+        jReload.totalAmmo = totalAmmo + "";
+        string log = JsonUtility.ToJson(jLog);
+        experimentManagerScript.WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jReload) + "}");
+    }
+
+    // Logs the shot.
+    protected void LogShot() {
+        jLog.time = Time.time.ToString("n4");
+        jLog.type = "player_shot";
+        jShoot.x = transform.root.position.x.ToString("n4");
+        jShoot.y = transform.root.position.z.ToString("n4");
+        jShoot.direction = transform.root.rotation.y.ToString("n4");
+        jShoot.weapon = gunId + "";
+        jShoot.ammoInCharger = ammoInCharger + "";
+        jShoot.totalAmmo = totalAmmo + "";
+        string log = JsonUtility.ToJson(jLog);
+        experimentManagerScript.WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jShoot) + "}");
+    }
+
+    private class JsonLog {
+        public string time;
+        public string type;
+        public string log;
+    }
+
+    private class JsonShoot {
+        public string x;
+        public string y;
+        public string direction;
+        public string weapon;
+        public string ammoInCharger;
+        public string totalAmmo;
+    }
+
+    private class JsonReload {
+        public string weapon;
+        public string ammoInCharger;
+        public string totalAmmo;
     }
 
 }

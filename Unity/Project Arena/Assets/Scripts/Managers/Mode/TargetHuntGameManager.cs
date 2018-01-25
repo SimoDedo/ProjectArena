@@ -1,6 +1,4 @@
-﻿
-using System;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 public class TargetHuntGameManager : GameManager {
@@ -53,7 +51,6 @@ public class TargetHuntGameManager : GameManager {
                 playerScript.LockCursor();
                 startTime = Time.time;
             }
-
             SetReady(true);
         } else if (IsReady() && !generateOnly) {
             ManageGame();

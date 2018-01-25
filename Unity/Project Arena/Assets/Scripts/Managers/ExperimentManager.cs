@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -17,12 +16,17 @@ public class ExperimentManager : MonoBehaviour {
     [Header("Survey")] [SerializeField] private Case survey;
     [SerializeField] private bool playSurvey;
 
+    [Header("Logging")] [SerializeField] private bool logGame;
+
     // List of cases the current player has to play.
     private List<Case> caseList;
     // Directory for this esperiment files.
     private string experimentDirectory;
     // Directory for the surveys.
     private string surveysDirectory;
+
+    // Stream writer of the current game log.
+    private StreamWriter logStream;
 
     private int currentCase = -1;
     private string currentTimestamp;
@@ -47,6 +51,12 @@ public class ExperimentManager : MonoBehaviour {
     void Awake() {
         DontDestroyOnLoad(transform.gameObject);
     }
+
+    void OnEnable() {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    /* EXPERIMENT */
 
     // Creates a new list of cases for the player to play.
     private void CreateNewList() {
@@ -119,11 +129,7 @@ public class ExperimentManager : MonoBehaviour {
         return c.scene;
     }
 
-    // Creates a directory if needed.
-    private void CreateDirectory(string directory) {
-        if (!Directory.Exists(directory))
-            Directory.CreateDirectory(directory);
-    }
+    /* SURVEY */
 
     // Tells if I need to save the survey.
     public bool MustSaveSurvey() {
@@ -151,6 +157,45 @@ public class ExperimentManager : MonoBehaviour {
             maps[i] = playTutorial ? caseList[i + 1].map.name : caseList[i].map.name;
         return maps;
     }
+
+    /* LOGGING */
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
+        if (logGame && !(playTutorial && currentCase == 0) && !(playSurvey && currentCase == caseList.Count - 2) && currentCase != caseList.Count - 1)
+            StartLogging();
+    }
+
+    // Starts logging.
+    private void StartLogging() {
+        logStream = File.CreateText(experimentDirectory + "/" + caseList[currentCase].map.name + "/" + caseList[currentCase].map.name + "_" + currentTimestamp + "_log.json");
+        logStream.AutoFlush = true;
+
+        foreach (MonoBehaviour monoBehaviour in FindObjectsOfType(typeof(MonoBehaviour))) {
+            ILoggable logger = monoBehaviour as ILoggable;
+            if (logger != null)
+                logger.SetupLogging(this);
+        }
+    }
+
+    // Writes a log in the log stream.
+    public void WriteLog(string log) {
+        logStream.WriteLine(log);
+    }
+
+    // Stops logging and saves the log.
+    public void StopLogging() {
+        logStream.Close();
+    }
+
+    /* SUPPORT FUNCTIONS */
+
+    // Creates a directory if needed.
+    private void CreateDirectory(string directory) {
+        if (!Directory.Exists(directory))
+            Directory.CreateDirectory(directory);
+    }
+
+    /* CUTSOM OBJECTS */
 
     private class JsonInfo {
         public string experimentName;
