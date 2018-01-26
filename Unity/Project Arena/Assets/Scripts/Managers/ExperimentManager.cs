@@ -17,6 +17,7 @@ public class ExperimentManager : MonoBehaviour {
     [SerializeField] private bool playSurvey;
 
     [Header("Logging")] [SerializeField] private bool logGame;
+    [SerializeField] private bool logStatistics;
 
     // List of cases the current player has to play.
     private List<Case> caseList;
@@ -42,8 +43,42 @@ public class ExperimentManager : MonoBehaviour {
     // Support object to format the log.
     private JsonHit jHit;
 
+    // Stream writer of the current statistic log.
+    private StreamWriter statisticsStream;
+    // Spawn time of current target.
+    private float targetSpawn = 0;
+    // Spawn time of last target.
+    private float lastTargetSpawn = 0;
+    // Current distance.
+    private float currentDistance = 0;
+    // Total distance.
+    private float totalDistance = 0;
+    // Total shots.
+    private int shotCount = 0;
+    // Total hits.
+    private int hitCount = 0;
+    // Total destoryed targets.
+    private float killCount = 0;
+    // Medium kill time.
+    private float mediumKillTime = 0;
+    // Medium distance covered to find a target.
+    private float mediumKillDistance = 0;
+    // Size of a map tile.
+    private float tileSize = 1;
+    // Position of the player.
+    private Vector3 lastPosition = new Vector3(-1, -1, -1);
+    // Initial target position.
+    private Vector3 initialTargetPosition = new Vector3(-1, -1, -1);
+    // Initial player position.
+    private Vector3 initialPlayerPosition = new Vector3(-1, -1, -1);
+    // Support object to format the log.
+    private JsonGameStatistics jGameStatistics;
+    // Support object to format the log.
+    private JsonTargetStatistics jTargetStatistics;
+
     private int currentCase = -1;
     private string currentTimestamp;
+    private bool logging;
 
     void Start() {
         caseList = new List<Case>();
@@ -132,6 +167,9 @@ public class ExperimentManager : MonoBehaviour {
     public string GetNextScene(ParameterManager pm) {
         currentCase++;
 
+        if (logging)
+            StopLogging();
+
         if (currentCase == caseList.Count || caseList.Count == 0)
             CreateNewList();
 
@@ -198,10 +236,24 @@ public class ExperimentManager : MonoBehaviour {
         GameManager gm = FindObjectOfType(typeof(GameManager)) as GameManager;
         if (gm != null)
             gm.LoggingHandshake(this);
+
+        if (logStatistics)
+            SetupStatisticsLogging();
+    }
+
+    // Sets up statistics logging.
+    private void SetupStatisticsLogging() {
+        statisticsStream = File.CreateText(experimentDirectory + "/" + caseList[currentCase].map.name + "/" + caseList[currentCase].map.name + "_" + currentTimestamp + "_statistics.json");
+        statisticsStream.AutoFlush = true;
+
+        jGameStatistics = new JsonGameStatistics();
+        jTargetStatistics = new JsonTargetStatistics();
     }
 
     // Starts logging.
     public void StartLogging() {
+        logging = true;
+
         foreach (MonoBehaviour monoBehaviour in FindObjectsOfType(typeof(MonoBehaviour))) {
             ILoggable logger = monoBehaviour as ILoggable;
             if (logger != null)
@@ -214,8 +266,19 @@ public class ExperimentManager : MonoBehaviour {
         logStream.WriteLine(log);
     }
 
+    // Writes a log in the statistics stream.
+    public void WriteStatisticsLog(string log) {
+        statisticsStream.WriteLine(log);
+    }
+
     // Stops logging and saves the log.
     public void StopLogging() {
+        if (logStatistics) {
+            LogGameStatistics();
+            statisticsStream.Close();
+            logStatistics = false;
+        }
+
         logStream.Close();
     }
 
@@ -242,15 +305,25 @@ public class ExperimentManager : MonoBehaviour {
         jShoot.totalAmmo = totalAmmo.ToString();
         string log = JsonUtility.ToJson(jLog);
         WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jShoot) + "}");
+
+        if (logStatistics)
+            shotCount++;
     }
 
     // Logs info about the map.
-    public void LogMapInfo(float height, float width, float tileSize) {
-        WriteLog(JsonUtility.ToJson(new JsonMapInfo {
+    public void LogMapInfo(float height, float width, float ts) {
+        string infoLog = JsonUtility.ToJson(new JsonMapInfo {
             height = height.ToString(),
             width = width.ToString(),
-            tileSize = tileSize.ToString(),
-        }));
+            tileSize = ts.ToString(),
+        });
+
+        WriteLog(infoLog);
+
+        if (logStatistics) {
+            WriteStatisticsLog(infoLog);
+            tileSize = ts;
+        }
     }
 
     // Logs the position.
@@ -262,6 +335,16 @@ public class ExperimentManager : MonoBehaviour {
         jPosition.direction = direction.ToString("n4");
         string log = JsonUtility.ToJson(jLog);
         WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jPosition) + "}");
+
+        if (logStatistics) {
+            if (lastPosition.x != -1) {
+                float delta = EulerDistance(x, z, lastPosition.x, lastPosition.z, tileSize);
+                totalDistance += delta;
+                currentDistance += delta;
+            }
+            lastPosition.x = x;
+            lastPosition.z = z;
+        }
     }
 
     // Logs spawn.
@@ -273,6 +356,13 @@ public class ExperimentManager : MonoBehaviour {
         jSpawn.spawnedEntity = spawnedEntity;
         string log = JsonUtility.ToJson(jLog);
         WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jSpawn) + "}");
+
+        if (logStatistics) {
+            targetSpawn = Time.time;
+            initialTargetPosition.x = x;
+            initialTargetPosition.z = z;
+            initialPlayerPosition = lastPosition;
+        }
     }
 
     // Logs a kill.
@@ -285,6 +375,15 @@ public class ExperimentManager : MonoBehaviour {
         jKill.killerEntity = killerEntity;
         string log = JsonUtility.ToJson(jLog);
         WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jKill) + "}");
+
+        if (logStatistics) {
+            LogTargetStatistics(x, z);
+            killCount++;
+            mediumKillTime += (Time.time - lastTargetSpawn - mediumKillTime) / killCount;
+            mediumKillDistance += (currentDistance - mediumKillDistance) / killCount;
+            currentDistance = 0;
+            lastTargetSpawn = targetSpawn;
+        }
     }
 
     // Logs a hit.
@@ -298,6 +397,34 @@ public class ExperimentManager : MonoBehaviour {
         jHit.damage = damage.ToString();
         string log = JsonUtility.ToJson(jLog);
         WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jHit) + "}");
+
+        if (logStatistics)
+            hitCount++;
+    }
+
+    // Logs statistics about the performance of the player finding the target.
+    private void LogTargetStatistics(float x, float z) {
+        jTargetStatistics.playerInitialX = initialPlayerPosition.x.ToString("n4");
+        jTargetStatistics.playerInitialY = initialPlayerPosition.z.ToString("n4");
+        jTargetStatistics.playerX = lastPosition.x.ToString("n4");
+        jTargetStatistics.playerY = lastPosition.z.ToString("n4");
+        jTargetStatistics.targetX = x.ToString("n4");
+        jTargetStatistics.targetY = z.ToString("n4");
+        jTargetStatistics.time = (Time.time - lastTargetSpawn).ToString("n4");
+        jTargetStatistics.coveredTileDistance = currentDistance.ToString("n4");
+        jTargetStatistics.speed = (currentDistance / (Time.time - lastTargetSpawn)).ToString("n4");
+        WriteStatisticsLog(JsonUtility.ToJson(jTargetStatistics));
+    }
+
+    // Logs statistics about the game.
+    private void LogGameStatistics() {
+        jGameStatistics.coveredDistance = totalDistance.ToString("n4");
+        jGameStatistics.mediumKillTime = mediumKillTime.ToString("n4");
+        jGameStatistics.mediumKillDistance = mediumKillDistance.ToString("n4");
+        jGameStatistics.totalShots = shotCount.ToString("n4");
+        jGameStatistics.totalHits = hitCount.ToString("n4");
+        jGameStatistics.accuracy = (shotCount > 0) ? (hitCount / (float)shotCount).ToString("n4") : "0";
+        WriteStatisticsLog(JsonUtility.ToJson(jGameStatistics));
     }
 
     /* SUPPORT FUNCTIONS */
@@ -306,6 +433,11 @@ public class ExperimentManager : MonoBehaviour {
     private void CreateDirectory(string directory) {
         if (!Directory.Exists(directory))
             Directory.CreateDirectory(directory);
+    }
+
+    // Returns the normalized euler distance.
+    private float EulerDistance(float x1, float y1, float x2, float y2, float normalization) {
+        return Mathf.Sqrt(Mathf.Pow(x1 - x2, 2) + Mathf.Pow(y1 - y2, 2)) / normalization;
     }
 
     /* CUTSOM OBJECTS */
@@ -367,6 +499,27 @@ public class ExperimentManager : MonoBehaviour {
         public string x;
         public string y;
         public string spawnedEntity;
+    }
+
+    private class JsonTargetStatistics {
+        public string playerInitialX;
+        public string playerInitialY;
+        public string playerX;
+        public string playerY;
+        public string targetX;
+        public string targetY;
+        public string coveredTileDistance;
+        public string time;
+        public string speed;
+    }
+
+    private class JsonGameStatistics {
+        public string totalShots;
+        public string totalHits;
+        public string accuracy;
+        public string coveredDistance;
+        public string mediumKillTime;
+        public string mediumKillDistance;
     }
 
     [Serializable]

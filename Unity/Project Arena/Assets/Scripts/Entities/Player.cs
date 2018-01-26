@@ -81,8 +81,10 @@ public class Player : Entity, ILoggable {
             UpdatePosition();
             UpdateGun();
             // Log if needed.
-            if (logging && Time.time > lastPositionLog + 0.5)
+            if (logging && Time.time > lastPositionLog + 0.5) {
                 experimentManagerScript.LogPosition(transform.position.x, transform.position.z, transform.rotation.y);
+                lastPositionLog = Time.time;
+            }
         } else {
             UpdateVerticalPosition();
         }

@@ -8,6 +8,8 @@ public class SpawnPointManager : CoreComponent {
 
     // List of all the spawn points.
     private List<SpawnPoint> spawnPoints;
+    // Last used spawn point.
+    private SpawnPoint lastUsed;
 
     // Use this for initialization.
     private void Start() {
@@ -43,7 +45,7 @@ public class SpawnPointManager : CoreComponent {
     // Returns an available spawn position.
     public Vector3 GetSpawnPosition() {
         List<SpawnPoint> availableSpawnPoints = spawnPoints
-            .Where(spawnPoint => Time.time - spawnPoint.lastUsed >= spawnCooldown)
+            .Where(spawnPoint => Time.time - spawnPoint.lastUsed >= spawnCooldown && spawnPoint != lastUsed)
             .ToList();
 
         if (availableSpawnPoints.Count == 0)
@@ -56,6 +58,7 @@ public class SpawnPointManager : CoreComponent {
     private SpawnPoint GetRandomSpawnPoint(List<SpawnPoint> SPs) {
         int index = UnityEngine.Random.Range(0, SPs.Count);
         SPs[index].lastUsed = Time.time;
+        lastUsed = SPs[index];
         return SPs[index];
     }
 
