@@ -93,7 +93,10 @@ public class ExperimentManager : MonoBehaviour {
             foreach (Case c in s.cases) {
                 CreateDirectory(experimentDirectory + "/" + c.map.name);
                 System.IO.File.WriteAllText(@experimentDirectory + "/" + c.map.name + "/" + c.map.name + ".txt", c.map.text);
+                c.completion = (Directory.GetFiles(experimentDirectory + "/" + c.map.name + "/", "*", SearchOption.AllDirectories).Length - 1) / 2;
+                s.completion += c.completion;
             }
+
         // Create the survey directory if needed.
         surveysDirectory = experimentDirectory + "/Surveys";
         CreateDirectory(surveysDirectory);
@@ -181,6 +184,11 @@ public class ExperimentManager : MonoBehaviour {
         pm.SetMapDNA(c.map == null ? "" : c.map.text);
 
         return c.scene;
+    }
+
+    // Set case count.
+    private void SetCaseCount() {
+
     }
 
     /* SURVEY */
