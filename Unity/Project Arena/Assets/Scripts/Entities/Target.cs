@@ -20,14 +20,6 @@ public class Target : Entity, ILoggable {
     private bool logging = false;
     // Experiment manager.
     private ExperimentManager experimentManagerScript;
-    // Support object to format the log.
-    private JsonLog jLog;
-    // Support object to format the log.
-    private JsonKill jKill;
-    // Support object to format the log.
-    private JsonSpawn jSpawn;
-    // Support object to format the log.
-    private JsonHit jHit;
 
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id) {
         originalScale = target.transform.localScale;
@@ -48,7 +40,7 @@ public class Target : Entity, ILoggable {
         // Log if needed.
         if (gms.IsLogging()) {
             SetupLogging(gms.GetExperimentManager());
-            LogSpawn();
+            experimentManagerScript.LogSpawn(transform.position.x, transform.position.z, gameObject.name);
         }
 
         StartCoroutine(FadeIn());
@@ -89,7 +81,7 @@ public class Target : Entity, ILoggable {
 
             // Log if needed.
             if (logging)
-                LogHit();
+                experimentManagerScript.LogHit(transform.position.x, transform.position.z, gameObject.name, "Player " + killerID, damage);
 
             if (health < 1)
                 Die(killerID);
@@ -102,7 +94,7 @@ public class Target : Entity, ILoggable {
 
         // Log if needed.
         if (logging)
-            LogKill();
+            experimentManagerScript.LogKill(transform.position.x, transform.position.z, gameObject.name, "Player " + id);
 
         Destroy(gameObject);
     }
@@ -123,78 +115,7 @@ public class Target : Entity, ILoggable {
     // Setups stuff for the logging.
     public void SetupLogging(ExperimentManager em) {
         experimentManagerScript = em;
-
-        jLog = new JsonLog {
-            log = ""
-        };
-
-        jSpawn = new JsonSpawn();
-        jKill = new JsonKill();
-        jHit = new JsonHit();
-
         logging = true;
-    }
-
-    // Logs spawn.
-    private void LogSpawn() {
-        jLog.time = Time.time.ToString("n4");
-        jLog.type = "spawn";
-        jSpawn.x = transform.position.x.ToString();
-        jSpawn.y = transform.position.z.ToString();
-        jSpawn.spawnedEntity = gameObject.name.ToString();
-        string log = JsonUtility.ToJson(jLog);
-        experimentManagerScript.WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jSpawn) + "}");
-    }
-
-    // Logs a kill.
-    protected void LogKill() {
-        jLog.time = Time.time.ToString("n4");
-        jLog.type = "kill";
-        jKill.x = transform.position.x.ToString();
-        jKill.y = transform.position.y.ToString();
-        jKill.killedEntity = gameObject.name.ToString();
-        jKill.killerEntity = "Player";
-        string log = JsonUtility.ToJson(jLog);
-        experimentManagerScript.WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jKill) + "}");
-    }
-
-    // Logs a hit.
-    protected void LogHit() {
-        jLog.time = Time.time.ToString("n4");
-        jLog.type = "hit";
-        jHit.x = transform.position.x.ToString();
-        jHit.y = transform.position.y.ToString();
-        jHit.hittedEntity = gameObject.name.ToString();
-        jHit.hitterEntity = "Player";
-        string log = JsonUtility.ToJson(jLog);
-        experimentManagerScript.WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jHit) + "}");
-    }
-
-    private class JsonLog {
-        public string time;
-        public string type;
-        public string log;
-    }
-
-    private class JsonKill {
-        public string x;
-        public string y;
-        public string killedEntity;
-        public string killerEntity;
-    }
-
-    private class JsonHit {
-        public string x;
-        public string y;
-        public string hittedEntity;
-        public string hitterEntity;
-    }
-
-
-    private class JsonSpawn {
-        public string x;
-        public string y;
-        public string spawnedEntity;
     }
 
 }

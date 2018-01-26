@@ -60,18 +60,12 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     // Is the input enabled?
     private bool inputEnabled = true;
     // Gun identifier.
-    private int gunId;
+    protected int gunId;
 
     // Do I have to log?
     protected bool logging = false;
     // Experiment manager.
-    private ExperimentManager experimentManagerScript;
-    // Support object to format the log.
-    private JsonLog jLog;
-    // Support object to fromat the position log.
-    private JsonShoot jShoot;
-    // Support object to fromat the position log.
-    private JsonReload jReload;
+    protected ExperimentManager experimentManagerScript;
 
     protected void Awake() {
         if (aimEnabled)
@@ -139,7 +133,7 @@ public abstract class Gun : MonoBehaviour, ILoggable {
             if (Time.time > reloadStart + reloadTime) {
                 // Log if needed.
                 if (logging)
-                    LogRelaod();
+                    experimentManagerScript.LogRelaod(gunId, ammoInCharger, totalAmmo);
                 // Stop the reloading.
                 reloading = false;
                 // Update charger and total ammo count.
@@ -340,61 +334,7 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     // Setups stuff for the logging.
     public void SetupLogging(ExperimentManager em) {
         experimentManagerScript = em;
-
-        jLog = new JsonLog {
-            log = ""
-        };
-
-        jShoot = new JsonShoot();
-        jReload = new JsonReload();
-
         logging = true;
-    }
-
-    // Logs reload.
-    protected void LogRelaod() {
-        jLog.time = Time.time.ToString("n4");
-        jLog.type = "player_reload";
-        jReload.weapon = gunId.ToString();
-        jReload.ammoInCharger = ammoInCharger.ToString();
-        jReload.totalAmmo = totalAmmo.ToString();
-        string log = JsonUtility.ToJson(jLog);
-        experimentManagerScript.WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jReload) + "}");
-    }
-
-    // Logs the shot.
-    protected void LogShot() {
-        jLog.time = Time.time.ToString("n4");
-        jLog.type = "player_shot";
-        jShoot.x = transform.root.position.x.ToString("n4");
-        jShoot.y = transform.root.position.z.ToString("n4");
-        jShoot.direction = transform.root.rotation.y.ToString("n4");
-        jShoot.weapon = gunId.ToString();
-        jShoot.ammoInCharger = ammoInCharger.ToString();
-        jShoot.totalAmmo = totalAmmo.ToString();
-        string log = JsonUtility.ToJson(jLog);
-        experimentManagerScript.WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jShoot) + "}");
-    }
-
-    private class JsonLog {
-        public string time;
-        public string type;
-        public string log;
-    }
-
-    private class JsonShoot {
-        public string x;
-        public string y;
-        public string direction;
-        public string weapon;
-        public string ammoInCharger;
-        public string totalAmmo;
-    }
-
-    private class JsonReload {
-        public string weapon;
-        public string ammoInCharger;
-        public string totalAmmo;
     }
 
 }

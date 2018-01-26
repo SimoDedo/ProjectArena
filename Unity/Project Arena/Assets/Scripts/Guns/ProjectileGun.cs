@@ -23,7 +23,7 @@ public class ProjectileGun : Gun {
 
         // Log if needed.
         if (logging)
-            LogShot();
+            experimentManagerScript.LogShot(transform.root.position.x, transform.root.position.z, transform.root.rotation.y, gunId, ammoInCharger, totalAmmo);
 
         if (hasUI)
             gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);

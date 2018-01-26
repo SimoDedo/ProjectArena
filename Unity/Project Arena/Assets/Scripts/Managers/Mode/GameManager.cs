@@ -82,11 +82,9 @@ public abstract class GameManager : CoreComponent, ILoggable {
 
     // Setups stuff for the logging.
     public void SetupLogging(ExperimentManager em) {
-        experimentManagerScript.WriteLog(JsonUtility.ToJson(new JsonInfo {
-            height = mapManagerScript.GetMapGenerator().GetHeight().ToString(),
-            width = mapManagerScript.GetMapGenerator().GetWidth().ToString(),
-            tileSize = mapManagerScript.GetMapGenerator().GetSquareSize().ToString(),
-        }));
+        experimentManagerScript.LogMapInfo(mapManagerScript.GetMapGenerator().GetHeight(),
+            mapManagerScript.GetMapGenerator().GetWidth(),
+            mapManagerScript.GetMapGenerator().GetSquareSize());
 
         logging = true;
     }
@@ -99,13 +97,6 @@ public abstract class GameManager : CoreComponent, ILoggable {
     // Returns the experiment manager.
     public ExperimentManager GetExperimentManager() {
         return experimentManagerScript;
-    }
-
-
-    private class JsonInfo {
-        public string height;
-        public string width;
-        public string tileSize;
     }
 
 }

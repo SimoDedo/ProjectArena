@@ -27,6 +27,20 @@ public class ExperimentManager : MonoBehaviour {
 
     // Stream writer of the current game log.
     private StreamWriter logStream;
+    // Support object to format the log.
+    private JsonLog jLog;
+    // Support object to fromat the position log.
+    private JsonShoot jShoot;
+    // Support object to fromat the position log.
+    private JsonReload jReload;
+    // Support object to fromat the position log.
+    private JsonPosition jPosition;
+    // Support object to format the log.
+    private JsonKill jKill;
+    // Support object to format the log.
+    private JsonSpawn jSpawn;
+    // Support object to format the log.
+    private JsonHit jHit;
 
     private int currentCase = -1;
     private string currentTimestamp;
@@ -170,6 +184,17 @@ public class ExperimentManager : MonoBehaviour {
         logStream = File.CreateText(experimentDirectory + "/" + caseList[currentCase].map.name + "/" + caseList[currentCase].map.name + "_" + currentTimestamp + "_log.json");
         logStream.AutoFlush = true;
 
+        jLog = new JsonLog {
+            log = ""
+        };
+
+        jShoot = new JsonShoot();
+        jReload = new JsonReload();
+        jPosition = new JsonPosition();
+        jSpawn = new JsonSpawn();
+        jKill = new JsonKill();
+        jHit = new JsonHit();
+
         GameManager gm = FindObjectOfType(typeof(GameManager)) as GameManager;
         if (gm != null)
             gm.LoggingHandshake(this);
@@ -194,6 +219,87 @@ public class ExperimentManager : MonoBehaviour {
         logStream.Close();
     }
 
+    // Logs reload.
+    public void LogRelaod(int gunId, int ammoInCharger, int totalAmmo) {
+        jLog.time = Time.time.ToString("n4");
+        jLog.type = "player_reload";
+        jReload.weapon = gunId.ToString();
+        jReload.ammoInCharger = ammoInCharger.ToString();
+        jReload.totalAmmo = totalAmmo.ToString();
+        string log = JsonUtility.ToJson(jLog);
+        WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jReload) + "}");
+    }
+
+    // Logs the shot.
+    public void LogShot(float x, float z, float direction, int gunId, int ammoInCharger, int totalAmmo) {
+        jLog.time = Time.time.ToString("n4");
+        jLog.type = "player_shot";
+        jShoot.x = x.ToString("n4");
+        jShoot.y = z.ToString("n4");
+        jShoot.direction = direction.ToString("n4");
+        jShoot.weapon = gunId.ToString();
+        jShoot.ammoInCharger = ammoInCharger.ToString();
+        jShoot.totalAmmo = totalAmmo.ToString();
+        string log = JsonUtility.ToJson(jLog);
+        WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jShoot) + "}");
+    }
+
+    // Logs info about the map.
+    public void LogMapInfo(float height, float width, float tileSize) {
+        WriteLog(JsonUtility.ToJson(new JsonMapInfo {
+            height = height.ToString(),
+            width = width.ToString(),
+            tileSize = tileSize.ToString(),
+        }));
+    }
+
+    // Logs the position.
+    public void LogPosition(float x, float z, float direction) {
+        jLog.time = Time.time.ToString("n4");
+        jLog.type = "player_position";
+        jPosition.x = x.ToString("n4");
+        jPosition.y = z.ToString("n4");
+        jPosition.direction = direction.ToString("n4");
+        string log = JsonUtility.ToJson(jLog);
+        WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jPosition) + "}");
+    }
+
+    // Logs spawn.
+    public void LogSpawn(float x, float z, string spawnedEntity) {
+        jLog.time = Time.time.ToString("n4");
+        jLog.type = "spawn";
+        jSpawn.x = x.ToString("n4");
+        jSpawn.y = z.ToString("n4");
+        jSpawn.spawnedEntity = spawnedEntity;
+        string log = JsonUtility.ToJson(jLog);
+        WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jSpawn) + "}");
+    }
+
+    // Logs a kill.
+    public void LogKill(float x, float z, string killedEnitiy, string killerEntity) {
+        jLog.time = Time.time.ToString("n4");
+        jLog.type = "kill";
+        jKill.x = x.ToString("n4");
+        jKill.y = z.ToString("n4");
+        jKill.killedEntity = killedEnitiy;
+        jKill.killerEntity = killerEntity;
+        string log = JsonUtility.ToJson(jLog);
+        WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jKill) + "}");
+    }
+
+    // Logs a hit.
+    public void LogHit(float x, float z, string hittedEntity, string hitterEntity, int damage) {
+        jLog.time = Time.time.ToString("n4");
+        jLog.type = "hit";
+        jHit.x = x.ToString("n4");
+        jHit.y = z.ToString("n4");
+        jHit.hittedEntity = hittedEntity;
+        jHit.hitterEntity = hitterEntity;
+        jHit.damage = damage.ToString();
+        string log = JsonUtility.ToJson(jLog);
+        WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jHit) + "}");
+    }
+
     /* SUPPORT FUNCTIONS */
 
     // Creates a directory if needed.
@@ -204,9 +310,63 @@ public class ExperimentManager : MonoBehaviour {
 
     /* CUTSOM OBJECTS */
 
+    private class JsonLog {
+        public string time;
+        public string type;
+        public string log;
+    }
+
     private class JsonInfo {
         public string experimentName;
         public string[] playedMaps;
+    }
+
+    private class JsonMapInfo {
+        public string height;
+        public string width;
+        public string tileSize;
+    }
+
+    private class JsonPosition {
+        public string x;
+        public string y;
+        public string direction;
+    }
+
+    private class JsonShoot {
+        public string x;
+        public string y;
+        public string direction;
+        public string weapon;
+        public string ammoInCharger;
+        public string totalAmmo;
+    }
+
+    private class JsonReload {
+        public string weapon;
+        public string ammoInCharger;
+        public string totalAmmo;
+    }
+
+    private class JsonKill {
+        public string x;
+        public string y;
+        public string killedEntity;
+        public string killerEntity;
+    }
+
+    private class JsonHit {
+        public string x;
+        public string y;
+        public string hittedEntity;
+        public string hitterEntity;
+        public string damage;
+    }
+
+    private class JsonSpawn {
+        public string x;
+        public string y;
+        public string spawnedEntity;
     }
 
     [Serializable]

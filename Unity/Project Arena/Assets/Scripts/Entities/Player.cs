@@ -36,11 +36,7 @@ public class Player : Entity, ILoggable {
     // Experiment manager.
     private ExperimentManager experimentManagerScript;
     // Time of the last position log.
-    private float lastPositionLog;
-    // Support object to format the log.
-    private JsonLog jLog;
-    // Support object to fromat the position log.
-    private JsonPosition jPosition;
+    private float lastPositionLog = 0;
 
     private PlayerUIManager playerUIManagerScript;
 
@@ -86,7 +82,7 @@ public class Player : Entity, ILoggable {
             UpdateGun();
             // Log if needed.
             if (logging && Time.time > lastPositionLog + 0.5)
-                LogPosition();
+                experimentManagerScript.LogPosition(transform.position.x, transform.position.z, transform.rotation.y);
         } else {
             UpdateVerticalPosition();
         }
@@ -317,37 +313,7 @@ public class Player : Entity, ILoggable {
     // Setups stuff for the logging.
     public void SetupLogging(ExperimentManager em) {
         experimentManagerScript = em;
-
-        jLog = new JsonLog {
-            log = ""
-        };
-
-        jPosition = new JsonPosition();
-
         logging = true;
-    }
-
-    // Logs the position.
-    private void LogPosition() {
-        jLog.time = Time.time.ToString("n4");
-        jLog.type = "player_position";
-        jPosition.x = transform.position.x.ToString("n4");
-        jPosition.y = transform.position.z.ToString("n4");
-        jPosition.direction = transform.rotation.y.ToString("n4");
-        string log = JsonUtility.ToJson(jLog);
-        experimentManagerScript.WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jPosition) + "}");
-    }
-
-    private class JsonLog {
-        public string time;
-        public string type;
-        public string log;
-    }
-
-    private class JsonPosition {
-        public string x;
-        public string y;
-        public string direction;
     }
 
 }
