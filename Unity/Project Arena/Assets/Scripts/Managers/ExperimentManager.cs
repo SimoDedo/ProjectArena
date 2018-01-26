@@ -78,7 +78,9 @@ public class ExperimentManager : MonoBehaviour {
 
     private int currentCase = -1;
     private string currentTimestamp;
-    private bool logging;
+
+    private bool logging = false;
+    private bool loggingStatistics = false;
 
     void Start() {
         caseList = new List<Case>();
@@ -254,6 +256,9 @@ public class ExperimentManager : MonoBehaviour {
     public void StartLogging() {
         logging = true;
 
+        if (logStatistics)
+            loggingStatistics = true;
+
         foreach (MonoBehaviour monoBehaviour in FindObjectsOfType(typeof(MonoBehaviour))) {
             ILoggable logger = monoBehaviour as ILoggable;
             if (logger != null)
@@ -273,11 +278,13 @@ public class ExperimentManager : MonoBehaviour {
 
     // Stops logging and saves the log.
     public void StopLogging() {
-        if (logStatistics) {
+        if (loggingStatistics) {
             LogGameStatistics();
             statisticsStream.Close();
-            logStatistics = false;
+            loggingStatistics = false;
         }
+
+        logging = false;
 
         logStream.Close();
     }
@@ -306,7 +313,7 @@ public class ExperimentManager : MonoBehaviour {
         string log = JsonUtility.ToJson(jLog);
         WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jShoot) + "}");
 
-        if (logStatistics)
+        if (loggingStatistics)
             shotCount++;
     }
 
@@ -320,7 +327,7 @@ public class ExperimentManager : MonoBehaviour {
 
         WriteLog(infoLog);
 
-        if (logStatistics) {
+        if (loggingStatistics) {
             WriteStatisticsLog(infoLog);
             tileSize = ts;
         }
@@ -336,7 +343,7 @@ public class ExperimentManager : MonoBehaviour {
         string log = JsonUtility.ToJson(jLog);
         WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jPosition) + "}");
 
-        if (logStatistics) {
+        if (loggingStatistics) {
             if (lastPosition.x != -1) {
                 float delta = EulerDistance(x, z, lastPosition.x, lastPosition.z, tileSize);
                 totalDistance += delta;
@@ -357,7 +364,7 @@ public class ExperimentManager : MonoBehaviour {
         string log = JsonUtility.ToJson(jLog);
         WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jSpawn) + "}");
 
-        if (logStatistics) {
+        if (loggingStatistics) {
             targetSpawn = Time.time;
             initialTargetPosition.x = x;
             initialTargetPosition.z = z;
@@ -376,7 +383,7 @@ public class ExperimentManager : MonoBehaviour {
         string log = JsonUtility.ToJson(jLog);
         WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jKill) + "}");
 
-        if (logStatistics) {
+        if (loggingStatistics) {
             LogTargetStatistics(x, z);
             killCount++;
             mediumKillTime += (Time.time - lastTargetSpawn - mediumKillTime) / killCount;
@@ -398,7 +405,7 @@ public class ExperimentManager : MonoBehaviour {
         string log = JsonUtility.ToJson(jLog);
         WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jHit) + "}");
 
-        if (logStatistics)
+        if (loggingStatistics)
             hitCount++;
     }
 
