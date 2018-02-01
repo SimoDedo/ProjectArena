@@ -76,7 +76,7 @@ public class TargetHuntGameManager : GameManager {
             targetHuntGameUIManagerScript.Fade(0.7f, 0f, false, 0.25f);
             targetHuntGameUIManagerScript.SetScore(0);
             spawnPointManagerScript.UpdateLastUsed();
-            SpawnTarget();
+            StartCoroutine(SpawnTarget());
             playerScript.SetInGame(true);
             targetHuntGameUIManagerScript.ActivateFightUI();
             gamePhase = 1;
@@ -128,7 +128,7 @@ public class TargetHuntGameManager : GameManager {
             targetHuntGameUIManagerScript.AddScore(scoreIncrease);
 
             // Spawn a new target.
-            SpawnTarget();
+            StartCoroutine(SpawnTarget());
         }
     }
 
@@ -154,7 +154,9 @@ public class TargetHuntGameManager : GameManager {
     }
 
     // Spawns a targets.
-    private void SpawnTarget() {
+    private IEnumerator SpawnTarget() {
+        yield return new WaitForSeconds(respawnDuration);
+
         GameObject newTarget = (GameObject)Instantiate(targetList[currentTarget]);
         newTarget.name = targetList[currentTarget].name;
         newTarget.transform.position = spawnPointManagerScript.GetSpawnPosition();

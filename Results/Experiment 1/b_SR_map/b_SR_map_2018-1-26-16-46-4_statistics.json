@@ -1,0 +1,13 @@
+{"height":"40","width":"40","tileSize":"4.41"}
+{"playerInitialX":"-59.3529","playerInitialY":"-71.4501","playerX":"-59.3529","playerY":"-71.4501","targetX":"4.4100","targetY":"-70.5600","coveredTileDistance":"123.2524","time":"37.4607","speed":"3.2902"}
+{"playerInitialX":"55.1865","playerInitialY":"-54.4657","playerX":"55.1865","playerY":"-54.4657","targetX":"57.3300","targetY":"4.4100","coveredTileDistance":"28.9579","time":"7.6287","speed":"3.7959"}
+{"playerInitialX":"43.5315","playerInitialY":"2.0942","playerX":"43.5315","playerY":"2.0942","targetX":"30.8700","targetY":"17.6400","coveredTileDistance":"15.4951","time":"4.0645","speed":"3.8123"}
+{"playerInitialX":"40.7466","playerInitialY":"-72.8970","playerX":"40.7466","playerY":"-72.8970","targetX":"4.4100","targetY":"-70.5600","coveredTileDistance":"97.1425","time":"25.8835","speed":"3.7531"}
+{"playerInitialX":"2.9180","playerInitialY":"-77.1830","playerX":"2.9180","playerY":"-77.1830","targetX":"-66.1500","targetY":"-61.7400","coveredTileDistance":"8.9464","time":"2.5144","speed":"3.5580"}
+{"playerInitialX":"-36.3216","playerInitialY":"-66.7216","playerX":"-36.3216","playerY":"-66.7216","targetX":"17.6400","targetY":"-52.9200","coveredTileDistance":"18.1072","time":"5.2981","speed":"3.4177"}
+{"playerInitialX":"-38.1879","playerInitialY":"4.3751","playerX":"-38.1879","playerY":"4.3751","targetX":"57.3300","targetY":"4.4100","coveredTileDistance":"33.4828","time":"9.5603","speed":"3.5023"}
+{"playerInitialX":"33.3888","playerInitialY":"-71.9971","playerX":"33.3888","playerY":"-71.9971","targetX":"4.4100","targetY":"-70.5600","coveredTileDistance":"71.0347","time":"18.8711","speed":"3.7642"}
+{"playerInitialX":"-51.6627","playerInitialY":"2.3234","playerX":"-51.6627","playerY":"2.3234","targetX":"57.3300","targetY":"4.4100","coveredTileDistance":"48.3178","time":"12.7271","speed":"3.7965"}
+{"playerInitialX":"21.8595","playerInitialY":"-69.2875","playerX":"21.8595","playerY":"-69.2875","targetX":"17.6400","targetY":"-52.9200","coveredTileDistance":"78.8623","time":"20.6055","speed":"3.8272"}
+{"playerInitialX":"-69.0061","playerInitialY":"3.3817","playerX":"-69.0061","playerY":"3.3817","targetX":"57.3300","targetY":"4.4100","coveredTileDistance":"45.2721","time":"11.9248","speed":"3.7965"}
+{"totalShots":"980.0000","totalHits":"426.0000","accuracy":"0.4347","coveredDistance":"5,491.4090","mediumKillTime":"29.8098","mediumKillDistance":"51.2617"}

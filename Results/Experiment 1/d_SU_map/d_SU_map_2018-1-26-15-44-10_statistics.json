@@ -1,0 +1,14 @@
+{"height":"40","width":"40","tileSize":"4.41"}
+{"playerInitialX":"-1.4114","playerInitialY":"36.2346","playerX":"-1.4114","playerY":"36.2346","targetX":"-4.4100","targetY":"-17.6400","coveredTileDistance":"50.6955","time":"342.8223","speed":"0.1479"}
+{"playerInitialX":"27.5904","playerInitialY":"9.7365","playerX":"27.5904","playerY":"9.7365","targetX":"52.9200","targetY":"8.8200","coveredTileDistance":"12.2817","time":"5.3757","speed":"2.2847"}
+{"playerInitialX":"-47.5431","playerInitialY":"8.9938","playerX":"-47.5431","playerY":"8.9938","targetX":"-35.2800","targetY":"13.2300","coveredTileDistance":"65.7442","time":"19.0574","speed":"3.4498"}
+{"playerInitialX":"-23.7466","playerInitialY":"60.6882","playerX":"-23.7466","playerY":"60.6882","targetX":"-4.4100","targetY":"61.7400","coveredTileDistance":"17.7858","time":"5.5452","speed":"3.2074"}
+{"playerInitialX":"16.7531","playerInitialY":"10.4379","playerX":"16.7531","playerY":"10.4379","targetX":"-35.2800","targetY":"13.2300","coveredTileDistance":"70.8025","time":"19.6228","speed":"3.6082"}
+{"playerInitialX":"54.6228","playerInitialY":"-23.2554","playerX":"54.6228","playerY":"-23.2554","targetX":"52.9200","targetY":"8.8200","coveredTileDistance":"37.6562","time":"11.1084","speed":"3.3899"}
+{"playerInitialX":"-41.7748","playerInitialY":"-49.5804","playerX":"-41.7748","playerY":"-49.5804","targetX":"26.4600","targetY":"-61.7400","coveredTileDistance":"47.6677","time":"13.2756","speed":"3.5906"}
+{"playerInitialX":"15.9168","playerInitialY":"-18.2081","playerX":"15.9168","playerY":"-18.2081","targetX":"-4.4100","targetY":"-17.6400","coveredTileDistance":"38.5384","time":"10.6443","speed":"3.6206"}
+{"playerInitialX":"-40.7199","playerInitialY":"11.4603","playerX":"-40.7199","playerY":"11.4603","targetX":"52.9200","targetY":"8.8200","coveredTileDistance":"52.8618","time":"15.3245","speed":"3.4495"}
+{"playerInitialX":"-2.8658","playerInitialY":"-16.5119","playerX":"-2.8658","playerY":"-16.5119","targetX":"-4.4100","targetY":"-17.6400","coveredTileDistance":"12.2925","time":"4.5452","speed":"2.7045"}
+{"playerInitialX":"-23.5139","playerInitialY":"60.4308","playerX":"-23.5139","playerY":"60.4308","targetX":"-4.4100","targetY":"61.7400","coveredTileDistance":"55.2411","time":"15.9563","speed":"3.4620"}
+{"playerInitialX":"-49.6015","playerInitialY":"5.6339","playerX":"-49.6015","playerY":"5.6339","targetX":"-35.2800","targetY":"13.2300","coveredTileDistance":"76.4773","time":"19.4558","speed":"3.9308"}
+{"totalShots":"802.0000","totalHits":"408.0000","accuracy":"0.5087","coveredDistance":"4,595.7170","mediumKillTime":"24.7119","mediumKillDistance":"44.8631"}

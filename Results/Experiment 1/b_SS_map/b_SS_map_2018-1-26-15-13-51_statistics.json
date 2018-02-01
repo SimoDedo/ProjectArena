@@ -1,0 +1,10 @@
+{"height":"40","width":"40","tileSize":"4.41"}
+{"playerInitialX":"55.8930","playerInitialY":"-56.5829","playerX":"55.8930","playerY":"-56.5829","targetX":"66.1500","targetY":"8.8200","coveredTileDistance":"97.5099","time":"34.8064","speed":"2.8015"}
+{"playerInitialX":"48.1550","playerInitialY":"0.9382","playerX":"48.1550","playerY":"0.9382","targetX":"8.8200","targetY":"35.2800","coveredTileDistance":"14.5702","time":"4.0985","speed":"3.5551"}
+{"playerInitialX":"-63.3253","playerInitialY":"68.1434","playerX":"-63.3253","playerY":"68.1434","targetX":"-74.9700","targetY":"57.3300","coveredTileDistance":"156.9234","time":"51.1830","speed":"3.0659"}
+{"playerInitialX":"-12.3720","playerInitialY":"4.1080","playerX":"-12.3720","playerY":"4.1080","targetX":"66.1500","targetY":"8.8200","coveredTileDistance":"26.7439","time":"8.1620","speed":"3.2766"}
+{"playerInitialX":"11.0743","playerInitialY":"14.3039","playerX":"11.0743","playerY":"14.3039","targetX":"8.8200","targetY":"35.2800","coveredTileDistance":"6.9238","time":"2.6649","speed":"2.5982"}
+{"playerInitialX":"-53.0836","playerInitialY":"61.1488","playerX":"-53.0836","playerY":"61.1488","targetX":"-74.9700","targetY":"57.3300","coveredTileDistance":"129.9710","time":"36.6264","speed":"3.5486"}
+{"playerInitialX":"-7.3467","playerInitialY":"-69.2236","playerX":"-7.3467","playerY":"-69.2236","targetX":"-70.5600","targetY":"-70.5600","coveredTileDistance":"72.4780","time":"19.7053","speed":"3.6781"}
+{"playerInitialX":"-69.8954","playerInitialY":"-24.0561","playerX":"-69.8954","playerY":"-24.0561","targetX":"-35.2800","targetY":"-4.4100","coveredTileDistance":"29.3819","time":"8.0150","speed":"3.6659"}
+{"totalShots":"432.0000","totalHits":"200.0000","accuracy":"0.4630","coveredDistance":"2,103.2280","mediumKillTime":"18.8279","mediumKillDistance":"41.8824"}

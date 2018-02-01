@@ -1,0 +1,423 @@
+{"height":"40","width":"40","tileSize":"4.41"}
+{"time":"2,359.1030","type":"spawn","log":{"x":"-8.8200","y":"-74.9700","spawnedEntity":"Medium Target"}}
+{"time":"2,359.1030","type":"player_position","log":{"x":"-88.2000","y":"61.7400","direction":"0.0000"}}
+{"time":"2,359.6190","type":"player_position","log":{"x":"-88.2000","y":"61.7400","direction":"0.3034"}}
+{"time":"2,360.1240","type":"player_position","log":{"x":"-88.2000","y":"61.7400","direction":"0.6843"}}
+{"time":"2,360.6390","type":"player_position","log":{"x":"-83.0904","y":"61.6987","direction":"0.6904"}}
+{"time":"2,361.1410","type":"player_position","log":{"x":"-74.4827","y":"64.9646","direction":"0.8356"}}
+{"time":"2,361.6580","type":"player_position","log":{"x":"-67.7861","y":"64.8514","direction":"0.8846"}}
+{"time":"2,362.1580","type":"player_position","log":{"x":"-67.6566","y":"64.8108","direction":"0.9734"}}
+{"time":"2,362.6720","type":"player_position","log":{"x":"-62.5537","y":"62.7193","direction":"0.9987"}}
+{"time":"2,363.1880","type":"player_position","log":{"x":"-64.0420","y":"55.2521","direction":"0.9998"}}
+{"time":"2,363.6880","type":"player_position","log":{"x":"-65.0374","y":"47.7427","direction":"0.9901"}}
+{"time":"2,364.1890","type":"player_position","log":{"x":"-59.5836","y":"42.8602","direction":"0.8739"}}
+{"time":"2,364.7010","type":"player_position","log":{"x":"-62.4163","y":"35.4356","direction":"0.9936"}}
+{"time":"2,365.2180","type":"player_position","log":{"x":"-68.6188","y":"28.5006","direction":"0.9966"}}
+{"time":"2,365.7340","type":"player_position","log":{"x":"-69.7500","y":"20.8430","direction":"0.9978"}}
+{"time":"2,366.2500","type":"player_position","log":{"x":"-71.9632","y":"13.3267","direction":"0.9978"}}
+{"time":"2,366.7660","type":"player_position","log":{"x":"-73.1198","y":"5.6724","direction":"0.9954"}}
+{"time":"2,367.2820","type":"player_position","log":{"x":"-74.7981","y":"-1.8840","direction":"0.9932"}}
+{"time":"2,367.7980","type":"player_position","log":{"x":"-76.5847","y":"-9.4174","direction":"0.9932"}}
+{"time":"2,368.3140","type":"player_position","log":{"x":"-78.3643","y":"-16.9511","direction":"0.9937"}}
+{"time":"2,368.8310","type":"player_position","log":{"x":"-79.9200","y":"-24.5372","direction":"0.9960"}}
+{"time":"2,369.3470","type":"player_position","log":{"x":"-80.9416","y":"-32.2065","direction":"0.9997"}}
+{"time":"2,369.8630","type":"player_position","log":{"x":"-81.2206","y":"-39.9470","direction":"0.9999"}}
+{"time":"2,370.3790","type":"player_position","log":{"x":"-82.4845","y":"-47.5043","direction":"0.9796"}}
+{"time":"2,370.8950","type":"player_position","log":{"x":"-84.9214","y":"-55.3442","direction":"0.8995"}}
+{"time":"2,371.4120","type":"player_position","log":{"x":"-86.3935","y":"-62.2926","direction":"0.9744"}}
+{"time":"2,371.9160","type":"player_position","log":{"x":"-80.7957","y":"-66.5984","direction":"0.7207"}}
+{"time":"2,372.4310","type":"player_position","log":{"x":"-73.0947","y":"-66.9150","direction":"0.7581"}}
+{"time":"2,372.9470","type":"player_position","log":{"x":"-65.4247","y":"-67.9967","direction":"0.7484"}}
+{"time":"2,373.4630","type":"player_position","log":{"x":"-57.7508","y":"-68.9514","direction":"0.7551"}}
+{"time":"2,373.9620","type":"player_shot","log":{"x":"-50.5622","y":"-69.8779","direction":"0.7487","weapon":"1","ammoInCharger":"31","totalAmmo":"28"}}
+{"time":"2,373.9620","type":"hit","log":{"x":"-8.8200","y":"-74.9700","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,373.9790","type":"player_position","log":{"x":"-50.0697","y":"-69.9379","direction":"0.7487"}}
+{"time":"2,374.0790","type":"player_shot","log":{"x":"-48.8279","y":"-70.0893","direction":"0.7487","weapon":"1","ammoInCharger":"30","totalAmmo":"28"}}
+{"time":"2,374.0790","type":"hit","log":{"x":"-8.8200","y":"-74.9700","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,374.1950","type":"player_shot","log":{"x":"-47.0949","y":"-70.3006","direction":"0.7487","weapon":"1","ammoInCharger":"29","totalAmmo":"28"}}
+{"time":"2,374.1950","type":"hit","log":{"x":"-8.8200","y":"-74.9700","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,374.3120","type":"player_shot","log":{"x":"-45.3630","y":"-70.5118","direction":"0.7487","weapon":"1","ammoInCharger":"28","totalAmmo":"28"}}
+{"time":"2,374.3120","type":"hit","log":{"x":"-8.8200","y":"-74.9700","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,374.3120","type":"spawn","log":{"x":"57.3300","y":"13.2300","spawnedEntity":"Medium Target"}}
+{"time":"2,374.3120","type":"kill","log":{"x":"-8.8200","y":"-74.9700","killedEntity":"Medium Target","killerEntity":"Player 0"}}
+{"time":"2,374.4290","type":"player_shot","log":{"x":"-43.6230","y":"-70.7240","direction":"0.7487","weapon":"1","ammoInCharger":"27","totalAmmo":"28"}}
+{"time":"2,374.4950","type":"player_position","log":{"x":"-42.3871","y":"-70.8747","direction":"0.7487"}}
+{"time":"2,374.5450","type":"player_shot","log":{"x":"-41.8887","y":"-70.9355","direction":"0.7487","weapon":"1","ammoInCharger":"26","totalAmmo":"28"}}
+{"time":"2,375.0110","type":"player_position","log":{"x":"-34.7002","y":"-71.8021","direction":"0.7481"}}
+{"time":"2,375.5120","type":"player_position","log":{"x":"-27.3458","y":"-70.8663","direction":"0.5907"}}
+{"time":"2,376.0130","type":"player_position","log":{"x":"-18.9968","y":"-69.2616","direction":"0.3312"}}
+{"time":"2,376.5260","type":"player_position","log":{"x":"-9.3379","y":"-71.2863","direction":"0.7439"}}
+{"time":"2,377.0430","type":"player_position","log":{"x":"-1.7124","y":"-72.1946","direction":"0.6435"}}
+{"time":"2,377.5580","type":"player_position","log":{"x":"3.6155","y":"-74.6730","direction":"0.9754"}}
+{"time":"2,378.0610","type":"player_position","log":{"x":"6.4818","y":"-74.0278","direction":"0.3091"}}
+{"time":"2,378.5620","type":"player_position","log":{"x":"14.5602","y":"-71.2201","direction":"0.1773"}}
+{"time":"2,379.0740","type":"player_position","log":{"x":"21.2650","y":"-75.3848","direction":"0.5613"}}
+{"time":"2,379.5900","type":"player_position","log":{"x":"28.8878","y":"-75.9188","direction":"0.8702"}}
+{"time":"2,380.1060","type":"player_position","log":{"x":"37.9438","y":"-75.8150","direction":"0.8865"}}
+{"time":"2,380.6080","type":"player_position","log":{"x":"44.5409","y":"-72.8629","direction":"0.2263"}}
+{"time":"2,381.1090","type":"player_position","log":{"x":"51.4196","y":"-66.6566","direction":"0.0752"}}
+{"time":"2,381.6260","type":"player_position","log":{"x":"56.0950","y":"-59.5360","direction":"0.0173"}}
+{"time":"2,382.1420","type":"player_position","log":{"x":"56.1202","y":"-51.7958","direction":"0.0108"}}
+{"time":"2,382.6580","type":"player_position","log":{"x":"56.3007","y":"-44.0592","direction":"0.0098"}}
+{"time":"2,382.7080","type":"player_shot","log":{"x":"56.3105","y":"-43.5586","direction":"0.0098","weapon":"1","ammoInCharger":"25","totalAmmo":"28"}}
+{"time":"2,382.7080","type":"hit","log":{"x":"57.3300","y":"13.2300","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,382.8240","type":"player_shot","log":{"x":"56.3448","y":"-41.8120","direction":"0.0098","weapon":"1","ammoInCharger":"24","totalAmmo":"28"}}
+{"time":"2,382.8240","type":"hit","log":{"x":"57.3300","y":"13.2300","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,382.9400","type":"player_shot","log":{"x":"56.3790","y":"-40.0658","direction":"0.0098","weapon":"1","ammoInCharger":"23","totalAmmo":"28"}}
+{"time":"2,382.9400","type":"hit","log":{"x":"57.3300","y":"13.2300","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,383.0410","type":"player_shot","log":{"x":"56.4085","y":"-38.5666","direction":"0.0098","weapon":"1","ammoInCharger":"22","totalAmmo":"28"}}
+{"time":"2,383.0410","type":"hit","log":{"x":"57.3300","y":"13.2300","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,383.0410","type":"spawn","log":{"x":"52.9200","y":"-57.3300","spawnedEntity":"Medium Target"}}
+{"time":"2,383.0410","type":"kill","log":{"x":"57.3300","y":"13.2300","killedEntity":"Medium Target","killerEntity":"Player 0"}}
+{"time":"2,383.1570","type":"player_shot","log":{"x":"56.4427","y":"-36.8193","direction":"0.0098","weapon":"1","ammoInCharger":"21","totalAmmo":"28"}}
+{"time":"2,383.1740","type":"player_position","log":{"x":"56.4526","y":"-36.3178","direction":"0.0098"}}
+{"time":"2,383.2740","type":"player_shot","log":{"x":"56.4769","y":"-35.0762","direction":"0.0098","weapon":"1","ammoInCharger":"20","totalAmmo":"28"}}
+{"time":"2,383.6890","type":"player_position","log":{"x":"56.6043","y":"-28.5837","direction":"0.0098"}}
+{"time":"2,384.2060","type":"player_position","log":{"x":"56.9716","y":"-20.8193","direction":"-0.0204"}}
+{"time":"2,384.7080","type":"player_position","log":{"x":"61.2696","y":"-11.7954","direction":"-0.2535"}}
+{"time":"2,385.2080","type":"player_position","log":{"x":"60.7019","y":"-2.6576","direction":"-0.5242"}}
+{"time":"2,385.7230","type":"player_position","log":{"x":"57.8472","y":"7.4524","direction":"-0.3212"}}
+{"time":"2,386.2370","type":"player_position","log":{"x":"62.7531","y":"12.1064","direction":"-0.0734"}}
+{"time":"2,386.7390","type":"player_position","log":{"x":"58.7649","y":"16.3462","direction":"-0.4516"}}
+{"time":"2,387.2530","type":"player_position","log":{"x":"60.1784","y":"24.7367","direction":"-0.0680"}}
+{"time":"2,387.7690","type":"player_position","log":{"x":"60.9227","y":"32.8612","direction":"-0.1182"}}
+{"time":"2,388.2850","type":"player_position","log":{"x":"59.5602","y":"40.4951","direction":"-0.1166"}}
+{"time":"2,388.8010","type":"player_position","log":{"x":"59.3872","y":"48.4121","direction":"-0.1158"}}
+{"time":"2,389.3020","type":"player_position","log":{"x":"57.2364","y":"55.7189","direction":"-0.3904"}}
+{"time":"2,389.8040","type":"player_position","log":{"x":"51.9825","y":"63.9139","direction":"-0.6944"}}
+{"time":"2,390.3050","type":"player_position","log":{"x":"44.5492","y":"64.4437","direction":"-0.8002"}}
+{"time":"2,390.8220","type":"player_position","log":{"x":"37.2473","y":"61.8552","direction":"-0.8214"}}
+{"time":"2,391.3380","type":"player_position","log":{"x":"27.7474","y":"61.3738","direction":"-0.9146"}}
+{"time":"2,391.8540","type":"player_position","log":{"x":"17.1851","y":"62.3669","direction":"-0.8969"}}
+{"time":"2,392.3710","type":"player_position","log":{"x":"11.3787","y":"57.4265","direction":"-0.9320"}}
+{"time":"2,392.8870","type":"player_position","log":{"x":"14.9400","y":"47.5429","direction":"-0.9882"}}
+{"time":"2,393.4020","type":"player_position","log":{"x":"13.4734","y":"40.3465","direction":"-0.9969"}}
+{"time":"2,393.9180","type":"player_position","log":{"x":"10.0529","y":"32.9779","direction":"-0.9980"}}
+{"time":"2,394.4340","type":"player_position","log":{"x":"13.7936","y":"24.4159","direction":"-0.9923"}}
+{"time":"2,394.9500","type":"player_position","log":{"x":"18.9970","y":"14.8603","direction":"-0.9603"}}
+{"time":"2,395.4670","type":"player_position","log":{"x":"13.3491","y":"10.0040","direction":"-0.8042"}}
+{"time":"2,395.9830","type":"player_position","log":{"x":"5.9029","y":"7.8506","direction":"-0.7457"}}
+{"time":"2,396.4980","type":"player_position","log":{"x":"-3.0487","y":"7.0938","direction":"-0.4304"}}
+{"time":"2,397.0140","type":"player_position","log":{"x":"-10.1003","y":"12.6301","direction":"-0.2490"}}
+{"time":"2,397.5150","type":"player_position","log":{"x":"-12.3763","y":"13.4964","direction":"-0.9585"}}
+{"time":"2,398.0310","type":"player_position","log":{"x":"-15.2631","y":"12.9437","direction":"-0.9995"}}
+{"time":"2,398.5470","type":"player_position","log":{"x":"-21.8709","y":"6.8034","direction":"-0.9626"}}
+{"time":"2,399.0630","type":"player_position","log":{"x":"-30.6045","y":"3.7763","direction":"-0.9596"}}
+{"time":"2,399.5790","type":"player_position","log":{"x":"-33.5623","y":"-1.2682","direction":"-0.7886"}}
+{"time":"2,400.0790","type":"player_position","log":{"x":"-33.5366","y":"0.2897","direction":"-0.0138"}}
+{"time":"2,400.5950","type":"player_position","log":{"x":"-33.9039","y":"2.6069","direction":"-0.0873"}}
+{"time":"2,401.1110","type":"player_position","log":{"x":"-41.9298","y":"7.9245","direction":"-0.1749"}}
+{"time":"2,401.6270","type":"player_position","log":{"x":"-44.9281","y":"15.0688","direction":"-0.1795"}}
+{"time":"2,402.1440","type":"player_position","log":{"x":"-47.7325","y":"22.2913","direction":"-0.1861"}}
+{"time":"2,402.6590","type":"player_position","log":{"x":"-51.9037","y":"28.9148","direction":"-0.2053"}}
+{"time":"2,403.1760","type":"player_position","log":{"x":"-54.8550","y":"36.0759","direction":"-0.1909"}}
+{"time":"2,403.6920","type":"player_position","log":{"x":"-57.2154","y":"43.4468","direction":"-0.1474"}}
+{"time":"2,404.2080","type":"player_position","log":{"x":"-63.1957","y":"50.8054","direction":"0.0732"}}
+{"time":"2,404.7100","type":"player_position","log":{"x":"-61.8136","y":"58.8533","direction":"0.6386"}}
+{"time":"2,405.2270","type":"player_position","log":{"x":"-55.3905","y":"65.6593","direction":"0.7000"}}
+{"time":"2,405.7270","type":"player_position","log":{"x":"-54.3895","y":"67.5657","direction":"0.7153"}}
+{"time":"2,406.2410","type":"player_position","log":{"x":"-54.3895","y":"67.5657","direction":"0.8290"}}
+{"time":"2,406.7570","type":"player_position","log":{"x":"-54.5066","y":"67.5208","direction":"0.8277"}}
+{"time":"2,407.2570","type":"player_position","log":{"x":"-62.3583","y":"68.6455","direction":"0.8919"}}
+{"time":"2,407.7740","type":"player_position","log":{"x":"-73.0808","y":"69.8476","direction":"0.9338"}}
+{"time":"2,408.2750","type":"player_position","log":{"x":"-77.2352","y":"63.8435","direction":"0.9958"}}
+{"time":"2,408.7920","type":"player_position","log":{"x":"-81.1084","y":"56.7050","direction":"0.9982"}}
+{"time":"2,409.3080","type":"player_position","log":{"x":"-81.4759","y":"48.9794","direction":"0.9997"}}
+{"time":"2,409.8240","type":"player_position","log":{"x":"-81.6877","y":"41.2362","direction":"0.9999"}}
+{"time":"2,410.3400","type":"player_position","log":{"x":"-81.8703","y":"33.4976","direction":"0.9999"}}
+{"time":"2,410.8560","type":"player_position","log":{"x":"-82.0530","y":"25.7572","direction":"0.9999"}}
+{"time":"2,411.3720","type":"player_position","log":{"x":"-82.2357","y":"18.0179","direction":"0.9999"}}
+{"time":"2,411.8880","type":"player_position","log":{"x":"-82.8683","y":"10.2917","direction":"0.9999"}}
+{"time":"2,412.4040","type":"player_position","log":{"x":"-83.0690","y":"2.5524","direction":"0.9999"}}
+{"time":"2,412.9210","type":"player_position","log":{"x":"-83.3023","y":"-5.1894","direction":"0.9999"}}
+{"time":"2,413.4370","type":"player_position","log":{"x":"-83.5353","y":"-12.9254","direction":"0.9999"}}
+{"time":"2,413.9530","type":"player_position","log":{"x":"-83.7194","y":"-20.6635","direction":"0.9999"}}
+{"time":"2,414.4690","type":"player_position","log":{"x":"-83.9022","y":"-28.4083","direction":"0.9999"}}
+{"time":"2,414.9850","type":"player_position","log":{"x":"-84.1610","y":"-36.1424","direction":"0.9994"}}
+{"time":"2,415.5010","type":"player_position","log":{"x":"-84.7606","y":"-43.8628","direction":"0.9993"}}
+{"time":"2,416.0170","type":"player_position","log":{"x":"-86.3322","y":"-51.3560","direction":"0.9640"}}
+{"time":"2,416.5340","type":"player_position","log":{"x":"-90.7157","y":"-57.5897","direction":"0.9479"}}
+{"time":"2,417.0360","type":"player_position","log":{"x":"-85.4389","y":"-63.3109","direction":"0.8269"}}
+{"time":"2,417.5520","type":"player_position","log":{"x":"-78.8258","y":"-67.4209","direction":"0.8453"}}
+{"time":"2,418.0520","type":"player_position","log":{"x":"-71.9168","y":"-70.2803","direction":"0.7615"}}
+{"time":"2,418.5680","type":"player_position","log":{"x":"-64.1978","y":"-70.8990","direction":"0.7305"}}
+{"time":"2,419.0850","type":"player_position","log":{"x":"-56.4708","y":"-71.4204","direction":"0.7305"}}
+{"time":"2,419.6010","type":"player_position","log":{"x":"-48.7515","y":"-71.9414","direction":"0.7305"}}
+{"time":"2,420.1170","type":"player_position","log":{"x":"-41.0447","y":"-72.6857","direction":"0.7403"}}
+{"time":"2,420.6190","type":"player_position","log":{"x":"-33.7139","y":"-71.0791","direction":"0.5009"}}
+{"time":"2,421.1190","type":"player_position","log":{"x":"-23.5562","y":"-71.0019","direction":"0.3419"}}
+{"time":"2,421.6190","type":"player_position","log":{"x":"-15.4367","y":"-67.4757","direction":"0.1345"}}
+{"time":"2,422.1350","type":"player_position","log":{"x":"-12.7046","y":"-60.2488","direction":"0.2029"}}
+{"time":"2,422.6480","type":"player_position","log":{"x":"-5.4111","y":"-58.6202","direction":"0.5830"}}
+{"time":"2,423.1650","type":"player_position","log":{"x":"0.5331","y":"-53.4476","direction":"0.4691"}}
+{"time":"2,423.6660","type":"player_position","log":{"x":"9.0583","y":"-49.1508","direction":"0.1523"}}
+{"time":"2,424.1800","type":"player_position","log":{"x":"13.6664","y":"-43.5943","direction":"0.5645"}}
+{"time":"2,424.6960","type":"player_position","log":{"x":"14.0252","y":"-43.5775","direction":"0.7954"}}
+{"time":"2,425.2120","type":"player_position","log":{"x":"14.0047","y":"-44.1362","direction":"0.9984"}}
+{"time":"2,425.7290","type":"player_position","log":{"x":"13.8225","y":"-51.1036","direction":"0.9743"}}
+{"time":"2,426.2450","type":"player_position","log":{"x":"18.4195","y":"-57.3374","direction":"0.9437"}}
+{"time":"2,426.7610","type":"player_position","log":{"x":"22.5813","y":"-63.8806","direction":"0.8896"}}
+{"time":"2,427.2780","type":"player_position","log":{"x":"30.1030","y":"-69.5898","direction":"0.6897"}}
+{"time":"2,427.7940","type":"player_position","log":{"x":"38.0526","y":"-72.9983","direction":"0.4892"}}
+{"time":"2,428.3110","type":"player_position","log":{"x":"44.2714","y":"-68.2975","direction":"0.3838"}}
+{"time":"2,428.8280","type":"player_position","log":{"x":"47.5443","y":"-66.0084","direction":"0.2499"}}
+{"time":"2,428.8610","type":"player_shot","log":{"x":"47.5443","y":"-66.0084","direction":"0.2499","weapon":"1","ammoInCharger":"19","totalAmmo":"28"}}
+{"time":"2,428.8610","type":"hit","log":{"x":"52.9200","y":"-57.3300","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,428.9780","type":"player_shot","log":{"x":"47.5443","y":"-66.0084","direction":"0.2499","weapon":"1","ammoInCharger":"18","totalAmmo":"28"}}
+{"time":"2,428.9780","type":"hit","log":{"x":"52.9200","y":"-57.3300","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,429.0780","type":"player_shot","log":{"x":"47.5443","y":"-66.0084","direction":"0.2499","weapon":"1","ammoInCharger":"17","totalAmmo":"28"}}
+{"time":"2,429.0780","type":"hit","log":{"x":"52.9200","y":"-57.3300","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,429.1950","type":"player_shot","log":{"x":"47.5443","y":"-66.0084","direction":"0.2499","weapon":"1","ammoInCharger":"16","totalAmmo":"28"}}
+{"time":"2,429.1950","type":"hit","log":{"x":"52.9200","y":"-57.3300","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,429.1950","type":"spawn","log":{"x":"57.3300","y":"13.2300","spawnedEntity":"Medium Target"}}
+{"time":"2,429.1950","type":"kill","log":{"x":"52.9200","y":"-57.3300","killedEntity":"Medium Target","killerEntity":"Player 0"}}
+{"time":"2,429.3110","type":"player_shot","log":{"x":"47.5443","y":"-66.0084","direction":"0.2499","weapon":"1","ammoInCharger":"15","totalAmmo":"28"}}
+{"time":"2,429.3440","type":"player_position","log":{"x":"47.5443","y":"-66.0084","direction":"0.2499"}}
+{"time":"2,429.4280","type":"player_shot","log":{"x":"47.5443","y":"-66.0084","direction":"0.2495","weapon":"1","ammoInCharger":"14","totalAmmo":"28"}}
+{"time":"2,429.8620","type":"player_position","log":{"x":"47.7261","y":"-65.4726","direction":"0.1456"}}
+{"time":"2,430.3770","type":"player_position","log":{"x":"49.9516","y":"-58.7996","direction":"0.1453"}}
+{"time":"2,430.8950","type":"player_position","log":{"x":"51.1979","y":"-51.1563","direction":"0.0548"}}
+{"time":"2,431.4110","type":"player_position","log":{"x":"52.9216","y":"-43.5428","direction":"0.0458"}}
+{"time":"2,431.9270","type":"player_position","log":{"x":"53.5883","y":"-35.8314","direction":"0.0328"}}
+{"time":"2,432.0270","type":"player_shot","log":{"x":"53.6696","y":"-34.5910","direction":"0.0327","weapon":"1","ammoInCharger":"13","totalAmmo":"28"}}
+{"time":"2,432.1430","type":"player_shot","log":{"x":"53.7843","y":"-32.8397","direction":"0.0327","weapon":"1","ammoInCharger":"12","totalAmmo":"28"}}
+{"time":"2,432.2590","type":"player_shot","log":{"x":"53.9026","y":"-31.0973","direction":"0.0357","weapon":"1","ammoInCharger":"11","totalAmmo":"28"}}
+{"time":"2,432.2590","type":"hit","log":{"x":"57.3300","y":"13.2300","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,432.3760","type":"player_shot","log":{"x":"54.0277","y":"-29.3602","direction":"0.0360","weapon":"1","ammoInCharger":"10","totalAmmo":"28"}}
+{"time":"2,432.3760","type":"hit","log":{"x":"57.3300","y":"13.2300","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,432.4430","type":"player_position","log":{"x":"54.1177","y":"-28.1114","direction":"0.0360"}}
+{"time":"2,432.4760","type":"player_shot","log":{"x":"54.1354","y":"-27.8655","direction":"0.0360","weapon":"1","ammoInCharger":"9","totalAmmo":"28"}}
+{"time":"2,432.4760","type":"hit","log":{"x":"57.3300","y":"13.2300","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,432.5930","type":"player_shot","log":{"x":"54.2615","y":"-26.1146","direction":"0.0360","weapon":"1","ammoInCharger":"8","totalAmmo":"28"}}
+{"time":"2,432.5930","type":"hit","log":{"x":"57.3300","y":"13.2300","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,432.5930","type":"spawn","log":{"x":"-97.0200","y":"4.4100","spawnedEntity":"Medium Target"}}
+{"time":"2,432.5930","type":"kill","log":{"x":"57.3300","y":"13.2300","killedEntity":"Medium Target","killerEntity":"Player 0"}}
+{"time":"2,432.7090","type":"player_shot","log":{"x":"54.3871","y":"-24.3717","direction":"0.0360","weapon":"1","ammoInCharger":"7","totalAmmo":"28"}}
+{"time":"2,432.8090","type":"player_shot","log":{"x":"54.4946","y":"-22.8806","direction":"0.0360","weapon":"1","ammoInCharger":"6","totalAmmo":"28"}}
+{"time":"2,432.9590","type":"player_position","log":{"x":"54.6744","y":"-20.3848","direction":"0.0360"}}
+{"time":"2,433.4750","type":"player_position","log":{"x":"55.7561","y":"-12.6430","direction":"-0.0439"}}
+{"time":"2,433.9780","type":"player_position","log":{"x":"59.4139","y":"-3.4329","direction":"-0.5048"}}
+{"time":"2,434.4780","type":"player_position","log":{"x":"59.1081","y":"4.7677","direction":"-0.7960"}}
+{"time":"2,434.9950","type":"player_position","log":{"x":"55.9204","y":"11.2414","direction":"-0.7147"}}
+{"time":"2,435.5110","type":"player_position","log":{"x":"49.4817","y":"9.7765","direction":"-0.7305"}}
+{"time":"2,436.0270","type":"player_position","log":{"x":"41.8484","y":"5.1248","direction":"-0.6974"}}
+{"time":"2,436.5430","type":"player_position","log":{"x":"34.1313","y":"5.6689","direction":"-0.7081"}}
+{"time":"2,436.8250","type":"player_shot","log":{"x":"30.1486","y":"5.6486","direction":"-0.7090","weapon":"1","ammoInCharger":"5","totalAmmo":"28"}}
+{"time":"2,436.9410","type":"player_shot","log":{"x":"28.3941","y":"5.6393","direction":"-0.7090","weapon":"1","ammoInCharger":"4","totalAmmo":"28"}}
+{"time":"2,437.0580","type":"player_shot","log":{"x":"26.6530","y":"5.6233","direction":"-0.7107","weapon":"1","ammoInCharger":"3","totalAmmo":"28"}}
+{"time":"2,437.0580","type":"hit","log":{"x":"-97.0200","y":"4.4100","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,437.0580","type":"player_position","log":{"x":"26.3968","y":"5.6207","direction":"-0.7107"}}
+{"time":"2,437.1750","type":"player_shot","log":{"x":"24.8998","y":"5.6022","direction":"-0.7118","weapon":"1","ammoInCharger":"2","totalAmmo":"28"}}
+{"time":"2,437.2910","type":"player_shot","log":{"x":"23.1515","y":"5.5787","direction":"-0.7118","weapon":"1","ammoInCharger":"1","totalAmmo":"28"}}
+{"time":"2,437.4080","type":"player_shot","log":{"x":"21.4097","y":"5.5553","direction":"-0.7118","weapon":"1","ammoInCharger":"0","totalAmmo":"28"}}
+{"time":"2,437.5740","type":"player_position","log":{"x":"18.6618","y":"5.5172","direction":"-0.7124"}}
+{"time":"2,438.0900","type":"player_position","log":{"x":"10.9180","y":"5.4201","direction":"-0.7107"}}
+{"time":"2,438.4900","type":"player_reload","log":{"weapon":"1","ammoInCharger":"0","totalAmmo":"28"}}
+{"time":"2,438.6060","type":"player_position","log":{"x":"3.1819","y":"5.3476","direction":"-0.7101"}}
+{"time":"2,438.7890","type":"player_shot","log":{"x":"0.6868","y":"5.3264","direction":"-0.7101","weapon":"1","ammoInCharger":"31","totalAmmo":"28"}}
+{"time":"2,438.7890","type":"hit","log":{"x":"-97.0200","y":"4.4100","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,438.9050","type":"player_shot","log":{"x":"-1.0606","y":"5.3115","direction":"-0.7101","weapon":"1","ammoInCharger":"30","totalAmmo":"28"}}
+{"time":"2,438.9050","type":"hit","log":{"x":"-97.0200","y":"4.4100","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,439.0050","type":"player_shot","log":{"x":"-2.5599","y":"5.2987","direction":"-0.7101","weapon":"1","ammoInCharger":"29","totalAmmo":"28"}}
+{"time":"2,439.0050","type":"hit","log":{"x":"-97.0200","y":"4.4100","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,439.0050","type":"spawn","log":{"x":"52.9200","y":"-57.3300","spawnedEntity":"Medium Target"}}
+{"time":"2,439.0050","type":"kill","log":{"x":"-97.0200","y":"4.4100","killedEntity":"Medium Target","killerEntity":"Player 0"}}
+{"time":"2,439.1220","type":"player_shot","log":{"x":"-4.3016","y":"5.2838","direction":"-0.7101","weapon":"1","ammoInCharger":"28","totalAmmo":"28"}}
+{"time":"2,439.1220","type":"player_position","log":{"x":"-4.5564","y":"5.2817","direction":"-0.7101"}}
+{"time":"2,439.2220","type":"player_shot","log":{"x":"-5.7998","y":"5.2711","direction":"-0.7101","weapon":"1","ammoInCharger":"27","totalAmmo":"28"}}
+{"time":"2,439.3380","type":"player_shot","log":{"x":"-7.5523","y":"5.2561","direction":"-0.7101","weapon":"1","ammoInCharger":"26","totalAmmo":"28"}}
+{"time":"2,439.6380","type":"player_position","log":{"x":"-11.3233","y":"5.2240","direction":"-0.7101"}}
+{"time":"2,440.1540","type":"player_position","log":{"x":"-14.4258","y":"6.0650","direction":"-0.5396"}}
+{"time":"2,440.6700","type":"player_position","log":{"x":"-24.2347","y":"7.2535","direction":"-0.1769"}}
+{"time":"2,441.1860","type":"player_position","log":{"x":"-33.2801","y":"7.3927","direction":"-0.3492"}}
+{"time":"2,441.7020","type":"player_position","log":{"x":"-38.7983","y":"2.6848","direction":"-0.8103"}}
+{"time":"2,442.2190","type":"player_position","log":{"x":"-49.0676","y":"3.4588","direction":"-0.9210"}}
+{"time":"2,442.7350","type":"player_position","log":{"x":"-60.0221","y":"3.6132","direction":"-0.9254"}}
+{"time":"2,443.2510","type":"player_position","log":{"x":"-70.3571","y":"0.6142","direction":"-0.9755"}}
+{"time":"2,443.7680","type":"player_position","log":{"x":"-78.1407","y":"-5.2933","direction":"-0.9984"}}
+{"time":"2,444.2850","type":"player_position","log":{"x":"-86.2892","y":"-11.6824","direction":"-0.9967"}}
+{"time":"2,444.7870","type":"player_position","log":{"x":"-91.7531","y":"-13.4108","direction":"-0.8454"}}
+{"time":"2,445.2880","type":"player_position","log":{"x":"-91.7744","y":"-13.4753","direction":"-0.5359"}}
+{"time":"2,445.8010","type":"player_position","log":{"x":"-91.5680","y":"-12.1930","direction":"-0.0680"}}
+{"time":"2,446.3170","type":"player_position","log":{"x":"-90.3968","y":"-4.7376","direction":"-0.0801"}}
+{"time":"2,446.8330","type":"player_position","log":{"x":"-88.9052","y":"2.8603","direction":"-0.1042"}}
+{"time":"2,447.3490","type":"player_position","log":{"x":"-87.4240","y":"10.4587","direction":"-0.0910"}}
+{"time":"2,447.8650","type":"player_position","log":{"x":"-86.1545","y":"18.0925","direction":"-0.0745"}}
+{"time":"2,448.3810","type":"player_position","log":{"x":"-85.0049","y":"25.7502","direction":"-0.0744"}}
+{"time":"2,448.8980","type":"player_position","log":{"x":"-86.7453","y":"33.9402","direction":"-0.1156"}}
+{"time":"2,449.4140","type":"player_position","log":{"x":"-85.4243","y":"41.5752","direction":"-0.1901"}}
+{"time":"2,449.9300","type":"player_position","log":{"x":"-85.5550","y":"49.9205","direction":"-0.1921"}}
+{"time":"2,450.4320","type":"player_position","log":{"x":"-84.8652","y":"58.3568","direction":"-0.5391"}}
+{"time":"2,450.9490","type":"player_position","log":{"x":"-77.4154","y":"60.5169","direction":"-0.6019"}}
+{"time":"2,451.4490","type":"player_position","log":{"x":"-70.2536","y":"62.5888","direction":"-0.6970"}}
+{"time":"2,451.9650","type":"player_position","log":{"x":"-62.5421","y":"64.2284","direction":"-0.7061"}}
+{"time":"2,452.4810","type":"player_position","log":{"x":"-54.7988","y":"64.0954","direction":"-0.7176"}}
+{"time":"2,452.9970","type":"player_position","log":{"x":"-47.0673","y":"63.8633","direction":"-0.7176"}}
+{"time":"2,453.5130","type":"player_position","log":{"x":"-39.2851","y":"64.8607","direction":"-0.7199"}}
+{"time":"2,454.0290","type":"player_position","log":{"x":"-31.5605","y":"64.4187","direction":"-0.7447"}}
+{"time":"2,454.5460","type":"player_position","log":{"x":"-23.7822","y":"64.1546","direction":"-0.7563"}}
+{"time":"2,455.0620","type":"player_position","log":{"x":"-15.1697","y":"67.7799","direction":"-0.8013"}}
+{"time":"2,455.5620","type":"player_position","log":{"x":"-6.3938","y":"69.1423","direction":"-0.8772"}}
+{"time":"2,456.0630","type":"player_position","log":{"x":"2.2132","y":"67.5667","direction":"-0.9604"}}
+{"time":"2,456.5790","type":"player_position","log":{"x":"12.4065","y":"64.8554","direction":"-0.9480"}}
+{"time":"2,457.0950","type":"player_position","log":{"x":"20.3888","y":"66.9762","direction":"-0.9547"}}
+{"time":"2,457.6100","type":"player_position","log":{"x":"31.2025","y":"66.0804","direction":"-0.8865"}}
+{"time":"2,458.1250","type":"player_position","log":{"x":"41.9132","y":"68.2896","direction":"-0.8808"}}
+{"time":"2,458.6260","type":"player_position","log":{"x":"49.7862","y":"66.3976","direction":"-0.9480"}}
+{"time":"2,459.1420","type":"player_position","log":{"x":"56.8880","y":"61.7085","direction":"-0.9754"}}
+{"time":"2,459.6430","type":"player_position","log":{"x":"59.8798","y":"54.8216","direction":"-0.9978"}}
+{"time":"2,460.1590","type":"player_position","log":{"x":"60.8618","y":"47.1383","direction":"-0.9999"}}
+{"time":"2,460.6600","type":"player_position","log":{"x":"60.2359","y":"39.6668","direction":"-0.9983"}}
+{"time":"2,461.1750","type":"player_position","log":{"x":"59.5821","y":"31.9638","direction":"-0.9991"}}
+{"time":"2,461.2420","type":"player_shot","log":{"x":"59.5189","y":"31.2162","direction":"-0.9991","weapon":"1","ammoInCharger":"25","totalAmmo":"28"}}
+{"time":"2,461.2420","type":"hit","log":{"x":"52.9200","y":"-57.3300","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,461.3590","type":"player_shot","log":{"x":"59.3767","y":"29.4704","direction":"-0.9992","weapon":"1","ammoInCharger":"24","totalAmmo":"28"}}
+{"time":"2,461.3590","type":"hit","log":{"x":"52.9200","y":"-57.3300","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,461.4750","type":"player_shot","log":{"x":"59.2403","y":"27.7273","direction":"-0.9993","weapon":"1","ammoInCharger":"23","totalAmmo":"28"}}
+{"time":"2,461.4750","type":"hit","log":{"x":"52.9200","y":"-57.3300","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,461.5750","type":"player_shot","log":{"x":"59.1334","y":"26.2322","direction":"-0.9994","weapon":"1","ammoInCharger":"22","totalAmmo":"28"}}
+{"time":"2,461.5750","type":"hit","log":{"x":"52.9200","y":"-57.3300","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,461.5750","type":"spawn","log":{"x":"-97.0200","y":"4.4100","spawnedEntity":"Medium Target"}}
+{"time":"2,461.5750","type":"kill","log":{"x":"52.9200","y":"-57.3300","killedEntity":"Medium Target","killerEntity":"Player 0"}}
+{"time":"2,461.6910","type":"player_shot","log":{"x":"59.0148","y":"24.4918","direction":"-0.9994","weapon":"1","ammoInCharger":"21","totalAmmo":"28"}}
+{"time":"2,461.6910","type":"player_position","log":{"x":"58.9979","y":"24.2432","direction":"-0.9994"}}
+{"time":"2,461.7920","type":"player_shot","log":{"x":"58.9130","y":"22.9960","direction":"-0.9994","weapon":"1","ammoInCharger":"20","totalAmmo":"28"}}
+{"time":"2,462.2070","type":"player_position","log":{"x":"58.5473","y":"16.5163","direction":"-0.9994"}}
+{"time":"2,462.7240","type":"player_position","log":{"x":"58.9685","y":"8.7419","direction":"-0.9974"}}
+{"time":"2,463.2400","type":"player_position","log":{"x":"59.7119","y":"0.8114","direction":"-0.9973"}}
+{"time":"2,463.7560","type":"player_position","log":{"x":"63.5998","y":"-7.5976","direction":"-0.9973"}}
+{"time":"2,464.2710","type":"player_position","log":{"x":"62.4584","y":"-15.2493","direction":"-0.9973"}}
+{"time":"2,464.7880","type":"player_position","log":{"x":"61.4739","y":"-22.9229","direction":"-1.0000"}}
+{"time":"2,465.3040","type":"player_position","log":{"x":"61.1346","y":"-30.6577","direction":"-0.9999"}}
+{"time":"2,465.8210","type":"player_position","log":{"x":"58.3948","y":"-38.2003","direction":"-0.9967"}}
+{"time":"2,466.3360","type":"player_position","log":{"x":"57.7302","y":"-45.8981","direction":"-0.9977"}}
+{"time":"2,466.8530","type":"player_position","log":{"x":"57.0459","y":"-53.4754","direction":"-0.9941"}}
+{"time":"2,467.3690","type":"player_position","log":{"x":"54.3610","y":"-60.8567","direction":"-0.9667"}}
+{"time":"2,467.8700","type":"player_position","log":{"x":"49.0941","y":"-66.6369","direction":"-0.8321"}}
+{"time":"2,468.3710","type":"player_position","log":{"x":"42.0209","y":"-68.8861","direction":"-0.7193"}}
+{"time":"2,468.8880","type":"player_position","log":{"x":"34.2686","y":"-70.2883","direction":"-0.7004"}}
+{"time":"2,469.3900","type":"player_position","log":{"x":"24.9589","y":"-74.6761","direction":"-0.4132"}}
+{"time":"2,469.8900","type":"player_position","log":{"x":"14.5045","y":"-73.7503","direction":"-0.1449"}}
+{"time":"2,470.4040","type":"player_position","log":{"x":"4.6174","y":"-71.6771","direction":"-0.5101"}}
+{"time":"2,470.9180","type":"player_position","log":{"x":"-4.1661","y":"-72.7382","direction":"-0.6225"}}
+{"time":"2,471.4340","type":"player_position","log":{"x":"-11.8450","y":"-71.9913","direction":"-0.6962"}}
+{"time":"2,471.9500","type":"player_position","log":{"x":"-19.5823","y":"-72.1225","direction":"-0.7158"}}
+{"time":"2,472.4670","type":"player_position","log":{"x":"-27.3193","y":"-72.4117","direction":"-0.7238"}}
+{"time":"2,472.9830","type":"player_position","log":{"x":"-35.0412","y":"-72.9915","direction":"-0.7447"}}
+{"time":"2,473.4990","type":"player_position","log":{"x":"-42.5466","y":"-74.7436","direction":"-0.8124"}}
+{"time":"2,473.9990","type":"player_position","log":{"x":"-49.6546","y":"-73.6802","direction":"-0.4955"}}
+{"time":"2,474.5000","type":"player_position","log":{"x":"-58.8901","y":"-70.3922","direction":"-0.2150"}}
+{"time":"2,475.0160","type":"player_position","log":{"x":"-69.6376","y":"-68.4527","direction":"-0.2984"}}
+{"time":"2,475.5160","type":"player_position","log":{"x":"-77.9463","y":"-64.0711","direction":"-0.1286"}}
+{"time":"2,476.0320","type":"player_position","log":{"x":"-80.2556","y":"-56.6852","direction":"-0.1401"}}
+{"time":"2,476.5480","type":"player_position","log":{"x":"-82.3236","y":"-49.2254","direction":"-0.1297"}}
+{"time":"2,476.7310","type":"player_shot","log":{"x":"-82.9649","y":"-46.8100","direction":"-0.1295","weapon":"1","ammoInCharger":"19","totalAmmo":"28"}}
+{"time":"2,476.8480","type":"player_shot","log":{"x":"-83.4151","y":"-45.1280","direction":"-0.1312","weapon":"1","ammoInCharger":"18","totalAmmo":"28"}}
+{"time":"2,476.9650","type":"player_shot","log":{"x":"-83.8805","y":"-43.4380","direction":"-0.1364","weapon":"1","ammoInCharger":"17","totalAmmo":"28"}}
+{"time":"2,477.0640","type":"player_position","log":{"x":"-84.3547","y":"-41.7540","direction":"-0.1369"}}
+{"time":"2,477.0810","type":"player_shot","log":{"x":"-84.3547","y":"-41.7540","direction":"-0.1369","weapon":"1","ammoInCharger":"16","totalAmmo":"28"}}
+{"time":"2,477.1980","type":"player_shot","log":{"x":"-84.8274","y":"-40.0765","direction":"-0.1369","weapon":"1","ammoInCharger":"15","totalAmmo":"28"}}
+{"time":"2,477.3140","type":"player_shot","log":{"x":"-85.3031","y":"-38.3886","direction":"-0.1369","weapon":"1","ammoInCharger":"14","totalAmmo":"28"}}
+{"time":"2,477.4310","type":"player_shot","log":{"x":"-85.7765","y":"-36.7083","direction":"-0.1369","weapon":"1","ammoInCharger":"13","totalAmmo":"28"}}
+{"time":"2,477.4310","type":"hit","log":{"x":"-97.0200","y":"4.4100","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,477.5810","type":"player_position","log":{"x":"-86.4544","y":"-34.3025","direction":"-0.1369"}}
+{"time":"2,477.6800","type":"player_shot","log":{"x":"-86.7924","y":"-33.1029","direction":"-0.1369","weapon":"1","ammoInCharger":"12","totalAmmo":"28"}}
+{"time":"2,477.6800","type":"hit","log":{"x":"-97.0200","y":"4.4100","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,477.7970","type":"player_shot","log":{"x":"-87.2673","y":"-31.4177","direction":"-0.1369","weapon":"1","ammoInCharger":"11","totalAmmo":"28"}}
+{"time":"2,477.7970","type":"hit","log":{"x":"-97.0200","y":"4.4100","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,477.8970","type":"player_shot","log":{"x":"-87.6738","y":"-29.9750","direction":"-0.1369","weapon":"1","ammoInCharger":"10","totalAmmo":"28"}}
+{"time":"2,477.8970","type":"hit","log":{"x":"-97.0200","y":"4.4100","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,477.8970","type":"spawn","log":{"x":"52.9200","y":"-57.3300","spawnedEntity":"Medium Target"}}
+{"time":"2,477.8970","type":"kill","log":{"x":"-97.0200","y":"4.4100","killedEntity":"Medium Target","killerEntity":"Player 0"}}
+{"time":"2,478.0130","type":"player_shot","log":{"x":"-88.1452","y":"-28.2901","direction":"-0.1337","weapon":"1","ammoInCharger":"9","totalAmmo":"28"}}
+{"time":"2,478.0970","type":"player_position","log":{"x":"-88.5376","y":"-26.8446","direction":"-0.1313"}}
+{"time":"2,478.1300","type":"player_shot","log":{"x":"-88.6008","y":"-26.6102","direction":"-0.1313","weapon":"1","ammoInCharger":"8","totalAmmo":"28"}}
+{"time":"2,478.5980","type":"player_position","log":{"x":"-89.2010","y":"-19.4581","direction":"0.1073"}}
+{"time":"2,479.1150","type":"player_position","log":{"x":"-86.9614","y":"-12.0350","direction":"0.1458"}}
+{"time":"2,479.6170","type":"player_position","log":{"x":"-85.8666","y":"-2.8826","direction":"0.5868"}}
+{"time":"2,480.1320","type":"player_position","log":{"x":"-80.7582","y":"6.7678","direction":"0.5794"}}
+{"time":"2,480.6480","type":"player_position","log":{"x":"-75.9873","y":"16.6293","direction":"0.5794"}}
+{"time":"2,481.1620","type":"player_position","log":{"x":"-74.6492","y":"25.9271","direction":"0.2988"}}
+{"time":"2,481.6780","type":"player_position","log":{"x":"-75.7609","y":"35.4675","direction":"0.2837"}}
+{"time":"2,482.1940","type":"player_position","log":{"x":"-68.4580","y":"40.1927","direction":"0.1942"}}
+{"time":"2,482.7090","type":"player_position","log":{"x":"-60.7152","y":"46.6258","direction":"-0.0271"}}
+{"time":"2,483.2260","type":"player_position","log":{"x":"-64.2134","y":"55.0384","direction":"0.2907"}}
+{"time":"2,483.7280","type":"player_position","log":{"x":"-61.2848","y":"64.3435","direction":"0.6450"}}
+{"time":"2,484.2440","type":"player_position","log":{"x":"-53.7917","y":"66.6801","direction":"0.6741"}}
+{"time":"2,484.7600","type":"player_position","log":{"x":"-46.0607","y":"66.6740","direction":"0.7244"}}
+{"time":"2,485.2770","type":"player_position","log":{"x":"-38.3210","y":"66.2913","direction":"0.7244"}}
+{"time":"2,485.7930","type":"player_position","log":{"x":"-30.5075","y":"67.9910","direction":"0.7519"}}
+{"time":"2,486.3100","type":"player_position","log":{"x":"-22.9496","y":"66.3054","direction":"0.8073"}}
+{"time":"2,486.8260","type":"player_position","log":{"x":"-15.3117","y":"64.5722","direction":"0.8265"}}
+{"time":"2,487.3430","type":"player_position","log":{"x":"-5.0455","y":"67.7588","direction":"0.9082"}}
+{"time":"2,487.8440","type":"player_position","log":{"x":"5.0069","y":"64.7071","direction":"0.9815"}}
+{"time":"2,488.3590","type":"player_position","log":{"x":"15.3389","y":"61.2771","direction":"0.9577"}}
+{"time":"2,488.8750","type":"player_position","log":{"x":"25.3493","y":"60.1245","direction":"0.9604"}}
+{"time":"2,489.3900","type":"player_position","log":{"x":"30.8359","y":"65.3992","direction":"0.8984"}}
+{"time":"2,489.9060","type":"player_position","log":{"x":"40.7224","y":"67.3879","direction":"0.8916"}}
+{"time":"2,490.4220","type":"player_position","log":{"x":"49.6645","y":"66.4607","direction":"0.9009"}}
+{"time":"2,490.9220","type":"player_position","log":{"x":"54.5922","y":"60.8591","direction":"0.9624"}}
+{"time":"2,491.4240","type":"player_position","log":{"x":"59.7259","y":"54.7140","direction":"0.9994"}}
+{"time":"2,491.9240","type":"player_position","log":{"x":"60.0515","y":"47.2337","direction":"0.9996"}}
+{"time":"2,492.4400","type":"player_position","log":{"x":"59.4733","y":"39.5156","direction":"0.9994"}}
+{"time":"2,492.7230","type":"player_shot","log":{"x":"59.1973","y":"35.5317","direction":"0.9994","weapon":"1","ammoInCharger":"7","totalAmmo":"28"}}
+{"time":"2,492.7230","type":"hit","log":{"x":"52.9200","y":"-57.3300","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,492.8230","type":"player_shot","log":{"x":"59.0960","y":"34.0389","direction":"0.9994","weapon":"1","ammoInCharger":"6","totalAmmo":"28"}}
+{"time":"2,492.8230","type":"hit","log":{"x":"52.9200","y":"-57.3300","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,492.9390","type":"player_shot","log":{"x":"58.9773","y":"32.2898","direction":"0.9994","weapon":"1","ammoInCharger":"5","totalAmmo":"28"}}
+{"time":"2,492.9390","type":"hit","log":{"x":"52.9200","y":"-57.3300","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,492.9560","type":"player_position","log":{"x":"58.9438","y":"31.7962","direction":"0.9994"}}
+{"time":"2,493.0390","type":"player_shot","log":{"x":"58.8762","y":"30.7992","direction":"0.9994","weapon":"1","ammoInCharger":"4","totalAmmo":"28"}}
+{"time":"2,493.0390","type":"hit","log":{"x":"52.9200","y":"-57.3300","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,493.0390","type":"spawn","log":{"x":"-88.2000","y":"61.7400","spawnedEntity":"Medium Target"}}
+{"time":"2,493.0390","type":"kill","log":{"x":"52.9200","y":"-57.3300","killedEntity":"Medium Target","killerEntity":"Player 0"}}
+{"time":"2,493.1560","type":"player_shot","log":{"x":"58.7583","y":"29.0616","direction":"0.9994","weapon":"1","ammoInCharger":"3","totalAmmo":"28"}}
+{"time":"2,493.2720","type":"player_shot","log":{"x":"58.6412","y":"27.3119","direction":"0.9995","weapon":"1","ammoInCharger":"2","totalAmmo":"28"}}
+{"time":"2,493.3720","type":"player_shot","log":{"x":"58.5432","y":"25.8134","direction":"0.9995","weapon":"1","ammoInCharger":"1","totalAmmo":"28"}}
+{"time":"2,493.4720","type":"player_position","log":{"x":"58.4313","y":"24.0721","direction":"0.9995"}}
+{"time":"2,493.9740","type":"player_position","log":{"x":"58.0503","y":"15.3473","direction":"0.9035"}}
+{"time":"2,494.4900","type":"player_position","log":{"x":"52.0559","y":"10.4551","direction":"0.8962"}}
+{"time":"2,495.0050","type":"player_position","log":{"x":"41.6775","y":"11.4059","direction":"0.9102"}}
+{"time":"2,495.5220","type":"player_position","log":{"x":"34.6679","y":"7.7146","direction":"0.9035"}}
+{"time":"2,496.0370","type":"player_position","log":{"x":"26.0976","y":"6.1284","direction":"0.8763"}}
+{"time":"2,496.5540","type":"player_position","log":{"x":"19.0248","y":"3.5853","direction":"0.6797"}}
+{"time":"2,497.0700","type":"player_position","log":{"x":"11.2827","y":"2.7050","direction":"0.6940"}}
+{"time":"2,497.5860","type":"player_position","log":{"x":"3.6033","y":"3.2709","direction":"0.5780"}}
+{"time":"2,498.1020","type":"player_position","log":{"x":"-6.2599","y":"5.4540","direction":"0.2611"}}
+{"time":"2,498.6180","type":"player_position","log":{"x":"-12.1663","y":"0.2527","direction":"0.9626"}}
+{"time":"2,499.1340","type":"player_position","log":{"x":"-18.6659","y":"2.5662","direction":"0.8637"}}
+{"time":"2,499.6510","type":"player_position","log":{"x":"-27.2696","y":"3.4465","direction":"0.8717"}}
+{"time":"2,500.1670","type":"player_position","log":{"x":"-31.3868","y":"-2.9330","direction":"0.9705"}}
+{"time":"2,500.6830","type":"player_position","log":{"x":"-38.4007","y":"-0.2847","direction":"0.1280"}}
+{"time":"2,501.1990","type":"player_position","log":{"x":"-47.6155","y":"3.0366","direction":"0.3073"}}
+{"time":"2,501.7150","type":"player_position","log":{"x":"-52.4171","y":"9.1186","direction":"0.2921"}}
+{"time":"2,501.7820","type":"player_shot","log":{"x":"-52.8351","y":"9.7397","direction":"0.2918","weapon":"1","ammoInCharger":"0","totalAmmo":"28"}}
+{"time":"2,501.7820","type":"hit","log":{"x":"-88.2000","y":"61.7400","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,502.2310","type":"player_position","log":{"x":"-56.7374","y":"15.5420","direction":"0.2917"}}
+{"time":"2,502.7480","type":"player_position","log":{"x":"-61.0593","y":"21.9683","direction":"0.2917"}}
+{"time":"2,502.8640","type":"player_reload","log":{"weapon":"1","ammoInCharger":"0","totalAmmo":"28"}}
+{"time":"2,503.1800","type":"player_shot","log":{"x":"-64.5683","y":"27.1339","direction":"0.2980","weapon":"1","ammoInCharger":"31","totalAmmo":"28"}}
+{"time":"2,503.2640","type":"player_position","log":{"x":"-65.4203","y":"28.3657","direction":"0.2980"}}
+{"time":"2,503.2970","type":"player_shot","log":{"x":"-65.5607","y":"28.5686","direction":"0.2980","weapon":"1","ammoInCharger":"30","totalAmmo":"28"}}
+{"time":"2,503.3970","type":"player_shot","log":{"x":"-66.4135","y":"29.8015","direction":"0.2980","weapon":"1","ammoInCharger":"29","totalAmmo":"28"}}
+{"time":"2,503.5130","type":"player_shot","log":{"x":"-67.4018","y":"31.2453","direction":"0.2949","weapon":"1","ammoInCharger":"28","totalAmmo":"28"}}
+{"time":"2,503.5130","type":"hit","log":{"x":"-88.2000","y":"61.7400","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,503.6300","type":"player_shot","log":{"x":"-68.3865","y":"32.6890","direction":"0.2949","weapon":"1","ammoInCharger":"27","totalAmmo":"28"}}
+{"time":"2,503.6300","type":"hit","log":{"x":"-88.2000","y":"61.7400","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,503.7470","type":"player_shot","log":{"x":"-69.3723","y":"34.1342","direction":"0.2949","weapon":"1","ammoInCharger":"26","totalAmmo":"28"}}
+{"time":"2,503.7470","type":"hit","log":{"x":"-88.2000","y":"61.7400","hittedEntity":"Medium Target","hitterEntity":"Player 0","damage":"15"}}
+{"time":"2,503.7470","type":"spawn","log":{"x":"52.9200","y":"-57.3300","spawnedEntity":"Medium Target"}}
+{"time":"2,503.7470","type":"kill","log":{"x":"-88.2000","y":"61.7400","killedEntity":"Medium Target","killerEntity":"Player 0"}}
+{"time":"2,503.7800","type":"player_position","log":{"x":"-69.7949","y":"34.7539","direction":"0.2949"}}
+{"time":"2,503.8630","type":"player_shot","log":{"x":"-70.3573","y":"35.5784","direction":"0.2949","weapon":"1","ammoInCharger":"25","totalAmmo":"28"}}
+{"time":"2,503.9800","type":"player_shot","log":{"x":"-71.5574","y":"36.8737","direction":"0.2949","weapon":"1","ammoInCharger":"24","totalAmmo":"28"}}
+{"time":"2,504.2960","type":"player_position","log":{"x":"-77.3411","y":"37.2526","direction":"0.7205"}}
+{"time":"2,504.7980","type":"player_position","log":{"x":"-77.6192","y":"29.3387","direction":"0.9998"}}
+{"time":"2,505.3140","type":"player_position","log":{"x":"-78.8216","y":"21.5381","direction":"1.0000"}}
+{"time":"2,505.8300","type":"player_position","log":{"x":"-80.8517","y":"13.7815","direction":"1.0000"}}
+{"time":"2,506.3460","type":"player_position","log":{"x":"-80.8756","y":"6.0391","direction":"1.0000"}}
+{"time":"2,506.8620","type":"player_position","log":{"x":"-81.0090","y":"-1.7001","direction":"1.0000"}}
+{"time":"2,507.3790","type":"player_position","log":{"x":"-81.0046","y":"-9.4435","direction":"1.0000"}}
+{"time":"2,507.8950","type":"player_position","log":{"x":"-80.9847","y":"-17.1834","direction":"1.0000"}}
+{"time":"2,508.4110","type":"player_position","log":{"x":"-80.9649","y":"-24.9288","direction":"1.0000"}}
+{"time":"2,508.9270","type":"player_position","log":{"x":"-80.9451","y":"-32.6683","direction":"1.0000"}}

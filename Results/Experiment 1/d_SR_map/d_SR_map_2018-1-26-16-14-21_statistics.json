@@ -1,0 +1,11 @@
+{"height":"40","width":"40","tileSize":"4.41"}
+{"playerInitialX":"2.5903","playerInitialY":"-31.5373","playerX":"2.5903","playerY":"-31.5373","targetX":"-4.4100","targetY":"-44.1000","coveredTileDistance":"142.8368","time":"509.9427","speed":"0.2801"}
+{"playerInitialX":"-32.6911","playerInitialY":"40.4425","playerX":"-32.6911","playerY":"40.4425","targetX":"8.8200","targetY":"-17.6400","coveredTileDistance":"59.2335","time":"16.0263","speed":"3.6960"}
+{"playerInitialX":"6.0090","playerInitialY":"-19.7531","playerX":"6.0090","playerY":"-19.7531","targetX":"-26.4600","targetY":"35.2800","coveredTileDistance":"63.4694","time":"17.0714","speed":"3.7179"}
+{"playerInitialX":"-60.0037","playerInitialY":"-22.1307","playerX":"-60.0037","playerY":"-22.1307","targetX":"-83.7900","targetY":"-26.4600","coveredTileDistance":"18.9812","time":"5.5776","speed":"3.4031"}
+{"playerInitialX":"-28.8699","playerInitialY":"30.0298","playerX":"-28.8699","playerY":"30.0298","targetX":"8.8200","targetY":"-17.6400","coveredTileDistance":"39.0440","time":"11.8626","speed":"3.2914"}
+{"playerInitialX":"34.2124","playerInitialY":"10.5955","playerX":"34.2124","playerY":"10.5955","targetX":"-88.2000","targetY":"8.8200","coveredTileDistance":"128.7263","time":"36.5448","speed":"3.5224"}
+{"playerInitialX":"-17.8596","playerInitialY":"17.1932","playerX":"-17.8596","playerY":"17.1932","targetX":"-26.4600","targetY":"35.2800","coveredTileDistance":"12.1611","time":"4.6438","speed":"2.6188"}
+{"playerInitialX":"-23.5577","playerInitialY":"8.3461","playerX":"-23.5577","playerY":"8.3461","targetX":"8.8200","targetY":"-17.6400","coveredTileDistance":"46.6834","time":"15.2754","speed":"3.0561"}
+{"playerInitialX":"-8.1755","playerInitialY":"-13.3228","playerX":"-8.1755","playerY":"-13.3228","targetX":"-83.7900","targetY":"-26.4600","coveredTileDistance":"41.3648","time":"13.8411","speed":"2.9886"}
+{"totalShots":"227.0000","totalHits":"96.0000","accuracy":"0.4229","coveredDistance":"1,599.5450","mediumKillTime":"46.6974","mediumKillDistance":"66.5458"}
