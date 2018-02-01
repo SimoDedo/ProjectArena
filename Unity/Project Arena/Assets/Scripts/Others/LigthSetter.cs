@@ -4,22 +4,22 @@
 public class LigthSetter : MonoBehaviour {
 
     [Header("Standalone settings")] [SerializeField] LightShadows standaloneShadowType;
-    [SerializeField] float standaloneShadowIntensity;
+    [SerializeField] float standaloneLightIntensity;
 
     [Header("Web settings")] [SerializeField] LightShadows webShadowType;
-    [SerializeField] float webShadowIntensity;
+    [SerializeField] float webLightIntensity;
 
     private Light sceneLigth;
 
     void Start() {
         sceneLigth = gameObject.GetComponent<Light>();
 
-        if (Application.isWebPlayer) {
+        if (Application.platform == RuntimePlatform.WebGLPlayer) {
             sceneLigth.shadows = webShadowType;
-            sceneLigth.intensity = webShadowIntensity;
+            sceneLigth.intensity = webLightIntensity;
         } else {
             sceneLigth.shadows = standaloneShadowType;
-            sceneLigth.intensity = standaloneShadowIntensity;
+            sceneLigth.intensity = standaloneLightIntensity;
         }
     }
 
