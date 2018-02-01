@@ -39,7 +39,6 @@ public class MLMapManager : MapManager {
                 SaveMLMapAsText();
         }
 
-
         if (assembleMap) {
             // Assemble the map.
             mapAssemblerScript.AssembleMap(maps, mapGeneratorScript.GetWallChar(), mapGeneratorScript.GetRoomChar(), stairsGeneratorScript.GetVoidChar(), mapGeneratorScript.GetSquareSize(), mapGeneratorScript.GetWallHeight());
@@ -118,7 +117,6 @@ public class MLMapManager : MapManager {
             } catch (Exception) {
                 ManageError(Error.SOFT_ERROR, "Error while saving the map, please insert a valid path and check its permissions.");
             }
-
         }
     }
 

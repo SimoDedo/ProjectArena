@@ -169,7 +169,6 @@ public abstract class MapGenerator : CoreComponent {
                 int selected = pseudoRandomGen.Next(0, roomTiles.Count);
                 map[roomTiles[selected].tileX, roomTiles[selected].tileY] = o.objectChar;
                 DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY, (o.placeAnywere) ? 1 : objectToObjectDistance, supportMap, wallChar);
-                DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY, (o.placeAnywere) ? 1 : objectToObjectDistance, restrictedMap, wallChar);
                 roomTiles = GetFreeTiles(supportMap);
             } else {
                 ManageError(Error.SOFT_ERROR, "Error while populating the map, no more free tiles are availabe.");
