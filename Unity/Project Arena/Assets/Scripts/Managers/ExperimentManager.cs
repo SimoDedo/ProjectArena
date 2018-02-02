@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -120,8 +121,7 @@ public class ExperimentManager : MonoBehaviour {
         if (playTutorial)
             caseList.Add(tutorial);
 
-        for (int i = 0; i < casesPerUsers; i++)
-            caseList.Add(GetCase());
+        caseList.AddRange(GetCases(casesPerUsers));
 
         if (playSurvey)
             caseList.Add(survey);
@@ -139,8 +139,10 @@ public class ExperimentManager : MonoBehaviour {
         return now.Year + "-" + now.Month + "-" + now.Day + "-" + now.Hour + "-" + now.Minute + "-" + now.Second;
     }
 
-    // Gets the next case to add in a round-robin fashion.
-    private Case GetCase() {
+    // Gets the cases to add in a round-robin fashion.
+    private List<Case> GetCases(int count) {
+        List<Case> lessPlayedCases = new List<Case>();
+
         // Get the least played study.
         int minValue = studies[0].completion;
         int minIndex = 0;
@@ -151,21 +153,24 @@ public class ExperimentManager : MonoBehaviour {
                 minIndex = i;
             }
         }
-        studies[minIndex].completion++;
 
-        // Get the least played case in the least played study.
-        int minMinValue = studies[minIndex].cases[0].completion;
-        int minMinIndex = 0;
-
-        for (int i = 0; i < studies[minIndex].cases.Count; i++) {
-            if (studies[minIndex].cases[i].completion < minMinValue) {
-                minMinValue = studies[minIndex].cases[i].completion;
-                minMinIndex = i;
+        // Get the least played cases in the least played study.
+        if (count < studies[minIndex].cases.Count) {
+            studies[minIndex].cases = studies[minIndex].cases.OrderBy(o => o.completion).ToList();
+            for (int i = 0; i < count; i++) {
+                lessPlayedCases.Add(studies[minIndex].cases[i]);
+                studies[minIndex].cases[i].completion++;
+                studies[minIndex].completion++;
+            }
+        } else {
+            foreach (Case c in studies[minIndex].cases) {
+                lessPlayedCases.Add(c);
+                c.completion++;
+                studies[minIndex].completion++;
             }
         }
-        studies[minIndex].cases[minMinIndex].completion++;
 
-        return studies[minIndex].cases[minMinIndex];
+        return lessPlayedCases;
     }
 
     // Retuns the next scene to be played.

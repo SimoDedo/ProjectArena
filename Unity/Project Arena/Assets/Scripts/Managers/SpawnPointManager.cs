@@ -19,20 +19,14 @@ public class SpawnPointManager : CoreComponent {
     }
 
     // Sets the spawn points.
-    public bool SetSpawnPoints(List<GameObject> SPs) {
-        bool generateOnly;
-
+    public void SetSpawnPoints(List<GameObject> SPs) {
         if (SPs != null && SPs.Count > 0) {
             foreach (GameObject s in SPs) {
                 spawnPoints.Add(new SpawnPoint(s.transform.position, -1 * Mathf.Infinity));
             }
-            generateOnly = false;
         } else {
             ManageError(Error.HARD_ERROR, "Error while setting the spawn points, no spawn point was found.");
-            generateOnly = true;
         }
-
-        return generateOnly;
     }
 
     // Updates the last used field of all the spawn points that have already been used.

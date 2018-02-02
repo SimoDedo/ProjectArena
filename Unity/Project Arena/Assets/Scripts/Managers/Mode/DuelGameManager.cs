@@ -47,7 +47,7 @@ public class DuelGameManager : GameManager {
 
             // Set the spawn points.
             if (!generateOnly)
-                generateOnly = spawnPointManagerScript.SetSpawnPoints(mapManagerScript.GetSpawnPoints());
+                spawnPointManagerScript.SetSpawnPoints(mapManagerScript.GetSpawnPoints());
 
             if (!generateOnly) {
                 // Spawn the player and the opponent.
