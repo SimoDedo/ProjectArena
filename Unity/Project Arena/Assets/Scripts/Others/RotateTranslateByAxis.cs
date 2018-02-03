@@ -5,7 +5,7 @@ public class RotateTranslateByAxis : MonoBehaviour {
     [SerializeField] private bool xTranslation = false;
     [SerializeField] private float xLength = 0f;
     [SerializeField] private float xTransSpeed = 0f;
-
+    
     [SerializeField] private bool zTranslation = false;
     [SerializeField] private float zLength = 0f;
     [SerializeField] private float zTransSpeed = 0f;
