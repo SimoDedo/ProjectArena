@@ -95,6 +95,9 @@ public class MainMenuUIManager : MonoBehaviour {
             parameterManagerScript.SetErrorCode(0);
         }
 
+        exportSP.isOn = false;
+        exportMP.isOn = false;
+
         if (forceInput || Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.LinuxPlayer) {
             allowIO = true;
             importPath = Application.persistentDataPath + "/Import";
@@ -110,10 +113,8 @@ public class MainMenuUIManager : MonoBehaviour {
             quit.SetActive(false);
             // Disable all the import/export.
             allowIO = false;
-            exportSP.isOn = false;
             exportSP.interactable = false;
             exportTextSP.color = exportSP.GetComponent<Toggle>().colors.disabledColor;
-            exportMP.isOn = false;
             exportMP.interactable = false;
             exportTextMP.color = exportMP.GetComponent<Toggle>().colors.disabledColor;
         }
@@ -192,6 +193,7 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Opens the singleplayer menu.
     public void OpenSingleplayer() {
+        exportSP.isOn = false;
         OpenSection(singleplayer);
         ResetValues();
         UpdateSingleplayerModes();
@@ -200,8 +202,11 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Opens the multiplayer menu.
     public void OpenMultiplayer() {
+        exportMP.isOn = false;
         OpenSection(multiplayer);
         ResetValues();
+        UpdateMultiplayerModes();
+        ActivateCurrentModeMP();
     }
 
     // Opens the settings menu.
@@ -226,7 +231,7 @@ public class MainMenuUIManager : MonoBehaviour {
         currentMode = 0;
         currentMap = 0;
         currentGeneration = 0;
-        exportData = true;
+        exportData = false;
     }
 
     // Sets the error message.
@@ -332,6 +337,7 @@ public class MainMenuUIManager : MonoBehaviour {
 
         currentMap = 0;
         currentGeneration = GetMinGenerationIndex(singleplayerModes[currentMode].maps[currentMap].enabledGenerations);
+        exportSP.isOn = false;
 
         UpdateSingleplayerMaps();
         ActivateCurrentMapSP();
@@ -437,6 +443,7 @@ public class MainMenuUIManager : MonoBehaviour {
 
         currentMap = 0;
         currentGeneration = GetMinGenerationIndex(multiplayerModes[currentMode].maps[currentMap].enabledGenerations);
+        exportMP.isOn = false;
 
         UpdateMultiplayerMaps();
         ActivateCurrentMapMP();

@@ -86,21 +86,14 @@ public class ExperimentManager : MonoBehaviour {
     void Start() {
         caseList = new List<Case>();
 
-        // Create the experiment directory if needed.
-        experimentDirectory = Application.persistentDataPath + "/Export/" + experimentName;
-        CreateDirectory(experimentDirectory);
-        // Create the maps directory if needed.
-        foreach (Study s in studies)
-            foreach (Case c in s.cases) {
-                CreateDirectory(experimentDirectory + "/" + c.map.name);
-                System.IO.File.WriteAllText(@experimentDirectory + "/" + c.map.name + "/" + c.map.name + ".txt", c.map.text);
-                c.completion = (Directory.GetFiles(experimentDirectory + "/" + c.map.name + "/", "*", SearchOption.AllDirectories).Length - 1) / 2;
-                s.completion += c.completion;
-            }
+        if (GameObject.Find("Parameter Manager") != null && GameObject.Find("Parameter Manager").GetComponent<ParameterManager>().GetExport() == false) {
+            logGame = false;
+            logStatistics = false;
+        }
 
-        // Create the survey directory if needed.
-        surveysDirectory = experimentDirectory + "/Surveys";
-        CreateDirectory(surveysDirectory);
+        if (logGame || logStatistics) {
+            SetupDirectories();
+        }
     }
 
     void Awake() {
@@ -230,6 +223,25 @@ public class ExperimentManager : MonoBehaviour {
     void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
         if (logGame && !(playTutorial && currentCase == 0) && !(playSurvey && currentCase == caseList.Count - 2) && currentCase != caseList.Count - 1)
             SetupLogging();
+    }
+
+    // Sets up the directories.
+    private void SetupDirectories() {
+        experimentDirectory = Application.persistentDataPath + "/Export/" + experimentName;
+        CreateDirectory(experimentDirectory);
+        // Create the maps directory if needed.
+        foreach (Study s in studies) {
+            foreach (Case c in s.cases) {
+                CreateDirectory(experimentDirectory + "/" + c.map.name);
+                System.IO.File.WriteAllText(@experimentDirectory + "/" + c.map.name + "/" + c.map.name + ".txt", c.map.text);
+                c.completion = (Directory.GetFiles(experimentDirectory + "/" + c.map.name + "/", "*", SearchOption.AllDirectories).Length - 1) / 2;
+                s.completion += c.completion;
+            }
+        }
+
+        // Create the survey directory if needed.
+        surveysDirectory = experimentDirectory + "/Surveys";
+        CreateDirectory(surveysDirectory);
     }
 
     // Sets up logging.
