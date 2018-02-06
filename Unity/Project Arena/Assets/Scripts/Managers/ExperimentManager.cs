@@ -64,7 +64,7 @@ public class ExperimentManager : MonoBehaviour {
     private float mediumKillTime = 0;
     // Medium distance covered to find a target.
     private float mediumKillDistance = 0;
-    // Size of a map tile.
+    // Size of a maps tile.
     private float tileSize = 1;
     // Position of the player.
     private Vector3 lastPosition = new Vector3(-1, -1, -1);
@@ -151,17 +151,22 @@ public class ExperimentManager : MonoBehaviour {
         if (count < studies[minIndex].cases.Count) {
             studies[minIndex].cases = studies[minIndex].cases.OrderBy(o => o.completion).ToList();
             for (int i = 0; i < count; i++) {
+                studies[minIndex].cases[i].RandomizeCurrentMap();
                 lessPlayedCases.Add(studies[minIndex].cases[i]);
                 studies[minIndex].cases[i].completion++;
                 studies[minIndex].completion++;
             }
         } else {
             foreach (Case c in studies[minIndex].cases) {
+                c.RandomizeCurrentMap();
                 lessPlayedCases.Add(c);
                 c.completion++;
                 studies[minIndex].completion++;
             }
         }
+
+        // Randomize the play order.
+        Shuffle(lessPlayedCases);
 
         return lessPlayedCases;
     }
@@ -178,15 +183,25 @@ public class ExperimentManager : MonoBehaviour {
 
         Case c = caseList[currentCase];
 
+        pm.SetFlip(currentCase % 2 == 0 ? true : false);
         pm.SetGenerationMode(4);
-        pm.SetMapDNA(c.map == null ? "" : c.map.text);
+        pm.SetMapDNA((c.maps == null || c.maps.Count == 0) ? "" : c.GetCurrentMap().text);
 
         return c.scene;
     }
 
-    // Set case count.
-    private void SetCaseCount() {
+    // Shuffles a list.
+    void Shuffle<T>(IList<T> list) {
+        var random = new System.Random();
+        int n = list.Count;
 
+        while (n > 1) {
+            n--;
+            int k = random.Next(n + 1);
+            T value = list[k];
+            list[k] = list[n];
+            list[n] = value;
+        }
     }
 
     /* SURVEY */
@@ -214,7 +229,7 @@ public class ExperimentManager : MonoBehaviour {
     public string[] GetCurrentCasesArray() {
         string[] maps = new string[casesPerUsers];
         for (int i = 0; i < casesPerUsers; i++)
-            maps[i] = playTutorial ? caseList[i + 1].map.name : caseList[i].map.name;
+            maps[i] = playTutorial ? caseList[i + 1].GetCurrentMap().name : caseList[i].GetCurrentMap().name;
         return maps;
     }
 
@@ -232,9 +247,9 @@ public class ExperimentManager : MonoBehaviour {
         // Create the maps directory if needed.
         foreach (Study s in studies) {
             foreach (Case c in s.cases) {
-                CreateDirectory(experimentDirectory + "/" + c.map.name);
-                System.IO.File.WriteAllText(@experimentDirectory + "/" + c.map.name + "/" + c.map.name + ".txt", c.map.text);
-                c.completion = (Directory.GetFiles(experimentDirectory + "/" + c.map.name + "/", "*", SearchOption.AllDirectories).Length - 1) / 2;
+                CreateDirectory(experimentDirectory + "/" + c.GetCurrentMap().name);
+                System.IO.File.WriteAllText(@experimentDirectory + "/" + c.GetCurrentMap().name + "/" + c.GetCurrentMap().name + ".txt", c.GetCurrentMap().text);
+                c.completion = (Directory.GetFiles(experimentDirectory + "/" + c.GetCurrentMap().name + "/", "*", SearchOption.AllDirectories).Length - 1) / 2;
                 s.completion += c.completion;
             }
         }
@@ -246,7 +261,7 @@ public class ExperimentManager : MonoBehaviour {
 
     // Sets up logging.
     private void SetupLogging() {
-        logStream = File.CreateText(experimentDirectory + "/" + caseList[currentCase].map.name + "/" + caseList[currentCase].map.name + "_" + currentTimestamp + "_log.json");
+        logStream = File.CreateText(experimentDirectory + "/" + caseList[currentCase].GetCurrentMap().name + "/" + caseList[currentCase].GetCurrentMap().name + "_" + currentTimestamp + "_log.json");
         logStream.AutoFlush = true;
 
         jLog = new JsonLog {
@@ -270,7 +285,8 @@ public class ExperimentManager : MonoBehaviour {
 
     // Sets up statistics logging.
     private void SetupStatisticsLogging() {
-        statisticsStream = File.CreateText(experimentDirectory + "/" + caseList[currentCase].map.name + "/" + caseList[currentCase].map.name + "_" + currentTimestamp + "_statistics.json");
+        statisticsStream = File.CreateText(experimentDirectory + "/" + caseList[currentCase].GetCurrentMap().name +
+            "/" + caseList[currentCase].GetCurrentMap().name + "_" + currentTimestamp + "_statistics.json");
         statisticsStream.AutoFlush = true;
 
         jGameStatistics = new JsonGameStatistics();
@@ -342,7 +358,7 @@ public class ExperimentManager : MonoBehaviour {
             shotCount++;
     }
 
-    // Logs info about the map.
+    // Logs info about the maps.
     public void LogMapInfo(float height, float width, float ts) {
         string infoLog = JsonUtility.ToJson(new JsonMapInfo {
             height = height.ToString(),
@@ -557,15 +573,33 @@ public class ExperimentManager : MonoBehaviour {
     [Serializable]
     private class Study {
         [SerializeField] public string studyName;
+        [SerializeField] public bool flip;
         [SerializeField] public List<Case> cases;
         [NonSerialized] public int completion;
     }
 
     [Serializable]
     private class Case {
-        [SerializeField] public TextAsset map;
+        [SerializeField] public List<TextAsset> maps;
         [SerializeField] public string scene;
         [NonSerialized] public int completion;
+        [NonSerialized] public int mapIndex;
+
+        public Case() {
+            RandomizeCurrentMap();
+        }
+
+        public TextAsset GetCurrentMap() {
+            return maps[mapIndex];
+        }
+
+        public void RandomizeCurrentMap() {
+            if (maps != null) {
+                mapIndex = UnityEngine.Random.Range(0, maps.Count);
+            } else {
+                mapIndex = 0;
+            }
+        }
     }
 
 }

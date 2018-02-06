@@ -32,11 +32,10 @@ public class TutorialGameManager : GameManager {
             // Generate the map.
             mapManagerScript.ManageMap(true);
 
-            // Set the spawn points.
-            if (!generateOnly)
+            if (!generateOnly) {
+                // Set the spawn points.
                 spawnPointManagerScript.SetSpawnPoints(mapManagerScript.GetSpawnPoints());
 
-            if (!generateOnly) {
                 // Spawn the player.
                 Spawn(player);
 
@@ -107,7 +106,7 @@ public class TutorialGameManager : GameManager {
         GameObject newTarget = (GameObject)Instantiate(target);
         newTarget.name = target.name;
         newTarget.transform.position = spawnPointManagerScript.GetSpawnPosition();
-        newTarget.GetComponent<Entity>().SetupEntity(0, null, this, 0);      
+        newTarget.GetComponent<Entity>().SetupEntity(0, null, this, 0);
     }
 
     // Pauses and unpauses the game.

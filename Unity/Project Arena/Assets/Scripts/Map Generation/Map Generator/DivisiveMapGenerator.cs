@@ -64,9 +64,6 @@ public class DivisiveMapGenerator : MapGenerator {
 
         AddBorders();
 
-        if (flipMap)
-            FlipMap();
-
         if (createTextFile) {
             PopulateABRooms();
             AddBorderToAB(borderSize);

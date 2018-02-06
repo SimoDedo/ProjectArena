@@ -6,6 +6,7 @@ public class ParameterManager : MonoBehaviour {
     // Map data.
     private int generationMode;
     private string mapDNA;
+    private bool flip;
 
     // Export data.
     private bool export;
@@ -53,6 +54,14 @@ public class ParameterManager : MonoBehaviour {
 
     public string GetMapDNA() {
         return mapDNA;
+    }
+
+    public void SetFlip(bool f) {
+        flip = f;
+    }
+
+    public bool GetFlip() {
+        return flip;
     }
 
     public void SetExport(bool e) {

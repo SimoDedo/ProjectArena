@@ -25,15 +25,12 @@ public abstract class MapGenerator : CoreComponent {
     // Border size.
     [SerializeField] protected int borderSize = 5;
 
-    // The map must be flipped?
-    [Header("Representation")] [SerializeField] protected bool flipMap;
     // Char that denotes a room
-    [SerializeField] protected char roomChar = 'r';
+    [Header("Representation")] [SerializeField] protected char roomChar = 'r';
     // Char that denotes a wall;
     [SerializeField] protected char wallChar = 'w';
     // Custom objects that will be added to the map.
     [SerializeField] protected MapObject[] mapObjects;
-
 
     // Do I have to create a .txt output?
     [Header("Export")] [SerializeField] protected bool createTextFile = false;
@@ -180,12 +177,15 @@ public abstract class MapGenerator : CoreComponent {
     /* HELPERS */
 
     // Flips the map.
-    protected void FlipMap() {
-        char[,] clonedMap = CloneMap(map);
+    public void FlipMap(char[,] m) {
+        char[,] clonedMap = CloneMap(m);
 
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                map[x, y] = clonedMap[height - y - 1, width - x - 1];
+        int w = m.GetLength(0);
+        int h = m.GetLength(1);
+
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                m[x, y] = clonedMap[h - y - 1, w - x - 1];
             }
         }
     }

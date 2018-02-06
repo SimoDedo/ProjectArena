@@ -39,11 +39,10 @@ public class TargetRushGameManager : GameManager {
             // Generate the map.
             mapManagerScript.ManageMap(true);
 
-            // Set the spawn points.
-            if (!generateOnly)
+            if (!generateOnly) {
+                // Set the spawn points.
                 spawnPointManagerScript.SetSpawnPoints(mapManagerScript.GetSpawnPoints());
 
-            if (!generateOnly) {
                 // Spawn the player.
                 Spawn(player);
 

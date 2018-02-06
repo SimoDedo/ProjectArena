@@ -43,7 +43,7 @@ public class ABMLMapManager : MLMapManager {
             }
         }
 
-        if (assembleMap) {
+        if (assembleMap) {            
             // Assemble the map.
             mapAssemblerScript.AssembleMap(maps, mapGeneratorScript.GetWallChar(), mapGeneratorScript.GetRoomChar(), stairsGeneratorScript.GetVoidChar(), mapGeneratorScript.GetSquareSize(), mapGeneratorScript.GetWallHeight());
             // Displace the objects.

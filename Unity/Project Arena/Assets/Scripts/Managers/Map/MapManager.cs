@@ -22,6 +22,7 @@ public abstract class MapManager : CoreComponent {
     protected string seed;
     protected bool export;
     protected string exportPath;
+    protected bool flip;
 
     private void Start() {
         ExtractParametersFromManager();
@@ -53,6 +54,7 @@ public abstract class MapManager : CoreComponent {
         if (GetParameterManager() != null) {
             export = GetParameterManager().GetExport();
             exportPath = GetParameterManager().GetExportPath();
+            flip = GetParameterManager().GetFlip();
 
             switch (GetParameterManager().GetGenerationMode()) {
                 case 0:
@@ -82,7 +84,7 @@ public abstract class MapManager : CoreComponent {
         }
     }
 
-    // Returns the parameter Manager.
+    // Returns the Parameter Manager.
     protected ParameterManager GetParameterManager() {
         if (GameObject.Find("Parameter Manager") != null)
             return GameObject.Find("Parameter Manager").GetComponent<ParameterManager>();

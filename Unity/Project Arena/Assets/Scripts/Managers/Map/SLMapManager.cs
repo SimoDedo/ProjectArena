@@ -15,6 +15,10 @@ public class SLMapManager : MapManager {
         if (loadMapFromFile) {
             // Load the map.
             LoadMapFromText();
+            // Flip the map if needed.
+            if (flip) {
+                mapGeneratorScript.FlipMap(map);
+            }
         } else {
             // Generate the map.
             if (GetParameterManager() != null)
