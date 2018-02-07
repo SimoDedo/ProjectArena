@@ -1,6 +1,10 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Entity is an abstract class used to implement any kind of agent. An entity can spawn, recive
+/// damage and die. An entity can also be healed, supplied with ammunitions and have weapons.
+/// </summary>
 public abstract class Entity : MonoBehaviour {
 
     // Guns.
@@ -38,26 +42,30 @@ public abstract class Entity : MonoBehaviour {
         if (next) {
             // Try for the guns after it
             for (int i = currentGun + 1; i < guns.Count; i++) {
-                if (activeGuns[i])
+                if (activeGuns[i]) {
                     return i;
+                }
             }
             // Try for the guns before it
             for (int i = 0; i < currentGun; i++) {
-                if (activeGuns[i])
+                if (activeGuns[i]) {
                     return i;
+                }
             }
             // There's no other gun, return itself.
             return currentGun;
         } else {
             // Try for the guns before it
             for (int i = currentGun - 1; i >= 0; i--) {
-                if (activeGuns[i])
+                if (activeGuns[i]) {
                     return i;
+                }
             }
             // Try for the guns after it
             for (int i = guns.Count - 1; i > currentGun; i--) {
-                if (activeGuns[i])
+                if (activeGuns[i]) {
                     return i;
+                }
             }
             // There's no other gun, return itself.
             return currentGun;
@@ -72,12 +80,14 @@ public abstract class Entity : MonoBehaviour {
     // Heals the entity.
     public abstract void Heal(int restoredHealth);
 
-    // If the entity is enabled, tells if any of the weapons passed as parameters hasn't the maximum ammo.
+    // If the entity is enabled, tells if any of the weapons passed as 
+    // parameters hasn't the maximum ammo.
     public bool CanBeSupllied(bool[] suppliedGuns) {
         if (inGame) {
             for (int i = 0; i < suppliedGuns.GetLength(0); i++) {
-                if (suppliedGuns[i] && activeGuns[i] && !guns[i].GetComponent<Gun>().IsFull())
+                if (suppliedGuns[i] && activeGuns[i] && !guns[i].GetComponent<Gun>().IsFull()) {
                     return true;
+                }
             }
         }
         return false;
@@ -86,12 +96,14 @@ public abstract class Entity : MonoBehaviour {
     // Increases the ammo of the available guns.
     public void SupplyGuns(bool[] suppliedGuns, int[] ammoAmounts) {
         for (int i = 0; i < suppliedGuns.GetLength(0); i++) {
-            if (suppliedGuns[i] && activeGuns[i] && !guns[i].GetComponent<Gun>().IsFull())
+            if (suppliedGuns[i] && activeGuns[i] && !guns[i].GetComponent<Gun>().IsFull()) {
                 guns[i].GetComponent<Gun>().AddAmmo(ammoAmounts[i]);
+            }
         }
     }
 
-    // Sets if the entity is in game, i.e. if it can move, shoot, interact with object and be hitten.
+    // Sets if the entity is in game, i.e. if it can move, shoot, interact
+    // with object and be hitten.
     abstract public void SetInGame(bool b);
 
     // Returns the ID of the entity.
@@ -102,8 +114,9 @@ public abstract class Entity : MonoBehaviour {
     // Hides/shows the meshe.
     protected void SetMeshVisible(Transform father, bool isVisible) {
         foreach (Transform children in father) {
-            if (children.GetComponent<MeshRenderer>())
+            if (children.GetComponent<MeshRenderer>()) {
                 children.GetComponent<MeshRenderer>().enabled = isVisible;
+            }
             SetMeshVisible(children, isVisible);
         }
     }
@@ -131,8 +144,9 @@ public abstract class Entity : MonoBehaviour {
     // Resets the ammo of all the weapons.
     protected void ResetAllAmmo() {
         for (int i = 0; i < guns.Count; i++) {
-            if (activeGuns[i])
+            if (activeGuns[i]) {
                 guns[i].GetComponent<Gun>().ResetAmmo();
+            }
         }
     }
 

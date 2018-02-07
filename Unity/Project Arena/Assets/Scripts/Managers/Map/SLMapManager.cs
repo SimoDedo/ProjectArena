@@ -1,15 +1,13 @@
-﻿using System;
+﻿using MapManipulation;
+using System;
 using System.IO;
 
+/// <summary>
+/// SLMapManager is an implementation of MapManager used to manage single-level maps.
+/// </summary>
 public class SLMapManager : MapManager {
 
     private char[,] map;
-
-    protected override void InitializeAll() {
-        mapAssemblerScript = mapAssembler.GetComponent<MapAssebler>();
-        mapGeneratorScript = mapGenerator.GetComponent<MapGenerator>();
-        objectDisplacerScript = objectDisplacer.GetComponent<ObjectDisplacer>();
-    }
 
     public override void ManageMap(bool assembleMap) {
         if (loadMapFromFile) {
@@ -17,21 +15,25 @@ public class SLMapManager : MapManager {
             LoadMapFromText();
             // Flip the map if needed.
             if (flip) {
-                mapGeneratorScript.FlipMap(map);
+                MapEdit.FlipMap(map);
             }
         } else {
             // Generate the map.
-            if (GetParameterManager() != null)
+            if (GetParameterManager() != null) {
                 map = mapGeneratorScript.GenerateMap(seed, export, exportPath);
-            else
+            } else {
                 map = mapGeneratorScript.GenerateMap();
+            }
         }
 
         if (assembleMap) {
             // Assemble the map.
-            mapAssemblerScript.AssembleMap(map, mapGeneratorScript.GetWallChar(), mapGeneratorScript.GetRoomChar(), mapGeneratorScript.GetSquareSize(), mapGeneratorScript.GetWallHeight());
+            mapAssemblerScript.AssembleMap(map, mapGeneratorScript.GetWallChar(),
+                mapGeneratorScript.GetRoomChar(), mapGeneratorScript.GetSquareSize(),
+                mapGeneratorScript.GetWallHeight());
             // Displace the objects.
-            objectDisplacerScript.DisplaceObjects(map, mapGeneratorScript.GetSquareSize(), mapGeneratorScript.GetWallHeight());
+            objectDisplacerScript.DisplaceObjects(map, mapGeneratorScript.GetSquareSize(),
+                mapGeneratorScript.GetWallHeight());
         }
     }
 
@@ -50,7 +52,8 @@ public class SLMapManager : MapManager {
                 }
             }
         } else {
-            ConvertToMatrix(seed.Split(new string[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries));
+            ConvertToMatrix(seed.Split(new string[] { "\n", "\r\n" },
+                StringSplitOptions.RemoveEmptyEntries));
         }
     }
 

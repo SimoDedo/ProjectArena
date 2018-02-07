@@ -1,6 +1,10 @@
 ﻿using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// Target is an implementation of Entity with a ILoggable interface, which allows its actions
+/// to be logged. A target can be equipped with lasers. 
+/// </summary>
 public class Target : Entity, ILoggable {
 
     [Header("Target")] [SerializeField] private GameObject target;
@@ -21,7 +25,8 @@ public class Target : Entity, ILoggable {
     // Experiment manager.
     private ExperimentManager experimentManagerScript;
 
-    public override void SetupEntity(int th, bool[] ag, GameManager gms, int id) {
+    public override void SetupEntity(int th, bool[] ag, GameManager gms,
+        int id) {
         originalScale = target.transform.localScale;
         gameManagerScript = gms;
         health = totalHealthTarget;
@@ -40,7 +45,8 @@ public class Target : Entity, ILoggable {
         // Log if needed.
         if (gms.IsLogging()) {
             SetupLogging(gms.GetExperimentManager());
-            experimentManagerScript.LogSpawn(transform.position.x, transform.position.z, gameObject.name);
+            experimentManagerScript.LogSpawn(transform.position.x, transform.position.z,
+                gameObject.name);
         }
 
         StartCoroutine(FadeIn());
@@ -77,14 +83,18 @@ public class Target : Entity, ILoggable {
         if (inGame) {
             health -= damage;
 
-            target.transform.localScale = originalScale * ((float)health / (float)totalHealthTarget / 4f + 0.75f);
+            target.transform.localScale = originalScale * ((float)health / (float)totalHealthTarget
+                / 4f + 0.75f);
 
             // Log if needed.
-            if (logging)
-                experimentManagerScript.LogHit(transform.position.x, transform.position.z, gameObject.name, "Player " + killerID, damage);
+            if (logging) {
+                experimentManagerScript.LogHit(transform.position.x, transform.position.z,
+                    gameObject.name, "Player " + killerID, damage);
+            }
 
-            if (health < 1)
+            if (health < 1) {
                 Die(killerID);
+            }
         }
     }
 
@@ -93,8 +103,10 @@ public class Target : Entity, ILoggable {
         gameManagerScript.AddScore(bonusScore, bonusTime);
 
         // Log if needed.
-        if (logging)
-            experimentManagerScript.LogKill(transform.position.x, transform.position.z, gameObject.name, "Player " + id);
+        if (logging) {
+            experimentManagerScript.LogKill(transform.position.x, transform.position.z,
+                gameObject.name, "Player " + id);
+        }
 
         Destroy(gameObject);
     }

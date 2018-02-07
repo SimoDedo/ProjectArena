@@ -1,6 +1,11 @@
 ﻿using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// DuelGameManager is an implementation of GameManager. The duel game mode consists in a deathmatch
+/// between two players. Each time a player kills his opponent he scores one point. If a player
+/// kills himself he loses one point. Who has more points when time runs up wins.
+/// </summary>
 public class DuelGameManager : GameManager {
 
     [Header("Contenders")] [SerializeField] private GameObject player;
@@ -12,9 +17,7 @@ public class DuelGameManager : GameManager {
     [SerializeField] private bool[] activeGunsPlayer;
     [SerializeField] private bool[] activeGunsOpponent;
 
-    [Header("Duel variables")] [SerializeField] protected GameObject duelGameUIManager;
-
-    private DuelGameUIManager duelGameUIManagerScript;
+    [Header("Duel variables")] [SerializeField] protected DuelGameUIManager duelGameUIManagerScript;
 
     private Player playerScript;
     private Opponent opponentScript;
@@ -30,10 +33,6 @@ public class DuelGameManager : GameManager {
             UnityEditor.SceneView.FocusWindowIfItsOpen(typeof(UnityEditor.SceneView));
         #endif */
 
-        mapManagerScript = mapManager.GetComponent<MapManager>();
-        spawnPointManagerScript = spawnPointManager.GetComponent<SpawnPointManager>();
-        duelGameUIManagerScript = duelGameUIManager.GetComponent<DuelGameUIManager>();
-
         playerScript = player.GetComponent<Player>();
         opponentScript = opponent.GetComponent<Opponent>();
 
@@ -41,7 +40,8 @@ public class DuelGameManager : GameManager {
     }
 
     private void Update() {
-        if (!IsReady() && mapManagerScript.IsReady() && spawnPointManagerScript.IsReady() && duelGameUIManagerScript.IsReady()) {
+        if (!IsReady() && mapManagerScript.IsReady() && spawnPointManagerScript.IsReady()
+            && duelGameUIManagerScript.IsReady()) {
             // Generate the map.
             mapManagerScript.ManageMap(true);
 
@@ -55,15 +55,17 @@ public class DuelGameManager : GameManager {
 
                 // Setup the contenders.
                 playerScript.SetupEntity(totalHealthPlayer, activeGunsPlayer, this, playerID);
-                opponentScript.SetupEntity(totalHealthOpponent, activeGunsOpponent, this, opponentID);
+                opponentScript.SetupEntity(totalHealthOpponent,
+                    activeGunsOpponent, this, opponentID);
 
                 playerScript.LockCursor();
                 startTime = Time.time;
             }
 
             // If needed, tell the Experiment Manager it can start logging.
-            if (handshaking)
+            if (handshaking) {
                 experimentManagerScript.StartLogging();
+            }
 
             SetReady(true);
         } else if (IsReady() && !generateOnly) {
@@ -76,7 +78,8 @@ public class DuelGameManager : GameManager {
         int passedTime = (int)(Time.time - startTime);
 
         if (gamePhase == -1) {
-            // Disable the contenders movement and interactions, activate the ready UI, set the name of the players and set the phase.
+            // Disable the contenders movement and interactions, activate the ready UI, set the 
+            // name of the players and set the phase.
             playerScript.SetInGame(false);
             opponentScript.SetInGame(false);
             duelGameUIManagerScript.ActivateReadyUI();
@@ -84,7 +87,8 @@ public class DuelGameManager : GameManager {
             duelGameUIManagerScript.SetReadyUI();
             gamePhase = 0;
         } else if (gamePhase == 0 && passedTime >= readyDuration) {
-            // Enable the contenders movement and interactions, activate the fight UI, set the kills to zero and set the phase.
+            // Enable the contenders movement and interactions, activate the fight UI, set the 
+            // kills to zero and set the phase.
             duelGameUIManagerScript.Fade(0.7f, 0f, false, 0.25f);
             playerScript.SetInGame(true);
             opponentScript.SetInGame(true);
@@ -92,7 +96,8 @@ public class DuelGameManager : GameManager {
             duelGameUIManagerScript.ActivateFightUI();
             gamePhase = 1;
         } else if (gamePhase == 1 && passedTime >= readyDuration + gameDuration) {
-            // Disable the contenders movement and interactions, activate the score UI, set the winner and set the phase.
+            // Disable the contenders movement and interactions, activate the score UI, set the 
+            // winner and set the phase.
             playerScript.SetInGame(false);
             opponentScript.SetInGame(false);
             duelGameUIManagerScript.Fade(0.7f, 0, true, 0.5f);
@@ -115,10 +120,12 @@ public class DuelGameManager : GameManager {
                 break;
             case 1:
                 // Update the time.
-                duelGameUIManagerScript.SetTime((int)(startTime + readyDuration + gameDuration - Time.time));
+                duelGameUIManagerScript.SetTime((int)(startTime + readyDuration + gameDuration
+                    - Time.time));
                 // Pause or unpause if needed.
-                if (Input.GetKeyDown(KeyCode.Escape))
+                if (Input.GetKeyDown(KeyCode.Escape)) {
                     Pause();
+                }
                 break;
             case 2:
                 // Do nothing.
@@ -129,15 +136,17 @@ public class DuelGameManager : GameManager {
     // Adds a kill to the kill counters.
     public override void AddScore(int killerIdentifier, int killedID) {
         if (killerIdentifier == killedID) {
-            if (killerIdentifier == playerID)
+            if (killerIdentifier == playerID) {
                 playerKillCount--;
-            else
+            } else {
                 opponentKillCount--;
+            }
         } else {
-            if (killerIdentifier == playerID)
+            if (killerIdentifier == playerID) {
                 playerKillCount++;
-            else
+            } else {
                 opponentKillCount++;
+            }
         }
 
         duelGameUIManagerScript.SetKills(playerKillCount, opponentKillCount);
@@ -172,7 +181,7 @@ public class DuelGameManager : GameManager {
     }
 
     // Respawns an entity, but only if the game phase is still figth.
-    private  IEnumerator WaitForRespawn(GameObject g, Entity e) {
+    private IEnumerator WaitForRespawn(GameObject g, Entity e) {
         yield return new WaitForSeconds(respawnDuration);
 
         if (gamePhase == 1) {

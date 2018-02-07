@@ -1,6 +1,11 @@
 ﻿using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// TargetHuntGameManager is an implementation of GameManager. The target hunt game mode consists in 
+/// finding and destroying a single target as many times as possible before time runs. After the
+/// target is destroyed a new one is spawned at a different spawn point.
+/// </summary>
 public class TargetHuntGameManager : GameManager {
 
     [Header("Contenders")] [SerializeField] private GameObject player;
@@ -8,9 +13,7 @@ public class TargetHuntGameManager : GameManager {
     [SerializeField] private bool[] activeGunsPlayer;
     [SerializeField] private GameObject[] targetList;
 
-    [Header("Target hunt variables")] [SerializeField] protected GameObject targetHuntGameUIManager;
-
-    private TargetHuntGameUIManager targetHuntGameUIManagerScript;
+    [Header("Target hunt variables")] [SerializeField] protected TargetHuntGameUIManager targetHuntGameUIManagerScript;
 
     private Player playerScript;
     private int playerScore = 0;
@@ -22,10 +25,6 @@ public class TargetHuntGameManager : GameManager {
         /* #if UNITY_EDITOR
             UnityEditor.SceneView.FocusWindowIfItsOpen(typeof(UnityEditor.SceneView));
         #endif */
-
-        mapManagerScript = mapManager.GetComponent<MapManager>();
-        spawnPointManagerScript = spawnPointManager.GetComponent<SpawnPointManager>();
-        targetHuntGameUIManagerScript = targetHuntGameUIManager.GetComponent<TargetHuntGameUIManager>();
 
         playerScript = player.GetComponent<Player>();
 
@@ -52,8 +51,9 @@ public class TargetHuntGameManager : GameManager {
             }
 
             // If needed, tell the Experiment Manager it can start logging.
-            if (handshaking)
+            if (handshaking) {
                 experimentManagerScript.StartLogging();
+            }
 
             SetReady(true);
         } else if (IsReady() && !generateOnly) {
@@ -104,8 +104,9 @@ public class TargetHuntGameManager : GameManager {
                 // Update the time.
                 targetHuntGameUIManagerScript.SetTime((int)(startTime + readyDuration + gameDuration - Time.time));
                 // Pause or unpause if needed.
-                if (Input.GetKeyDown(KeyCode.Escape))
+                if (Input.GetKeyDown(KeyCode.Escape)) {
                     Pause();
+                }
                 break;
             case 2:
                 // Do nothing.
@@ -162,8 +163,9 @@ public class TargetHuntGameManager : GameManager {
         newTarget.GetComponent<Entity>().SetupEntity(0, null, this, 0);
 
         currentTarget++;
-        if (currentTarget == targetList.GetLength(0))
+        if (currentTarget == targetList.GetLength(0)) {
             currentTarget = 0;
+        }
     }
 
     // Ends the game.

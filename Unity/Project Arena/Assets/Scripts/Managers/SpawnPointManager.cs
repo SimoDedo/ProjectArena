@@ -2,6 +2,10 @@
 using System.Linq;
 using UnityEngine;
 
+/// <summary>
+/// SpawnPointManager menages the spawn points, keeping track of the last time each one of them was
+/// used.
+/// </summary>
 public class SpawnPointManager : CoreComponent {
 
     [SerializeField] private float spawnCooldown = 5f;
@@ -25,29 +29,31 @@ public class SpawnPointManager : CoreComponent {
                 spawnPoints.Add(new SpawnPoint(s.transform.position, -1 * Mathf.Infinity));
             }
         } else {
-            ManageError(Error.HARD_ERROR, "Error while setting the spawn points, no spawn point was found.");
+            ManageError(Error.HARD_ERROR, "Error while setting the spawn points, no spawn point " +
+                "was found.");
         }
     }
 
     // Updates the last used field of all the spawn points that have already been used.
     public void UpdateLastUsed() {
         foreach (SpawnPoint s in spawnPoints)
-            if (s.lastUsed > -1 * Mathf.Infinity)
+            if (s.lastUsed > -1 * Mathf.Infinity) {
                 s.lastUsed = Time.time;
+            }
     }
 
     // Returns an available spawn position.
     public Vector3 GetSpawnPosition() {
-        List<SpawnPoint> availableSpawnPoints = spawnPoints
-            .Where(spawnPoint => Time.time - spawnPoint.lastUsed >= spawnCooldown && spawnPoint != lastUsed)
-            .ToList();
+        List<SpawnPoint> availableSpawnPoints = spawnPoints.Where(spawnPoint =>
+            Time.time - spawnPoint.lastUsed >= spawnCooldown && spawnPoint != lastUsed).ToList();
 
-        if (availableSpawnPoints.Count == 0)
+        if (availableSpawnPoints.Count == 0) {
             return GetRandomSpawnPoint(spawnPoints).spawnPosition;
-        else
+        } else {
             return GetRandomSpawnPoint(availableSpawnPoints).spawnPosition;
+        }
     }
-    
+
     // Returns a random spawn point from a list.
     private SpawnPoint GetRandomSpawnPoint(List<SpawnPoint> SPs) {
         int index = UnityEngine.Random.Range(0, SPs.Count);

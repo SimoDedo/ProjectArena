@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MapManipulation;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -35,7 +36,7 @@ public class CellularMapGenerator : MapGenerator {
 
         ProcessMap();
 
-        AddBorders();
+        MapEdit.AddBorders(map, borderSize, wallChar);
 
         if (createTextFile)
             SaveMapAsText();

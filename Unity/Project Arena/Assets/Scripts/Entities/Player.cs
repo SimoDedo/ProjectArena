@@ -1,5 +1,9 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Player is an implementation of Entity with a ILoggable interface, which allows its actions
+/// to be logged. Player is the agent controlled by the user.
+/// </summary>
 public class Player : Entity, ILoggable {
 
     // Head object containing the camera.
@@ -62,17 +66,19 @@ public class Player : Entity, ILoggable {
         playerUIManagerScript = GetComponent<PlayerUIManager>();
 
         // Get the mouse sensibility.
-        if (PlayerPrefs.HasKey("MouseSensibility"))
+        if (PlayerPrefs.HasKey("MouseSensibility")) {
             sensibility = PlayerPrefs.GetFloat("MouseSensibility");
-        else
+        } else {
             PlayerPrefs.SetFloat("MouseSensibility", sensibility);
+        }
     }
 
     private void Update() {
         // If the cursor should be locked but it isn't, lock it when the user clicks.
         if (Input.GetMouseButtonDown(0) && inputEnabled) {
-            if (cursorLocked && Cursor.lockState != CursorLockMode.Locked)
+            if (cursorLocked && Cursor.lockState != CursorLockMode.Locked) {
                 Cursor.lockState = CursorLockMode.Locked;
+            }
         }
 
         // If I can move update the player position depending on the inputs.
@@ -82,7 +88,8 @@ public class Player : Entity, ILoggable {
             UpdateGun();
             // Log if needed.
             if (logging && Time.time > lastPositionLog + 0.5) {
-                experimentManagerScript.LogPosition(transform.position.x, transform.position.z, transform.rotation.y);
+                experimentManagerScript.LogPosition(transform.position.x, transform.position.z,
+                    transform.rotation.y);
                 lastPositionLog = Time.time;
             }
         } else {
@@ -126,10 +133,11 @@ public class Player : Entity, ILoggable {
 
     // Heals the player.
     public override void Heal(int restoredHealth) {
-        if (health + restoredHealth > totalHealth)
+        if (health + restoredHealth > totalHealth) {
             health = totalHealth;
-        else
+        } else {
             health += restoredHealth;
+        }
 
         playerUIManagerScript.SetHealth(health, totalHealth);
     }
@@ -144,8 +152,9 @@ public class Player : Entity, ILoggable {
 
     // Respawns the player.
     public override void Respawn() {
-        if (!inputEnabled)
+        if (!inputEnabled) {
             guns[currentGun].GetComponent<Gun>().EnableInput(true);
+        }
 
         health = totalHealth;
         ResetAllAmmo();
@@ -213,8 +222,9 @@ public class Player : Entity, ILoggable {
             moveDirection = transform.TransformDirection(moveDirection);
             moveDirection *= speed * inputPenalty;
             // Jump if needed.
-            if (Input.GetButton("Jump"))
+            if (Input.GetButton("Jump")) {
                 moveDirection.y = jumpSpeed;
+            }
         }
 
         // Apply gravity to the direction and apply it using the controller.
@@ -237,10 +247,11 @@ public class Player : Entity, ILoggable {
         inputEnabled = b;
         guns[currentGun].GetComponent<Gun>().EnableInput(b);
 
-        if (b)
+        if (b) {
             Cursor.lockState = CursorLockMode.Locked;
-        else
+        } else {
             Cursor.lockState = CursorLockMode.None;
+        }
     }
 
     // Updates the camera position.
@@ -248,7 +259,8 @@ public class Player : Entity, ILoggable {
         Vector2 mouseDelta = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
 
         // Extract the delta of the mouse.
-        mouseDelta = Vector2.Scale(mouseDelta, new Vector2(sensibility * smoothing * inputPenalty, sensibility * smoothing * inputPenalty));
+        mouseDelta = Vector2.Scale(mouseDelta, new Vector2(sensibility * smoothing * inputPenalty,
+            sensibility * smoothing * inputPenalty));
         smoothedDelta.x = Mathf.Lerp(smoothedDelta.x, mouseDelta.x, 1f / smoothing);
         smoothedDelta.y = Mathf.Lerp(smoothedDelta.y, mouseDelta.y, 1f / smoothing);
         mouseLook += smoothedDelta;
@@ -279,8 +291,9 @@ public class Player : Entity, ILoggable {
             playerUIManagerScript.SetPlayerUIVisible(true);
             ActivateGun(currentGun);
             // Disable the input of the gun I just activated if the input is disabled.
-            if (!inputEnabled)
+            if (!inputEnabled) {
                 guns[currentGun].GetComponent<Gun>().EnableInput(false);
+            }
         } else {
             playerUIManagerScript.SetPlayerUIVisible(false);
             DeactivateGun(currentGun);
@@ -301,10 +314,11 @@ public class Player : Entity, ILoggable {
 
     // Shows current guns
     public void ShowGun(bool b) {
-        if (b)
+        if (b) {
             ActivateGun(currentGun);
-        else
+        } else {
             DeactivateGun(currentGun);
+        }
     }
 
     // Updates the sensibility.

@@ -2,6 +2,11 @@
 using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// TargetRushGameManager is an implementation of GameManager. The target rush game mode consists in 
+/// destroying consecutive waves of targets. The games ends when the player dies, time runs up or 
+/// the last wave is destoryed.
+/// </summary>
 public class TargetRushGameManager : GameManager {
 
     [Header("Contenders")] [SerializeField] private GameObject player;
@@ -9,9 +14,7 @@ public class TargetRushGameManager : GameManager {
     [SerializeField] private bool[] activeGunsPlayer;
     [SerializeField] private Wave[] waveList;
 
-    [Header("Target hunt variables")] [SerializeField] protected GameObject targetRushGameUIManager;
-
-    private TargetRushGameUIManager targetRushGameUIManagerScript;
+    [Header("Target hunt variables")] [SerializeField] protected TargetRushGameUIManager targetRushGameUIManagerScript;
 
     private Player playerScript;
     private int playerScore = 0;
@@ -25,17 +28,14 @@ public class TargetRushGameManager : GameManager {
             UnityEditor.SceneView.FocusWindowIfItsOpen(typeof(UnityEditor.SceneView));
         #endif */
 
-        mapManagerScript = mapManager.GetComponent<MapManager>();
-        spawnPointManagerScript = spawnPointManager.GetComponent<SpawnPointManager>();
-        targetRushGameUIManagerScript = targetRushGameUIManager.GetComponent<TargetRushGameUIManager>();
-
         playerScript = player.GetComponent<Player>();
 
         targetRushGameUIManagerScript.Fade(0.7f, 1f, true, 0.5f);
     }
 
     private void Update() {
-        if (!IsReady() && mapManagerScript.IsReady() && spawnPointManagerScript.IsReady() && targetRushGameUIManagerScript.IsReady()) {
+        if (!IsReady() && mapManagerScript.IsReady() && spawnPointManagerScript.IsReady()
+            && targetRushGameUIManagerScript.IsReady()) {
             // Generate the map.
             mapManagerScript.ManageMap(true);
 
@@ -54,8 +54,9 @@ public class TargetRushGameManager : GameManager {
             }
 
             // If needed, tell the Experiment Manager it can start logging.
-            if (handshaking)
+            if (handshaking) {
                 experimentManagerScript.StartLogging();
+            }
 
             SetReady(true);
         } else if (IsReady() && !generateOnly) {
@@ -68,12 +69,14 @@ public class TargetRushGameManager : GameManager {
         int passedTime = (int)(Time.time - startTime);
 
         if (gamePhase == -1) {
-            // Disable the player movement and interactions, activate the ready UI and set the phase.
+            // Disable the player movement and interactions, activate the ready UI and set the 
+            // phase.
             playerScript.SetInGame(false);
             targetRushGameUIManagerScript.ActivateReadyUI();
             gamePhase = 0;
         } else if (gamePhase == 0 && passedTime >= readyDuration) {
-            // Enable the player movement and interactions, activate the fight UI, set the score to zero, the wave to 1 and set the phase.
+            // Enable the player movement and interactions, activate the fight UI, set the score to 
+            // zero, the wave to 1 and set the phase.
             targetRushGameUIManagerScript.Fade(0.7f, 0f, false, 0.25f);
             targetRushGameUIManagerScript.SetScore(0);
             spawnPointManagerScript.UpdateLastUsed();
@@ -82,7 +85,8 @@ public class TargetRushGameManager : GameManager {
             targetRushGameUIManagerScript.ActivateFightUI();
             gamePhase = 1;
         } else if (gamePhase == 1 && passedTime >= readyDuration + gameDuration) {
-            // Disable the player movement and interactions, activate the score UI, set the winner and set the phase.
+            // Disable the player movement and interactions, activate the score UI, set the winner 
+            // and set the phase.
             playerScript.SetInGame(false);
             targetRushGameUIManagerScript.Fade(0.7f, 0, true, 0.5f);
             targetRushGameUIManagerScript.SetFinalScore(playerScore);
@@ -102,14 +106,17 @@ public class TargetRushGameManager : GameManager {
         switch (gamePhase) {
             case 0:
                 // Update the countdown.
-                targetRushGameUIManagerScript.SetCountdown((int)(startTime + readyDuration - Time.time));
+                targetRushGameUIManagerScript.SetCountdown((int)(startTime + readyDuration
+                    - Time.time));
                 break;
             case 1:
                 // Update the time.
-                targetRushGameUIManagerScript.SetTime((int)(startTime + readyDuration + gameDuration - Time.time));
+                targetRushGameUIManagerScript.SetTime((int)(startTime + readyDuration + gameDuration
+                    - Time.time));
                 // Pause or unpause if needed.
-                if (Input.GetKeyDown(KeyCode.Escape))
+                if (Input.GetKeyDown(KeyCode.Escape)) {
                     Pause();
+                }
                 break;
             case 2:
                 // Do nothing.
@@ -122,7 +129,8 @@ public class TargetRushGameManager : GameManager {
         targetRushGameUIManagerScript.SetColorAll(c);
     }
 
-    // Called when a target is destroyed, adds score and time and changes wave if the target is the last one.
+    // Called when a target is destroyed, adds score and time and changes wave if the target is the 
+    // last one.
     public override void AddScore(int scoreIncrease, int timeIncrease) {
         IncreaseTime(timeIncrease);
         IncreaseScore(scoreIncrease);
@@ -162,10 +170,12 @@ public class TargetRushGameManager : GameManager {
         IncreaseScore(currentWave * 100);
 
         if (currentWave == waveList.Length) {
-            // Disable the player movement and interactions, activate the score UI, set the winner and set the phase.
+            // Disable the player movement and interactions, activate the score UI, set the winner 
+            // and set the phase.
             playerScript.SetInGame(false);
             targetRushGameUIManagerScript.Fade(0.7f, 0, true, 0.5f);
-            targetRushGameUIManagerScript.SetFinalScore(playerScore + (int)(Time.time - startTime) * 10);
+            targetRushGameUIManagerScript.SetFinalScore(playerScore + (int)(Time.time - startTime)
+                * 10);
             targetRushGameUIManagerScript.SetFinalWave(currentWave);
             targetRushGameUIManagerScript.SetVictory(true);
             targetRushGameUIManagerScript.ActivateScoreUI();
@@ -181,8 +191,9 @@ public class TargetRushGameManager : GameManager {
         targetRushGameUIManagerScript.SetWave(currentWave);
 
         // Set the target count.
-        foreach (Target target in waveList[currentWave - 1].targetList)
+        foreach (Target target in waveList[currentWave - 1].targetList) {
             targetsCount += target.count;
+        }
         targetRushGameUIManagerScript.SetTargets(targetsCount);
         // Debug.Log("Going to spawn " + targetsCount + " targets in wave " + currentWave + ".");
 
@@ -190,7 +201,8 @@ public class TargetRushGameManager : GameManager {
 
         // Spawn the targets.
         foreach (Target target in waveList[currentWave - 1].targetList) {
-            // Debug.Log("Spawning " + target.count + " " + target.prefab.name + " in wave " + currentWave + ".");
+            // Debug.Log("Spawning " + target.count + " " + target.prefab.name + " in wave " 
+            // + currentWave + ".");
             for (int i = 0; i < target.count; i++) {
                 GameObject newTarget = (GameObject)Instantiate(target.prefab);
                 newTarget.name = target.prefab.name;
@@ -212,7 +224,8 @@ public class TargetRushGameManager : GameManager {
     // Increases time.
     private void IncreaseTime(int i) {
         startTime += i;
-        targetRushGameUIManagerScript.SetTime((int)(startTime + readyDuration + gameDuration - Time.time));
+        targetRushGameUIManagerScript.SetTime((int)(startTime + readyDuration + gameDuration 
+            - Time.time));
         targetRushGameUIManagerScript.AddTime(i);
     }
 

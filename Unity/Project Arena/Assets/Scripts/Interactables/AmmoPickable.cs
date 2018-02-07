@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Ammo Pickable is an implementation of Pickable that supplies the player whit ammo.
+/// </summary>
 public class AmmoPickable : Pickable {
 
     [SerializeField] private bool[] suppliedGuns;

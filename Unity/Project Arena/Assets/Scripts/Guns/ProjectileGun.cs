@@ -1,6 +1,11 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// ProjectileGun is an implementation of Gun. A projectile gun uses gameobjects with an attached 
+/// Projectile script as projectiles. Projectiles are stored in a queue and created only when 
+/// needed.
+/// </summary>
 public class ProjectileGun : Gun {
 
     [Header("Projectile parameters")] [SerializeField] private GameObject projectilePosition;
@@ -22,19 +27,23 @@ public class ProjectileGun : Gun {
         ammoInCharger -= 1;
 
         // Log if needed.
-        if (logging)
-            experimentManagerScript.LogShot(transform.root.position.x, transform.root.position.z, transform.root.rotation.y, gunId, ammoInCharger, totalAmmo);
+        if (logging) {
+            experimentManagerScript.LogShot(transform.root.position.x, transform.root.position.z,
+                transform.root.rotation.y, gunId, ammoInCharger, totalAmmo);
+        }
 
-        if (hasUI)
+        if (hasUI) {
             gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
+        }
 
         for (int i = 0; i < projectilesPerShot; i++) {
             Quaternion rotation;
 
-            if (dispersion != 0)
+            if (dispersion != 0) {
                 rotation = GetDeviatedRotation(transform.rotation, dispersion);
-            else
+            } else {
                 rotation = transform.rotation;
+            }
 
             InstantiateProjectile(rotation);
         }
@@ -53,7 +62,8 @@ public class ProjectileGun : Gun {
             projectile = (GameObject)Instantiate(projectilePrefab);
             projectile.transform.parent = projectiles.transform;
             projectile.name = projectilePrefab.name;
-            projectile.GetComponent<Projectile>().SetupProjectile(projectileLifeTime, projectileSpeed, this, damage, ownerEntityScript.GetID());
+            projectile.GetComponent<Projectile>().SetupProjectile(projectileLifeTime,
+                projectileSpeed, this, damage, ownerEntityScript.GetID());
         }
         // Place and fire the projectile.
         projectile.GetComponent<Projectile>().Fire(projectilePosition.transform.position, rotation);

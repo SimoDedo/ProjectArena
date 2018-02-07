@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
+/// <summary>
+/// Projectile is an abstract class used to implement any kind of projectile.
+/// </summary>
 public abstract class Projectile : MonoBehaviour {
 
     [SerializeField] protected GameObject projectile;
@@ -17,8 +19,9 @@ public abstract class Projectile : MonoBehaviour {
         if (shot) {
             transform.position += transform.forward * Time.deltaTime * projectileSpeed;
 
-            if (Time.time > shotTime + projectileLifeTime)
+            if (Time.time > shotTime + projectileLifeTime) {
                 Recover();
+            }
         }
     }
 

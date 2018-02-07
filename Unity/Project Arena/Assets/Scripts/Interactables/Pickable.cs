@@ -1,5 +1,9 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Pickable is an abstract class used to implement any kind of object that can be picked up by 
+/// the player.
+/// </summary>
 [RequireComponent(typeof(BoxCollider))]
 public abstract class Pickable : MonoBehaviour {
 

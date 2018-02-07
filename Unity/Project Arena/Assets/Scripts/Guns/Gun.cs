@@ -2,6 +2,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Gun is an abstract class used to implement any kind of ranged weapon.
+/// </summary>
 public abstract class Gun : MonoBehaviour, ILoggable {
 
     [Header("Objects")] [SerializeField] protected Camera headCamera;
@@ -68,27 +71,33 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     protected ExperimentManager experimentManagerScript;
 
     protected void Awake() {
-        if (aimEnabled)
+        if (aimEnabled) {
             originalFOV = headCamera.fieldOfView;
+        }
     }
 
     protected void Update() {
         if (used && inputEnabled) {
-            if (reloading || coolingDown)
+            if (reloading || coolingDown) {
                 UpdateTimers();
+            }
 
             if (aimEnabled) {
-                if (Input.GetButtonDown("Fire2"))
+                if (Input.GetButtonDown("Fire2")) {
                     Aim(true);
-                if (Input.GetButtonUp("Fire2"))
+                }
+                if (Input.GetButtonUp("Fire2")) {
                     Aim(false);
-                if (animatingAim)
+                }
+                if (animatingAim) {
                     AnimateAim();
+                }
             }
 
             if (Input.GetButton("Fire1") && CanShoot()) {
-                if (ammoInCharger > 0)
+                if (ammoInCharger > 0) {
                     Shoot();
+                }
             } else if (Input.GetButtonDown("Reload") && CanReload()) {
                 Reload();
             }
@@ -96,10 +105,12 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     }
 
     protected void OnDisable() {
-        if (aimEnabled)
+        if (aimEnabled) {
             ResetAim();
-        if (muzzleFlash.activeSelf)
+        }
+        if (muzzleFlash.activeSelf) {
             muzzleFlash.SetActive(false);
+        }
     }
 
     // Allows accepting input and enables all the childrens.
@@ -108,8 +119,9 @@ public abstract class Gun : MonoBehaviour, ILoggable {
         muzzleFlash.SetActive(false);
         used = true;
 
-        if (ammoInCharger == 0 && CanReload())
+        if (ammoInCharger == 0 && CanReload()) {
             Reload();
+        }
     }
 
     // Stops reloading, stops aiming, disallows accepting input and disables all the childrens.
@@ -117,11 +129,13 @@ public abstract class Gun : MonoBehaviour, ILoggable {
         // When I switch guns I stop the reloading, but not the cooldown.
         reloading = false;
 
-        if (hasUI)
+        if (hasUI) {
             playerUIManagerScript.StopReloading();
+        }
 
-        if (aimEnabled)
+        if (aimEnabled) {
             ResetAim();
+        }
 
         SetChildrenEnabled(false);
         used = false;
@@ -132,14 +146,15 @@ public abstract class Gun : MonoBehaviour, ILoggable {
         if (reloading) {
             if (Time.time > reloadStart + reloadTime) {
                 // Log if needed.
-                if (logging)
+                if (logging) {
                     experimentManagerScript.LogRelaod(gunId, ammoInCharger, totalAmmo);
+                }
                 // Stop the reloading.
                 reloading = false;
                 // Update charger and total ammo count.
-                if (infinteAmmo)
+                if (infinteAmmo) {
                     ammoInCharger = chargerSize;
-                else if (totalAmmo >= chargerSize - ammoInCharger) {
+                } else if (totalAmmo >= chargerSize - ammoInCharger) {
                     totalAmmo -= chargerSize - ammoInCharger;
                     ammoInCharger = chargerSize;
                 } else {
@@ -147,16 +162,19 @@ public abstract class Gun : MonoBehaviour, ILoggable {
                     totalAmmo = 0;
                 }
                 // Set the ammo in the UI.
-                if (hasUI)
+                if (hasUI) {
                     gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
+                }
             }
         } else if (coolingDown) {
-            if (Time.time > cooldownStart + cooldownTime)
+            if (Time.time > cooldownStart + cooldownTime) {
                 coolingDown = false;
+            }
         }
     }
 
-    // Called by player, sets references to the game manager, to the player script itself and to the player UI.
+    // Called by player, sets references to the game manager, to the player script itself and to 
+    // the player UI.
     public void SetupGun(GameManager gms, Entity e, PlayerUIManager puims, int id) {
         gameManagerScript = gms;
         ownerEntityScript = e;
@@ -189,8 +207,9 @@ public abstract class Gun : MonoBehaviour, ILoggable {
         defaultAmmoInCharger = ammoInCharger;
         defaultTotalAmmo = totalAmmo;
 
-        if (hasUI)
+        if (hasUI) {
             gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
+        }
     }
 
     // I can reload when I have ammo left, my charger isn't full and I'm not reloading.
@@ -221,10 +240,13 @@ public abstract class Gun : MonoBehaviour, ILoggable {
 
     // Animates the aim.
     protected void AnimateAim() {
-        if (aiming)
-            transform.localPosition = Vector3.Lerp(transform.localPosition, aimPosition, (Time.time - aimStart) * 10f);
-        else
-            transform.localPosition = Vector3.Lerp(transform.localPosition, Vector3.zero, (Time.time - aimStart) * 10f);
+        if (aiming) {
+            transform.localPosition = Vector3.Lerp(transform.localPosition, aimPosition,
+                (Time.time - aimStart) * 10f);
+        } else {
+            transform.localPosition = Vector3.Lerp(transform.localPosition, Vector3.zero,
+                (Time.time - aimStart) * 10f);
+        }
 
         if (transform.localPosition == aimPosition && aiming) {
             EnableAimOverlay(true);
@@ -281,36 +303,43 @@ public abstract class Gun : MonoBehaviour, ILoggable {
 
     // Adds ammo.
     public void AddAmmo(int amount) {
-        if (totalAmmo + amount < maximumAmmo)
+        if (totalAmmo + amount < maximumAmmo) {
             totalAmmo += amount;
-        else
+        } else {
             totalAmmo = maximumAmmo;
+        }
 
         if (gameObject.activeSelf && hasUI) {
             gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
-            if (used && ammoInCharger == 0 && CanReload())
+            if (used && ammoInCharger == 0 && CanReload()) {
                 Reload();
+            }
         }
     }
 
     // Show muzzle flash.
     protected IEnumerator ShowMuzzleFlash() {
         // Move the gun downwards.
-        transform.position = new Vector3(transform.position.x, transform.position.y + recoil, transform.position.z);
+        transform.position = new Vector3(transform.position.x, transform.position.y + recoil, 
+            transform.position.z);
         // Rotate the muzzle flesh and show it.
-        muzzleFlash.transform.RotateAround(muzzleFlash.transform.position, transform.forward, Random.Range(0f, 360f));
+        muzzleFlash.transform.RotateAround(muzzleFlash.transform.position, transform.forward, 
+            Random.Range(0f, 360f));
         muzzleFlash.SetActive(true);
         // Wait.
         yield return new WaitForSeconds(muzzleFlashDuration);
         // Move the gun upwards and hide the muzzle flash.
-        transform.position = new Vector3(transform.position.x, transform.position.y - recoil, transform.position.z);
+        transform.position = new Vector3(transform.position.x, transform.position.y - recoil, 
+            transform.position.z);
         muzzleFlash.SetActive(false);
         // Reload if needed.
-        if (ammoInCharger == 0 && CanReload())
+        if (ammoInCharger == 0 && CanReload()) {
             Reload();
+        }
     }
 
-    // Activates/deactivates the children objects, with the exception of muzzle flashed which must always be deactivated.
+    // Activates/deactivates the children objects, with the exception of muzzle flashed which must
+    // always be deactivated.
     private void SetChildrenEnabled(bool active) {
         foreach (Transform child in transform) {
             child.gameObject.SetActive(active);
@@ -322,8 +351,9 @@ public abstract class Gun : MonoBehaviour, ILoggable {
         ammoInCharger = defaultAmmoInCharger;
         totalAmmo = defaultTotalAmmo;
 
-        if (hasUI)
+        if (hasUI) {
             gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
+        }
     }
 
     // Enables or disables the input.

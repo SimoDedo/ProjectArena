@@ -1,5 +1,9 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Laser is a simple implementation of Gun. A laser continuously emits a ray that causes damage 
+/// over time.
+/// </summary>
 [RequireComponent(typeof(LineRenderer))]
 public class Laser : MonoBehaviour {
 
@@ -25,7 +29,8 @@ public class Laser : MonoBehaviour {
         if (active) {
             RaycastHit hit;
 
-            if (Physics.Raycast(transform.position, -transform.right, out hit, Mathf.Infinity, ignoredLayers)) {
+            if (Physics.Raycast(transform.position, -transform.right, out hit, Mathf.Infinity, 
+                ignoredLayers)) {
                 Entity entityScript = hit.transform.root.GetComponent<Entity>();
                 if (entityScript != null && Time.time > lastHit + 1f) {
                     entityScript.TakeDamage(dps, -1);

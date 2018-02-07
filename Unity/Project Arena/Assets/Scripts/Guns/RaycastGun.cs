@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// RaycastGun is an implementation of Gun. Since the raycast gun uses a raycast to find the hit 
+/// position, there is no time of fligth for the bullet.
+/// </summary>
 public class RaycastGun : Gun {
 
     [Header("Raycast parameters")] [SerializeField] private bool limitRange = false;
@@ -14,8 +18,9 @@ public class RaycastGun : Gun {
     private GameObject sparks;
 
     private void Start() {
-        if (!limitRange)
+        if (!limitRange) {
             range = Mathf.Infinity;
+        }
 
         ignoredLayers = ~ignoredLayers;
 
@@ -29,27 +34,33 @@ public class RaycastGun : Gun {
         ammoInCharger -= 1;
 
         // Log if needed.
-        if (logging)
-            experimentManagerScript.LogShot(transform.root.position.x, transform.root.position.z, transform.root.rotation.y, gunId, ammoInCharger, totalAmmo);
+        if (logging) {
+            experimentManagerScript.LogShot(transform.root.position.x, transform.root.position.z,
+                transform.root.rotation.y, gunId, ammoInCharger, totalAmmo);
+        }
 
-        if (hasUI)
+        if (hasUI) {
             gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
+        }
 
         for (int i = 0; i < projectilesPerShot; i++) {
             RaycastHit hit;
             Vector3 direction;
 
-            if (dispersion != 0)
+            if (dispersion != 0) {
                 direction = GetDeviatedDirection(headCamera.transform.forward, dispersion);
-            else
+            } else {
                 direction = headCamera.transform.forward;
+            }
 
-            if (Physics.Raycast(headCamera.transform.position, direction, out hit, range, ignoredLayers)) {
+            if (Physics.Raycast(headCamera.transform.position, direction, out hit, range, 
+                ignoredLayers)) {
                 if (!hit.transform.root.GetComponent<Player>()) {
                     StartCoroutine(ShowSpark(hit));
                     Entity entityScript = hit.transform.root.GetComponent<Entity>();
-                    if (entityScript != null)
+                    if (entityScript != null) {
                         entityScript.TakeDamage(damage, ownerEntityScript.GetID());
+                    }
                 }
             }
         }

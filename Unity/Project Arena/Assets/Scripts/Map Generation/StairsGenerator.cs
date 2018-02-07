@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// StairsGenerator is a class used to generate stairs in multi-level maps.
+/// </summary>
 public class StairsGenerator : CoreComponent {
 
     [SerializeField] private int stairsPerLevel = 4;
@@ -68,10 +71,14 @@ public class StairsGenerator : CoreComponent {
         if (direction == stairCharUp) {
             // Up.
             if (y - (stairLength - 1) > 0) {
-                if (maps[currentLevel][x, y] == roomChar && maps[currentLevel - 1][x, y - (stairLength - 1)] == roomChar) {
+                if (maps[currentLevel][x, y] == roomChar &&
+                    maps[currentLevel - 1][x, y - (stairLength - 1)] == roomChar) {
                     for (int i = 1; i < stairLength - 1; i++) {
-                        if (!((maps[currentLevel][x, y - i] == roomChar || maps[currentLevel][x, y - i] == wallChar) && maps[currentLevel - 1][x, y - i] == roomChar))
+                        if (!((maps[currentLevel][x, y - i] == roomChar ||
+                            maps[currentLevel][x, y - i] == wallChar) &&
+                            maps[currentLevel - 1][x, y - i] == roomChar)) {
                             return false;
+                        }
                     }
                     return true;
                 }
@@ -79,10 +86,14 @@ public class StairsGenerator : CoreComponent {
         } else if (direction == stairCharRigth) {
             // Rigth.
             if (x + (stairLength - 1) < maps[currentLevel].GetLength(0)) {
-                if (maps[currentLevel][x, y] == roomChar && maps[currentLevel - 1][x + (stairLength - 1), y] == roomChar) {
+                if (maps[currentLevel][x, y] == roomChar &&
+                    maps[currentLevel - 1][x + (stairLength - 1), y] == roomChar) {
                     for (int i = 1; i < stairLength - 1; i++) {
-                        if (!((maps[currentLevel][x + i, y] == roomChar || maps[currentLevel][x + i, y] == wallChar) && maps[currentLevel - 1][x + i, y] == roomChar))
+                        if (!((maps[currentLevel][x + i, y] == roomChar ||
+                            maps[currentLevel][x + i, y] == wallChar) &&
+                            maps[currentLevel - 1][x + i, y] == roomChar)) {
                             return false;
+                        }
                     }
                     return true;
                 }
@@ -90,10 +101,14 @@ public class StairsGenerator : CoreComponent {
         } else if (direction == stairCharDown) {
             // Down.
             if (y + (stairLength - 1) < maps[currentLevel].GetLength(1)) {
-                if (maps[currentLevel][x, y] == roomChar && maps[currentLevel - 1][x, y + (stairLength - 1)] == roomChar) {
+                if (maps[currentLevel][x, y] == roomChar &&
+                    maps[currentLevel - 1][x, y + (stairLength - 1)] == roomChar) {
                     for (int i = 1; i < stairLength - 1; i++) {
-                        if (!((maps[currentLevel][x, y + i] == roomChar || maps[currentLevel][x, y + i] == wallChar) && maps[currentLevel - 1][x, y + i] == roomChar))
+                        if (!((maps[currentLevel][x, y + i] == roomChar ||
+                            maps[currentLevel][x, y + i] == wallChar) &&
+                            maps[currentLevel - 1][x, y + i] == roomChar)) {
                             return false;
+                        }
                     }
                     return true;
                 }
@@ -101,10 +116,14 @@ public class StairsGenerator : CoreComponent {
         } else if (direction == stairCharLeft) {
             // Left.
             if (x - (stairLength - 1) > 0) {
-                if (maps[currentLevel][x, y] == roomChar && maps[currentLevel - 1][x - (stairLength - 1), y] == roomChar) {
+                if (maps[currentLevel][x, y] == roomChar &&
+                    maps[currentLevel - 1][x - (stairLength - 1), y] == roomChar) {
                     for (int i = 1; i < stairLength - 1; i++) {
-                        if (!((maps[currentLevel][x - i, y] == roomChar || maps[currentLevel][x - i, y] == wallChar) && maps[currentLevel - 1][x - i, y] == roomChar))
+                        if (!((maps[currentLevel][x - i, y] == roomChar ||
+                            maps[currentLevel][x - i, y] == wallChar) &&
+                            maps[currentLevel - 1][x - i, y] == roomChar)) {
                             return false;
+                        }
                     }
                     return true;
                 }
@@ -117,13 +136,13 @@ public class StairsGenerator : CoreComponent {
     private bool CanPlaceStair(int originX, int originY, int endX, int endY, int currentLevel) {
         int direction = 0;
 
-        if (originY < endY)
+        if (originY < endY) {
             direction = 1;
-        else if (originY > endY)
+        } else if (originY > endY) {
             direction = 3;
-        else if (originX < endX)
+        } else if (originX < endX) {
             direction = 2;
-        else direction = 4;
+        } else { direction = 4; }
 
         return CanPlaceStair(originX, originY, currentLevel, stairChars[direction - 1]);
     }
@@ -133,19 +152,24 @@ public class StairsGenerator : CoreComponent {
         if (stairList.Count > 2) {
             int placedStairs = 0;
             while (stairList.Count > 0 && placedStairs < stairsPerLevel) {
-                Stair currentStair = stairList[mapGeneratorScript.GetRandomInteger(0, stairList.Count)];
+                Stair currentStair = stairList[mapGeneratorScript.GetRandomInteger(0,
+                    stairList.Count)];
                 stairList.Remove(currentStair);
-                if (CanPlaceStair(currentStair.originX, currentStair.originY, currentStair.endX, currentStair.endY, currentLevel)) {
+                if (CanPlaceStair(currentStair.originX, currentStair.originY, currentStair.endX,
+                    currentStair.endY, currentLevel)) {
                     PlaceStair(currentStair, currentLevel);
                     placedStairs++;
                 }
             }
-            if (placedStairs == 0)
-                ManageError(Error.HARD_ERROR, "Error while populating the map, stairs could not be placed.\nPlease use another input.");
-        } else if (stairList.Count == 1)
+            if (placedStairs == 0) {
+                ManageError(Error.HARD_ERROR, "Error while populating the map, stairs could not " +
+                    "be placed.\nPlease use another input.");
+            }
+        } else if (stairList.Count == 1) {
             PlaceStair(stairList[0], currentLevel);
-        else {
-            ManageError(Error.HARD_ERROR, "Error while populating the map, stairs could not be placed.\nPlease use another input.");
+        } else {
+            ManageError(Error.HARD_ERROR, "Error while populating the map, stairs could not be " +
+                "placed.\nPlease use another input.");
         }
     }
 
@@ -158,40 +182,44 @@ public class StairsGenerator : CoreComponent {
             for (int y = 0; y < maps[currentLevel].GetLength(1); y++) {
                 if (maps[currentLevel][x, y] == stairCharUp) {
                     maps[currentLevel][x, y] = roomChar;
-                    if (CanPlaceStair(x, y, currentLevel, stairCharUp))
+                    if (CanPlaceStair(x, y, currentLevel, stairCharUp)) {
                         stairList.Add(new Stair {
                             originX = x,
                             originY = y,
                             endX = x,
                             endY = y - (stairLength - 1)
                         });
+                    }
                 } else if (maps[currentLevel][x, y] == stairCharRigth) {
                     maps[currentLevel][x, y] = roomChar;
-                    if (CanPlaceStair(x, y, currentLevel, stairCharRigth))
+                    if (CanPlaceStair(x, y, currentLevel, stairCharRigth)) {
                         stairList.Add(new Stair {
                             originX = x,
                             originY = y,
                             endX = x + (stairLength - 1),
                             endY = y
                         });
+                    }
                 } else if (maps[currentLevel][x, y] == stairCharDown) {
                     maps[currentLevel][x, y] = roomChar;
-                    if (CanPlaceStair(x, y, currentLevel, stairCharDown))
+                    if (CanPlaceStair(x, y, currentLevel, stairCharDown)) {
                         stairList.Add(new Stair {
                             originX = x,
                             originY = y,
                             endX = x,
                             endY = y + (stairLength - 1)
                         });
+                    }
                 } else if (maps[currentLevel][x, y] == stairCharLeft) {
                     maps[currentLevel][x, y] = roomChar;
-                    if (CanPlaceStair(x, y, currentLevel, stairCharLeft))
+                    if (CanPlaceStair(x, y, currentLevel, stairCharLeft)) {
                         stairList.Add(new Stair {
                             originX = x,
                             originY = y,
                             endX = x - (stairLength - 1),
                             endY = y
                         });
+                    }
                 }
             }
         }
@@ -199,15 +227,17 @@ public class StairsGenerator : CoreComponent {
         return stairList;
     }
 
-    // Returns a list of the possible stairs that can be placed between the two levels passed as parameter.
+    // Returns a list of the possible stairs that can be placed between the two levels passed as 
+    // parameter.
     private List<Stair> GetPossibleStairs(int currentLevel) {
         List<Stair> stairList = new List<Stair>();
 
         for (int x = 0; x < maps[currentLevel].GetLength(0); x++) {
             for (int y = 0; y < maps[currentLevel].GetLength(1); y++) {
                 if (maps[currentLevel][x, y] == roomChar) {
-                    for (int i = 0; i < 4; i++)
+                    for (int i = 0; i < 4; i++) {
                         AddToListIfPossible(currentLevel, x, y, stairList, stairChars[i]);
+                    }
                 }
             }
         }
@@ -218,68 +248,79 @@ public class StairsGenerator : CoreComponent {
     // Places a stair.
     private void PlaceStair(Stair stair, int currentLevel) {
         if (stair.originY == stair.endY) {
-            if (stair.originX > stair.endX)
+            if (stair.originX > stair.endX) {
                 maps[currentLevel][stair.originX, stair.originY] = stairCharLeft;
-            else
+            } else {
                 maps[currentLevel][stair.originX, stair.originY] = stairCharRigth;
+            }
         } else {
-            if (stair.originY > stair.endY)
+            if (stair.originY > stair.endY) {
                 maps[currentLevel][stair.originX, stair.originY] = stairCharUp;
-            else
+            } else {
                 maps[currentLevel][stair.originX, stair.originY] = stairCharDown;
+            }
         }
 
-        for (int j = 1; j < stairLength - 1; j++)
+        for (int j = 1; j < stairLength - 1; j++) {
             if (stair.originY == stair.endY) {
-                if (stair.originX > stair.endX)
+                if (stair.originX > stair.endX) {
                     maps[currentLevel][stair.originX - j, stair.originY] = voidChar;
-                else
+                } else {
                     maps[currentLevel][stair.originX + j, stair.originY] = voidChar;
+                }
             } else {
-                if (stair.originY > stair.endY)
+                if (stair.originY > stair.endY) {
                     maps[currentLevel][stair.originX, stair.originY + j] = voidChar;
-                else
+                } else {
                     maps[currentLevel][stair.originX, stair.originY - j] = voidChar;
+                }
             }
+        }
     }
 
-    // Adds a new stair to the list, if possible. The origin of the stair is marked as a room tile because of maps with already placed stair. 
-    private void AddToListIfPossible(int currentLevel, int x, int y, List<Stair> stairList, char direction) {
+    // Adds a new stair to the list, if possible. The origin of the stair is marked as a room tile 
+    // because of maps with already placed stair. 
+    private void AddToListIfPossible(int currentLevel, int x, int y, List<Stair> stairList,
+        char direction) {
         if (direction == stairCharUp) {
-            if (CanPlaceStair(x, y, currentLevel, stairCharUp))
+            if (CanPlaceStair(x, y, currentLevel, stairCharUp)) {
                 stairList.Add(new Stair {
                     originX = x,
                     originY = y,
                     endX = x,
                     endY = y - (stairLength - 1)
                 });
+            }
             maps[currentLevel][x, y] = roomChar;
         } else if (direction == stairCharRigth) {
-            if (CanPlaceStair(x, y, currentLevel, stairCharRigth))
+            if (CanPlaceStair(x, y, currentLevel, stairCharRigth)) {
                 stairList.Add(new Stair {
                     originX = x,
                     originY = y,
                     endX = x + (stairLength - 1),
                     endY = y
                 });
+            }
             maps[currentLevel][x, y] = roomChar;
         } else if (direction == stairCharDown) {
-            if (CanPlaceStair(x, y, currentLevel, stairCharDown))
+            if (CanPlaceStair(x, y, currentLevel, stairCharDown)) {
                 stairList.Add(new Stair {
                     originX = x,
                     originY = y,
                     endX = x,
                     endY = y + (stairLength - 1)
                 });
+            }
             maps[currentLevel][x, y] = roomChar;
         } else if (direction == stairCharLeft) {
-            if (CanPlaceStair(x, y, currentLevel, stairCharLeft))
+            if (CanPlaceStair(x, y, currentLevel, stairCharLeft)) {
                 stairList.Add(new Stair {
                     originX = x,
                     originY = y,
                     endX = x - (stairLength - 1),
                     endY = y
                 });
+            }
             maps[currentLevel][x, y] = roomChar;
         }
     }

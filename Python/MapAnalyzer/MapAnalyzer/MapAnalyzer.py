@@ -19,8 +19,8 @@ def getFiles(inputDir):
     inputAcquired = False
     text = input("\nInsert the MAPNAME value: ")
     while inputAcquired == False:
-        mapFileName = text + "_map.txt"
-        ABFileName = text + "_AB.txt"
+        mapFileName = text + ".map.txt"
+        ABFileName = text + ".AB.txt"
         mapFilePath = inputDir + "/" + mapFileName
         ABFilePath = inputDir + "/" + ABFileName
         if os.path.isfile(mapFilePath) and os.path.isfile(ABFilePath):

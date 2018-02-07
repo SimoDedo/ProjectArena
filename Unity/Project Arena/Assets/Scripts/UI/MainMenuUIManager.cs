@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MapManipulation;
+using System;
 using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -55,7 +56,6 @@ public class MainMenuUIManager : MonoBehaviour {
     [Header("Loading fields")] [SerializeField] private Text loadingText;
 
     [Header("Other")] [SerializeField] private GameObject parameterManagerPrefab;
-    [SerializeField] private MapValidator mapValidator;
     [SerializeField] private RotateTranslateByAxis backgroundScript;
     [SerializeField] private bool forceInput;
 
@@ -81,18 +81,18 @@ public class MainMenuUIManager : MonoBehaviour {
 
         if (!GameObject.Find("Parameter Manager")) {
             InstantiateParameterManager();
-            parameterManagerScript.SetBackgroundRotation(backgroundScript.GetRotation());
+            parameterManagerScript.BackgroundRotation = backgroundScript.GetRotation();
         } else {
             parameterManagerScript = GameObject.Find("Parameter Manager").GetComponent<ParameterManager>();
-            backgroundScript.SetRotation(parameterManagerScript.GetBackgroundRotation());
+            backgroundScript.SetRotation(parameterManagerScript.BackgroundRotation);
         }
 
         openedSection = main;
 
-        if (parameterManagerScript.GetErrorCode() != 0) {
+        if (parameterManagerScript.ErrorCode != 0) {
             OpenSection(error);
-            SetErrorMessage(parameterManagerScript.GetErrorCode(), parameterManagerScript.GetErrorMessage());
-            parameterManagerScript.SetErrorCode(0);
+            SetErrorMessage(parameterManagerScript.ErrorCode, parameterManagerScript.ErrorMessage);
+            parameterManagerScript.ErrorCode = 0;
         }
 
         exportSP.isOn = false;
@@ -146,10 +146,10 @@ public class MainMenuUIManager : MonoBehaviour {
         if (currentGeneration == 2)
             mapDNA = importPath + "/" + mapDNA;
 
-        parameterManagerScript.SetGenerationMode(currentGeneration);
-        parameterManagerScript.SetMapDNA(mapDNA);
-        parameterManagerScript.SetExport(exportData && allowIO);
-        parameterManagerScript.SetExportPath(exportPath);
+        parameterManagerScript.GenerationMode = currentGeneration;
+        parameterManagerScript.MapDNA = mapDNA;
+        parameterManagerScript.Export = exportData && allowIO;
+        parameterManagerScript.ExportPath = exportPath;
 
         Loading();
     }
@@ -160,7 +160,7 @@ public class MainMenuUIManager : MonoBehaviour {
         OpenSection(loading);
         if (currentGeneration == 2) {
             loadingText.text = "Validating the map";
-            int errorCode = currentIsMultilevel ? mapValidator.ValidateMLMap(parameterManagerScript.GetMapDNA()) : mapValidator.ValidateMap(parameterManagerScript.GetMapDNA());
+            int errorCode = currentIsMultilevel ? MapValidate.ValidateMLMap(parameterManagerScript.MapDNA) : MapValidate.ValidateMap(parameterManagerScript.MapDNA);
             if (errorCode == 0) {
                 Load(currentScene);
             } else {
@@ -169,7 +169,7 @@ public class MainMenuUIManager : MonoBehaviour {
             }
         } else if (currentGeneration == 3) {
             loadingText.text = "Validating the map";
-            int errorCode = currentIsMultilevel ? mapValidator.ValidateGeneticMLMap(parameterManagerScript.GetMapDNA()) : mapValidator.ValidateGeneticMap(parameterManagerScript.GetMapDNA());
+            int errorCode = currentIsMultilevel ? MapValidate.ValidateGeneticMLMap(parameterManagerScript.MapDNA) : MapValidate.ValidateGeneticMap(parameterManagerScript.MapDNA);
             if (errorCode == 0) {
                 Load(currentScene);
             } else {
@@ -182,7 +182,7 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Loads a scene.
     private void Load(string scene) {
-        parameterManagerScript.SetBackgroundRotation(backgroundScript.GetRotation());
+        parameterManagerScript.BackgroundRotation = backgroundScript.GetRotation();
         SceneManager.LoadScene(scene);
     }
 

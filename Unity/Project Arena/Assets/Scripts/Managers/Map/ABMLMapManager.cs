@@ -1,7 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// SLMapManager is an implementation of MapManager used to manage multi-level AB maps.
+/// </summary>
 public class ABMLMapManager : MLMapManager {
 
     [Header("AB generation")] [SerializeField] private MapGenerator diggerGeneratorScript;
@@ -21,15 +23,17 @@ public class ABMLMapManager : MLMapManager {
             for (int i = 0; i < genomes.Count; i++) {
                 mapGeneratorScript.ResetMapSize();
                 if (GetParameterManager() != null) {
-                    if (genomes[i].useDefaultGenerator)
+                    if (genomes[i].useDefaultGenerator) {
                         maps.Add(mapGeneratorScript.GenerateMap(genomes[i].genome, false, null));
-                    else if (i > 0)
-                        maps.Add(diggerGeneratorScript.GenerateMap(genomes[i].genome, maps[i - 1].GetLength(0), maps[i - 1].GetLength(1), false, null));
-                    else
+                        maps.Add(diggerGeneratorScript.GenerateMap(genomes[i].genome,
+                            maps[i - 1].GetLength(0), maps[i - 1].GetLength(1), false, null));
+                    } else {
                         maps.Add(diggerGeneratorScript.GenerateMap(genomes[i].genome, false, null));
-                    usesDiggerGeneratorList.Add(!genomes[i].useDefaultGenerator);
-                } else
+                        usesDiggerGeneratorList.Add(!genomes[i].useDefaultGenerator);
+                    }
+                } else {
                     maps.Add(mapGeneratorScript.GenerateMap());
+                }
                 mapGeneratorScript.ResetMapSize();
             }
             // Resize all the maps.
@@ -43,12 +47,16 @@ public class ABMLMapManager : MLMapManager {
             }
         }
 
-        if (assembleMap) {            
+        if (assembleMap) {
             // Assemble the map.
-            mapAssemblerScript.AssembleMap(maps, mapGeneratorScript.GetWallChar(), mapGeneratorScript.GetRoomChar(), stairsGeneratorScript.GetVoidChar(), mapGeneratorScript.GetSquareSize(), mapGeneratorScript.GetWallHeight());
+            mapAssemblerScript.AssembleMap(maps, mapGeneratorScript.GetWallChar(),
+                mapGeneratorScript.GetRoomChar(), stairsGeneratorScript.GetVoidChar(),
+                mapGeneratorScript.GetSquareSize(), mapGeneratorScript.GetWallHeight());
             // Displace the objects.
-            for (int i = 0; i < maps.Count; i++)
-                objectDisplacerScript.DisplaceObjects(maps[i], mapGeneratorScript.GetSquareSize(), mapGeneratorScript.GetWallHeight() * i);
+            for (int i = 0; i < maps.Count; i++) {
+                objectDisplacerScript.DisplaceObjects(maps[i], mapGeneratorScript.GetSquareSize(),
+                    mapGeneratorScript.GetWallHeight() * i);
+            }
         }
     }
 
@@ -58,15 +66,18 @@ public class ABMLMapManager : MLMapManager {
         int maxHeight = 0;
 
         foreach (char[,] m in maps) {
-            if (m.GetLength(0) > maxWidth)
+            if (m.GetLength(0) > maxWidth) {
                 maxWidth = m.GetLength(0);
-            if (m.GetLength(1) > maxHeight)
+            }
+            if (m.GetLength(1) > maxHeight) {
                 maxHeight = m.GetLength(1);
+            }
         }
 
         for (int i = 0; i < maps.Count; i++) {
-            if (maps[i].GetLength(0) < maxWidth || maps[i].GetLength(1) < maxHeight)
+            if (maps[i].GetLength(0) < maxWidth || maps[i].GetLength(1) < maxHeight) {
                 maps[i] = ResizeMap(maps[i], maxWidth, maxHeight);
+            }
         }
     }
 
@@ -78,10 +89,11 @@ public class ABMLMapManager : MLMapManager {
 
         for (int x = 0; x < maxWidth; x++) {
             for (int y = 0; y < maxHeight; y++) {
-                if (x < map.GetLength(0) && y < map.GetLength(1))
+                if (x < map.GetLength(0) && y < map.GetLength(1)) {
                     resizedMap[x, y] = map[x, y];
-                else
+                } else {
                     resizedMap[x, y] = wallChar;
+                }
             }
         }
 

@@ -1,11 +1,16 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// MapManager is an abstract class used to implement any kind of map manager. A map manager manages
+/// the creation process of a map, which consists in generation (performed by a map generator), 
+/// assembling (performed by a map assembler) and population (performed by an object displacer).
+/// </summary>
 public abstract class MapManager : CoreComponent {
 
-    [Header("Core components")] [SerializeField] protected GameObject mapAssembler;
-    [SerializeField] protected GameObject mapGenerator;
-    [SerializeField] protected GameObject objectDisplacer;
+    [Header("Core components")] [SerializeField] protected MapGenerator mapGeneratorScript;
+    [SerializeField] protected MapAssebler mapAssemblerScript;
+    [SerializeField] protected ObjectDisplacer objectDisplacerScript;
 
     // Do I have to load the map from a .txt?
     [Header("Import")] [SerializeField] protected bool loadMapFromFile = false;
@@ -15,10 +20,6 @@ public abstract class MapManager : CoreComponent {
     // Category of the spawn point gameobjects in the object displacer. 
     [Header("Other")] [SerializeField] protected string spawnPointCategory;
 
-    protected MapGenerator mapGeneratorScript;
-    protected MapAssebler mapAssemblerScript;
-    protected ObjectDisplacer objectDisplacerScript;
-
     protected string seed;
     protected bool export;
     protected string exportPath;
@@ -26,18 +27,14 @@ public abstract class MapManager : CoreComponent {
 
     private void Start() {
         ExtractParametersFromManager();
-
-        InitializeAll();
     }
 
     private void Update() {
-        if (!IsReady() && mapAssemblerScript.IsReady() && mapGeneratorScript.IsReady()
-            && objectDisplacerScript.IsReady()) {
+        if (!IsReady() && mapAssemblerScript.IsReady() && mapGeneratorScript.IsReady() &&
+             objectDisplacerScript.IsReady()) {
             SetReady(true);
         }
     }
-
-    protected abstract void InitializeAll();
 
     public abstract void ManageMap(bool assembleMap);
 
@@ -52,32 +49,32 @@ public abstract class MapManager : CoreComponent {
     // Extracts the parameters from the parameter Manager, if any.
     protected void ExtractParametersFromManager() {
         if (GetParameterManager() != null) {
-            export = GetParameterManager().GetExport();
-            exportPath = GetParameterManager().GetExportPath();
-            flip = GetParameterManager().GetFlip();
+            export = GetParameterManager().Export;
+            exportPath = GetParameterManager().ExportPath;
+            flip = GetParameterManager().Flip;
 
-            switch (GetParameterManager().GetGenerationMode()) {
+            switch (GetParameterManager().GenerationMode) {
                 case 0:
                     loadMapFromFile = false;
-                    seed = GetParameterManager().GetMapDNA();
+                    seed = GetParameterManager().MapDNA;
                     break;
                 case 1:
                     loadMapFromFile = false;
-                    seed = GetParameterManager().GetMapDNA();
+                    seed = GetParameterManager().MapDNA;
                     break;
                 case 2:
                     loadMapFromFile = true;
                     seed = null;
-                    textFilePath = GetParameterManager().GetMapDNA();
+                    textFilePath = GetParameterManager().MapDNA;
                     break;
                 case 3:
                     loadMapFromFile = false;
-                    seed = GetParameterManager().GetMapDNA();
-                    textFilePath = GetParameterManager().GetMapDNA();
+                    seed = GetParameterManager().MapDNA;
+                    textFilePath = GetParameterManager().MapDNA;
                     break;
                 case 4:
                     loadMapFromFile = true;
-                    seed = GetParameterManager().GetMapDNA();
+                    seed = GetParameterManager().MapDNA;
                     textFilePath = null;
                     break;
             }
@@ -86,10 +83,11 @@ public abstract class MapManager : CoreComponent {
 
     // Returns the Parameter Manager.
     protected ParameterManager GetParameterManager() {
-        if (GameObject.Find("Parameter Manager") != null)
+        if (GameObject.Find("Parameter Manager") != null) {
             return GameObject.Find("Parameter Manager").GetComponent<ParameterManager>();
-        else
+        } else {
             return null;
+        }
     }
 
     // Returns the Map Generator.

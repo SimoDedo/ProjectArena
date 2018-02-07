@@ -1,10 +1,18 @@
-﻿using System;
+﻿using JsonModels;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// ExperimentManager allows to create and manage experiments. An experiment is composed of
+/// different studies (a set of maps), each one composed by cases (a set of map varaitions). Each 
+/// time a new experiment is requested, a list of cases from the less played study is provided to 
+/// the user to be played. A tutorial and a survey scene can be added at the beginning and at the 
+/// end of the experiment, respectevely.
+/// </summary>
 public class ExperimentManager : MonoBehaviour {
 
     [Header("Tutorial")] [SerializeField] private Case tutorial;
@@ -86,7 +94,8 @@ public class ExperimentManager : MonoBehaviour {
     void Start() {
         caseList = new List<Case>();
 
-        if (GameObject.Find("Parameter Manager") != null && GameObject.Find("Parameter Manager").GetComponent<ParameterManager>().GetExport() == false) {
+        if (GameObject.Find("Parameter Manager") != null && GameObject.Find("Parameter Manager").
+            GetComponent<ParameterManager>().Export == false) {
             logGame = false;
             logStatistics = false;
         }
@@ -111,13 +120,15 @@ public class ExperimentManager : MonoBehaviour {
         currentTimestamp = GetTimeStamp();
         caseList.Clear();
 
-        if (playTutorial)
+        if (playTutorial) {
             caseList.Add(tutorial);
+        }
 
         caseList.AddRange(GetCases(casesPerUsers));
 
-        if (playSurvey)
+        if (playSurvey) {
             caseList.Add(survey);
+        }
 
         caseList.Add(new Case {
             scene = SceneManager.GetActiveScene().name
@@ -129,7 +140,8 @@ public class ExperimentManager : MonoBehaviour {
     // Returns a well formatted timestamp.
     private string GetTimeStamp() {
         DateTime now = System.DateTime.Now;
-        return now.Year + "-" + now.Month + "-" + now.Day + "-" + now.Hour + "-" + now.Minute + "-" + now.Second;
+        return now.Year + "-" + now.Month + "-" + now.Day + "-" + now.Hour + "-" + now.Minute +
+            "-" + now.Second;
     }
 
     // Gets the cases to add in a round-robin fashion.
@@ -175,17 +187,19 @@ public class ExperimentManager : MonoBehaviour {
     public string GetNextScene(ParameterManager pm) {
         currentCase++;
 
-        if (logging)
+        if (logging) {
             StopLogging();
+        }
 
-        if (currentCase == caseList.Count || caseList.Count == 0)
+        if (currentCase == caseList.Count || caseList.Count == 0) {
             CreateNewList();
+        }
 
         Case c = caseList[currentCase];
 
-        pm.SetFlip(currentCase % 2 == 0 ? true : false);
-        pm.SetGenerationMode(4);
-        pm.SetMapDNA((c.maps == null || c.maps.Count == 0) ? "" : c.GetCurrentMap().text);
+        pm.Flip = currentCase % 2 == 0 ? true : false;
+        pm.GenerationMode = 4;
+        pm.MapDNA = (c.maps == null || c.maps.Count == 0) ? "" : c.GetCurrentMap().text;
 
         return c.scene;
     }
@@ -222,22 +236,27 @@ public class ExperimentManager : MonoBehaviour {
             experimentName = experimentName,
             playedMaps = GetCurrentCasesArray()
         });
-        System.IO.File.WriteAllText(surveysDirectory + "/" + currentTimestamp + "_survey.json", info + "\n" + answers);
+        System.IO.File.WriteAllText(surveysDirectory + "/" + currentTimestamp + "_survey.json",
+            info + "\n" + answers);
     }
 
     // Returns the played cases in an array.
     public string[] GetCurrentCasesArray() {
         string[] maps = new string[casesPerUsers];
-        for (int i = 0; i < casesPerUsers; i++)
-            maps[i] = playTutorial ? caseList[i + 1].GetCurrentMap().name : caseList[i].GetCurrentMap().name;
+        for (int i = 0; i < casesPerUsers; i++) {
+            maps[i] = playTutorial ? caseList[i + 1].GetCurrentMap().name :
+                caseList[i].GetCurrentMap().name;
+        }
         return maps;
     }
 
     /* LOGGING */
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
-        if (logGame && !(playTutorial && currentCase == 0) && !(playSurvey && currentCase == caseList.Count - 2) && currentCase != caseList.Count - 1)
+        if (logGame && !(playTutorial && currentCase == 0) && !(playSurvey
+            && currentCase == caseList.Count - 2) && currentCase != caseList.Count - 1) {
             SetupLogging();
+        }
     }
 
     // Sets up the directories.
@@ -248,8 +267,11 @@ public class ExperimentManager : MonoBehaviour {
         foreach (Study s in studies) {
             foreach (Case c in s.cases) {
                 CreateDirectory(experimentDirectory + "/" + c.GetCurrentMap().name);
-                System.IO.File.WriteAllText(@experimentDirectory + "/" + c.GetCurrentMap().name + "/" + c.GetCurrentMap().name + ".txt", c.GetCurrentMap().text);
-                c.completion = (Directory.GetFiles(experimentDirectory + "/" + c.GetCurrentMap().name + "/", "*", SearchOption.AllDirectories).Length - 1) / 2;
+                System.IO.File.WriteAllText(@experimentDirectory + "/" + c.GetCurrentMap().name
+                    + "/" + c.GetCurrentMap().name + ".txt", c.GetCurrentMap().text);
+                c.completion = (Directory.GetFiles(experimentDirectory + "/"
+                    + c.GetCurrentMap().name + "/", "*", SearchOption.AllDirectories).Length
+                    - 1) / 2;
                 s.completion += c.completion;
             }
         }
@@ -261,7 +283,9 @@ public class ExperimentManager : MonoBehaviour {
 
     // Sets up logging.
     private void SetupLogging() {
-        logStream = File.CreateText(experimentDirectory + "/" + caseList[currentCase].GetCurrentMap().name + "/" + caseList[currentCase].GetCurrentMap().name + "_" + currentTimestamp + "_log.json");
+        logStream = File.CreateText(experimentDirectory + "/"
+            + caseList[currentCase].GetCurrentMap().name + "/"
+            + caseList[currentCase].GetCurrentMap().name + "_" + currentTimestamp + "_log.json");
         logStream.AutoFlush = true;
 
         jLog = new JsonLog {
@@ -276,17 +300,21 @@ public class ExperimentManager : MonoBehaviour {
         jHit = new JsonHit();
 
         GameManager gm = FindObjectOfType(typeof(GameManager)) as GameManager;
-        if (gm != null)
+        if (gm != null) {
             gm.LoggingHandshake(this);
+        }
 
-        if (logStatistics)
+        if (logStatistics) {
             SetupStatisticsLogging();
+        }
     }
 
     // Sets up statistics logging.
     private void SetupStatisticsLogging() {
-        statisticsStream = File.CreateText(experimentDirectory + "/" + caseList[currentCase].GetCurrentMap().name +
-            "/" + caseList[currentCase].GetCurrentMap().name + "_" + currentTimestamp + "_statistics.json");
+        statisticsStream = File.CreateText(experimentDirectory + "/"
+            + caseList[currentCase].GetCurrentMap().name + "/"
+            + caseList[currentCase].GetCurrentMap().name + "_" + currentTimestamp
+            + "_statistics.json");
         statisticsStream.AutoFlush = true;
 
         jGameStatistics = new JsonGameStatistics();
@@ -297,13 +325,15 @@ public class ExperimentManager : MonoBehaviour {
     public void StartLogging() {
         logging = true;
 
-        if (logStatistics)
+        if (logStatistics) {
             loggingStatistics = true;
+        }
 
         foreach (MonoBehaviour monoBehaviour in FindObjectsOfType(typeof(MonoBehaviour))) {
             ILoggable logger = monoBehaviour as ILoggable;
-            if (logger != null)
+            if (logger != null) {
                 logger.SetupLogging(this);
+            }
         }
     }
 
@@ -342,7 +372,8 @@ public class ExperimentManager : MonoBehaviour {
     }
 
     // Logs the shot.
-    public void LogShot(float x, float z, float direction, int gunId, int ammoInCharger, int totalAmmo) {
+    public void LogShot(float x, float z, float direction, int gunId, int ammoInCharger,
+        int totalAmmo) {
         jLog.time = Time.time.ToString("n4");
         jLog.type = "player_shot";
         jShoot.x = x.ToString("n4");
@@ -354,8 +385,9 @@ public class ExperimentManager : MonoBehaviour {
         string log = JsonUtility.ToJson(jLog);
         WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jShoot) + "}");
 
-        if (loggingStatistics)
+        if (loggingStatistics) {
             shotCount++;
+        }
     }
 
     // Logs info about the maps.
@@ -446,8 +478,9 @@ public class ExperimentManager : MonoBehaviour {
         string log = JsonUtility.ToJson(jLog);
         WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jHit) + "}");
 
-        if (loggingStatistics)
+        if (loggingStatistics) {
             hitCount++;
+        }
     }
 
     // Logs statistics about the performance of the player finding the target.
@@ -471,7 +504,8 @@ public class ExperimentManager : MonoBehaviour {
         jGameStatistics.mediumKillDistance = mediumKillDistance.ToString("n4");
         jGameStatistics.totalShots = shotCount.ToString("n4");
         jGameStatistics.totalHits = hitCount.ToString("n4");
-        jGameStatistics.accuracy = (shotCount > 0) ? (hitCount / (float)shotCount).ToString("n4") : "0";
+        jGameStatistics.accuracy = (shotCount > 0) ? (hitCount / (float)shotCount).ToString("n4")
+            : "0";
         WriteStatisticsLog(JsonUtility.ToJson(jGameStatistics));
     }
 
@@ -489,86 +523,6 @@ public class ExperimentManager : MonoBehaviour {
     }
 
     /* CUTSOM OBJECTS */
-
-    private class JsonLog {
-        public string time;
-        public string type;
-        public string log;
-    }
-
-    private class JsonInfo {
-        public string experimentName;
-        public string[] playedMaps;
-    }
-
-    private class JsonMapInfo {
-        public string height;
-        public string width;
-        public string tileSize;
-    }
-
-    private class JsonPosition {
-        public string x;
-        public string y;
-        public string direction;
-    }
-
-    private class JsonShoot {
-        public string x;
-        public string y;
-        public string direction;
-        public string weapon;
-        public string ammoInCharger;
-        public string totalAmmo;
-    }
-
-    private class JsonReload {
-        public string weapon;
-        public string ammoInCharger;
-        public string totalAmmo;
-    }
-
-    private class JsonKill {
-        public string x;
-        public string y;
-        public string killedEntity;
-        public string killerEntity;
-    }
-
-    private class JsonHit {
-        public string x;
-        public string y;
-        public string hittedEntity;
-        public string hitterEntity;
-        public string damage;
-    }
-
-    private class JsonSpawn {
-        public string x;
-        public string y;
-        public string spawnedEntity;
-    }
-
-    private class JsonTargetStatistics {
-        public string playerInitialX;
-        public string playerInitialY;
-        public string playerX;
-        public string playerY;
-        public string targetX;
-        public string targetY;
-        public string coveredTileDistance;
-        public string time;
-        public string speed;
-    }
-
-    private class JsonGameStatistics {
-        public string totalShots;
-        public string totalHits;
-        public string accuracy;
-        public string coveredDistance;
-        public string mediumKillTime;
-        public string mediumKillDistance;
-    }
 
     [Serializable]
     private class Study {

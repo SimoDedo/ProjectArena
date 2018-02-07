@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Medkit Pickable is an implementation of Pickable that heals the player.
+/// </summary>
 public class MedkitPickable : Pickable {
 
     [SerializeField] private int restoredHealth = 50;

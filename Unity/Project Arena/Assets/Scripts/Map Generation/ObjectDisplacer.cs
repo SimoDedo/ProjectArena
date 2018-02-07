@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// ObjectDisplacer is a class used to place objects in a map.
+/// </summary>
 public class ObjectDisplacer : CoreComponent {
 
     // Tells if the expected height is negative.
@@ -27,9 +30,9 @@ public class ObjectDisplacer : CoreComponent {
         SetReady(true);
     }
 
-    // Creates all the category objects and adds them to the dictionary. An object with no category is 
-    // assigned to the default one. Creates and adds the prefabs lists to the charObjectsDictionary.
-    // Sets the height direction correction value.
+    // Creates all the category objects and adds them to the dictionary. An object with no category 
+    // is assigned to the default one. Creates and adds the prefabs lists to the 
+    // charObjectsDictionary. Sets the height direction correction value.
     private void InitializeAll() {
         charObjectsDictionary = new Dictionary<char, CustomObjectList>();
         categoryObjectsDictionary = new Dictionary<String, List<GameObject>>();
@@ -52,10 +55,11 @@ public class ObjectDisplacer : CoreComponent {
             }
         }
 
-        if (negativeHeight)
+        if (negativeHeight) {
             heightDirCorrection = -1f;
-        else
+        } else {
             heightDirCorrection = 1f;
+        }
     }
 
     // Displace the custom objects inside the map.
@@ -71,15 +75,17 @@ public class ObjectDisplacer : CoreComponent {
                     GameObject childObject = (GameObject)Instantiate(currentObject.prefab);
                     childObject.name = currentObject.prefab.name;
                     childObject.transform.parent = transform.Find(currentObject.category);
-                    childObject.transform.localPosition = new Vector3(squareSize * (x - map.GetLength(0) / 2),
-                        heightDirCorrection * (heightCorrection + height + currentObject.heightCorrection),
-                        squareSize * (y - map.GetLength(1) / 2));
+                    childObject.transform.localPosition = new Vector3(squareSize *
+                        (x - map.GetLength(0) / 2), heightDirCorrection * (heightCorrection +
+                        height + currentObject.heightCorrection), squareSize * (y -
+                        map.GetLength(1) / 2));
                     childObject.transform.localScale *= sizeCorrection;
 
                     if (categoryObjectsDictionary.ContainsKey(currentObject.category)) {
                         categoryObjectsDictionary[currentObject.category].Add(childObject);
                     } else {
-                        categoryObjectsDictionary.Add(currentObject.category, new List<GameObject>());
+                        categoryObjectsDictionary.Add(currentObject.category,
+                            new List<GameObject>());
                         categoryObjectsDictionary[currentObject.category].Add(childObject);
                     }
                 }
@@ -101,7 +107,8 @@ public class ObjectDisplacer : CoreComponent {
         try {
             return categoryObjectsDictionary[category];
         } catch (KeyNotFoundException) {
-            ManageError(Error.HARD_ERROR, "Error while populating the map, no object of category " + category + " found in the dictionary.");
+            ManageError(Error.HARD_ERROR, "Error while populating the map, no object of category " +
+                category + " found in the dictionary.");
             return null;
         }
     }
@@ -124,8 +131,9 @@ public class ObjectDisplacer : CoreComponent {
         public List<CustomObject> objs;
 
         public CustomObjectList(CustomObject obj) {
-            objs = new List<CustomObject>();
-            objs.Add(obj);
+            objs = new List<CustomObject> {
+                obj
+            };
         }
 
         public void AddObject(CustomObject obj) {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using MapManipulation;
 
 public abstract class MapGenerator : CoreComponent {
 
@@ -79,7 +80,7 @@ public abstract class MapGenerator : CoreComponent {
             char[,] restrictedMap = map.Clone() as char[,];
 
             if (objectToWallDistance > 0)
-                ErodeMap(restrictedMap);
+                MapEdit.ErodeMap(restrictedMap, wallChar);
 
             // Place the objects.
             foreach (MapObject o in mapObjects) {
@@ -104,11 +105,11 @@ public abstract class MapGenerator : CoreComponent {
         // Restrict again if there are object that need a further restriction.
         if (!o.placeAnywere && objectToWallDistance > 1) {
             for (int i = 1; i < objectToWallDistance; i++) {
-                ErodeMap(supportMap);
+                MapEdit.ErodeMap(supportMap,wallChar);
             }
         }
 
-        List<Coord> roomTiles = GetFreeTiles(supportMap);
+        List<Coord> roomTiles = MapInfo.GetFreeTiles(supportMap, roomChar);
 
         for (int i = 0; i < o.numObjPerMap; i++) {
             if (roomTiles.Count > 0) {
@@ -129,19 +130,19 @@ public abstract class MapGenerator : CoreComponent {
         // Restrict again if there are object that need a further restriction.
         if (!o.placeAnywere && objectToWallDistance > 1) {
             for (int i = 1; i < objectToWallDistance; i++) {
-                ErodeMap(supportMap);
+                MapEdit.ErodeMap(supportMap, wallChar);
             }
         }
 
-        List<Coord> roomTiles = GetFreeTiles(supportMap);
+        List<Coord> roomTiles = MapInfo.GetFreeTiles(supportMap, roomChar);
 
         for (int i = 0; i < o.numObjPerMap; i++) {
             if (roomTiles.Count > 0) {
                 int selected = pseudoRandomGen.Next(0, roomTiles.Count);
                 map[roomTiles[selected].tileX, roomTiles[selected].tileY] = o.objectChar;
                 restrictedMap[roomTiles[selected].tileX, roomTiles[selected].tileY] = wallChar;
-                DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY, objectToObjectDistance, supportMap, wallChar);
-                roomTiles = GetFreeTiles(supportMap);
+                MapEdit.DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY, objectToObjectDistance, supportMap, wallChar);
+                roomTiles = MapInfo.GetFreeTiles(supportMap, roomChar);
             } else {
                 ManageError(Error.SOFT_ERROR, "Error while populating the map, no more free tiles are availabe.");
                 return;
@@ -155,18 +156,18 @@ public abstract class MapGenerator : CoreComponent {
         // Restrict again if there are object that need a further restriction.
         if (!o.placeAnywere && objectToWallDistance > 1) {
             for (int i = 1; i < objectToWallDistance; i++) {
-                ErodeMap(supportMap);
+                MapEdit.ErodeMap(supportMap, wallChar);
             }
         }
 
-        List<Coord> roomTiles = GetFreeTiles(supportMap);
+        List<Coord> roomTiles = MapInfo.GetFreeTiles(supportMap, roomChar);
 
         for (int i = 0; i < o.numObjPerMap; i++) {
             if (roomTiles.Count > 0) {
                 int selected = pseudoRandomGen.Next(0, roomTiles.Count);
                 map[roomTiles[selected].tileX, roomTiles[selected].tileY] = o.objectChar;
-                DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY, (o.placeAnywere) ? 1 : objectToObjectDistance, supportMap, wallChar);
-                roomTiles = GetFreeTiles(supportMap);
+                MapEdit.DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY, (o.placeAnywere) ? 1 : objectToObjectDistance, supportMap, wallChar);
+                roomTiles = MapInfo.GetFreeTiles(supportMap, roomChar);
             } else {
                 ManageError(Error.SOFT_ERROR, "Error while populating the map, no more free tiles are availabe.");
                 return;
@@ -175,20 +176,6 @@ public abstract class MapGenerator : CoreComponent {
     }
 
     /* HELPERS */
-
-    // Flips the map.
-    public void FlipMap(char[,] m) {
-        char[,] clonedMap = CloneMap(m);
-
-        int w = m.GetLength(0);
-        int h = m.GetLength(1);
-
-        for (int x = 0; x < w; x++) {
-            for (int y = 0; y < h; y++) {
-                m[x, y] = clonedMap[h - y - 1, w - x - 1];
-            }
-        }
-    }
 
     // Initializes the pseudo random generator.
     protected void InitializePseudoRandomGenerator() {
@@ -199,103 +186,9 @@ public abstract class MapGenerator : CoreComponent {
         pseudoRandomGen = new System.Random(hash);
     }
 
-    // Gets the number of walls surrounding a cell.
-    protected int GetSurroundingWallCount(int gridX, int gridY, char[,] gridMap) {
-        int wallCount = 0;
-
-        // Loop on 3x3 grid centered on [gridX, gridY].
-        for (int neighbourX = gridX - 1; neighbourX <= gridX + 1; neighbourX++) {
-            for (int neighbourY = gridY - 1; neighbourY <= gridY + 1; neighbourY++) {
-                if (IsInMapRange(neighbourX, neighbourY)) {
-                    if (neighbourX != gridX || neighbourY != gridY)
-                        wallCount += GetMapTileAsNumber(neighbourX, neighbourY, gridMap);
-                } else
-                    wallCount++;
-            }
-        }
-
-        return wallCount;
-    }
-
-    // Erodes the map as many times as specified.
-    protected void ErodeMap(char[,] toBeErodedMap) {
-        char[,] originalMap = CloneMap(toBeErodedMap);
-
-        for (int x = 0; x < originalMap.GetLength(0); x++) {
-            for (int y = 0; y < originalMap.GetLength(1); y++) {
-                if (GetSurroundingWallCount(x, y, originalMap) > 0) {
-                    toBeErodedMap[x, y] = wallChar;
-                }
-            }
-        }
-    }
-
-    // Clones a map.
-    protected char[,] CloneMap(char[,] toBeClonedMap) {
-        char[,] clonedMap = new char[toBeClonedMap.GetLength(0), toBeClonedMap.GetLength(1)];
-
-        for (int x = 0; x < toBeClonedMap.GetLength(0); x++) {
-            for (int y = 0; y < toBeClonedMap.GetLength(1); y++) {
-                clonedMap[x, y] = toBeClonedMap[x, y];
-            }
-        }
-
-        return clonedMap;
-    }
-
-    // Returns a list of the free tiles.
-    protected List<Coord> GetFreeTiles(char[,] m) {
-        List<Coord> roomTiles = new List<Coord>();
-
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                if (m[x, y] == roomChar)
-                    roomTiles.Add(new Coord(x, y));
-            }
-        }
-
-        return roomTiles;
-    }
-
-    // Draws a circe of a given radius around a point.
-    protected void DrawCircle(int centerX, int centerY, int r, char[,] m, char t) {
-        for (int x = -r; x <= r; x++) {
-            for (int y = -r; y <= r; y++) {
-                if (x * x + y * y <= r * r) {
-                    int drawX = centerX + x;
-                    int drawY = centerY + y;
-
-                    if (IsInMapRange(drawX, drawY))
-                        m[drawX, drawY] = t;
-                }
-            }
-        }
-    }
-
-    // Converts coordinates to world position.
-    protected Vector3 CoordToWorldPoint(Coord tile) {
-        return new Vector3(-width / 2 + .5f + tile.tileX, 2, -height / 2 + .5f + tile.tileY);
-    }
-
-    // Tells if the "general" (full/room) type of two tiles is the same.
-    protected bool IsSameGeneralType(char tyleType, char t) {
-        if (tyleType == wallChar)
-            return t == wallChar;
-        else
-            return t != wallChar;
-    }
-
-    // Tells if a tile is in the map.
-    protected bool IsInMapRange(int x, int y) {
-        return x >= 0 && x < width && y >= 0 && y < height;
-    }
-
-    // Return 1 if the tile is a wall, 0 otherwise.
-    protected int GetMapTileAsNumber(int x, int y, char[,] gridMap) {
-        if (gridMap[x, y] == wallChar)
-            return 1;
-        else
-            return 0;
+    // Gets the current date as string.
+    public static string GetDateString() {
+        return System.DateTime.Now.ToString();
     }
 
     // Saves the map in a text file.
@@ -314,50 +207,9 @@ public abstract class MapGenerator : CoreComponent {
                         textMap = textMap + "\n";
                 }
 
-                System.IO.File.WriteAllText(@textFilePath + "/" + seed.ToString() + "_map.txt", textMap);
+                System.IO.File.WriteAllText(@textFilePath + "/" + seed.ToString() + "_txt.txt", textMap);
             } catch (Exception) {
                 ManageError(Error.SOFT_ERROR, "Error while saving the map, please insert a valid path and check its permissions.");
-            }
-        }
-    }
-
-    // Gets the current date as string.
-    protected string GetDateString() {
-        return System.DateTime.Now.ToString();
-    }
-
-    // Returns the maximum map size.
-    protected int GetMapSize() {
-        if (width > height)
-            return width;
-        else
-            return height;
-    }
-
-    // Adds borders to the map.
-    protected void AddBorders() {
-        char[,] borderedMap = new char[width + borderSize * 2, height + borderSize * 2];
-
-        for (int x = 0; x < borderedMap.GetLength(0); x++) {
-            for (int y = 0; y < borderedMap.GetLength(1); y++) {
-                if (x >= borderSize && x < width + borderSize && y >= borderSize && y < height + borderSize)
-                    borderedMap[x, y] = map[x - borderSize, y - borderSize];
-                else
-                    borderedMap[x, y] = wallChar;
-            }
-        }
-
-        map = borderedMap;
-
-        width = borderedMap.GetLength(0);
-        height = borderedMap.GetLength(1);
-    }
-
-    // Fills the map with wall cells.
-    protected void FillMap() {
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                map[x, y] = wallChar;
             }
         }
     }
@@ -418,17 +270,6 @@ public abstract class MapGenerator : CoreComponent {
         Rain,
         RainDistanced,
         RainShared
-    }
-
-    // Coordinates of a tile.
-    protected struct Coord {
-        public int tileX;
-        public int tileY;
-
-        public Coord(int x, int y) {
-            tileX = x;
-            tileY = y;
-        }
     }
 
     // Informations about an object. 

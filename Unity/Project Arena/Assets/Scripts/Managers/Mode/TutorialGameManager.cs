@@ -1,6 +1,10 @@
 ﻿using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// TutorialGameManager is an implementation of GameManager. The tutorial game mode consists in 
+/// finding and destroying a single target.
+/// </summary>
 public class TutorialGameManager : GameManager {
 
     [Header("Contenders")] [SerializeField] private GameObject player;
@@ -19,16 +23,14 @@ public class TutorialGameManager : GameManager {
             UnityEditor.SceneView.FocusWindowIfItsOpen(typeof(UnityEditor.SceneView));
         #endif */
 
-        mapManagerScript = mapManager.GetComponent<MapManager>();
-        spawnPointManagerScript = spawnPointManager.GetComponent<SpawnPointManager>();
-
         playerScript = player.GetComponent<Player>();
 
         tutorialGameUIManagerScript.Fade(0.7f, 1f, true, 0.5f);
     }
 
     void Update() {
-        if (!IsReady() && mapManagerScript.IsReady() && spawnPointManagerScript.IsReady() && tutorialGameUIManagerScript.IsReady()) {
+        if (!IsReady() && mapManagerScript.IsReady() && spawnPointManagerScript.IsReady()
+            && tutorialGameUIManagerScript.IsReady()) {
             // Generate the map.
             mapManagerScript.ManageMap(true);
 
@@ -62,8 +64,9 @@ public class TutorialGameManager : GameManager {
                 break;
             case 1:
                 // Pause or unpause if needed.
-                if (Input.GetKeyDown(KeyCode.Escape))
+                if (Input.GetKeyDown(KeyCode.Escape)) {
                     Pause();
+                }
                 break;
             case 2:
                 // Do nothing.
@@ -75,12 +78,14 @@ public class TutorialGameManager : GameManager {
         int passedTime = (int)(Time.time - startTime);
 
         if (gamePhase == -1) {
-            // Disable the player movement and interactions, activate the ready UI and set the phase.
+            // Disable the player movement and interactions, activate the ready UI and set the 
+            // phase.
             playerScript.SetInGame(false);
             tutorialGameUIManagerScript.ActivateReadyUI();
             gamePhase = 0;
         } else if (gamePhase == 0 && passedTime >= readyDuration) {
-            // Enable the player movement and interactions, activate the fight UI and spawn the target.
+            // Enable the player movement and interactions, activate the fight UI and spawn the 
+            // target.
             tutorialGameUIManagerScript.Fade(0.7f, 0f, false, 0.25f);
             spawnPointManagerScript.UpdateLastUsed();
             StartCoroutine(SpawnTarget());
@@ -88,7 +93,8 @@ public class TutorialGameManager : GameManager {
             tutorialGameUIManagerScript.ActivateFightUI();
             gamePhase = 1;
         } else if (gamePhase == 1 && tutorialCompleted) {
-            // Disable the player movement and interactions, activate the score UI, set the winner and set the phase.
+            // Disable the player movement and interactions, activate the score UI, set the winner 
+            // and set the phase.
             playerScript.SetInGame(false);
             tutorialGameUIManagerScript.Fade(0.7f, 0, true, 0.5f);
             tutorialGameUIManagerScript.ActivateScoreUI();

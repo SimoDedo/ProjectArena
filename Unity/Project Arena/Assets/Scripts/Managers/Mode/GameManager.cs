@@ -1,23 +1,21 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// The game manager manages the game, it passes itself to the player.
-
+/// <summary>
+/// GameManager is an abstract class used to define and manage a game mode. It implements an 
+/// ILoggable interface that allows to log the game.
+/// </summary>
 public abstract class GameManager : CoreComponent, ILoggable {
 
-    [Header("Managers")] [SerializeField] protected GameObject mapManager;
-    [SerializeField] protected GameObject spawnPointManager;
+    [Header("Managers")] [SerializeField] protected MapManager mapManagerScript;
+    [SerializeField] protected SpawnPointManager spawnPointManagerScript;
 
     [Header("Game")] [SerializeField] protected bool generateOnly;
     [SerializeField] protected int gameDuration = 600;
     [SerializeField] protected int readyDuration = 3;
     [SerializeField] protected int scoreDuration = 10;
     [SerializeField] protected float respawnDuration = 3;
-
-    protected MapManager mapManagerScript;
-    protected SpawnPointManager spawnPointManagerScript;
 
     // Time at which the game started.
     protected float startTime;
@@ -52,8 +50,9 @@ public abstract class GameManager : CoreComponent, ILoggable {
     public abstract void Pause();
 
     public IEnumerator FreezeTime(float wait, bool mustPause) {
-        if (mustPause)
+        if (mustPause) {
             yield return new WaitForSeconds(wait);
+        }
         Time.timeScale = isPaused ? 0f : 1f;
     }
 
@@ -66,8 +65,10 @@ public abstract class GameManager : CoreComponent, ILoggable {
     // Loads the next scene
     private void LoadNextScene(string def) {
         if (GameObject.Find("Experiment Manager") && GameObject.Find("Parameter Manager")) {
-            ParameterManager pm = GameObject.Find("Parameter Manager").GetComponent<ParameterManager>();
-            ExperimentManager em = GameObject.Find("Experiment Manager").GetComponent<ExperimentManager>();
+            ParameterManager pm = GameObject.Find("Parameter Manager")
+                .GetComponent<ParameterManager>();
+            ExperimentManager em = GameObject.Find("Experiment Manager")
+                .GetComponent<ExperimentManager>();
             SceneManager.LoadScene(em.GetNextScene(pm));
         } else {
             SceneManager.LoadScene(def);

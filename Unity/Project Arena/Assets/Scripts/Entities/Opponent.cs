@@ -1,4 +1,7 @@
-﻿public class Opponent : Entity {
+﻿/// <summary>
+/// Opponent is a simple implementation of Entity with no extra logic.
+/// </summary>
+public class Opponent : Entity {
 
     // Sets up all the player parameter and does the same with all its guns.
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id) {
@@ -12,7 +15,7 @@
         for (int i = 0; i < ag.GetLength(0); i++) {
             // Setup the gun.
             guns[i].GetComponent<Gun>().SetupGun(gms, this);
-            // Activate it if is one among the active ones which has the lowest rank.
+            // Activate if it is one among the active ones which has the lowest rank.
             if (i == GetActiveGun(-1, true)) {
                 currentGun = i;
                 guns[i].SetActive(true);
