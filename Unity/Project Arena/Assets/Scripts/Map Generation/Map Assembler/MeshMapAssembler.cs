@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// MeshMapAssembler is an implementation of MapAssebler that assembles the maps using meshes.
+/// </summary>
 public class MeshMapAssembler : MapAssebler {
 
     [SerializeField] private Material topMaterial;
@@ -17,7 +20,8 @@ public class MeshMapAssembler : MapAssebler {
     private List<Vector3> vertices;
     private List<int> triangles;
 
-    // A dictionary contains key-value pairs. We use the vertex index as a key and as value the list off all triangles that own that vertex.
+    // A dictionary contains key-value pairs. We use the vertex index as a key and as value the list 
+    // off all triangles that own that vertex.
     private Dictionary<int, List<Triangle>> triangleDictionary = new Dictionary<int, List<Triangle>>();
     // We can have multiple outlines, each one is a list of vertices.
     List<List<int>> outlines = new List<List<int>>();
@@ -62,9 +66,10 @@ public class MeshMapAssembler : MapAssebler {
 
         SetReady(true);
     }
-    
+
     // Generates the Mesh.
-    public override void AssembleMap(char[,] map, char wallChar, char roomChar, float squareSize, float h) {
+    public override void AssembleMap(char[,] map, char wallChar, char roomChar, float squareSize,
+        float h) {
         wallHeigth = h;
 
         outlines.Clear();
@@ -89,15 +94,16 @@ public class MeshMapAssembler : MapAssebler {
         CreateFloorMesh(map.GetLength(0), map.GetLength(1), squareSize, h);
     }
 
-    public override void AssembleMap(List<char[,]> maps, char wallChar, char roomChar, char voidChar, float squareSize, float h) { }
+    public override void AssembleMap(List<char[,]> maps, char wallChar, char roomChar,
+        char voidChar, float squareSize, float h) { }
 
     // Creates the top mesh.
     private void CreateTopMesh() {
 
-        Mesh topMesh = new Mesh();
-
-        topMesh.vertices = vertices.ToArray();
-        topMesh.triangles = triangles.ToArray();
+        Mesh topMesh = new Mesh {
+            vertices = vertices.ToArray(),
+            triangles = triangles.ToArray()
+        };
         topMesh.RecalculateNormals();
 
         topMeshFilter.mesh = topMesh;
@@ -185,40 +191,52 @@ public class MeshMapAssembler : MapAssebler {
                 break;
             // 2 points cases.
             case 3:
-                MeshFromPoints(square.centreRight, square.bottomRight, square.bottomLeft, square.centreLeft);
+                MeshFromPoints(square.centreRight, square.bottomRight, square.bottomLeft,
+                    square.centreLeft);
                 break;
             case 6:
-                MeshFromPoints(square.centreTop, square.topRight, square.bottomRight, square.centreBottom);
+                MeshFromPoints(square.centreTop, square.topRight, square.bottomRight,
+                    square.centreBottom);
                 break;
             case 9:
-                MeshFromPoints(square.topLeft, square.centreTop, square.centreBottom, square.bottomLeft);
+                MeshFromPoints(square.topLeft, square.centreTop, square.centreBottom,
+                    square.bottomLeft);
                 break;
             case 12:
-                MeshFromPoints(square.topLeft, square.topRight, square.centreRight, square.centreLeft);
+                MeshFromPoints(square.topLeft, square.topRight, square.centreRight,
+                    square.centreLeft);
                 break;
             case 5:
-                MeshFromPoints(square.centreTop, square.topRight, square.centreRight, square.centreBottom, square.bottomLeft, square.centreLeft);
+                MeshFromPoints(square.centreTop, square.topRight, square.centreRight,
+                    square.centreBottom, square.bottomLeft, square.centreLeft);
                 break;
             case 10:
-                MeshFromPoints(square.topLeft, square.centreTop, square.centreRight, square.bottomRight, square.centreBottom, square.centreLeft);
+                MeshFromPoints(square.topLeft, square.centreTop, square.centreRight,
+                    square.bottomRight, square.centreBottom, square.centreLeft);
                 break;
             // 3 points cases.
             case 7:
-                MeshFromPoints(square.centreTop, square.topRight, square.bottomRight, square.bottomLeft, square.centreLeft);
+                MeshFromPoints(square.centreTop, square.topRight, square.bottomRight,
+                    square.bottomLeft, square.centreLeft);
                 break;
             case 11:
-                MeshFromPoints(square.topLeft, square.centreTop, square.centreRight, square.bottomRight, square.bottomLeft);
+                MeshFromPoints(square.topLeft, square.centreTop, square.centreRight,
+                    square.bottomRight, square.bottomLeft);
                 break;
             case 13:
-                MeshFromPoints(square.topLeft, square.topRight, square.centreRight, square.centreBottom, square.bottomLeft);
+                MeshFromPoints(square.topLeft, square.topRight, square.centreRight,
+                    square.centreBottom, square.bottomLeft);
                 break;
             case 14:
-                MeshFromPoints(square.topLeft, square.topRight, square.bottomRight, square.centreBottom, square.centreLeft);
+                MeshFromPoints(square.topLeft, square.topRight, square.bottomRight,
+                    square.centreBottom, square.centreLeft);
                 break;
             // 4 point case.
             case 15:
-                MeshFromPoints(square.topLeft, square.topRight, square.bottomRight, square.bottomLeft);
-                // All sorrounding Nodes are walls, so none of this vertices can belong to an outline.
+                MeshFromPoints(square.topLeft, square.topRight, square.bottomRight,
+                    square.bottomLeft);
+                // All sorrounding Nodes are walls, so none of this vertices can belong to an 
+                // outline.
                 checkedVertices.Add(square.topLeft.vertexIndex);
                 checkedVertices.Add(square.bottomLeft.vertexIndex);
                 checkedVertices.Add(square.bottomRight.vertexIndex);
@@ -231,20 +249,25 @@ public class MeshMapAssembler : MapAssebler {
     private void MeshFromPoints(params Node[] points) {
         AssignVertices(points);
 
-        if (points.Length >= 3)
+        if (points.Length >= 3) {
             CreateTriangle(points[0], points[1], points[2]);
-        if (points.Length >= 4)
+        }
+        if (points.Length >= 4) {
             CreateTriangle(points[0], points[2], points[3]);
-        if (points.Length >= 5)
+        }
+        if (points.Length >= 5) {
             CreateTriangle(points[0], points[3], points[4]);
-        if (points.Length >= 6)
+        }
+        if (points.Length >= 6) {
             CreateTriangle(points[0], points[4], points[5]);
+        }
     }
 
     // I add the Nodes to the vertices list after assigning them an incremental ID.
     private void AssignVertices(Node[] points) {
         for (int i = 0; i < points.Length; i++) {
-            // vertexIndex default value is -1, if the value is still the same the vertix has not been assigned.
+            // vertexIndex default value is -1, if the value is still the same the vertix has not
+            // been assigned.
             if (points[i].vertexIndex == -1) {
                 points[i].vertexIndex = vertices.Count;
                 vertices.Add(points[i].position);
@@ -264,7 +287,8 @@ public class MeshMapAssembler : MapAssebler {
         AddTriangleToDictionary(triangle.vertexIndexC, triangle);
     }
 
-    // Goes trough every single vertex in the map, it checks if it is an outline and if it is it follows it until it meets up with itself. Then it adds it to the outline list.
+    // Goes trough every single vertex in the map, it checks if it is an outline and if it follows
+    // it until it meets up with itself. Then it adds it to the outline list.
     private void CalculateMeshOutilnes() {
         for (int vertexIndex = 0; vertexIndex < vertices.Count; vertexIndex++) {
             if (!checkedVertices.Contains(vertexIndex)) {
@@ -294,7 +318,8 @@ public class MeshMapAssembler : MapAssebler {
         }
     }
 
-    // Returns a connected vertex, if any, which forms an outline edge with the one passed as parameter.
+    // Returns a connected vertex, if any, which forms an outline edge with the one passed as 
+    // parameter.
     private int GetConnectedOutlineVertex(int vertexIndex) {
         // List of all the triangles containing the vertex index.
         List<Triangle> trianglesContainingVertex = triangleDictionary[vertexIndex];
@@ -316,7 +341,8 @@ public class MeshMapAssembler : MapAssebler {
         return -1;
     }
 
-    // Given two vertex indeces tells if they define an edge, this happens if the share only a trianle.
+    // Given two vertex indeces tells if they define an edge, this happens if the share only a 
+    // triangle.
     private bool IsOutlineEdge(int vertexA, int vertexB) {
         List<Triangle> trianglesContainingVertexA = triangleDictionary[vertexA];
         int sharedTriangleCount = 0;
@@ -325,8 +351,9 @@ public class MeshMapAssembler : MapAssebler {
             if (trianglesContainingVertexA[i].Contains(vertexB)) {
                 sharedTriangleCount++;
 
-                if (sharedTriangleCount > 1)
+                if (sharedTriangleCount > 1) {
                     break;
+                }
             }
         }
 
@@ -370,7 +397,8 @@ public class MeshMapAssembler : MapAssebler {
         }
 
         public bool Contains(int vertexIndex) {
-            return vertexIndex == vertexIndexA || vertexIndex == vertexIndexB || vertexIndex == vertexIndexC;
+            return vertexIndex == vertexIndexA || vertexIndex == vertexIndexB ||
+                vertexIndex == vertexIndexC;
         }
     }
 
@@ -389,7 +417,8 @@ public class MeshMapAssembler : MapAssebler {
 
             for (int x = 0; x < nodeCountX; x++) {
                 for (int y = 0; y < nodeCountY; y++) {
-                    Vector3 pos = new Vector3(-mapWidth / 2 + x * squareSize + squareSize / 2, 0, -mapHeigth / 2 + y * squareSize + squareSize / 2);
+                    Vector3 pos = new Vector3(-mapWidth / 2 + x * squareSize + squareSize / 2, 0,
+                        -mapHeigth / 2 + y * squareSize + squareSize / 2);
                     controlNodes[x, y] = new ControlNode(pos, map[x, y] == charWall, squareSize);
                 }
             }
@@ -399,17 +428,16 @@ public class MeshMapAssembler : MapAssebler {
 
             for (int x = 0; x < nodeCountX - 1; x++) {
                 for (int y = 0; y < nodeCountY - 1; y++) {
-                    squares[x, y] = new Square(controlNodes[x, y + 1], controlNodes[x + 1, y + 1], controlNodes[x + 1, y], controlNodes[x, y]);
+                    squares[x, y] = new Square(controlNodes[x, y + 1], controlNodes[x + 1, y + 1],
+                        controlNodes[x + 1, y], controlNodes[x, y]);
                 }
             }
         }
     }
 
-    // a   1   b	a, b, c, d are Control Nodes, each
-    // 2       3	of them owns two Nodes (1, 2, 3, 4).
-    // c   4   d	e.g.: c owns 2 and 4. 
-
-    // A square contains 4 Control Nodes, 4 Nodes and a configuration, which depends on which Control Nodes are active.
+    // a   1   b    a, b, c, d are Control Nodes, each of them owns two Nodes (1, 2, 3, 4). 
+    // 2       3    e.g.: c owns 2 and 4. A square contains 4 Control Nodes, 4 Nodes and a 
+    // c   4   d    configuration,which depends on which Control Nodes are active.
     public class Square {
         public ControlNode topLeft, topRight, bottomRight, bottomLeft;
         public Node centreTop, centreRight, centreBottom, centreLeft;
@@ -426,14 +454,18 @@ public class MeshMapAssembler : MapAssebler {
             centreBottom = bottomLeft.right;
             centreLeft = bottomLeft.above;
 
-            if (topLeft.active)
+            if (topLeft.active) {
                 configuration += 8;
-            if (topRight.active)
+            }
+            if (topRight.active) {
                 configuration += 4;
-            if (bottomRight.active)
+            }
+            if (bottomRight.active) {
                 configuration += 2;
-            if (bottomLeft.active)
+            }
+            if (bottomLeft.active) {
                 configuration += 1;
+            }
         }
     }
 
@@ -461,32 +493,40 @@ public class MeshMapAssembler : MapAssebler {
     }
 
     // Draws the map.
-    /*
-	void OnDrawGizmos() {
+    /* void NotOnDrawGizmos() {
         if (squareGrid != null) {
             for (int x = 0; x < squareGrid.squares.GetLength(0); x ++) {
                 for (int y = 0; y < squareGrid.squares.GetLength(1); y ++) {
-                    Gizmos.color = (squareGrid.squares[x, y].topLeft.active) ? Color.black : Color.white;
+                    Gizmos.color = (squareGrid.squares[x, y].topLeft.active) ? Color.black : 
+                        Color.white;
                     Gizmos.DrawCube(squareGrid.squares[x, y].topLeft.position, Vector3.one * .4f);
 
-                    Gizmos.color = (squareGrid.squares[x, y].topRight.active) ? Color.black : Color.white;
+                    Gizmos.color = (squareGrid.squares[x, y].topRight.active) ? Color.black : 
+                        Color.white;
                     Gizmos.DrawCube(squareGrid.squares[x, y].topRight.position, Vector3.one * .4f);
 
-                    Gizmos.color = (squareGrid.squares[x, y].bottomRight.active) ? Color.black : Color.white;
-                    Gizmos.DrawCube(squareGrid.squares[x, y].bottomRight.position, Vector3.one * .4f);
+                    Gizmos.color = (squareGrid.squares[x, y].bottomRight.active) ? Color.black : 
+                        Color.white;
+                    Gizmos.DrawCube(squareGrid.squares[x, y].bottomRight.position, 
+                        Vector3.one * .4f);
 
-                    Gizmos.color = (squareGrid.squares[x, y].bottomLeft.active) ? Color.black : Color.white;
-                    Gizmos.DrawCube(squareGrid.squares[x, y].bottomLeft.position, Vector3.one * .4f);
+                    Gizmos.color = (squareGrid.squares[x, y].bottomLeft.active) ? Color.black : 
+                        Color.white;
+                    Gizmos.DrawCube(squareGrid.squares[x, y].bottomLeft.position, 
+                        Vector3.one * .4f);
 
                     Gizmos.color = Color.grey;
-                    Gizmos.DrawCube(squareGrid.squares[x, y].centreTop.position, Vector3.one * .15f);
-                    Gizmos.DrawCube(squareGrid.squares[x, y].centreRight.position, Vector3.one * .15f);
-                    Gizmos.DrawCube(squareGrid.squares[x, y].centreBottom.position, Vector3.one * .15f);
-                    Gizmos.DrawCube(squareGrid.squares[x, y].centreLeft.position, Vector3.one * .15f);
+                    Gizmos.DrawCube(squareGrid.squares[x, y].centreTop.position, 
+                        Vector3.one * .15f);
+                    Gizmos.DrawCube(squareGrid.squares[x, y].centreRight.position, 
+                        Vector3.one * .15f);
+                    Gizmos.DrawCube(squareGrid.squares[x, y].centreBottom.position, 
+                        Vector3.one * .15f);
+                    Gizmos.DrawCube(squareGrid.squares[x, y].centreLeft.position, 
+                        Vector3.one * .15f);
 				}
             }
         }
-    }
-	*/
+    } */
 
 }

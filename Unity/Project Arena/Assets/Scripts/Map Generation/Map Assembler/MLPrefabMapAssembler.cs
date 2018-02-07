@@ -1,7 +1,11 @@
-﻿using System;
+﻿using MapManipulation;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// SLPrefabMapAssembler is an implementation of PrefabMapAssembler for multi-level maps.
+/// </summary>
 public class MLPrefabMapAssembler : PrefabMapAssembler {
 
     [Header("ML parameters")] [SerializeField] private GameObject floorPrefab;
@@ -22,7 +26,8 @@ public class MLPrefabMapAssembler : PrefabMapAssembler {
         SetReady(true);
     }
 
-    public override void AssembleMap(List<char[,]> ms, char wChar, char rChar, char vChar, float squareSize, float h) {
+    public override void AssembleMap(List<char[,]> ms, char wChar, char rChar, char vChar,
+        float squareSize, float h) {
         wallChar = wChar;
         roomChar = rChar;
         voidChar = vChar;
@@ -70,31 +75,42 @@ public class MLPrefabMapAssembler : PrefabMapAssembler {
     private void InitializeComulativeMask() {
         comulativeMask = new char[width, height];
 
-        for (int x = 0; x < width; x++)
-            for (int y = 0; y < height; y++)
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
                 comulativeMask[x, y] = wallChar;
+            }
+        }
     }
 
     private void UpdateComulativeMask(int currentLevel) {
-        for (int x = 0; x < width; x++)
-            for (int y = 0; y < height; y++)
-                if (maps[currentLevel][x, y] != wallChar)
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (maps[currentLevel][x, y] != wallChar) {
                     comulativeMask[x, y] = roomChar;
+                }
+            }
+        }
     }
 
-    public override void AssembleMap(char[,] m, char wChar, char rChar, float squareSize, float prefabHeight) { }
+    public override void AssembleMap(char[,] m, char wChar, char rChar, float squareSize,
+        float prefabHeight) { }
 
     // Adds a wall recursevely.
-    private void AddWallRecursevely(int currentLevel, int x, int y, float squareSize, String currentMask) {
+    private void AddWallRecursevely(int currentLevel, int x, int y, float squareSize,
+        String currentMask) {
         currentMask = GetMaskConjunction(currentMask, GetNeighbourhoodMask(currentLevel, x, y));
         if (currentMask != roomMask) {
             ProcessedTilePrefab currentPrefab = GetPrefabFromMask(currentMask);
-            AddPrefab(currentPrefab.prefab, x, y, squareSize, currentPrefab.rotation, levelHeight * currentLevel);
-            if (currentLevel < maps.Count - 1 && maps[currentLevel + 1][x, y] != roomChar)
+            AddPrefab(currentPrefab.prefab, x, y, squareSize, currentPrefab.rotation,
+                levelHeight * currentLevel);
+            if (currentLevel < maps.Count - 1 && maps[currentLevel + 1][x, y] != roomChar) {
                 AddWallRecursevely(currentLevel + 1, x, y, squareSize, currentMask);
-            else if (currentLevel == maps.Count - 1 && additionalWallLevels > 0)
-                for (int i = 1; i <= additionalWallLevels; i++)
-                    AddPrefab(currentPrefab.prefab, x, y, squareSize, currentPrefab.rotation, levelHeight * (currentLevel + i));
+            } else if (currentLevel == maps.Count - 1 && additionalWallLevels > 0) {
+                for (int i = 1; i <= additionalWallLevels; i++) {
+                    AddPrefab(currentPrefab.prefab, x, y, squareSize, currentPrefab.rotation,
+                        levelHeight * (currentLevel + i));
+                }
+            }
         }
     }
 
@@ -130,26 +146,32 @@ public class MLPrefabMapAssembler : PrefabMapAssembler {
 
     // Returns the char of a tile.
     private char GetTileChar(int level, int x, int y) {
-        if (IsInMapRange(x, y))
+        if (MapInfo.IsInMapRange(x, y, width, height)) {
             return maps[level][x, y] == wallChar ? wallChar : roomChar;
-        else
+        } else {
             return wallChar;
+        }
     }
 
     // Tells if a mask is contained in another one.
     private bool IsMaskContained(string containerMask, string containedMask) {
-        for (int i = 0; i < containerMask.Length; i++)
-            if (containerMask[i] == wallChar)
-                if (containedMask[i] == roomChar)
+        for (int i = 0; i < containerMask.Length; i++) {
+            if (containerMask[i] == wallChar) {
+                if (containedMask[i] == roomChar) {
                     return false;
+                }
+            }
+        }
         return true;
     }
 
     // Returns a prefab given a mask.
     private ProcessedTilePrefab GetPrefabFromMask(String mask) {
-        foreach (ProcessedTilePrefab p in processedTilePrefabs)
-            if (p.mask == mask)
+        foreach (ProcessedTilePrefab p in processedTilePrefabs) {
+            if (p.mask == mask) {
                 return p;
+            }
+        }
         return null;
     }
 

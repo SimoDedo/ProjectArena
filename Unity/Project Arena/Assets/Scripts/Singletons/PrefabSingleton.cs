@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Prefab singleton implementaion.
+/// <summary>
 public class PrefabSingleton<T> : MonoBehaviour where T : PrefabSingleton<T> {
 
     private const string m_AssetPath = "Singletons/";
@@ -11,10 +14,11 @@ public class PrefabSingleton<T> : MonoBehaviour where T : PrefabSingleton<T> {
                 m_Instance = FindObjectOfType<T>();
                 if (m_Instance == null) {
                     var prefab = Resources.Load<T>(m_AssetPath + typeof(T).Name);
-                    if (prefab == null)
+                    if (prefab == null) {
                         Debug.LogError("Singleton prefab missing at " + m_AssetPath + typeof(T).Name + ".");
-                    else
+                    } else {
                         m_Instance = Instantiate(prefab);
+                    }
                 }
                 DontDestroyOnLoad(m_Instance.gameObject);
             }

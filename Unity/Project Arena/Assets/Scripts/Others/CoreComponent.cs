@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// CoreComponent is an abstract class that must be extended by all classes that have to be fully
+/// initialized before the game can start. It also provides methods to menage errors.
+/// </summary>
 public abstract class CoreComponent : MonoBehaviour {
 
     protected enum Error { SOFT_ERROR, HARD_ERROR, RETRY_ERROR };
@@ -25,13 +29,17 @@ public abstract class CoreComponent : MonoBehaviour {
                 Debug.LogError("Unexpected soft error with code " + errorCode + ".");
                 break;
             case Error.HARD_ERROR:
-                if (GameObject.Find("Parameter Manager"))
-                    GameObject.Find("Parameter Manager").GetComponent<ParameterManager>().ErrorBackToMenu(errorCode);
-                else
-                    Debug.LogError("Unexpected hard error with code " + errorCode + ". Can't find the Parameter Manager.");
+                if (GameObject.Find("Parameter Manager")) {
+                    GameObject.Find("Parameter Manager").GetComponent<ParameterManager>().
+                        ErrorBackToMenu(errorCode);
+                } else {
+                    Debug.LogError("Unexpected hard error with code " + errorCode + ". Can't " +
+                    "find the Parameter Manager.");
+                }
                 break;
             case Error.RETRY_ERROR:
-                Debug.LogError("Unexpected error with code " + errorCode + ". The scene will be reloaded.");
+                Debug.LogError("Unexpected error with code " + errorCode + ". The scene will be" +
+                    " reloaded.");
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 break;
         }
@@ -44,13 +52,17 @@ public abstract class CoreComponent : MonoBehaviour {
                 Debug.LogError("Unexpected soft error. " + errorMessage);
                 break;
             case Error.HARD_ERROR:
-                if (GameObject.Find("Parameter Manager"))
-                    GameObject.Find("Parameter Manager").GetComponent<ParameterManager>().ErrorBackToMenu(errorMessage);
-                else
-                    Debug.LogError("Unexpected hard error. " + errorMessage + " Can't find the Parameter Manager.");
+                if (GameObject.Find("Parameter Manager")) {
+                    GameObject.Find("Parameter Manager").GetComponent<ParameterManager>().
+                        ErrorBackToMenu(errorMessage);
+                } else {
+                    Debug.LogError("Unexpected hard error. " + errorMessage + " Can't find the " +
+                        "Parameter Manager.");
+                }
                 break;
             case Error.RETRY_ERROR:
-                Debug.LogError("Unexpected  error. " + errorMessage + " The scene will be reloaded.");
+                Debug.LogError("Unexpected  error. " + errorMessage + " The scene will be " +
+                    "reloaded.");
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 break;
         }

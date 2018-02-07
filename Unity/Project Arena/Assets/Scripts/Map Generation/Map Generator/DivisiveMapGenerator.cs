@@ -4,6 +4,10 @@ using System.IO;
 using UnityEngine;
 using MapManipulation;
 
+/// <summary>
+/// DivisiveMapGenerator is an implementation of MapGenerator that generates the map by recursevly
+/// splitting the map. A part of the resulting rooms are kept and connection are added.
+/// </summary>
 public class DivisiveMapGenerator : MapGenerator {
 
     // Probability of a room being divided again.
@@ -54,10 +58,11 @@ public class DivisiveMapGenerator : MapGenerator {
             ABCorridors = new List<ABRoom>();
         }
 
-        if (width > height)
+        if (width > height) {
             DivideRoom(0, 0, width, height, true, 0);
-        else
+        } else {
             DivideRoom(0, 0, width, height, false, 0);
+        }
 
         ProcessRooms();
 
@@ -94,19 +99,26 @@ public class DivisiveMapGenerator : MapGenerator {
     }
 
     // Divides a room in subrooms or stops there.
-    private void DivideRoom(int originX, int originY, int roomWidth, int roomHeigth, bool horizontal, int depth) {
-        if ((pseudoRandomGen.Next(0, 100) < roomDivideProbability && roomWidth > minimumDividableRoomDimension && roomHeigth > minimumDividableRoomDimension) || depth < minimumDepth) {
+    private void DivideRoom(int originX, int originY, int roomWidth, int roomHeigth,
+        bool horizontal, int depth) {
+        if ((pseudoRandomGen.Next(0, 100) < roomDivideProbability &&
+            roomWidth > minimumDividableRoomDimension &&
+            roomHeigth > minimumDividableRoomDimension) || depth < minimumDepth) {
             // Divide the room.
             if (horizontal) {
                 int division = GetDivisionPoint(roomHeigth);
-                // Debug.Log("Dividing vertically in " + division + " a " + roomWidth + "x" + roomHeigth + "room in [" + originX + ", " + originY + "].");
+                // Debug.Log("Dividing vertically in " + division + " a " + roomWidth + "x" + 
+                // roomHeigth + "room in [" + originX + ", " + originY + "].");
                 DivideRoom(originX, originY, roomWidth, division, false, depth + 1);
-                DivideRoom(originX, originY + division + 1, roomWidth, roomHeigth - division - 1, false, depth + 1);
+                DivideRoom(originX, originY + division + 1, roomWidth, roomHeigth - division - 1,
+                    false, depth + 1);
             } else {
                 int division = GetDivisionPoint(roomWidth);
-                // Debug.Log("Dividing horizontally in " + division + " a " + roomWidth + "x" + roomHeigth + "room in [" + originX + ", " + originY + "].");
+                // Debug.Log("Dividing horizontally in " + division + " a " + roomWidth + "x" + 
+                // roomHeigth + "room in [" + originX + ", " + originY + "].");
                 DivideRoom(originX, originY, division, roomHeigth, true, depth + 1);
-                DivideRoom(originX + division + 1, originY, roomWidth - division - 1, roomHeigth, true, depth + 1);
+                DivideRoom(originX + division + 1, originY, roomWidth - division - 1, roomHeigth,
+                    true, depth + 1);
             }
         } else {
             AddRoom(originX, originY, roomWidth, roomHeigth);
@@ -119,8 +131,10 @@ public class DivisiveMapGenerator : MapGenerator {
 
         while (currentFill < minimumFilledTiles && rooms.Count > 0) {
             int current = pseudoRandomGen.Next(0, rooms.Count);
-            // Debug.Log("Selected room " + current + " out of " + rooms.Count + " of size " + rooms[current].roomSize  + ".");
-            PlaceRoom(rooms[current].originX, rooms[current].originY, rooms[current].width, rooms[current].height);
+            // Debug.Log("Selected room " + current + " out of " + rooms.Count + " of size " + 
+            // rooms[current].roomSize  + ".");
+            PlaceRoom(rooms[current].originX, rooms[current].originY, rooms[current].width,
+                rooms[current].height);
             currentFill += rooms[current].roomSize;
             placedRooms.Add(rooms[current]);
             rooms.RemoveAt(current);
@@ -133,7 +147,8 @@ public class DivisiveMapGenerator : MapGenerator {
     }
 
     // Connects each room which the closest one.
-    private void ConnectClosestRooms(List<Room> allRooms, bool forceAccessibilityFromMainRoom = false) {
+    private void ConnectClosestRooms(List<Room> allRooms,
+        bool forceAccessibilityFromMainRoom = false) {
         // Accessible rooms.
         List<Room> roomsA = new List<Room>();
         // Not accessible rooms.
@@ -141,10 +156,11 @@ public class DivisiveMapGenerator : MapGenerator {
 
         if (forceAccessibilityFromMainRoom) {
             foreach (Room room in allRooms) {
-                if (room.isAccessibleFromMainRoom)
+                if (room.isAccessibleFromMainRoom) {
                     roomsB.Add(room);
-                else
+                } else {
                     roomsA.Add(room);
+                }
             }
         } else {
             roomsA = allRooms;
@@ -159,14 +175,17 @@ public class DivisiveMapGenerator : MapGenerator {
         foreach (Room roomA in roomsA) {
             if (!forceAccessibilityFromMainRoom) {
                 possibleConnectionFound = false;
-                if (roomA.connectedRooms.Count > 0)
+                if (roomA.connectedRooms.Count > 0) {
                     continue;
+                }
             }
 
             foreach (Room roomB in roomsB) {
-                int distanceBetweenRooms = (int)(Mathf.Pow(roomA.centerX - roomB.centerX, 2) + Mathf.Pow(roomA.centerY - roomB.centerY, 2));
+                int distanceBetweenRooms = (int)(Mathf.Pow(roomA.centerX - roomB.centerX, 2) +
+                    Mathf.Pow(roomA.centerY - roomB.centerY, 2));
 
-                if (!(roomA == roomB || roomA.IsConnected(roomB)) && (distanceBetweenRooms < bestDistance || !possibleConnectionFound)) {
+                if (!(roomA == roomB || roomA.IsConnected(roomB)) &&
+                    (distanceBetweenRooms < bestDistance || !possibleConnectionFound)) {
                     bestDistance = distanceBetweenRooms;
                     possibleConnectionFound = true;
                     bestRoomA = roomA;
@@ -220,36 +239,66 @@ public class DivisiveMapGenerator : MapGenerator {
 
             // Create the horizontal section.
             if (extremeX > connectionX) {
-                for (int x = connectionX - Mathf.FloorToInt(passageWidth / 2f); x <= extremeX; x++)
-                    for (int y = connectionY - passageWidth / 2; y <= connectionY + passageWidth / 2; y++)
-                        if (MapInfo.IsInMapRange(x, y, width, height))
+                for (int x = connectionX - Mathf.FloorToInt(passageWidth / 2f); x <= extremeX;
+                    x++) {
+                    for (int y = connectionY - passageWidth / 2;
+                        y <= connectionY + passageWidth / 2; y++) {
+                        if (MapInfo.IsInMapRange(x, y, width, height)) {
                             map[x, y] = roomChar;
-                if (createTextFile && (extremeX != connectionX))
-                    ABCorridors.Add(new ABRoom(connectionX - Mathf.FloorToInt(passageWidth / 2f), connectionY - Mathf.FloorToInt(passageWidth / 2f), extremeX - connectionX + passageWidth));
+                        }
+                    }
+                }
+                if (createTextFile && (extremeX != connectionX)) {
+                    ABCorridors.Add(new ABRoom(connectionX - Mathf.FloorToInt(passageWidth / 2f),
+                        connectionY - Mathf.FloorToInt(passageWidth / 2f),
+                        extremeX - connectionX + passageWidth));
+                }
             } else {
-                for (int x = extremeX; x <= connectionX + Mathf.FloorToInt(passageWidth / 2f); x++)
-                    for (int y = connectionY - passageWidth / 2; y <= connectionY + passageWidth / 2; y++)
-                        if (MapInfo.IsInMapRange(x, y, width, height))
+                for (int x = extremeX; x <= connectionX + Mathf.FloorToInt(passageWidth / 2f); x++) {
+                    for (int y = connectionY - passageWidth / 2;
+                        y <= connectionY + passageWidth / 2; y++) {
+                        if (MapInfo.IsInMapRange(x, y, width, height)) {
                             map[x, y] = roomChar;
+                        }
+                    }
+                }
                 if (createTextFile && (extremeX != connectionX))
-                    ABCorridors.Add(new ABRoom(extremeX - Mathf.FloorToInt(passageWidth / 2f), connectionY - Mathf.FloorToInt(passageWidth / 2f), connectionX - extremeX + passageWidth));
+                    ABCorridors.Add(new ABRoom(extremeX - Mathf.FloorToInt(passageWidth / 2f),
+                        connectionY - Mathf.FloorToInt(passageWidth / 2f),
+                        connectionX - extremeX + passageWidth));
             }
 
             // Create the vertical section.
             if (extremeY > connectionY) {
-                for (int y = connectionY - Mathf.FloorToInt(passageWidth / 2f); y <= extremeY; y++)
-                    for (int x = connectionX - passageWidth / 2; x <= connectionX + passageWidth / 2; x++)
-                        if (MapInfo.IsInMapRange(x, y, width, height))
+                for (int y = connectionY - Mathf.FloorToInt(passageWidth / 2f); y <= extremeY;
+                    y++) {
+                    for (int x = connectionX - passageWidth / 2;
+                        x <= connectionX + passageWidth / 2; x++) {
+                        if (MapInfo.IsInMapRange(x, y, width, height)) {
                             map[x, y] = roomChar;
-                if (createTextFile && (extremeY != connectionY))
-                    ABCorridors.Add(new ABRoom(connectionX - Mathf.FloorToInt(passageWidth / 2f), connectionY - Mathf.FloorToInt(passageWidth / 2f), connectionY - extremeY - passageWidth));
+                        }
+                    }
+                }
+                if (createTextFile && (extremeY != connectionY)) {
+                    ABCorridors.Add(new ABRoom(connectionX - Mathf.FloorToInt(passageWidth / 2f),
+                        connectionY - Mathf.FloorToInt(passageWidth / 2f),
+                        connectionY - extremeY - passageWidth));
+                }
             } else {
-                for (int y = extremeY; y <= connectionY + Mathf.FloorToInt(passageWidth / 2f); y++)
-                    for (int x = connectionX - passageWidth / 2; x <= connectionX + passageWidth / 2; x++)
-                        if (MapInfo.IsInMapRange(x, y, width, height))
+                for (int y = extremeY; y <= connectionY + Mathf.FloorToInt(passageWidth / 2f);
+                    y++) {
+                    for (int x = connectionX - passageWidth / 2;
+                        x <= connectionX + passageWidth / 2; x++) {
+                        if (MapInfo.IsInMapRange(x, y, width, height)) {
                             map[x, y] = roomChar;
-                if (createTextFile && (extremeY != connectionY))
-                    ABCorridors.Add(new ABRoom(connectionX - Mathf.FloorToInt(passageWidth / 2f), extremeY - Mathf.FloorToInt(passageWidth / 2f), extremeY - connectionY - passageWidth));
+                        }
+                    }
+                }
+                if (createTextFile && (extremeY != connectionY)) {
+                    ABCorridors.Add(new ABRoom(connectionX - Mathf.FloorToInt(passageWidth / 2f),
+                        extremeY - Mathf.FloorToInt(passageWidth / 2f),
+                        extremeY - connectionY - passageWidth));
+                }
             }
         }
     }
@@ -267,7 +316,9 @@ public class DivisiveMapGenerator : MapGenerator {
     // Adds a room to the list.
     private void AddRoom(int originX, int originY, int roomWidth, int roomHeigth) {
         // If the room makes sense.
-        if (MapInfo.IsInMapRange(originX, originY, width, height) && MapInfo.IsInMapRange(originX + roomWidth, originY + roomHeigth, width, height) && roomWidth > minimumRoomDimension && roomHeigth > minimumRoomDimension) {
+        if (MapInfo.IsInMapRange(originX, originY, width, height) &&
+            MapInfo.IsInMapRange(originX + roomWidth, originY + roomHeigth, width, height) &&
+            roomWidth > minimumRoomDimension && roomHeigth > minimumRoomDimension) {
             // Add it to the room list.
             rooms.Add(new Room(originX, originY, roomWidth, roomHeigth));
         } else {
@@ -289,16 +340,20 @@ public class DivisiveMapGenerator : MapGenerator {
         foreach (Room r in placedRooms) {
             if (r.width > r.height) {
                 int count = r.width / r.height;
-                for (int i = 0; i < count; i++)
+                for (int i = 0; i < count; i++) {
                     ABRooms.Add(new ABRoom(r.originX + i * r.height, r.originY, r.height));
-                if (r.width % r.height != 0)
+                }
+                if (r.width % r.height != 0) {
                     ABRooms.Add(new ABRoom(r.originX + r.width - r.height, r.originY, r.height));
+                }
             } else {
                 int count = r.height / r.width;
-                for (int i = 0; i < count; i++)
+                for (int i = 0; i < count; i++) {
                     ABRooms.Add(new ABRoom(r.originX, r.originY + i * r.width, r.width));
-                if (r.height % r.width != 0)
+                }
+                if (r.height % r.width != 0) {
                     ABRooms.Add(new ABRoom(r.originX, r.originY + r.height - r.width, r.width));
+                }
             }
         }
     }
@@ -318,7 +373,8 @@ public class DivisiveMapGenerator : MapGenerator {
     // Saves the map using AB notation.
     private void SaveMapAsAB() {
         if (textFilePath == null && !Directory.Exists(textFilePath)) {
-            ManageError(Error.SOFT_ERROR, "Error while retrieving the folder, please insert a valid path.");
+            ManageError(Error.SOFT_ERROR, "Error while retrieving the folder, please insert a " +
+                "valid path.");
         } else {
             try {
                 string genome = "";
@@ -333,9 +389,11 @@ public class DivisiveMapGenerator : MapGenerator {
                         genome += "<" + r.originX + ',' + r.originY + ',' + r.dimension + ">";
                     }
                 }
-                System.IO.File.WriteAllText(@textFilePath + "/" + seed.ToString() + ".ab.txt", genome);
+                System.IO.File.WriteAllText(@textFilePath + "/" + seed.ToString() + ".ab.txt",
+                    genome);
             } catch (Exception) {
-                ManageError(Error.SOFT_ERROR, "Error while saving the map, please insert a valid path and check its permissions.");
+                ManageError(Error.SOFT_ERROR, "Error while saving the map, please insert a valid " +
+                    "path and check its permissions.");
             }
         }
     }

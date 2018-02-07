@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Scene singleton implementaion.
+/// <summary>
 public class SceneSingleton<T> : MonoBehaviour where T : SceneSingleton<T> {
 
     private static T m_Instance = null;
@@ -9,8 +12,9 @@ public class SceneSingleton<T> : MonoBehaviour where T : SceneSingleton<T> {
             if (m_Instance == null) {
                 m_Instance = FindObjectOfType<T>();
 
-                if (m_Instance == null)
+                if (m_Instance == null) {
                     m_Instance = new GameObject(typeof(T).Name).AddComponent<T>();
+                }
 
                 DontDestroyOnLoad(m_Instance.gameObject);
             }

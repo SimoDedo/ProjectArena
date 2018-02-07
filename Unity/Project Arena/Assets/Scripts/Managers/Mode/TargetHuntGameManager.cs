@@ -13,7 +13,7 @@ public class TargetHuntGameManager : GameManager {
     [SerializeField] private bool[] activeGunsPlayer;
     [SerializeField] private GameObject[] targetList;
 
-    [Header("Target hunt variables")] [SerializeField] protected TargetHuntGameUIManager targetHuntGameUIManagerScript;
+    [Header("Target Hunt variables")] [SerializeField] protected TargetHuntGameUIManager targetHuntGameUIManagerScript;
 
     private Player playerScript;
     private int playerScore = 0;

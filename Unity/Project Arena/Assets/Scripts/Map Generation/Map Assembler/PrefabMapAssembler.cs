@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// PrefabMapAssembler is an implementation of MapAssebler that assembles the maps using differet 
+/// prefabs.
+/// </summary>
 public abstract class PrefabMapAssembler : MapAssebler {
 
     // Ceil height.
@@ -25,11 +29,13 @@ public abstract class PrefabMapAssembler : MapAssebler {
     protected int height;
 
     // Adds a prefab to the map.
-    protected void AddPrefab(GameObject gameObject, int x, int y, float squareSize, float rotation, float prefabHeight) {
+    protected void AddPrefab(GameObject gameObject, int x, int y, float squareSize, float rotation,
+        float prefabHeight) {
         GameObject childObject = (GameObject)Instantiate(gameObject);
         childObject.name = gameObject.name;
         childObject.transform.parent = transform;
-        childObject.transform.position = new Vector3(squareSize * (x - width / 2), prefabHeight, squareSize * (y - height / 2));
+        childObject.transform.position = new Vector3(squareSize * (x - width / 2), prefabHeight,
+            squareSize * (y - height / 2));
         childObject.transform.eulerAngles = new Vector3(0, rotation, 0);
     }
 
@@ -40,12 +46,14 @@ public abstract class PrefabMapAssembler : MapAssebler {
         // For each tile create three rotated copies.
         foreach (TilePrefab t in tilePrefabs) {
             string convertedMask = ConvertMask(t.binaryMask);
-            processedTilePrefabs.Add(new ProcessedTilePrefab(convertedMask, t.prefab, rotationCorrection));
+            processedTilePrefabs.Add(new ProcessedTilePrefab(convertedMask, t.prefab,
+                rotationCorrection));
             // Debug.Log("Added mask " + convertedMask + ".");
             if (t.binaryMask != "0000" && t.binaryMask != "1111") {
                 for (int i = 1; i < 4; i++) {
                     convertedMask = CircularShiftMask(convertedMask);
-                    processedTilePrefabs.Add(new ProcessedTilePrefab(convertedMask, t.prefab, 90 * i + rotationCorrection));
+                    processedTilePrefabs.Add(new ProcessedTilePrefab(convertedMask, t.prefab,
+                        90 * i + rotationCorrection));
                     // Debug.Log("Added mask " + convertedMask + ".");
                 }
             }
@@ -65,11 +73,6 @@ public abstract class PrefabMapAssembler : MapAssebler {
         return new string(shiftedMask);
     }
 
-    // Tells if a tile is in the map.
-    protected bool IsInMapRange(int x, int y) {
-        return x >= 0 && x < width && y >= 0 && y < height;
-    }
-
     // Creates a flat mesh.
     protected Mesh CreateFlatMesh(int sizeX, int sizeY, float squareSize, float height, bool inverted) {
         Mesh flatMesh = new Mesh();
@@ -83,10 +86,11 @@ public abstract class PrefabMapAssembler : MapAssebler {
 
         int[] floorTriangles;
 
-        if (inverted)
+        if (inverted) {
             floorTriangles = new int[] { 3, 1, 2, 2, 1, 0 };
-        else
+        } else {
             floorTriangles = new int[] { 0, 1, 2, 2, 1, 3 };
+        }
 
         flatMesh.vertices = floorVertices;
         flatMesh.triangles = floorTriangles;

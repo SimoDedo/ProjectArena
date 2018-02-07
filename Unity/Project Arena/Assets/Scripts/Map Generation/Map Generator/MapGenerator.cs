@@ -4,6 +4,10 @@ using System.IO;
 using UnityEngine;
 using MapManipulation;
 
+/// <summary>
+/// MapGenerator is an abstract class used to implement any kind of map generator. A map consist in
+/// a matrix of chars.
+/// </summary>
 public abstract class MapGenerator : CoreComponent {
 
     // Do I have to generate my seed?
@@ -74,13 +78,14 @@ public abstract class MapGenerator : CoreComponent {
 
     /* OBJECT GENERATION */
 
-    // Erodes the map once, scans the custom objects and adds them to the map using the rigth method.
+    // Erodes the map once, scans custom objects and adds them to the map using the rigth method.
     protected void PopulateMap() {
         if (mapObjects.Length > 0) {
             char[,] restrictedMap = map.Clone() as char[,];
 
-            if (objectToWallDistance > 0)
+            if (objectToWallDistance > 0) {
                 MapEdit.ErodeMap(restrictedMap, wallChar);
+            }
 
             // Place the objects.
             foreach (MapObject o in mapObjects) {
@@ -105,7 +110,7 @@ public abstract class MapGenerator : CoreComponent {
         // Restrict again if there are object that need a further restriction.
         if (!o.placeAnywere && objectToWallDistance > 1) {
             for (int i = 1; i < objectToWallDistance; i++) {
-                MapEdit.ErodeMap(supportMap,wallChar);
+                MapEdit.ErodeMap(supportMap, wallChar);
             }
         }
 
@@ -118,7 +123,8 @@ public abstract class MapGenerator : CoreComponent {
                 restrictedMap[roomTiles[selected].tileX, roomTiles[selected].tileY] = wallChar;
                 roomTiles.RemoveAt(selected);
             } else {
-                ManageError(Error.SOFT_ERROR, "Error while populating the map, no more free tiles are availabe.");
+                ManageError(Error.SOFT_ERROR, "Error while populating the map, no more free " +
+                    "tiles are availabe.");
                 return;
             }
         }
@@ -141,10 +147,12 @@ public abstract class MapGenerator : CoreComponent {
                 int selected = pseudoRandomGen.Next(0, roomTiles.Count);
                 map[roomTiles[selected].tileX, roomTiles[selected].tileY] = o.objectChar;
                 restrictedMap[roomTiles[selected].tileX, roomTiles[selected].tileY] = wallChar;
-                MapEdit.DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY, objectToObjectDistance, supportMap, wallChar);
+                MapEdit.DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY,
+                    objectToObjectDistance, supportMap, wallChar);
                 roomTiles = MapInfo.GetFreeTiles(supportMap, roomChar);
             } else {
-                ManageError(Error.SOFT_ERROR, "Error while populating the map, no more free tiles are availabe.");
+                ManageError(Error.SOFT_ERROR, "Error while populating the map, no more free " +
+                    "tiles are availabe.");
                 return;
             }
         }
@@ -166,10 +174,12 @@ public abstract class MapGenerator : CoreComponent {
             if (roomTiles.Count > 0) {
                 int selected = pseudoRandomGen.Next(0, roomTiles.Count);
                 map[roomTiles[selected].tileX, roomTiles[selected].tileY] = o.objectChar;
-                MapEdit.DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY, (o.placeAnywere) ? 1 : objectToObjectDistance, supportMap, wallChar);
+                MapEdit.DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY,
+                    (o.placeAnywere) ? 1 : objectToObjectDistance, supportMap, wallChar);
                 roomTiles = MapInfo.GetFreeTiles(supportMap, roomChar);
             } else {
-                ManageError(Error.SOFT_ERROR, "Error while populating the map, no more free tiles are availabe.");
+                ManageError(Error.SOFT_ERROR, "Error while populating the map, no more free " +
+                    "tiles are availabe.");
                 return;
             }
         }
@@ -179,8 +189,9 @@ public abstract class MapGenerator : CoreComponent {
 
     // Initializes the pseudo random generator.
     protected void InitializePseudoRandomGenerator() {
-        if (useRandomSeed)
+        if (useRandomSeed) {
             seed = GetDateString();
+        }
 
         hash = seed.GetHashCode();
         pseudoRandomGen = new System.Random(hash);
@@ -194,7 +205,8 @@ public abstract class MapGenerator : CoreComponent {
     // Saves the map in a text file.
     protected void SaveMapAsText() {
         if (textFilePath == null && !Directory.Exists(textFilePath)) {
-            ManageError(Error.SOFT_ERROR, "Error while retrieving the folder, please insert a valid path.");
+            ManageError(Error.SOFT_ERROR, "Error while retrieving the folder, please insert a " +
+                "valid path.");
         } else {
             try {
                 string textMap = "";
@@ -203,13 +215,16 @@ public abstract class MapGenerator : CoreComponent {
                     for (int y = 0; y < height; y++) {
                         textMap = textMap + map[x, y];
                     }
-                    if (x < width - 1)
+                    if (x < width - 1) {
                         textMap = textMap + "\n";
+                    }
                 }
 
-                System.IO.File.WriteAllText(@textFilePath + "/" + seed.ToString() + "_txt.txt", textMap);
+                System.IO.File.WriteAllText(@textFilePath + "/" + seed.ToString() + "_txt.txt",
+                    textMap);
             } catch (Exception) {
-                ManageError(Error.SOFT_ERROR, "Error while saving the map, please insert a valid path and check its permissions.");
+                ManageError(Error.SOFT_ERROR, "Error while saving the map, please insert a valid " +
+                    "path and check its permissions.");
             }
         }
     }

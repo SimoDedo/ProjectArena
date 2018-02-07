@@ -1,7 +1,12 @@
-﻿using System;
+﻿using MapManipulation;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// CellularMapGenerator is an implementation of MapGenerator that generates the map by using a
+/// cellular automata.
+/// </summary>
 public class ABMapGenerator : MapGenerator {
 
     [SerializeField] private int passageWidth = 3;
@@ -33,7 +38,7 @@ public class ABMapGenerator : MapGenerator {
         ProcessMap();
 
         // Add borders to the map.
-        AddBorders();
+        MapEdit.AddBorders(map, borderSize, wallChar);
 
         if (createTextFile) {
             seed = seed.GetHashCode().ToString();
@@ -143,21 +148,27 @@ public class ABMapGenerator : MapGenerator {
     // Updates the map size.
     private void UpdateMapSize(int originX, int originY, int dimension, bool isArena) {
         if (isArena) {
-            if (originX + dimension > width)
+            if (originX + dimension > width) {
                 width = originX + dimension;
-            if (originY + dimension > height)
+            }
+            if (originY + dimension > height) {
                 height = originY + dimension;
+            }
         } else {
             if (dimension > 0) {
-                if (originX + dimension > width)
+                if (originX + dimension > width) {
                     width = originX + dimension;
-                if (originY + passageWidth > height)
+                }
+                if (originY + passageWidth > height) {
                     height = originY + passageWidth;
+                }
             } else {
-                if (originX + passageWidth > width)
+                if (originX + passageWidth > width) {
                     width = originX + passageWidth;
-                if (originY + dimension > height)
+                }
+                if (originY + dimension > height) {
                     height = originY + dimension;
+                }
             }
         }
     }
@@ -166,28 +177,39 @@ public class ABMapGenerator : MapGenerator {
     private void InitializeMap() {
         map = new char[width, height];
 
-        for (int x = 0; x < width; x++)
-            for (int y = 0; y < height; y++)
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
                 map[x, y] = wallChar;
+            }
+        }
 
         foreach (Room a in arenas) {
-            for (int x = a.originX; x < a.originX + a.dimension; x++)
-                for (int y = a.originY; y < a.originY + a.dimension; y++)
-                    if (IsInMapRange(x, y))
+            for (int x = a.originX; x < a.originX + a.dimension; x++) {
+                for (int y = a.originY; y < a.originY + a.dimension; y++) {
+                    if (MapInfo.IsInMapRange(x, y, width, height)) {
                         map[x, y] = roomChar;
+                    }
+                }
+            }
         }
 
         foreach (Room c in corridors) {
             if (c.dimension > 0) {
-                for (int x = c.originX; x < c.originX + c.dimension; x++)
-                    for (int y = c.originY; y < c.originY + passageWidth; y++)
-                        if (IsInMapRange(x, y))
+                for (int x = c.originX; x < c.originX + c.dimension; x++) {
+                    for (int y = c.originY; y < c.originY + passageWidth; y++) {
+                        if (MapInfo.IsInMapRange(x, y, width, height)) {
                             map[x, y] = roomChar;
+                        }
+                    }
+                }
             } else {
-                for (int x = c.originX; x < c.originX + passageWidth; x++)
-                    for (int y = c.originY; y < c.originY - c.dimension; y++)
-                        if (IsInMapRange(x, y))
+                for (int x = c.originX; x < c.originX + passageWidth; x++) {
+                    for (int y = c.originY; y < c.originY - c.dimension; y++) {
+                        if (MapInfo.IsInMapRange(x, y, width, height)) {
                             map[x, y] = roomChar;
+                        }
+                    }
+                }
             }
         }
     }
@@ -198,23 +220,29 @@ public class ABMapGenerator : MapGenerator {
         bool[,] reachabilityMask = ComputeReachabilityMask();
 
         // Remove rooms not connected to the main one.
-        for (int x = 0; x < width; x++)
-            for (int y = 0; y < height; y++)
-                if (!reachabilityMask[x, y])
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (!reachabilityMask[x, y]) {
                     map[x, y] = wallChar;
+                }
+            }
+        }
 
         // Add objects;
         PopulateMap();
     }
 
-    // Computes a mask of the tiles reachable by the main arena and scales the number of objects to be displaced..
+    // Computes a mask of the tiles reachable by the main arena and scales the number of objects to 
+    // be displaced..
     private bool[,] ComputeReachabilityMask() {
         bool[,] reachabilityMask = new bool[width, height];
         int floorCount = 0;
 
-        for (int x = 0; x < width; x++)
-            for (int y = 0; y < height; y++)
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
                 reachabilityMask[x, y] = false;
+            }
+        }
 
         Queue<Coord> queue = new Queue<Coord>();
         queue.Enqueue(new Coord(mainRoom.originX, mainRoom.originY));
@@ -224,7 +252,8 @@ public class ABMapGenerator : MapGenerator {
 
             for (int x = tile.tileX - 1; x <= tile.tileX + 1; x++) {
                 for (int y = tile.tileY - 1; y <= tile.tileY + 1; y++) {
-                    if (IsInMapRange(x, y) && (y == tile.tileY || x == tile.tileX)) {
+                    if (MapInfo.IsInMapRange(x, y, width, height) && (y == tile.tileY ||
+                        x == tile.tileX)) {
                         if (reachabilityMask[x, y] == false && map[x, y] == roomChar) {
                             reachabilityMask[x, y] = true;
                             queue.Enqueue(new Coord(x, y));
@@ -240,12 +269,15 @@ public class ABMapGenerator : MapGenerator {
         return reachabilityMask;
     }
 
-    // Scales the number of instance of each object depending on the size of the map w.r.t. the original one.
+    // Scales the number of instance of each object depending on the size of the map w.r.t. the 
+    // original one.
     private void ScaleObjectsPopulation(int floorCount) {
         float scaleFactor = floorCount / (originalHeight * originalWidth / 3f);
 
-        for (int i = 0; i < mapObjects.Length; i++)
-            mapObjects[i].numObjPerMap = (int)Math.Ceiling(scaleFactor * mapObjects[i].numObjPerMap);
+        for (int i = 0; i < mapObjects.Length; i++) {
+            mapObjects[i].numObjPerMap = (int)Math.Ceiling(scaleFactor *
+                mapObjects[i].numObjPerMap);
+        }
     }
 
     // Stores all information about a room.

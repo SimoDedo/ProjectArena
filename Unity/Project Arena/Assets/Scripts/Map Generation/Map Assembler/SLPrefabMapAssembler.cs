@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using MapManipulation;
+using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// SLPrefabMapAssembler is an implementation of PrefabMapAssembler for single-level maps.
+/// </summary>
 public class SLPrefabMapAssembler : PrefabMapAssembler {
 
     // Map.
@@ -8,7 +12,6 @@ public class SLPrefabMapAssembler : PrefabMapAssembler {
 
     private MeshCollider floorCollider;
     private MeshCollider ceilCollider;
-
 
     void Start() {
         GameObject childObject;
@@ -26,7 +29,8 @@ public class SLPrefabMapAssembler : PrefabMapAssembler {
         SetReady(true);
     }
 
-    public override void AssembleMap(char[,] m, char wChar, char rChar, float squareSize, float prefabHeight) {
+    public override void AssembleMap(char[,] m, char wChar, char rChar, float squareSize,
+        float prefabHeight) {
         wallChar = wChar;
         roomChar = rChar;
         width = m.GetLength(0);
@@ -51,11 +55,14 @@ public class SLPrefabMapAssembler : PrefabMapAssembler {
         }
 
         // Generate floor and ceil colliders.
-        floorCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, prefabHeight + floorHeight, false);
-        ceilCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, prefabHeight + ceilHeight, true);
+        floorCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, prefabHeight +
+            floorHeight, false);
+        ceilCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, prefabHeight +
+            ceilHeight, true);
     }
 
-    public override void AssembleMap(List<char[,]> maps, char wallChar, char roomChar, char voidChar, float squareSize, float h) { }
+    public override void AssembleMap(List<char[,]> maps, char wallChar, char roomChar,
+        char voidChar, float squareSize, float h) { }
 
     // Gets the neighbours of a cell as a mask.
     protected string GetNeighbourhoodMask(int gridX, int gridY) {
@@ -69,10 +76,11 @@ public class SLPrefabMapAssembler : PrefabMapAssembler {
 
     // Returns the char of a tile.
     protected char GetTileChar(int x, int y) {
-        if (IsInMapRange(x, y))
+        if (MapInfo.IsInMapRange(x, y, width, height)) {
             return map[x, y] == wallChar ? wallChar : roomChar;
-        else
+        } else {
             return wallChar;
+        }
     }
 
 }

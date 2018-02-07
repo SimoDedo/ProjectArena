@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// LigthSetter sets the main ligth of the current scene depending on the build.
+/// </summary>
 [RequireComponent(typeof(Light))]
 public class LigthSetter : MonoBehaviour {
 

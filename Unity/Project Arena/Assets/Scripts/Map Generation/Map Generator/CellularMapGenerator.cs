@@ -3,6 +3,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// CellularMapGenerator is an implementation of MapGenerator that generates the map by using a
+/// cellular automata.
+/// </summary>
 public class CellularMapGenerator : MapGenerator {
 
     // How much the map will be randomly filled at the beginning.
@@ -82,7 +86,8 @@ public class CellularMapGenerator : MapGenerator {
     }
 
     // Connects each room which the closest one.
-    private void ConnectClosestRooms(List<Room> allRooms, bool forceAccessibilityFromMainRoom = false) {
+    private void ConnectClosestRooms(List<Room> allRooms,
+        bool forceAccessibilityFromMainRoom = false) {
         // Accessible rooms.
         List<Room> roomListA = new List<Room>();
         // Not accessible rooms.
@@ -90,10 +95,11 @@ public class CellularMapGenerator : MapGenerator {
 
         if (forceAccessibilityFromMainRoom) {
             foreach (Room room in allRooms) {
-                if (room.isAccessibleFromMainRoom)
+                if (room.isAccessibleFromMainRoom) {
                     roomListB.Add(room);
-                else
+                } else {
                     roomListA.Add(room);
+                }
             }
         } else {
             roomListA = allRooms;
@@ -110,19 +116,22 @@ public class CellularMapGenerator : MapGenerator {
         foreach (Room roomA in roomListA) {
             if (!forceAccessibilityFromMainRoom) {
                 possibleConnectionFound = false;
-                if (roomA.connectedRooms.Count > 0)
+                if (roomA.connectedRooms.Count > 0) {
                     continue;
+                }
             }
 
             foreach (Room roomB in roomListB) {
-                if (roomA == roomB || roomA.IsConnected(roomB))
+                if (roomA == roomB || roomA.IsConnected(roomB)) {
                     continue;
+                }
 
                 for (int tileIndexA = 0; tileIndexA < roomA.edgeTiles.Count; tileIndexA++) {
                     for (int tileIndexB = 0; tileIndexB < roomB.edgeTiles.Count; tileIndexB++) {
                         Coord tileA = roomA.edgeTiles[tileIndexA];
                         Coord tileB = roomB.edgeTiles[tileIndexB];
-                        int distanceBetweenRooms = (int)(Mathf.Pow(tileA.tileX - tileB.tileX, 2) + Mathf.Pow(tileA.tileY - tileB.tileY, 2));
+                        int distanceBetweenRooms = (int)(Mathf.Pow(tileA.tileX - tileB.tileX, 2) +
+                            Mathf.Pow(tileA.tileY - tileB.tileY, 2));
 
                         if (distanceBetweenRooms < bestDistance || !possibleConnectionFound) {
                             bestDistance = distanceBetweenRooms;
@@ -156,8 +165,9 @@ public class CellularMapGenerator : MapGenerator {
 
         List<Coord> line = GetLine(tileA, tileB);
 
-        foreach (Coord c in line)
-            DrawCircle(c.tileX, c.tileY, passageWidth, map, roomChar);
+        foreach (Coord c in line) {
+            MapEdit.DrawCircle(c.tileX, c.tileY, passageWidth, map, roomChar);
+        }
     }
 
     // Returns a list of coordinates for each point in the line.
@@ -217,7 +227,8 @@ public class CellularMapGenerator : MapGenerator {
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                if (mapFlags[x, y] == 0 && IsSameGeneralType(tileType, map[x, y])) {
+                if (mapFlags[x, y] == 0 && MapInfo.IsSameGeneralType(tileType, map[x, y],
+                    wallChar)) {
                     List<Coord> newRegion = GetRegionTiles(x, y);
                     regions.Add(newRegion);
 
@@ -231,7 +242,8 @@ public class CellularMapGenerator : MapGenerator {
         return regions;
     }
 
-    // Return the tiles of the region the parameter coordinates belong too using the flood-fill algorithm.
+    // Return the tiles of the region the parameter coordinates belong too using the flood-fill 
+    // algorithm.
     private List<Coord> GetRegionTiles(int startX, int startY) {
         List<Coord> tiles = new List<Coord>();
         int[,] mapFlags = new int[width, height];
@@ -247,7 +259,8 @@ public class CellularMapGenerator : MapGenerator {
 
             for (int x = tile.tileX - 1; x <= tile.tileX + 1; x++) {
                 for (int y = tile.tileY - 1; y <= tile.tileY + 1; y++) {
-                    if (IsInMapRange(x, y) && (y == tile.tileY || x == tile.tileX)) {
+                    if (MapInfo.IsInMapRange(x, y, width, height) && (y == tile.tileY ||
+                        x == tile.tileX)) {
                         if (mapFlags[x, y] == 0 && map[x, y] == tileType) {
                             mapFlags[x, y] = 1;
                             queue.Enqueue(new Coord(x, y));
@@ -265,10 +278,12 @@ public class CellularMapGenerator : MapGenerator {
         // Loop on each tile and assign a value;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                if (x == 0 || x == width - 1 || y == 0 || y == height - 1)
+                if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
                     map[x, y] = wallChar;
-                else
-                    map[x, y] = (pseudoRandomGen.Next(0, 100) < ramdomFillPercent) ? wallChar : roomChar;
+                } else {
+                    map[x, y] = (pseudoRandomGen.Next(0, 100) < ramdomFillPercent) ? wallChar :
+                        roomChar;
+                }
             }
         }
     }
@@ -277,16 +292,13 @@ public class CellularMapGenerator : MapGenerator {
     private void SmoothMap() {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                /* char[] neighbours = GetNeighbours(x, y);
-                int neighbourWallTiles = GetNeighboursWallCount(neighbours); */
-                int neighbourWallTiles = GetSurroundingWallCount(x, y, map);
+                int neighbourWallTiles = MapInfo.GetSurroundingWallCount(x, y, map, wallChar);
 
-                if (neighbourWallTiles > neighbourTileLimitHigh)
+                if (neighbourWallTiles > neighbourTileLimitHigh) {
                     map[x, y] = wallChar;
-                else if (neighbourWallTiles < neighbourTileLimitLow)
+                } else if (neighbourWallTiles < neighbourTileLimitLow) {
                     map[x, y] = roomChar;
-                /* else if (useCustomRules)
-                [x, y] = ApplyMasks(x, y, neighbours); */
+                }
             }
         }
     }
@@ -309,13 +321,15 @@ public class CellularMapGenerator : MapGenerator {
             connectedRooms = new List<Room>();
             edgeTiles = new List<Coord>();
 
-            // For each tile of the room I get the neighbours that are walls obtaining the edge of the room.
+            // For each tile of the room I get the neighbours that are walls obtaining the edge of 
+            // the room.
             foreach (Coord tile in tiles) {
                 for (int x = tile.tileX - 1; x <= tile.tileX + 1; x++) {
                     for (int y = tile.tileY - 1; y <= tile.tileY + 1; y++) {
                         if (x == tile.tileX || y == tile.tileY) {
-                            if (map[x, y] == wallChar)
+                            if (map[x, y] == wallChar) {
                                 edgeTiles.Add(tile);
+                            }
                         }
                     }
                 }
@@ -350,5 +364,5 @@ public class CellularMapGenerator : MapGenerator {
             return otherRoom.roomSize.CompareTo(roomSize);
         }
     }
-    
+
 }

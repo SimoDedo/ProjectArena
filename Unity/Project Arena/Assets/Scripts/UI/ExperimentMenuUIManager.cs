@@ -22,7 +22,7 @@ public class ExperimentMenuUIManager : MonoBehaviour {
         else
             parameterManagerScript = InstantiateManager(parameterManagerPrefab, parameterManagerPrefab.name).GetComponent<ParameterManager>();
 
-        backgroundScript.SetRotation(parameterManagerScript.GetBackgroundRotation());
+        backgroundScript.SetRotation(parameterManagerScript.BackgroundRotation);
 
         if (GameObject.Find("Experiment Manager"))
             experimentManagerScript = GameObject.Find("Experiment Manager").GetComponent<ExperimentManager>();
@@ -50,7 +50,7 @@ public class ExperimentMenuUIManager : MonoBehaviour {
     // Goes back to the main menu.
     public void Back() {
         if (parameterManagerScript != null)
-            parameterManagerScript.SetBackgroundRotation(backgroundScript.GetRotation());
+            parameterManagerScript.BackgroundRotation = backgroundScript.GetRotation();
 
         Destroy(experimentManagerScript.gameObject);
         SceneManager.LoadScene("Menu");

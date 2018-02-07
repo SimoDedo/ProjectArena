@@ -1,7 +1,12 @@
-﻿using System;
+﻿using MapManipulation;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// DiggerMapGenerator is an implementation of MapGenerator that generates the map by using a random
+/// digger.
+/// </summary>
 public class DiggerMapGenerator : MapGenerator {
 
     [Header("Divisive generation")] [SerializeField, Range(0, 100)] private int forwardProbability;
@@ -35,13 +40,13 @@ public class DiggerMapGenerator : MapGenerator {
 
         InitializePseudoRandomGenerator();
 
-        FillMap();
+        MapEdit.FillMap(map, wallChar);
 
         DigMap();
 
         PopulateMap();
 
-        AddBorders();
+        MapEdit.AddBorders(map, borderSize, wallChar);
 
         if (createTextFile && !useABGeneration)
             SaveMapAsText();
@@ -49,8 +54,9 @@ public class DiggerMapGenerator : MapGenerator {
         return map;
     }
 
-    // Digs the map. The direction of the digger is coded as: 1 for up, 2 for rigth, 3 for down and 4 for left.
-    // Turning left means decreasing the direction by 1 in a circular fashion and vice versa for turning rigth.
+    // Digs the map. The direction of the digger is coded as: 1 for up, 2 for rigth, 3 for down and 
+    // 4 for left. Turning left means decreasing the direction by 1 in a circular fashion and vice 
+    // versa for turning rigth.
     private void DigMap() {
         currentX = width / 2;
         currentY = height / 2;
@@ -76,7 +82,8 @@ public class DiggerMapGenerator : MapGenerator {
             } else if (nextAction < visitedProbability) {
                 MoveDiggerRandomly();
             } else {
-                map[currentX, currentY] = CircularIncrease(direction, 1, 4, GetRandomBoolean()).ToString()[0];
+                map[currentX, currentY] = CircularIncrease(direction, 1, 4,
+                    GetRandomBoolean()).ToString()[0];
             }
         }
     }
@@ -85,28 +92,28 @@ public class DiggerMapGenerator : MapGenerator {
     private void MoveDiggerForward() {
         switch (direction) {
             case 1:
-                if (IsInMapRange(currentX, currentY - 1)) {
+                if (MapInfo.IsInMapRange(currentX, currentY - 1, width, height)) {
                     currentY -= 1;
                     map[currentX, currentY] = roomChar;
                 } else
                     MoveDiggerRandomly();
                 break;
             case 2:
-                if (IsInMapRange(currentX + 1, currentY)) {
+                if (MapInfo.IsInMapRange(currentX + 1, currentY, width, height)) {
                     currentX += 1;
                     map[currentX, currentY] = roomChar;
                 } else
                     MoveDiggerRandomly();
                 break;
             case 3:
-                if (IsInMapRange(currentX, currentY + 1)) {
+                if (MapInfo.IsInMapRange(currentX, currentY + 1, width, height)) {
                     currentY += 1;
                     map[currentX, currentY] = roomChar;
                 } else
                     MoveDiggerRandomly();
                 break;
             case 4:
-                if (IsInMapRange(currentX - 1, currentY)) {
+                if (MapInfo.IsInMapRange(currentX - 1, currentY, width, height)) {
                     currentX -= 1;
                     map[currentX, currentY] = roomChar;
                 } else
@@ -127,10 +134,11 @@ public class DiggerMapGenerator : MapGenerator {
 
     // Makes a circular sum.
     private int CircularIncrease(int value, int min, int max, bool increase) {
-        if (increase)
+        if (increase) {
             return (value == max) ? min : value + 1;
-        else
+        } else {
             return (value == min) ? max : value - 1;
+        }
     }
 
     // Validates the probabilities and corrects them if needed.
@@ -157,10 +165,11 @@ public class DiggerMapGenerator : MapGenerator {
 
     // Scales a probability.
     private int ScaleProbability(int p, int s) {
-        if (s + p > 100)
+        if (s + p > 100) {
             return 100;
-        else
+        } else {
             return s + p;
+        }
     }
 
     // Decodes the genome setting the probabilities.

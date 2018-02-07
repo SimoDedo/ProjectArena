@@ -19,7 +19,7 @@ public class SurveyUIManager : MonoBehaviour {
     private void Start() {
         parameterManagerScript = GameObject.Find("Parameter Manager").GetComponent<ParameterManager>();
         experimentManagerScript = GameObject.Find("Experiment Manager").GetComponent<ExperimentManager>();
-        backgroundScript.SetRotation(parameterManagerScript.GetBackgroundRotation());
+        backgroundScript.SetRotation(parameterManagerScript.BackgroundRotation);
     }
 
     public void Submit() {
@@ -68,7 +68,7 @@ public class SurveyUIManager : MonoBehaviour {
 
     // Returns to the experiment menu.
     private void Quit() {
-        parameterManagerScript.SetBackgroundRotation(backgroundScript.GetRotation());
+        parameterManagerScript.BackgroundRotation = backgroundScript.GetRotation();
         SceneManager.LoadScene(experimentManagerScript.GetNextScene(parameterManagerScript));
     }
 
