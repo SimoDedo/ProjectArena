@@ -13,7 +13,6 @@ public class SurveyUIManager : MonoBehaviour {
 
     [Header("Other")] [SerializeField] private RotateTranslateByAxis backgroundScript;
 
-    private ParameterManager parameterManagerScript;
     private ExperimentManager experimentManagerScript;
 
     private int currentQuestion = 0;
@@ -21,11 +20,9 @@ public class SurveyUIManager : MonoBehaviour {
     private string answers = "";
 
     private void Start() {
-        parameterManagerScript = GameObject.Find("Parameter Manager").
-            GetComponent<ParameterManager>();
         experimentManagerScript = GameObject.Find("Experiment Manager").
             GetComponent<ExperimentManager>();
-        backgroundScript.SetRotation(parameterManagerScript.BackgroundRotation);
+        backgroundScript.SetRotation(ParameterManager.Instance.BackgroundRotation);
     }
 
     public void Submit() {
@@ -77,8 +74,8 @@ public class SurveyUIManager : MonoBehaviour {
 
     // Returns to the experiment menu.
     private void Quit() {
-        parameterManagerScript.BackgroundRotation = backgroundScript.GetRotation();
-        SceneManager.LoadScene(experimentManagerScript.GetNextScene(parameterManagerScript));
+        ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
+        SceneManager.LoadScene(experimentManagerScript.GetNextScene());
     }
 
 }

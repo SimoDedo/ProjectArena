@@ -22,7 +22,7 @@ public class ABMLMapManager : MLMapManager {
             // Generate the map.
             for (int i = 0; i < genomes.Count; i++) {
                 mapGeneratorScript.ResetMapSize();
-                if (GetParameterManager() != null) {
+                if (ParameterManager.HasInstance()) {
                     if (genomes[i].useDefaultGenerator) {
                         maps.Add(mapGeneratorScript.GenerateMap(genomes[i].genome, false, null));
                         usesDiggerGeneratorList.Add(false);

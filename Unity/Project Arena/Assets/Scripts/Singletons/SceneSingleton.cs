@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Scene singleton implementaion.
+/// Scene singleton implementaion. A scene singleton is a singleton that generates a gameobject
+/// when istanced.
 /// <summary>
 public class SceneSingleton<T> : MonoBehaviour where T : SceneSingleton<T> {
 
@@ -20,6 +21,10 @@ public class SceneSingleton<T> : MonoBehaviour where T : SceneSingleton<T> {
             }
             return m_Instance;
         }
+    }
+
+    public static bool HasInstance() {
+        return m_Instance != null;
     }
 
 }

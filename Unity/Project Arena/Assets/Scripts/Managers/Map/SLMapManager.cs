@@ -19,7 +19,7 @@ public class SLMapManager : MapManager {
             }
         } else {
             // Generate the map.
-            if (GetParameterManager() != null) {
+            if (ParameterManager.HasInstance()) {
                 map = mapGeneratorScript.GenerateMap(seed, export, exportPath);
             } else {
                 map = mapGeneratorScript.GenerateMap();
@@ -41,14 +41,14 @@ public class SLMapManager : MapManager {
     protected override void LoadMapFromText() {
         if (seed == null) {
             if (textFilePath == null) {
-                GetParameterManager().ErrorBackToMenu(-1);
+                ParameterManager.Instance.ErrorBackToMenu(-1);
             } else if (!File.Exists(textFilePath)) {
-                GetParameterManager().ErrorBackToMenu(-1);
+                ParameterManager.Instance.ErrorBackToMenu(-1);
             } else {
                 try {
                     ConvertToMatrix(File.ReadAllLines(@textFilePath));
                 } catch (Exception) {
-                    GetParameterManager().ErrorBackToMenu(-1);
+                    ParameterManager.Instance.ErrorBackToMenu(-1);
                 }
             }
         } else {

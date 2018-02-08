@@ -60,8 +60,7 @@ public class MainMenuUIManager : MonoBehaviour {
 
     [Header("Loading fields")] [SerializeField] private Text loadingText;
 
-    [Header("Other")] [SerializeField] private GameObject parameterManagerPrefab;
-    [SerializeField] private RotateTranslateByAxis backgroundScript;
+    [Header("Other")] [SerializeField] private RotateTranslateByAxis backgroundScript;
     [SerializeField] private bool forceInput;
 
     private GameObject openedSection;
@@ -79,26 +78,22 @@ public class MainMenuUIManager : MonoBehaviour {
     private String importPath;
     private String exportPath;
 
-    private ParameterManager parameterManagerScript;
-
     public void Start() {
         Cursor.lockState = CursorLockMode.None;
 
-        if (!GameObject.Find("Parameter Manager")) {
-            InstantiateParameterManager();
-            parameterManagerScript.BackgroundRotation = backgroundScript.GetRotation();
+        if (ParameterManager.HasInstance()) {
+            backgroundScript.SetRotation(ParameterManager.Instance.BackgroundRotation);
         } else {
-            parameterManagerScript = GameObject.Find("Parameter Manager").
-                GetComponent<ParameterManager>();
-            backgroundScript.SetRotation(parameterManagerScript.BackgroundRotation);
+            ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
         }
 
         openedSection = main;
 
-        if (parameterManagerScript.ErrorCode != 0) {
+        if (ParameterManager.Instance.ErrorCode != 0) {
             OpenSection(error);
-            SetErrorMessage(parameterManagerScript.ErrorCode, parameterManagerScript.ErrorMessage);
-            parameterManagerScript.ErrorCode = 0;
+            SetErrorMessage(ParameterManager.Instance.ErrorCode,
+                ParameterManager.Instance.ErrorMessage);
+            ParameterManager.Instance.ErrorCode = 0;
         }
 
         exportSP.isOn = false;
@@ -158,10 +153,10 @@ public class MainMenuUIManager : MonoBehaviour {
             mapDNA = importPath + "/" + mapDNA;
         }
 
-        parameterManagerScript.GenerationMode = currentGeneration;
-        parameterManagerScript.MapDNA = mapDNA;
-        parameterManagerScript.Export = exportData && allowIO;
-        parameterManagerScript.ExportPath = exportPath;
+        ParameterManager.Instance.GenerationMode = currentGeneration;
+        ParameterManager.Instance.MapDNA = mapDNA;
+        ParameterManager.Instance.Export = exportData && allowIO;
+        ParameterManager.Instance.ExportPath = exportPath;
 
         Loading();
     }
@@ -173,8 +168,8 @@ public class MainMenuUIManager : MonoBehaviour {
         if (currentGeneration == 2) {
             loadingText.text = "Validating the map";
             int errorCode = currentIsMultilevel ?
-                MapValidate.ValidateMLMap(parameterManagerScript.MapDNA) :
-                MapValidate.ValidateMap(parameterManagerScript.MapDNA);
+                MapValidate.ValidateMLMap(ParameterManager.Instance.MapDNA) :
+                MapValidate.ValidateMap(ParameterManager.Instance.MapDNA);
             if (errorCode == 0) {
                 Load(currentScene);
             } else {
@@ -184,8 +179,8 @@ public class MainMenuUIManager : MonoBehaviour {
         } else if (currentGeneration == 3) {
             loadingText.text = "Validating the map";
             int errorCode = currentIsMultilevel ?
-                MapValidate.ValidateGeneticMLMap(parameterManagerScript.MapDNA) :
-                MapValidate.ValidateGeneticMap(parameterManagerScript.MapDNA);
+                MapValidate.ValidateGeneticMLMap(ParameterManager.Instance.MapDNA) :
+                MapValidate.ValidateGeneticMap(ParameterManager.Instance.MapDNA);
             if (errorCode == 0) {
                 Load(currentScene);
             } else {
@@ -199,7 +194,7 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Loads a scene.
     private void Load(string scene) {
-        parameterManagerScript.BackgroundRotation = backgroundScript.GetRotation();
+        ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
         SceneManager.LoadScene(scene);
     }
 
@@ -610,13 +605,6 @@ public class MainMenuUIManager : MonoBehaviour {
     public void ShowExplorer(string path) {
         path = path.Replace(@"/", @"\");
         System.Diagnostics.Process.Start("explorer.exe", "/select," + path);
-    }
-
-    // Instantiates the Parameter Manager.
-    private void InstantiateParameterManager() {
-        GameObject instance = Instantiate(parameterManagerPrefab);
-        instance.name = parameterManagerPrefab.name;
-        parameterManagerScript = instance.GetComponent<ParameterManager>();
     }
 
     // Returns the number of enables generators.

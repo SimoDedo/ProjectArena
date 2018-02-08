@@ -64,12 +64,10 @@ public abstract class GameManager : CoreComponent, ILoggable {
 
     // Loads the next scene
     private void LoadNextScene(string def) {
-        if (GameObject.Find("Experiment Manager") && GameObject.Find("Parameter Manager")) {
-            ParameterManager pm = GameObject.Find("Parameter Manager")
-                .GetComponent<ParameterManager>();
+        if (GameObject.Find("Experiment Manager") && ParameterManager.HasInstance()) {
             ExperimentManager em = GameObject.Find("Experiment Manager")
                 .GetComponent<ExperimentManager>();
-            SceneManager.LoadScene(em.GetNextScene(pm));
+            SceneManager.LoadScene(em.GetNextScene());
         } else {
             SceneManager.LoadScene(def);
         }

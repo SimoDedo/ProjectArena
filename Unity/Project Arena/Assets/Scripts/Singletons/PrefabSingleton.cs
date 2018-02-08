@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Prefab singleton implementaion.
+/// Prefab singleton implementation.
 /// <summary>
 public class PrefabSingleton<T> : MonoBehaviour where T : PrefabSingleton<T> {
 

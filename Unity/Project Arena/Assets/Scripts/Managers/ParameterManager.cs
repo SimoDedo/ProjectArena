@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 /// <summary>
 /// ParameterManager allows to exchange information between different scenes.
 /// </summary>
-public class ParameterManager : MonoBehaviour {
+public class ParameterManager : SceneSingleton<ParameterManager> {
 
     // Map data.
     [HideInInspector] public int GenerationMode { get; set; }

@@ -38,7 +38,7 @@ public abstract class MapManager : CoreComponent {
 
     public abstract void ManageMap(bool assembleMap);
 
-    // Returns the spawn points.
+    // Returns the spawn points.k
     public List<GameObject> GetSpawnPoints() {
         return objectDisplacerScript.GetObjectsByCategory(spawnPointCategory);
     }
@@ -48,45 +48,36 @@ public abstract class MapManager : CoreComponent {
 
     // Extracts the parameters from the parameter Manager, if any.
     protected void ExtractParametersFromManager() {
-        if (GetParameterManager() != null) {
-            export = GetParameterManager().Export;
-            exportPath = GetParameterManager().ExportPath;
-            flip = GetParameterManager().Flip;
+        if (ParameterManager.HasInstance()) {
+            export = ParameterManager.Instance.Export;
+            exportPath = ParameterManager.Instance.ExportPath;
+            flip = ParameterManager.Instance.Flip;
 
-            switch (GetParameterManager().GenerationMode) {
+            switch (ParameterManager.Instance.GenerationMode) {
                 case 0:
                     loadMapFromFile = false;
-                    seed = GetParameterManager().MapDNA;
+                    seed = ParameterManager.Instance.MapDNA;
                     break;
                 case 1:
                     loadMapFromFile = false;
-                    seed = GetParameterManager().MapDNA;
+                    seed = ParameterManager.Instance.MapDNA;
                     break;
                 case 2:
                     loadMapFromFile = true;
                     seed = null;
-                    textFilePath = GetParameterManager().MapDNA;
+                    textFilePath = ParameterManager.Instance.MapDNA;
                     break;
                 case 3:
                     loadMapFromFile = false;
-                    seed = GetParameterManager().MapDNA;
-                    textFilePath = GetParameterManager().MapDNA;
+                    seed = ParameterManager.Instance.MapDNA;
+                    textFilePath = ParameterManager.Instance.MapDNA;
                     break;
                 case 4:
                     loadMapFromFile = true;
-                    seed = GetParameterManager().MapDNA;
+                    seed = ParameterManager.Instance.MapDNA;
                     textFilePath = null;
                     break;
             }
-        }
-    }
-
-    // Returns the Parameter Manager.
-    protected ParameterManager GetParameterManager() {
-        if (GameObject.Find("Parameter Manager") != null) {
-            return GameObject.Find("Parameter Manager").GetComponent<ParameterManager>();
-        } else {
-            return null;
         }
     }
 

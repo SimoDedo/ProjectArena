@@ -21,7 +21,7 @@ public class MLMapManager : MapManager {
             // Generate the map.
             mapGeneratorScript.SaveMapSize();
             for (int i = 0; i < levelsCount; i++) {
-                if (GetParameterManager() != null) {
+                if (ParameterManager.HasInstance()) {
                     maps.Add(mapGeneratorScript.GenerateMap(seed + i, false, null));
                 } else {
                     maps.Add(mapGeneratorScript.GenerateMap());

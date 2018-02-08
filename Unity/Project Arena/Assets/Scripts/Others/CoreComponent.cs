@@ -29,13 +29,7 @@ public abstract class CoreComponent : MonoBehaviour {
                 Debug.LogError("Unexpected soft error with code " + errorCode + ".");
                 break;
             case Error.HARD_ERROR:
-                if (GameObject.Find("Parameter Manager")) {
-                    GameObject.Find("Parameter Manager").GetComponent<ParameterManager>().
-                        ErrorBackToMenu(errorCode);
-                } else {
-                    Debug.LogError("Unexpected hard error with code " + errorCode + ". Can't " +
-                    "find the Parameter Manager.");
-                }
+                ParameterManager.Instance.ErrorBackToMenu(errorCode);
                 break;
             case Error.RETRY_ERROR:
                 Debug.LogError("Unexpected error with code " + errorCode + ". The scene will be" +
@@ -52,13 +46,7 @@ public abstract class CoreComponent : MonoBehaviour {
                 Debug.LogError("Unexpected soft error. " + errorMessage);
                 break;
             case Error.HARD_ERROR:
-                if (GameObject.Find("Parameter Manager")) {
-                    GameObject.Find("Parameter Manager").GetComponent<ParameterManager>().
-                        ErrorBackToMenu(errorMessage);
-                } else {
-                    Debug.LogError("Unexpected hard error. " + errorMessage + " Can't find the " +
-                        "Parameter Manager.");
-                }
+                ParameterManager.Instance.ErrorBackToMenu(errorMessage);
                 break;
             case Error.RETRY_ERROR:
                 Debug.LogError("Unexpected  error. " + errorMessage + " The scene will be " +

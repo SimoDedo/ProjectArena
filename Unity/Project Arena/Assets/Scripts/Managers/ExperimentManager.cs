@@ -94,8 +94,7 @@ public class ExperimentManager : MonoBehaviour {
     void Start() {
         caseList = new List<Case>();
 
-        if (GameObject.Find("Parameter Manager") != null && GameObject.Find("Parameter Manager").
-            GetComponent<ParameterManager>().Export == false) {
+        if (ParameterManager.HasInstance() && ParameterManager.Instance.Export == false) {
             logGame = false;
             logStatistics = false;
         }
@@ -184,7 +183,7 @@ public class ExperimentManager : MonoBehaviour {
     }
 
     // Retuns the next scene to be played.
-    public string GetNextScene(ParameterManager pm) {
+    public string GetNextScene() {
         currentCase++;
 
         if (logging) {
@@ -197,9 +196,10 @@ public class ExperimentManager : MonoBehaviour {
 
         Case c = caseList[currentCase];
 
-        pm.Flip = currentCase % 2 == 0 ? true : false;
-        pm.GenerationMode = 4;
-        pm.MapDNA = (c.maps == null || c.maps.Count == 0) ? "" : c.GetCurrentMap().text;
+        ParameterManager.Instance.Flip = currentCase % 2 == 0 ? true : false;
+        ParameterManager.Instance.GenerationMode = 4;
+        ParameterManager.Instance.MapDNA = (c.maps == null || c.maps.Count == 0) ? "" :
+            c.GetCurrentMap().text;
 
         return c.scene;
     }
