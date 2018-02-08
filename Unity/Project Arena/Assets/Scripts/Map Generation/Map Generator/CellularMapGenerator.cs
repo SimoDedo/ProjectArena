@@ -40,7 +40,9 @@ public class CellularMapGenerator : MapGenerator {
 
         ProcessMap();
 
-        MapEdit.AddBorders(map, borderSize, wallChar);
+        MapSize newSize = MapEdit.AddBorders(map, borderSize, wallChar);
+        width = newSize.width;
+        height = newSize.height;
 
         if (createTextFile)
             SaveMapAsText();

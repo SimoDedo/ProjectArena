@@ -28,17 +28,15 @@ public class ABMapGenerator : MapGenerator {
         width = 0;
         height = 0;
 
-        // Decode the genome.
         ParseGenome();
 
-        // Create arenas and corridors in the map.
         InitializeMap();
 
-        // Process the map.
         ProcessMap();
 
-        // Add borders to the map.
-        MapEdit.AddBorders(map, borderSize, wallChar);
+        MapSize newSize = MapEdit.AddBorders(map, borderSize, wallChar);
+        width = newSize.width;
+        height = newSize.height;
 
         if (createTextFile) {
             seed = seed.GetHashCode().ToString();

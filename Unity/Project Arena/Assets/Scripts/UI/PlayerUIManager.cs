@@ -1,8 +1,11 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// This class manages the UI of the player. Health and available weapons are always visible, 
+/// whereas an hitted indicator and a reload animation can be displayer when needed.
+/// </summary>
 public class PlayerUIManager : MonoBehaviour {
 
     [SerializeField] private GameObject health;
@@ -28,7 +31,8 @@ public class PlayerUIManager : MonoBehaviour {
                 cooldown.GetComponent<Image>().fillAmount = 0;
                 mustCooldown = false;
             } else {
-                cooldown.GetComponent<Image>().fillAmount = (Time.time - cooldownStart) / cooldownDuration;
+                cooldown.GetComponent<Image>().fillAmount = (Time.time - cooldownStart) /
+                    cooldownDuration;
             }
         }
     }
@@ -43,8 +47,9 @@ public class PlayerUIManager : MonoBehaviour {
         for (int i = 0; i < activeGuns.GetLength(0); i++) {
             if (activeGuns[i]) {
                 SetTextAlpha(gunNumbers[i], 1);
-            } else
+            } else {
                 SetTextAlpha(gunNumbers[i], 0.5f);
+            }
         }
     }
 
@@ -72,8 +77,9 @@ public class PlayerUIManager : MonoBehaviour {
     public void SetPlayerUIVisible(bool b) {
         health.SetActive(b);
         cooldown.SetActive(b);
-        foreach (GameObject g in gunNumbers)
+        foreach (GameObject g in gunNumbers) {
             g.SetActive(b);
+        }
     }
 
     // Returns the color of a gun.
@@ -84,8 +90,10 @@ public class PlayerUIManager : MonoBehaviour {
     // Sets the color of all the UI elements (except health).
     public void SetColorAll(Color c) {
         cooldown.GetComponent<Image>().color = c;
-        foreach (GameObject gn in gunNumbers)
-            gn.GetComponent<Text>().color = new Color(c.r, c.g, c.b, gn.GetComponent<Text>().color.a);
+        foreach (GameObject gn in gunNumbers) {
+            gn.GetComponent<Text>().color = new Color(c.r, c.g, c.b,
+                gn.GetComponent<Text>().color.a);
+        }
     }
 
     // Shows the damage indicator.
@@ -101,4 +109,5 @@ public class PlayerUIManager : MonoBehaviour {
         yield return new WaitForSeconds(damageDuration);
         damage.SetActive(false);
     }
+
 }

@@ -1,8 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using JsonModels;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// CheckboxQuestion allows to menage a list of checkboxes plus a submit button. The exclusive flag
+/// imposes to have at most a selected box. The compulsory flag imposes to have at least a selected
+/// box.
+/// </summary>
 public class CheckboxQuestion : MonoBehaviour {
 
     [SerializeField] private int questionId;
@@ -22,12 +27,15 @@ public class CheckboxQuestion : MonoBehaviour {
     public void UpdateAnswer(int id) {
         bool activated = GetOptionById(id).toggle.isOn;
 
-        if (exclusive && activated)
-            foreach (Option o in options)
-                if (o.id != id && o.toggle.isOn)
+        if (exclusive && activated) {
+            foreach (Option o in options) {
+                if (o.id != id && o.toggle.isOn) {
                     // Updating the isOn value calls again this method, so there is non need
                     // to decrease the active count now.
                     o.toggle.isOn = false;
+                }
+            }
+        }
 
         activeCount = activated ? activeCount + 1 : activeCount - 1;
         submit.interactable = activeCount > 0 || !compulsory ? true : false;
@@ -35,9 +43,11 @@ public class CheckboxQuestion : MonoBehaviour {
 
     // Returns the oprion given its id.
     private Option GetOptionById(int id) {
-        foreach (Option o in options)
-            if (o.id == id)
+        foreach (Option o in options) {
+            if (o.id == id) {
                 return o;
+            }
+        }
         return new Option();
     }
 
@@ -46,11 +56,12 @@ public class CheckboxQuestion : MonoBehaviour {
         int[] activeAnswers = new int[activeCount];
 
         int j = 0;
-        for (int i = 0; i < options.Length; i++)
+        for (int i = 0; i < options.Length; i++) {
             if (options[i].toggle.isOn) {
                 activeAnswers[j] = options[i].id;
                 j++;
             }
+        }
 
         return activeAnswers;
     }
@@ -82,27 +93,12 @@ public class CheckboxQuestion : MonoBehaviour {
                 optionId = (int)options[i].id,
                 optionText = options[i].toggle.transform.parent.GetComponentInChildren<Text>().text
             });
-            if (i < options.Length - 1)
+            if (i < options.Length - 1) {
                 jOptions += ", ";
+            }
         }
 
         return jOptions + "]";
-    }
-
-    private class JsonQuestion {
-        public int questionId;
-        public string questionText;
-        public string options;
-    }
-
-    private class JsonOption {
-        public int optionId;
-        public string optionText;
-    }
-
-    private class JsonAnswer {
-        public int questionId;
-        public int[] answers;
     }
 
     [Serializable]
@@ -110,4 +106,5 @@ public class CheckboxQuestion : MonoBehaviour {
         public Toggle toggle;
         public int id;
     }
+
 }

@@ -1,6 +1,13 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// GameUIManager is an abstract class used to implement any kind of game UI manager. A game UI
+/// consists in different UIs activated in different phases of the game. Ready UI contains 
+/// an explenation of the current game mode and a countdown. Figth UI contains information
+/// about the current game (i.e. score, residual time). Score UI shows the outcome of the
+/// current game. Pause UI is a simple pause screen.
+/// </summary>
 public abstract class GameUIManager : CoreComponent {
 
     [SerializeField] protected GameObject readyUI;
@@ -46,12 +53,13 @@ public abstract class GameUIManager : CoreComponent {
     protected string TimeToString(int t) {
         string s = t.ToString();
 
-        if (t < 0)
+        if (t < 0) {
             return "00";
-        else if (s.Length > 1)
+        } else if (s.Length > 1) {
             return s;
-        else
+        } else {
             return "0" + s;
+        }
     }
 
     public void Fade(float min, float max, bool mustLigthen, float duration) {
@@ -64,16 +72,18 @@ public abstract class GameUIManager : CoreComponent {
     private void UpdateSensibility() {
         if (PlayerPrefs.HasKey("MouseSensibility")) {
             sensibilitySlider.value = PlayerPrefs.GetFloat("MouseSensibility");
-        } else
+        } else {
             PlayerPrefs.SetFloat("MouseSensibility", sensibilitySlider.value);
+        }
     }
 
     // Initializes the sensibilitiy slider.
     public void SetMouseSensibility() {
         PlayerPrefs.SetFloat("MouseSensibility", sensibilitySlider.value);
         Player playerScript = GameObject.Find("Player").GetComponent<Player>();
-        if (playerScript != null)
+        if (playerScript != null) {
             playerScript.SetSensibility(sensibilitySlider.value);
+        }
     }
 
 }

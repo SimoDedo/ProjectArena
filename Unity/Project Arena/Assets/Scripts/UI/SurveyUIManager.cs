@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// This class manages the UI of the survey. A survey is a sequence of screens that starts with an
+/// introduction, continues with some questions and ends with a thanks.
+/// </summary>
 public class SurveyUIManager : MonoBehaviour {
 
     [Header("Survey fields")] [SerializeField] private GameObject introduction;
@@ -17,8 +21,10 @@ public class SurveyUIManager : MonoBehaviour {
     private string answers = "";
 
     private void Start() {
-        parameterManagerScript = GameObject.Find("Parameter Manager").GetComponent<ParameterManager>();
-        experimentManagerScript = GameObject.Find("Experiment Manager").GetComponent<ExperimentManager>();
+        parameterManagerScript = GameObject.Find("Parameter Manager").
+            GetComponent<ParameterManager>();
+        experimentManagerScript = GameObject.Find("Experiment Manager").
+            GetComponent<ExperimentManager>();
         backgroundScript.SetRotation(parameterManagerScript.BackgroundRotation);
     }
 
@@ -31,18 +37,21 @@ public class SurveyUIManager : MonoBehaviour {
     private void UpdateValues() {
         if (experimentManagerScript.MustSaveSurvey()) {
             survey += questions[currentQuestion].GetComponent<CheckboxQuestion>().GetJsonQuestion();
-            if (currentQuestion < questions.Length - 1)
+            if (currentQuestion < questions.Length - 1) {
                 survey += "\n";
+            }
         }
         answers += questions[currentQuestion].GetComponent<CheckboxQuestion>().GetJsonAnswer();
-        if (currentQuestion < questions.Length - 1)
+        if (currentQuestion < questions.Length - 1) {
             answers += "\n";
+        }
     }
 
     // Saves the values of the survey.
     private void SaveValues() {
-        if (experimentManagerScript.MustSaveSurvey())
+        if (experimentManagerScript.MustSaveSurvey()) {
             experimentManagerScript.SaveSurvey(survey);
+        }
         experimentManagerScript.SaveAnswers(answers);
     }
 

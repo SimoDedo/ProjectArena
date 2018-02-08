@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// This class allows to fade an image.
+/// </summary>
 [RequireComponent(typeof(Image))]
 public class FadeUI : MonoBehaviour {
 

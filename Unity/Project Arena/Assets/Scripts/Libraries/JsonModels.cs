@@ -80,4 +80,20 @@
         public string mediumKillDistance;
     }
 
+    public class JsonQuestion {
+        public int questionId;
+        public string questionText;
+        public string options;
+    }
+
+    public class JsonOption {
+        public int optionId;
+        public string optionText;
+    }
+
+    public class JsonAnswer {
+        public int questionId;
+        public int[] answers;
+    }
+
 }

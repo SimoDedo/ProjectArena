@@ -25,14 +25,20 @@ public class ABMLMapManager : MLMapManager {
                 if (GetParameterManager() != null) {
                     if (genomes[i].useDefaultGenerator) {
                         maps.Add(mapGeneratorScript.GenerateMap(genomes[i].genome, false, null));
-                        maps.Add(diggerGeneratorScript.GenerateMap(genomes[i].genome,
-                            maps[i - 1].GetLength(0), maps[i - 1].GetLength(1), false, null));
+                        usesDiggerGeneratorList.Add(false);
                     } else {
-                        maps.Add(diggerGeneratorScript.GenerateMap(genomes[i].genome, false, null));
-                        usesDiggerGeneratorList.Add(!genomes[i].useDefaultGenerator);
+                        if (i > 0) {
+                            maps.Add(diggerGeneratorScript.GenerateMap(genomes[i].genome,
+                                maps[i - 1].GetLength(0), maps[i - 1].GetLength(1), false, null));
+                        } else {
+                            maps.Add(diggerGeneratorScript.GenerateMap(genomes[i].genome, false,
+                                null));
+                        }
+                        usesDiggerGeneratorList.Add(true);
                     }
                 } else {
                     maps.Add(mapGeneratorScript.GenerateMap());
+                    usesDiggerGeneratorList.Add(false);
                 }
                 mapGeneratorScript.ResetMapSize();
             }

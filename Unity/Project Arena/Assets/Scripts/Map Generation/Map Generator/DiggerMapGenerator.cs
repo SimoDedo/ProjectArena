@@ -46,7 +46,9 @@ public class DiggerMapGenerator : MapGenerator {
 
         PopulateMap();
 
-        MapEdit.AddBorders(map, borderSize, wallChar);
+        MapSize newSize = MapEdit.AddBorders(map, borderSize, wallChar);
+        width = newSize.width;
+        height = newSize.height;
 
         if (createTextFile && !useABGeneration)
             SaveMapAsText();

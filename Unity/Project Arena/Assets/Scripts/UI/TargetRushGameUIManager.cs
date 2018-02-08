@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// TargetRushGameUIManager is an implementation of GameUIManager. The figth UI shows the number of
+/// the current wave, the number of alive targets, the score and the residual time.
+/// </summary>
 public class TargetRushGameUIManager : GameUIManager {
 
     // Elements of the ready UI.
@@ -47,7 +51,8 @@ public class TargetRushGameUIManager : GameUIManager {
                 }
             } else if (additiveTimeQueue.Count > 0 && Time.time > addedTimeTime + 1f) {
                 String additive = additiveTimeQueue.Dequeue();
-                additiveTimeText.text = GetSpacesString((additive.Length + time.text.Length) * 2 - 1) + additive;
+                additiveTimeText.text =
+                    GetSpacesString((additive.Length + time.text.Length) * 2 - 1) + additive;
                 addedTimeDisplayed = true;
                 addedTimeTime = Time.time;
             }
@@ -59,7 +64,8 @@ public class TargetRushGameUIManager : GameUIManager {
                 }
             } else if (additiveScoreQueue.Count > 0 && Time.time > addedScoreTime + 1f) {
                 String additive = additiveScoreQueue.Dequeue();
-                additiveScoreText.text = GetSpacesString((additive.Length + score.text.Length) * 2 - 1) + additive; ;
+                additiveScoreText.text =
+                    GetSpacesString((additive.Length + score.text.Length) * 2 - 1) + additive; ;
                 addedScoreDisplayed = true;
                 addedScoreTime = Time.time;
             }
@@ -78,10 +84,11 @@ public class TargetRushGameUIManager : GameUIManager {
 
     // Sets the countdown.
     public void SetCountdown(int i) {
-        if (i > 0)
+        if (i > 0) {
             countdown.text = i.ToString();
-        else
+        } else {
             countdown.text = "Fight!";
+        }
     }
 
     // Sets the remaining time.

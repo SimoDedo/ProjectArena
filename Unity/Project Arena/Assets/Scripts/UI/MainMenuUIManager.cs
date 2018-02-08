@@ -5,6 +5,11 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+/// <summary>
+/// This class manages the UI of the main menu. The main menu is composed by 3 sections: 
+/// singleplayer, multiplayer and setting. Some buttons and options (quit and export) are hidden
+/// or disabled in the web build.
+/// </summary>
 public class MainMenuUIManager : MonoBehaviour {
 
     [Header("Scenes")] [SerializeField] Mode[] singleplayerModes;
@@ -83,7 +88,8 @@ public class MainMenuUIManager : MonoBehaviour {
             InstantiateParameterManager();
             parameterManagerScript.BackgroundRotation = backgroundScript.GetRotation();
         } else {
-            parameterManagerScript = GameObject.Find("Parameter Manager").GetComponent<ParameterManager>();
+            parameterManagerScript = GameObject.Find("Parameter Manager").
+                GetComponent<ParameterManager>();
             backgroundScript.SetRotation(parameterManagerScript.BackgroundRotation);
         }
 
@@ -98,16 +104,20 @@ public class MainMenuUIManager : MonoBehaviour {
         exportSP.isOn = false;
         exportMP.isOn = false;
 
-        if (forceInput || Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.LinuxPlayer) {
+        if (forceInput || Application.platform == RuntimePlatform.OSXPlayer ||
+            Application.platform == RuntimePlatform.WindowsPlayer ||
+            Application.platform == RuntimePlatform.LinuxPlayer) {
             allowIO = true;
             importPath = Application.persistentDataPath + "/Import";
             exportPath = Application.persistentDataPath + "/Export";
             // Create the import directory if needed.
-            if (!Directory.Exists(importPath))
+            if (!Directory.Exists(importPath)) {
                 Directory.CreateDirectory(importPath);
+            }
             // Create the export directory if needed.
-            if (!Directory.Exists(exportPath))
+            if (!Directory.Exists(exportPath)) {
                 Directory.CreateDirectory(exportPath);
+            }
         } else {
             // Hide the quit button.
             quit.SetActive(false);
@@ -120,10 +130,11 @@ public class MainMenuUIManager : MonoBehaviour {
         }
 
         // Get the mouse sensibility.
-        if (PlayerPrefs.HasKey("MouseSensibility"))
+        if (PlayerPrefs.HasKey("MouseSensibility")) {
             sensibilitySlider.value = PlayerPrefs.GetFloat("MouseSensibility");
-        else
+        } else {
             PlayerPrefs.SetFloat("MouseSensibility", sensibilitySlider.value);
+        }
 
         if (Application.platform == RuntimePlatform.WindowsPlayer) {
             importButton.SetActive(true);
@@ -143,8 +154,9 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Starts the loading of the rigth scene.
     public void LoadScene() {
-        if (currentGeneration == 2)
+        if (currentGeneration == 2) {
             mapDNA = importPath + "/" + mapDNA;
+        }
 
         parameterManagerScript.GenerationMode = currentGeneration;
         parameterManagerScript.MapDNA = mapDNA;
@@ -160,7 +172,9 @@ public class MainMenuUIManager : MonoBehaviour {
         OpenSection(loading);
         if (currentGeneration == 2) {
             loadingText.text = "Validating the map";
-            int errorCode = currentIsMultilevel ? MapValidate.ValidateMLMap(parameterManagerScript.MapDNA) : MapValidate.ValidateMap(parameterManagerScript.MapDNA);
+            int errorCode = currentIsMultilevel ?
+                MapValidate.ValidateMLMap(parameterManagerScript.MapDNA) :
+                MapValidate.ValidateMap(parameterManagerScript.MapDNA);
             if (errorCode == 0) {
                 Load(currentScene);
             } else {
@@ -169,15 +183,18 @@ public class MainMenuUIManager : MonoBehaviour {
             }
         } else if (currentGeneration == 3) {
             loadingText.text = "Validating the map";
-            int errorCode = currentIsMultilevel ? MapValidate.ValidateGeneticMLMap(parameterManagerScript.MapDNA) : MapValidate.ValidateGeneticMap(parameterManagerScript.MapDNA);
+            int errorCode = currentIsMultilevel ?
+                MapValidate.ValidateGeneticMLMap(parameterManagerScript.MapDNA) :
+                MapValidate.ValidateGeneticMap(parameterManagerScript.MapDNA);
             if (errorCode == 0) {
                 Load(currentScene);
             } else {
                 SetErrorMessage(errorCode, null);
                 OpenSection(error);
             }
-        } else
+        } else {
             Load(currentScene);
+        }
     }
 
     // Loads a scene.
@@ -241,19 +258,25 @@ public class MainMenuUIManager : MonoBehaviour {
                 errorText.text = errorMessage;
                 break;
             case 2:
-                errorText.text = "Error while loading the map.\nThe specified file was not found.\nPlease put the file in the rigth folder.";
+                errorText.text = "Error while loading the map.\nThe specified file was not " +
+                    "found.\nPlease put the file in the rigth folder.";
                 break;
             case 3:
-                errorText.text = "Error while loading the map.\nThe map must be rectangular, with at least one spawn point and walls around its border.";
+                errorText.text = "Error while loading the map.\nThe map must be rectangular, " +
+                    "with at least one spawn point and walls around its border.";
                 break;
             case 4:
-                errorText.text = "Error while loading the map.\nThe map exceeds the maximum dimension.";
+                errorText.text = "Error while loading the map.\nThe map exceeds the maximum " +
+                    "dimension.";
                 break;
             case 5:
-                errorText.text = "Error while loading the map.\nThe genome doesn't follow the expected convention.";
+                errorText.text = "Error while loading the map.\nThe genome doesn't follow the " +
+                    "expected convention.";
                 break;
             case 6:
-                errorText.text = "Error while loading the map.\nEach level must be rectangular and have the same size, with at least one spawn point and walls around its border.";
+                errorText.text = "Error while loading the map.\nEach level must be rectangular " +
+                    "and have the same size, with at least one spawn point and walls around its " +
+                    "border.";
                 break;
             default:
                 errorText.text = "Something really bad just happened.";
@@ -287,7 +310,8 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Enables or disbales the change generation buttons
     private void UpdateSingleplayerGenerations() {
-        if (GetGeneratorsCount(singleplayerModes[currentMode].maps[currentMap].enabledGenerations) > 1) {
+        if (GetGeneratorsCount(singleplayerModes[currentMode].maps[currentMap].enabledGenerations)
+            > 1) {
             previousGenerationSP.GetComponent<Button>().interactable = true;
             nextGenerationSP.GetComponent<Button>().interactable = true;
         } else {
@@ -310,25 +334,29 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Shows the next maps in the singleplayer menu.
     public void SingleplayerNextMap() {
-        currentMap = GetCiruclarIndex(currentMap, singleplayerModes[currentMode].maps.Length - 1, true);
+        currentMap = GetCiruclarIndex(currentMap, singleplayerModes[currentMode].maps.Length - 1,
+            true);
         ActivateCurrentMapSP();
     }
 
     // Shows the previous maps in the singleplayer menu.
     public void SingleplayerPreviousMap() {
-        currentMap = GetCiruclarIndex(currentMap, singleplayerModes[currentMode].maps.Length - 1, false);
+        currentMap = GetCiruclarIndex(currentMap, singleplayerModes[currentMode].maps.Length - 1,
+            false);
         ActivateCurrentMapSP();
     }
 
     // Shows the next generation method in the singleplayer menu.
     public void SingleplayerNextGeneration() {
-        currentGeneration = GetCiruclarIndex(currentGeneration, singleplayerModes[currentMode].maps[currentMap].enabledGenerations, true);
+        currentGeneration = GetCiruclarIndex(currentGeneration,
+            singleplayerModes[currentMode].maps[currentMap].enabledGenerations, true);
         ActivateCurrentGenerationSP();
     }
 
     // Shows the previous generation method in the singleplayer menu.
     public void SingleplayerPreviousGeneration() {
-        currentGeneration = GetCiruclarIndex(currentGeneration, singleplayerModes[currentMode].maps[currentMap].enabledGenerations, false);
+        currentGeneration = GetCiruclarIndex(currentGeneration,
+            singleplayerModes[currentMode].maps[currentMap].enabledGenerations, false);
         ActivateCurrentGenerationSP();
     }
 
@@ -336,7 +364,8 @@ public class MainMenuUIManager : MonoBehaviour {
         modeTextSP.text = singleplayerModes[currentMode].modeName;
 
         currentMap = 0;
-        currentGeneration = GetMinGenerationIndex(singleplayerModes[currentMode].maps[currentMap].enabledGenerations);
+        currentGeneration = GetMinGenerationIndex(singleplayerModes[currentMode].maps[currentMap].
+            enabledGenerations);
         exportSP.isOn = false;
 
         UpdateSingleplayerMaps();
@@ -346,7 +375,8 @@ public class MainMenuUIManager : MonoBehaviour {
     private void ActivateCurrentMapSP() {
         mapTextSP.text = singleplayerModes[currentMode].maps[currentMap].mapName;
 
-        currentGeneration = GetMinGenerationIndex(singleplayerModes[currentMode].maps[currentMap].enabledGenerations);
+        currentGeneration = GetMinGenerationIndex(singleplayerModes[currentMode].maps[currentMap].
+            enabledGenerations);
         currentIsMultilevel = singleplayerModes[currentMode].maps[currentMap].isMultilevel;
 
         UpdateSingleplayerGenerations();
@@ -354,16 +384,20 @@ public class MainMenuUIManager : MonoBehaviour {
     }
 
     private void ActivateCurrentGenerationSP() {
-        generationTextSP.text = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].generationName;
-        currentScene = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].scene;
+        generationTextSP.text = singleplayerModes[currentMode].maps[currentMap].
+            enabledGenerations[currentGeneration].generationName;
+        currentScene = singleplayerModes[currentMode].maps[currentMap].
+            enabledGenerations[currentGeneration].scene;
 
-        inputSP.interactable = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].inputEnabled;
+        inputSP.interactable = singleplayerModes[currentMode].maps[currentMap].
+            enabledGenerations[currentGeneration].inputEnabled;
         inputSP.text = "";
 
         if (currentGeneration == 0) {
             inputSP.placeholder.GetComponent<Text>().text = GetSeed();
         } else {
-            inputSP.placeholder.GetComponent<Text>().text = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].placeholder;
+            inputSP.placeholder.GetComponent<Text>().text = singleplayerModes[currentMode].
+                maps[currentMap].enabledGenerations[currentGeneration].placeholder;
         }
     }
 
@@ -393,7 +427,8 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Enables or disbales the change generation buttons
     private void UpdateMultiplayerGenerations() {
-        if (GetGeneratorsCount(multiplayerModes[currentMode].maps[currentMap].enabledGenerations) > 1) {
+        if (GetGeneratorsCount(multiplayerModes[currentMode].maps[currentMap].enabledGenerations)
+            > 1) {
             previousGenerationMP.GetComponent<Button>().interactable = true;
             nextGenerationMP.GetComponent<Button>().interactable = true;
         } else {
@@ -416,25 +451,29 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Shows the next maps in the multiplayer menu.
     public void MultiplayerNextMap() {
-        currentMap = GetCiruclarIndex(currentMap, multiplayerModes[currentMode].maps.Length - 1, true);
+        currentMap = GetCiruclarIndex(currentMap, multiplayerModes[currentMode].maps.Length - 1,
+            true);
         ActivateCurrentMapMP();
     }
 
     // Shows the previous maps in the multiplayer menu.
     public void MultiplayerPreviousMap() {
-        currentMap = GetCiruclarIndex(currentMap, multiplayerModes[currentMode].maps.Length - 1, false);
+        currentMap = GetCiruclarIndex(currentMap, multiplayerModes[currentMode].maps.Length - 1,
+            false);
         ActivateCurrentMapMP();
     }
 
     // Shows the next generation method in the multiplayer menu.
     public void MultiplayerNextGeneration() {
-        currentGeneration = GetCiruclarIndex(currentGeneration, multiplayerModes[currentMode].maps[currentMap].enabledGenerations, true);
+        currentGeneration = GetCiruclarIndex(currentGeneration,
+            multiplayerModes[currentMode].maps[currentMap].enabledGenerations, true);
         ActivateCurrentGenerationMP();
     }
 
     // Shows the previous generation method in the multiplayer menu.
     public void MultiplayerPreviousGeneration() {
-        currentGeneration = GetCiruclarIndex(currentGeneration, multiplayerModes[currentMode].maps[currentMap].enabledGenerations, false);
+        currentGeneration = GetCiruclarIndex(currentGeneration, multiplayerModes[currentMode].
+            maps[currentMap].enabledGenerations, false);
         ActivateCurrentGenerationMP();
     }
 
@@ -442,7 +481,8 @@ public class MainMenuUIManager : MonoBehaviour {
         modeTextMP.text = multiplayerModes[currentMode].modeName;
 
         currentMap = 0;
-        currentGeneration = GetMinGenerationIndex(multiplayerModes[currentMode].maps[currentMap].enabledGenerations);
+        currentGeneration = GetMinGenerationIndex(multiplayerModes[currentMode].maps[currentMap].
+            enabledGenerations);
         exportMP.isOn = false;
 
         UpdateMultiplayerMaps();
@@ -452,7 +492,8 @@ public class MainMenuUIManager : MonoBehaviour {
     private void ActivateCurrentMapMP() {
         mapTextMP.text = multiplayerModes[currentMode].maps[currentMap].mapName;
 
-        currentGeneration = GetMinGenerationIndex(multiplayerModes[currentMode].maps[currentMap].enabledGenerations);
+        currentGeneration = GetMinGenerationIndex(multiplayerModes[currentMode].maps[currentMap].
+            enabledGenerations);
         currentIsMultilevel = multiplayerModes[currentMode].maps[currentMap].isMultilevel;
 
         UpdateMultiplayerGenerations();
@@ -460,16 +501,20 @@ public class MainMenuUIManager : MonoBehaviour {
     }
 
     private void ActivateCurrentGenerationMP() {
-        generationTextMP.text = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].generationName;
-        currentScene = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].scene;
+        generationTextMP.text = singleplayerModes[currentMode].maps[currentMap].
+            enabledGenerations[currentGeneration].generationName;
+        currentScene = singleplayerModes[currentMode].maps[currentMap].
+            enabledGenerations[currentGeneration].scene;
 
-        inputMP.interactable = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].inputEnabled;
+        inputMP.interactable = singleplayerModes[currentMode].maps[currentMap]
+            .enabledGenerations[currentGeneration].inputEnabled;
         inputMP.text = "";
 
         if (currentGeneration == 0) {
             inputMP.placeholder.GetComponent<Text>().text = GetSeed();
         } else {
-            inputMP.placeholder.GetComponent<Text>().text = singleplayerModes[currentMode].maps[currentMap].enabledGenerations[currentGeneration].placeholder;
+            inputMP.placeholder.GetComponent<Text>().text = singleplayerModes[currentMode].
+                maps[currentMap].enabledGenerations[currentGeneration].placeholder;
         }
     }
 
@@ -478,35 +523,44 @@ public class MainMenuUIManager : MonoBehaviour {
     // Returns the previous or the next circular index.
     private int GetCiruclarIndex(int current, int max, bool next) {
         if (next) {
-            if (current == max)
+            if (current == max) {
                 return 0;
-            else
+            } else {
                 return current + 1;
+            }
         } else {
-            if (current == 0)
+            if (current == 0) {
                 return max;
-            else
+            } else {
                 return current - 1;
+            }
         }
-
     }
 
     // Returns the previous or the next circular index.
     private int GetCiruclarIndex(int current, Generation[] mask, bool next) {
         if (next) {
-            for (int i = current; i < mask.Length; i++)
-                if (mask[i].enabled && i != current)
+            for (int i = current; i < mask.Length; i++) {
+                if (mask[i].enabled && i != current) {
                     return i;
-            for (int i = 0; i < current; i++)
-                if (mask[i].enabled && i != current)
+                }
+            }
+            for (int i = 0; i < current; i++) {
+                if (mask[i].enabled && i != current) {
                     return i;
+                }
+            }
         } else {
-            for (int i = current; i >= 0; i--)
-                if (mask[i].enabled && i != current)
+            for (int i = current; i >= 0; i--) {
+                if (mask[i].enabled && i != current) {
                     return i;
-            for (int i = mask.Length - 1; i > current; i--)
-                if (mask[i].enabled && i != current)
+                }
+            }
+            for (int i = mask.Length - 1; i > current; i--) {
+                if (mask[i].enabled && i != current) {
                     return i;
+                }
+            }
         }
 
         return current;
@@ -516,10 +570,11 @@ public class MainMenuUIManager : MonoBehaviour {
         int i = 0;
 
         foreach (Generation g in mask) {
-            if (g.enabled)
+            if (g.enabled) {
                 break;
-            else
+            } else {
                 i++;
+            }
         }
 
         return i;

@@ -70,7 +70,7 @@ namespace MapManipulation {
         }
 
         // Adds borders to the map.
-        public static Vector2 AddBorders(char[,] map, int borderSize, char wallChar) {
+        public static MapSize AddBorders(char[,] map, int borderSize, char wallChar) {
             int width = map.GetLength(0);
             int height = map.GetLength(1);
 
@@ -87,7 +87,7 @@ namespace MapManipulation {
 
             map = borderedMap;
 
-            return new Vector2(borderedMap.GetLength(0), borderedMap.GetLength(1));
+            return new MapSize(borderedMap.GetLength(0), borderedMap.GetLength(1));
         }
 
         // Fills the map with wall cells.
@@ -304,6 +304,17 @@ namespace MapManipulation {
         public Coord(int x, int y) {
             tileX = x;
             tileY = y;
+        }
+    }
+
+    // Size of a map.
+    public struct MapSize {
+        public int width;
+        public int height;
+
+        public MapSize(int w, int h) {
+            width = w;
+            height = h;
         }
     }
 

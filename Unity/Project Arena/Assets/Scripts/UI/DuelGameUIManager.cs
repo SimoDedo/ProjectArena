@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// DuelGameUIManager is an implementation of GameUIManager. The figth UI shows the kill count of
+/// each player and the residual time.
+/// </summary>
 public class DuelGameUIManager : GameUIManager {
 
     // Elements of the ready UI.
@@ -48,10 +52,11 @@ public class DuelGameUIManager : GameUIManager {
 
     // Sets the countdown.
     public void SetCountdown(int i) {
-        if (i > 0)
+        if (i > 0) {
             countdownText.text = i.ToString();
-        else
+        } else {
             countdownText.text = "Fight!";
+        }
     }
 
     // Sets the ready UI.

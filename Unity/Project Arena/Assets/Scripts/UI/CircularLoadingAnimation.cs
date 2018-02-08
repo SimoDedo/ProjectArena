@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// CircularLoadingAnimation applies a period circular fill animation to an image.
+/// </summary>
 [RequireComponent(typeof(Image))]
 public class CircularLoadingAnimation : MonoBehaviour {
 

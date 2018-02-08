@@ -40,7 +40,6 @@ public class MLPrefabMapAssembler : PrefabMapAssembler {
 
         InitializeRoomMask();
 
-        // Process all the tiles.
         ProcessTiles();
 
         for (int i = 0; i < maps.Count; i++) {
@@ -117,10 +116,14 @@ public class MLPrefabMapAssembler : PrefabMapAssembler {
     // Gets the coumlative neighbours of a cell as a mask.
     private string GetComulativeNeighbourhoodMask(int gridX, int gridY) {
         char[] mask = new char[4];
-        mask[0] = comulativeMask[gridX, gridY + 1];
-        mask[1] = comulativeMask[gridX + 1, gridY];
-        mask[2] = comulativeMask[gridX, gridY - 1];
-        mask[3] = comulativeMask[gridX - 1, gridY];
+        mask[0] = MapInfo.IsInMapRange(gridX, gridY + 1, width, height) ?
+            comulativeMask[gridX, gridY + 1] : wallChar;
+        mask[1] = MapInfo.IsInMapRange(gridX + 1, gridY, width, height) ?
+            comulativeMask[gridX + 1, gridY] : wallChar;
+        mask[2] = MapInfo.IsInMapRange(gridX, gridY - 1, width, height) ?
+            comulativeMask[gridX, gridY - 1] : wallChar;
+        mask[3] = MapInfo.IsInMapRange(gridX - 1, gridY, width, height) ?
+            comulativeMask[gridX - 1, gridY] : wallChar;
         return new string(mask);
     }
 
