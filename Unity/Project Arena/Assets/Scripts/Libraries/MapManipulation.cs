@@ -15,12 +15,12 @@ namespace MapManipulation {
         public static void FlipMap(char[,] map) {
             char[,] clonedMap = CloneMap(map);
 
-            int w = map.GetLength(0);
-            int h = map.GetLength(1);
+            int width = map.GetLength(0);
+            int height = map.GetLength(1);
 
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    map[x, y] = clonedMap[h - y - 1, w - x - 1];
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    map[x, y] = clonedMap[height - y - 1, width - x - 1];
                 }
             }
         }
@@ -70,7 +70,7 @@ namespace MapManipulation {
         }
 
         // Adds borders to the map.
-        public static MapSize AddBorders(char[,] map, int borderSize, char wallChar) {
+        public static char[,] AddBorders(char[,] map, int borderSize, char wallChar) {
             int width = map.GetLength(0);
             int height = map.GetLength(1);
 
@@ -85,9 +85,7 @@ namespace MapManipulation {
                 }
             }
 
-            map = borderedMap;
-
-            return new MapSize(borderedMap.GetLength(0), borderedMap.GetLength(1));
+            return borderedMap;
         }
 
         // Fills the map with wall cells.
@@ -160,7 +158,8 @@ namespace MapManipulation {
         }
 
         // Gets the number of walls surrounding a cell.
-        public static int GetSurroundingWallCount(int gridX, int gridY, char[,] gridMap, char wallChar) {
+        public static int GetSurroundingWallCount(int gridX, int gridY, char[,] gridMap,
+            char wallChar) {
             int width = gridMap.GetLength(0);
             int height = gridMap.GetLength(1);
             int wallCount = 0;
@@ -178,6 +177,7 @@ namespace MapManipulation {
 
             return wallCount;
         }
+
     }
 
     /// <summary>
@@ -304,17 +304,6 @@ namespace MapManipulation {
         public Coord(int x, int y) {
             tileX = x;
             tileY = y;
-        }
-    }
-
-    // Size of a map.
-    public struct MapSize {
-        public int width;
-        public int height;
-
-        public MapSize(int w, int h) {
-            width = w;
-            height = h;
         }
     }
 

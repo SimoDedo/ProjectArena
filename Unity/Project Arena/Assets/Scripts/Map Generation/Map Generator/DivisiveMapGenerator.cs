@@ -68,9 +68,9 @@ public class DivisiveMapGenerator : MapGenerator {
 
         ProcessMap();
 
-        MapSize newSize = MapEdit.AddBorders(map, borderSize, wallChar);
-        width = newSize.width;
-        height = newSize.height;
+        map = MapEdit.AddBorders(map, borderSize, wallChar);
+        width = map.GetLength(0);
+        height = map.GetLength(1);
 
         if (createTextFile) {
             PopulateABRooms();

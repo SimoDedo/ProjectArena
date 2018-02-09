@@ -34,9 +34,8 @@ public class ABMapGenerator : MapGenerator {
 
         ProcessMap();
 
-        MapSize newSize = MapEdit.AddBorders(map, borderSize, wallChar);
-        width = newSize.width;
-        height = newSize.height;
+        map = MapEdit.AddBorders(map, borderSize, wallChar);
+        ResetMapSize(); ;
 
         if (createTextFile) {
             seed = seed.GetHashCode().ToString();

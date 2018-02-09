@@ -156,10 +156,13 @@ public class MeshMapAssembler : MapAssebler {
 
         Vector3[] floorVertices = new Vector3[4];
 
-        floorVertices[0] = new Vector3(-sizeX / 2 * squareSize, -height, -sizeY / 2 * squareSize);
-        floorVertices[1] = new Vector3(-sizeX / 2 * squareSize, -height, sizeY / 2 * squareSize);
-        floorVertices[2] = new Vector3(sizeX / 2 * squareSize, -height, -sizeY / 2 * squareSize);
-        floorVertices[3] = new Vector3(sizeX / 2 * squareSize, -height, sizeY / 2 * squareSize);
+        floorVertices[0] = new Vector3(-squareSize / 2, -height, -squareSize / 2);
+        floorVertices[1] = new Vector3(-squareSize / 2, -height,
+            sizeY * squareSize + squareSize / 2);
+        floorVertices[2] = new Vector3(sizeX * squareSize + squareSize / 2, -height,
+            -squareSize / 2);
+        floorVertices[3] = new Vector3(sizeX * squareSize + squareSize / 2, -height,
+            sizeY * squareSize + squareSize / 2);
 
         int[] floorTriangles = new int[] { 0, 1, 2, 2, 1, 3 };
 
@@ -409,16 +412,13 @@ public class MeshMapAssembler : MapAssebler {
         public SquareGrid(char[,] map, char charWall, float squareSize) {
             int nodeCountX = map.GetLength(0);
             int nodeCountY = map.GetLength(1);
-            float mapWidth = nodeCountX * squareSize;
-            float mapHeigth = nodeCountY * squareSize;
 
             // We create a grid of Control Nodes.
             ControlNode[,] controlNodes = new ControlNode[nodeCountX, nodeCountY];
 
             for (int x = 0; x < nodeCountX; x++) {
                 for (int y = 0; y < nodeCountY; y++) {
-                    Vector3 pos = new Vector3(-mapWidth / 2 + x * squareSize + squareSize / 2, 0,
-                        -mapHeigth / 2 + y * squareSize + squareSize / 2);
+                    Vector3 pos = new Vector3(x * squareSize, 0, y * squareSize);
                     controlNodes[x, y] = new ControlNode(pos, map[x, y] == charWall, squareSize);
                 }
             }

@@ -34,8 +34,8 @@ public abstract class PrefabMapAssembler : MapAssebler {
         GameObject childObject = (GameObject)Instantiate(gameObject);
         childObject.name = gameObject.name;
         childObject.transform.parent = transform;
-        childObject.transform.position = new Vector3(squareSize * (x - width / 2), prefabHeight,
-            squareSize * (y - height / 2));
+        childObject.transform.position = new Vector3(squareSize * x, prefabHeight,
+            squareSize * y);
         childObject.transform.eulerAngles = new Vector3(0, rotation, 0);
     }
 
@@ -74,15 +74,17 @@ public abstract class PrefabMapAssembler : MapAssebler {
     }
 
     // Creates a flat mesh.
-    protected Mesh CreateFlatMesh(int sizeX, int sizeY, float squareSize, float height, bool inverted) {
+    protected Mesh CreateFlatMesh(int sizeX, int sizeY, float squareSize, float height,
+        bool inverted) {
         Mesh flatMesh = new Mesh();
 
         Vector3[] floorVertices = new Vector3[4];
 
-        floorVertices[0] = new Vector3(-sizeX / 2 * squareSize, height, -sizeY / 2 * squareSize);
-        floorVertices[1] = new Vector3(-sizeX / 2 * squareSize, height, sizeY / 2 * squareSize);
-        floorVertices[2] = new Vector3(sizeX / 2 * squareSize, height, -sizeY / 2 * squareSize);
-        floorVertices[3] = new Vector3(sizeX / 2 * squareSize, height, sizeY / 2 * squareSize);
+        floorVertices[0] = new Vector3(-squareSize, height, -squareSize);
+        floorVertices[1] = new Vector3(-squareSize, height, sizeY * squareSize + squareSize);
+        floorVertices[2] = new Vector3(sizeX * squareSize + squareSize, height, -squareSize);
+        floorVertices[3] = new Vector3(sizeX * squareSize + squareSize, height,
+            sizeY * squareSize + squareSize);
 
         int[] floorTriangles;
 

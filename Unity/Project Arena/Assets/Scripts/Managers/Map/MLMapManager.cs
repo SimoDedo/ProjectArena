@@ -118,7 +118,7 @@ public class MLMapManager : MapManager {
                     }
                 }
 
-                System.IO.File.WriteAllText(exportPath + "/" + seed.ToString() + "_txt.txt",
+                System.IO.File.WriteAllText(exportPath + "/" + seed.ToString() + ".map.txt",
                     textMap);
             } catch (Exception) {
                 ManageError(Error.SOFT_ERROR, "Error while saving the map, please insert a " +
