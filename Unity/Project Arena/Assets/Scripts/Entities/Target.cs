@@ -22,8 +22,6 @@ public class Target : Entity, ILoggable {
 
     // Do I have to log?
     private bool logging = false;
-    // Experiment manager.
-    private ExperimentManager experimentManagerScript;
 
     public override void SetupEntity(int th, bool[] ag, GameManager gms,
         int id) {
@@ -44,8 +42,8 @@ public class Target : Entity, ILoggable {
 
         // Log if needed.
         if (gms.IsLogging()) {
-            SetupLogging(gms.GetExperimentManager());
-            experimentManagerScript.LogSpawn(transform.position.x, transform.position.z,
+            SetupLogging();
+            ExperimentManager.Instance.LogSpawn(transform.position.x, transform.position.z,
                 gameObject.name);
         }
 
@@ -88,7 +86,7 @@ public class Target : Entity, ILoggable {
 
             // Log if needed.
             if (logging) {
-                experimentManagerScript.LogHit(transform.position.x, transform.position.z,
+                ExperimentManager.Instance.LogHit(transform.position.x, transform.position.z,
                     gameObject.name, "Player " + killerID, damage);
             }
 
@@ -104,7 +102,7 @@ public class Target : Entity, ILoggable {
 
         // Log if needed.
         if (logging) {
-            experimentManagerScript.LogKill(transform.position.x, transform.position.z,
+            ExperimentManager.Instance.LogKill(transform.position.x, transform.position.z,
                 gameObject.name, "Player " + id);
         }
 
@@ -125,8 +123,7 @@ public class Target : Entity, ILoggable {
     public override void SlowEntity(float penalty) { }
 
     // Setups stuff for the logging.
-    public void SetupLogging(ExperimentManager em) {
-        experimentManagerScript = em;
+    public void SetupLogging() {
         logging = true;
     }
 

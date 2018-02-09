@@ -64,7 +64,7 @@ public class DuelGameManager : GameManager {
 
             // If needed, tell the Experiment Manager it can start logging.
             if (handshaking) {
-                experimentManagerScript.StartLogging();
+                ExperimentManager.Instance.StartLogging();
             }
 
             SetReady(true);

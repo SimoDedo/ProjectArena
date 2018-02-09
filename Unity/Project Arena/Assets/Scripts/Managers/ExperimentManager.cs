@@ -1,4 +1,5 @@
-﻿using JsonModels;
+﻿using ExperimentObjects;
+using JsonObjects;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,26 +8,26 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// ExperimentManager allows to create and manage experiments. An experiment is composed of
-/// different studies (a set of maps), each one composed by cases (a set of map varaitions). Each 
-/// time a new experiment is requested, a list of cases from the less played study is provided to 
-/// the user to be played. A tutorial and a survey scene can be added at the beginning and at the 
-/// end of the experiment, respectevely.
+/// ExperimentManager allows to manage experiments. An experiment is composed of different studies 
+/// (a set of maps), each one composed by cases (a set of map varaitions). Each time a new
+/// experiment is requested, a list of cases from the less played study is provided to the user
+/// to be played. A tutorial and a survey scene can be added at the beginning and at the end of
+/// the experiment, respectevely.
 /// </summary>
-public class ExperimentManager : MonoBehaviour {
+public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
-    [Header("Tutorial")] [SerializeField] private Case tutorial;
-    [SerializeField] private bool playTutorial;
+    private Case tutorial;
+    private bool playTutorial;
 
-    [Header("Experiment")] [SerializeField] private List<Study> studies;
-    [SerializeField] private int casesPerUsers;
-    [SerializeField] private string experimentName;
+    private List<Study> studies;
+    private int casesPerUsers;
+    private string experimentName;
 
-    [Header("Survey")] [SerializeField] private Case survey;
-    [SerializeField] private bool playSurvey;
+    private Case survey;
+    private bool playSurvey;
 
-    [Header("Logging")] [SerializeField] private bool logGame;
-    [SerializeField] private bool logStatistics;
+    private bool logGame;
+    private bool logStatistics;
 
     // List of cases the current player has to play.
     private List<Case> caseList;
@@ -113,6 +114,20 @@ public class ExperimentManager : MonoBehaviour {
     }
 
     /* EXPERIMENT */
+
+    // Sets up the experiment manager.
+    public void Setup(Case tutorial, bool playTutorial, List<Study> studies, int casesPerUsers,
+        string experimentName, Case survey, bool playSurvey, bool logGame, bool logStatistics) {
+        this.tutorial = tutorial;
+        this.playTutorial = playTutorial;
+        this.studies = studies;
+        this.casesPerUsers = casesPerUsers;
+        this.experimentName = experimentName;
+        this.survey = survey;
+        this.playSurvey = playSurvey;
+        this.logGame = logGame;
+        this.logStatistics = logStatistics;
+    }
 
     // Creates a new list of cases for the player to play.
     private void CreateNewList() {
@@ -301,7 +316,7 @@ public class ExperimentManager : MonoBehaviour {
 
         GameManager gm = FindObjectOfType(typeof(GameManager)) as GameManager;
         if (gm != null) {
-            gm.LoggingHandshake(this);
+            gm.LoggingHandshake();
         }
 
         if (logStatistics) {
@@ -332,7 +347,7 @@ public class ExperimentManager : MonoBehaviour {
         foreach (MonoBehaviour monoBehaviour in FindObjectsOfType(typeof(MonoBehaviour))) {
             ILoggable logger = monoBehaviour as ILoggable;
             if (logger != null) {
-                logger.SetupLogging(this);
+                logger.SetupLogging();
             }
         }
     }
@@ -520,40 +535,6 @@ public class ExperimentManager : MonoBehaviour {
     // Returns the normalized euler distance.
     private float EulerDistance(float x1, float y1, float x2, float y2, float normalization) {
         return Mathf.Sqrt(Mathf.Pow(x1 - x2, 2) + Mathf.Pow(y1 - y2, 2)) / normalization;
-    }
-
-    /* CUTSOM OBJECTS */
-
-    [Serializable]
-    private class Study {
-        [SerializeField] public string studyName;
-        [SerializeField] public bool flip;
-        [SerializeField] public List<Case> cases;
-        [NonSerialized] public int completion;
-    }
-
-    [Serializable]
-    private class Case {
-        [SerializeField] public List<TextAsset> maps;
-        [SerializeField] public string scene;
-        [NonSerialized] public int completion;
-        [NonSerialized] public int mapIndex;
-
-        public Case() {
-            RandomizeCurrentMap();
-        }
-
-        public TextAsset GetCurrentMap() {
-            return maps[mapIndex];
-        }
-
-        public void RandomizeCurrentMap() {
-            if (maps != null) {
-                mapIndex = UnityEngine.Random.Range(0, maps.Count);
-            } else {
-                mapIndex = 0;
-            }
-        }
     }
 
 }

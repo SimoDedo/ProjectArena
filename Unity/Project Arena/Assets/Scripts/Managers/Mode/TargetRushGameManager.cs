@@ -55,7 +55,7 @@ public class TargetRushGameManager : GameManager {
 
             // If needed, tell the Experiment Manager it can start logging.
             if (handshaking) {
-                experimentManagerScript.StartLogging();
+                ExperimentManager.Instance.StartLogging();
             }
 
             SetReady(true);
@@ -224,7 +224,7 @@ public class TargetRushGameManager : GameManager {
     // Increases time.
     private void IncreaseTime(int i) {
         startTime += i;
-        targetRushGameUIManagerScript.SetTime((int)(startTime + readyDuration + gameDuration 
+        targetRushGameUIManagerScript.SetTime((int)(startTime + readyDuration + gameDuration
             - Time.time));
         targetRushGameUIManagerScript.AddTime(i);
     }

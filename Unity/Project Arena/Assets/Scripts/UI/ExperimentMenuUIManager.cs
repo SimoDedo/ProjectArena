@@ -10,24 +10,13 @@ public class ExperimentMenuUIManager : MonoBehaviour {
 
     [Header("Menu fields")] [SerializeField] private Button backButton;
 
-    [Header("Other")] [SerializeField] private GameObject experimentManagerPrefab;
-    [SerializeField] private RotateTranslateByAxis backgroundScript;
-
-    private ExperimentManager experimentManagerScript;
+    [Header("Other")] [SerializeField] private RotateTranslateByAxis backgroundScript;
 
     // Use this for initialization
     void Start() {
         Cursor.lockState = CursorLockMode.None;
 
         backgroundScript.SetRotation(ParameterManager.Instance.BackgroundRotation);
-
-        if (GameObject.Find("Experiment Manager")) {
-            experimentManagerScript = GameObject.Find("Experiment Manager").
-                GetComponent<ExperimentManager>();
-        } else {
-            experimentManagerScript = InstantiateManager(experimentManagerPrefab,
-                "Experiment Manager").GetComponent<ExperimentManager>();
-        }
     }
 
     void Update() {
@@ -45,14 +34,14 @@ public class ExperimentMenuUIManager : MonoBehaviour {
 
     // Loads the level indicated by the Experiment Manager.
     public void Play() {
-        SceneManager.LoadScene(experimentManagerScript.GetNextScene());
+        SceneManager.LoadScene(ExperimentManager.Instance.GetNextScene());
     }
 
     // Goes back to the main menu.
     public void Back() {
         ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
 
-        Destroy(experimentManagerScript.gameObject);
+        Destroy(ExperimentManager.Instance.gameObject);
         SceneManager.LoadScene("Menu");
     }
 

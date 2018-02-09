@@ -28,8 +28,6 @@ public abstract class GameManager : CoreComponent, ILoggable {
     protected bool handshaking = false;
     // Do I have to log?
     protected bool logging = false;
-    // Experiment manager.
-    protected ExperimentManager experimentManagerScript;
 
     // Moves a gameobject to a free spawn point.
     public void Spawn(GameObject g) {
@@ -64,24 +62,21 @@ public abstract class GameManager : CoreComponent, ILoggable {
 
     // Loads the next scene
     private void LoadNextScene(string def) {
-        if (GameObject.Find("Experiment Manager") && ParameterManager.HasInstance()) {
-            ExperimentManager em = GameObject.Find("Experiment Manager")
-                .GetComponent<ExperimentManager>();
-            SceneManager.LoadScene(em.GetNextScene());
+        if (ExperimentManager.HasInstance() && ParameterManager.HasInstance()) {
+            SceneManager.LoadScene(ExperimentManager.Instance.GetNextScene());
         } else {
             SceneManager.LoadScene(def);
         }
     }
 
     // Allows the Game Manager to tell the Experiment Manager when it can start to log.
-    public void LoggingHandshake(ExperimentManager em) {
-        experimentManagerScript = em;
+    public void LoggingHandshake() {
         handshaking = true;
     }
 
     // Setups stuff for the logging.
-    public void SetupLogging(ExperimentManager em) {
-        experimentManagerScript.LogMapInfo(mapManagerScript.GetMapGenerator().GetHeight(),
+    public void SetupLogging() {
+        ExperimentManager.Instance.LogMapInfo(mapManagerScript.GetMapGenerator().GetHeight(),
             mapManagerScript.GetMapGenerator().GetWidth(),
             mapManagerScript.GetMapGenerator().GetSquareSize());
 
@@ -91,11 +86,6 @@ public abstract class GameManager : CoreComponent, ILoggable {
     // Tells if it is logging.
     public bool IsLogging() {
         return logging;
-    }
-
-    // Returns the experiment manager.
-    public ExperimentManager GetExperimentManager() {
-        return experimentManagerScript;
     }
 
 }

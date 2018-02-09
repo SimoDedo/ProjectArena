@@ -1,4 +1,4 @@
-﻿namespace JsonModels {
+﻿namespace JsonObjects {
 
     public class JsonLog {
         public string time;

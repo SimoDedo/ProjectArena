@@ -35,7 +35,7 @@ public class RaycastGun : Gun {
 
         // Log if needed.
         if (logging) {
-            experimentManagerScript.LogShot(transform.root.position.x, transform.root.position.z,
+            ExperimentManager.Instance.LogShot(transform.root.position.x, transform.root.position.z,
                 transform.root.rotation.y, gunId, ammoInCharger, totalAmmo);
         }
 
@@ -53,7 +53,7 @@ public class RaycastGun : Gun {
                 direction = headCamera.transform.forward;
             }
 
-            if (Physics.Raycast(headCamera.transform.position, direction, out hit, range, 
+            if (Physics.Raycast(headCamera.transform.position, direction, out hit, range,
                 ignoredLayers)) {
                 if (!hit.transform.root.GetComponent<Player>()) {
                     StartCoroutine(ShowSpark(hit));

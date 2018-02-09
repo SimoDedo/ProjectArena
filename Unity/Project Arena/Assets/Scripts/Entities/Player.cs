@@ -37,8 +37,6 @@ public class Player : Entity, ILoggable {
 
     // Do I have to log?
     private bool logging = false;
-    // Experiment manager.
-    private ExperimentManager experimentManagerScript;
     // Time of the last position log.
     private float lastPositionLog = 0;
 
@@ -88,7 +86,7 @@ public class Player : Entity, ILoggable {
             UpdateGun();
             // Log if needed.
             if (logging && Time.time > lastPositionLog + 0.5) {
-                experimentManagerScript.LogPosition(transform.position.x, transform.position.z,
+                ExperimentManager.Instance.LogPosition(transform.position.x, transform.position.z,
                     transform.rotation.y);
                 lastPositionLog = Time.time;
             }
@@ -327,8 +325,7 @@ public class Player : Entity, ILoggable {
     }
 
     // Setups stuff for the logging.
-    public void SetupLogging(ExperimentManager em) {
-        experimentManagerScript = em;
+    public void SetupLogging() {
         logging = true;
     }
 

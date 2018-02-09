@@ -32,7 +32,8 @@ public class TargetHuntGameManager : GameManager {
     }
 
     private void Update() {
-        if (!IsReady() && mapManagerScript.IsReady() && spawnPointManagerScript.IsReady() && targetHuntGameUIManagerScript.IsReady()) {
+        if (!IsReady() && mapManagerScript.IsReady() && spawnPointManagerScript.IsReady() &&
+            targetHuntGameUIManagerScript.IsReady()) {
             // Generate the map.
             mapManagerScript.ManageMap(true);
 
@@ -52,7 +53,7 @@ public class TargetHuntGameManager : GameManager {
 
             // If needed, tell the Experiment Manager it can start logging.
             if (handshaking) {
-                experimentManagerScript.StartLogging();
+                ExperimentManager.Instance.StartLogging();
             }
 
             SetReady(true);
@@ -66,12 +67,14 @@ public class TargetHuntGameManager : GameManager {
         int passedTime = (int)(Time.time - startTime);
 
         if (gamePhase == -1) {
-            // Disable the player movement and interactions, activate the ready UI and set the phase.
+            // Disable the player movement and interactions, activate the ready UI and set the 
+            // phase.
             playerScript.SetInGame(false);
             targetHuntGameUIManagerScript.ActivateReadyUI();
             gamePhase = 0;
         } else if (gamePhase == 0 && passedTime >= readyDuration) {
-            // Enable the player movement and interactions, activate the fight UI, set the score to zero, the wave to 1 and set the phase.
+            // Enable the player movement and interactions, activate the fight UI, set the score to 
+            // zero, the wave to 1 and set the phase.
             targetHuntGameUIManagerScript.Fade(0.7f, 0f, false, 0.25f);
             targetHuntGameUIManagerScript.SetScore(0);
             spawnPointManagerScript.UpdateLastUsed();
@@ -80,7 +83,8 @@ public class TargetHuntGameManager : GameManager {
             targetHuntGameUIManagerScript.ActivateFightUI();
             gamePhase = 1;
         } else if (gamePhase == 1 && passedTime >= readyDuration + gameDuration) {
-            // Disable the player movement and interactions, activate the score UI, set the winner and set the phase.
+            // Disable the player movement and interactions, activate the score UI, set the winner 
+            // and set the phase.
             playerScript.SetInGame(false);
             targetHuntGameUIManagerScript.Fade(0.7f, 0, true, 0.5f);
             targetHuntGameUIManagerScript.SetFinalScore(playerScore);
@@ -98,11 +102,13 @@ public class TargetHuntGameManager : GameManager {
         switch (gamePhase) {
             case 0:
                 // Update the countdown.
-                targetHuntGameUIManagerScript.SetCountdown((int)(startTime + readyDuration - Time.time));
+                targetHuntGameUIManagerScript.SetCountdown((int)(startTime + readyDuration -
+                    Time.time));
                 break;
             case 1:
                 // Update the time.
-                targetHuntGameUIManagerScript.SetTime((int)(startTime + readyDuration + gameDuration - Time.time));
+                targetHuntGameUIManagerScript.SetTime((int)(startTime + readyDuration +
+                    gameDuration - Time.time));
                 // Pause or unpause if needed.
                 if (Input.GetKeyDown(KeyCode.Escape)) {
                     Pause();
@@ -119,7 +125,8 @@ public class TargetHuntGameManager : GameManager {
         targetHuntGameUIManagerScript.SetColorAll(c);
     }
 
-    // Called when a target is destroyed, adds score and time and changes wave if the target is the last one.
+    // Called when a target is destroyed, adds score and time and changes wave if the target is the 
+    // last one.
     public override void AddScore(int scoreIncrease, int timeIncrease) {
         // I need to ignore the targets call to decrease score.
         if (scoreIncrease > 0) {

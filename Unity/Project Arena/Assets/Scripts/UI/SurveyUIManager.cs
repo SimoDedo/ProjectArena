@@ -13,15 +13,11 @@ public class SurveyUIManager : MonoBehaviour {
 
     [Header("Other")] [SerializeField] private RotateTranslateByAxis backgroundScript;
 
-    private ExperimentManager experimentManagerScript;
-
     private int currentQuestion = 0;
     private string survey = "";
     private string answers = "";
 
     private void Start() {
-        experimentManagerScript = GameObject.Find("Experiment Manager").
-            GetComponent<ExperimentManager>();
         backgroundScript.SetRotation(ParameterManager.Instance.BackgroundRotation);
     }
 
@@ -32,7 +28,7 @@ public class SurveyUIManager : MonoBehaviour {
 
     // Updates the values of the survey.
     private void UpdateValues() {
-        if (experimentManagerScript.MustSaveSurvey()) {
+        if (ExperimentManager.Instance.MustSaveSurvey()) {
             survey += questions[currentQuestion].GetComponent<CheckboxQuestion>().GetJsonQuestion();
             if (currentQuestion < questions.Length - 1) {
                 survey += "\n";
@@ -46,10 +42,10 @@ public class SurveyUIManager : MonoBehaviour {
 
     // Saves the values of the survey.
     private void SaveValues() {
-        if (experimentManagerScript.MustSaveSurvey()) {
-            experimentManagerScript.SaveSurvey(survey);
+        if (ExperimentManager.Instance.MustSaveSurvey()) {
+            ExperimentManager.Instance.SaveSurvey(survey);
         }
-        experimentManagerScript.SaveAnswers(answers);
+        ExperimentManager.Instance.SaveAnswers(answers);
     }
 
     // Shows the first question.
@@ -75,7 +71,7 @@ public class SurveyUIManager : MonoBehaviour {
     // Returns to the experiment menu.
     private void Quit() {
         ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
-        SceneManager.LoadScene(experimentManagerScript.GetNextScene());
+        SceneManager.LoadScene(ExperimentManager.Instance.GetNextScene());
     }
 
 }

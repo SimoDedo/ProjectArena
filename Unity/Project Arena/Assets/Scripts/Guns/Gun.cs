@@ -67,8 +67,6 @@ public abstract class Gun : MonoBehaviour, ILoggable {
 
     // Do I have to log?
     protected bool logging = false;
-    // Experiment manager.
-    protected ExperimentManager experimentManagerScript;
 
     protected void Awake() {
         if (aimEnabled) {
@@ -147,7 +145,7 @@ public abstract class Gun : MonoBehaviour, ILoggable {
             if (Time.time > reloadStart + reloadTime) {
                 // Log if needed.
                 if (logging) {
-                    experimentManagerScript.LogRelaod(gunId, ammoInCharger, totalAmmo);
+                    ExperimentManager.Instance.LogRelaod(gunId, ammoInCharger, totalAmmo);
                 }
                 // Stop the reloading.
                 reloading = false;
@@ -320,16 +318,16 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     // Show muzzle flash.
     protected IEnumerator ShowMuzzleFlash() {
         // Move the gun downwards.
-        transform.position = new Vector3(transform.position.x, transform.position.y + recoil, 
+        transform.position = new Vector3(transform.position.x, transform.position.y + recoil,
             transform.position.z);
         // Rotate the muzzle flesh and show it.
-        muzzleFlash.transform.RotateAround(muzzleFlash.transform.position, transform.forward, 
+        muzzleFlash.transform.RotateAround(muzzleFlash.transform.position, transform.forward,
             Random.Range(0f, 360f));
         muzzleFlash.SetActive(true);
         // Wait.
         yield return new WaitForSeconds(muzzleFlashDuration);
         // Move the gun upwards and hide the muzzle flash.
-        transform.position = new Vector3(transform.position.x, transform.position.y - recoil, 
+        transform.position = new Vector3(transform.position.x, transform.position.y - recoil,
             transform.position.z);
         muzzleFlash.SetActive(false);
         // Reload if needed.
@@ -362,8 +360,7 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     }
 
     // Setups stuff for the logging.
-    public void SetupLogging(ExperimentManager em) {
-        experimentManagerScript = em;
+    public void SetupLogging() {
         logging = true;
     }
 

@@ -28,7 +28,7 @@ public class ProjectileGun : Gun {
 
         // Log if needed.
         if (logging) {
-            experimentManagerScript.LogShot(transform.root.position.x, transform.root.position.z,
+            ExperimentManager.Instance.LogShot(transform.root.position.x, transform.root.position.z,
                 transform.root.rotation.y, gunId, ammoInCharger, totalAmmo);
         }
 

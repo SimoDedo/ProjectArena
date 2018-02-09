@@ -1,4 +1,4 @@
-﻿using JsonModels;
+﻿using JsonObjects;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
