@@ -15,7 +15,7 @@ public class SLMapManager : MapManager {
             LoadMapFromText();
             // Flip the map if needed.
             if (flip) {
-                MapEdit.FlipMap(map);
+                map = MapEdit.FlipMap(map);                
             }
         } else {
             // Generate the map.

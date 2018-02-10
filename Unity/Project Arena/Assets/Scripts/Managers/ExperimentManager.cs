@@ -75,6 +75,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     private float mediumKillDistance = 0;
     // Size of a maps tile.
     private float tileSize = 1;
+    // Is the map flip?
+    private bool flip = false;
     // Position of the player.
     private Vector3 lastPosition = new Vector3(-1, -1, -1);
     // Initial target position.
@@ -98,9 +100,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         if (ParameterManager.HasInstance() && ParameterManager.Instance.Export == false) {
             logGame = false;
             logStatistics = false;
-        }
-
-        if (logGame || logStatistics) {
+        } else if (logGame || logStatistics) {
             SetupDirectories();
         }
     }
@@ -242,7 +242,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
     // Save survey. This has to be done once.
     public void SaveSurvey(string survey) {
-        System.IO.File.WriteAllText(surveysDirectory + "/survey.json", survey);
+        File.WriteAllText(surveysDirectory + "/survey.json", survey);
     }
 
     // Saves answers and informations about the experiment.
@@ -251,7 +251,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
             experimentName = experimentName,
             playedMaps = GetCurrentCasesArray()
         });
-        System.IO.File.WriteAllText(surveysDirectory + "/" + currentTimestamp + "_survey.json",
+        File.WriteAllText(surveysDirectory + "/" + currentTimestamp + "_survey.json",
             info + "\n" + answers);
     }
 
@@ -278,14 +278,14 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     private void SetupDirectories() {
         experimentDirectory = Application.persistentDataPath + "/Export/" + experimentName;
         CreateDirectory(experimentDirectory);
-        // Create the maps directory if needed.
+        // Create the case directories if needed.
         foreach (Study s in studies) {
             foreach (Case c in s.cases) {
-                CreateDirectory(experimentDirectory + "/" + c.GetCurrentMap().name);
-                System.IO.File.WriteAllText(@experimentDirectory + "/" + c.GetCurrentMap().name
-                    + "/" + c.GetCurrentMap().name + ".txt", c.GetCurrentMap().text);
+                CreateDirectory(experimentDirectory + "/" + c.caseName);
+                File.WriteAllText(@experimentDirectory + "/" + c.caseName + "/" +
+                    c.GetCurrentMap().name + ".txt", c.GetCurrentMap().text);
                 c.completion = (Directory.GetFiles(experimentDirectory + "/"
-                    + c.GetCurrentMap().name + "/", "*", SearchOption.AllDirectories).Length
+                    + c.caseName + "/", "*", SearchOption.AllDirectories).Length
                     - 1) / 2;
                 s.completion += c.completion;
             }
@@ -299,7 +299,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     // Sets up logging.
     private void SetupLogging() {
         logStream = File.CreateText(experimentDirectory + "/"
-            + caseList[currentCase].GetCurrentMap().name + "/"
+            + caseList[currentCase].caseName + "/"
             + caseList[currentCase].GetCurrentMap().name + "_" + currentTimestamp + "_log.json");
         logStream.AutoFlush = true;
 
@@ -327,7 +327,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     // Sets up statistics logging.
     private void SetupStatisticsLogging() {
         statisticsStream = File.CreateText(experimentDirectory + "/"
-            + caseList[currentCase].GetCurrentMap().name + "/"
+            + caseList[currentCase].caseName + "/"
             + caseList[currentCase].GetCurrentMap().name + "_" + currentTimestamp
             + "_statistics.json");
         statisticsStream.AutoFlush = true;
@@ -389,11 +389,13 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     // Logs the shot.
     public void LogShot(float x, float z, float direction, int gunId, int ammoInCharger,
         int totalAmmo) {
+        Coord coord = NormalizeFlipCoord(x, z);
+
         jLog.time = Time.time.ToString("n4");
         jLog.type = "player_shot";
-        jShoot.x = x.ToString("n4");
-        jShoot.y = z.ToString("n4");
-        jShoot.direction = direction.ToString("n4");
+        jShoot.x = coord.x.ToString("n4");
+        jShoot.y = coord.z.ToString("n4");
+        jShoot.direction = NormalizeFlipAngle(direction).ToString("n4");
         jShoot.weapon = gunId.ToString();
         jShoot.ammoInCharger = ammoInCharger.ToString();
         jShoot.totalAmmo = totalAmmo.ToString();
@@ -406,73 +408,82 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     }
 
     // Logs info about the maps.
-    public void LogMapInfo(float height, float width, float ts) {
+    public void LogMapInfo(float height, float width, float ts, bool f) {
+        tileSize = ts;
+        flip = f;
+
         string infoLog = JsonUtility.ToJson(new JsonMapInfo {
             height = height.ToString(),
             width = width.ToString(),
             tileSize = ts.ToString(),
+            flip = f.ToString()
         });
 
         WriteLog(infoLog);
 
         if (loggingStatistics) {
             WriteStatisticsLog(infoLog);
-            tileSize = ts;
         }
     }
 
-    // Logs the position.
+    // Logs the position (x and z respectively correspond to row and column in matrix notation).
     public void LogPosition(float x, float z, float direction) {
+        Coord coord = NormalizeFlipCoord(x, z);
+
         jLog.time = Time.time.ToString("n4");
         jLog.type = "player_position";
-        jPosition.x = x.ToString("n4");
-        jPosition.y = z.ToString("n4");
-        jPosition.direction = direction.ToString("n4");
+        jPosition.x = coord.x.ToString("n4");
+        jPosition.y = coord.z.ToString("n4");
+        jPosition.direction = NormalizeFlipAngle(direction).ToString("n4");
         string log = JsonUtility.ToJson(jLog);
         WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jPosition) + "}");
 
         if (loggingStatistics) {
             if (lastPosition.x != -1) {
-                float delta = EulerDistance(x, z, lastPosition.x, lastPosition.z, tileSize);
+                float delta = EulerDistance(coord.x, coord.z, lastPosition.x, lastPosition.z);
                 totalDistance += delta;
                 currentDistance += delta;
             }
-            lastPosition.x = x;
-            lastPosition.z = z;
+            lastPosition.x = coord.x;
+            lastPosition.z = coord.z;
         }
     }
 
     // Logs spawn.
     public void LogSpawn(float x, float z, string spawnedEntity) {
+        Coord coord = NormalizeFlipCoord(x, z);
+
         jLog.time = Time.time.ToString("n4");
         jLog.type = "spawn";
-        jSpawn.x = x.ToString("n4");
-        jSpawn.y = z.ToString("n4");
+        jSpawn.x = coord.x.ToString("n4");
+        jSpawn.y = coord.z.ToString("n4");
         jSpawn.spawnedEntity = spawnedEntity;
         string log = JsonUtility.ToJson(jLog);
         WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jSpawn) + "}");
 
         if (loggingStatistics) {
             targetSpawn = Time.time;
-            initialTargetPosition.x = x;
-            initialTargetPosition.z = z;
+            initialTargetPosition.x = coord.x;
+            initialTargetPosition.z = coord.z;
             initialPlayerPosition = lastPosition;
         }
     }
 
     // Logs a kill.
     public void LogKill(float x, float z, string killedEnitiy, string killerEntity) {
+        Coord coord = NormalizeFlipCoord(x, z);
+
         jLog.time = Time.time.ToString("n4");
         jLog.type = "kill";
-        jKill.x = x.ToString("n4");
-        jKill.y = z.ToString("n4");
+        jKill.x = coord.x.ToString("n4");
+        jKill.y = coord.z.ToString("n4");
         jKill.killedEntity = killedEnitiy;
         jKill.killerEntity = killerEntity;
         string log = JsonUtility.ToJson(jLog);
         WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jKill) + "}");
 
         if (loggingStatistics) {
-            LogTargetStatistics(x, z);
+            LogTargetStatistics(coord.x, coord.z);
             killCount++;
             mediumKillTime += (Time.time - lastTargetSpawn - mediumKillTime) / killCount;
             mediumKillDistance += (currentDistance - mediumKillDistance) / killCount;
@@ -483,10 +494,12 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
     // Logs a hit.
     public void LogHit(float x, float z, string hittedEntity, string hitterEntity, int damage) {
+        Coord coord = NormalizeFlipCoord(x, z);
+
         jLog.time = Time.time.ToString("n4");
         jLog.type = "hit";
-        jHit.x = x.ToString("n4");
-        jHit.y = z.ToString("n4");
+        jHit.x = coord.x.ToString("n4");
+        jHit.y = coord.z.ToString("n4");
         jHit.hittedEntity = hittedEntity;
         jHit.hitterEntity = hitterEntity;
         jHit.damage = damage.ToString();
@@ -532,9 +545,44 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
             Directory.CreateDirectory(directory);
     }
 
-    // Returns the normalized euler distance.
-    private float EulerDistance(float x1, float y1, float x2, float y2, float normalization) {
-        return Mathf.Sqrt(Mathf.Pow(x1 - x2, 2) + Mathf.Pow(y1 - y2, 2)) / normalization;
+    // Returns the euler distance.
+    private float EulerDistance(float x1, float y1, float x2, float y2) {
+        return Mathf.Sqrt(Mathf.Pow(x1 - x2, 2) + Mathf.Pow(y1 - y2, 2));
+    }
+
+    // Normalizes the coordinates and flips them if needed.
+    private Coord NormalizeFlipCoord(float x, float z) {
+        x /= tileSize;
+        z /= tileSize;
+
+        if (flip) {
+            return new Coord {
+                x = z,
+                z = x
+            };
+        } else {
+            return new Coord {
+                x = x,
+                z = z
+            };
+        }
+    }
+
+    // Normalizes and, if needed, flips an angle with respect to the y = -x axis.
+    private float NormalizeFlipAngle(float angle) {
+        angle = NormalizeAngle(angle);
+
+        if (flip) {
+            angle = NormalizeAngle(angle + 45);
+            angle = NormalizeAngle(-1 * angle - 45);
+        }
+
+        return angle;
+    }
+
+    // If an angle is negative it makes it positive.
+    private float NormalizeAngle(float angle) {
+        return (angle < 0) ? (360 + angle % 360) : (angle % 360);
     }
 
 }

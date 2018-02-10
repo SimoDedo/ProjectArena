@@ -391,7 +391,7 @@ public class DivisiveMapGenerator : MapGenerator {
                         genome += "<" + r.originX + ',' + r.originY + ',' + r.dimension + ">";
                     }
                 }
-                System.IO.File.WriteAllText(@textFilePath + "/" + seed.ToString() + ".ab.txt",
+                File.WriteAllText(@textFilePath + "/" + seed.ToString() + ".ab.txt",
                     genome);
             } catch (Exception) {
                 ManageError(Error.SOFT_ERROR, "Error while saving the map, please insert a valid " +

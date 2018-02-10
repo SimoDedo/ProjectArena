@@ -14,6 +14,7 @@ namespace ExperimentObjects {
 
     [Serializable]
     public class Case {
+        [SerializeField] public string caseName;
         [SerializeField] public List<TextAsset> maps;
         [SerializeField] public string scene;
         [NonSerialized] public int completion;
@@ -34,6 +35,11 @@ namespace ExperimentObjects {
                 mapIndex = 0;
             }
         }
+    }
+
+    public struct Coord {
+        public float x;
+        public float z;
     }
 
 }

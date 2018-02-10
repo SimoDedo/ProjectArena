@@ -87,7 +87,7 @@ public class Player : Entity, ILoggable {
             // Log if needed.
             if (logging && Time.time > lastPositionLog + 0.5) {
                 ExperimentManager.Instance.LogPosition(transform.position.x, transform.position.z,
-                    transform.rotation.y);
+                    transform.eulerAngles.y);
                 lastPositionLog = Time.time;
             }
         } else {

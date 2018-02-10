@@ -12,17 +12,19 @@ namespace MapManipulation {
     public static class MapEdit {
 
         // Flips the map.
-        public static void FlipMap(char[,] map) {
-            char[,] clonedMap = CloneMap(map);
-
+        public static char[,] FlipMap(char[,] map) {
             int width = map.GetLength(0);
             int height = map.GetLength(1);
 
+            char[,] flippedMap = new char[height, width];
+
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
-                    map[x, y] = clonedMap[height - y - 1, width - x - 1];
+                    flippedMap[height - y - 1, width - x - 1] = map[x, y];
                 }
             }
+
+            return flippedMap;
         }
 
         // Erodes the map as many times as specified.

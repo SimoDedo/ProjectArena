@@ -15,6 +15,7 @@
         public string height;
         public string width;
         public string tileSize;
+        public string flip;
     }
 
     public class JsonPosition {

@@ -78,7 +78,7 @@ public abstract class GameManager : CoreComponent, ILoggable {
     public void SetupLogging() {
         ExperimentManager.Instance.LogMapInfo(mapManagerScript.GetMapGenerator().GetHeight(),
             mapManagerScript.GetMapGenerator().GetWidth(),
-            mapManagerScript.GetMapGenerator().GetSquareSize());
+            mapManagerScript.GetMapGenerator().GetSquareSize(), mapManagerScript.GetFlip());
 
         logging = true;
     }

@@ -36,7 +36,7 @@ public class RaycastGun : Gun {
         // Log if needed.
         if (logging) {
             ExperimentManager.Instance.LogShot(transform.root.position.x, transform.root.position.z,
-                transform.root.rotation.y, gunId, ammoInCharger, totalAmmo);
+                transform.root.eulerAngles.y, gunId, ammoInCharger, totalAmmo);
         }
 
         if (hasUI) {

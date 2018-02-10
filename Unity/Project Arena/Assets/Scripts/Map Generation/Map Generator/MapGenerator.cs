@@ -220,7 +220,7 @@ public abstract class MapGenerator : CoreComponent {
                     }
                 }
 
-                System.IO.File.WriteAllText(@textFilePath + "/" + seed.ToString() + ".map.txt",
+                File.WriteAllText(@textFilePath + "/" + seed.ToString() + ".map.txt",
                     textMap);
             } catch (Exception) {
                 ManageError(Error.SOFT_ERROR, "Error while saving the map at " + @textFilePath +

@@ -86,4 +86,8 @@ public abstract class MapManager : CoreComponent {
         return mapGeneratorScript;
     }
 
+    public bool GetFlip() {
+        return flip;
+    }
+
 }
