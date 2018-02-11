@@ -293,7 +293,7 @@ def addSpawnPointsSafe(map, rooms, spawnPoint):
     diagonal = math.sqrt(math.pow(width, 2) + math.pow(height, 2))
 
     visibilityMatrix = getVisibilityMatrix(map)
-    normalizedDegree = getNormalizedDegree(roomGraph)
+    normalizedDegree = getNormalizedDegree(roomGraph, True)
     placedObjects = []
 
     print("Done.")
@@ -301,11 +301,11 @@ def addSpawnPointsSafe(map, rooms, spawnPoint):
     # Place the spawn points.
     print("Placing the spawn points... ", end='', flush=True)
 
-    degreeFit = getNormalizedDegreeFit(normalizedDegree, 0.1, 0.3)
+    degreeFit = dict([(fit[0], 1 - fit[1]) for fit in normalizedDegree])
     visibilityFit = [[(1 - visibilityMatrix[x][y]) for y in range(len(visibilityMatrix[0]))] for x in range(len(visibilityMatrix))]
 
     for i in range(spawnPoint[1]):
-        bestTile = getBestTile(roomGraph, diameter, diagonal, spawnPoint, [spawnPoint[0]], placedObjects, degreeFit, visibilityFit, [1, 0.25, -2], [1, 0.5, 0.5])
+        bestTile = getBestTile(roomGraph, diameter, diagonal, spawnPoint, [spawnPoint[0]], placedObjects, degreeFit, visibilityFit, [1, 0.5, -2], [1, 0.5, 0.5])
         addResource(bestTile[0], bestTile[1], spawnPoint[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], spawnPoint[0]])
 
@@ -331,7 +331,7 @@ def addSpawnPointsUnsafe(map, rooms, spawnPoint):
     diagonal = math.sqrt(math.pow(width, 2) + math.pow(height, 2))
 
     visibilityMatrix = getVisibilityMatrix(map)
-    normalizedDegree = getNormalizedDegree(roomGraph)
+    normalizedDegree = getNormalizedDegree(roomGraph, True)
     placedObjects = []
     deadEndCount = 0
 
@@ -344,7 +344,7 @@ def addSpawnPointsUnsafe(map, rooms, spawnPoint):
     visibilityFit = visibilityMatrix
 
     for node in list(roomGraph.nodes(data = True)):
-        if roomGraph.degree(node[0]) == 1 and deadEndCount < spawnPoint[1] / 2:
+        if not roomGraph in normalizedDegree and deadEndCount < spawnPoint[1] / 2:
             candidateTiles = [(x, y, visibilityFit[x][y]) for x in range(node[1]["originX"], node[1]["endX"]) for y in range(node[1]["originY"], node[1]["endY"])]
             bestTile = max(candidateTiles, key = lambda x: x[2])
             addResource(bestTile[0], bestTile[1], spawnPoint[0], roomGraph, map)
@@ -352,9 +352,54 @@ def addSpawnPointsUnsafe(map, rooms, spawnPoint):
             deadEndCount = deadEndCount + 1
 
     for i in range(spawnPoint[1] - deadEndCount):
-        bestTile = getBestTile(roomGraph, diameter, diagonal, spawnPoint, [spawnPoint[0]], placedObjects, degreeFit, visibilityFit, [1, 1, -2], [1, 0.75, 0.75])
+        bestTile = getBestTile(roomGraph, diameter, diagonal, spawnPoint, [spawnPoint[0]], placedObjects, degreeFit, visibilityFit, [1, 1.5, -2], [1, 0.75, 0.75])
         addResource(bestTile[0], bestTile[1], spawnPoint[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], spawnPoint[0]])
+
+    print("Done.")
+
+# Adds spawn points in a random uniform way.
+def addSpawnPointsUniformly(map, rooms, spawnPoint):
+    width = len(map)
+    height = len(map[0])
+
+    # Removing the objects.
+    print("\nRemoving the pre-existing objects... ", end='', flush=True)
+    for x in range(width): 
+        for y in range(height): 
+            if not map[x][y] == "w" and not map[x][y] == "r" :
+                map[x][y] = "r"
+    print("Done.")
+
+    print("Initializing the variables... ", end='', flush=True)
+
+    roomGraph = getRoomsCorridorsGraph(rooms, False)
+    diagonal = math.sqrt(math.pow(width, 2) + math.pow(height, 2))
+
+    visibilityMatrix = getVisibilityMatrix(map)
+    placedObjects = []
+
+    print("Done.")
+
+    # Place the spawn points.
+    print("Placing the spawn points... ", end='', flush=True)
+
+    visibilityFit = [[(1 - visibilityMatrix[x][y]) for y in range(len(visibilityMatrix[0]))] for x in range(len(visibilityMatrix))]
+    
+    for i in range(spawnPoint[1]):
+        if (len(placedObjects) > 0):
+            bestRoom = getMostIsolatedNode(roomGraph, spawnPoint[0])
+        else:
+            bestRoom = roomGraph.node[random.choice(list(roomGraph.nodes))]
+
+        print("Done.")
+
+
+        candidateTiles = [(x, y, tileFit(x, y, visibilityFit[x][y], bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], \
+        placedObjects, diagonal, [1, 0.5, 0.5])) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]
+        bestTile = max(candidateTiles, key = lambda x: x[2])
+        addResource(bestTile[0], bestTile[1], spawnPoint[0], roomGraph, map)
+        placedObjects.append([bestTile[0], bestTile[1], spawnPoint[0]])        
 
     print("Done.")
 
@@ -424,19 +469,19 @@ def getDegreeFit(roomGraph, minimum, maximum):
     maxFit = max(fitness, key = lambda x: x[1])[1]
     return dict([(fit[0], 1 - (fit[1] - minFit) / (maxFit - minFit)) for fit in fitness])
 
+# Computes the normalized degree.
+def getNormalizedDegree(roomGraph, discardDeadEnds=False):
+    degree = roomGraph.degree
+    minDeg = min(degree, key = lambda x: x[1])[1]
+    maxDeg = max(degree, key = lambda x: x[1])[1]
+    return [(deg[0], (deg[1] / (maxDeg + minDeg))) for deg in roomGraph.degree if (discardDeadEnds is False or deg[1] > 1)]
+
 # Computes how much each normalized degree fits the specified interval.
 def getNormalizedDegreeFit(normalizedDegree, minimum, maximum):
     fitness = [(deg[0], intervalDistance(minimum, maximum, deg[1])) for deg in normalizedDegree]
     minFit = min(fitness, key = lambda x: x[1])[1]
     maxFit = max(fitness, key = lambda x: x[1])[1]
     return dict([(fit[0], 1 - (fit[1] - minFit) / (maxFit - minFit)) for fit in fitness])
-
-# Computes the normalized degree.
-def getNormalizedDegree(roomGraph):
-    degree = roomGraph.degree
-    minDeg = min(degree, key = lambda x: x[1])[1]
-    maxDeg = max(degree, key = lambda x: x[1])[1]
-    return [(deg[0], deg[1] / (maxDeg + minDeg)) for deg in roomGraph.degree]
 
 # Computes a matrix where each cell is the visibility of that cell in the map
 # with respect to the visibility of the other cells.
@@ -487,8 +532,8 @@ def resourceRedundancy(graph, node, resource):
     return redundancy
 
 # Returns the fitness of a room.
-def roomFit(graph, diameter, node, intervalFit, object, objectList, weigths):
-    return weigths[0] * intervalFit + weigths[1] * resourceDistance(graph, diameter, node, objectList) + weigths[2] * resourceRedundancy(graph, node, object)
+def roomFit(graph, diameter, node, degreeFit, object, objectList, weigths):
+    return weigths[0] * degreeFit + weigths[1] * resourceDistance(graph, diameter, node, objectList) + weigths[2] * resourceRedundancy(graph, node, object)
 
 # Returns the distance of a tile from the walls.
 def wallDistace(originX, originY, endX, endY, x, y):
@@ -505,11 +550,17 @@ def tileFit(x, y, visibility, originX, originY, endX, endY, placedObjects, diago
 # Returns the best tile.
 def getBestTile(graph, diameter, diagonal, object, objects, placedObjects, degreeFit, visibilityFit, roomWeigths, tileWeigths):
     candidateRooms = [(node, roomFit(graph, diameter, node, degreeFit[node], object, objects, roomWeigths)) \
-                      for node, data in graph.nodes(data = True) if not "resource" in data]
+                      for node, data in graph.nodes(data = True) if (not "resource" in data and node in degreeFit)]
     bestRoom = graph.node[max(candidateRooms, key = lambda x: x[1])[0]]
     candidateTiles = [(x, y, tileFit(x, y, visibilityFit[x][y], bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], \
                       placedObjects, diagonal, tileWeigths)) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]
     return max(candidateTiles, key = lambda x: x[2])
+
+# Returns the node which has the maximum minimum distance from the resource nodes.
+def getMostIsolatedNode(graph, resource):
+    nodes = [(node1, min([nx.shortest_path_length(graph, node1, node2) for node2, data2 in graph.nodes(data = True) if ("resource" in data2 and data2["resource"] == resource)])) \
+                      for node1, data1 in graph.nodes(data = True) if ("resource" not in data1)]
+    return graph.node[max(nodes, key = lambda x: x[1])[0]]
 
 ### GRAPH FUNCTIONS ###########################################################
 
@@ -872,12 +923,15 @@ def filesMenu():
 
 # Mengaes the map population menu.
 def populateMenu():
+    index = 0;
+
     while True:
         print("\n[MAP POPULATION] Select an option:")
         print("[1] Add spawn points with low risk heuristic")
         print("[2] Add spawn points with high risk heuristic")
-        print("[3] Add spawn points randomly")
-        print("[4] Add everything")
+        print("[3] Add spawn points uniformly")
+        print("[4] Add spawn points randomly")
+        print("[5] Add everything")
         print("[0] Back\n")
 
         option = input("Option: ")
@@ -887,16 +941,20 @@ def populateMenu():
     
         if option == "1":
             addSpawnPointsSafe(map, rooms, ["s", 5])
-            exportMap(outputDir + "/" + mapName + "_SS_map.txt")    
+            exportMap(outputDir + "/" + mapName + "_SS.map.txt")    
         elif option == "2":
             addSpawnPointsUnsafe(map, rooms, ["s", 5])
-            exportMap(outputDir + "/" + mapName + "_SU_map.txt")    
+            exportMap(outputDir + "/" + mapName + "_SU.map.txt")    
         elif option == "3":
-            addSpawnPointsRandom(map, rooms, ["s", 5])
-            exportMap(outputDir + "/" + mapName + "_SR_map.txt")         
+            index = index + 1
+            addSpawnPointsUniformly(map, rooms, ["s", 5])
+            exportMap(outputDir + "/" + mapName + "_SUD" + str(index) + ".map.txt")         
         elif option == "4":
+            addSpawnPointsRandom(map, rooms, ["s", 5])
+            exportMap(outputDir + "/" + mapName + "_SR.map.txt")  
+        elif option == "5":
             addEverything(map, rooms, ["s", 5], ["h", 4], ["a", 4])
-            exportMap(outputDir + "/" + mapName + "_E_map.txt")    
+            exportMap(outputDir + "/" + mapName + "_ES.map.txt")  
         elif option == "0":
             return
 
@@ -911,7 +969,7 @@ if not os.path.exists(outputDir):
     os.makedirs(outputDir)
 
 print("MAP ANALYZER\n")
-print("This script expects a MAPNAME_map.txt file and MAPNAME_AB.txt file in the input folder.")
+print("This script expects a MAPNAME.map.txt file and MAPNAME_AB.txt file in the input folder.")
 
 # Get the files and process them.
 mapName, mapFileName, ABFileName, mapFilePath, ABFilePath, map, rooms = filesMenu()
