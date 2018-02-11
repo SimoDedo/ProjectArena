@@ -38,7 +38,7 @@ public class DivisiveMapGenerator : MapGenerator {
 
     private void Start() {
         minimumDividableRoomDimension = minimumRoomDimension * 2;
-        minimumFilledTiles = width * height * mapRoomPercentage / 100;
+        minimumFilledTiles = (int) (width * height * mapRoomPercentage / 100f);
 
         SetReady(true);
     }
