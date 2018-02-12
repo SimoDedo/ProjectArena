@@ -1,5 +1,6 @@
 ﻿using ExperimentObjects;
 using JsonObjects;
+using Polimi.GameCollective.Connectivity;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,6 +27,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     private Case survey;
     private bool playSurvey;
 
+    private bool logOffline;
+    private bool logOnline;
     private bool logGame;
     private bool logStatistics;
 
@@ -36,8 +39,12 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     // Directory for the surveys.
     private string surveysDirectory;
 
+    // Label of the current game log.
+    private string logLabel;
     // Stream writer of the current game log.
     private StreamWriter logStream;
+    // String of the current game log.
+    private string logString;
     // Support object to format the log.
     private JsonLog jLog;
     // Support object to fromat the position log.
@@ -53,8 +60,12 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     // Support object to format the log.
     private JsonHit jHit;
 
+    // Label of the current statistic log.
+    private string statisticsLabel;
     // Stream writer of the current statistic log.
     private StreamWriter statisticsStream;
+    // String of the current statistic log.
+    private string statisticsString;
     // Spawn time of current target.
     private float targetSpawn = 0;
     // Spawn time of last target.
@@ -94,30 +105,74 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     private bool logging = false;
     private bool loggingStatistics = false;
 
-    void Start() {
-        caseList = new List<Case>();
-
-        if (ParameterManager.HasInstance() && ParameterManager.Instance.Export == false) {
-            logGame = false;
-            logStatistics = false;
-        } else if (logGame || logStatistics) {
-            SetupDirectories();
-        }
-    }
+    private Queue<Entry> postQueue;
 
     void Awake() {
         DontDestroyOnLoad(transform.gameObject);
+    }
+
+    void Start() {
+        caseList = new List<Case>();
+
+        if (ParameterManager.HasInstance() && ParameterManager.Instance.Export == true) {
+            logOffline = true;
+        } else {
+            logOffline = false;
+        }
+
+        if (!logOffline && !logOnline) {
+            logGame = false;
+            logStatistics = false;
+        } else {
+            if (logOnline) {
+                postQueue = new Queue<Entry>();
+                SetCompletionOnline();
+            }
+            if (logOffline) {
+                SetupDirectories();
+                if (!logOnline) {
+                    SetCompletionOffline();
+                }
+            }
+
+            jLog = new JsonLog {
+                log = ""
+            };
+
+            if (logGame) {
+                jShoot = new JsonShoot();
+                jReload = new JsonReload();
+                jPosition = new JsonPosition();
+                jSpawn = new JsonSpawn();
+                jKill = new JsonKill();
+                jHit = new JsonHit();
+            }
+
+            if (logStatistics) {
+                jGameStatistics = new JsonGameStatistics();
+                jTargetStatistics = new JsonTargetStatistics();
+            }
+        }
     }
 
     void OnEnable() {
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
+    void Update() {
+        if (logOnline) {
+            if (!RemoteDataManager.Instance.IsRequestPending && postQueue.Count > 0) {
+                RemoteDataManager.Instance.SaveData(postQueue.Dequeue());
+            }
+        }
+    }
+
     /* EXPERIMENT */
 
     // Sets up the experiment manager.
     public void Setup(Case tutorial, bool playTutorial, List<Study> studies, int casesPerUsers,
-        string experimentName, Case survey, bool playSurvey, bool logGame, bool logStatistics) {
+        string experimentName, Case survey, bool playSurvey, bool logOnline, bool logGame,
+        bool logStatistics) {
         this.tutorial = tutorial;
         this.playTutorial = playTutorial;
         this.studies = studies;
@@ -125,6 +180,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         this.experimentName = experimentName;
         this.survey = survey;
         this.playSurvey = playSurvey;
+        this.logOnline = logOnline;
         this.logGame = logGame;
         this.logStatistics = logStatistics;
     }
@@ -138,7 +194,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
             caseList.Add(tutorial);
         }
 
-        caseList.AddRange(GetCases(casesPerUsers));
+        caseList.AddRange(logOnline ? GetCasesOnline(casesPerUsers) :
+            GetCasesOffline(casesPerUsers));
 
         if (playSurvey) {
             caseList.Add(survey);
@@ -158,8 +215,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
             "-" + now.Second;
     }
 
-    // Gets the cases to add in a round-robin fashion.
-    private List<Case> GetCases(int count) {
+    // Gets the cases to add in a round-robin fashion (offline).
+    private List<Case> GetCasesOffline(int count) {
         List<Case> lessPlayedCases = new List<Case>();
 
         // Get the least played study.
@@ -193,6 +250,15 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
         // Randomize the play order.
         Shuffle(lessPlayedCases);
+
+        return lessPlayedCases;
+    }
+
+    // Gets the cases to add in a round-robin fashion  (online).
+    private List<Case> GetCasesOnline(int count) {
+        List<Case> lessPlayedCases = new List<Case>();
+
+        // TODO.
 
         return lessPlayedCases;
     }
@@ -233,38 +299,6 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         }
     }
 
-    /* SURVEY */
-
-    // Tells if I need to save the survey.
-    public bool MustSaveSurvey() {
-        return !File.Exists(surveysDirectory + "/survey.json");
-    }
-
-    // Save survey. This has to be done once.
-    public void SaveSurvey(string survey) {
-        File.WriteAllText(surveysDirectory + "/survey.json", survey);
-    }
-
-    // Saves answers and informations about the experiment.
-    public void SaveAnswers(string answers) {
-        string info = JsonUtility.ToJson(new JsonInfo {
-            experimentName = experimentName,
-            playedMaps = GetCurrentCasesArray()
-        });
-        File.WriteAllText(surveysDirectory + "/" + currentTimestamp + "_survey.json",
-            info + "\n" + answers);
-    }
-
-    // Returns the played cases in an array.
-    public string[] GetCurrentCasesArray() {
-        string[] maps = new string[casesPerUsers];
-        for (int i = 0; i < casesPerUsers; i++) {
-            maps[i] = playTutorial ? caseList[i + 1].GetCurrentMap().name :
-                caseList[i].GetCurrentMap().name;
-        }
-        return maps;
-    }
-
     /* LOGGING */
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
@@ -284,10 +318,6 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
                 CreateDirectory(experimentDirectory + "/" + c.caseName);
                 File.WriteAllText(@experimentDirectory + "/" + c.caseName + "/" +
                     c.GetCurrentMap().name + ".txt", c.GetCurrentMap().text);
-                c.completion = (Directory.GetFiles(experimentDirectory + "/"
-                    + c.caseName + "/", "*", SearchOption.AllDirectories).Length
-                    - 1) / 2;
-                s.completion += c.completion;
             }
         }
 
@@ -296,23 +326,34 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         CreateDirectory(surveysDirectory);
     }
 
+    // Sets the completion (online).
+    private void SetCompletionOnline() {
+        // TODO.
+    }
+
+    // Sets the completion (offline).
+    private void SetCompletionOffline() {
+        foreach (Study s in studies) {
+            foreach (Case c in s.cases) {
+                c.completion = (Directory.GetFiles(experimentDirectory + "/"
+                    + c.caseName + "/", "*", SearchOption.AllDirectories).Length
+                    - 1) / 2;
+                s.completion += c.completion;
+            }
+        }
+    }
+
     // Sets up logging.
     private void SetupLogging() {
-        logStream = File.CreateText(experimentDirectory + "/"
-            + caseList[currentCase].caseName + "/"
-            + caseList[currentCase].GetCurrentMap().name + "_" + currentTimestamp + "_log.json");
-        logStream.AutoFlush = true;
-
-        jLog = new JsonLog {
-            log = ""
-        };
-
-        jShoot = new JsonShoot();
-        jReload = new JsonReload();
-        jPosition = new JsonPosition();
-        jSpawn = new JsonSpawn();
-        jKill = new JsonKill();
-        jHit = new JsonHit();
+        if (logOnline) {
+            logLabel = caseList[currentCase].GetCurrentMap().name + "_" + currentTimestamp + "_log";
+        }
+        if (logOffline) {
+            logStream = File.CreateText(experimentDirectory + "/"
+                + caseList[currentCase].caseName + "/"
+                + caseList[currentCase].GetCurrentMap().name + "_" + currentTimestamp + "_log.json");
+            logStream.AutoFlush = true;
+        }
 
         GameManager gm = FindObjectOfType(typeof(GameManager)) as GameManager;
         if (gm != null) {
@@ -326,14 +367,17 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
     // Sets up statistics logging.
     private void SetupStatisticsLogging() {
-        statisticsStream = File.CreateText(experimentDirectory + "/"
+        if (logOnline) {
+            statisticsLabel = caseList[currentCase].GetCurrentMap().name + "_" + currentTimestamp
+            + "_statistics";
+        }
+        if (logOffline) {
+            statisticsStream = File.CreateText(experimentDirectory + "/"
             + caseList[currentCase].caseName + "/"
             + caseList[currentCase].GetCurrentMap().name + "_" + currentTimestamp
             + "_statistics.json");
-        statisticsStream.AutoFlush = true;
-
-        jGameStatistics = new JsonGameStatistics();
-        jTargetStatistics = new JsonTargetStatistics();
+            statisticsStream.AutoFlush = true;
+        }
     }
 
     // Starts logging.
@@ -354,25 +398,46 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
     // Writes a log in the log stream.
     public void WriteLog(string log) {
-        logStream.WriteLine(log);
+        if (logOffline) {
+            logStream.WriteLine(log);
+        }
+        if (logOnline) {
+            logString += (log + "\n");
+        }
     }
 
     // Writes a log in the statistics stream.
     public void WriteStatisticsLog(string log) {
-        statisticsStream.WriteLine(log);
+        if (logOffline) {
+            statisticsStream.WriteLine(log);
+        }
+        if (logOnline) {
+            statisticsString += (log + "\n");
+        }
     }
 
     // Stops logging and saves the log.
     public void StopLogging() {
         if (loggingStatistics) {
             LogGameStatistics();
-            statisticsStream.Close();
+            if (logOffline) {
+                statisticsStream.Close();
+            }
+            if (logOnline) {
+                postQueue.Enqueue(new Entry(statisticsLabel, statisticsString, ""));
+                statisticsString = "";
+            }
             loggingStatistics = false;
         }
 
+        if (logOffline) {
+            logStream.Close();
+        }
+        if (logOnline) {
+            postQueue.Enqueue(new Entry(logLabel, logString, ""));
+            logString = "";
+        }
         logging = false;
-
-        logStream.Close();
     }
 
     // Logs reload.
@@ -535,6 +600,47 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         jGameStatistics.accuracy = (shotCount > 0) ? (hitCount / (float)shotCount).ToString("n4")
             : "0";
         WriteStatisticsLog(JsonUtility.ToJson(jGameStatistics));
+    }
+
+    /* SURVEY*/
+
+    // Tells if I need to save the survey.
+    public bool MustSaveSurvey() {
+        return !File.Exists(surveysDirectory + "/survey.json") && logOffline;
+    }
+
+    // Save survey. This has to be done once.
+    public void SaveSurvey(string survey) {
+        File.WriteAllText(surveysDirectory + "/survey.json", survey);
+    }
+
+    // Saves answers and informations about the experiment.
+    public void SaveAnswers(string answers) {
+        string info = JsonUtility.ToJson(new JsonInfo {
+            experimentName = experimentName,
+            playedMaps = GetCurrentCasesArray()
+        });
+        if (logOnline) {
+            postQueue.Enqueue(new Entry(currentTimestamp + "_survey.json", statisticsString, ""));
+        }
+        if (logOffline) {
+            File.WriteAllText(surveysDirectory + "/" + currentTimestamp + "_survey.json",
+                info + "\n" + answers);
+        }
+    }
+
+    // Returns the played cases in an array.
+    public string[] GetCurrentCasesArray() {
+        try {
+            string[] maps = new string[casesPerUsers];
+            for (int i = 0; i < casesPerUsers; i++) {
+                maps[i] = playTutorial ? caseList[i + 1].GetCurrentMap().name :
+                    caseList[i].GetCurrentMap().name;
+            }
+            return maps;
+        } catch {
+            return null;
+        }
     }
 
     /* SUPPORT FUNCTIONS */
