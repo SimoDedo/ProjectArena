@@ -7,8 +7,8 @@ namespace JsonObjects {
 
         [Serializable]
         public class JsonGameLog {
-            public JsonExperimentProgress experimentProgress;
             public JsonMapInfo mapInfo;
+            public JsonGameInfo gameInfo;
             public List<JsonSpawn> spawnLogs;
             public List<JsonPosition> positionLogs;
             public List<JsonShot> shotLogs;
@@ -60,7 +60,8 @@ namespace JsonObjects {
             public int ammoInCharger;
             public int totalAmmo;
 
-            public JsonShot(float timestamp, float x, float y, float direction, int weapon, int ammoInCharger,
+            public JsonShot(float timestamp, float x, float y, float direction, int weapon,
+                int ammoInCharger,
                 int totalAmmo) {
                 this.timestamp = timestamp;
                 this.x = x;
@@ -94,7 +95,8 @@ namespace JsonObjects {
             public string killedEntity;
             public string killerEntity;
 
-            public JsonKill(float timestamp, float x, float y, string killedEntity, string killerEntity) {
+            public JsonKill(float timestamp, float x, float y, string killedEntity,
+                string killerEntity) {
                 this.timestamp = timestamp;
                 this.x = x;
                 this.y = y;
@@ -112,7 +114,8 @@ namespace JsonObjects {
             public string hitterEntity;
             public int damage;
 
-            public JsonHit(float timestamp, float x, float y, string hittedEntity, string hitterEntity, int damage) {
+            public JsonHit(float timestamp, float x, float y, string hittedEntity,
+                string hitterEntity, int damage) {
                 this.timestamp = timestamp;
                 this.x = x;
                 this.y = y;
@@ -143,8 +146,8 @@ namespace JsonObjects {
 
         [Serializable]
         public class JsonStatisticsLog {
-            public JsonExperimentProgress experimentProgress;
             public JsonMapInfo mapInfo;
+            public JsonGameInfo gameInfo;
             public List<JsonTargetStatistics> targetStatisticsLogs;
             public JsonFinalStatistics finalStatistics;
 
@@ -245,14 +248,12 @@ namespace JsonObjects {
 
         [Serializable]
         public class JsonAnswers {
-            public JsonExperimentProgress experimentProgress;
             public string experimentName;
             public string[] playedMaps;
             public List<JsonAnswer> answers;
 
-            public JsonAnswers(JsonExperimentProgress experimentProgress, string experimentName, 
-                string[] playedMaps, List<JsonAnswer> answers) {
-                this.experimentProgress = experimentProgress;
+            public JsonAnswers(string experimentName, string[] playedMaps,
+                List<JsonAnswer> answers) {
                 this.experimentName = experimentName;
                 this.playedMaps = playedMaps;
                 this.answers = answers;
@@ -273,27 +274,6 @@ namespace JsonObjects {
     }
 
     [Serializable]
-    public class JsonExperimentProgress {
-        public List<JsonStudyProgress> studyProgresses;
-
-        public JsonExperimentProgress(List<JsonStudyProgress> studyProgresses) {
-            this.studyProgresses = studyProgresses;
-        }
-    }
-
-    [Serializable]
-    public class JsonStudyProgress {
-        public int studyProgress;
-        public int[] caseProgresses;
-
-        public JsonStudyProgress(int studyProgress, int[] caseProgresses) {
-            this.studyProgress = studyProgress;
-            this.caseProgresses = caseProgresses;
-
-        }
-    }
-
-    [Serializable]
     public class JsonMapInfo {
         public float height;
         public float width;
@@ -305,6 +285,27 @@ namespace JsonObjects {
             this.width = width;
             this.tileSize = tileSize;
             this.flip = flip;
+        }
+    }
+
+    [Serializable]
+    public class JsonGameInfo {
+        public int duration;
+        public string scene;
+
+        public JsonGameInfo(int duration, string scene) {
+            this.duration = duration;
+            this.scene = scene;
+        }
+    }
+
+    [Serializable]
+    public class JsonCompletionTracker {
+        public List<ExperimentObjects.StudyCompletionTracker> studyCompletionTrackers;
+
+        public JsonCompletionTracker(List<ExperimentObjects.StudyCompletionTracker> 
+            studyCompletionTrackers) {
+            this.studyCompletionTrackers = studyCompletionTrackers;
         }
     }
 

@@ -9,6 +9,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -49,8 +51,9 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     private string statisticsLabel;
     // Support object to format the log.
     private JsonStatisticsLog jStatisticsLog;
-    // Support object for formatting the experiment progress.
-    private JsonExperimentProgress jExperimentProgress;
+
+    // Completion trackers.
+    private List<StudyCompletionTracker> experimentCompletionTracker;
 
     // Spawn time of current target.
     private float targetSpawn = 0;
@@ -81,8 +84,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     // Initial player position.
     private Vector3 initialPlayerPosition = new Vector3(-1, -1, -1);
 
-    private readonly int SERVER_CONNECTION_ATTEMPTS = 50;
-    private readonly float SERVER_CONNECTION_PERIOD = 0.1f;
+    private readonly float SERVER_CONNECTION_PERIOD = 0.5f;
 
     private int currentStudy = -1;
     private int currentCase = -1;
@@ -139,8 +141,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     }
 
     void Update() {
-        if (logOnline) {
-            if (!RemoteDataManager.Instance.IsRequestPending && postQueue.Count > 0) {
+        if (logOnline && postQueue.Count > 0) {
+            if (!RemoteDataManager.Instance.IsRequestPending) {
                 RemoteDataManager.Instance.SaveData(postQueue.Dequeue());
             }
         }
@@ -173,8 +175,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
             caseList.Add(tutorial);
         }
 
-        caseList.AddRange(logOnline ? GetCasesOnline(casesPerUsers) :
-            GetCasesOffline(casesPerUsers));
+        caseList.AddRange(GetCases(casesPerUsers));
 
         if (playSurvey) {
             caseList.Add(survey);
@@ -195,49 +196,42 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     }
 
     // Gets the cases to add in a round-robin fashion (offline).
-    private List<Case> GetCasesOffline(int count) {
+    private List<Case> GetCases(int count) {
         List<Case> lessPlayedCases = new List<Case>();
 
         // Get the least played study.
-        int minValue = studies[0].completion;
+        int minValue = experimentCompletionTracker[0].studyCompletion;
         currentStudy = 0;
 
-        for (int i = 0; i < studies.Count; i++) {
-            if (studies[i].completion < minValue) {
-                minValue = studies[i].completion;
+        for (int i = 0; i < experimentCompletionTracker.Count; i++) {
+            if (experimentCompletionTracker[i].studyCompletion < minValue) {
+                minValue = experimentCompletionTracker[i].studyCompletion;
                 currentStudy = i;
             }
         }
 
         // Get the least played cases in the least played study.
         if (count < studies[currentStudy].cases.Count) {
-            studies[currentStudy].cases = studies[currentStudy].cases.OrderBy(o => o.completion).ToList();
+            var sorted = experimentCompletionTracker[currentStudy].casesCompletion.Select((v, i) =>
+                i).OrderBy(v => v).ToList();
+
             for (int i = 0; i < count; i++) {
-                studies[currentStudy].cases[i].RandomizeCurrentMap();
-                lessPlayedCases.Add(studies[currentStudy].cases[i]);
-                studies[currentStudy].cases[i].completion++;
-                studies[currentStudy].completion++;
+                studies[currentStudy].cases[sorted[i]].RandomizeCurrentMap();
+                lessPlayedCases.Add(studies[currentStudy].cases[sorted[i]]);
+                experimentCompletionTracker[currentStudy].casesCompletion[sorted[i]]++;
+                experimentCompletionTracker[currentStudy].studyCompletion++;
             }
         } else {
-            foreach (Case c in studies[currentStudy].cases) {
-                c.RandomizeCurrentMap();
-                lessPlayedCases.Add(c);
-                c.completion++;
-                studies[currentStudy].completion++;
+            for (int i = 0; i < studies[currentStudy].cases.Count; i++) {
+                studies[currentStudy].cases[i].RandomizeCurrentMap();
+                lessPlayedCases.Add(studies[currentStudy].cases[i]);
+                experimentCompletionTracker[currentStudy].studyCompletion++;
+                experimentCompletionTracker[currentStudy].studyCompletion++;
             }
         }
 
         // Randomize the play order.
         Shuffle(lessPlayedCases);
-
-        return lessPlayedCases;
-    }
-
-    // Gets the cases to add in a round-robin fashion  (online).
-    private List<Case> GetCasesOnline(int count) {
-        List<Case> lessPlayedCases = new List<Case>();
-
-        // TODO.
 
         return lessPlayedCases;
     }
@@ -308,19 +302,24 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     private IEnumerator SetCompletionOnline() {
         RemoteDataManager.Instance.GetLastEntry();
 
-        int attempt = 0;
-        while (!RemoteDataManager.Instance.IsResultReady && attempt < SERVER_CONNECTION_ATTEMPTS) {
-            attempt++;
+        while (!RemoteDataManager.Instance.IsResultReady) {
             yield return new WaitForSeconds(SERVER_CONNECTION_PERIOD);
         }
 
         if (RemoteDataManager.Instance.IsResultReady) {
-            string result = RemoteDataManager.Instance.Result;
-            result = result.Substring(1, result.IndexOf("\n", StringComparison.Ordinal));
-            JsonUtility.FromJsonOverwrite(result, jExperimentProgress);
-            // TODO.
-        } else {
-            // TODO.
+            string comment = RemoteDataManager.Instance.GetResultAsEntry().Comment;
+
+            try {
+                experimentCompletionTracker =
+                    JsonUtility.FromJson<JsonCompletionTracker>(comment).studyCompletionTrackers;
+                Debug.Log(JsonUtility.ToJson(new JsonCompletionTracker(experimentCompletionTracker)));
+            } catch {
+                experimentCompletionTracker = null;
+            }
+        }
+
+        if (experimentCompletionTracker == null || experimentCompletionTracker.Count == 0) {
+            SetCompletionOffline();
         }
 
         GameObject.Find("Experiment Menu UI Manager").GetComponent<ExperimentMenuUIManager>().
@@ -329,8 +328,13 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
     // Sets the completion (offline).
     private void SetCompletionOffline() {
+        experimentCompletionTracker = new List<StudyCompletionTracker>();
+
         foreach (Study s in studies) {
             string[] allFiles = Directory.GetFiles(experimentDirectory + "/" + s.studyName);
+
+            int studyCompletion = 0;
+            List<int> casesCompletion = new List<int>();
 
             foreach (Case c in s.cases) {
                 int logCount = 0;
@@ -347,15 +351,18 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
                     }
                 }
 
-                c.completion = (logCount > statisticsCount) ? logCount : statisticsCount;
-                s.completion += c.completion;
+                casesCompletion.Add((logCount > statisticsCount) ? logCount : statisticsCount);
+                studyCompletion += casesCompletion.Last();
             }
+
+            experimentCompletionTracker.Add(new StudyCompletionTracker(studyCompletion,
+                casesCompletion.ToArray()));
         }
     }
 
     // Sets up logging.
     private void SetupLogging() {
-        gameLabel = testID + "_" + caseList[currentCase].GetCurrentMap().name.Replace(".map", "") +
+        gameLabel = "PA_" + testID + "_" + caseList[currentCase].GetCurrentMap().name.Replace(".map", "") +
             "_log";
 
         GameManager gm = FindObjectOfType(typeof(GameManager)) as GameManager;
@@ -364,7 +371,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         }
 
         if (logStatistics) {
-            statisticsLabel = testID + "_" +
+            statisticsLabel = "PA_" + testID + "_" +
                 caseList[currentCase].GetCurrentMap().name.Replace(".map", "") + "_statistics";
         }
     }
@@ -399,7 +406,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
                     + statisticsLabel + ".json", log);
             }
             if (logOnline) {
-                postQueue.Enqueue(new Entry(statisticsLabel, log, ""));
+                postQueue.Enqueue(new Entry(statisticsLabel, log,
+                    JsonUtility.ToJson(new JsonCompletionTracker(experimentCompletionTracker))));
             }
             loggingStatistics = false;
         }
@@ -411,7 +419,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
                 + gameLabel + ".json", log);
         }
         if (logOnline) {
-            postQueue.Enqueue(new Entry(gameLabel, log, ""));
+            postQueue.Enqueue(new Entry(gameLabel, log,
+                JsonUtility.ToJson(new JsonCompletionTracker(experimentCompletionTracker))));
         }
         logging = false;
     }
@@ -444,6 +453,16 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
         if (loggingStatistics) {
             jStatisticsLog.mapInfo = new JsonMapInfo(height, width, tileSize, flip);
+        }
+    }
+
+    // Logs info about the maps.
+    public void LogGameInfo(int gameDuration, string scene) {
+
+        jGameLog.gameInfo = new JsonGameInfo(gameDuration, scene);
+
+        if (loggingStatistics) {
+            jStatisticsLog.gameInfo = new JsonGameInfo(gameDuration, scene); ;
         }
     }
 
@@ -539,10 +558,12 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
     // Saves answers and informations about the experiment.
     public void SaveAnswers(List<JsonAnswer> answers) {
-        string log = JsonUtility.ToJson(new JsonAnswers(jExperimentProgress, experimentName, GetCurrentCasesArray(), answers));
+        string log = JsonUtility.ToJson(new JsonAnswers(experimentName, GetCurrentCasesArray(),
+            answers));
 
         if (logOnline) {
-            postQueue.Enqueue(new Entry(testID + "_survey.json", log, ""));
+            postQueue.Enqueue(new Entry("PA_" + testID + "_survey.json", log,
+                JsonUtility.ToJson(new JsonCompletionTracker(experimentCompletionTracker))));
         }
         if (logOffline) {
             File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName + "/" +

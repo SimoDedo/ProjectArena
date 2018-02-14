@@ -120,6 +120,12 @@ namespace Polimi.GameCollective.Connectivity {
             }
         }
 
+        public Entry GetResultAsEntry() {
+            string[] splittedResult = Result.Split('|');
+
+            return new Entry(splittedResult[2], splittedResult[3], splittedResult[4]);
+        }
+
         public delegate void DoneCallback();
     }
 

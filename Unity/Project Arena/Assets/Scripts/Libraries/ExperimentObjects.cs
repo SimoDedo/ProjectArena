@@ -9,7 +9,6 @@ namespace ExperimentObjects {
         [SerializeField] public string studyName;
         [SerializeField] public bool flip;
         [SerializeField] public List<Case> cases;
-        public int completion;
     }
 
     [Serializable]
@@ -17,7 +16,6 @@ namespace ExperimentObjects {
         [SerializeField] public string caseName;
         [SerializeField] public List<TextAsset> maps;
         [SerializeField] public string scene;
-        public int completion;
         [NonSerialized] public int mapIndex;
 
         public Case() {
@@ -34,6 +32,18 @@ namespace ExperimentObjects {
             } else {
                 mapIndex = 0;
             }
+        }
+    }
+
+    [Serializable]
+    public class StudyCompletionTracker {
+        public int studyCompletion;
+        public int[] casesCompletion;
+
+        public StudyCompletionTracker(int studyCompletion, int[] casesCompletion) {
+            this.studyCompletion = studyCompletion;
+            this.casesCompletion = casesCompletion;
+
         }
     }
 
