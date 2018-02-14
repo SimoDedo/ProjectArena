@@ -1,100 +1,311 @@
-﻿namespace JsonObjects {
+﻿using System;
+using System.Collections.Generic;
 
-    public class JsonLog {
-        public string time;
-        public string type;
-        public string log;
+namespace JsonObjects {
+
+    namespace Game {
+
+        [Serializable]
+        public class JsonGameLog {
+            public JsonExperimentProgress experimentProgress;
+            public JsonMapInfo mapInfo;
+            public List<JsonSpawn> spawnLogs;
+            public List<JsonPosition> positionLogs;
+            public List<JsonShot> shotLogs;
+            public List<JsonReload> reloadLogs;
+            public List<JsonHit> hitLogs;
+            public List<JsonKill> killLogs;
+
+            public JsonGameLog() {
+                spawnLogs = new List<JsonSpawn>();
+                positionLogs = new List<JsonPosition>();
+                shotLogs = new List<JsonShot>();
+                reloadLogs = new List<JsonReload>();
+                hitLogs = new List<JsonHit>();
+                killLogs = new List<JsonKill>();
+            }
+
+            public void Reset() {
+                spawnLogs.Clear();
+                positionLogs.Clear();
+                shotLogs.Clear();
+                reloadLogs.Clear();
+                hitLogs.Clear();
+                killLogs.Clear();
+            }
+        }
+
+        [Serializable]
+        public class JsonPosition {
+            public float timestamp;
+            public float x;
+            public float y;
+            public float direction;
+
+            public JsonPosition(float timestamp, float x, float y, float direction) {
+                this.timestamp = timestamp;
+                this.x = x;
+                this.y = y;
+                this.direction = direction;
+            }
+        }
+
+        [Serializable]
+        public class JsonShot {
+            public float timestamp;
+            public float x;
+            public float y;
+            public float direction;
+            public int weapon;
+            public int ammoInCharger;
+            public int totalAmmo;
+
+            public JsonShot(float timestamp, float x, float y, float direction, int weapon, int ammoInCharger,
+                int totalAmmo) {
+                this.timestamp = timestamp;
+                this.x = x;
+                this.y = y;
+                this.direction = direction;
+                this.weapon = weapon;
+                this.ammoInCharger = ammoInCharger;
+            }
+        }
+
+        [Serializable]
+        public class JsonReload {
+            public float timestamp;
+            public int weapon;
+            public int ammoInCharger;
+            public int totalAmmo;
+
+            public JsonReload(float timestamp, int weapon, int ammoInCharger, int totalAmmo) {
+                this.timestamp = timestamp;
+                this.weapon = weapon;
+                this.ammoInCharger = ammoInCharger;
+                this.totalAmmo = totalAmmo;
+            }
+        }
+
+        [Serializable]
+        public class JsonKill {
+            public float timestamp;
+            public float x;
+            public float y;
+            public string killedEntity;
+            public string killerEntity;
+
+            public JsonKill(float timestamp, float x, float y, string killedEntity, string killerEntity) {
+                this.timestamp = timestamp;
+                this.x = x;
+                this.y = y;
+                this.killedEntity = killedEntity;
+                this.killerEntity = killerEntity;
+            }
+        }
+
+        [Serializable]
+        public class JsonHit {
+            public float timestamp;
+            public float x;
+            public float y;
+            public string hittedEntity;
+            public string hitterEntity;
+            public int damage;
+
+            public JsonHit(float timestamp, float x, float y, string hittedEntity, string hitterEntity, int damage) {
+                this.timestamp = timestamp;
+                this.x = x;
+                this.y = y;
+                this.hittedEntity = hittedEntity;
+                this.hitterEntity = hitterEntity;
+                this.damage = damage;
+            }
+        }
+
+        [Serializable]
+        public class JsonSpawn {
+            public float timestamp;
+            public float x;
+            public float y;
+            public string spawnedEntity;
+
+            public JsonSpawn(float timestamp, float x, float y, string spawnedEntity) {
+                this.timestamp = timestamp;
+                this.x = x;
+                this.y = y;
+                this.spawnedEntity = spawnedEntity;
+            }
+        }
+
     }
 
-    public class JsonInfo {
-        public string experimentName;
-        public string[] playedMaps;
+    namespace Statistics {
+
+        [Serializable]
+        public class JsonStatisticsLog {
+            public JsonExperimentProgress experimentProgress;
+            public JsonMapInfo mapInfo;
+            public List<JsonTargetStatistics> targetStatisticsLogs;
+            public JsonFinalStatistics finalStatistics;
+
+            public JsonStatisticsLog() {
+                targetStatisticsLogs = new List<JsonTargetStatistics>();
+            }
+
+            public void Reset() {
+                targetStatisticsLogs.Clear();
+            }
+        }
+
+        [Serializable]
+        public class JsonTargetStatistics {
+            public float timestamp;
+            public float playerInitialX;
+            public float playerInitialY;
+            public float playerX;
+            public float playerY;
+            public float targetX;
+            public float targetY;
+            public float coveredTileDistance;
+            public float time;
+            public float speed;
+
+            public JsonTargetStatistics(float timestamp, float playerInitialX,
+                float playerInitialY, float playerX, float playerY, float targetX,
+                float targetY, float coveredTileDistance, float time, float speed) {
+                this.timestamp = timestamp;
+                this.playerInitialX = playerInitialX;
+                this.playerInitialY = playerInitialY;
+                this.playerX = playerX;
+                this.playerY = playerY;
+                this.targetX = targetX;
+                this.targetY = targetY;
+                this.coveredTileDistance = coveredTileDistance;
+                this.time = time;
+                this.speed = speed;
+            }
+        }
+
+        [Serializable]
+        public class JsonFinalStatistics {
+            public int totalShots;
+            public int totalHits;
+            public float accuracy;
+            public float coveredDistance;
+            public float mediumKilltimestamp;
+            public float mediumKillDistance;
+
+            public JsonFinalStatistics(int totalShots, int totalHits, float accuracy,
+                float coveredDistance, float mediumKilltimestamp, float mediumKillDistance) {
+                this.totalShots = totalShots;
+                this.totalHits = totalHits;
+                this.accuracy = accuracy;
+                this.coveredDistance = coveredDistance;
+                this.mediumKilltimestamp = mediumKilltimestamp;
+                this.mediumKillDistance = mediumKillDistance;
+            }
+        }
+
     }
 
+    namespace Survey {
+
+        [Serializable]
+        public class JsonSurvey {
+            public List<JsonQuestion> questions;
+
+            public JsonSurvey(List<JsonQuestion> questions) {
+                this.questions = questions;
+            }
+        }
+
+        [Serializable]
+        public class JsonQuestion {
+            public int questionId;
+            public string questionText;
+            public List<JsonOption> options;
+
+            public JsonQuestion(int questionId, string questionText, List<JsonOption> options) {
+                this.questionId = questionId;
+                this.questionText = questionText;
+                this.options = options;
+            }
+        }
+
+        [Serializable]
+        public class JsonOption {
+            public int optionId;
+            public string optionText;
+
+            public JsonOption(int optionId, string optionText) {
+                this.optionId = optionId;
+                this.optionText = optionText;
+            }
+        }
+
+        [Serializable]
+        public class JsonAnswers {
+            public JsonExperimentProgress experimentProgress;
+            public string experimentName;
+            public string[] playedMaps;
+            public List<JsonAnswer> answers;
+
+            public JsonAnswers(JsonExperimentProgress experimentProgress, string experimentName, 
+                string[] playedMaps, List<JsonAnswer> answers) {
+                this.experimentProgress = experimentProgress;
+                this.experimentName = experimentName;
+                this.playedMaps = playedMaps;
+                this.answers = answers;
+            }
+        }
+
+        [Serializable]
+        public class JsonAnswer {
+            public int questionId;
+            public int[] answers;
+
+            public JsonAnswer(int questionId, int[] answers) {
+                this.questionId = questionId;
+                this.answers = answers;
+            }
+        }
+
+    }
+
+    [Serializable]
+    public class JsonExperimentProgress {
+        public List<JsonStudyProgress> studyProgresses;
+
+        public JsonExperimentProgress(List<JsonStudyProgress> studyProgresses) {
+            this.studyProgresses = studyProgresses;
+        }
+    }
+
+    [Serializable]
+    public class JsonStudyProgress {
+        public int studyProgress;
+        public int[] caseProgresses;
+
+        public JsonStudyProgress(int studyProgress, int[] caseProgresses) {
+            this.studyProgress = studyProgress;
+            this.caseProgresses = caseProgresses;
+
+        }
+    }
+
+    [Serializable]
     public class JsonMapInfo {
-        public string height;
-        public string width;
-        public string tileSize;
-        public string flip;
-    }
+        public float height;
+        public float width;
+        public float tileSize;
+        public bool flip;
 
-    public class JsonPosition {
-        public string x;
-        public string y;
-        public string direction;
-    }
-
-    public class JsonShoot {
-        public string x;
-        public string y;
-        public string direction;
-        public string weapon;
-        public string ammoInCharger;
-        public string totalAmmo;
-    }
-
-    public class JsonReload {
-        public string weapon;
-        public string ammoInCharger;
-        public string totalAmmo;
-    }
-
-    public class JsonKill {
-        public string x;
-        public string y;
-        public string killedEntity;
-        public string killerEntity;
-    }
-
-    public class JsonHit {
-        public string x;
-        public string y;
-        public string hittedEntity;
-        public string hitterEntity;
-        public string damage;
-    }
-
-    public class JsonSpawn {
-        public string x;
-        public string y;
-        public string spawnedEntity;
-    }
-
-    public class JsonTargetStatistics {
-        public string playerInitialX;
-        public string playerInitialY;
-        public string playerX;
-        public string playerY;
-        public string targetX;
-        public string targetY;
-        public string coveredTileDistance;
-        public string time;
-        public string speed;
-    }
-
-    public class JsonGameStatistics {
-        public string totalShots;
-        public string totalHits;
-        public string accuracy;
-        public string coveredDistance;
-        public string mediumKillTime;
-        public string mediumKillDistance;
-    }
-
-    public class JsonQuestion {
-        public int questionId;
-        public string questionText;
-        public string options;
-    }
-
-    public class JsonOption {
-        public int optionId;
-        public string optionText;
-    }
-
-    public class JsonAnswer {
-        public int questionId;
-        public int[] answers;
+        public JsonMapInfo(float height, float width, float tileSize, bool flip) {
+            this.height = height;
+            this.width = width;
+            this.tileSize = tileSize;
+            this.flip = flip;
+        }
     }
 
 }

@@ -1,5 +1,6 @@
-﻿using JsonObjects;
+﻿using JsonObjects.Survey;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -66,39 +67,27 @@ public class CheckboxQuestion : MonoBehaviour {
         return activeAnswers;
     }
 
-    // Converts the answe in Json format.
-    public string GetJsonAnswer() {
-        return JsonUtility.ToJson(new JsonAnswer {
-            questionId = questionId,
-            answers = GetActiveAnswers()
-        });
+    // Converts the answer in Json format.
+    public JsonAnswer GetJsonAnswer() {
+        return new JsonAnswer(questionId, GetActiveAnswers());
     }
 
     // Converts the question and the options in Json format.
-    public string GetJsonQuestion() {
-        string jq = JsonUtility.ToJson(new JsonQuestion {
-            questionId = questionId,
-            questionText = transform.GetComponentInChildren<Text>().text,
-            options = ""
-        });
-        return jq.Remove(jq.Length - 3) + GetJsonOptions() + "}";
+    public JsonQuestion GetJsonQuestion() {
+        return new JsonQuestion(questionId, transform.GetComponentInChildren<Text>().text,
+            GetJsonOptions());
     }
 
     // Converts the options in Json format.
-    private string GetJsonOptions() {
-        string jOptions = "[";
+    private List<JsonOption> GetJsonOptions() {
+        List<JsonOption> jOptions = new List<JsonOption>();
 
         for (int i = 0; i < options.Length; i++) {
-            jOptions += JsonUtility.ToJson(new JsonOption {
-                optionId = (int)options[i].id,
-                optionText = options[i].toggle.transform.parent.GetComponentInChildren<Text>().text
-            });
-            if (i < options.Length - 1) {
-                jOptions += ", ";
-            }
+            jOptions.Add(new JsonOption((int)options[i].id,
+                options[i].toggle.transform.parent.GetComponentInChildren<Text>().text));
         }
 
-        return jOptions + "]";
+        return jOptions;
     }
 
     [Serializable]

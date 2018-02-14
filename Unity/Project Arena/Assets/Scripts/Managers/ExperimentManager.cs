@@ -1,7 +1,11 @@
 ﻿using ExperimentObjects;
 using JsonObjects;
+using JsonObjects.Game;
+using JsonObjects.Statistics;
+using JsonObjects.Survey;
 using Polimi.GameCollective.Connectivity;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -36,36 +40,18 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     private List<Case> caseList;
     // Directory for this esperiment files.
     private string experimentDirectory;
-    // Directory for the surveys.
-    private string surveysDirectory;
 
     // Label of the current game log.
-    private string logLabel;
-    // Stream writer of the current game log.
-    private StreamWriter logStream;
-    // String of the current game log.
-    private string logString;
+    private string gameLabel;
     // Support object to format the log.
-    private JsonLog jLog;
-    // Support object to fromat the position log.
-    private JsonShoot jShoot;
-    // Support object to fromat the position log.
-    private JsonReload jReload;
-    // Support object to fromat the position log.
-    private JsonPosition jPosition;
-    // Support object to format the log.
-    private JsonKill jKill;
-    // Support object to format the log.
-    private JsonSpawn jSpawn;
-    // Support object to format the log.
-    private JsonHit jHit;
-
+    private JsonGameLog jGameLog;
     // Label of the current statistic log.
     private string statisticsLabel;
-    // Stream writer of the current statistic log.
-    private StreamWriter statisticsStream;
-    // String of the current statistic log.
-    private string statisticsString;
+    // Support object to format the log.
+    private JsonStatisticsLog jStatisticsLog;
+    // Support object for formatting the experiment progress.
+    private JsonExperimentProgress jExperimentProgress;
+
     // Spawn time of current target.
     private float targetSpawn = 0;
     // Spawn time of last target.
@@ -94,13 +80,13 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     private Vector3 initialTargetPosition = new Vector3(-1, -1, -1);
     // Initial player position.
     private Vector3 initialPlayerPosition = new Vector3(-1, -1, -1);
-    // Support object to format the log.
-    private JsonGameStatistics jGameStatistics;
-    // Support object to format the log.
-    private JsonTargetStatistics jTargetStatistics;
 
+    private readonly int SERVER_CONNECTION_ATTEMPTS = 50;
+    private readonly float SERVER_CONNECTION_PERIOD = 0.1f;
+
+    private int currentStudy = -1;
     private int currentCase = -1;
-    private string currentTimestamp;
+    private double testID;
 
     private bool logging = false;
     private bool loggingStatistics = false;
@@ -114,11 +100,14 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     void Start() {
         caseList = new List<Case>();
 
-        if (ParameterManager.HasInstance() && ParameterManager.Instance.Export == true) {
+        if (/*ParameterManager.HasInstance() && ParameterManager.Instance.Export == true*/ true) {
             logOffline = true;
         } else {
             logOffline = false;
         }
+
+        GameObject.Find("Experiment Menu UI Manager").GetComponent<ExperimentMenuUIManager>().
+            SetLoadingVisible(logOnline);
 
         if (!logOffline && !logOnline) {
             logGame = false;
@@ -126,7 +115,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         } else {
             if (logOnline) {
                 postQueue = new Queue<Entry>();
-                SetCompletionOnline();
+                StartCoroutine(SetCompletionOnline());
             }
             if (logOffline) {
                 SetupDirectories();
@@ -135,22 +124,12 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
                 }
             }
 
-            jLog = new JsonLog {
-                log = ""
-            };
-
             if (logGame) {
-                jShoot = new JsonShoot();
-                jReload = new JsonReload();
-                jPosition = new JsonPosition();
-                jSpawn = new JsonSpawn();
-                jKill = new JsonKill();
-                jHit = new JsonHit();
+                jGameLog = new JsonGameLog();
             }
 
             if (logStatistics) {
-                jGameStatistics = new JsonGameStatistics();
-                jTargetStatistics = new JsonTargetStatistics();
+                jStatisticsLog = new JsonStatisticsLog();
             }
         }
     }
@@ -187,7 +166,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
     // Creates a new list of cases for the player to play.
     private void CreateNewList() {
-        currentTimestamp = GetTimeStamp();
+        testID = GetTimeStamp();
         caseList.Clear();
 
         if (playTutorial) {
@@ -209,10 +188,10 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     }
 
     // Returns a well formatted timestamp.
-    private string GetTimeStamp() {
-        DateTime now = System.DateTime.Now;
-        return now.Year + "-" + now.Month + "-" + now.Day + "-" + now.Hour + "-" + now.Minute +
-            "-" + now.Second;
+    private double GetTimeStamp() {
+        DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+        TimeSpan diff = System.DateTime.Now.ToUniversalTime() - origin;
+        return Math.Floor(diff.TotalSeconds);
     }
 
     // Gets the cases to add in a round-robin fashion (offline).
@@ -221,30 +200,30 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
         // Get the least played study.
         int minValue = studies[0].completion;
-        int minIndex = 0;
+        currentStudy = 0;
 
         for (int i = 0; i < studies.Count; i++) {
             if (studies[i].completion < minValue) {
                 minValue = studies[i].completion;
-                minIndex = i;
+                currentStudy = i;
             }
         }
 
         // Get the least played cases in the least played study.
-        if (count < studies[minIndex].cases.Count) {
-            studies[minIndex].cases = studies[minIndex].cases.OrderBy(o => o.completion).ToList();
+        if (count < studies[currentStudy].cases.Count) {
+            studies[currentStudy].cases = studies[currentStudy].cases.OrderBy(o => o.completion).ToList();
             for (int i = 0; i < count; i++) {
-                studies[minIndex].cases[i].RandomizeCurrentMap();
-                lessPlayedCases.Add(studies[minIndex].cases[i]);
-                studies[minIndex].cases[i].completion++;
-                studies[minIndex].completion++;
+                studies[currentStudy].cases[i].RandomizeCurrentMap();
+                lessPlayedCases.Add(studies[currentStudy].cases[i]);
+                studies[currentStudy].cases[i].completion++;
+                studies[currentStudy].completion++;
             }
         } else {
-            foreach (Case c in studies[minIndex].cases) {
+            foreach (Case c in studies[currentStudy].cases) {
                 c.RandomizeCurrentMap();
                 lessPlayedCases.Add(c);
                 c.completion++;
-                studies[minIndex].completion++;
+                studies[currentStudy].completion++;
             }
         }
 
@@ -265,11 +244,11 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
     // Retuns the next scene to be played.
     public string GetNextScene() {
-        currentCase++;
-
         if (logging) {
             StopLogging();
         }
+
+        currentCase++;
 
         if (currentCase == caseList.Count || caseList.Count == 0) {
             CreateNewList();
@@ -314,30 +293,61 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         CreateDirectory(experimentDirectory);
         // Create the case directories if needed.
         foreach (Study s in studies) {
+            CreateDirectory(experimentDirectory + "/" + s.studyName);
+            CreateDirectory(experimentDirectory + "/" + s.studyName + "/Maps");
             foreach (Case c in s.cases) {
-                CreateDirectory(experimentDirectory + "/" + c.caseName);
-                File.WriteAllText(@experimentDirectory + "/" + c.caseName + "/" +
-                    c.GetCurrentMap().name + ".txt", c.GetCurrentMap().text);
+                foreach (TextAsset map in c.maps) {
+                    File.WriteAllText(@experimentDirectory + "/" + s.studyName + "/Maps/" +
+                       map.name + ".txt", map.text);
+                }
             }
         }
-
-        // Create the survey directory if needed.
-        surveysDirectory = experimentDirectory + "/Surveys";
-        CreateDirectory(surveysDirectory);
     }
 
     // Sets the completion (online).
-    private void SetCompletionOnline() {
-        // TODO.
+    private IEnumerator SetCompletionOnline() {
+        RemoteDataManager.Instance.GetLastEntry();
+
+        int attempt = 0;
+        while (!RemoteDataManager.Instance.IsResultReady && attempt < SERVER_CONNECTION_ATTEMPTS) {
+            attempt++;
+            yield return new WaitForSeconds(SERVER_CONNECTION_PERIOD);
+        }
+
+        if (RemoteDataManager.Instance.IsResultReady) {
+            string result = RemoteDataManager.Instance.Result;
+            result = result.Substring(1, result.IndexOf("\n", StringComparison.Ordinal));
+            JsonUtility.FromJsonOverwrite(result, jExperimentProgress);
+            // TODO.
+        } else {
+            // TODO.
+        }
+
+        GameObject.Find("Experiment Menu UI Manager").GetComponent<ExperimentMenuUIManager>().
+            SetLoadingVisible(false);
     }
 
     // Sets the completion (offline).
     private void SetCompletionOffline() {
         foreach (Study s in studies) {
+            string[] allFiles = Directory.GetFiles(experimentDirectory + "/" + s.studyName);
+
             foreach (Case c in s.cases) {
-                c.completion = (Directory.GetFiles(experimentDirectory + "/"
-                    + c.caseName + "/", "*", SearchOption.AllDirectories).Length
-                    - 1) / 2;
+                int logCount = 0;
+                int statisticsCount = 0;
+
+                foreach (TextAsset map in c.maps) {
+                    foreach (string file in allFiles) {
+                        if (file.Contains(map.name.Replace(".map", "") + "_log")) {
+                            logCount++;
+                        }
+                        if (file.Contains(map.name.Replace(".map", "") + "_statistics")) {
+                            statisticsCount++;
+                        }
+                    }
+                }
+
+                c.completion = (logCount > statisticsCount) ? logCount : statisticsCount;
                 s.completion += c.completion;
             }
         }
@@ -345,15 +355,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
     // Sets up logging.
     private void SetupLogging() {
-        if (logOnline) {
-            logLabel = caseList[currentCase].GetCurrentMap().name + "_" + currentTimestamp + "_log";
-        }
-        if (logOffline) {
-            logStream = File.CreateText(experimentDirectory + "/"
-                + caseList[currentCase].caseName + "/"
-                + caseList[currentCase].GetCurrentMap().name + "_" + currentTimestamp + "_log.json");
-            logStream.AutoFlush = true;
-        }
+        gameLabel = testID + "_" + caseList[currentCase].GetCurrentMap().name.Replace(".map", "") +
+            "_log";
 
         GameManager gm = FindObjectOfType(typeof(GameManager)) as GameManager;
         if (gm != null) {
@@ -361,22 +364,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         }
 
         if (logStatistics) {
-            SetupStatisticsLogging();
-        }
-    }
-
-    // Sets up statistics logging.
-    private void SetupStatisticsLogging() {
-        if (logOnline) {
-            statisticsLabel = caseList[currentCase].GetCurrentMap().name + "_" + currentTimestamp
-            + "_statistics";
-        }
-        if (logOffline) {
-            statisticsStream = File.CreateText(experimentDirectory + "/"
-            + caseList[currentCase].caseName + "/"
-            + caseList[currentCase].GetCurrentMap().name + "_" + currentTimestamp
-            + "_statistics.json");
-            statisticsStream.AutoFlush = true;
+            statisticsLabel = testID + "_" +
+                caseList[currentCase].GetCurrentMap().name.Replace(".map", "") + "_statistics";
         }
     }
 
@@ -396,59 +385,40 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         }
     }
 
-    // Writes a log in the log stream.
-    public void WriteLog(string log) {
-        if (logOffline) {
-            logStream.WriteLine(log);
-        }
-        if (logOnline) {
-            logString += (log + "\n");
-        }
-    }
-
-    // Writes a log in the statistics stream.
-    public void WriteStatisticsLog(string log) {
-        if (logOffline) {
-            statisticsStream.WriteLine(log);
-        }
-        if (logOnline) {
-            statisticsString += (log + "\n");
-        }
-    }
-
     // Stops logging and saves the log.
     public void StopLogging() {
+        string log = "";
+
         if (loggingStatistics) {
             LogGameStatistics();
+
+            log = JsonUtility.ToJson(jStatisticsLog);
+
             if (logOffline) {
-                statisticsStream.Close();
+                File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName + "/"
+                    + statisticsLabel + ".json", log);
             }
             if (logOnline) {
-                postQueue.Enqueue(new Entry(statisticsLabel, statisticsString, ""));
-                statisticsString = "";
+                postQueue.Enqueue(new Entry(statisticsLabel, log, ""));
             }
             loggingStatistics = false;
         }
 
+        log = JsonUtility.ToJson(jGameLog);
+
         if (logOffline) {
-            logStream.Close();
+            File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName + "/"
+                + gameLabel + ".json", log);
         }
         if (logOnline) {
-            postQueue.Enqueue(new Entry(logLabel, logString, ""));
-            logString = "";
+            postQueue.Enqueue(new Entry(gameLabel, log, ""));
         }
         logging = false;
     }
 
     // Logs reload.
     public void LogRelaod(int gunId, int ammoInCharger, int totalAmmo) {
-        jLog.time = Time.time.ToString("n4");
-        jLog.type = "player_reload";
-        jReload.weapon = gunId.ToString();
-        jReload.ammoInCharger = ammoInCharger.ToString();
-        jReload.totalAmmo = totalAmmo.ToString();
-        string log = JsonUtility.ToJson(jLog);
-        WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jReload) + "}");
+        jGameLog.reloadLogs.Add(new JsonReload(Time.time, gunId, ammoInCharger, totalAmmo));
     }
 
     // Logs the shot.
@@ -456,16 +426,9 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         int totalAmmo) {
         Coord coord = NormalizeFlipCoord(x, z);
 
-        jLog.time = Time.time.ToString("n4");
-        jLog.type = "player_shot";
-        jShoot.x = coord.x.ToString("n4");
-        jShoot.y = coord.z.ToString("n4");
-        jShoot.direction = NormalizeFlipAngle(direction).ToString("n4");
-        jShoot.weapon = gunId.ToString();
-        jShoot.ammoInCharger = ammoInCharger.ToString();
-        jShoot.totalAmmo = totalAmmo.ToString();
-        string log = JsonUtility.ToJson(jLog);
-        WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jShoot) + "}");
+        jGameLog.shotLogs.Add(new JsonShot(Time.time,
+            coord.x, coord.z,
+            NormalizeFlipAngle(direction), gunId, ammoInCharger, totalAmmo));
 
         if (loggingStatistics) {
             shotCount++;
@@ -477,17 +440,10 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         tileSize = ts;
         flip = f;
 
-        string infoLog = JsonUtility.ToJson(new JsonMapInfo {
-            height = height.ToString(),
-            width = width.ToString(),
-            tileSize = ts.ToString(),
-            flip = f.ToString()
-        });
-
-        WriteLog(infoLog);
+        jGameLog.mapInfo = new JsonMapInfo(height, width, tileSize, flip);
 
         if (loggingStatistics) {
-            WriteStatisticsLog(infoLog);
+            jStatisticsLog.mapInfo = new JsonMapInfo(height, width, tileSize, flip);
         }
     }
 
@@ -495,13 +451,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     public void LogPosition(float x, float z, float direction) {
         Coord coord = NormalizeFlipCoord(x, z);
 
-        jLog.time = Time.time.ToString("n4");
-        jLog.type = "player_position";
-        jPosition.x = coord.x.ToString("n4");
-        jPosition.y = coord.z.ToString("n4");
-        jPosition.direction = NormalizeFlipAngle(direction).ToString("n4");
-        string log = JsonUtility.ToJson(jLog);
-        WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jPosition) + "}");
+        jGameLog.positionLogs.Add(new JsonPosition(Time.time, coord.x, coord.z,
+            NormalizeFlipAngle(direction)));
 
         if (loggingStatistics) {
             if (lastPosition.x != -1) {
@@ -518,13 +469,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     public void LogSpawn(float x, float z, string spawnedEntity) {
         Coord coord = NormalizeFlipCoord(x, z);
 
-        jLog.time = Time.time.ToString("n4");
-        jLog.type = "spawn";
-        jSpawn.x = coord.x.ToString("n4");
-        jSpawn.y = coord.z.ToString("n4");
-        jSpawn.spawnedEntity = spawnedEntity;
-        string log = JsonUtility.ToJson(jLog);
-        WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jSpawn) + "}");
+        jGameLog.spawnLogs.Add(new JsonSpawn(Time.time, coord.x, coord.z, spawnedEntity));
 
         if (loggingStatistics) {
             targetSpawn = Time.time;
@@ -538,14 +483,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     public void LogKill(float x, float z, string killedEnitiy, string killerEntity) {
         Coord coord = NormalizeFlipCoord(x, z);
 
-        jLog.time = Time.time.ToString("n4");
-        jLog.type = "kill";
-        jKill.x = coord.x.ToString("n4");
-        jKill.y = coord.z.ToString("n4");
-        jKill.killedEntity = killedEnitiy;
-        jKill.killerEntity = killerEntity;
-        string log = JsonUtility.ToJson(jLog);
-        WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jKill) + "}");
+        jGameLog.killLogs.Add(new JsonKill(Time.time, coord.x, coord.z, killedEnitiy,
+            killerEntity));
 
         if (loggingStatistics) {
             LogTargetStatistics(coord.x, coord.z);
@@ -561,15 +500,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     public void LogHit(float x, float z, string hittedEntity, string hitterEntity, int damage) {
         Coord coord = NormalizeFlipCoord(x, z);
 
-        jLog.time = Time.time.ToString("n4");
-        jLog.type = "hit";
-        jHit.x = coord.x.ToString("n4");
-        jHit.y = coord.z.ToString("n4");
-        jHit.hittedEntity = hittedEntity;
-        jHit.hitterEntity = hitterEntity;
-        jHit.damage = damage.ToString();
-        string log = JsonUtility.ToJson(jLog);
-        WriteLog(log.Remove(log.Length - 3) + JsonUtility.ToJson(jHit) + "}");
+        jGameLog.hitLogs.Add(new JsonHit(Time.time, coord.x, coord.z, hittedEntity, hitterEntity,
+            damage));
 
         if (loggingStatistics) {
             hitCount++;
@@ -578,54 +510,43 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
     // Logs statistics about the performance of the player finding the target.
     private void LogTargetStatistics(float x, float z) {
-        jTargetStatistics.playerInitialX = initialPlayerPosition.x.ToString("n4");
-        jTargetStatistics.playerInitialY = initialPlayerPosition.z.ToString("n4");
-        jTargetStatistics.playerX = lastPosition.x.ToString("n4");
-        jTargetStatistics.playerY = lastPosition.z.ToString("n4");
-        jTargetStatistics.targetX = x.ToString("n4");
-        jTargetStatistics.targetY = z.ToString("n4");
-        jTargetStatistics.time = (Time.time - lastTargetSpawn).ToString("n4");
-        jTargetStatistics.coveredTileDistance = currentDistance.ToString("n4");
-        jTargetStatistics.speed = (currentDistance / (Time.time - lastTargetSpawn)).ToString("n4");
-        WriteStatisticsLog(JsonUtility.ToJson(jTargetStatistics));
+        jStatisticsLog.targetStatisticsLogs.Add(new JsonTargetStatistics(Time.time,
+            initialPlayerPosition.x, initialPlayerPosition.z, lastPosition.x, lastPosition.z, x,
+            z, currentDistance, (Time.time - lastTargetSpawn),
+            currentDistance / (Time.time - lastTargetSpawn)));
     }
 
     // Logs statistics about the game.
     private void LogGameStatistics() {
-        jGameStatistics.coveredDistance = totalDistance.ToString("n4");
-        jGameStatistics.mediumKillTime = mediumKillTime.ToString("n4");
-        jGameStatistics.mediumKillDistance = mediumKillDistance.ToString("n4");
-        jGameStatistics.totalShots = shotCount.ToString("n4");
-        jGameStatistics.totalHits = hitCount.ToString("n4");
-        jGameStatistics.accuracy = (shotCount > 0) ? (hitCount / (float)shotCount).ToString("n4")
-            : "0";
-        WriteStatisticsLog(JsonUtility.ToJson(jGameStatistics));
+        jStatisticsLog.finalStatistics = new JsonFinalStatistics(shotCount, hitCount,
+            (shotCount > 0) ? (hitCount / (float)shotCount) : 0,
+            totalDistance, mediumKillTime,
+            mediumKillTime);
     }
 
     /* SURVEY*/
 
     // Tells if I need to save the survey.
     public bool MustSaveSurvey() {
-        return !File.Exists(surveysDirectory + "/survey.json") && logOffline;
+        return !File.Exists(experimentDirectory + "/survey.json") && logOffline;
     }
 
     // Save survey. This has to be done once.
-    public void SaveSurvey(string survey) {
-        File.WriteAllText(surveysDirectory + "/survey.json", survey);
+    public void SaveSurvey(List<JsonQuestion> questions) {
+        File.WriteAllText(experimentDirectory + "/survey.json",
+            JsonUtility.ToJson(new JsonSurvey(questions)));
     }
 
     // Saves answers and informations about the experiment.
-    public void SaveAnswers(string answers) {
-        string info = JsonUtility.ToJson(new JsonInfo {
-            experimentName = experimentName,
-            playedMaps = GetCurrentCasesArray()
-        });
+    public void SaveAnswers(List<JsonAnswer> answers) {
+        string log = JsonUtility.ToJson(new JsonAnswers(jExperimentProgress, experimentName, GetCurrentCasesArray(), answers));
+
         if (logOnline) {
-            postQueue.Enqueue(new Entry(currentTimestamp + "_survey.json", statisticsString, ""));
+            postQueue.Enqueue(new Entry(testID + "_survey.json", log, ""));
         }
         if (logOffline) {
-            File.WriteAllText(surveysDirectory + "/" + currentTimestamp + "_survey.json",
-                info + "\n" + answers);
+            File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName + "/" +
+                testID + "_survey.json", log);
         }
     }
 

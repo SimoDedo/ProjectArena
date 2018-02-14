@@ -9,7 +9,7 @@ namespace ExperimentObjects {
         [SerializeField] public string studyName;
         [SerializeField] public bool flip;
         [SerializeField] public List<Case> cases;
-        [NonSerialized] public int completion;
+        public int completion;
     }
 
     [Serializable]
@@ -17,7 +17,7 @@ namespace ExperimentObjects {
         [SerializeField] public string caseName;
         [SerializeField] public List<TextAsset> maps;
         [SerializeField] public string scene;
-        [NonSerialized] public int completion;
+        public int completion;
         [NonSerialized] public int mapIndex;
 
         public Case() {

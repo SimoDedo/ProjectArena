@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using JsonObjects.Survey;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
@@ -14,10 +16,14 @@ public class SurveyUIManager : MonoBehaviour {
     [Header("Other")] [SerializeField] private RotateTranslateByAxis backgroundScript;
 
     private int currentQuestion = 0;
-    private string survey = "";
-    private string answers = "";
+
+    private List<JsonQuestion> jQuestions;
+    private List<JsonAnswer> jAnswers;
 
     private void Start() {
+        jQuestions = new List<JsonQuestion>();
+        jAnswers = new List<JsonAnswer>();
+
         backgroundScript.SetRotation(ParameterManager.Instance.BackgroundRotation);
     }
 
@@ -29,23 +35,18 @@ public class SurveyUIManager : MonoBehaviour {
     // Updates the values of the survey.
     private void UpdateValues() {
         if (ExperimentManager.Instance.MustSaveSurvey()) {
-            survey += questions[currentQuestion].GetComponent<CheckboxQuestion>().GetJsonQuestion();
-            if (currentQuestion < questions.Length - 1) {
-                survey += "\n";
-            }
+            jQuestions.Add(questions[currentQuestion].GetComponent<CheckboxQuestion>().
+                GetJsonQuestion());
         }
-        answers += questions[currentQuestion].GetComponent<CheckboxQuestion>().GetJsonAnswer();
-        if (currentQuestion < questions.Length - 1) {
-            answers += "\n";
-        }
+        jAnswers.Add(questions[currentQuestion].GetComponent<CheckboxQuestion>().GetJsonAnswer());
     }
 
     // Saves the values of the survey.
     private void SaveValues() {
         if (ExperimentManager.Instance.MustSaveSurvey()) {
-            ExperimentManager.Instance.SaveSurvey(survey);
+            ExperimentManager.Instance.SaveSurvey(jQuestions);
         }
-        ExperimentManager.Instance.SaveAnswers(answers);
+        ExperimentManager.Instance.SaveAnswers(jAnswers);
     }
 
     // Shows the first question.

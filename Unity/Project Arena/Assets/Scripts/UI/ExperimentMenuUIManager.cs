@@ -8,7 +8,9 @@ using UnityEngine.UI;
 /// </summary>
 public class ExperimentMenuUIManager : MonoBehaviour {
 
-    [Header("Menu fields")] [SerializeField] private Button backButton;
+    [Header("Menu")] [SerializeField] private GameObject menu;
+    [SerializeField] private GameObject loading;
+    [SerializeField] private Button backButton;
 
     [Header("Other")] [SerializeField] private RotateTranslateByAxis backgroundScript;
 
@@ -25,13 +27,6 @@ public class ExperimentMenuUIManager : MonoBehaviour {
         }
     }
 
-    // Instantiates a manager.
-    private GameObject InstantiateManager(GameObject prefab, string name) {
-        GameObject instance = Instantiate(prefab);
-        instance.name = name;
-        return instance;
-    }
-
     // Loads the level indicated by the Experiment Manager.
     public void Play() {
         SceneManager.LoadScene(ExperimentManager.Instance.GetNextScene());
@@ -43,6 +38,16 @@ public class ExperimentMenuUIManager : MonoBehaviour {
 
         Destroy(ExperimentManager.Instance.gameObject);
         SceneManager.LoadScene("Menu");
+    }
+
+    public void SetLoadingVisible(bool visible) {
+        if (visible) {
+            menu.SetActive(false);
+            loading.SetActive(true);
+        } else {
+            menu.SetActive(true);
+            loading.SetActive(false);
+        }
     }
 
 }

@@ -65,36 +65,36 @@ namespace Polimi.GameCollective.Connectivity {
         /// <summary>
         /// Retrieves the last entry from the server.
         /// </summary>
-        public void GetLastEntry() {
-            Get(COMMAND_LOAD_LAST);
+        public void GetLastEntry(DoneCallback callback = null) {
+            Get(COMMAND_LOAD_LAST, callback);
         }
 
         /// <summary>
         /// Retrieves the last n entry from the server.
         /// </summary>
         /// <param name="n">How many entries to retrieve.</param>
-        public void GetLastEntries(int n) {
-            Get(COMMAND_LOAD_N + n);
+        public void GetLastEntries(int n, DoneCallback callback = null) {
+            Get(COMMAND_LOAD_N + n, callback);
         }
 
         /// <summary>
         /// Retrieves all entries from the server.
         /// </summary>
-        public void GetAllEntries() {
-            Get(COMMAND_LOAD_ALL);
+        public void GetAllEntries(DoneCallback callback = null) {
+            Get(COMMAND_LOAD_ALL, callback);
         }
 
-        private void Post(string message) {
+        private void Post(string message, DoneCallback callback = null) {
             // Handles only one request at a time.
             if (IsRequestPending) {
                 return;
             }
             IsRequestPending = true;
             string postUrl = connection.GeneratePostURL(message);
-            StartCoroutine(ContactServer(postUrl));
+            StartCoroutine(ContactServer(postUrl, callback));
         }
 
-        private void Get(string message) {
+        private void Get(string message, DoneCallback callback = null) {
             // Handles only one request at a time.
             if (IsRequestPending) {
                 return;
@@ -102,10 +102,10 @@ namespace Polimi.GameCollective.Connectivity {
             IsRequestPending = true;
             Result = "";
             string getUrl = connection.GenerateGetURL(message);
-            StartCoroutine(ContactServer(getUrl));
+            StartCoroutine(ContactServer(getUrl, callback));
         }
 
-        private IEnumerator ContactServer(string url) {
+        private IEnumerator ContactServer(string url, DoneCallback callback = null) {
             IsResultReady = false;
             WWW www = new WWW(url);
             yield return www;
@@ -114,7 +114,13 @@ namespace Polimi.GameCollective.Connectivity {
             Result = www.text;
             IsResultReady = true;
             IsRequestPending = false;
+
+            if (callback != null) {
+                callback();
+            }
         }
+
+        public delegate void DoneCallback();
     }
 
 }

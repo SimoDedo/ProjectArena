@@ -22,8 +22,10 @@ public class ExperimentInitializer : MonoBehaviour {
     [SerializeField] private bool logStatistics;
 
     void Start() {
-        ExperimentManager.Instance.Setup(tutorial, playTutorial, studies, casesPerUsers,
-            experimentName, survey, playSurvey, logOnline, logGame, logStatistics);
+        if (!ExperimentManager.HasInstance()) {
+            ExperimentManager.Instance.Setup(tutorial, playTutorial, studies, casesPerUsers,
+                experimentName, survey, playSurvey, logOnline, logGame, logStatistics);
+        }
     }
 
 }
