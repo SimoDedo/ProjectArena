@@ -66,7 +66,7 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     protected int gunId;
 
     // Do I have to log?
-    protected bool logging = false;
+    protected bool loggingGame = false;
 
     protected void Awake() {
         if (aimEnabled) {
@@ -144,7 +144,7 @@ public abstract class Gun : MonoBehaviour, ILoggable {
         if (reloading) {
             if (Time.time > reloadStart + reloadTime) {
                 // Log if needed.
-                if (logging) {
+                if (loggingGame) {
                     ExperimentManager.Instance.LogRelaod(gunId, ammoInCharger, totalAmmo);
                 }
                 // Stop the reloading.
@@ -359,9 +359,9 @@ public abstract class Gun : MonoBehaviour, ILoggable {
         inputEnabled = b;
     }
 
-    // Setups stuff for the logging.
+    // Setups stuff for the loggingGame.
     public void SetupLogging() {
-        logging = true;
+        loggingGame = true;
     }
 
 }

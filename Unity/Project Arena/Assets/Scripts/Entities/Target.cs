@@ -21,7 +21,7 @@ public class Target : Entity, ILoggable {
     private Laser[] laserList;
 
     // Do I have to log?
-    private bool logging = false;
+    private bool loggingGame = false;
 
     public override void SetupEntity(int th, bool[] ag, GameManager gms,
         int id) {
@@ -85,7 +85,7 @@ public class Target : Entity, ILoggable {
                 / 4f + 0.75f);
 
             // Log if needed.
-            if (logging) {
+            if (loggingGame) {
                 ExperimentManager.Instance.LogHit(transform.position.x, transform.position.z,
                     gameObject.name, "Player " + killerID, damage);
             }
@@ -101,7 +101,7 @@ public class Target : Entity, ILoggable {
         gameManagerScript.AddScore(bonusScore, bonusTime);
 
         // Log if needed.
-        if (logging) {
+        if (loggingGame) {
             ExperimentManager.Instance.LogKill(transform.position.x, transform.position.z,
                 gameObject.name, "Player " + id);
         }
@@ -122,9 +122,9 @@ public class Target : Entity, ILoggable {
 
     public override void SlowEntity(float penalty) { }
 
-    // Setups stuff for the logging.
+    // Setups stuff for the loggingGame.
     public void SetupLogging() {
-        logging = true;
+        loggingGame = true;
     }
 
 }

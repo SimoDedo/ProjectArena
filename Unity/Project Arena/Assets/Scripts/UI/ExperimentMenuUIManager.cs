@@ -21,7 +21,7 @@ public class ExperimentMenuUIManager : MonoBehaviour {
 
     // Loads the level indicated by the Experiment Manager.
     public void Play() {
-        SceneManager.LoadScene(ExperimentManager.Instance.GetNextScene());
+        StartCoroutine(ExperimentManager.Instance.StartNewExperiment());
     }
 
     public void SetLoadingVisible(bool visible) {

@@ -102,6 +102,7 @@ public class TutorialGameManager : GameManager {
             gamePhase = 2;
         } else if (gamePhase == 2 && Time.time >= completionTime + scoreDuration) {
             Quit();
+            gamePhase = 3;
         }
     }
 

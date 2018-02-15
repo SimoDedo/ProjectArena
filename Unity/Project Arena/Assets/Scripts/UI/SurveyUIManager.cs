@@ -46,7 +46,7 @@ public class SurveyUIManager : MonoBehaviour {
         if (ExperimentManager.Instance.MustSaveSurvey()) {
             ExperimentManager.Instance.SaveSurvey(jQuestions);
         }
-        ExperimentManager.Instance.SaveAnswers(jAnswers);
+        StartCoroutine(ExperimentManager.Instance.SaveAnswers(jAnswers));
     }
 
     // Shows the first question.
@@ -72,7 +72,7 @@ public class SurveyUIManager : MonoBehaviour {
     // Returns to the experiment menu.
     private void Quit() {
         ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
-        SceneManager.LoadScene(ExperimentManager.Instance.GetNextScene());
+        StartCoroutine(ExperimentManager.Instance.LoadNextScene());
     }
 
 }

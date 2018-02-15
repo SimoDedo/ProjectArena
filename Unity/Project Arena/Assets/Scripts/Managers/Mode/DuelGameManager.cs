@@ -62,7 +62,7 @@ public class DuelGameManager : GameManager {
                 startTime = Time.time;
             }
 
-            // If needed, tell the Experiment Manager it can start logging.
+            // If needed, tell the Experiment Manager it can start loggingGame.
             if (handshaking) {
                 ExperimentManager.Instance.StartLogging();
             }
@@ -106,6 +106,7 @@ public class DuelGameManager : GameManager {
             gamePhase = 2;
         } else if (gamePhase == 2 && passedTime >= readyDuration + gameDuration + scoreDuration) {
             Quit();
+            gamePhase = 3;
         }
     }
 

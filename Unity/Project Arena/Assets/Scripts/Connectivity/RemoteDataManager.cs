@@ -59,6 +59,7 @@ namespace Polimi.GameCollective.Connectivity {
         /// </param>
         /// <param name="comment">Any free comment needed.</param>
         public void SaveData(string label, string data, string comment) {
+            Debug.Log(comment);
             Post(COMMAND_SAVE + label + "|" + data + "|" + comment);
         }
 
@@ -118,12 +119,6 @@ namespace Polimi.GameCollective.Connectivity {
             if (callback != null) {
                 callback();
             }
-        }
-
-        public Entry ResultAsEntry() {
-            string[] splittedResult = Result.Split('|');
-
-            return new Entry(splittedResult[2], splittedResult[3], splittedResult[4]);
         }
 
         public delegate void DoneCallback();

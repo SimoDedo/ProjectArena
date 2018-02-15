@@ -27,7 +27,7 @@ public abstract class GameManager : CoreComponent, ILoggable {
     // Do I have to handshake with the Experiment Manager?
     protected bool handshaking = false;
     // Do I have to log?
-    protected bool logging = false;
+    protected bool loggingGame = false;
 
     // Moves a gameobject to a free spawn point.
     public void Spawn(GameObject g) {
@@ -63,7 +63,7 @@ public abstract class GameManager : CoreComponent, ILoggable {
     // Loads the next scene
     private void LoadNextScene(string def) {
         if (ExperimentManager.HasInstance() && ParameterManager.HasInstance()) {
-            SceneManager.LoadScene(ExperimentManager.Instance.GetNextScene());
+            StartCoroutine(ExperimentManager.Instance.LoadNextScene());
         } else {
             SceneManager.LoadScene(def);
         }
@@ -74,19 +74,19 @@ public abstract class GameManager : CoreComponent, ILoggable {
         handshaking = true;
     }
 
-    // Setups stuff for the logging.
+    // Setups stuff for the loggingGame.
     public void SetupLogging() {
         ExperimentManager.Instance.LogMapInfo(mapManagerScript.GetMapGenerator().GetHeight(),
             mapManagerScript.GetMapGenerator().GetWidth(),
             mapManagerScript.GetMapGenerator().GetSquareSize(), mapManagerScript.GetFlip());
         ExperimentManager.Instance.LogGameInfo(gameDuration, SceneManager.GetActiveScene().name);
 
-        logging = true;
+        loggingGame = true;
     }
 
-    // Tells if it is logging.
+    // Tells if it is loggingGame.
     public bool IsLogging() {
-        return logging;
+        return loggingGame;
     }
 
 }

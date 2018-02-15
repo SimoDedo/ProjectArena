@@ -27,7 +27,7 @@ public class ProjectileGun : Gun {
         ammoInCharger -= 1;
 
         // Log if needed.
-        if (logging) {
+        if (loggingGame) {
             ExperimentManager.Instance.LogShot(transform.root.position.x, transform.root.position.z,
                 transform.root.eulerAngles.y, gunId, ammoInCharger, totalAmmo);
         }

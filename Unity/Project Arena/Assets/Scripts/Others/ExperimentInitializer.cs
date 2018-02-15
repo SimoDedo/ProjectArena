@@ -17,7 +17,7 @@ public class ExperimentInitializer : MonoBehaviour {
     [Header("Survey")] [SerializeField] private Case survey;
     [SerializeField] private bool playSurvey;
 
-    [Header("Logging")] [SerializeField] private bool logOffline;
+    [Header("loggingGame")] [SerializeField] private bool logOffline;
     [SerializeField] private bool logOnline;
     [SerializeField] private bool logGame;
     [SerializeField] private bool logStatistics;

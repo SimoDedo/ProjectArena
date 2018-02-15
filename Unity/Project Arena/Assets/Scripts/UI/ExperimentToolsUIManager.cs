@@ -69,7 +69,7 @@ public class ExperimentToolsUIManager : MonoBehaviour {
 
         try {
             int downloadCount = JsonUtility.FromJson<JsonCompletionTracker>(
-                RemoteDataManager.Instance.ResultAsEntry().Comment).logsCount;
+                RemoteDataManager.Instance.Result.Split('|')[4]).logsCount;
 
             RemoteDataManager.Instance.GetLastEntries(downloadCount);
 
@@ -80,8 +80,10 @@ public class ExperimentToolsUIManager : MonoBehaviour {
             string[] results = RemoteDataManager.Instance.Result.Split('|');
 
             for (int i = 0; i < results.Length / 5; i++) {
-                File.WriteAllText(downloadDirectory + "/" + results[i * 5 + 2] + ".json",
-                    results[i * 5 + 3]);
+                if (results[i * 5 + 2] != "PA_COMPLETION" && results[i * 5 + 2] != "PA_RESET") {
+                    File.WriteAllText(downloadDirectory + "/" + results[i * 5 + 2] + ".json",
+                        results[i * 5 + 3]);
+                }
             }
         } finally {
             SetButtonsInteractable(true);
@@ -108,4 +110,5 @@ public class ExperimentToolsUIManager : MonoBehaviour {
         importButton.interactable = interactable;
         exportButton.interactable = interactable;
     }
+
 }
