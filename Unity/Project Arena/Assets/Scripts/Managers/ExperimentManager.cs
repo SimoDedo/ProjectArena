@@ -9,8 +9,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -19,7 +17,8 @@ using UnityEngine.SceneManagement;
 /// (a set of maps), each one composed by cases (a set of map varaitions). Each time a new
 /// experiment is requested, a list of cases from the less played study is provided to the user
 /// to be played. A tutorial and a survey scene can be added at the beginning and at the end of
-/// the experiment, respectevely.
+/// the experiment, respectevely. When ExperimentManager is used to log onlne data, the experiment
+/// completion is obtained from the server. This information is stored in every entry comment field.
 /// </summary>
 public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
@@ -54,6 +53,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
     // Completion trackers.
     private List<StudyCompletionTracker> experimentCompletionTracker;
+    // Logs count.
+    private int logsCount = 0;
 
     // Spawn time of current target.
     private float targetSpawn = 0;
@@ -102,9 +103,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     void Start() {
         caseList = new List<Case>();
 
-        if (/*ParameterManager.HasInstance() && ParameterManager.Instance.Export == true*/ true) {
-            logOffline = true;
-        } else {
+        if (logOffline && Application.isWebPlayer) {
             logOffline = false;
         }
 
@@ -141,8 +140,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     }
 
     void Update() {
-        if (logOnline && postQueue.Count > 0) {
-            if (!RemoteDataManager.Instance.IsRequestPending) {
+        if (postQueue != null && postQueue.Count > 0) {
+            if (RemoteDataManager.Instance.IsResultReady) {
                 RemoteDataManager.Instance.SaveData(postQueue.Dequeue());
             }
         }
@@ -152,8 +151,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
     // Sets up the experiment manager.
     public void Setup(Case tutorial, bool playTutorial, List<Study> studies, int casesPerUsers,
-        string experimentName, Case survey, bool playSurvey, bool logOnline, bool logGame,
-        bool logStatistics) {
+        string experimentName, Case survey, bool playSurvey, bool logOffline, bool logOnline,
+        bool logGame, bool logStatistics) {
         this.tutorial = tutorial;
         this.playTutorial = playTutorial;
         this.studies = studies;
@@ -161,6 +160,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         this.experimentName = experimentName;
         this.survey = survey;
         this.playSurvey = playSurvey;
+        this.logOffline = logOffline;
         this.logOnline = logOnline;
         this.logGame = logGame;
         this.logStatistics = logStatistics;
@@ -215,6 +215,9 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
             var sorted = experimentCompletionTracker[currentStudy].casesCompletion.Select((v, i) =>
                 i).OrderBy(v => v).ToList();
 
+            Debug.Log(experimentCompletionTracker[currentStudy].studyCompletion.ToString());
+            Debug.Log(sorted.ToString());
+
             for (int i = 0; i < count; i++) {
                 studies[currentStudy].cases[sorted[i]].RandomizeCurrentMap();
                 lessPlayedCases.Add(studies[currentStudy].cases[sorted[i]]);
@@ -225,7 +228,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
             for (int i = 0; i < studies[currentStudy].cases.Count; i++) {
                 studies[currentStudy].cases[i].RandomizeCurrentMap();
                 lessPlayedCases.Add(studies[currentStudy].cases[i]);
-                experimentCompletionTracker[currentStudy].studyCompletion++;
+                experimentCompletionTracker[currentStudy].casesCompletion[i]++;
                 experimentCompletionTracker[currentStudy].studyCompletion++;
             }
         }
@@ -307,12 +310,14 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         }
 
         if (RemoteDataManager.Instance.IsResultReady) {
-            string comment = RemoteDataManager.Instance.GetResultAsEntry().Comment;
+            string comment = RemoteDataManager.Instance.ResultAsEntry().Comment;
 
             try {
-                experimentCompletionTracker =
-                    JsonUtility.FromJson<JsonCompletionTracker>(comment).studyCompletionTrackers;
-                Debug.Log(JsonUtility.ToJson(new JsonCompletionTracker(experimentCompletionTracker)));
+                JsonCompletionTracker completionTracker =
+                    JsonUtility.FromJson<JsonCompletionTracker>(comment);
+                experimentCompletionTracker = completionTracker.studyCompletionTrackers;
+                logsCount = completionTracker.logsCount;
+                Debug.Log(JsonUtility.ToJson(completionTracker));
             } catch {
                 experimentCompletionTracker = null;
             }
@@ -337,13 +342,13 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
             List<int> casesCompletion = new List<int>();
 
             foreach (Case c in s.cases) {
-                int logCount = 0;
+                int logsCount = 0;
                 int statisticsCount = 0;
 
                 foreach (TextAsset map in c.maps) {
                     foreach (string file in allFiles) {
                         if (file.Contains(map.name.Replace(".map", "") + "_log")) {
-                            logCount++;
+                            ++logsCount;
                         }
                         if (file.Contains(map.name.Replace(".map", "") + "_statistics")) {
                             statisticsCount++;
@@ -351,7 +356,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
                     }
                 }
 
-                casesCompletion.Add((logCount > statisticsCount) ? logCount : statisticsCount);
+                casesCompletion.Add((logsCount > statisticsCount) ? logsCount : statisticsCount);
                 studyCompletion += casesCompletion.Last();
             }
 
@@ -396,6 +401,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     public void StopLogging() {
         string log = "";
 
+        Debug.Log(JsonUtility.ToJson(new JsonCompletionTracker(0, experimentCompletionTracker)));
+
         if (loggingStatistics) {
             LogGameStatistics();
 
@@ -407,7 +414,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
             }
             if (logOnline) {
                 postQueue.Enqueue(new Entry(statisticsLabel, log,
-                    JsonUtility.ToJson(new JsonCompletionTracker(experimentCompletionTracker))));
+                    JsonUtility.ToJson(new JsonCompletionTracker(++logsCount,
+                    experimentCompletionTracker))));
             }
             loggingStatistics = false;
         }
@@ -420,7 +428,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         }
         if (logOnline) {
             postQueue.Enqueue(new Entry(gameLabel, log,
-                JsonUtility.ToJson(new JsonCompletionTracker(experimentCompletionTracker))));
+                JsonUtility.ToJson(new JsonCompletionTracker(++logsCount,
+                experimentCompletionTracker))));
         }
         logging = false;
     }
@@ -563,7 +572,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
         if (logOnline) {
             postQueue.Enqueue(new Entry("PA_" + testID + "_survey.json", log,
-                JsonUtility.ToJson(new JsonCompletionTracker(experimentCompletionTracker))));
+                JsonUtility.ToJson(new JsonCompletionTracker(++logsCount,
+                experimentCompletionTracker))));
         }
         if (logOffline) {
             File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName + "/" +

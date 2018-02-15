@@ -356,7 +356,7 @@ public class MainMenuUIManager : MonoBehaviour {
     }
 
     private void ActivateCurrentModeSP() {
-        modeTextSP.text = singleplayerModes[currentMode].modeName;
+        modeTextSP.text = "Mode: " + singleplayerModes[currentMode].modeName;
 
         currentMap = 0;
         currentGeneration = GetMinGenerationIndex(singleplayerModes[currentMode].maps[currentMap].
@@ -368,7 +368,7 @@ public class MainMenuUIManager : MonoBehaviour {
     }
 
     private void ActivateCurrentMapSP() {
-        mapTextSP.text = singleplayerModes[currentMode].maps[currentMap].mapName;
+        mapTextSP.text = "Map: " + singleplayerModes[currentMode].maps[currentMap].mapName;
 
         currentGeneration = GetMinGenerationIndex(singleplayerModes[currentMode].maps[currentMap].
             enabledGenerations);
@@ -379,7 +379,7 @@ public class MainMenuUIManager : MonoBehaviour {
     }
 
     private void ActivateCurrentGenerationSP() {
-        generationTextSP.text = singleplayerModes[currentMode].maps[currentMap].
+        generationTextSP.text = "Generation: " + singleplayerModes[currentMode].maps[currentMap].
             enabledGenerations[currentGeneration].generationName;
         currentScene = singleplayerModes[currentMode].maps[currentMap].
             enabledGenerations[currentGeneration].scene;
@@ -473,7 +473,7 @@ public class MainMenuUIManager : MonoBehaviour {
     }
 
     private void ActivateCurrentModeMP() {
-        modeTextMP.text = multiplayerModes[currentMode].modeName;
+        modeTextMP.text = "Mode: " + multiplayerModes[currentMode].modeName;
 
         currentMap = 0;
         currentGeneration = GetMinGenerationIndex(multiplayerModes[currentMode].maps[currentMap].
@@ -485,7 +485,7 @@ public class MainMenuUIManager : MonoBehaviour {
     }
 
     private void ActivateCurrentMapMP() {
-        mapTextMP.text = multiplayerModes[currentMode].maps[currentMap].mapName;
+        mapTextMP.text = "Map: " + multiplayerModes[currentMode].maps[currentMap].mapName;
 
         currentGeneration = GetMinGenerationIndex(multiplayerModes[currentMode].maps[currentMap].
             enabledGenerations);
@@ -496,7 +496,7 @@ public class MainMenuUIManager : MonoBehaviour {
     }
 
     private void ActivateCurrentGenerationMP() {
-        generationTextMP.text = singleplayerModes[currentMode].maps[currentMap].
+        generationTextMP.text = "Generation: " + singleplayerModes[currentMode].maps[currentMap].
             enabledGenerations[currentGeneration].generationName;
         currentScene = singleplayerModes[currentMode].maps[currentMap].
             enabledGenerations[currentGeneration].scene;
@@ -602,7 +602,7 @@ public class MainMenuUIManager : MonoBehaviour {
     }
 
     // Opens an explorer in Windows.
-    public void ShowExplorer(string path) {
+    private void ShowExplorer(string path) {
         path = path.Replace(@"/", @"\");
         System.Diagnostics.Process.Start("explorer.exe", "/select," + path);
     }

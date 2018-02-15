@@ -302,9 +302,11 @@ namespace JsonObjects {
     [Serializable]
     public class JsonCompletionTracker {
         public List<ExperimentObjects.StudyCompletionTracker> studyCompletionTrackers;
+        public int logsCount;
 
-        public JsonCompletionTracker(List<ExperimentObjects.StudyCompletionTracker> 
+        public JsonCompletionTracker(int logCount, List<ExperimentObjects.StudyCompletionTracker>
             studyCompletionTrackers) {
+            this.logsCount = logCount;
             this.studyCompletionTrackers = studyCompletionTrackers;
         }
     }
