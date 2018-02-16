@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// This class manages the UI of the main menu. The main menu is composed by 3 sections: 
-/// singleplayer, multiplayer and setting. Some buttons and options (quit and export) are hidden
+/// singleplayer, multiplayer and setting. Some buttons and options (quitButton and export) are hidden
 /// or disabled in the web build.
 /// </summary>
 public class MainMenuUIManager : MonoBehaviour {
@@ -22,7 +22,8 @@ public class MainMenuUIManager : MonoBehaviour {
     [SerializeField] private GameObject error;
     [SerializeField] private GameObject loading;
 
-    [Header("Main menu fields")] [SerializeField] private GameObject quit;
+    [Header("Main menu fields")] [SerializeField] private Button quitButton;
+    [SerializeField] private Button experimentButton;
 
     [Header("Singleplayer fields")] [SerializeField] private GameObject nextModeSP;
     [SerializeField] private GameObject previousModeSP;
@@ -82,6 +83,9 @@ public class MainMenuUIManager : MonoBehaviour {
         Cursor.lockState = CursorLockMode.None;
 
         if (ParameterManager.HasInstance()) {
+            if (ParameterManager.Instance.Version == ParameterManager.BuildVersion.COMPLETE) {
+                experimentButton.interactable = true;
+            }
             backgroundScript.SetRotation(ParameterManager.Instance.BackgroundRotation);
         } else {
             ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
@@ -114,8 +118,8 @@ public class MainMenuUIManager : MonoBehaviour {
                 Directory.CreateDirectory(exportPath);
             }
         } else {
-            // Hide the quit button.
-            quit.SetActive(false);
+            // Hide the quitButton button.
+            quitButton.interactable = false;
             // Disable all the import/export.
             allowIO = false;
             exportSP.interactable = false;
@@ -159,6 +163,12 @@ public class MainMenuUIManager : MonoBehaviour {
         ParameterManager.Instance.ExportPath = exportPath;
 
         Loading();
+    }
+
+    // Loads a scene.
+    public void LoadScene(string scene) {
+        ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
+        SceneManager.LoadScene(scene);
     }
 
     // Shows the loading animation and loads.

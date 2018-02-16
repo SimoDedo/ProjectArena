@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class ParameterManager : SceneSingleton<ParameterManager> {
 
+    public enum BuildVersion { COMPLETE, GAME_ONLY, EXPERIMENT_CONTROL, EXPERIMENT_ONLY };
+
     // Map data.
     [HideInInspector] public int GenerationMode { get; set; }
     [HideInInspector] public string MapDNA { get; set; }
@@ -19,8 +21,14 @@ public class ParameterManager : SceneSingleton<ParameterManager> {
     [HideInInspector] public int ErrorCode { get; set; }
     [HideInInspector] public string ErrorMessage { get; set; }
 
+    // Experiment data.
+    [HideInInspector] public bool LogOnline { get; set; }
+    [HideInInspector] public bool LogOffline { get; set; }
+    [HideInInspector] public string ExperimentControlScene { get; set; }
+
     // Other data.
     [HideInInspector] public Quaternion BackgroundRotation { get; set; }
+    [HideInInspector] public BuildVersion Version { get; set; }
 
     void Awake() {
         ErrorCode = 0;

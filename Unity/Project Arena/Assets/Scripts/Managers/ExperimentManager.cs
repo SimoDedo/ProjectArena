@@ -104,7 +104,6 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
     void Start() {
         caseList = new List<Case>();
-        ParameterManager.Instance.name = "q";
 
         if (logOffline && Application.isWebPlayer) {
             logOffline = false;
@@ -336,6 +335,10 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
                     JsonUtility.FromJson<JsonCompletionTracker>(splittedResult[4]);
                 experimentCompletionTracker = completionTracker.studyCompletionTrackers;
                 logsCount = completionTracker.logsCount;
+                if (experimentCompletionTracker == null || experimentCompletionTracker.Count == 0) {
+                    experimentCompletionTracker = GetZeroTracker();
+                    logsCount = 0;
+                }
             } catch {
                 experimentCompletionTracker = GetZeroTracker();
                 logsCount = 0;
