@@ -91,7 +91,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
     private int currentStudy = -1;
     private int currentCase = -1;
-    private double testID;
+    private string testID;
 
     private bool loggingGame = false;
     private bool loggingStatistics = false;
@@ -186,10 +186,10 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     }
 
     // Returns a well formatted timestamp.
-    private double GetTimeStamp() {
-        DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-        TimeSpan diff = System.DateTime.Now.ToUniversalTime() - origin;
-        return Math.Floor(diff.TotalSeconds);
+    private string GetTimeStamp() {
+        return DateTime.Now.ToString("yy") + DateTime.Now.ToString("MM") +
+            DateTime.Now.ToString("dd") + DateTime.Now.ToString("HH") +
+            DateTime.Now.ToString("mm") + DateTime.Now.ToString("ss");
     }
 
     // Gets the cases to add in a round-robin fashion.
@@ -255,7 +255,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
             if (logOnline) {
                 yield return StartCoroutine(SetCompletionOnline());
             }
-            StopLogging();
+            yield return StopLogging();
         }
 
         currentCase++;
@@ -418,7 +418,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     }
 
     // Stops loggingGame and saves the log.
-    public void StopLogging() {
+    public IEnumerator StopLogging() {
         string log = "";
 
         if (loggingStatistics) {
@@ -437,6 +437,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
             }
             loggingStatistics = false;
         }
+
         if (loggingGame) {
             log = JsonUtility.ToJson(jGameLog);
 
@@ -450,6 +451,12 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
                     experimentCompletionTracker))));
             }
             loggingGame = false;
+        }
+
+        if (logOnline) {
+            while (postQueue.Count > 0) {
+                yield return new WaitForSeconds(SERVER_CONNECTION_PERIOD);
+            }
         }
     }
 
@@ -597,12 +604,17 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
         if (logOnline) {
             yield return StartCoroutine(SetCompletionOnline());
+
             postQueue.Enqueue(new Entry("PA_" + testID + "_survey.json", log,
                 JsonUtility.ToJson(new JsonCompletionTracker(++logsCount,
                 experimentCompletionTracker))));
+
+            while (postQueue.Count > 0) {
+                yield return new WaitForSeconds(SERVER_CONNECTION_PERIOD);
+            }
         }
         if (logOffline) {
-            File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName + "/" +
+            File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName + "/PA_" +
                 testID + "_survey.json", log);
         }
     }

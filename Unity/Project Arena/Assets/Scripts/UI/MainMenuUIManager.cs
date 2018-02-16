@@ -87,8 +87,6 @@ public class MainMenuUIManager : MonoBehaviour {
                 experimentButton.interactable = true;
             }
             backgroundScript.SetRotation(ParameterManager.Instance.BackgroundRotation);
-        } else {
-            ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
         }
 
         openedSection = main;

@@ -17,12 +17,17 @@ public class ExperimentInitializer : MonoBehaviour {
     [Header("Survey")] [SerializeField] private Case survey;
     [SerializeField] private bool playSurvey;
 
-    [Header("loggingGame")] [SerializeField] private bool logOffline;
+    [Header("Logging")] [SerializeField] private bool logOffline;
     [SerializeField] private bool logOnline;
     [SerializeField] private bool logGame;
     [SerializeField] private bool logStatistics;
 
     void Start() {
+        if (ParameterManager.HasInstance()) {
+            logOnline = ParameterManager.Instance.LogOnline;
+            logOffline = ParameterManager.Instance.LogOffline;
+        }
+
         if (!ExperimentManager.HasInstance()) {
             ExperimentManager.Instance.Setup(tutorial, playTutorial, studies, casesPerUsers,
                 experimentName, survey, playSurvey, logOffline, logOnline, logGame, logStatistics);

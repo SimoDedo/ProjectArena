@@ -1,4 +1,5 @@
 ﻿using JsonObjects.Survey;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,6 +15,7 @@ public class SurveyUIManager : MonoBehaviour {
     [SerializeField] private GameObject thanks;
 
     [Header("Other")] [SerializeField] private RotateTranslateByAxis backgroundScript;
+    [SerializeField] private GameObject loading;
 
     private int currentQuestion = 0;
 
@@ -28,8 +30,10 @@ public class SurveyUIManager : MonoBehaviour {
     }
 
     public void Submit() {
-        SaveValues();
-        Quit();
+        loading.SetActive(true);
+        thanks.SetActive(false);
+
+        StartCoroutine(SaveAndQuit());
     }
 
     // Updates the values of the survey.
@@ -41,12 +45,16 @@ public class SurveyUIManager : MonoBehaviour {
         jAnswers.Add(questions[currentQuestion].GetComponent<CheckboxQuestion>().GetJsonAnswer());
     }
 
-    // Saves the values of the survey.
-    private void SaveValues() {
+    // Saves the values of the survey and quits.
+    private IEnumerator SaveAndQuit() {
         if (ExperimentManager.Instance.MustSaveSurvey()) {
             ExperimentManager.Instance.SaveSurvey(jQuestions);
         }
-        StartCoroutine(ExperimentManager.Instance.SaveAnswers(jAnswers));
+
+        yield return StartCoroutine(ExperimentManager.Instance.SaveAnswers(jAnswers));
+
+        ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
+        StartCoroutine(ExperimentManager.Instance.LoadNextScene());
     }
 
     // Shows the first question.
@@ -68,11 +76,4 @@ public class SurveyUIManager : MonoBehaviour {
             thanks.SetActive(true);
         }
     }
-
-    // Returns to the experiment menu.
-    private void Quit() {
-        ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
-        StartCoroutine(ExperimentManager.Instance.LoadNextScene());
-    }
-
 }

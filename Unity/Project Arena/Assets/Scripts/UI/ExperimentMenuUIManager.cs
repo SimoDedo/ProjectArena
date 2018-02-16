@@ -29,14 +29,13 @@ public class ExperimentMenuUIManager : MonoBehaviour {
                 SetExitButton(true);
             }
         } else {
-            ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
             SetExitButton(true);
         }
     }
 
     private void Update() {
         if (Input.GetKey(KeyCode.E) && Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.C)) {
-            if (Application.platform == RuntimePlatform.OSXPlayer ||
+            if (!exitMustQuit || Application.platform == RuntimePlatform.OSXPlayer ||
                 Application.platform == RuntimePlatform.WindowsPlayer ||
                 Application.platform == RuntimePlatform.LinuxPlayer) {
                 exitButton.interactable = true;

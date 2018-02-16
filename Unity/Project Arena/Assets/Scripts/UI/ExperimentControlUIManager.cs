@@ -34,7 +34,6 @@ public class ExperimentControlUIManager : MonoBehaviour {
                 SetExitButton(true);
             }
         } else {
-            ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
             SetExitButton(true);
         }
 
@@ -96,16 +95,19 @@ public class ExperimentControlUIManager : MonoBehaviour {
                 yield return new WaitForSeconds(0.25f);
             }
 
-            string[] results = RemoteDataManager.Instance.Result.Split('|');
+            string[] results = RemoteDataManager.Instance.Result.Split('\n');
 
-            for (int i = 0; i < results.Length / 5; i++) {
-                if (results[i * 5 + 2] != "PA_COMPLETION" && results[i * 5 + 2] != "PA_RESET") {
-                    File.WriteAllText(downloadDirectory + "/" + results[i * 5 + 2] + ".json",
-                        results[i * 5 + 3]);
+            foreach (string result in results) {
+                string[] resultFields = result.Split('|');
+                if (resultFields.Length == 6) {
+                    if (resultFields[2] != "PA_COMPLETION" && resultFields[2] != "PA_RESET") {
+                        File.WriteAllText(downloadDirectory + "/" + resultFields[2] + ".json",
+                            resultFields[3]);
+                    }
                 }
             }
 
-            ShowExplorer(downloadDirectory);
+            ShowExplorer(downloadDirectory + "/");
         } finally {
             SetButtonsInteractable(true);
         }
