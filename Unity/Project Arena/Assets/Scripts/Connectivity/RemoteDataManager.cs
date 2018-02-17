@@ -59,6 +59,7 @@ namespace Polimi.GameCollective.Connectivity {
         /// </param>
         /// <param name="comment">Any free comment needed.</param>
         public void SaveData(string label, string data, string comment) {
+            Debug.Log("Posting " + label + ".");
             Post(COMMAND_SAVE + label + "|" + data + "|" + comment);
         }
 

@@ -26,6 +26,8 @@ public class ExperimentControlUIManager : MonoBehaviour {
     private bool exitMustQuit;
 
     void Start() {
+        Cursor.lockState = CursorLockMode.None;
+
         if (ParameterManager.HasInstance()) {
             backgroundScript.SetRotation(ParameterManager.Instance.BackgroundRotation);
             if (ParameterManager.Instance.Version == ParameterManager.BuildVersion.COMPLETE) {

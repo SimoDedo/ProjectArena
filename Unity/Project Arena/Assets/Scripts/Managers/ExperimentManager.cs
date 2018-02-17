@@ -52,6 +52,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     private string statisticsLabel;
     // Support object to format the log.
     private JsonStatisticsLog jStatisticsLog;
+    // Start time of the log.
+    private float logStart;
 
     // Completion trackers.
     private List<StudyCompletionTracker> experimentCompletionTracker;
@@ -96,8 +98,6 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     private bool loggingGame = false;
     private bool loggingStatistics = false;
 
-    private Queue<Entry> postQueue;
-
     void Awake() {
         DontDestroyOnLoad(transform.gameObject);
     }
@@ -113,9 +113,6 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
             logGame = false;
             logStatistics = false;
         } else {
-            if (logOnline) {
-                postQueue = new Queue<Entry>();
-            }
             if (logOffline) {
                 SetupDirectories();
                 if (!logOnline) {
@@ -134,14 +131,6 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
     void OnEnable() {
         SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
-    void Update() {
-        if (postQueue != null && postQueue.Count > 0) {
-            if (RemoteDataManager.Instance.IsResultReady) {
-                RemoteDataManager.Instance.SaveData(postQueue.Dequeue());
-            }
-        }
     }
 
     /* EXPERIMENT */
@@ -228,7 +217,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         }
 
         if (logOnline) {
-            postQueue.Enqueue(new Entry("PA_COMPLETION", "",
+            RemoteDataManager.Instance.SaveData(new Entry("PA_COMPLETION", "",
                 JsonUtility.ToJson(new JsonCompletionTracker(++logsCount,
                 experimentCompletionTracker))));
         }
@@ -243,8 +232,11 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     public IEnumerator StartNewExperiment() {
         if (logOnline) {
             yield return StartCoroutine(SetCompletionOnline());
+            CreateNewList();
+            yield return StartCoroutine(WaitForDataManager());
+        } else {
+            CreateNewList();
         }
-        CreateNewList();
 
         yield return StartCoroutine(LoadNextScene());
     }
@@ -317,16 +309,10 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
                 SetLoadingVisible(true);
         }
 
-        while (postQueue.Count > 0) {
-            yield return new WaitForSeconds(SERVER_CONNECTION_PERIOD);
-        }
-
+        yield return StartCoroutine(WaitForDataManager());
         RemoteDataManager.Instance.GetLastEntry();
 
-        while (!RemoteDataManager.Instance.IsResultReady) {
-            yield return new WaitForSeconds(SERVER_CONNECTION_PERIOD);
-        }
-
+        yield return StartCoroutine(WaitForDataManager());
         string[] splittedResult = RemoteDataManager.Instance.Result.Split('|');
 
         if (splittedResult.Length == 6) {
@@ -402,10 +388,30 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
     // Starts loggingGame.
     public void StartLogging() {
+        logStart = Time.time;
+
         if (logGame) {
+            jGameLog = new JsonGameLog();
+
             loggingGame = true;
         }
+
         if (logStatistics) {
+            jStatisticsLog = new JsonStatisticsLog();
+
+            targetSpawn = 0;
+            lastTargetSpawn = 0;
+            currentDistance = 0;
+            totalDistance = 0;
+            shotCount = 0;
+            hitCount = 0;
+            killCount = 0;
+            mediumKillTime = 0;
+            mediumKillDistance = 0;
+            lastPosition = new Vector3(-1, -1, -1);
+            initialTargetPosition = new Vector3(-1, -1, -1);
+            initialPlayerPosition = new Vector3(-1, -1, -1);
+
             loggingStatistics = true;
         }
 
@@ -431,7 +437,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
                     + statisticsLabel + ".json", log);
             }
             if (logOnline) {
-                postQueue.Enqueue(new Entry(statisticsLabel, log,
+                yield return StartCoroutine(WaitForDataManager());
+                RemoteDataManager.Instance.SaveData(new Entry(statisticsLabel, log,
                     JsonUtility.ToJson(new JsonCompletionTracker(++logsCount,
                     experimentCompletionTracker))));
             }
@@ -446,23 +453,21 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
                     + gameLabel + ".json", log);
             }
             if (logOnline) {
-                postQueue.Enqueue(new Entry(gameLabel, log,
+                yield return StartCoroutine(WaitForDataManager());
+                RemoteDataManager.Instance.SaveData(new Entry(gameLabel, log,
                     JsonUtility.ToJson(new JsonCompletionTracker(++logsCount,
                     experimentCompletionTracker))));
             }
             loggingGame = false;
         }
-
-        if (logOnline) {
-            while (postQueue.Count > 0) {
-                yield return new WaitForSeconds(SERVER_CONNECTION_PERIOD);
-            }
-        }
     }
 
     // Logs reload.
     public void LogRelaod(int gunId, int ammoInCharger, int totalAmmo) {
-        jGameLog.reloadLogs.Add(new JsonReload(Time.time, gunId, ammoInCharger, totalAmmo));
+        if (loggingGame) {
+            jGameLog.reloadLogs.Add(new JsonReload(Time.time - logStart, gunId, ammoInCharger,
+                totalAmmo));
+        }
     }
 
     // Logs the shot.
@@ -471,7 +476,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         if (loggingGame) {
             Coord coord = NormalizeFlipCoord(x, z);
 
-            jGameLog.shotLogs.Add(new JsonShot(Time.time,
+            jGameLog.shotLogs.Add(new JsonShot(Time.time - logStart,
                 coord.x, coord.z,
                 NormalizeFlipAngle(direction), gunId, ammoInCharger, totalAmmo));
         }
@@ -508,7 +513,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         Coord coord = NormalizeFlipCoord(x, z);
 
         if (loggingGame) {
-            jGameLog.positionLogs.Add(new JsonPosition(Time.time, coord.x, coord.z,
+            jGameLog.positionLogs.Add(new JsonPosition(Time.time - logStart, coord.x, coord.z,
             NormalizeFlipAngle(direction)));
         }
         if (loggingStatistics) {
@@ -527,10 +532,10 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         Coord coord = NormalizeFlipCoord(x, z);
 
         if (loggingGame) {
-            jGameLog.spawnLogs.Add(new JsonSpawn(Time.time, coord.x, coord.z, spawnedEntity));
+            jGameLog.spawnLogs.Add(new JsonSpawn(Time.time - logStart, coord.x, coord.z, spawnedEntity));
         }
         if (loggingStatistics) {
-            targetSpawn = Time.time;
+            targetSpawn = Time.time - logStart;
             initialTargetPosition.x = coord.x;
             initialTargetPosition.z = coord.z;
             initialPlayerPosition = lastPosition;
@@ -542,13 +547,13 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         Coord coord = NormalizeFlipCoord(x, z);
 
         if (loggingGame) {
-            jGameLog.killLogs.Add(new JsonKill(Time.time, coord.x, coord.z, killedEnitiy,
+            jGameLog.killLogs.Add(new JsonKill(Time.time - logStart, coord.x, coord.z, killedEnitiy,
             killerEntity));
         }
         if (loggingStatistics) {
             LogTargetStatistics(coord.x, coord.z);
             killCount++;
-            mediumKillTime += (Time.time - lastTargetSpawn - mediumKillTime) / killCount;
+            mediumKillTime += (Time.time - logStart - lastTargetSpawn - mediumKillTime) / killCount;
             mediumKillDistance += (currentDistance - mediumKillDistance) / killCount;
             currentDistance = 0;
             lastTargetSpawn = targetSpawn;
@@ -560,7 +565,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         Coord coord = NormalizeFlipCoord(x, z);
 
         if (loggingGame) {
-            jGameLog.hitLogs.Add(new JsonHit(Time.time, coord.x, coord.z, hittedEntity, hitterEntity,
+            jGameLog.hitLogs.Add(new JsonHit(Time.time - logStart, coord.x, coord.z, hittedEntity, hitterEntity,
             damage));
         }
         if (loggingStatistics) {
@@ -570,25 +575,30 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
     // Logs statistics about the performance of the player finding the target.
     private void LogTargetStatistics(float x, float z) {
-        jStatisticsLog.targetStatisticsLogs.Add(new JsonTargetStatistics(Time.time,
+        if (loggingStatistics) {
+            jStatisticsLog.targetStatisticsLogs.Add(new JsonTargetStatistics(Time.time - logStart,
             initialPlayerPosition.x, initialPlayerPosition.z, lastPosition.x, lastPosition.z, x,
-            z, currentDistance, (Time.time - lastTargetSpawn),
-            currentDistance / (Time.time - lastTargetSpawn)));
+            z, currentDistance, (Time.time - logStart - lastTargetSpawn),
+            currentDistance / (Time.time - logStart - lastTargetSpawn)));
+        }
     }
 
     // Logs statistics about the game.
     private void LogGameStatistics() {
-        jStatisticsLog.finalStatistics = new JsonFinalStatistics(shotCount, hitCount,
+        if (loggingStatistics) {
+            jStatisticsLog.finalStatistics = new JsonFinalStatistics(shotCount, hitCount,
             (shotCount > 0) ? (hitCount / (float)shotCount) : 0,
             totalDistance, mediumKillTime,
             mediumKillTime);
+        }
     }
 
     /* SURVEY*/
 
     // Tells if I need to save the survey.
     public bool MustSaveSurvey() {
-        return !File.Exists(experimentDirectory + "/survey.json") && logOffline;
+        return logOffline && (logGame || logStatistics) &&
+            !File.Exists(experimentDirectory + "/survey.json");
     }
 
     // Save survey. This has to be done once.
@@ -599,23 +609,22 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
     // Saves answers and informations about the experiment.
     public IEnumerator SaveAnswers(List<JsonAnswer> answers) {
-        string log = JsonUtility.ToJson(new JsonAnswers(experimentName, GetCurrentCasesArray(),
+        if (logGame || logStatistics) {
+            string log = JsonUtility.ToJson(new JsonAnswers(experimentName, GetCurrentCasesArray(),
             answers));
 
-        if (logOnline) {
-            yield return StartCoroutine(SetCompletionOnline());
+            if (logOnline) {
+                yield return StartCoroutine(SetCompletionOnline());
 
-            postQueue.Enqueue(new Entry("PA_" + testID + "_survey.json", log,
-                JsonUtility.ToJson(new JsonCompletionTracker(++logsCount,
-                experimentCompletionTracker))));
-
-            while (postQueue.Count > 0) {
-                yield return new WaitForSeconds(SERVER_CONNECTION_PERIOD);
+                yield return StartCoroutine(WaitForDataManager());
+                RemoteDataManager.Instance.SaveData(new Entry("PA_" + testID + "_survey.json", log,
+                    JsonUtility.ToJson(new JsonCompletionTracker(++logsCount,
+                    experimentCompletionTracker))));
             }
-        }
-        if (logOffline) {
-            File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName + "/PA_" +
-                testID + "_survey.json", log);
+            if (logOffline) {
+                File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName + "/PA_" +
+                    testID + "_survey.json", log);
+            }
         }
     }
 
@@ -691,6 +700,13 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         }
 
         return zeroTracker;
+    }
+
+    // Waits the Data Manager to complete the current operation.
+    private IEnumerator WaitForDataManager() {
+        while (!RemoteDataManager.Instance.IsResultReady) {
+            yield return new WaitForSeconds(SERVER_CONNECTION_PERIOD);
+        }
     }
 
 }
