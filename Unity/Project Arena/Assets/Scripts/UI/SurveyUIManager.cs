@@ -31,11 +31,18 @@ public class SurveyUIManager : MonoBehaviour {
         backgroundScript.SetRotation(ParameterManager.Instance.BackgroundRotation);
     }
 
+    // Saves the values of the survey and quits
     public void Submit() {
+        ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
+
         loading.SetActive(true);
         thanks.SetActive(false);
 
-        StartCoroutine(SaveAndQuit());
+        if (ExperimentManager.Instance.MustSaveSurvey()) {
+            ExperimentManager.Instance.SaveSurvey(jQuestions);
+        }
+        ExperimentManager.Instance.SaveAnswers(jAnswers);
+        ExperimentManager.Instance.LoadNextScene();
     }
 
     // Updates the values of the survey.
@@ -48,15 +55,8 @@ public class SurveyUIManager : MonoBehaviour {
     }
 
     // Saves the values of the survey and quits.
-    private IEnumerator SaveAndQuit() {
-        if (ExperimentManager.Instance.MustSaveSurvey()) {
-            ExperimentManager.Instance.SaveSurvey(jQuestions);
-        }
+    private void SaveAndQuit() {
 
-        yield return StartCoroutine(ExperimentManager.Instance.SaveAnswers(jAnswers));
-
-        ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
-        StartCoroutine(ExperimentManager.Instance.LoadNextScene());
     }
 
     // Shows the first question.

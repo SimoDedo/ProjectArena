@@ -56,9 +56,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     private float logStart;
 
     // Completion trackers.
-    private List<StudyCompletionTracker> experimentCompletionTracker;
-    // Logs count.
-    private int logsCount = 0;
+    private List<StudyCompletionTracker> studyCompletionTrackers;
 
     // Spawn time of current target.
     private float targetSpawn = 0;
@@ -89,7 +87,13 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     // Initial player position.
     private Vector3 initialPlayerPosition = new Vector3(-1, -1, -1);
 
-    private readonly float SERVER_CONNECTION_PERIOD = 0.5f;
+    private readonly float SERVER_CONNECTION_PERIOD = 0.1f;
+    private readonly float SERVER_CONNECTION_TIMEOUT = 10f;
+    private readonly string KEEP_COMPLETION = "KEEP_COMPLETION";
+    private readonly string DISCARD_COMPLETION = "DISCARD_COMPLETION";
+
+    private Queue<Entry> postQueue;
+    private bool postCompletion;
 
     private int currentStudy = -1;
     private int currentCase = -1;
@@ -100,9 +104,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
     void Awake() {
         DontDestroyOnLoad(transform.gameObject);
-    }
 
-    void Start() {
         caseList = new List<Case>();
 
         if (logOffline && Application.isWebPlayer) {
@@ -129,8 +131,49 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         }
     }
 
+    void Start() {
+        if (logOnline) {
+            postQueue = new Queue<Entry>();
+            StartCoroutine(ContactServer());
+        }
+    }
+
     void OnEnable() {
         SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
+        if ((logGame || logStatistics) && !(playTutorial && currentCase == 0) && !(playSurvey
+            && currentCase == caseList.Count - 2) && currentCase != caseList.Count - 1) {
+            SetupLogging();
+        }
+    }
+
+    // Menages the post queue.
+    private IEnumerator ContactServer() {
+        while (true) {
+            if (postQueue.Count > 0) {
+                Entry currentEntry = postQueue.Dequeue();
+                Debug.Log("I'm posting " + currentEntry.Label + "...");
+                // Wait for the Data Manager to finish the current operation, if any.
+                yield return StartCoroutine(WaitForDataManager());
+                // Get the log count of the last log on the server.
+                RemoteDataManager.Instance.GetLastEntry();
+                yield return StartCoroutine(WaitForDataManager());
+                JsonCompletionTracker jcp =
+                    ExtractCompletionTracker(RemoteDataManager.Instance.Result);
+                jcp.logsCount++;
+                if (currentEntry.Comment == KEEP_COMPLETION) {
+                    jcp.studyCompletionTrackers = studyCompletionTrackers;
+                }
+                // Post the data.
+                RemoteDataManager.Instance.SaveData(new Entry(currentEntry.Label, currentEntry.Data,
+                   JsonUtility.ToJson(jcp)));
+            } else {
+                Debug.Log("I'm doing nothing...");
+                yield return new WaitForSeconds(SERVER_CONNECTION_PERIOD);
+            }
+        }
     }
 
     /* EXPERIMENT */
@@ -186,40 +229,39 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         List<Case> lessPlayedCases = new List<Case>();
 
         // Get the least played study.
-        int minValue = experimentCompletionTracker[0].studyCompletion;
+        int minValue = studyCompletionTrackers[0].studyCompletion;
         currentStudy = 0;
 
-        for (int i = 0; i < experimentCompletionTracker.Count; i++) {
-            if (experimentCompletionTracker[i].studyCompletion < minValue) {
-                minValue = experimentCompletionTracker[i].studyCompletion;
+        for (int i = 0; i < studyCompletionTrackers.Count; i++) {
+            if (studyCompletionTrackers[i].studyCompletion < minValue) {
+                minValue = studyCompletionTrackers[i].studyCompletion;
                 currentStudy = i;
             }
         }
 
         // Get the least played cases in the least played study.
         if (count < studies[currentStudy].cases.Count) {
-            var sorted = experimentCompletionTracker[currentStudy].casesCompletion.Select((v, i) =>
+            var sorted = studyCompletionTrackers[currentStudy].casesCompletion.Select((v, i) =>
                 i).OrderBy(v => v).ToList();
 
             for (int i = 0; i < count; i++) {
                 studies[currentStudy].cases[sorted[i]].RandomizeCurrentMap();
                 lessPlayedCases.Add(studies[currentStudy].cases[sorted[i]]);
-                experimentCompletionTracker[currentStudy].casesCompletion[sorted[i]]++;
-                experimentCompletionTracker[currentStudy].studyCompletion++;
+                studyCompletionTrackers[currentStudy].casesCompletion[sorted[i]]++;
+                studyCompletionTrackers[currentStudy].studyCompletion++;
             }
         } else {
             for (int i = 0; i < studies[currentStudy].cases.Count; i++) {
                 studies[currentStudy].cases[i].RandomizeCurrentMap();
                 lessPlayedCases.Add(studies[currentStudy].cases[i]);
-                experimentCompletionTracker[currentStudy].casesCompletion[i]++;
-                experimentCompletionTracker[currentStudy].studyCompletion++;
+                studyCompletionTrackers[currentStudy].casesCompletion[i]++;
+                studyCompletionTrackers[currentStudy].studyCompletion++;
             }
         }
 
-        if (logOnline) {
-            RemoteDataManager.Instance.SaveData(new Entry("PA_COMPLETION", "",
-                JsonUtility.ToJson(new JsonCompletionTracker(++logsCount,
-                experimentCompletionTracker))));
+        if (logOnline && postCompletion) {
+            postQueue.Enqueue(new Entry("PA_COMPLETION", "", KEEP_COMPLETION));
+            postCompletion = false;
         }
 
         // Randomize the play order.
@@ -232,22 +274,15 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     public IEnumerator StartNewExperiment() {
         if (logOnline) {
             yield return StartCoroutine(SetCompletionOnline());
-            CreateNewList();
-            yield return StartCoroutine(WaitForDataManager());
-        } else {
-            CreateNewList();
         }
-
-        yield return StartCoroutine(LoadNextScene());
+        CreateNewList();
+        LoadNextScene();
     }
 
     // Retuns the next scene to be played.
-    public IEnumerator LoadNextScene() {
+    public void LoadNextScene() {
         if (loggingGame || loggingStatistics) {
-            if (logOnline) {
-                yield return StartCoroutine(SetCompletionOnline());
-            }
-            yield return StopLogging();
+            StopLogging();
         }
 
         currentCase++;
@@ -262,28 +297,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         SceneManager.LoadScene(c.scene);
     }
 
-    // Shuffles a list.
-    void Shuffle<T>(IList<T> list) {
-        var random = new System.Random();
-        int n = list.Count;
-
-        while (n > 1) {
-            n--;
-            int k = random.Next(n + 1);
-            T value = list[k];
-            list[k] = list[n];
-            list[n] = value;
-        }
-    }
-
     /* LOGGING */
-
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
-        if ((logGame || logStatistics) && !(playTutorial && currentCase == 0) && !(playSurvey
-            && currentCase == caseList.Count - 2) && currentCase != caseList.Count - 1) {
-            SetupLogging();
-        }
-    }
 
     // Sets up the directories.
     private void SetupDirectories() {
@@ -304,40 +318,39 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
     // Sets the completion (online).
     private IEnumerator SetCompletionOnline() {
-        if (GameObject.Find("Experiment Menu UI Manager")) {
-            GameObject.Find("Experiment Menu UI Manager").GetComponent<ExperimentMenuUIManager>().
-                SetLoadingVisible(true);
+        int connectionAttempts = 0;
+
+        // Wait for the Connection Manager.
+        while (connectionAttempts * SERVER_CONNECTION_PERIOD < SERVER_CONNECTION_TIMEOUT &&
+            postQueue.Count() > 0) {
+            connectionAttempts++;
+            yield return new WaitForSeconds(SERVER_CONNECTION_PERIOD);
         }
 
-        yield return StartCoroutine(WaitForDataManager());
-        RemoteDataManager.Instance.GetLastEntry();
-
-        yield return StartCoroutine(WaitForDataManager());
-        string[] splittedResult = RemoteDataManager.Instance.Result.Split('|');
-
-        if (splittedResult.Length == 6) {
-            try {
-                JsonCompletionTracker completionTracker =
-                    JsonUtility.FromJson<JsonCompletionTracker>(splittedResult[4]);
-                experimentCompletionTracker = completionTracker.studyCompletionTrackers;
-                logsCount = completionTracker.logsCount;
-                if (experimentCompletionTracker == null || experimentCompletionTracker.Count == 0) {
-                    experimentCompletionTracker = GetZeroTracker();
-                    logsCount = 0;
-                }
-            } catch {
-                experimentCompletionTracker = GetZeroTracker();
-                logsCount = 0;
+        // If the Connection Manager finished before the timeout I try to contact the server.
+        if (connectionAttempts * SERVER_CONNECTION_PERIOD < SERVER_CONNECTION_TIMEOUT) {
+            // Get the log count of the last log on the server.
+            RemoteDataManager.Instance.GetLastEntry();
+            yield return StartCoroutine(WaitForDataManager(SERVER_CONNECTION_TIMEOUT -
+                connectionAttempts * SERVER_CONNECTION_PERIOD));
+            if (RemoteDataManager.Instance.IsResultReady) {
+                JsonCompletionTracker jcp =
+                    ExtractCompletionTracker(RemoteDataManager.Instance.Result);
+                studyCompletionTrackers = jcp.studyCompletionTrackers;
+                postCompletion = true;
+            } else {
+                studyCompletionTrackers = GetRandomTracker();
+                postCompletion = false;
             }
         } else {
-            experimentCompletionTracker = GetZeroTracker();
-            logsCount = 0;
+            studyCompletionTrackers = GetRandomTracker();
+            postCompletion = false;
         }
     }
 
     // Sets the completion (offline).
     private void SetCompletionOffline() {
-        experimentCompletionTracker = new List<StudyCompletionTracker>();
+        studyCompletionTrackers = new List<StudyCompletionTracker>();
 
         foreach (Study s in studies) {
             string[] allFiles = Directory.GetFiles(experimentDirectory + "/" + s.studyName);
@@ -364,7 +377,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
                 studyCompletion += casesCompletion.Last();
             }
 
-            experimentCompletionTracker.Add(new StudyCompletionTracker(studyCompletion,
+            studyCompletionTrackers.Add(new StudyCompletionTracker(studyCompletion,
                 casesCompletion.ToArray()));
         }
     }
@@ -424,9 +437,10 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     }
 
     // Stops loggingGame and saves the log.
-    public IEnumerator StopLogging() {
+    public void StopLogging() {
         string log = "";
 
+        // Save the statistics log, if any.
         if (loggingStatistics) {
             LogGameStatistics();
 
@@ -437,14 +451,12 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
                     + statisticsLabel + ".json", log);
             }
             if (logOnline) {
-                yield return StartCoroutine(WaitForDataManager());
-                RemoteDataManager.Instance.SaveData(new Entry(statisticsLabel, log,
-                    JsonUtility.ToJson(new JsonCompletionTracker(++logsCount,
-                    experimentCompletionTracker))));
+                postQueue.Enqueue(new Entry(statisticsLabel, log, DISCARD_COMPLETION));
             }
             loggingStatistics = false;
         }
 
+        // Save the game log, if any.
         if (loggingGame) {
             log = JsonUtility.ToJson(jGameLog);
 
@@ -453,10 +465,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
                     + gameLabel + ".json", log);
             }
             if (logOnline) {
-                yield return StartCoroutine(WaitForDataManager());
-                RemoteDataManager.Instance.SaveData(new Entry(gameLabel, log,
-                    JsonUtility.ToJson(new JsonCompletionTracker(++logsCount,
-                    experimentCompletionTracker))));
+                postQueue.Enqueue(new Entry(gameLabel, log, DISCARD_COMPLETION));
             }
             loggingGame = false;
         }
@@ -608,22 +617,18 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     }
 
     // Saves answers and informations about the experiment.
-    public IEnumerator SaveAnswers(List<JsonAnswer> answers) {
+    public void SaveAnswers(List<JsonAnswer> answers) {
         if (logGame || logStatistics) {
             string log = JsonUtility.ToJson(new JsonAnswers(experimentName, GetCurrentCasesArray(),
             answers));
 
             if (logOnline) {
-                yield return StartCoroutine(SetCompletionOnline());
-
-                yield return StartCoroutine(WaitForDataManager());
-                RemoteDataManager.Instance.SaveData(new Entry("PA_" + testID + "_survey.json", log,
-                    JsonUtility.ToJson(new JsonCompletionTracker(++logsCount,
-                    experimentCompletionTracker))));
+                postQueue.Enqueue(new Entry("PA_" + testID + "_survey.json", log,
+                    DISCARD_COMPLETION));
             }
             if (logOffline) {
-                File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName + "/PA_" +
-                    testID + "_survey.json", log);
+                File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName +
+                    "/PA_" + testID + "_survey.json", log);
             }
         }
     }
@@ -690,6 +695,37 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         return (angle < 0) ? (360 + angle % 360) : (angle % 360);
     }
 
+    // Shuffles a list.
+    private void Shuffle<T>(IList<T> list) {
+        var random = new System.Random();
+        int n = list.Count;
+
+        while (n > 1) {
+            n--;
+            int k = random.Next(n + 1);
+            T value = list[k];
+            list[k] = list[n];
+            list[n] = value;
+        }
+    }
+
+    // Waits the Data Manager to complete the current operation.
+    private IEnumerator WaitForDataManager() {
+        while (!RemoteDataManager.Instance.IsResultReady) {
+            yield return new WaitForSeconds(SERVER_CONNECTION_PERIOD);
+        }
+    }
+
+    // Waits the Data Manager to complete the current operation, but with a timeout.
+    private IEnumerator WaitForDataManager(float timeout) {
+        int connectionAttempts = 0;
+
+        while (connectionAttempts * SERVER_CONNECTION_PERIOD < timeout &&
+            !RemoteDataManager.Instance.IsResultReady) {
+            yield return new WaitForSeconds(SERVER_CONNECTION_PERIOD);
+        }
+    }
+
     // Returns a tracker with all the values set to zero.
     private List<StudyCompletionTracker> GetZeroTracker() {
         List<StudyCompletionTracker> zeroTracker = new List<StudyCompletionTracker>();
@@ -702,11 +738,40 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         return zeroTracker;
     }
 
-    // Waits the Data Manager to complete the current operation.
-    private IEnumerator WaitForDataManager() {
-        while (!RemoteDataManager.Instance.IsResultReady) {
-            yield return new WaitForSeconds(SERVER_CONNECTION_PERIOD);
+    // Returns a tracker with random completions.
+    private List<StudyCompletionTracker> GetRandomTracker() {
+        List<StudyCompletionTracker> randomTracker = new List<StudyCompletionTracker>();
+
+        foreach (Study s in studies) {
+            int[] casesCompletion = new int[s.cases.Count];
+            // Assign a random completion to the cases.
+            for (int i = 0; i < s.cases.Count; i++) {
+                casesCompletion[i] = UnityEngine.Random.Range(0, s.cases.Count);
+            }
+            // Assign a random completion to the study.
+            randomTracker.Add(new StudyCompletionTracker(UnityEngine.Random.Range(0, studies.Count),
+                casesCompletion));
         }
+
+        return randomTracker;
+    }
+
+    // Extracts the completion tracker from a log.
+    private JsonCompletionTracker ExtractCompletionTracker(string result) {
+        string[] splittedResult = result.Split('|');
+
+        if (splittedResult.Length == 6) {
+            try {
+                JsonCompletionTracker jct =
+                    JsonUtility.FromJson<JsonCompletionTracker>(splittedResult[4]);
+                if (jct != null && jct.studyCompletionTrackers.Count > 0) {
+                    return jct;
+                }
+            } catch {
+            }
+        }
+
+        return new JsonCompletionTracker(0, GetZeroTracker());
     }
 
 }

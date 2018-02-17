@@ -45,6 +45,7 @@ public class ExperimentMenuUIManager : MonoBehaviour {
 
     // Loads the level indicated by the Experiment Manager.
     public void Play() {
+        SetLoadingVisible(true);
         StartCoroutine(ExperimentManager.Instance.StartNewExperiment());
     }
 

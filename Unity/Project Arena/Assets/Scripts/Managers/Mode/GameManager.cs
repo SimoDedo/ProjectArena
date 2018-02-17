@@ -63,7 +63,7 @@ public abstract class GameManager : CoreComponent, ILoggable {
     // Loads the next scene
     private void LoadNextScene(string def) {
         if (ExperimentManager.HasInstance() && ParameterManager.HasInstance()) {
-            StartCoroutine(ExperimentManager.Instance.LoadNextScene());
+            ExperimentManager.Instance.LoadNextScene();
         } else {
             SceneManager.LoadScene(def);
         }
