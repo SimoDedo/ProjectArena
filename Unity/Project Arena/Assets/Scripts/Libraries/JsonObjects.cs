@@ -37,25 +37,25 @@ namespace JsonObjects {
 
         [Serializable]
         public class JsonPosition {
-            public float timestamp;
-            public float x;
-            public float y;
-            public float direction;
+            public double timestamp;
+            public double x;
+            public double y;
+            public double direction;
 
             public JsonPosition(float timestamp, float x, float y, float direction) {
-                this.timestamp = timestamp;
-                this.x = x;
-                this.y = y;
-                this.direction = direction;
+                this.timestamp = Math.Round((double)timestamp, 2, MidpointRounding.AwayFromZero);
+                this.x = Math.Round((double)x, 2, MidpointRounding.AwayFromZero);
+                this.y = Math.Round((double)y, 2, MidpointRounding.AwayFromZero);
+                this.direction = Math.Round((double)direction, 2, MidpointRounding.AwayFromZero);
             }
         }
 
         [Serializable]
         public class JsonShot {
-            public float timestamp;
-            public float x;
-            public float y;
-            public float direction;
+            public double timestamp;
+            public double x;
+            public double y;
+            public double direction;
             public int weapon;
             public int ammoInCharger;
             public int totalAmmo;
@@ -63,10 +63,10 @@ namespace JsonObjects {
             public JsonShot(float timestamp, float x, float y, float direction, int weapon,
                 int ammoInCharger,
                 int totalAmmo) {
-                this.timestamp = timestamp;
-                this.x = x;
-                this.y = y;
-                this.direction = direction;
+                this.timestamp = Math.Round((double)timestamp, 2, MidpointRounding.AwayFromZero);
+                this.x = Math.Round((double)x, 2, MidpointRounding.AwayFromZero);
+                this.y = Math.Round((double)y, 2, MidpointRounding.AwayFromZero);
+                this.direction = Math.Round((double)direction, 2, MidpointRounding.AwayFromZero);
                 this.weapon = weapon;
                 this.ammoInCharger = ammoInCharger;
             }
@@ -74,13 +74,13 @@ namespace JsonObjects {
 
         [Serializable]
         public class JsonReload {
-            public float timestamp;
+            public double timestamp;
             public int weapon;
             public int ammoInCharger;
             public int totalAmmo;
 
             public JsonReload(float timestamp, int weapon, int ammoInCharger, int totalAmmo) {
-                this.timestamp = timestamp;
+                this.timestamp = Math.Round((double)timestamp, 2, MidpointRounding.AwayFromZero);
                 this.weapon = weapon;
                 this.ammoInCharger = ammoInCharger;
                 this.totalAmmo = totalAmmo;
@@ -89,17 +89,17 @@ namespace JsonObjects {
 
         [Serializable]
         public class JsonKill {
-            public float timestamp;
-            public float x;
-            public float y;
+            public double timestamp;
+            public double x;
+            public double y;
             public string killedEntity;
             public string killerEntity;
 
             public JsonKill(float timestamp, float x, float y, string killedEntity,
                 string killerEntity) {
-                this.timestamp = timestamp;
-                this.x = x;
-                this.y = y;
+                this.timestamp = Math.Round((double)timestamp, 2, MidpointRounding.AwayFromZero);
+                this.x = Math.Round((double)x, 2, MidpointRounding.AwayFromZero);
+                this.y = Math.Round((double)y, 2, MidpointRounding.AwayFromZero);
                 this.killedEntity = killedEntity;
                 this.killerEntity = killerEntity;
             }
@@ -107,18 +107,18 @@ namespace JsonObjects {
 
         [Serializable]
         public class JsonHit {
-            public float timestamp;
-            public float x;
-            public float y;
+            public double timestamp;
+            public double x;
+            public double y;
             public string hittedEntity;
             public string hitterEntity;
             public int damage;
 
             public JsonHit(float timestamp, float x, float y, string hittedEntity,
                 string hitterEntity, int damage) {
-                this.timestamp = timestamp;
-                this.x = x;
-                this.y = y;
+                this.timestamp = Math.Round((double)timestamp, 2, MidpointRounding.AwayFromZero);
+                this.x = Math.Round((double)x, 2, MidpointRounding.AwayFromZero);
+                this.y = Math.Round((double)y, 2, MidpointRounding.AwayFromZero);
                 this.hittedEntity = hittedEntity;
                 this.hitterEntity = hitterEntity;
                 this.damage = damage;
@@ -127,15 +127,15 @@ namespace JsonObjects {
 
         [Serializable]
         public class JsonSpawn {
-            public float timestamp;
-            public float x;
-            public float y;
+            public double timestamp;
+            public double x;
+            public double y;
             public string spawnedEntity;
 
             public JsonSpawn(float timestamp, float x, float y, string spawnedEntity) {
-                this.timestamp = timestamp;
-                this.x = x;
-                this.y = y;
+                this.timestamp = Math.Round((double)timestamp, 2, MidpointRounding.AwayFromZero);
+                this.x = Math.Round((double)x, 2, MidpointRounding.AwayFromZero);
+                this.y = Math.Round((double)y, 2, MidpointRounding.AwayFromZero);
                 this.spawnedEntity = spawnedEntity;
             }
         }
@@ -162,13 +162,13 @@ namespace JsonObjects {
 
         [Serializable]
         public class JsonTargetStatistics {
-            public float timestamp;
-            public float playerInitialX;
-            public float playerInitialY;
-            public float playerX;
-            public float playerY;
-            public float targetX;
-            public float targetY;
+            public double timestamp;
+            public double playerInitialX;
+            public double playerInitialY;
+            public double playerX;
+            public double playerY;
+            public double targetX;
+            public double targetY;
             public float coveredTileDistance;
             public float time;
             public float speed;
@@ -176,13 +176,15 @@ namespace JsonObjects {
             public JsonTargetStatistics(float timestamp, float playerInitialX,
                 float playerInitialY, float playerX, float playerY, float targetX,
                 float targetY, float coveredTileDistance, float time, float speed) {
-                this.timestamp = timestamp;
-                this.playerInitialX = playerInitialX;
-                this.playerInitialY = playerInitialY;
-                this.playerX = playerX;
-                this.playerY = playerY;
-                this.targetX = targetX;
-                this.targetY = targetY;
+                this.timestamp = Math.Round((double)timestamp, 2, MidpointRounding.AwayFromZero);
+                this.playerInitialX = Math.Round((double)playerInitialX, 2,
+                    MidpointRounding.AwayFromZero);
+                this.playerInitialY = Math.Round((double)playerInitialY, 2,
+                    MidpointRounding.AwayFromZero);
+                this.playerX = Math.Round((double)playerX, 2, MidpointRounding.AwayFromZero);
+                this.playerY = Math.Round((double)playerY, 2, MidpointRounding.AwayFromZero);
+                this.targetX = Math.Round((double)targetX, 2, MidpointRounding.AwayFromZero);
+                this.targetY = Math.Round((double)targetY, 2, MidpointRounding.AwayFromZero);
                 this.coveredTileDistance = coveredTileDistance;
                 this.time = time;
                 this.speed = speed;

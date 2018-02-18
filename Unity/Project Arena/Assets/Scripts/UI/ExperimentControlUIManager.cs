@@ -45,9 +45,11 @@ public class ExperimentControlUIManager : MonoBehaviour {
             offlineExperimentButton.interactable = false;
             completeExperimentButton.interactable = false;
             directoryButton.interactable = false;
+        } else {
+            downloadDirectory = Application.persistentDataPath + "/Downloads";
+            if (!Directory.Exists(downloadDirectory))
+                Directory.CreateDirectory(downloadDirectory);
         }
-
-        downloadDirectory = Application.persistentDataPath + "/Downloads";
     }
 
     public void Exit() {
@@ -149,6 +151,7 @@ public class ExperimentControlUIManager : MonoBehaviour {
     public void LoadOnlineExperiment() {
         ParameterManager.Instance.LogOnline = true;
         ParameterManager.Instance.LogOffline = false;
+        ParameterManager.Instance.LogSetted = true;
         ParameterManager.Instance.ExperimentControlScene = SceneManager.GetActiveScene().name;
         ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
         SceneManager.LoadScene(experimentScene);
@@ -157,6 +160,7 @@ public class ExperimentControlUIManager : MonoBehaviour {
     public void LoadOfflineExperiment() {
         ParameterManager.Instance.LogOnline = false;
         ParameterManager.Instance.LogOffline = true;
+        ParameterManager.Instance.LogSetted = true;
         ParameterManager.Instance.ExperimentControlScene = SceneManager.GetActiveScene().name;
         ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
         SceneManager.LoadScene(experimentScene);
@@ -165,6 +169,7 @@ public class ExperimentControlUIManager : MonoBehaviour {
     public void LoadCompleteExperiment() {
         ParameterManager.Instance.LogOnline = true;
         ParameterManager.Instance.LogOffline = true;
+        ParameterManager.Instance.LogSetted = true;
         ParameterManager.Instance.ExperimentControlScene = SceneManager.GetActiveScene().name;
         ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
         SceneManager.LoadScene(experimentScene);

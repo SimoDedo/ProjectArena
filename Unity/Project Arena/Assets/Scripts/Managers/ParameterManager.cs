@@ -24,6 +24,7 @@ public class ParameterManager : SceneSingleton<ParameterManager> {
     // Experiment data.
     [HideInInspector] public bool LogOnline { get; set; }
     [HideInInspector] public bool LogOffline { get; set; }
+    [HideInInspector] public bool LogSetted { get; set; }
     [HideInInspector] public string ExperimentControlScene { get; set; }
 
     // Other data.
@@ -35,6 +36,7 @@ public class ParameterManager : SceneSingleton<ParameterManager> {
 
         LogOnline = true;
         LogOffline = true;
+        LogSetted = false;
 
         DontDestroyOnLoad(transform.gameObject);
     }

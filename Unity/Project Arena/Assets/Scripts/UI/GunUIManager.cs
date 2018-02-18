@@ -8,13 +8,20 @@ public class GunUIManager : MonoBehaviour {
 
     [SerializeField] private GameObject ammo;
 
+    private string infinite;
+
+    private void Awake() {
+        if (Application.platform == RuntimePlatform.WebGLPlayer) {
+            infinite = "INF";
+        } else {
+            infinite = "∞";
+        }
+    }
+
     // Sets the ammo.
     public void SetAmmo(int charger, int tot) {
-        if (tot == -1) {
-            ammo.GetComponent<Text>().text = charger.ToString() + "/∞";
-        } else {
-            ammo.GetComponent<Text>().text = charger.ToString() + "/" + tot.ToString();
-        }
+        ammo.GetComponent<Text>().text = charger.ToString() + "/" +
+            ((tot == -1) ? infinite : tot.ToString());
     }
 
 }

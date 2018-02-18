@@ -22,7 +22,7 @@ public class ExperimentInitializer : MonoBehaviour {
     [SerializeField] private bool logGame;
     [SerializeField] private bool logStatistics;
 
-    void Start() {
+    void Awake() {
         if (ParameterManager.HasInstance()) {
             logOnline = ParameterManager.Instance.LogOnline;
             logOffline = ParameterManager.Instance.LogOffline;

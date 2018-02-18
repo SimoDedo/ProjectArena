@@ -107,7 +107,12 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
         caseList = new List<Case>();
 
-        if (logOffline && Application.isWebPlayer) {
+        if (ParameterManager.Instance.LogSetted) {
+            logOnline = ParameterManager.Instance.LogOnline;
+            logOffline = ParameterManager.Instance.LogOffline;
+        }
+
+        if (logOffline && Application.platform == RuntimePlatform.WebGLPlayer) {
             logOffline = false;
         }
 
@@ -115,13 +120,6 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
             logGame = false;
             logStatistics = false;
         } else {
-            if (logOffline) {
-                SetupDirectories();
-                if (!logOnline) {
-                    SetCompletionOffline();
-                }
-            }
-
             if (logGame) {
                 jGameLog = new JsonGameLog();
             }
@@ -132,6 +130,13 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     }
 
     void Start() {
+        if (logOffline) {
+            SetupDirectories();
+            if (!logOnline) {
+                SetCompletionOffline();
+            }
+        }
+
         if (logOnline) {
             postQueue = new Queue<Entry>();
             StartCoroutine(ContactServer());
@@ -147,6 +152,23 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
             && currentCase == caseList.Count - 2) && currentCase != caseList.Count - 1) {
             SetupLogging();
         }
+    }
+
+    // Sets up the experiment manager.
+    public void Setup(Case tutorial, bool playTutorial, List<Study> studies, int casesPerUsers,
+        string experimentName, Case survey, bool playSurvey, bool logOffline, bool logOnline,
+        bool logGame, bool logStatistics) {
+        this.tutorial = tutorial;
+        this.playTutorial = playTutorial;
+        this.studies = studies;
+        this.casesPerUsers = casesPerUsers;
+        this.experimentName = experimentName;
+        this.survey = survey;
+        this.playSurvey = playSurvey;
+        this.logOffline = logOffline;
+        this.logOnline = logOnline;
+        this.logGame = logGame;
+        this.logStatistics = logStatistics;
     }
 
     // Menages the post queue.
@@ -177,23 +199,6 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     }
 
     /* EXPERIMENT */
-
-    // Sets up the experiment manager.
-    public void Setup(Case tutorial, bool playTutorial, List<Study> studies, int casesPerUsers,
-        string experimentName, Case survey, bool playSurvey, bool logOffline, bool logOnline,
-        bool logGame, bool logStatistics) {
-        this.tutorial = tutorial;
-        this.playTutorial = playTutorial;
-        this.studies = studies;
-        this.casesPerUsers = casesPerUsers;
-        this.experimentName = experimentName;
-        this.survey = survey;
-        this.playSurvey = playSurvey;
-        this.logOffline = logOffline;
-        this.logOnline = logOnline;
-        this.logGame = logGame;
-        this.logStatistics = logStatistics;
-    }
 
     // Creates a new list of cases for the player to play.
     private void CreateNewList() {
