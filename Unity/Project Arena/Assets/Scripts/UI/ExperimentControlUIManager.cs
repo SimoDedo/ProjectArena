@@ -18,6 +18,8 @@ public class ExperimentControlUIManager : MonoBehaviour {
     [SerializeField] private Button resetCompletionButton;
     [SerializeField] private Button onlineExperimentButton;
     [SerializeField] private Button offlineExperimentButton;
+    [SerializeField] private Button completeExperimentButton;
+    [SerializeField] private Button directoryButton;
     [SerializeField] private RotateTranslateByAxis backgroundScript;
 
     [Header("Experiment")] [SerializeField] private string experimentScene;
@@ -41,14 +43,11 @@ public class ExperimentControlUIManager : MonoBehaviour {
 
         if (Application.platform == RuntimePlatform.WebGLPlayer) {
             offlineExperimentButton.interactable = false;
-        } else {
-            offlineExperimentButton.interactable = true;
+            completeExperimentButton.interactable = false;
+            directoryButton.interactable = false;
         }
 
         downloadDirectory = Application.persistentDataPath + "/Downloads";
-
-        if (!Directory.Exists(downloadDirectory))
-            Directory.CreateDirectory(downloadDirectory);
     }
 
     public void Exit() {
@@ -108,23 +107,25 @@ public class ExperimentControlUIManager : MonoBehaviour {
                     }
                 }
             }
-
-            ShowExplorer(downloadDirectory + "/");
         } finally {
             SetButtonsInteractable(true);
         }
     }
 
-    private void ShowExplorer(string path) {
-        path = path.Replace(@"/", @"\");
-        System.Diagnostics.Process.Start("explorer.exe", "/select," + path);
+    public void OpenDataDirectory() {
+        System.Diagnostics.Process.Start("explorer.exe",
+            "/select," + downloadDirectory.Replace(@"/", @"\"));
     }
 
     private void SetButtonsInteractable(bool interactable) {
+        if (Application.platform != RuntimePlatform.WebGLPlayer) {
+            offlineExperimentButton.interactable = interactable;
+            completeExperimentButton.interactable = interactable;
+            directoryButton.interactable = interactable;
+        }
         resetCompletionButton.interactable = interactable;
         downloadAllButton.interactable = interactable;
         onlineExperimentButton.interactable = interactable;
-        offlineExperimentButton.interactable = interactable;
         exitButton.interactable = interactable;
     }
 
@@ -155,6 +156,14 @@ public class ExperimentControlUIManager : MonoBehaviour {
 
     public void LoadOfflineExperiment() {
         ParameterManager.Instance.LogOnline = false;
+        ParameterManager.Instance.LogOffline = true;
+        ParameterManager.Instance.ExperimentControlScene = SceneManager.GetActiveScene().name;
+        ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
+        SceneManager.LoadScene(experimentScene);
+    }
+
+    public void LoadCompleteExperiment() {
+        ParameterManager.Instance.LogOnline = true;
         ParameterManager.Instance.LogOffline = true;
         ParameterManager.Instance.ExperimentControlScene = SceneManager.GetActiveScene().name;
         ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();

@@ -33,6 +33,9 @@ public class ParameterManager : SceneSingleton<ParameterManager> {
     void Awake() {
         ErrorCode = 0;
 
+        LogOnline = true;
+        LogOffline = true;
+
         DontDestroyOnLoad(transform.gameObject);
     }
 

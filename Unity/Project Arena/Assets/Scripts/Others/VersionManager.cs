@@ -5,8 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class VersionManager : MonoBehaviour {
 
-    [Header("Version")]
-    [SerializeField] private ParameterManager.BuildVersion version;
+    [Header("Version")] [SerializeField] private ParameterManager.BuildVersion version;
     [SerializeField] private string[] versionInitialScene =
         new string[Enum.GetNames(typeof(ParameterManager.BuildVersion)).Length];
 
