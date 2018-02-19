@@ -35,9 +35,7 @@ public class ExperimentMenuUIManager : MonoBehaviour {
 
     private void Update() {
         if (Input.GetKey(KeyCode.E) && Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.C)) {
-            if (!exitMustQuit || Application.platform == RuntimePlatform.OSXPlayer ||
-                Application.platform == RuntimePlatform.WindowsPlayer ||
-                Application.platform == RuntimePlatform.LinuxPlayer) {
+            if (!exitMustQuit || Application.platform != RuntimePlatform.WebGLPlayer) {
                 exitButton.interactable = true;
             }
         }

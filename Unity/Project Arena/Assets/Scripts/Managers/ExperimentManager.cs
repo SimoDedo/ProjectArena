@@ -87,11 +87,6 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     // Initial player position.
     private Vector3 initialPlayerPosition = new Vector3(-1, -1, -1);
 
-    private readonly float SERVER_CONNECTION_PERIOD = 0.1f;
-    private readonly float SERVER_CONNECTION_TIMEOUT = 10f;
-    private readonly string KEEP_COMPLETION = "KEEP_COMPLETION";
-    private readonly string DISCARD_COMPLETION = "DISCARD_COMPLETION";
-
     private Queue<Entry> postQueue;
     private bool postCompletion;
 
@@ -119,13 +114,6 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         if (!logOffline && !logOnline) {
             logGame = false;
             logStatistics = false;
-        } else {
-            if (logGame) {
-                jGameLog = new JsonGameLog();
-            }
-            if (logStatistics) {
-                jStatisticsLog = new JsonStatisticsLog();
-            }
         }
     }
 
@@ -176,7 +164,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         while (true) {
             if (postQueue.Count > 0) {
                 Entry currentEntry = postQueue.Dequeue();
-                Debug.Log("I'm posting " + currentEntry.Label + "...");
+                // Debug.Log("I'm posting " + currentEntry.Label + "...");
                 // Wait for the Data Manager to finish the current operation, if any.
                 yield return StartCoroutine(WaitForDataManager());
                 // Get the log count of the last log on the server.
@@ -185,15 +173,15 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
                 JsonCompletionTracker jcp =
                     ExtractCompletionTracker(RemoteDataManager.Instance.Result);
                 jcp.logsCount++;
-                if (currentEntry.Comment == KEEP_COMPLETION) {
+                if (currentEntry.Comment == ConnectionSettings.KEEP_COMPLETION) {
                     jcp.studyCompletionTrackers = studyCompletionTrackers;
                 }
                 // Post the data.
                 RemoteDataManager.Instance.SaveData(new Entry(currentEntry.Label, currentEntry.Data,
                    JsonUtility.ToJson(jcp)));
             } else {
-                Debug.Log("I'm doing nothing...");
-                yield return new WaitForSeconds(SERVER_CONNECTION_PERIOD);
+                // Debug.Log("I'm doing nothing...");
+                yield return new WaitForSeconds(ConnectionSettings.SERVER_CONNECTION_PERIOD);
             }
         }
     }
@@ -265,7 +253,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         }
 
         if (logOnline && postCompletion) {
-            postQueue.Enqueue(new Entry("PA_COMPLETION", "", KEEP_COMPLETION));
+            postQueue.Enqueue(new Entry(ConnectionSettings.SERVER_COMPLETION_LABEL, "",
+                ConnectionSettings.KEEP_COMPLETION));
             postCompletion = false;
         }
 
@@ -326,18 +315,20 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         int connectionAttempts = 0;
 
         // Wait for the Connection Manager.
-        while (connectionAttempts * SERVER_CONNECTION_PERIOD < SERVER_CONNECTION_TIMEOUT &&
-            postQueue.Count() > 0) {
+        while (connectionAttempts * ConnectionSettings.SERVER_CONNECTION_PERIOD <
+            ConnectionSettings.SERVER_CONNECTION_TIMEOUT && postQueue.Count() > 0) {
             connectionAttempts++;
-            yield return new WaitForSeconds(SERVER_CONNECTION_PERIOD);
+            yield return new WaitForSeconds(ConnectionSettings.SERVER_CONNECTION_PERIOD);
         }
 
         // If the Connection Manager finished before the timeout I try to contact the server.
-        if (connectionAttempts * SERVER_CONNECTION_PERIOD < SERVER_CONNECTION_TIMEOUT) {
+        if (connectionAttempts * ConnectionSettings.SERVER_CONNECTION_PERIOD <
+            ConnectionSettings.SERVER_CONNECTION_TIMEOUT) {
             // Get the log count of the last log on the server.
             RemoteDataManager.Instance.GetLastEntry();
-            yield return StartCoroutine(WaitForDataManager(SERVER_CONNECTION_TIMEOUT -
-                connectionAttempts * SERVER_CONNECTION_PERIOD));
+            yield return StartCoroutine(WaitForDataManager(
+                ConnectionSettings.SERVER_CONNECTION_TIMEOUT - connectionAttempts *
+                ConnectionSettings.SERVER_CONNECTION_PERIOD));
             if (RemoteDataManager.Instance.IsResultReady) {
                 JsonCompletionTracker jcp =
                     ExtractCompletionTracker(RemoteDataManager.Instance.Result);
@@ -369,7 +360,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
                 foreach (TextAsset map in c.maps) {
                     foreach (string file in allFiles) {
-                        if (file.Contains(map.name.Replace(".map", "") + "_log")) {
+                        if (file.Contains(map.name.Replace(".map", "") + "_game")) {
                             gameCount++;
                         }
                         if (file.Contains(map.name.Replace(".map", "") + "_statistics")) {
@@ -395,11 +386,11 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         }
 
         if (logGame) {
-            gameLabel = "PA_" + testID + "_" +
-                caseList[currentCase].GetCurrentMap().name.Replace(".map", "") + "_log";
+            gameLabel = testID + "_" +
+                caseList[currentCase].GetCurrentMap().name.Replace(".map", "") + "_game";
         }
         if (logStatistics) {
-            statisticsLabel = "PA_" + testID + "_" +
+            statisticsLabel = testID + "_" +
                 caseList[currentCase].GetCurrentMap().name.Replace(".map", "") + "_statistics";
         }
     }
@@ -409,13 +400,13 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         logStart = Time.time;
 
         if (logGame) {
-            jGameLog = new JsonGameLog();
+            jGameLog = new JsonGameLog(testID);
 
             loggingGame = true;
         }
 
         if (logStatistics) {
-            jStatisticsLog = new JsonStatisticsLog();
+            jStatisticsLog = new JsonStatisticsLog(testID);
 
             targetSpawn = 0;
             lastTargetSpawn = 0;
@@ -456,7 +447,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
                     + statisticsLabel + ".json", log);
             }
             if (logOnline) {
-                postQueue.Enqueue(new Entry(statisticsLabel, log, DISCARD_COMPLETION));
+                postQueue.Enqueue(new Entry(ConnectionSettings.SERVER_STATISTICS_LABEL, log,
+                    ConnectionSettings.DISCARD_COMPLETION));
             }
             loggingStatistics = false;
         }
@@ -465,14 +457,59 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         if (loggingGame) {
             log = JsonUtility.ToJson(jGameLog);
 
+            if (jGameLog.logPart > 0) {
+                gameLabel += ("_" + jGameLog.logPart);
+            }
+
             if (logOffline) {
                 File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName + "/"
                     + gameLabel + ".json", log);
             }
             if (logOnline) {
-                postQueue.Enqueue(new Entry(gameLabel, log, DISCARD_COMPLETION));
+                postQueue.Enqueue(new Entry(ConnectionSettings.SERVER_GAME_LABEL, log,
+                    ConnectionSettings.DISCARD_COMPLETION));
             }
             loggingGame = false;
+        }
+    }
+
+    // Checks the length of the game log and splits it if needed.
+    private void CheckGameLogLength() {
+        string log = JsonUtility.ToJson(jGameLog);
+
+        if (log.Length > ConnectionSettings.SERVER_MAXIMUM_DATA_LENGTH) {
+            if (logOffline) {
+                File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName + "/"
+                    + gameLabel + "_" + jGameLog.logPart + ".json", log);
+            }
+            postQueue.Enqueue(new Entry(ConnectionSettings.SERVER_GAME_LABEL, log,
+                ConnectionSettings.DISCARD_COMPLETION));
+            jGameLog.Split();
+        }
+    }
+
+    // Logs info about the maps.
+    public void LogMapInfo(float height, float width, float ts, bool f) {
+        tileSize = ts;
+        flip = f;
+
+        string currentMap = caseList[currentCase].GetCurrentMap().name.Replace(".map", "");
+
+        if (loggingGame) {
+            jGameLog.mapInfo = new JsonMapInfo(currentMap, height, width, tileSize, flip);
+        }
+        if (loggingStatistics) {
+            jStatisticsLog.mapInfo = new JsonMapInfo(currentMap, height, width, tileSize, flip);
+        }
+    }
+
+    // Logs info about the maps.
+    public void LogGameInfo(int gameDuration, string scene) {
+        if (loggingGame) {
+            jGameLog.gameInfo = new JsonGameInfo(gameDuration, scene, experimentName);
+        }
+        if (loggingStatistics) {
+            jStatisticsLog.gameInfo = new JsonGameInfo(gameDuration, scene, experimentName); ;
         }
     }
 
@@ -481,6 +518,10 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         if (loggingGame) {
             jGameLog.reloadLogs.Add(new JsonReload(Time.time - logStart, gunId, ammoInCharger,
                 totalAmmo));
+
+            if (logOnline) {
+                CheckGameLogLength();
+            }
         }
     }
 
@@ -490,35 +531,15 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         if (loggingGame) {
             Coord coord = NormalizeFlipCoord(x, z);
 
-            jGameLog.shotLogs.Add(new JsonShot(Time.time - logStart,
-                coord.x, coord.z,
-                NormalizeFlipAngle(direction), gunId, ammoInCharger, totalAmmo));
+            jGameLog.shotLogs.Add(new JsonShot(Time.time - logStart, coord.x, coord.z,
+               NormalizeFlipAngle(direction), gunId, ammoInCharger, totalAmmo));
+
+            if (logOnline) {
+                CheckGameLogLength();
+            }
         }
         if (loggingStatistics) {
             shotCount++;
-        }
-    }
-
-    // Logs info about the maps.
-    public void LogMapInfo(float height, float width, float ts, bool f) {
-        tileSize = ts;
-        flip = f;
-
-        if (loggingGame) {
-            jGameLog.mapInfo = new JsonMapInfo(height, width, tileSize, flip);
-        }
-        if (loggingStatistics) {
-            jStatisticsLog.mapInfo = new JsonMapInfo(height, width, tileSize, flip);
-        }
-    }
-
-    // Logs info about the maps.
-    public void LogGameInfo(int gameDuration, string scene) {
-        if (loggingGame) {
-            jGameLog.gameInfo = new JsonGameInfo(gameDuration, scene);
-        }
-        if (loggingStatistics) {
-            jStatisticsLog.gameInfo = new JsonGameInfo(gameDuration, scene); ;
         }
     }
 
@@ -529,6 +550,10 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         if (loggingGame) {
             jGameLog.positionLogs.Add(new JsonPosition(Time.time - logStart, coord.x, coord.z,
             NormalizeFlipAngle(direction)));
+
+            if (logOnline) {
+                CheckGameLogLength();
+            }
         }
         if (loggingStatistics) {
             if (lastPosition.x != -1) {
@@ -546,7 +571,12 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         Coord coord = NormalizeFlipCoord(x, z);
 
         if (loggingGame) {
-            jGameLog.spawnLogs.Add(new JsonSpawn(Time.time - logStart, coord.x, coord.z, spawnedEntity));
+            jGameLog.spawnLogs.Add(new JsonSpawn(Time.time - logStart, coord.x, coord.z,
+                spawnedEntity));
+
+            if (logOnline) {
+                CheckGameLogLength();
+            }
         }
         if (loggingStatistics) {
             targetSpawn = Time.time - logStart;
@@ -563,6 +593,10 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         if (loggingGame) {
             jGameLog.killLogs.Add(new JsonKill(Time.time - logStart, coord.x, coord.z, killedEnitiy,
             killerEntity));
+
+            if (logOnline) {
+                CheckGameLogLength();
+            }
         }
         if (loggingStatistics) {
             LogTargetStatistics(coord.x, coord.z);
@@ -579,8 +613,12 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         Coord coord = NormalizeFlipCoord(x, z);
 
         if (loggingGame) {
-            jGameLog.hitLogs.Add(new JsonHit(Time.time - logStart, coord.x, coord.z, hittedEntity, hitterEntity,
-            damage));
+            jGameLog.hitLogs.Add(new JsonHit(Time.time - logStart, coord.x, coord.z, hittedEntity,
+                hitterEntity, damage));
+
+            if (logOnline) {
+                CheckGameLogLength();
+            }
         }
         if (loggingStatistics) {
             hitCount++;
@@ -624,16 +662,16 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     // Saves answers and informations about the experiment.
     public void SaveAnswers(List<JsonAnswer> answers) {
         if (logGame || logStatistics) {
-            string log = JsonUtility.ToJson(new JsonAnswers(experimentName, GetCurrentCasesArray(),
+            string log = JsonUtility.ToJson(new JsonAnswers(testID, GetCurrentCasesArray(),
             answers));
 
             if (logOnline) {
-                postQueue.Enqueue(new Entry("PA_" + testID + "_survey.json", log,
-                    DISCARD_COMPLETION));
+                postQueue.Enqueue(new Entry(ConnectionSettings.SERVER_ANSWERS_LABEL, log,
+                    ConnectionSettings.DISCARD_COMPLETION));
             }
             if (logOffline) {
                 File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName +
-                    "/PA_" + testID + "_survey.json", log);
+                    "/" + testID + "_answers.json", log);
             }
         }
     }
@@ -717,7 +755,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     // Waits the Data Manager to complete the current operation.
     private IEnumerator WaitForDataManager() {
         while (!RemoteDataManager.Instance.IsResultReady) {
-            yield return new WaitForSeconds(SERVER_CONNECTION_PERIOD);
+            yield return new WaitForSeconds(ConnectionSettings.SERVER_CONNECTION_PERIOD);
         }
     }
 
@@ -725,9 +763,9 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     private IEnumerator WaitForDataManager(float timeout) {
         int connectionAttempts = 0;
 
-        while (connectionAttempts * SERVER_CONNECTION_PERIOD < timeout &&
+        while (connectionAttempts * ConnectionSettings.SERVER_CONNECTION_PERIOD < timeout &&
             !RemoteDataManager.Instance.IsResultReady) {
-            yield return new WaitForSeconds(SERVER_CONNECTION_PERIOD);
+            yield return new WaitForSeconds(ConnectionSettings.SERVER_CONNECTION_PERIOD);
         }
     }
 

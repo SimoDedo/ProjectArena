@@ -62,7 +62,6 @@ public class MainMenuUIManager : MonoBehaviour {
     [Header("Loading fields")] [SerializeField] private Text loadingText;
 
     [Header("Other")] [SerializeField] private RotateTranslateByAxis backgroundScript;
-    [SerializeField] private bool forceInput;
 
     private GameObject openedSection;
 
@@ -101,9 +100,16 @@ public class MainMenuUIManager : MonoBehaviour {
         exportSP.isOn = false;
         exportMP.isOn = false;
 
-        if (forceInput || Application.platform == RuntimePlatform.OSXPlayer ||
-            Application.platform == RuntimePlatform.WindowsPlayer ||
-            Application.platform == RuntimePlatform.LinuxPlayer) {
+        if (Application.platform == RuntimePlatform.WebGLPlayer) {
+            // Hide the quitButton button.
+            quitButton.interactable = false;
+            // Disable all the import/export.
+            allowIO = false;
+            exportSP.interactable = false;
+            exportTextSP.color = exportSP.GetComponent<Toggle>().colors.disabledColor;
+            exportMP.interactable = false;
+            exportTextMP.color = exportMP.GetComponent<Toggle>().colors.disabledColor;
+        } else {
             allowIO = true;
             importPath = Application.persistentDataPath + "/Import";
             exportPath = Application.persistentDataPath + "/Export";
@@ -115,15 +121,6 @@ public class MainMenuUIManager : MonoBehaviour {
             if (!Directory.Exists(exportPath)) {
                 Directory.CreateDirectory(exportPath);
             }
-        } else {
-            // Hide the quitButton button.
-            quitButton.interactable = false;
-            // Disable all the import/export.
-            allowIO = false;
-            exportSP.interactable = false;
-            exportTextSP.color = exportSP.GetComponent<Toggle>().colors.disabledColor;
-            exportMP.interactable = false;
-            exportTextMP.color = exportMP.GetComponent<Toggle>().colors.disabledColor;
         }
 
         // Get the mouse sensibility.

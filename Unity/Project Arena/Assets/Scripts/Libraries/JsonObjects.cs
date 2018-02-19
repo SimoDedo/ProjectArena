@@ -7,6 +7,8 @@ namespace JsonObjects {
 
         [Serializable]
         public class JsonGameLog {
+            public int logPart;
+            public string testID;
             public JsonMapInfo mapInfo;
             public JsonGameInfo gameInfo;
             public List<JsonSpawn> spawnLogs;
@@ -16,7 +18,10 @@ namespace JsonObjects {
             public List<JsonHit> hitLogs;
             public List<JsonKill> killLogs;
 
-            public JsonGameLog() {
+            public JsonGameLog(string testID) {
+                logPart = 0;
+                this.testID = testID;
+
                 spawnLogs = new List<JsonSpawn>();
                 positionLogs = new List<JsonPosition>();
                 shotLogs = new List<JsonShot>();
@@ -32,6 +37,11 @@ namespace JsonObjects {
                 reloadLogs.Clear();
                 hitLogs.Clear();
                 killLogs.Clear();
+            }
+
+            public void Split() {
+                logPart++;
+                Reset();
             }
         }
 
@@ -146,12 +156,15 @@ namespace JsonObjects {
 
         [Serializable]
         public class JsonStatisticsLog {
+            public string testID;
             public JsonMapInfo mapInfo;
             public JsonGameInfo gameInfo;
             public List<JsonTargetStatistics> targetStatisticsLogs;
             public JsonFinalStatistics finalStatistics;
 
-            public JsonStatisticsLog() {
+            public JsonStatisticsLog(string testID) {
+                this.testID = testID;
+
                 targetStatisticsLogs = new List<JsonTargetStatistics>();
             }
 
@@ -197,16 +210,16 @@ namespace JsonObjects {
             public int totalHits;
             public float accuracy;
             public float coveredDistance;
-            public float mediumKilltimestamp;
+            public float mediumKillTime;
             public float mediumKillDistance;
 
             public JsonFinalStatistics(int totalShots, int totalHits, float accuracy,
-                float coveredDistance, float mediumKilltimestamp, float mediumKillDistance) {
+                float coveredDistance, float mediumKillTime, float mediumKillDistance) {
                 this.totalShots = totalShots;
                 this.totalHits = totalHits;
                 this.accuracy = accuracy;
                 this.coveredDistance = coveredDistance;
-                this.mediumKilltimestamp = mediumKilltimestamp;
+                this.mediumKillTime = mediumKillTime;
                 this.mediumKillDistance = mediumKillDistance;
             }
         }
@@ -250,13 +263,13 @@ namespace JsonObjects {
 
         [Serializable]
         public class JsonAnswers {
-            public string experimentName;
+            public string testID;
             public string[] playedMaps;
             public List<JsonAnswer> answers;
 
-            public JsonAnswers(string experimentName, string[] playedMaps,
+            public JsonAnswers(string testID, string[] playedMaps,
                 List<JsonAnswer> answers) {
-                this.experimentName = experimentName;
+                this.testID = testID;
                 this.playedMaps = playedMaps;
                 this.answers = answers;
             }
@@ -277,12 +290,14 @@ namespace JsonObjects {
 
     [Serializable]
     public class JsonMapInfo {
+        public string name;
         public float height;
         public float width;
         public float tileSize;
         public bool flip;
 
-        public JsonMapInfo(float height, float width, float tileSize, bool flip) {
+        public JsonMapInfo(string name, float height, float width, float tileSize, bool flip) {
+            this.name = name;
             this.height = height;
             this.width = width;
             this.tileSize = tileSize;
@@ -292,12 +307,14 @@ namespace JsonObjects {
 
     [Serializable]
     public class JsonGameInfo {
-        public int duration;
+        public string experiment;
         public string scene;
+        public int duration;
 
-        public JsonGameInfo(int duration, string scene) {
+        public JsonGameInfo(int duration, string scene, string experiment) {
             this.duration = duration;
             this.scene = scene;
+            this.experiment = experiment;
         }
     }
 

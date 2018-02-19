@@ -15,7 +15,6 @@ public class SurveyUIManager : MonoBehaviour {
     [SerializeField] private GameObject thanks;
 
     [Header("Other")] [SerializeField] private RotateTranslateByAxis backgroundScript;
-    [SerializeField] private GameObject loading;
 
     private int currentQuestion = 0;
 
@@ -35,7 +34,6 @@ public class SurveyUIManager : MonoBehaviour {
     public void Submit() {
         ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
 
-        loading.SetActive(true);
         thanks.SetActive(false);
 
         if (ExperimentManager.Instance.MustSaveSurvey()) {

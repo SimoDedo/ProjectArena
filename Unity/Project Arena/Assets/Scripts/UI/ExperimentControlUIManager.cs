@@ -1,4 +1,7 @@
 ﻿using JsonObjects;
+using JsonObjects.Game;
+using JsonObjects.Statistics;
+using JsonObjects.Survey;
 using Polimi.GameCollective.Connectivity;
 using System.Collections;
 using System.IO;
@@ -72,7 +75,7 @@ public class ExperimentControlUIManager : MonoBehaviour {
     }
 
     private IEnumerator ResetCompletionAttempt() {
-        RemoteDataManager.Instance.SaveData("PA_RESET", "", "");
+        RemoteDataManager.Instance.SaveData(ConnectionSettings.SERVER_RESET_LABEL, "", "");
 
         while (!RemoteDataManager.Instance.IsResultReady) {
             yield return new WaitForSeconds(0.25f);
@@ -103,8 +106,31 @@ public class ExperimentControlUIManager : MonoBehaviour {
             foreach (string result in results) {
                 string[] resultFields = result.Split('|');
                 if (resultFields.Length == 6) {
-                    if (resultFields[2] != "PA_COMPLETION" && resultFields[2] != "PA_RESET") {
-                        File.WriteAllText(downloadDirectory + "/" + resultFields[2] + ".json",
+                    if (resultFields[2] != ConnectionSettings.SERVER_COMPLETION_LABEL &&
+                        resultFields[2] != ConnectionSettings.SERVER_RESET_LABEL) {
+                        string fileName = "";
+
+                        switch (resultFields[2]) {
+                            case ConnectionSettings.SERVER_GAME_LABEL:
+                                JsonGameLog jGameLog =
+                                    JsonUtility.FromJson<JsonGameLog>(resultFields[3]);
+                                fileName = jGameLog.testID + "_" + jGameLog.mapInfo.name +
+                                    "_game_" + jGameLog.logPart;
+                                break;
+                            case ConnectionSettings.SERVER_STATISTICS_LABEL:
+                                JsonStatisticsLog jStatisticsLog =
+                                    JsonUtility.FromJson<JsonStatisticsLog>(resultFields[3]);
+                                fileName = jStatisticsLog.testID + "_" + jStatisticsLog.mapInfo.name
+                                    + "_" + "statistics";
+                                break;
+                            case ConnectionSettings.SERVER_ANSWERS_LABEL:
+                                JsonAnswers jAnswers =
+                                    JsonUtility.FromJson<JsonAnswers>(resultFields[3]);
+                                fileName = jAnswers.testID + "_answers";
+                                break;
+                        }
+
+                        File.WriteAllText(downloadDirectory + "/" + fileName + ".json",
                             resultFields[3]);
                     }
                 }
@@ -134,9 +160,7 @@ public class ExperimentControlUIManager : MonoBehaviour {
     private void SetExitButton(bool mustQuit) {
         if (mustQuit) {
             exitButton.GetComponentInChildren<Text>().text = "Quit";
-            if (Application.platform == RuntimePlatform.OSXPlayer ||
-                Application.platform == RuntimePlatform.WindowsPlayer ||
-                Application.platform == RuntimePlatform.LinuxPlayer) {
+            if (Application.platform != RuntimePlatform.WebGLPlayer) {
                 exitButton.interactable = true;
             } else {
                 exitButton.interactable = false;
