@@ -48,10 +48,14 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     private string gameLabel;
     // Support object to format the log.
     private JsonGameLog jGameLog;
+    // Length of the current game log.
+    private int gameLogLength;
     // Label of the current statistic log.
     private string statisticsLabel;
     // Support object to format the log.
     private JsonStatisticsLog jStatisticsLog;
+    // Length of the current statistics log.
+    private int statisticsLogLength;
     // Start time of the log.
     private float logStart;
 
@@ -173,7 +177,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
                 JsonCompletionTracker jcp =
                     ExtractCompletionTracker(RemoteDataManager.Instance.Result);
                 jcp.logsCount++;
-                if (currentEntry.Comment == ConnectionSettings.KEEP_COMPLETION) {
+                if (currentEntry.Comment == ConnectionSettings.KEEP_LOCAL_COMPLETION) {
                     jcp.studyCompletionTrackers = studyCompletionTrackers;
                 }
                 // Post the data.
@@ -214,7 +218,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     private string GetTimeStamp() {
         return DateTime.Now.ToString("yy") + DateTime.Now.ToString("MM") +
             DateTime.Now.ToString("dd") + DateTime.Now.ToString("HH") +
-            DateTime.Now.ToString("mm") + DateTime.Now.ToString("ss");
+            DateTime.Now.ToString("mm") + DateTime.Now.ToString("ss") +
+            DateTime.Now.ToString("ff");
     }
 
     // Gets the cases to add in a round-robin fashion.
@@ -254,7 +259,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
         if (logOnline && postCompletion) {
             postQueue.Enqueue(new Entry(ConnectionSettings.SERVER_COMPLETION_LABEL, "",
-                ConnectionSettings.KEEP_COMPLETION));
+                ConnectionSettings.KEEP_LOCAL_COMPLETION));
             postCompletion = false;
         }
 
@@ -401,12 +406,14 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
         if (logGame) {
             jGameLog = new JsonGameLog(testID);
+            gameLogLength = JsonUtility.ToJson(jGameLog).Length;
 
             loggingGame = true;
         }
 
         if (logStatistics) {
             jStatisticsLog = new JsonStatisticsLog(testID);
+            statisticsLogLength = JsonUtility.ToJson(jStatisticsLog).Length + 200;
 
             targetSpawn = 0;
             lastTargetSpawn = 0;
@@ -442,13 +449,17 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
             log = JsonUtility.ToJson(jStatisticsLog);
 
+            if (jStatisticsLog.logPart > 0) {
+                statisticsLabel += ("_" + jStatisticsLog.logPart);
+            }
+
             if (logOffline) {
                 File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName + "/"
                     + statisticsLabel + ".json", log);
             }
             if (logOnline) {
                 postQueue.Enqueue(new Entry(ConnectionSettings.SERVER_STATISTICS_LABEL, log,
-                    ConnectionSettings.DISCARD_COMPLETION));
+                    ConnectionSettings.DISCARD_LOCAL_COMPLETION));
             }
             loggingStatistics = false;
         }
@@ -467,24 +478,44 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
             }
             if (logOnline) {
                 postQueue.Enqueue(new Entry(ConnectionSettings.SERVER_GAME_LABEL, log,
-                    ConnectionSettings.DISCARD_COMPLETION));
+                    ConnectionSettings.DISCARD_LOCAL_COMPLETION));
             }
             loggingGame = false;
         }
     }
 
     // Checks the length of the game log and splits it if needed.
-    private void CheckGameLogLength() {
-        string log = JsonUtility.ToJson(jGameLog);
+    private void CheckGameLogLength(int increment) {
+        // I add 1 to the increment to considern the comma.
+        gameLogLength += (increment + 1);
 
-        if (log.Length > ConnectionSettings.SERVER_MAXIMUM_DATA_LENGTH) {
+        if (gameLogLength > ConnectionSettings.SERVER_MAXIMUM_DATA_LENGTH) {
             if (logOffline) {
                 File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName + "/"
-                    + gameLabel + "_" + jGameLog.logPart + ".json", log);
+                    + gameLabel + "_" + jGameLog.logPart + ".json", JsonUtility.ToJson(jGameLog));
             }
-            postQueue.Enqueue(new Entry(ConnectionSettings.SERVER_GAME_LABEL, log,
-                ConnectionSettings.DISCARD_COMPLETION));
+            postQueue.Enqueue(new Entry(ConnectionSettings.SERVER_GAME_LABEL,
+                JsonUtility.ToJson(jGameLog), ConnectionSettings.DISCARD_LOCAL_COMPLETION));
             jGameLog.Split();
+            gameLogLength = JsonUtility.ToJson(jGameLog).Length;
+        }
+    }
+
+    // Checks the length of the game log and splits it if needed.
+    private void CheckStatisticsLogLength(int increment) {
+        // I add 1 to the increment to considern the comma.
+        statisticsLogLength += (increment + 1);
+
+        if (statisticsLogLength > ConnectionSettings.SERVER_MAXIMUM_DATA_LENGTH) {
+            if (logOffline) {
+                File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName + "/"
+                + statisticsLabel + "_" + jStatisticsLog.logPart + ".json",
+                JsonUtility.ToJson(jStatisticsLog));
+            }
+            postQueue.Enqueue(new Entry(ConnectionSettings.SERVER_STATISTICS_LABEL,
+                JsonUtility.ToJson(jStatisticsLog), ConnectionSettings.DISCARD_LOCAL_COMPLETION));
+            jStatisticsLog.Split();
+            statisticsLogLength = JsonUtility.ToJson(jStatisticsLog).Length + 200;
         }
     }
 
@@ -497,9 +528,17 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
         if (loggingGame) {
             jGameLog.mapInfo = new JsonMapInfo(currentMap, height, width, tileSize, flip);
+
+            if (logOnline) {
+                CheckGameLogLength(JsonUtility.ToJson(jGameLog.mapInfo).Length);
+            }
         }
         if (loggingStatistics) {
             jStatisticsLog.mapInfo = new JsonMapInfo(currentMap, height, width, tileSize, flip);
+
+            if (logOnline) {
+                CheckStatisticsLogLength(JsonUtility.ToJson(jStatisticsLog.mapInfo).Length);
+            }
         }
     }
 
@@ -507,20 +546,29 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     public void LogGameInfo(int gameDuration, string scene) {
         if (loggingGame) {
             jGameLog.gameInfo = new JsonGameInfo(gameDuration, scene, experimentName);
+
+            if (logOnline) {
+                CheckGameLogLength(JsonUtility.ToJson(jGameLog.gameInfo).Length);
+            }
         }
         if (loggingStatistics) {
-            jStatisticsLog.gameInfo = new JsonGameInfo(gameDuration, scene, experimentName); ;
+            jStatisticsLog.gameInfo = new JsonGameInfo(gameDuration, scene, experimentName);
+
+            if (logOnline) {
+                CheckStatisticsLogLength(JsonUtility.ToJson(jStatisticsLog.gameInfo).Length);
+            }
         }
     }
 
     // Logs reload.
     public void LogRelaod(int gunId, int ammoInCharger, int totalAmmo) {
         if (loggingGame) {
-            jGameLog.reloadLogs.Add(new JsonReload(Time.time - logStart, gunId, ammoInCharger,
-                totalAmmo));
+            JsonReload jReload = new JsonReload(Time.time - logStart, gunId, ammoInCharger,
+                totalAmmo);
+            jGameLog.reloadLogs.Add(jReload);
 
             if (logOnline) {
-                CheckGameLogLength();
+                CheckGameLogLength(JsonUtility.ToJson(jReload).Length);
             }
         }
     }
@@ -531,11 +579,12 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         if (loggingGame) {
             Coord coord = NormalizeFlipCoord(x, z);
 
-            jGameLog.shotLogs.Add(new JsonShot(Time.time - logStart, coord.x, coord.z,
-               NormalizeFlipAngle(direction), gunId, ammoInCharger, totalAmmo));
+            JsonShot jShot = new JsonShot(Time.time - logStart, coord.x, coord.z,
+               NormalizeFlipAngle(direction), gunId, ammoInCharger, totalAmmo);
+            jGameLog.shotLogs.Add(jShot);
 
             if (logOnline) {
-                CheckGameLogLength();
+                CheckGameLogLength(JsonUtility.ToJson(jShot).Length);
             }
         }
         if (loggingStatistics) {
@@ -548,11 +597,12 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         Coord coord = NormalizeFlipCoord(x, z);
 
         if (loggingGame) {
-            jGameLog.positionLogs.Add(new JsonPosition(Time.time - logStart, coord.x, coord.z,
-            NormalizeFlipAngle(direction)));
+            JsonPosition jPosition = new JsonPosition(Time.time - logStart, coord.x, coord.z,
+            NormalizeFlipAngle(direction));
+            jGameLog.positionLogs.Add(jPosition);
 
             if (logOnline) {
-                CheckGameLogLength();
+                CheckGameLogLength(JsonUtility.ToJson(jPosition).Length);
             }
         }
         if (loggingStatistics) {
@@ -571,11 +621,12 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         Coord coord = NormalizeFlipCoord(x, z);
 
         if (loggingGame) {
-            jGameLog.spawnLogs.Add(new JsonSpawn(Time.time - logStart, coord.x, coord.z,
-                spawnedEntity));
+            JsonSpawn jSpawn = new JsonSpawn(Time.time - logStart, coord.x, coord.z,
+                spawnedEntity);
+            jGameLog.spawnLogs.Add(jSpawn);
 
             if (logOnline) {
-                CheckGameLogLength();
+                CheckGameLogLength(JsonUtility.ToJson(jSpawn).Length);
             }
         }
         if (loggingStatistics) {
@@ -591,11 +642,12 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         Coord coord = NormalizeFlipCoord(x, z);
 
         if (loggingGame) {
-            jGameLog.killLogs.Add(new JsonKill(Time.time - logStart, coord.x, coord.z, killedEnitiy,
-            killerEntity));
+            JsonKill jKill = new JsonKill(Time.time - logStart, coord.x, coord.z, killedEnitiy,
+            killerEntity);
+            jGameLog.killLogs.Add(jKill);
 
             if (logOnline) {
-                CheckGameLogLength();
+                CheckGameLogLength(JsonUtility.ToJson(jKill).Length);
             }
         }
         if (loggingStatistics) {
@@ -613,11 +665,12 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         Coord coord = NormalizeFlipCoord(x, z);
 
         if (loggingGame) {
-            jGameLog.hitLogs.Add(new JsonHit(Time.time - logStart, coord.x, coord.z, hittedEntity,
-                hitterEntity, damage));
+            JsonHit jHit = new JsonHit(Time.time - logStart, coord.x, coord.z, hittedEntity,
+                hitterEntity, damage);
+            jGameLog.hitLogs.Add(jHit);
 
             if (logOnline) {
-                CheckGameLogLength();
+                CheckGameLogLength(JsonUtility.ToJson(jHit).Length);
             }
         }
         if (loggingStatistics) {
@@ -628,10 +681,14 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     // Logs statistics about the performance of the player finding the target.
     private void LogTargetStatistics(float x, float z) {
         if (loggingStatistics) {
-            jStatisticsLog.targetStatisticsLogs.Add(new JsonTargetStatistics(Time.time - logStart,
+            JsonTargetStatistics jTargetStatistics = new JsonTargetStatistics(Time.time - logStart,
             initialPlayerPosition.x, initialPlayerPosition.z, lastPosition.x, lastPosition.z, x,
             z, currentDistance, (Time.time - logStart - lastTargetSpawn),
-            currentDistance / (Time.time - logStart - lastTargetSpawn)));
+            currentDistance / (Time.time - logStart - lastTargetSpawn));
+
+            if (logOnline) {
+                CheckStatisticsLogLength(JsonUtility.ToJson(jTargetStatistics).Length);
+            }
         }
     }
 
@@ -667,7 +724,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
 
             if (logOnline) {
                 postQueue.Enqueue(new Entry(ConnectionSettings.SERVER_ANSWERS_LABEL, log,
-                    ConnectionSettings.DISCARD_COMPLETION));
+                    ConnectionSettings.DISCARD_LOCAL_COMPLETION));
             }
             if (logOffline) {
                 File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName +

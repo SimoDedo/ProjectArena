@@ -90,7 +90,7 @@ public class ExperimentControlUIManager : MonoBehaviour {
         while (!RemoteDataManager.Instance.IsResultReady) {
             yield return new WaitForSeconds(0.25f);
         }
-
+    
         try {
             int downloadCount = JsonUtility.FromJson<JsonCompletionTracker>(
                 RemoteDataManager.Instance.Result.Split('|')[4]).logsCount;
@@ -121,7 +121,7 @@ public class ExperimentControlUIManager : MonoBehaviour {
                                 JsonStatisticsLog jStatisticsLog =
                                     JsonUtility.FromJson<JsonStatisticsLog>(resultFields[3]);
                                 fileName = jStatisticsLog.testID + "_" + jStatisticsLog.mapInfo.name
-                                    + "_" + "statistics";
+                                    + "_statistics_" + jStatisticsLog.logPart;
                                 break;
                             case ConnectionSettings.SERVER_ANSWERS_LABEL:
                                 JsonAnswers jAnswers =

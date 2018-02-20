@@ -156,6 +156,7 @@ namespace JsonObjects {
 
         [Serializable]
         public class JsonStatisticsLog {
+            public int logPart;
             public string testID;
             public JsonMapInfo mapInfo;
             public JsonGameInfo gameInfo;
@@ -170,6 +171,11 @@ namespace JsonObjects {
 
             public void Reset() {
                 targetStatisticsLogs.Clear();
+            }
+
+            public void Split() {
+                logPart++;
+                Reset();
             }
         }
 
