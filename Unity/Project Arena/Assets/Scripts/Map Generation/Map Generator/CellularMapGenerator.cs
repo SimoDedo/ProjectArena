@@ -305,6 +305,10 @@ public class CellularMapGenerator : MapGenerator {
         }
     }
 
+    public override string ConvertMapToAB(bool exportObjects = true) {
+        throw new NotImplementedException();
+    }
+
     // Stores all information about a room.
     private class Room : IComparable<Room> {
         public List<Coord> tiles;

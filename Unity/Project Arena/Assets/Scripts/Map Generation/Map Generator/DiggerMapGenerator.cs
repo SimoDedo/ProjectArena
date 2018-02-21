@@ -227,4 +227,9 @@ public class DiggerMapGenerator : MapGenerator {
         stairProbability = Mathf.FloorToInt(float.Parse(currentValue) * 100);
     }
 
+    public override string ConvertMapToAB(bool exportObjects = true) {
+        return "<" + forwardProbability + "," + leftProbability + "," + rigthProbability + "," +
+            visitedProbability + "," + stairProbability + ">";
+    }
+
 }

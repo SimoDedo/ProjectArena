@@ -49,6 +49,9 @@ public abstract class MapGenerator : CoreComponent {
     // Pseudo random generator.
     protected System.Random pseudoRandomGen;
 
+    // Tells if we have to prepare for an AB export.
+    protected bool prepareABExport = false;
+
     protected int originalWidth = 0;
     protected int originalHeight = 0;
 
@@ -71,6 +74,13 @@ public abstract class MapGenerator : CoreComponent {
         textFilePath = e;
 
         return GenerateMap();
+    }
+
+    // Sets the parmaters, generates a map and returns it.
+    public char[,] GenerateMap(string s, bool pABe) {
+        prepareABExport = pABe;
+
+        return GenerateMap(s, false, null);
     }
 
     // Generates the map and returns it.
@@ -228,6 +238,9 @@ public abstract class MapGenerator : CoreComponent {
             }
         }
     }
+
+    // Returns the map in AB notation.
+    public abstract string ConvertMapToAB(bool exportObjects = true);
 
     // Saves the original size of the map.
     public void SaveMapSize() {

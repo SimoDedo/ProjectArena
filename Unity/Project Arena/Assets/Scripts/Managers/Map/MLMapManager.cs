@@ -18,13 +18,18 @@ public class MLMapManager : MapManager {
             // Load the map.
             LoadMapFromText();
         } else {
+            List<string> partialGenomes = new List<string>();
+
             // Generate the map.
             mapGeneratorScript.SaveMapSize();
             for (int i = 0; i < levelsCount; i++) {
                 if (ParameterManager.HasInstance()) {
-                    maps.Add(mapGeneratorScript.GenerateMap(seed + i, false, null));
+                    maps.Add(mapGeneratorScript.GenerateMap(seed + i, export));
                 } else {
                     maps.Add(mapGeneratorScript.GenerateMap());
+                }
+                if (export) {
+                    partialGenomes.Add(mapGeneratorScript.ConvertMapToAB(false));
                 }
                 mapGeneratorScript.ResetMapSize();
             }
@@ -32,6 +37,8 @@ public class MLMapManager : MapManager {
             stairsGeneratorScript.GenerateStairs(maps, mapGeneratorScript);
             // Save the map.
             if (export) {
+                AddTilesToGenomes(partialGenomes);
+                SaveMLMapAsAB(partialGenomes);
                 SaveMLMapAsText();
             }
         }
@@ -123,6 +130,44 @@ public class MLMapManager : MapManager {
             } catch (Exception) {
                 ManageError(Error.SOFT_ERROR, "Error while saving the map, please insert a " +
                     "valid path and check its permissions.");
+            }
+        }
+    }
+
+    // Saves the map using AB notation.
+    private void SaveMLMapAsAB(List<string> genomes) {
+        if (textFilePath == null && !Directory.Exists(textFilePath)) {
+            ManageError(Error.SOFT_ERROR, "Error while retrieving the folder, please insert a " +
+                "valid path.");
+        } else {
+            try {
+                string genome = genomes[0];
+
+                for (int i = 1; i < genomes.Count; i++) {
+                    genome += ("||" + genomes[i]);
+                }
+
+                File.WriteAllText(exportPath + "/" + seed.ToString() + ".ab.txt",
+                    genome);
+            } catch (Exception) {
+                ManageError(Error.SOFT_ERROR, "Error while saving the map, please insert a valid " +
+                    "path and check its permissions.");
+            }
+        }
+    }
+
+    // Adds tiles to the already computed genomes.
+    private void AddTilesToGenomes(List<string> genomes) {
+        char wallChar = mapGeneratorScript.GetWallChar();
+        char roomChar = mapGeneratorScript.GetRoomChar();
+
+        for (int i = 0; i < genomes.Count; i++) {
+            genomes[i] += "|";
+            for (int x = 0; x < maps[i].GetLength(0); x++) {
+                for (int y = 0; y < maps[i].GetLength(1); y++) {
+                    if (maps[i][x, y] != wallChar && maps[i][x, y] != roomChar)
+                    genomes[i] += ("<" + x + "," + y + "," + maps[i][x, y] + ">");
+                }
             }
         }
     }

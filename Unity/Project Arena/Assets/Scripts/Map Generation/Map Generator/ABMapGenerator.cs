@@ -337,4 +337,8 @@ public class ABMapGenerator : MapGenerator {
         }
     }
 
+    public override string ConvertMapToAB(bool exportObjects = true) {
+        throw new NotImplementedException();
+    }
+
 }

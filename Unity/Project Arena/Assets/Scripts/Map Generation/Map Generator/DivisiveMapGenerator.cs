@@ -55,7 +55,7 @@ public class DivisiveMapGenerator : MapGenerator {
         rooms = new List<Room>();
         placedRooms = new List<Room>();
 
-        if (createTextFile) {
+        if (createTextFile || prepareABExport) {
             ABRooms = new List<ABRoom>();
             ABCorridors = new List<ABRoom>();
             ABTiles = new List<ABTile>();
@@ -75,10 +75,12 @@ public class DivisiveMapGenerator : MapGenerator {
         width = map.GetLength(0);
         height = map.GetLength(1);
 
-        if (createTextFile) {
+        if (createTextFile || prepareABExport) {
             PopulateABRooms();
             PopulateABObjects();
             AddBorderToAB(borderSize);
+        }
+        if (createTextFile) {
             SaveMapAsText();
             SaveMapAsAB();
         }
@@ -394,32 +396,40 @@ public class DivisiveMapGenerator : MapGenerator {
                 "valid path.");
         } else {
             try {
-                string genome = "";
-                // Add the rooms to the genome.
-                foreach (ABRoom r in ABRooms) {
-                    genome += "<" + r.originX + ',' + r.originY + ',' + r.dimension + ">";
-                }
-                // Add the corridors to the genome.
-                if (ABCorridors.Count > 0) {
-                    genome += "|";
-                    foreach (ABRoom r in ABCorridors) {
-                        genome += "<" + r.originX + ',' + r.originY + ',' + r.dimension + ">";
-                    }
-                }
-                // Add the tiles to the genome.
-                if (ABTiles.Count > 0) {
-                    genome += "|";
-                    foreach (ABTile t in ABTiles) {
-                        genome += "<" + t.x + ',' + t.y + ',' + t.value + ">";
-                    }
-                }
                 File.WriteAllText(@textFilePath + "/" + seed.ToString() + ".ab.txt",
-                    genome);
+                    ConvertMapToAB());
             } catch (Exception) {
                 ManageError(Error.SOFT_ERROR, "Error while saving the map, please insert a valid " +
                     "path and check its permissions.");
             }
         }
+    }
+
+    public override string ConvertMapToAB(bool exportObjects = true) {
+        string genome = "";
+
+        // Add the rooms to the genome.
+        foreach (ABRoom r in ABRooms) {
+            genome += "<" + r.originX + ',' + r.originY + ',' + r.dimension + ">";
+        }
+        // Add the corridors to the genome.
+        if (ABCorridors.Count > 0) {
+            genome += "|";
+            foreach (ABRoom r in ABCorridors) {
+                genome += "<" + r.originX + ',' + r.originY + ',' + r.dimension + ">";
+            }
+        }
+        if (exportObjects) {
+            // Add the tiles to the genome.
+            if (ABTiles.Count > 0) {
+                genome += "|";
+                foreach (ABTile t in ABTiles) {
+                    genome += "<" + t.x + ',' + t.y + ',' + t.value + ">";
+                }
+            }
+        }
+
+        return genome;
     }
 
     // Stores all information about a room.
