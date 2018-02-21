@@ -279,7 +279,7 @@ namespace MapManipulation {
 
         // Validates a loaded from a string as a genome.
         public static int ValidateGeneticMap(string genome) {
-            Regex rgx = new Regex(@"(\<\d+,\d+,[1-9]\d*\>)+(\|(\<\d+,\d+,-?[1-9]\d*\>)*)?$");
+            Regex rgx = new Regex(@"(\<\d+,\d+,[1-9]\d*\>)+(\|(\<\d+,\d+,-?[1-9]\d*\>)+)?(\|(\<\d+,\d+,[a-zA-Z]\>)+)?$");
 
             if (rgx.IsMatch(genome))
                 return 0;
@@ -289,7 +289,7 @@ namespace MapManipulation {
 
         // Validates a multi-level map loaded from a string as a genome.
         public static int ValidateGeneticMLMap(string genome) {
-            Regex rgx = new Regex(@"(\<\d+,\d+,[1-9]\d*\>)+(\|(\<\d+,\d+,-?[1-9]\d*\>)+)?(\|\|(((\<\d+,\d+,[1-9]\d*\>)+(\|(\<\d+,\d+,-?[1-9]\d*\>)+)?)|(\<0.\d+,0.\d+,0.\d+,0.\d+,0.\d+\>)))+$");
+            Regex rgx = new Regex(@"(\<\d+,\d+,[1-9]\d*\>)+(\|(\<\d+,\d+,-?[1-9]\d*\>)+)?(\|(\<\d+,\d+,[a-zA-Z]\>)+)?(\|\|(((\<\d+,\d+,[1-9]\d*\>)+(\|(\<\d+,\d+,-?[1-9]\d*\>)+)?(\|(\<\d+,\d+,[a-zA-Z]\>)+)?)|(\<0.\d+,0.\d+,0.\d+,0.\d+,0.\d+\>)(\|(\<\d+,\d+,[a-zA-Z]\>)+)?))+$");
 
             if (rgx.IsMatch(genome))
                 return 0;
@@ -297,6 +297,8 @@ namespace MapManipulation {
                 return 5;
         }
     }
+
+
 
     // Coordinates of a tile.
     public struct Coord {

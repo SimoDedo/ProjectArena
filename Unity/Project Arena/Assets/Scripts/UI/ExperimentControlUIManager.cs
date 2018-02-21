@@ -1,7 +1,7 @@
-﻿using JsonObjects;
-using JsonObjects.Game;
-using JsonObjects.Statistics;
-using JsonObjects.Survey;
+﻿using JsonObjects.Logging;
+using JsonObjects.Logging.Game;
+using JsonObjects.Logging.Statistics;
+using JsonObjects.Logging.Survey;
 using Polimi.GameCollective.Connectivity;
 using System.Collections;
 using System.IO;
@@ -90,7 +90,7 @@ public class ExperimentControlUIManager : MonoBehaviour {
         while (!RemoteDataManager.Instance.IsResultReady) {
             yield return new WaitForSeconds(0.25f);
         }
-    
+
         try {
             int downloadCount = JsonUtility.FromJson<JsonCompletionTracker>(
                 RemoteDataManager.Instance.Result.Split('|')[4]).logsCount;

@@ -66,6 +66,9 @@ public class Player : Entity, ILoggable {
         // Get the mouse sensibility.
         if (PlayerPrefs.HasKey("MouseSensibility")) {
             sensibility = PlayerPrefs.GetFloat("MouseSensibility");
+            if (Application.platform == RuntimePlatform.WebGLPlayer) {
+                sensibility /= 2;
+            }
         } else {
             PlayerPrefs.SetFloat("MouseSensibility", sensibility);
         }

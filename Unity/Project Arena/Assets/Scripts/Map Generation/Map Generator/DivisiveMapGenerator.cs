@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ABObjects;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -32,6 +33,7 @@ public class DivisiveMapGenerator : MapGenerator {
 
     private List<ABRoom> ABRooms;
     private List<ABRoom> ABCorridors;
+    private List<ABTile> ABTiles;
 
     private int minimumDividableRoomDimension;
     private int minimumFilledTiles;
@@ -56,6 +58,7 @@ public class DivisiveMapGenerator : MapGenerator {
         if (createTextFile) {
             ABRooms = new List<ABRoom>();
             ABCorridors = new List<ABRoom>();
+            ABTiles = new List<ABTile>();
         }
 
         if (width > height) {
@@ -74,6 +77,7 @@ public class DivisiveMapGenerator : MapGenerator {
 
         if (createTextFile) {
             PopulateABRooms();
+            PopulateABObjects();
             AddBorderToAB(borderSize);
             SaveMapAsText();
             SaveMapAsAB();
@@ -360,6 +364,17 @@ public class DivisiveMapGenerator : MapGenerator {
         }
     }
 
+    // Populates the AB objects scanning the map.
+    private void PopulateABObjects() {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (map[x, y] != wallChar && map[x, y] != roomChar) {
+                    ABTiles.Add(new ABTile(x, y, map[x, y]));
+                }
+            }
+        }
+    }
+
     // Adds the border to the AB notation.
     private void AddBorderToAB(int border) {
         foreach (ABRoom a in ABRooms) {
@@ -389,6 +404,13 @@ public class DivisiveMapGenerator : MapGenerator {
                     genome += "|";
                     foreach (ABRoom r in ABCorridors) {
                         genome += "<" + r.originX + ',' + r.originY + ',' + r.dimension + ">";
+                    }
+                }
+                // Add the tiles to the genome.
+                if (ABTiles.Count > 0) {
+                    genome += "|";
+                    foreach (ABTile t in ABTiles) {
+                        genome += "<" + t.x + ',' + t.y + ',' + t.value + ">";
                     }
                 }
                 File.WriteAllText(@textFilePath + "/" + seed.ToString() + ".ab.txt",
@@ -455,22 +477,6 @@ public class DivisiveMapGenerator : MapGenerator {
 
         public bool IsConnected(Room otherRoom) {
             return connectedRooms.Contains(otherRoom);
-        }
-    }
-
-    // Stores all information about an All Black room.
-    private class ABRoom {
-        public int originX;
-        public int originY;
-        public int dimension;
-
-        public ABRoom() {
-        }
-
-        public ABRoom(int x, int y, int d) {
-            originX = x;
-            originY = y;
-            dimension = d;
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using MapManipulation;
+﻿using ABObjects;
+using MapManipulation;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,9 +12,10 @@ public class ABMapGenerator : MapGenerator {
 
     [SerializeField] private int passageWidth = 3;
 
-    private Room mainRoom;
-    private List<Room> arenas;
-    private List<Room> corridors;
+    private ABRoom mainRoom;
+    private List<ABRoom> arenas;
+    private List<ABRoom> corridors;
+    private List<ABTile> tiles;
 
     private void Start() {
         originalWidth = width;
@@ -45,16 +47,18 @@ public class ABMapGenerator : MapGenerator {
         return map;
     }
 
-    // Decodes the genome populating the lists of arenas and corridors.
+    // Decodes the genome populating the lists of arenas, corridors and tiles.
     private void ParseGenome() {
-        arenas = new List<Room>();
-        corridors = new List<Room>();
+        arenas = new List<ABRoom>();
+        corridors = new List<ABRoom>();
+        tiles = new List<ABTile>();
 
         string currentValue = "";
         int currentChar = 0;
 
+        // Parse the arenas.
         while (currentChar < seed.Length && seed[currentChar] == '<') {
-            Room arena = new Room();
+            ABRoom arena = new ABRoom();
             currentChar++;
 
             // Get the x coordinate of the origin.
@@ -92,11 +96,14 @@ public class ABMapGenerator : MapGenerator {
             currentChar++;
         }
 
+        int rollbackCurrentChar = currentChar;
+
+        // Parse the corridors.
         if (currentChar < seed.Length && seed[currentChar] == '|') {
             currentChar++;
 
             while (currentChar < seed.Length && seed[currentChar] == '<') {
-                Room corridor = new Room();
+                ABRoom corridor = new ABRoom();
                 currentChar++;
 
                 // Get the x coordinate of the origin.
@@ -119,6 +126,12 @@ public class ABMapGenerator : MapGenerator {
                 currentValue = "";
                 currentChar++;
 
+                // Stop parsing the corridors if what I have is a tile.
+                if (!(seed[currentChar] == '-' || Char.IsNumber(seed[currentChar]))) {
+                    currentChar = rollbackCurrentChar;
+                    break;
+                }
+
                 // Get the size of the corridor.
                 if (seed[currentChar] == '-') {
                     currentValue += seed[currentChar];
@@ -136,6 +149,45 @@ public class ABMapGenerator : MapGenerator {
 
                 currentValue = "";
                 currentChar++;
+            }
+        }
+
+        // Parse the tiles.
+        if (currentChar < seed.Length && seed[currentChar] == '|') {
+            currentChar++;
+
+            while (currentChar < seed.Length && seed[currentChar] == '<') {
+                ABTile tile = new ABTile();
+                currentChar++;
+
+                // Get the x coordinate of the origin.
+                while (Char.IsNumber(seed[currentChar])) {
+                    currentValue += seed[currentChar];
+                    currentChar++;
+                }
+                tile.x = Int32.Parse(currentValue);
+
+                currentValue = "";
+                currentChar++;
+
+                // Get the y coordinate of the origin.
+                while (Char.IsNumber(seed[currentChar])) {
+                    currentValue += seed[currentChar];
+                    currentChar++;
+                }
+                tile.y = Int32.Parse(currentValue);
+
+                currentValue = "";
+                currentChar++;
+
+                // Get the value of the tile.
+                tile.value = seed[currentChar];
+
+                // Add the arena to the list.
+                tiles.Add(tile);
+
+                currentValue = "";
+                currentChar += 2;
             }
         }
 
@@ -180,7 +232,7 @@ public class ABMapGenerator : MapGenerator {
             }
         }
 
-        foreach (Room a in arenas) {
+        foreach (ABRoom a in arenas) {
             for (int x = a.originX; x < a.originX + a.dimension; x++) {
                 for (int y = a.originY; y < a.originY + a.dimension; y++) {
                     if (MapInfo.IsInMapRange(x, y, width, height)) {
@@ -190,7 +242,7 @@ public class ABMapGenerator : MapGenerator {
             }
         }
 
-        foreach (Room c in corridors) {
+        foreach (ABRoom c in corridors) {
             if (c.dimension > 0) {
                 for (int x = c.originX; x < c.originX + c.dimension; x++) {
                     for (int y = c.originY; y < c.originY + passageWidth; y++) {
@@ -226,7 +278,15 @@ public class ABMapGenerator : MapGenerator {
         }
 
         // Add objects;
-        PopulateMap();
+        if (tiles.Count > 0) {
+            foreach (ABTile t in tiles) {
+                if (MapManipulation.MapInfo.IsInMapRange(t.x, t.y, width, height)) {
+                    map[t.x, t.y] = t.value;
+                }
+            }
+        } else {
+            PopulateMap();
+        }
     }
 
     // Computes a mask of the tiles reachable by the main arena and scales the number of objects to 
@@ -274,16 +334,6 @@ public class ABMapGenerator : MapGenerator {
         for (int i = 0; i < mapObjects.Length; i++) {
             mapObjects[i].numObjPerMap = (int)Math.Ceiling(scaleFactor *
                 mapObjects[i].numObjPerMap);
-        }
-    }
-
-    // Stores all information about a room.
-    private class Room {
-        public int originX;
-        public int originY;
-        public int dimension;
-
-        public Room() {
         }
     }
 

@@ -1,4 +1,4 @@
-﻿using JsonObjects.Survey;
+﻿using JsonObjects.Logging.Survey;
 using System;
 using System.Collections.Generic;
 using UnityEngine;

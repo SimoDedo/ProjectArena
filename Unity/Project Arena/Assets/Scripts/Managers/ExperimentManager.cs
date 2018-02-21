@@ -1,8 +1,8 @@
 ﻿using ExperimentObjects;
-using JsonObjects;
-using JsonObjects.Game;
-using JsonObjects.Statistics;
-using JsonObjects.Survey;
+using JsonObjects.Logging;
+using JsonObjects.Logging.Game;
+using JsonObjects.Logging.Statistics;
+using JsonObjects.Logging.Survey;
 using Polimi.GameCollective.Connectivity;
 using System;
 using System.Collections;
