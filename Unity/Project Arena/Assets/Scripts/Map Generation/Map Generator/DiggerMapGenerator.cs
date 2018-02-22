@@ -1,4 +1,5 @@
-﻿using MapManipulation;
+﻿using ABObjects;
+using MapManipulation;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,14 +10,18 @@ using UnityEngine;
 /// </summary>
 public class DiggerMapGenerator : MapGenerator {
 
-    [Header("Divisive generation")] [SerializeField, Range(0, 100)] private int forwardProbability;
+    [Header("Digger generation")] [SerializeField, Range(0, 100)] private int forwardProbability;
     [SerializeField, Range(0, 100)] private int leftProbability;
     [SerializeField, Range(0, 100)] private int rigthProbability;
     [SerializeField, Range(0, 100)] private int visitedProbability;
     [SerializeField, Range(0, 100)] private int stairProbability;
     [SerializeField, Range(0, 100)] private int roomPercentage;
 
+    [Header("Stair generation")] [SerializeField] private char[] stairChars = new char[4];
+
     [Header("AB generation")] [SerializeField] private bool useABGeneration;
+
+    private List<ABTile> tiles;
 
     private List<Coord> visitedTiles;
 
@@ -33,8 +38,12 @@ public class DiggerMapGenerator : MapGenerator {
         map = new char[width, height];
 
         // Parse the genome if needed.
-        if (useABGeneration)
+        if (useABGeneration) {
             ParseGenome();
+        }
+        if (tiles != null && tiles.Count > 0) {
+            stairProbability = 0;
+        }
 
         ValidateProbabilities();
 
@@ -44,14 +53,23 @@ public class DiggerMapGenerator : MapGenerator {
 
         DigMap();
 
-        PopulateMap();
+        if (tiles != null && tiles.Count > 0) {
+            foreach (ABTile t in tiles) {
+                if (MapInfo.IsInMapRange(t.x, t.y, width, height)) {
+                    map[t.x, t.y] = t.value;
+                }
+            }
+        } else {
+            PopulateMap();
+        }
 
         map = MapEdit.AddBorders(map, borderSize, wallChar);
         width = map.GetLength(0);
         height = map.GetLength(1);
 
-        if (createTextFile && !useABGeneration)
+        if (createTextFile && !useABGeneration) {
             SaveMapAsText();
+        }
 
         return map;
     }
@@ -84,8 +102,8 @@ public class DiggerMapGenerator : MapGenerator {
             } else if (nextAction < visitedProbability) {
                 MoveDiggerRandomly();
             } else {
-                map[currentX, currentY] = CircularIncrease(direction, 1, 4,
-                    GetRandomBoolean()).ToString()[0];
+                map[currentX, currentY] = stairChars[CircularIncrease(direction, 1, 4,
+                    GetRandomBoolean()) - 1];
             }
         }
     }
@@ -225,11 +243,69 @@ public class DiggerMapGenerator : MapGenerator {
             currentChar++;
         }
         stairProbability = Mathf.FloorToInt(float.Parse(currentValue) * 100);
+
+        currentValue = "";
+        currentChar++;
+
+        // Parse the tiles.
+        if (currentChar < seed.Length && seed[currentChar] == '|') {
+            currentChar++;
+
+            tiles = new List<ABTile>();
+
+            while (currentChar < seed.Length && seed[currentChar] == '<') {
+                ABTile tile = new ABTile();
+                currentChar++;
+
+                // Get the x coordinate of the origin.
+                while (Char.IsNumber(seed[currentChar])) {
+                    currentValue += seed[currentChar];
+                    currentChar++;
+                }
+                tile.x = Int32.Parse(currentValue);
+
+                currentValue = "";
+                currentChar++;
+
+                // Get the y coordinate of the origin.
+                while (Char.IsNumber(seed[currentChar])) {
+                    currentValue += seed[currentChar];
+                    currentChar++;
+                }
+                tile.y = Int32.Parse(currentValue);
+
+                currentValue = "";
+                currentChar++;
+
+                // Get the value of the tile.
+                tile.value = seed[currentChar];
+
+                // Add the arena to the list.
+                tiles.Add(tile);
+
+                currentValue = "";
+                currentChar += 2;
+            }
+        }
     }
 
     public override string ConvertMapToAB(bool exportObjects = true) {
-        return "<" + forwardProbability + "," + leftProbability + "," + rigthProbability + "," +
+        string genome = "<" + forwardProbability + "," + leftProbability + "," + rigthProbability + "," +
             visitedProbability + "," + stairProbability + ">";
+
+        if (exportObjects) {
+            genome += "|";
+
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    if (map[x, y] != wallChar && map[x, y] != roomChar) {
+                        genome += "<" + x + ',' + y + ',' + map[x, y] + ">";
+                    }
+                }
+            }
+        }
+
+        return genome;
     }
 
 }

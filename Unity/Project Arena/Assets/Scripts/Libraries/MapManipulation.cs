@@ -296,9 +296,8 @@ namespace MapManipulation {
             else
                 return 5;
         }
+
     }
-
-
 
     // Coordinates of a tile.
     public struct Coord {

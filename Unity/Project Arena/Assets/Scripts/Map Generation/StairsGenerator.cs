@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -8,11 +9,11 @@ public class StairsGenerator : CoreComponent {
 
     [SerializeField] private int stairsPerLevel = 4;
     [SerializeField] private int stairLength = 4;
-    [SerializeField] private char voidChar = '0';
-    [SerializeField] private char stairCharUp = '1';
-    [SerializeField] private char stairCharRigth = '2';
-    [SerializeField] private char stairCharDown = '3';
-    [SerializeField] private char stairCharLeft = '4';
+    [SerializeField] private char voidChar = 'O';
+    [SerializeField] private char stairCharUp = 'W';
+    [SerializeField] private char stairCharRigth = 'D';
+    [SerializeField] private char stairCharDown = 'S';
+    [SerializeField] private char stairCharLeft = 'A';
 
     private MapGenerator mapGeneratorScript = null;
     private List<char[,]> maps = null;
@@ -44,7 +45,8 @@ public class StairsGenerator : CoreComponent {
     }
 
     // Places stairs connecting adjacent levels of the map.
-    public void GenerateStairs(List<char[,]> ms, List<bool> hasPlacedStairs, MapGenerator mg) {
+    public void GenerateStairs(List<char[,]> ms, List<bool> hasPlacedStairs, MapGenerator mg,
+        bool validateOnly) {
         SetMapGenerationVariables(mg);
         maps = ms;
 
@@ -52,7 +54,7 @@ public class StairsGenerator : CoreComponent {
             if (currentLevel > 0) {
                 if (hasPlacedStairs[currentLevel]) {
                     GenerateLevelStairs(GetValidatedStairs(currentLevel), currentLevel);
-                } else {
+                } else if (!validateOnly) {
                     GenerateLevelStairs(GetPossibleStairs(currentLevel), currentLevel);
                 }
             }

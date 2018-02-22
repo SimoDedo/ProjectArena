@@ -256,7 +256,7 @@ public class DivisiveMapGenerator : MapGenerator {
                         }
                     }
                 }
-                if (createTextFile && (extremeX != connectionX)) {
+                if ((createTextFile || prepareABExport) && (extremeX != connectionX)) {
                     ABCorridors.Add(new ABRoom(connectionX - Mathf.FloorToInt(passageWidth / 2f),
                         connectionY - Mathf.FloorToInt(passageWidth / 2f),
                         extremeX - connectionX + passageWidth));
@@ -270,7 +270,7 @@ public class DivisiveMapGenerator : MapGenerator {
                         }
                     }
                 }
-                if (createTextFile && (extremeX != connectionX))
+                if ((createTextFile || prepareABExport) && (extremeX != connectionX))
                     ABCorridors.Add(new ABRoom(extremeX - Mathf.FloorToInt(passageWidth / 2f),
                         connectionY - Mathf.FloorToInt(passageWidth / 2f),
                         connectionX - extremeX + passageWidth));
@@ -287,7 +287,7 @@ public class DivisiveMapGenerator : MapGenerator {
                         }
                     }
                 }
-                if (createTextFile && (extremeY != connectionY)) {
+                if ((createTextFile || prepareABExport) && (extremeY != connectionY)) {
                     ABCorridors.Add(new ABRoom(connectionX - Mathf.FloorToInt(passageWidth / 2f),
                         connectionY - Mathf.FloorToInt(passageWidth / 2f),
                         connectionY - extremeY - passageWidth));
@@ -302,7 +302,7 @@ public class DivisiveMapGenerator : MapGenerator {
                         }
                     }
                 }
-                if (createTextFile && (extremeY != connectionY)) {
+                if ((createTextFile || prepareABExport) && (extremeY != connectionY)) {
                     ABCorridors.Add(new ABRoom(connectionX - Mathf.FloorToInt(passageWidth / 2f),
                         extremeY - Mathf.FloorToInt(passageWidth / 2f),
                         extremeY - connectionY - passageWidth));

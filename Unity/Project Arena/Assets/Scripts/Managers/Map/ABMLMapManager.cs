@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -45,7 +46,8 @@ public class ABMLMapManager : MLMapManager {
             // Resize all the maps.
             ResizeAllMaps();
             // Add the stairs.
-            stairsGeneratorScript.GenerateStairs(maps, usesDiggerGeneratorList, mapGeneratorScript);
+            stairsGeneratorScript.GenerateStairs(maps, usesDiggerGeneratorList, mapGeneratorScript, 
+                GenomeHasObjects(seed));
             // Save the map.
             if (export) {
                 seed = seed.GetHashCode().ToString();
@@ -112,21 +114,27 @@ public class ABMLMapManager : MLMapManager {
 
         string processedString = "";
         int genesCount = 1;
+        bool counting = true;
 
         for (int i = 0; i < seed.Length; i++) {
             if (i < seed.Length - 1 && seed[i] == '|' && seed[i + 1] == '|') {
                 genomes.Add(CreateNewGenome(processedString, genesCount));
                 processedString = "";
+                counting = true;
                 genesCount = 1;
                 i++;
             } else if (i == seed.Length - 1) {
                 genomes.Add(CreateNewGenome(processedString + seed[i], genesCount));
             } else if (seed[i] == ',') {
                 processedString += seed[i];
-                genesCount++;
+                if (counting) {
+                    genesCount++;
+                }
             } else if (seed[i] == '<') {
                 processedString += seed[i];
-                genesCount = 1;
+                if (genesCount > 1) {
+                    counting = false;
+                }
             } else {
                 processedString += seed[i];
             }
@@ -140,6 +148,16 @@ public class ABMLMapManager : MLMapManager {
             genome = s,
             useDefaultGenerator = (g == 5) ? false : true
         };
+    }
+
+    // Tells if the genome includes objects.
+    public static bool GenomeHasObjects(string genome) {
+        foreach (char c in genome) {
+            if (Char.IsLetter(c)) {
+                return true;
+            }
+        };
+        return false;
     }
 
     private struct Genome {

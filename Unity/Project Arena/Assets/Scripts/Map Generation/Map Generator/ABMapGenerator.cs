@@ -290,7 +290,7 @@ public class ABMapGenerator : MapGenerator {
     }
 
     // Computes a mask of the tiles reachable by the main arena and scales the number of objects to 
-    // be displaced..
+    // be displaced.
     private bool[,] ComputeReachabilityMask() {
         bool[,] reachabilityMask = new bool[width, height];
         int floorCount = 0;
