@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
 
 /// <summary>
 /// ParameterManager allows to exchange information between different scenes.
@@ -30,6 +29,7 @@ public class ParameterManager : SceneSingleton<ParameterManager> {
     // Other data.
     [HideInInspector] public Quaternion BackgroundRotation { get; set; }
     [HideInInspector] public BuildVersion Version { get; set; }
+    [HideInInspector] public string InitialScene { get; set; }
 
     void Awake() {
         ErrorCode = 0;
@@ -39,21 +39,6 @@ public class ParameterManager : SceneSingleton<ParameterManager> {
         LogSetted = false;
 
         DontDestroyOnLoad(transform.gameObject);
-    }
-
-    /* SUPPORT FUNCTIONS */
-
-    // Menages errors going back to the main menu.
-    public void ErrorBackToMenu(int errorCode) {
-        ErrorCode = errorCode;
-        SceneManager.LoadScene("Menu");
-    }
-
-    // Menages errors going back to the main menu.
-    public void ErrorBackToMenu(string errorMessage) {
-        ErrorCode = 1;
-        ErrorMessage = errorMessage;
-        SceneManager.LoadScene("Menu");
     }
 
 }

@@ -190,10 +190,10 @@ namespace MapManipulation {
         // Validates a map loaded from a text file as a char matrix.
         public static int ValidateMap(string path, int maxSize = 200) {
             if (path == null) {
-                Debug.Log(path + " is null.");
+                // Debug.Log(path + " is null.");
                 return 2;
             } else if (!File.Exists(path)) {
-                Debug.Log(path + " doesn't exist.");
+                // Debug.Log(path + " doesn't exist.");
                 return 2;
             } else {
                 try {

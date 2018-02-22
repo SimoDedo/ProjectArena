@@ -29,7 +29,7 @@ public abstract class CoreComponent : MonoBehaviour {
                 Debug.LogError("Unexpected soft error with code " + errorCode + ".");
                 break;
             case Error.HARD_ERROR:
-                ParameterManager.Instance.ErrorBackToMenu(errorCode);
+                ErrorManager.ErrorBackToMenu(errorCode);
                 break;
             case Error.RETRY_ERROR:
                 Debug.LogError("Unexpected error with code " + errorCode + ". The scene will be" +
@@ -46,7 +46,7 @@ public abstract class CoreComponent : MonoBehaviour {
                 Debug.LogError("Unexpected soft error. " + errorMessage);
                 break;
             case Error.HARD_ERROR:
-                ParameterManager.Instance.ErrorBackToMenu(errorMessage);
+                ErrorManager.ErrorBackToMenu(errorMessage);
                 break;
             case Error.RETRY_ERROR:
                 Debug.LogError("Unexpected  error. " + errorMessage + " The scene will be " +

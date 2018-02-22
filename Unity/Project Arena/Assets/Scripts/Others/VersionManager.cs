@@ -13,6 +13,8 @@ public class VersionManager : MonoBehaviour {
 
     private void Start() {
         ParameterManager.Instance.Version = version;
+        ParameterManager.Instance.InitialScene = versionInitialScene[(int)version];
+
         StartCoroutine(FadeAndLoad());
     }
 

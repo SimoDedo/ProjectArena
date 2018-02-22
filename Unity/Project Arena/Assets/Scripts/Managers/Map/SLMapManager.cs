@@ -41,14 +41,14 @@ public class SLMapManager : MapManager {
     protected override void LoadMapFromText() {
         if (seed == null) {
             if (textFilePath == null) {
-                ParameterManager.Instance.ErrorBackToMenu(-1);
+                ErrorManager.ErrorBackToMenu(-1);
             } else if (!File.Exists(textFilePath)) {
-                ParameterManager.Instance.ErrorBackToMenu(-1);
+                ErrorManager.ErrorBackToMenu(-1);
             } else {
                 try {
                     ConvertToMatrix(File.ReadAllLines(@textFilePath));
                 } catch (Exception) {
-                    ParameterManager.Instance.ErrorBackToMenu(-1);
+                    ErrorManager.ErrorBackToMenu(-1);
                 }
             }
         } else {

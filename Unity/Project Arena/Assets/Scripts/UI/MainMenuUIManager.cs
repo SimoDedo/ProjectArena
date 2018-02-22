@@ -19,7 +19,6 @@ public class MainMenuUIManager : MonoBehaviour {
     [SerializeField] private GameObject singleplayer;
     [SerializeField] private GameObject multiplayer;
     [SerializeField] private GameObject settings;
-    [SerializeField] private GameObject error;
     [SerializeField] private GameObject loading;
 
     [Header("Main menu fields")] [SerializeField] private Button quitButton;
@@ -57,8 +56,6 @@ public class MainMenuUIManager : MonoBehaviour {
     [SerializeField] private GameObject exportButton;
     [SerializeField] private Slider sensibilitySlider;
 
-    [Header("Error fields")] [SerializeField] private Text errorText;
-
     [Header("Loading fields")] [SerializeField] private Text loadingText;
 
     [Header("Other")] [SerializeField] private RotateTranslateByAxis backgroundScript;
@@ -89,13 +86,6 @@ public class MainMenuUIManager : MonoBehaviour {
         }
 
         openedSection = main;
-
-        if (ParameterManager.Instance.ErrorCode != 0) {
-            OpenSection(error);
-            SetErrorMessage(ParameterManager.Instance.ErrorCode,
-                ParameterManager.Instance.ErrorMessage);
-            ParameterManager.Instance.ErrorCode = 0;
-        }
 
         exportSP.isOn = false;
         exportMP.isOn = false;
@@ -178,8 +168,8 @@ public class MainMenuUIManager : MonoBehaviour {
             if (errorCode == 0) {
                 Load(currentScene);
             } else {
-                SetErrorMessage(errorCode, null);
-                OpenSection(error);
+                ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
+                ErrorManager.ErrorBackToMenu(errorCode);
             }
         } else if (currentGeneration == 3) {
             loadingText.text = "Validating the map";
@@ -189,8 +179,8 @@ public class MainMenuUIManager : MonoBehaviour {
             if (errorCode == 0) {
                 Load(currentScene);
             } else {
-                SetErrorMessage(errorCode, null);
-                OpenSection(error);
+                ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
+                ErrorManager.ErrorBackToMenu(errorCode);
             }
         } else {
             Load(currentScene);
@@ -249,39 +239,6 @@ public class MainMenuUIManager : MonoBehaviour {
         currentMap = 0;
         currentGeneration = 0;
         exportData = false;
-    }
-
-    // Sets the error message.
-    private void SetErrorMessage(int errorCode, string errorMessage) {
-        switch (errorCode) {
-            case 1:
-                errorText.text = errorMessage;
-                break;
-            case 2:
-                errorText.text = "Error while loading the map.\nThe specified file was not " +
-                    "found.\nPlease put the file in the rigth folder.";
-                break;
-            case 3:
-                errorText.text = "Error while loading the map.\nThe map must be rectangular, " +
-                    "with at least one spawn point and walls around its border.";
-                break;
-            case 4:
-                errorText.text = "Error while loading the map.\nThe map exceeds the maximum " +
-                    "dimension.";
-                break;
-            case 5:
-                errorText.text = "Error while loading the map.\nThe genome doesn't follow the " +
-                    "expected convention.";
-                break;
-            case 6:
-                errorText.text = "Error while loading the map.\nEach level must be rectangular " +
-                    "and have the same size, with at least one spawn point and walls around its " +
-                    "border.";
-                break;
-            default:
-                errorText.text = "Something really bad just happened.";
-                break;
-        }
     }
 
     /* SINGLEPLAYER */
@@ -366,7 +323,9 @@ public class MainMenuUIManager : MonoBehaviour {
         currentMap = 0;
         currentGeneration = GetMinGenerationIndex(singleplayerModes[currentMode].maps[currentMap].
             enabledGenerations);
+
         exportSP.isOn = false;
+        exportData = false;
 
         UpdateSingleplayerMaps();
         ActivateCurrentMapSP();
@@ -379,6 +338,9 @@ public class MainMenuUIManager : MonoBehaviour {
             enabledGenerations);
         currentIsMultilevel = singleplayerModes[currentMode].maps[currentMap].isMultilevel;
 
+        exportSP.isOn = false;
+        exportData = false;
+
         UpdateSingleplayerGenerations();
         ActivateCurrentGenerationSP();
     }
@@ -388,6 +350,9 @@ public class MainMenuUIManager : MonoBehaviour {
             enabledGenerations[currentGeneration].generationName;
         currentScene = singleplayerModes[currentMode].maps[currentMap].
             enabledGenerations[currentGeneration].scene;
+
+        exportSP.isOn = false;
+        exportData = false;
 
         inputSP.interactable = singleplayerModes[currentMode].maps[currentMap].
             enabledGenerations[currentGeneration].inputEnabled;
@@ -483,7 +448,9 @@ public class MainMenuUIManager : MonoBehaviour {
         currentMap = 0;
         currentGeneration = GetMinGenerationIndex(multiplayerModes[currentMode].maps[currentMap].
             enabledGenerations);
-        exportMP.isOn = false;
+
+        exportSP.isOn = false;
+        exportData = false;
 
         UpdateMultiplayerMaps();
         ActivateCurrentMapMP();
@@ -496,6 +463,9 @@ public class MainMenuUIManager : MonoBehaviour {
             enabledGenerations);
         currentIsMultilevel = multiplayerModes[currentMode].maps[currentMap].isMultilevel;
 
+        exportSP.isOn = false;
+        exportData = false;
+
         UpdateMultiplayerGenerations();
         ActivateCurrentGenerationMP();
     }
@@ -505,6 +475,9 @@ public class MainMenuUIManager : MonoBehaviour {
             enabledGenerations[currentGeneration].generationName;
         currentScene = singleplayerModes[currentMode].maps[currentMap].
             enabledGenerations[currentGeneration].scene;
+
+        exportSP.isOn = false;
+        exportData = false;
 
         inputMP.interactable = singleplayerModes[currentMode].maps[currentMap]
             .enabledGenerations[currentGeneration].inputEnabled;
