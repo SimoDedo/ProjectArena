@@ -17,9 +17,6 @@ public abstract class GameUIManager : CoreComponent {
 
     [SerializeField] protected FadeUI fadeUIScript;
 
-    // Elements of the pause UI.
-    [Header("Pause UI")] [SerializeField] protected Slider sensibilitySlider;
-
     // Activates the ready UI.
     public void ActivateReadyUI() {
         readyUI.SetActive(true);
@@ -44,7 +41,6 @@ public abstract class GameUIManager : CoreComponent {
 
     // Activates or deactivates the pause UI.
     public void ActivatePauseUI(bool b) {
-        UpdateSensibility();
         fightUI.SetActive(!b);
         pauseUI.SetActive(b);
     }
@@ -67,23 +63,5 @@ public abstract class GameUIManager : CoreComponent {
     }
 
     public abstract void SetColorAll(Color c);
-
-    // Updates the sensibilitiy slider.
-    private void UpdateSensibility() {
-        if (PlayerPrefs.HasKey("MouseSensibility")) {
-            sensibilitySlider.value = PlayerPrefs.GetFloat("MouseSensibility");
-        } else {
-            PlayerPrefs.SetFloat("MouseSensibility", sensibilitySlider.value);
-        }
-    }
-
-    // Initializes the sensibilitiy slider.
-    public void SetMouseSensibility() {
-        PlayerPrefs.SetFloat("MouseSensibility", sensibilitySlider.value);
-        Player playerScript = GameObject.Find("Player").GetComponent<Player>();
-        if (playerScript != null) {
-            playerScript.SetSensibility(sensibilitySlider.value);
-        }
-    }
 
 }

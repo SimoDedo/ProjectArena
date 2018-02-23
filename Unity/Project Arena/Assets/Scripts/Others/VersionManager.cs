@@ -6,12 +6,20 @@ using UnityEngine.SceneManagement;
 public class VersionManager : MonoBehaviour {
 
     [Header("Version")] [SerializeField] private ParameterManager.BuildVersion version;
-    [SerializeField] private string[] versionInitialScene =
+    [SerializeField]
+    private string[] versionInitialScene =
         new string[Enum.GetNames(typeof(ParameterManager.BuildVersion)).Length];
 
-    [Header("Other")] [SerializeField] private FadeUI fadeScript;
+    [Header("Debug")] [SerializeField] private bool resetPlayerPref = false;
+
+    [Header("Other")] [SerializeField] private FadeUI fadeScript;    
 
     private void Start() {
+        if (resetPlayerPref) {
+            PlayerPrefs.DeleteAll();
+            resetPlayerPref = false;
+        }
+
         ParameterManager.Instance.Version = version;
         ParameterManager.Instance.InitialScene = versionInitialScene[(int)version];
 

@@ -65,12 +65,9 @@ public class Player : Entity, ILoggable {
 
         // Get the mouse sensibility.
         if (PlayerPrefs.HasKey("MouseSensibility")) {
-            sensibility = PlayerPrefs.GetFloat("MouseSensibility");
-            if (Application.platform == RuntimePlatform.WebGLPlayer) {
-                sensibility /= 2;
-            }
+            SetSensibility(PlayerPrefs.GetFloat("MouseSensibility"));
         } else {
-            PlayerPrefs.SetFloat("MouseSensibility", sensibility);
+            SetSensibility(ParameterManager.Instance.DefaultSensibility);
         }
     }
 
@@ -325,6 +322,9 @@ public class Player : Entity, ILoggable {
     // Updates the sensibility.
     public void SetSensibility(float s) {
         sensibility = s;
+        if (Application.platform == RuntimePlatform.WebGLPlayer) {
+            sensibility /= ParameterManager.Instance.WebSensibilityDownscale;
+        }
     }
 
     // Setups stuff for the loggingGame.

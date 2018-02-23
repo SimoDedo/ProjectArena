@@ -26,6 +26,12 @@ public class ParameterManager : SceneSingleton<ParameterManager> {
     [HideInInspector] public bool LogSetted { get; set; }
     [HideInInspector] public string ExperimentControlScene { get; set; }
 
+    // Mouse sensibility data.
+    [HideInInspector] public float MinSensibility { get; internal set; }
+    [HideInInspector] public float MaxSensibility { get; internal set; }
+    [HideInInspector] public float DefaultSensibility { get; internal set; }
+    [HideInInspector] public float WebSensibilityDownscale { get; internal set; }
+
     // Other data.
     [HideInInspector] public Quaternion BackgroundRotation { get; set; }
     [HideInInspector] public BuildVersion Version { get; set; }
@@ -37,6 +43,11 @@ public class ParameterManager : SceneSingleton<ParameterManager> {
         LogOnline = true;
         LogOffline = true;
         LogSetted = false;
+
+        MinSensibility = 0.75f;
+        MaxSensibility = 2.75f;
+        DefaultSensibility = 1.75f;
+        WebSensibilityDownscale = 3f;
 
         DontDestroyOnLoad(transform.gameObject);
     }

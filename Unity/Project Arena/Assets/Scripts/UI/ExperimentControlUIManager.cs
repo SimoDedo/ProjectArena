@@ -30,7 +30,7 @@ public class ExperimentControlUIManager : MonoBehaviour {
     private string downloadDirectory;
     private bool exitMustQuit;
 
-    void Start() {
+    void Awake() {
         Cursor.lockState = CursorLockMode.None;
 
         if (ParameterManager.HasInstance()) {
@@ -44,11 +44,11 @@ public class ExperimentControlUIManager : MonoBehaviour {
             SetExitButton(true);
         }
 
-        if (Application.platform == RuntimePlatform.WebGLPlayer) {
-            offlineExperimentButton.interactable = false;
-            completeExperimentButton.interactable = false;
-            directoryButton.interactable = false;
-        } else {
+        if (Application.platform != RuntimePlatform.WebGLPlayer) {
+            offlineExperimentButton.interactable = true;
+            completeExperimentButton.interactable = true;
+            directoryButton.interactable = true;
+            downloadAllButton.interactable = true;
             downloadDirectory = Application.persistentDataPath + "/Downloads";
             if (!Directory.Exists(downloadDirectory))
                 Directory.CreateDirectory(downloadDirectory);

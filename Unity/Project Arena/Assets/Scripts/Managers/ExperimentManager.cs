@@ -62,10 +62,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     // Completion trackers.
     private List<StudyCompletionTracker> studyCompletionTrackers;
 
-    // Spawn time of current target.
-    private float targetSpawn = 0;
-    // Spawn time of last target.
-    private float lastTargetSpawn = 0;
+    // Time of last target log.
+    private float lastTargetLog = 0;
     // Current distance.
     private float currentDistance = 0;
     // Total distance.
@@ -76,10 +74,6 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
     private int hitCount = 0;
     // Total destoryed targets.
     private float killCount = 0;
-    // Medium kill time.
-    private float mediumKillTime = 0;
-    // Medium distance covered to find a target.
-    private float mediumKillDistance = 0;
     // Size of a maps tile.
     private float tileSize = 1;
     // Is the map flip?
@@ -415,15 +409,12 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
             jStatisticsLog = new JsonStatisticsLog(testID);
             statisticsLogLength = JsonUtility.ToJson(jStatisticsLog).Length + 200;
 
-            targetSpawn = 0;
-            lastTargetSpawn = 0;
+            lastTargetLog = 0;
             currentDistance = 0;
             totalDistance = 0;
             shotCount = 0;
             hitCount = 0;
             killCount = 0;
-            mediumKillTime = 0;
-            mediumKillDistance = 0;
             lastPosition = new Vector3(-1, -1, -1);
             initialTargetPosition = new Vector3(-1, -1, -1);
             initialPlayerPosition = new Vector3(-1, -1, -1);
@@ -630,7 +621,6 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
             }
         }
         if (loggingStatistics) {
-            targetSpawn = Time.time - logStart;
             initialTargetPosition.x = coord.x;
             initialTargetPosition.z = coord.z;
             initialPlayerPosition = lastPosition;
@@ -653,10 +643,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         if (loggingStatistics) {
             LogTargetStatistics(coord.x, coord.z);
             killCount++;
-            mediumKillTime += (Time.time - logStart - lastTargetSpawn - mediumKillTime) / killCount;
-            mediumKillDistance += (currentDistance - mediumKillDistance) / killCount;
             currentDistance = 0;
-            lastTargetSpawn = targetSpawn;
         }
     }
 
@@ -683,8 +670,10 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         if (loggingStatistics) {
             JsonTargetStatistics jTargetStatistics = new JsonTargetStatistics(Time.time - logStart,
             initialPlayerPosition.x, initialPlayerPosition.z, lastPosition.x, lastPosition.z, x,
-            z, currentDistance, (Time.time - logStart - lastTargetSpawn),
-            currentDistance / (Time.time - logStart - lastTargetSpawn));
+            z, currentDistance, (Time.time - logStart - lastTargetLog),
+            currentDistance / (Time.time - logStart - lastTargetLog));
+            jStatisticsLog.targetStatisticsLogs.Add(jTargetStatistics);
+            lastTargetLog = Time.time - logStart;
 
             if (logOnline) {
                 CheckStatisticsLogLength(JsonUtility.ToJson(jTargetStatistics).Length);
@@ -697,8 +686,8 @@ public class ExperimentManager : SceneSingleton<ExperimentManager> {
         if (loggingStatistics) {
             jStatisticsLog.finalStatistics = new JsonFinalStatistics(shotCount, hitCount,
             (shotCount > 0) ? (hitCount / (float)shotCount) : 0,
-            totalDistance, mediumKillTime,
-            mediumKillTime);
+            totalDistance, (killCount > 0) ? (jStatisticsLog.gameInfo.duration / killCount) : 0,
+            (killCount > 0) ? (totalDistance / killCount) : 0);
         }
     }
 

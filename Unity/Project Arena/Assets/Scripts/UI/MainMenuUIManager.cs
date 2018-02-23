@@ -113,13 +113,6 @@ public class MainMenuUIManager : MonoBehaviour {
             }
         }
 
-        // Get the mouse sensibility.
-        if (PlayerPrefs.HasKey("MouseSensibility")) {
-            sensibilitySlider.value = PlayerPrefs.GetFloat("MouseSensibility");
-        } else {
-            PlayerPrefs.SetFloat("MouseSensibility", sensibilitySlider.value);
-        }
-
         if (Application.platform == RuntimePlatform.WindowsPlayer) {
             importButton.SetActive(true);
             exportButton.SetActive(true);
@@ -594,11 +587,6 @@ public class MainMenuUIManager : MonoBehaviour {
                 activeCount++;
 
         return activeCount;
-    }
-
-    // Sets the mouse sensibility in the preferences.
-    public void SetMouseSensibility() {
-        PlayerPrefs.SetFloat("MouseSensibility", sensibilitySlider.value);
     }
 
     [Serializable]
