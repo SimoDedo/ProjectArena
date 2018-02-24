@@ -4,6 +4,7 @@ using JsonObjects.Logging.Statistics;
 using JsonObjects.Logging.Survey;
 using Polimi.GameCollective.Connectivity;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -95,6 +96,11 @@ public class ExperimentControlUIManager : MonoBehaviour {
             int downloadCount = JsonUtility.FromJson<JsonCompletionTracker>(
                 RemoteDataManager.Instance.Result.Split('|')[4]).logsCount;
 
+            List<JsonStatisticsLog> statisticsLogs = new List<JsonStatisticsLog>();
+            List<JsonGameLog> gameLogs = new List<JsonGameLog>();
+            List<JsonStatisticsLog> refinedStatisticsLogs = new List<JsonStatisticsLog>();
+            List<JsonGameLog> refinedGameLogs = new List<JsonGameLog>();
+
             RemoteDataManager.Instance.GetLastEntries(downloadCount);
 
             while (!RemoteDataManager.Instance.IsResultReady) {
@@ -108,32 +114,159 @@ public class ExperimentControlUIManager : MonoBehaviour {
                 if (resultFields.Length == 6) {
                     if (resultFields[2] != ConnectionSettings.SERVER_COMPLETION_LABEL &&
                         resultFields[2] != ConnectionSettings.SERVER_RESET_LABEL) {
-                        string fileName = "";
 
                         switch (resultFields[2]) {
                             case ConnectionSettings.SERVER_GAME_LABEL:
-                                JsonGameLog jGameLog =
-                                    JsonUtility.FromJson<JsonGameLog>(resultFields[3]);
-                                fileName = jGameLog.testID + "_" + jGameLog.mapInfo.name +
-                                    "_game_" + jGameLog.logPart;
+                                gameLogs.Add(
+                                    JsonUtility.FromJson<JsonGameLog>(resultFields[3]));
                                 break;
                             case ConnectionSettings.SERVER_STATISTICS_LABEL:
-                                JsonStatisticsLog jStatisticsLog =
-                                    JsonUtility.FromJson<JsonStatisticsLog>(resultFields[3]);
-                                fileName = jStatisticsLog.testID + "_" + jStatisticsLog.mapInfo.name
-                                    + "_statistics_" + jStatisticsLog.logPart;
+                                statisticsLogs.Add(
+                                    JsonUtility.FromJson<JsonStatisticsLog>(resultFields[3]));
                                 break;
                             case ConnectionSettings.SERVER_ANSWERS_LABEL:
                                 JsonAnswers jAnswers =
                                     JsonUtility.FromJson<JsonAnswers>(resultFields[3]);
-                                fileName = jAnswers.testID + "_answers";
+                                File.WriteAllText(downloadDirectory + "/" + jAnswers.testID +
+                                    "_answers" + ".json", resultFields[3]);
                                 break;
                         }
 
-                        File.WriteAllText(downloadDirectory + "/" + fileName + ".json",
-                            resultFields[3]);
+
                     }
                 }
+            }
+
+            // Merge the game logs.
+            foreach (JsonGameLog gameLog in gameLogs) {
+                if (gameLog.logPart == 0) {
+                    JsonGameLog refinedGameLog = gameLog;
+
+                    foreach (JsonGameLog gl in gameLogs) {
+                        bool started = false;
+
+                        if (gl.testID == gameLog.testID && gl.mapInfo.name == gameLog.mapInfo.name
+                            && gl.logPart > 0) {
+                            if (!started) {
+                                started = true;
+                            }
+                            refinedGameLog.hitLogs.AddRange(gl.hitLogs);
+                            refinedGameLog.killLogs.AddRange(gl.killLogs);
+                            refinedGameLog.positionLogs.AddRange(gl.positionLogs);
+                            refinedGameLog.reloadLogs.AddRange(gl.reloadLogs);
+                            refinedGameLog.shotLogs.AddRange(gl.shotLogs);
+                            refinedGameLog.spawnLogs.AddRange(gl.spawnLogs);
+                        } else {
+                            // When I stop seing inherent logs I stop.
+                            if (started) {
+                                break;
+                            }
+                        }
+                    }
+
+                    refinedGameLog.hitLogs.Sort((p, q) => p.timestamp.CompareTo(q.timestamp));
+                    refinedGameLog.killLogs.Sort((p, q) => p.timestamp.CompareTo(q.timestamp));
+                    refinedGameLog.positionLogs.Sort((p, q) => p.timestamp.CompareTo(q.timestamp));
+                    refinedGameLog.reloadLogs.Sort((p, q) => p.timestamp.CompareTo(q.timestamp));
+                    refinedGameLog.shotLogs.Sort((p, q) => p.timestamp.CompareTo(q.timestamp));
+                    refinedGameLog.spawnLogs.Sort((p, q) => p.timestamp.CompareTo(q.timestamp));
+
+                    refinedGameLogs.Add(refinedGameLog);
+                }
+            }
+
+            // Merge the statistics logs.
+            foreach (JsonStatisticsLog statisticsLog in statisticsLogs) {
+                if (statisticsLog.logPart == 0) {
+                    JsonStatisticsLog refinedStatisticLog = statisticsLog;
+
+                    foreach (JsonStatisticsLog sl in statisticsLogs) {
+                        bool started = false;
+
+                        if (sl.testID == statisticsLog.testID &&
+                            sl.mapInfo.name == statisticsLog.mapInfo.name && sl.logPart > 0) {
+                            if (!started) {
+                                break;
+                            }
+                            refinedStatisticLog.finalStatistics = sl.finalStatistics;
+                            refinedStatisticLog.targetStatisticsLogs.AddRange(
+                                sl.targetStatisticsLogs);
+                        } else {
+                            // When I stop seing inherent logs I stop.
+                            if (started) {
+                                break;
+                            }
+                        }
+                    }
+
+                    refinedStatisticLog.targetStatisticsLogs.Sort((p, q) =>
+                        p.timestamp.CompareTo(q.timestamp));
+                    refinedStatisticsLogs.Add(refinedStatisticLog);
+                }
+            }
+
+            gameLogs.Clear();
+            statisticsLogs.Clear();
+
+            // Generate the statistics from the game log if they have not been retrieved or if they
+            // have not been saved correctly (no target kills logged).
+            foreach (JsonGameLog gameLog in refinedGameLogs) {
+                JsonStatisticsLog statisticsLog = null;
+
+                foreach (JsonStatisticsLog sl in refinedStatisticsLogs) {
+                    if (sl.testID == gameLog.testID && sl.mapInfo.name == gameLog.mapInfo.name) {
+                        statisticsLog = sl;
+                        break;
+                    }
+                }
+
+                if (statisticsLog == null) {
+                    statisticsLog = new JsonStatisticsLog(gameLog.testID) {
+                        mapInfo = gameLog.mapInfo,
+                        gameInfo = gameLog.gameInfo,
+                        finalStatistics = new JsonFinalStatistics(0, 0, 0, 0, 0, 0)
+                    };
+                }
+
+                if (statisticsLog.targetStatisticsLogs.Count == 0) {
+                    List<JsonTargetStatistics> targetStatistics = new List<JsonTargetStatistics>();
+
+                    foreach (JsonKill k in gameLog.killLogs) {
+                        targetStatistics.Add(new JsonTargetStatistics((float)k.timestamp, 0, 0, 0,
+                            0, (float)k.x, (float)k.y, 0, 0, 0));
+                    }
+
+                    statisticsLog.targetStatisticsLogs = targetStatistics;
+
+                    statisticsLog.finalStatistics.totalHits = gameLog.hitLogs.Count;
+                    statisticsLog.finalStatistics.totalShots = gameLog.shotLogs.Count;
+                    statisticsLog.finalStatistics.accuracy =
+                        (statisticsLog.finalStatistics.totalShots == 0) ? 0 :
+                        statisticsLog.finalStatistics.totalHits /
+                        (statisticsLog.finalStatistics.totalShots * 1f);
+                    statisticsLog.finalStatistics.coveredDistance = 0;
+                    statisticsLog.finalStatistics.mediumKillTime =
+                        (statisticsLog.targetStatisticsLogs.Count == 0) ? 0 :
+                        (statisticsLog.gameInfo.duration * 1f) /
+                        statisticsLog.targetStatisticsLogs.Count;
+                    statisticsLog.finalStatistics.mediumKillDistance =
+                        (statisticsLog.targetStatisticsLogs.Count == 0) ? 0 :
+                        statisticsLog.finalStatistics.coveredDistance / 
+                        statisticsLog.targetStatisticsLogs.Count;
+                }
+            }
+
+            // Save the game logs.
+            foreach (JsonGameLog gameLog in refinedGameLogs) {
+                File.WriteAllText(downloadDirectory + "/" + gameLog.testID + "_" +
+                    gameLog.mapInfo.name + "_game.json", JsonUtility.ToJson(gameLog));
+            }
+
+            // Save the statistics logs.
+            foreach (JsonStatisticsLog statisticsLog in refinedStatisticsLogs) {
+                File.WriteAllText(downloadDirectory + "/" + statisticsLog.testID + "_" +
+                    statisticsLog.mapInfo.name + "_statistics.json",
+                    JsonUtility.ToJson(statisticsLog));
             }
         } finally {
             SetButtonsInteractable(true);
@@ -142,7 +275,7 @@ public class ExperimentControlUIManager : MonoBehaviour {
 
     public void OpenDataDirectory() {
         System.Diagnostics.Process.Start("explorer.exe",
-            "/select," + downloadDirectory.Replace(@"/", @"\"));
+            "/select," + Application.persistentDataPath.Replace(@"/", @"\"));
     }
 
     private void SetButtonsInteractable(bool interactable) {

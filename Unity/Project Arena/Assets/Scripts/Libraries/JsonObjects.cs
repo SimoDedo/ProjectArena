@@ -392,8 +392,6 @@ namespace JsonObjects {
             public char value;
         }
 
-
-
     }
 
 }

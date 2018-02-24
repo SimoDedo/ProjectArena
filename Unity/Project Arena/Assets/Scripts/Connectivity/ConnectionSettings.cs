@@ -2,7 +2,7 @@
 
     public const float SERVER_CONNECTION_PERIOD = 0.1f;
     public const float SERVER_CONNECTION_TIMEOUT = 10f;
-    public const float SERVER_MAXIMUM_DATA_LENGTH = 4750;
+    public const float SERVER_MAXIMUM_DATA_LENGTH = 4500;
 
     public const string SERVER_COMPLETION_LABEL = "PA_COMPLETION";
     public const string SERVER_GAME_LABEL = "PA_GAME";
