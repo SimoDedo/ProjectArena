@@ -574,8 +574,11 @@ public class MainMenuUIManager : MonoBehaviour {
 
     // Opens an explorer in Windows.
     private void ShowExplorer(string path) {
-        path = path.Replace(@"/", @"\");
-        System.Diagnostics.Process.Start("explorer.exe", "/select," + path);
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo() {
+            FileName = path.Replace(@"/", @"\"),
+            UseShellExecute = true,
+            Verb = "open"
+        });
     }
 
     // Returns the number of enables generators.

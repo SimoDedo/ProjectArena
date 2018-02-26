@@ -13,8 +13,6 @@ using UnityEngine;
 /// </summary>
 public static class ExperimentControlManager {
 
-    private const string INCOMPLETE_DIRECTORY = "Incompletes";
-
     // Resets the completion of the experiment to start a new one.
     public static IEnumerator ResetCompletionAttempt() {
         RemoteDataManager.Instance.SaveData(ConnectionSettings.SERVER_RESET_LABEL, "", "");
@@ -144,12 +142,6 @@ public static class ExperimentControlManager {
                     }
                 }
 
-                // Generate the incomplete directory if needed.
-                if (generateIncompleteDirectory && !Directory.Exists(downloadDirectory +
-                    "/" + INCOMPLETE_DIRECTORY)) {
-                    Directory.CreateDirectory(downloadDirectory + "/" + INCOMPLETE_DIRECTORY);
-                }
-
                 // Merge the statistics logs.
                 foreach (JsonStatisticsLog statisticsLog in statisticsLogs) {
                     if (statisticsLog.logPart == 0) {
@@ -201,6 +193,7 @@ public static class ExperimentControlManager {
                             gameInfo = gameLog.gameInfo,
                             finalStatistics = new JsonFinalStatistics(0, 0, 0, 0, 0, 0)
                         };
+                        refinedStatisticsLogs.Add(statisticsLog);
                     }
 
                     // Set the log part to know if the statistics are complete.
@@ -237,18 +230,20 @@ public static class ExperimentControlManager {
 
                 // Save the game logs.
                 foreach (JsonGameLog gameLog in refinedGameLogs) {
-                    File.WriteAllText(downloadDirectory + "/" + ((gameLog.logPart == -1) ?
-                        INCOMPLETE_DIRECTORY + "/" : "") + gameLog.testID + "_" +
-                        gameLog.mapInfo.name + "_game.json", JsonUtility.ToJson(gameLog));
+                    File.WriteAllText(downloadDirectory + "/" + gameLog.testID + "_" +
+                        gameLog.mapInfo.name + "_game" + ((gameLog.logPart == -1) ?
+                        "_incomplete" : "") + ".json", JsonUtility.ToJson(gameLog));
                 }
 
                 // Save the statistics logs.
                 foreach (JsonStatisticsLog statisticsLog in refinedStatisticsLogs) {
-                    File.WriteAllText(downloadDirectory + "/" + ((statisticsLog.logPart == -1) ?
-                        INCOMPLETE_DIRECTORY + "/" : "") + statisticsLog.testID + "_" +
-                        statisticsLog.mapInfo.name + "_statistics.json",
+                    File.WriteAllText(downloadDirectory + "/" + statisticsLog.testID + "_" +
+                        statisticsLog.mapInfo.name + "_statistics" +
+                        ((statisticsLog.finalStatistics.coveredDistance == 0) ? "_generated" : "") +
+                        ((statisticsLog.logPart == -1) ? "_incomplete" : "") + ".json",
                         JsonUtility.ToJson(statisticsLog));
                 }
+
             }
         } finally { }
     }

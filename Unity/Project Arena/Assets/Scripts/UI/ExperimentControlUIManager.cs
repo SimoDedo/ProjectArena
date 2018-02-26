@@ -85,8 +85,11 @@ public class ExperimentControlUIManager : MonoBehaviour {
     }
 
     public void OpenDataDirectory() {
-        System.Diagnostics.Process.Start("explorer.exe",
-            "/select," + Application.persistentDataPath.Replace(@"/", @"\"));
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo() {
+            FileName = Application.persistentDataPath.Replace(@"/", @"\"),
+            UseShellExecute = true,
+            Verb = "open"
+        });
     }
 
     private void SetButtonsInteractable(bool interactable) {
