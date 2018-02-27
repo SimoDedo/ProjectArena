@@ -1,0 +1,93 @@
+\documentclass[11pt,letterpaper,twoside,openrigth]{book}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage{setspace}
+\usepackage{siunitx}
+\usepackage{subcaption}
+\usepackage{titlepic}
+
+% SETUP %
+
+\sisetup{
+  round-mode = places,
+  round-precision = 2,
+}
+
+\setcounter{tocdepth}{3}
+
+\graphicspath{ {images/} }
+
+% MACROS %
+
+\def\<#1>{\textit{#1}}
+\def\[#1]{\textbf{#1}}
+
+% TITLE %
+
+\title{A framework to research procedural content generation in First Person Shooters}
+\author{Marco Ballabio}
+\titlepic{\includegraphics[width=5cm]{polimi}}
+\date{\vspace{-5ex}}
+
+% FRONT MATTER %
+
+\begin{document}
+
+\frontmatter
+
+\maketitle
+
+% ABSTRACTS AND THANKS %
+
+\include{chapters/chapter0}
+
+\tableofcontents
+
+\listoffigures
+
+\listoftables
+
+% MAIN MATTER %
+
+\mainmatter
+
+% CHAPTER 1 - INTRODUCTION AND MOTIVATION %
+
+\include{chapters/chapter1}
+
+% CHAPTER 2 - STATE OF THE ART %
+
+\include{chapters/chapter2}
+
+% CHAPTER 3 - UNITY FRAMEWORK %
+
+\include{chapters/chapter3}
+
+% CHAPTER 4 - PYTHON FRAMEWORK %
+
+\include{chapters/chapter4}
+
+% CHAPTER 5 - FIRST EXPERIMENT %
+
+\include{chapters/chapter5}
+
+% CHAPTER 6 - SECOND EXPERIMENT %
+
+\include{chapters/chapter6}
+
+% CHAPTER 7 - CONCLUSIONS %
+
+\include{chapters/chapter7}
+
+% BACK MATTER %
+
+\backmatter
+
+% BIBLIOGRAPHY %
+
+\bibliography{bibliography} 
+\bibliographystyle{ieeetr}
+
+\end{document}
