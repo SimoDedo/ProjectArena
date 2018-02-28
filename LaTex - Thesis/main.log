@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  27 FEB 2018 14:29
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  28 FEB 2018 09:46
 entering extended mode
 **./main.tex
 (main.tex
@@ -792,7 +792,52 @@ LaTeX Warning: Unused global option(s):
 (main.aux (chapters/chapter0.aux) (chapters/chapter1.aux)
 (chapters/chapter2.aux
 
-LaTeX Warning: Label `mirrorsEdgeFootnote' multiply defined.
+LaTeX Warning: Label `' multiply defined.
+
+
+LaTeX Warning: Label `' multiply defined.
+
+
+LaTeX Warning: Label `' multiply defined.
+
+
+LaTeX Warning: Label `' multiply defined.
+
+
+LaTeX Warning: Label `' multiply defined.
+
+
+LaTeX Warning: Label `' multiply defined.
+
+
+LaTeX Warning: Label `' multiply defined.
+
+
+LaTeX Warning: Label `' multiply defined.
+
+
+LaTeX Warning: Label `' multiply defined.
+
+
+LaTeX Warning: Label `' multiply defined.
+
+
+LaTeX Warning: Label `' multiply defined.
+
+
+LaTeX Warning: Label `' multiply defined.
+
+
+LaTeX Warning: Label `' multiply defined.
+
+
+LaTeX Warning: Label `' multiply defined.
+
+
+LaTeX Warning: Label `' multiply defined.
+
+
+LaTeX Warning: Label `' multiply defined.
 
 ) (chapters/chapter3.aux) (chapters/chapter4.aux) (chapters/chapter5.aux)
 (chapters/chapter6.aux) (chapters/chapter7.aux))
@@ -924,4 +969,183 @@ File: ts1enc.dfu 2017/01/28 v1.1t UTF-8 support for inputenc
    defining Unicode char U+2044 (decimal 8260)
    defining Unicode char U+204E (decimal 8270)
    defining Unicode char U+2052 (decimal 8274)
-   defining Unicode char U+2
+   defining Unicode char U+20A1 (decimal 8353)
+   defining Unicode char U+20A4 (decimal 8356)
+   defining Unicode char U+20A6 (decimal 8358)
+   defining Unicode char U+20A9 (decimal 8361)
+   defining Unicode char U+20AB (decimal 8363)
+   defining Unicode char U+20AC (decimal 8364)
+   defining Unicode char U+20B1 (decimal 8369)
+   defining Unicode char U+2103 (decimal 8451)
+   defining Unicode char U+2116 (decimal 8470)
+   defining Unicode char U+2117 (decimal 8471)
+   defining Unicode char U+211E (decimal 8478)
+   defining Unicode char U+2120 (decimal 8480)
+   defining Unicode char U+2122 (decimal 8482)
+   defining Unicode char U+2126 (decimal 8486)
+   defining Unicode char U+2127 (decimal 8487)
+   defining Unicode char U+212E (decimal 8494)
+   defining Unicode char U+2190 (decimal 8592)
+   defining Unicode char U+2191 (decimal 8593)
+   defining Unicode char U+2192 (decimal 8594)
+   defining Unicode char U+2193 (decimal 8595)
+   defining Unicode char U+2329 (decimal 9001)
+   defining Unicode char U+232A (decimal 9002)
+   defining Unicode char U+2422 (decimal 9250)
+   defining Unicode char U+25E6 (decimal 9702)
+   defining Unicode char U+25EF (decimal 9711)
+   defining Unicode char U+266A (decimal 9834)
+)
+("C:\Program Files\MiKTeX 2.9\tex\latex\translator\translator-basic-dictionary-
+English.dict"
+Dictionary: translator-basic-dictionary, Language: English 
+)
+("C:\Program Files\MiKTeX 2.9\tex\latex\siunitx\siunitx-abbreviations.cfg"
+File: siunitx-abbreviations.cfg 2017/11/26 v2.7k siunitx: Abbreviated units
+)
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: End \AtBeginDocument code.
+\c__siunitx_mathsf_int=\count281
+\c__siunitx_mathtt_int=\count282
+<images/polimi.png, id=1, 312.16624pt x 312.16624pt>
+File: images/polimi.png Graphic file (type png)
+<use images/polimi.png>
+Package pdftex.def Info: images/polimi.png  used on input line 40.
+(pdftex.def)             Requested size: 142.26378pt x 142.2645pt.
+
+[1
+
+
+
+{C:/Users/Marco/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map} <./images/po
+limi.png>]
+\openout2 = `chapters/chapter0.aux'.
+
+ (chapters/chapter0.tex) [2
+
+
+
+]
+\openout2 = `chapters/chapter1.aux'.
+
+ (chapters/chapter1.tex
+Chapter 1.
+) [1
+
+
+]
+\openout2 = `chapters/chapter2.aux'.
+
+ (chapters/chapter2.tex [2
+
+
+
+]
+Chapter 2.
+[3]
+
+LaTeX Warning: Citation `GuidingThePlayersEye' on page 4 undefined on input lin
+e 36.
+
+
+LaTeX Warning: Citation `HowLevelDesignersAffect' on page 4 undefined on input 
+line 36.
+
+
+LaTeX Warning: Citation `TheInvisibleHand' on page 4 undefined on input line 36
+.
+
+
+LaTeX Warning: Citation `InGameLigthing' on page 4 undefined on input line 36.
+
+
+LaTeX Warning: Citation `Guttler:2003:SPL:963900.963915' on page 4 undefined on
+ input line 40.
+
+
+LaTeX Warning: Citation `LevelDesignPatterns' on page 4 undefined on input line
+ 40.
+
+
+LaTeX Warning: Citation `Hullett:2010:DPF:1822348.1822359' on page 4 undefined 
+on input line 40.
+
+
+LaTeX Warning: Citation `TheScienceOfLevelDesign' on page 4 undefined on input 
+line 40.
+
+[4] [5]
+
+LaTeX Warning: Citation `10.1007/978-3-642-12239-2_15' on page 6 undefined on i
+nput line 70.
+
+[6])
+Overfull \hbox (85.87508pt too wide) has occurred while \output is active
+\OT1/cmr/m/sl/10.95 2.3.  PROCEDURAL CONTENT GENERATION FOR FIRST PERSON SHOOTE
+R MAPS \OT1/cmr/m/n/10.95 7
+ []
+
+[7]
+\openout2 = `chapters/chapter3.aux'.
+
+ (chapters/chapter3.tex)
+\openout2 = `chapters/chapter4.aux'.
+
+ (chapters/chapter4.tex)
+\openout2 = `chapters/chapter5.aux'.
+
+ (chapters/chapter5.tex)
+\openout2 = `chapters/chapter6.aux'.
+
+
+(chapters/chapter6.tex)
+\openout2 = `chapters/chapter7.aux'.
+
+ (chapters/chapter7.tex) [8
+
+
+
+
+
+
+
+
+
+
+
+
+]
+No file main.bbl.
+(main.aux (chapters/chapter0.aux) (chapters/chapter1.aux)
+(chapters/chapter2.aux) (chapters/chapter3.aux) (chapters/chapter4.aux)
+(chapters/chapter5.aux) (chapters/chapter6.aux) (chapters/chapter7.aux))
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: There were multiply-defined labels.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 14328 strings out of 493303
+ 293095 string characters out of 3138856
+ 315078 words of memory out of 3000000
+ 17724 multiletter control sequences out of 15000+200000
+ 541836 words of font info for 64 fonts, out of 3000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 42i,8n,40p,10380b,378s stack positions out of 5000i,500n,10000p,200000b,50000s
+<C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Pr
+ogram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Program Fi
+les/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MiKTe
+X 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Program Files/MiKTeX 2.9/fon
+ts/type1/public/amsfonts/cm/cmr17.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/
+public/amsfonts/cm/cmr6.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/ams
+fonts/cm/cmr8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/c
+mr9.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsl10.pfb>
+<C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti10.pfb>
+Output written on main.pdf (10 pages, 254721 bytes).
+PDF statistics:
+ 78 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 500000)
+ 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+

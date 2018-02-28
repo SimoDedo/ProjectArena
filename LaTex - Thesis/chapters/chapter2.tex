@@ -2,7 +2,7 @@
 
 % INTRODUCTION %
 
-In this chapter we analyze the current state of \<level design> and of its common practices, both in academic and in professional environments, with attention to the genre of \<First Person Shooters> (or \<FPS>).
+In this chapter we analyze the current state of \<Level Design> and of its common practices, both in academic and in professional environments, with attention to the genre of \<First Person Shooters> (or \<FPS>).
 
 \par
 
@@ -10,22 +10,22 @@ We then talk about \<Procedural Content Generation> (or \<PCG>), focusing on how
 
 \par
 
-Finally, we give an overview of the \<First Person Shooter> genre, analyzing its features, history and evolution, devoting special attention to the games that lead to greater innovation in the field and to the ones that are used to perform academic research in this field.
+Finally, we give an overview of the First Person Shooter genre, analyzing its features, history and evolution, devoting special attention to the games that lead to greater innovation in the field and to the ones that are used to perform academic research in this field.
 
 % LEVEL DESIGN %
 
 \section{Level Design Theory}
 
-\<Level design> is a game development discipline focused on the creation of video game levels.
+\<Level Design> is a game development discipline focused on the creation of video game levels.
 
 \par
 
-Today, the \<level designer> is a well-defined and fundamental figure in the development of a game, but it was not always so. In the early days of the video game industry, it was a widespread practice to assign the development of levels to members of the team with other roles, usually programmers. Apart from the limited number of team members and budget, this was because there were no tools such \<level editors>\footnote{\label{levelEditorFootnote}A level editor is a software used to design levels, maps and virtual worlds for a video game. An individual involved with the creation of game levels is a level designer.}, that allowed the \<level designer> to work on a level without being involved with code.
+Today, the level designer is a well-defined and fundamental figure in the development of a game, but it was not always so. In the early days of the video game industry, it was a widespread practice to assign the development of levels to members of the team with other roles, usually programmers. Apart from the limited number of team members and budget, this was because there were no tools such \<level editors>\footnote{\label{levelEditorFootnote}A level editor is a software used to design levels, maps and virtual worlds for a video game. An individual involved with the creation of game levels is a level designer.}, that allowed the level designer to work on a level without being involved with code.
 
 \par
 
-The \<level designer> has a really important role in the development of a good game, since he is responsible for the creation of the world and for how the player interacts with it. The level designer takes an idea, which is the game design, and makes it tangible.
-Despite the importance of this role, after all this years, it has not been established a common ground or a set of standards yet, instead, \<level design> is often considered as a form of art, based on heuristics, observation, previous solutions and personal sensibility.
+The level designer has a really significant role in the development of a good game, since he is responsible for the creation of the world and for how the player interacts with it. The level designer takes an idea, which is the game design, and makes it tangible.
+Despite the importance of this role, after all this years, it has not been established a common ground or a set of standards yet, instead, level design is often considered as a form of art, based on heuristics, observation, previous solutions and personal sensibility.
 
 \par
 
@@ -33,12 +33,12 @@ In addition to game play, the game designer must consider the visual appearance 
 
 \par
 
-One of the core components of level design is the \[''level flow'']. For single player games it translates into the series of actions and movements that the player needs to perform to complete the level. A good practice for \<level design> is to guide the player in a transparent way, by directing his attention towards the path he needs to follow. This can be achieved in different ways. Power ups and items can be used as breadcrumbs to suggest the right direction in a one way fashion, since they disappear once picked up. Lighting, illumination and distinctly colored objects are another common approach to this problem. A brilliant example of this is \<Mirror's Edge>\footnote{\label{}Digital Illusions CE, 2008.}, which uses a really clear color code, with red interactive objects in an otherwise white world, to guide the player through its fast-paced levels. There are also even more inventive solutions, like the dynamic flock of birds in \<Half Life 2>\footnote{\label{}Valve, 2004.}, used to catch the player attention or to warn him of incoming dangers\cite{GuidingThePlayersEye}. Finally, sounds and particular architectures are other elements that can be used to guide the player. In the academic environment, a lot of researchers have analyzed the effectiveness of this kind of solutions: Alotto\cite{HowLevelDesignersAffect} considers how architecture influences the decisions of the player, whereas Hoeg\cite{TheInvisibleHand} also takes into account the effect of sounds, objects and illumination, with the last being the focus of Brownmiller's\cite{InGameLigthing} work.
+One of the core components of level design is the \[''level flow'']. For single player games it translates into the series of actions and movements that the player needs to perform to complete the level. A proficient level design practice is to guide the player in a transparent way, by directing his attention towards the path he needs to follow. This can be achieved in diverse ways. Power ups and items can be used as breadcrumbs to suggest the right direction in a one-way fashion, since they disappear once picked up. Lighting, illumination and distinctly colored objects are another common approach to this problem. A brilliant example of this is \<Mirror's Edge>\footnote{Digital Illusions CE, 2008.}, which uses a really clear color code, with red interactive objects in an otherwise white world, to guide the player through its fast-paced levels. There are also even more inventive solutions, like the dynamic flock of birds in \<Half Life 2>\footnote{Valve, 2004.}, used to catch the player attention or to warn him of incoming dangers\cite{GuidingThePlayersEye}. Finally, sounds and architectures are other elements that can be used to guide the player. In the academic environment, a lot of researchers have analyzed the effectiveness of this kind of solutions: Alotto\cite{HowLevelDesignersAffect} considers how architecture influences the decisions of the player, whereas Hoeg\cite{TheInvisibleHand} also considers the effect of sounds, objects and illumination, with the last being the focus of Brownmiller's\cite{InGameLigthing} work.
 
 \par
 
-In multiplayer games the \<level flow> is defined by how the players interact with each other and with the environment. Because of this, the control of the \<level designer> is less direct and is exercised almost exclusively by modeling the map. Considering \<FPS>, the \<level flow> changes depending on how much an area is attractive for a player. The more an area is easy to navigate or offers tactical advantage, such as cover, resources or high ground, the more players will be comfortable moving in it. This doesn't mean that all areas need to be designed like this, since zones with a ''bad'' flow but an attractive reward, such as a powerful weapon, force the player to evaluate risks and benefits, making the game play more engaging. The conformation of the map and the positioning of interesting resources are used to obtain what Güttler et al.\cite{Guttler:2003:SPL:963900.963915} define as \[''points of collisions''], i.e. zones of the map were the majority of the fights are bound to happen. Moving back to academic research, Güttler et al. have also noticed how aesthetic design loses importance in a multiplayer context. Other researches are instead focused on finding \[patterns] in the design of multiplayer maps: Larsen\cite{LevelDesignPatterns} analyzes three really different multiplayer games, \<Unreal Tournament 2004>\footnote{\label{}Epic Games, 2004.}, \<Day of Defeat: Source>\footnote{\label{}Valve, 2005.} and \<Battlefield 1942>\footnote{\label{}DICE, 2002.}, identifying shared patterns and measuring their effect on gameplay, suggesting some guidelines on how to use them, whereas Hullet and Whitehead identify some patterns for singleplayer games\cite{Hullett:2010:DPF:1822348.1822359}, many of whom are compatible with a multiplayer setting, with Hullett also proving cause-effect relationships for some of this patterns by confronting hypnotized results with the ones observed on a sample of real players\cite{TheScienceOfLevelDesign}. Despite these experimental results contributing to a formalization of \<level design>, we are still far from a structured scientific approach to the subject.
- 
+In multiplayer games the level flow is defined by how the players interact with each other and with the environment. Because of this, the control of the level designer is less direct and is exercised almost exclusively by modeling the map. Considering FPS, the level flow changes depending on how much an area is attractive for a player. The more an area is easy to navigate or offers tactical advantage, such as cover, resources or high ground, the more players will be comfortable moving in it. This doesn't mean that all areas need to be designed like this, since zones with a ''bad'' flow but an attractive reward, such as a powerful weapon, force the player to evaluate risks and benefits, making the game play more engaging. The conformation of the map and the positioning of interesting resources are used to obtain what Güttler et al.\cite{Guttler:2003:SPL:963900.963915} define as \[''points of collisions''], i.e. zones of the map were the majority of the fights are bound to happen. Moving back to academic research, Güttler et al. have also noticed how aesthetic design loses importance in a multiplayer context. Other researches are instead focused on finding \[patterns] in the design of multiplayer maps: Larsen\cite{LevelDesignPatterns} analyzes three really different multiplayer games, \<Unreal Tournament 2004>\footnote{Epic Games, 2004.}, \<Day of Defeat: Source>\footnote{Valve, 2005.} and \<Battlefield 1942>\footnote{DICE, 2002.}, identifying shared patterns and measuring their effect on gameplay, suggesting some guidelines on how to use them, whereas Hullet and Whitehead identify some patterns for single player games\cite{Hullett:2010:DPF:1822348.1822359}, many of whom are compatible with a multiplayer setting, with Hullett also proving cause-effect relationships for some of this patterns by confronting hypnotized results with the ones observed on a sample of real players\cite{TheScienceOfLevelDesign}. Despite these experimental results contributing to a formalization of level design, we are still far from a structured scientific approach to the subject.
+
 % PROCEDURAL CONTENT GENERATION %
 
 \section{Procedural Content Generation}
@@ -47,32 +47,77 @@ In multiplayer games the \<level flow> is defined by how the players interact wi
 
 \par
 
-The first popular game to use this technique was \<Rogue>\footnote{\label{}Michael Toy, Glenn Wichman, 1980.}, an ASCII dungeon exploration game released in 1980, where the rooms, hallways, monsters, and treasures the player was going to find were generated in a pseudo-random fashion at each playthrough. Besides providing a huge replay value to a game, \<PCG> allowed to overcome the strict memory limitations of the early computers. Many games used pseudo-random generators with predefined \<seed values> in order to create very large game worlds that appeared to be premade. For instance, the space exploration and trading game \<Elite>\footnote{\label{}David Braben, Ian Bell, 1984.} contained only eight galaxies, each one with 256 solar systems, of the possible 282 trillion the code was able to generate, since the publisher was afraid that such an high number could cause disbelief in the players. Another example is the open world action role-playing game \<The Elder Scrolls II: Daggerfall>\footnote{\label{}Bethesda Softworks, 1996.}, which game world has the same size as Great Britain. 
+The first popular game to use this technique was \<Rogue>\footnote{Michael Toy, Glenn Wichman, 1980.}, an ASCII dungeon exploration game released in 1980, where the rooms, hallways, monsters, and treasures the player was going to find were generated in a pseudo-random fashion at each playthrough. Besides providing a huge replay value to a game, PCG allowed to overcome the strict memory limitations of the early computers. Many games used pseudo-random generators with predefined \<seed values> to create very large game worlds that appeared to be premade. For instance, the space exploration and trading game \<Elite>\footnote{David Braben, Ian Bell, 1984.} contained only eight galaxies, each one with 256 solar systems, of the possible 282 trillion the code was able to generate, since the publisher was afraid that such an high number could cause disbelief in the players. Another example is the open world action role-playing game \<The Elder Scrolls II: Daggerfall>\footnote{Bethesda Softworks, 1996.}, which game world has the same size as Great Britain. 
 
 \par
 
-As computer hardware advanced and CDs become more and more capacious, \<Procedural Generation> of game worlds was generally put aside, since it could not compete with the level of detail that hand-crafted worlds were able to achieve.
+As computer hardware advanced and CDs become more and more capacious, procedural generation of game worlds was generally put aside, since it could not compete with the level of detail that hand-crafted worlds were able to achieve.
 
 \par
 
-However, in the last years, with the players' expectations and the production value of video games constantly increasing, \<Procedural Generation> made a comeback as a way to automate the development process and reduce costs. Many \<middleware> tools, as \<SpeedTree>\footnote{\label{}IDV, Inc.} and \<World Machine>\footnote{\label{}World Machine Software, LLC.}, are used to produce content, like terrain and natural or artificial environments.
+However, in the last years, with the players' expectations and the production value of video games constantly increasing, procedural generation made a comeback as a way to automate the development process and reduce costs. Many \<middleware> tools, as \<SpeedTree>\footnote{IDV, Inc.} and \<World Machine>\footnote{World Machine Software, LLC.}, are used to produce content, like terrain and natural or artificial environments.
 
 \par
 
-Many modern \<AAA>\footnote{\label{}Video games produced and distributed by a major publisher, typically having high development and marketing budgets.} games use \<Procedural Generation>: in \<Borderlands>\footnote{\label{}Gearbox Software, 2009.} a procedural algorithm is responsible for the generation of guns and other pieces of equipment, with over a million unique combinations; in \<Left 4 Dead>\footnote{\label{}Valve, 2008.} an artificial intelligence is used to constantly make the players feel under threat, by dynamically changing the music, spawning waves of enemies and changing the accessible paths of the level; in \<Spore>\footnote{\label{}Maxis, 2008.} \<procedural animation> is employed to determine how the creatures created by the player move.
+Many modern \<AAA>\footnote{Video games produced and distributed by a major publisher, typically having high development and marketing budgets.} games use procedural generation: in \<Borderlands>\footnote{Gearbox Software, 2009.} a procedural algorithm is responsible for the generation of guns and other pieces of equipment, with over a million unique combinations; in \<Left 4 Dead>\footnote{Valve, 2008.} an artificial intelligence is used to constantly make the players feel under threat, by dynamically changing the music, spawning waves of enemies and changing the accessible paths of the level; in \<Spore>\footnote{Maxis, 2008.} \<procedural animation> is employed to determine how the creatures created by the player move.
 
 \par
 
-Nowadays, \<PCG> is widely used by \<independent> developers, that, lacking the high budgets of \<AAA> games, try to obtain engaging and unusual gameplay using unconventional means. The most famous example is \<Minecraft>\footnote{\label{ }Mojang, 2011.}, a sandbox survival game which worlds, composed exclusively by cubes, are generated automatically. Currently, the most extreme form of \<Procedural Generation> is the one found in \<No Man's Sky>\footnote{\label{}Hello Games, 2016.}, a space exploration game, where space stations, star-ships, planets, trees, resources, buildings, animals, weapons and even missions are generated procedurally. Following in the footstep of their forefather, many \<roguelike> games still use \<PCG>, like \<The Binding of Isaac>\footnote{\label{}Edmund McMillen, 2011.}.
+Nowadays, PCG is widely used by \<independent> developers, that, lacking the high budgets of AAA games, try to obtain engaging and unusual gameplay using unconventional means. The most famous example is \<Minecraft>\footnote{\label{ }Mojang, 2011.}, a sandbox survival game which worlds, composed exclusively by cubes, are generated automatically. Currently, the most extreme form of procedural generation is the one found in \<No Man's Sky>\footnote{Hello Games, 2016.}, a space exploration game, where space stations, star-ships, planets, trees, resources, buildings, animals, weapons and even missions are generated procedurally. Following in the footstep of their forefather, many roguelike games still use PCG, like \<The Binding of Isaac>\footnote{Edmund McMillen, 2011.}.
 
+\par
+
+All the algorithms used by these games and middleware are design to be as fast as possible, since they need to generate the content in real time. In the last years researchers have nevertheless tried to explore new paradigms, creating more complex procedural generation techniques, that allow for a tighter control on the output. Being one of the problems of PCG the lack of an assured minimum quality on the produced content, the academic environment has focused not only on more advanced generation algorithms, but also on techniques to evaluate the output itself in an \<automatic> fashion. In this field, Togelius et al.\cite{10.1007/978-3-642-12239-2_15} defined \<Search-Based Procedural Content Generation>, a particular kind of \<Generate-And-Test>\footnote{Algorithms with both a generation and an evaluation component, that depending on some criterion, decide to keep the current result or to generate a new one.} algorithm, where the generated content, instead of being just accepted or discarded, is evaluated assigning a suitability \<score> obtained from a \<fitness function>, used to select the best candidates for the next iterations.
 
 % PROCEDURAL CONTENT GENERATION IN FPS %
 
-\section{Procedural Content Generation for First Person Shooter maps}
+\section{Procedural Content Generation for FPS maps}
+
+We have really few examples of commercial FPS that use PCG to generate their maps: with the exception of \<Soldier of Fortune II: Double Helix>\footnote{ Raven Software, 2002.}, that employs these techniques to generate whole missions, the few other cases we have are all roguelikes with a FPS gameplay, like \<STRAFE>\footnote{Pixel Titans, 2017.}.
+
+\par
+
+Despite the total lack of FPS games using procedural generation to obtain multiplayer maps, researchers have proved that search-based procedural content generation can be an useful tool in this field. This method has been applied for the first time by Cardamone et al.\cite{Cardamone:2011:EIM:2008402.2008411}, who tried to understand which kind of \<deathmatch>\footnote{A widely used multiplayer game mode where the goal of each player is to kill as many other players as possible until a certain end condition is reached, commonly being a kill limit or a time limit.} maps created the most enjoyable gameplay possible. To achieve this, the authors generates maps for \<Cube 2: Sauerbraten>\footnote{Wouter van Oortmerssen, 2004} by maximizing a fitness function computed on the \<fight time> data collected from \<simulations>\footnote{In the field of search-based procedural generation, fitness function based on simulation are computed on the data collected from a match between artificial agents in the map at issue. They differ from \<direct> and \<interactive> functions, that evaluate, respectively, the generated content and the interaction with a real player.}, with the fight time being the time between the start of a fight and the death of one of the two contenders. The choice of this fitness function is based on the consideration that a long duration of the fight is correlated to the presence of interesting features in the map, such as escape or flanking routes, hideouts and well positioned resources. 
+
+\par
+
+Stucchi\cite{EvoluzioneMappeBilanciate}, yet remaining in the same field, attempted a completely different use of procedural generation, by producing balanced maps for player with different weapons or different levels of skill. For doing so, he generates procedural maps via evolutionary algorithms, evaluating them with a fitness function based on simulation that computed the entropy of kills. Starting from a situation where one of the two players was at a disadvantage, Stucchi is able to prove that changes in the map structure allow to achieve a significant balance increase.
+
+\par
+
+Arnaboldi\cite{SviluppoDiUnFramework} combined these two approaches, creating a framework that automatically produces maps using a genetic process like the one of Cardamone. In Arnaboldi work, however, the fitness function is way more complex, since it considers a high number of gameplay metrics, and the AI of the \<bots>\footnote{The artificial players of a video game.} is more like the one of a human player, thanks to a series of adjustments made to the stock \<Cube 2> one. These improvements significantly increase the scientific accuracy and the overall quality of the output, allowing to identify and analyze some recurring pattern and their relationship with the statistics gathered during the simulation. 
+
+\par
+
+Ølsted et al.\cite{DesignerJob} moved the focus of their research from deathmacth to squad game mods with specific objectives, sustaining not only that the maps generated by Cardamone et al. are not suitable for this kind of gameplay, but also that they not satisfy what they define as \<The Good Engagement> (or \<TGE>) rules, a set of rules that a FPS should satisfy to support and encourage interesting player choices, from which an engaging gameplay should emerge naturally. By analyzing the \<Search \& Destroy>\footnote{A multiplayer game mode where players, divided in two teams, have to eliminate the enemy team or detonate a bomb in their base.} mode of games like \<Counter Strike>\footnote{Valve Software, 2000} and \<Call of Duty>\footnote{Infinity Ward, 2003}, they defined a process to generate suitable maps: starting from a grid, some nodes are selected and connected among them, the result is then optimized to satisfy the TGE rules and finally rooms, resources, objects and spawn points are added, as can be seen in figure \ref{fig:olstedGenerativeProcess}. Opting for an \<interactive> approach, the fitness function used for the evolution of these maps is computed on the binary appreciation feedback expressed by real users, since the authors consider bot behavior too different form the one of real users.
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{olstedGenerativeProcess}
+  \caption{Visual representation of Ølsted et al.\cite{DesignerJob} generative process.}
+  \label{fig:olstedGenerativeProcess}
+\end{figure}
+
+\par
+
+A completely different approach from the ones listed above is the one of Anand and Wong\cite{10.1007/978-3-662-45212-7_19}, who employed search-based procedural generation to create \<online>, automatically and rapidly multiplayer maps for the \<Capture and Hold>\footnote{A multiplayer game mode where players, divided in two teams, fight for the control of some strategic areas. The score of each team increases over time proportionally to the number of controlled points until one of the two teams reaches a given limit, winning the game.} game mode, without compromising the quality of the generated maps. To achieve this result, they employ a genetic approach, which fitness function is evaluated directly on the topology the map, considering four different factors: the connectivity between regions, the number of points of collision, the balancing in the positioning of control points and spawn points. With no need to simulate matches, this process can be completed in a matter of seconds. This genetic process starts from three generated maps and the evolution is performed by mutation. To obtain the initial maps, Anand and Wong populate a grid with random tiles, they clean it of undesired artifacts and they identify regions within it, that are then populated with strategic points, resources, spawn points and covers. Despite its good results, this approach is not too sound on a scientific stand point, since it directly depends on the validity of the selected topological metrics and as we have seen it is still not to clear which are the good elements of a level.
+
+\par
+
+Finally, back to deathmatch, Cachia et al.\cite{MultiLevelEvolution} extended search-based procedural generation to multi-level maps, generating the ground floor with one of the methods defined by Cardamone and employing a random digger for the first floor. The final result can be seen in figure \ref{fig:multiLevelEvolution1}. Their algorithm also positions spawn points and resources through a topological fitness function, which implies the same problems described for of Anand and Wong's approach.
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{multiLevelEvolution}
+  \caption{One of the maps evolved by Cachia's et al.\cite{MultiLevelEvolution} algorithm.}
+  \label{fig:multiLevelEvolution1}
+\end{figure}
 
 % FPS DESIGN %
 
 \section{History of Level Design in FPS}
+
+% GRAPH THEORY %
+
+\section{Graph Theory in video games}
 
 % SUMMARY %
 

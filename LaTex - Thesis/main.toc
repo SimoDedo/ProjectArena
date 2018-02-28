@@ -1,7 +1,7 @@
-\contentsline {chapter}{\numberline {1}Introduction}{1}
-\contentsline {chapter}{\numberline {2}State of the art}{3}
-\contentsline {section}{\numberline {2.1}Level Design Theory}{3}
-\contentsline {section}{\numberline {2.2}Procedural Content Generation}{4}
-\contentsline {section}{\numberline {2.3}Procedural Content Generation for First Person Shooter maps}{4}
-\contentsline {section}{\numberline {2.4}History of Level Design in FPS}{4}
-\contentsline {section}{\numberline {2.5}Summary}{4}
+\contentsline {chapter}{\numberline {1}State of the art}{1}
+\contentsline {section}{\numberline {1.1}Level Design Theory}{1}
+\contentsline {section}{\numberline {1.2}Procedural Content Generation}{3}
+\contentsline {section}{\numberline {1.3}Procedural Content Generation for First Person Shooter maps}{5}
+\contentsline {section}{\numberline {1.4}History of Level Design in FPS}{5}
+\contentsline {section}{\numberline {1.5}Graph Theory in video games}{5}
+\contentsline {section}{\numberline {1.6}Summary}{5}
