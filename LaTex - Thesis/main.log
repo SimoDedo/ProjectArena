@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  1 MAR 2018 16:00
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  1 MAR 2018 17:52
 entering extended mode
 **./main.tex
 (main.tex
@@ -996,101 +996,95 @@ Chapter 2.
 [3]
 
 LaTeX Warning: Citation `GuidingThePlayersEye' on page 4 undefined on input lin
-e 36.
+e 40.
 
 
 LaTeX Warning: Citation `HowLevelDesignersAffect' on page 4 undefined on input 
-line 36.
+line 40.
 
 
-LaTeX Warning: Citation `TheInvisibleHand' on page 4 undefined on input line 36
+LaTeX Warning: Citation `TheInvisibleHand' on page 4 undefined on input line 40
 .
 
 
-LaTeX Warning: Citation `InGameLigthing' on page 4 undefined on input line 36.
+LaTeX Warning: Citation `InGameLigthing' on page 4 undefined on input line 40.
 
 
 LaTeX Warning: Citation `Guttler:2003:SPL:963900.963915' on page 4 undefined on
- input line 40.
+ input line 44.
 
 
 LaTeX Warning: Citation `LevelDesignPatterns' on page 4 undefined on input line
- 40.
+ 44.
 
 
 LaTeX Warning: Citation `Hullett:2010:DPF:1822348.1822359' on page 4 undefined 
-on input line 40.
+on input line 44.
 
 
 LaTeX Warning: Citation `TheScienceOfLevelDesign' on page 4 undefined on input 
-line 40.
+line 44.
 
-[4] [5]
+[4] [5] [6]
 
-LaTeX Warning: Citation `10.1007/978-3-642-12239-2_15' on page 6 undefined on i
-nput line 70.
+LaTeX Warning: Citation `10.1007/978-3-642-12239-2_15' on page 7 undefined on i
+nput line 74.
 
-[6]
 
 LaTeX Warning: Citation `Cardamone:2011:EIM:2008402.2008411' on page 7 undefine
-d on input line 80.
+d on input line 84.
 
 [7]
 
 LaTeX Warning: Citation `EvoluzioneMappeBilanciate' on page 8 undefined on inpu
-t line 84.
+t line 88.
 
 
 LaTeX Warning: Citation `SviluppoDiUnFramework' on page 8 undefined on input li
-ne 88.
+ne 92.
 
 
-LaTeX Warning: Citation `DesignerJob' on page 8 undefined on input line 92.
+LaTeX Warning: Citation `DesignerJob' on page 8 undefined on input line 96.
 
-<images/olstedGenerativeProcess.png, id=44, 1204.5pt x 532.99126pt>
+[8]
+<images/olstedGenerativeProcess.png, id=47, 1204.5pt x 532.99126pt>
 File: images/olstedGenerativeProcess.png Graphic file (type png)
 <use images/olstedGenerativeProcess.png>
 Package pdftex.def Info: images/olstedGenerativeProcess.png  used on input line
- 95.
+ 99.
 (pdftex.def)             Requested size: 360.0pt x 159.29678pt.
 
-LaTeX Warning: Citation `DesignerJob' on page 8 undefined on input line 96.
+
+LaTeX Warning: Citation `DesignerJob' on page 9 undefined on input line 100.
 
 
-LaTeX Warning: Citation `DesignerJob' on page 8 undefined on input line 96.
+LaTeX Warning: Citation `DesignerJob' on page 9 undefined on input line 100.
 
 
-LaTeX Warning: Citation `10.1007/978-3-662-45212-7_19' on page 8 undefined on i
-nput line 102.
-
-[8]
-
-LaTeX Warning: Citation `MultiLevelEvolution' on page 9 undefined on input line
- 106.
-
-<images/multiLevelEvolution.jpg, id=48, 1316.92pt x 690.58pt>
-File: images/multiLevelEvolution.jpg Graphic file (type jpg)
-<use images/multiLevelEvolution.jpg>
-Package pdftex.def Info: images/multiLevelEvolution.jpg  used on input line 109
-.
-(pdftex.def)             Requested size: 360.0pt x 188.77731pt.
-
-LaTeX Warning: Citation `MultiLevelEvolution' on page 9 undefined on input line
- 110.
+LaTeX Warning: Citation `10.1007/978-3-662-45212-7_19' on page 9 undefined on i
+nput line 106.
 
 
 LaTeX Warning: Citation `MultiLevelEvolution' on page 9 undefined on input line
  110.
 
 [9 <./images/olstedGenerativeProcess.png>]
-Underfull \vbox (badness 2368) has occurred while \output is active []
+<images/multiLevelEvolution.jpg, id=52, 1316.92pt x 690.58pt>
+File: images/multiLevelEvolution.jpg Graphic file (type jpg)
+<use images/multiLevelEvolution.jpg>
+Package pdftex.def Info: images/multiLevelEvolution.jpg  used on input line 113
+.
+(pdftex.def)             Requested size: 360.0pt x 188.77731pt.
 
- [10 <./images/multiLevelEvolution.jpg>]
-Underfull \hbox (badness 10000) in paragraph at lines 124--125
 
- []
+LaTeX Warning: Citation `MultiLevelEvolution' on page 10 undefined on input lin
+e 114.
 
 
+LaTeX Warning: Citation `MultiLevelEvolution' on page 10 undefined on input lin
+e 114.
+
+[10 <./images/multiLevelEvolution.jpg>]
 Underfull \hbox (badness 10000) in paragraph at lines 128--129
 
  []
@@ -1100,22 +1094,27 @@ Underfull \hbox (badness 10000) in paragraph at lines 132--133
 
  []
 
+
+Underfull \hbox (badness 10000) in paragraph at lines 136--137
+
+ []
+
 [11]
-Underfull \hbox (badness 10000) in paragraph at lines 140--141
+Underfull \hbox (badness 10000) in paragraph at lines 144--145
 
  []
 
 [12]
-Underfull \hbox (badness 10000) in paragraph at lines 152--153
-
- []
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 156--157
 
  []
 
-) [13]
+
+Underfull \hbox (badness 10000) in paragraph at lines 160--161
+
+ []
+
+[13]) [14]
 \openout2 = `chapters/chapter3.aux'.
 
  (chapters/chapter3.tex)
@@ -1124,27 +1123,14 @@ Underfull \hbox (badness 10000) in paragraph at lines 156--157
  (chapters/chapter4.tex)
 \openout2 = `chapters/chapter5.aux'.
 
- (chapters/chapter5.tex)
+
+(chapters/chapter5.tex)
 \openout2 = `chapters/chapter6.aux'.
 
-
-(chapters/chapter6.tex)
+ (chapters/chapter6.tex)
 \openout2 = `chapters/chapter7.aux'.
 
- (chapters/chapter7.tex) [14
-
-
-
-
-
-
-
-
-
-
-
-
-]
+ (chapters/chapter7.tex)
 No file main.bbl.
 (main.aux (chapters/chapter0.aux) (chapters/chapter1.aux)
 (chapters/chapter2.aux) (chapters/chapter3.aux) (chapters/chapter4.aux)
@@ -1171,7 +1157,7 @@ fonts/cm/cmr8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/c
 mr9.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsl10.pfb>
 <C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Prog
 ram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti9.pfb>
-Output written on main.pdf (16 pages, 505480 bytes).
+Output written on main.pdf (16 pages, 506605 bytes).
 PDF statistics:
  104 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
