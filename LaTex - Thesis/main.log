@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  28 FEB 2018 09:46
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  1 MAR 2018 16:00
 entering extended mode
 **./main.tex
 (main.tex
@@ -790,57 +790,8 @@ LaTeX Warning: Unused global option(s):
     [openrigth].
 
 (main.aux (chapters/chapter0.aux) (chapters/chapter1.aux)
-(chapters/chapter2.aux
-
-LaTeX Warning: Label `' multiply defined.
-
-
-LaTeX Warning: Label `' multiply defined.
-
-
-LaTeX Warning: Label `' multiply defined.
-
-
-LaTeX Warning: Label `' multiply defined.
-
-
-LaTeX Warning: Label `' multiply defined.
-
-
-LaTeX Warning: Label `' multiply defined.
-
-
-LaTeX Warning: Label `' multiply defined.
-
-
-LaTeX Warning: Label `' multiply defined.
-
-
-LaTeX Warning: Label `' multiply defined.
-
-
-LaTeX Warning: Label `' multiply defined.
-
-
-LaTeX Warning: Label `' multiply defined.
-
-
-LaTeX Warning: Label `' multiply defined.
-
-
-LaTeX Warning: Label `' multiply defined.
-
-
-LaTeX Warning: Label `' multiply defined.
-
-
-LaTeX Warning: Label `' multiply defined.
-
-
-LaTeX Warning: Label `' multiply defined.
-
-) (chapters/chapter3.aux) (chapters/chapter4.aux) (chapters/chapter5.aux)
-(chapters/chapter6.aux) (chapters/chapter7.aux))
+(chapters/chapter2.aux) (chapters/chapter3.aux) (chapters/chapter4.aux)
+(chapters/chapter5.aux) (chapters/chapter6.aux) (chapters/chapter7.aux))
 \openout1 = `main.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 36.
@@ -1079,13 +1030,92 @@ line 40.
 LaTeX Warning: Citation `10.1007/978-3-642-12239-2_15' on page 6 undefined on i
 nput line 70.
 
-[6])
-Overfull \hbox (85.87508pt too wide) has occurred while \output is active
-\OT1/cmr/m/sl/10.95 2.3.  PROCEDURAL CONTENT GENERATION FOR FIRST PERSON SHOOTE
-R MAPS \OT1/cmr/m/n/10.95 7
- []
+[6]
+
+LaTeX Warning: Citation `Cardamone:2011:EIM:2008402.2008411' on page 7 undefine
+d on input line 80.
 
 [7]
+
+LaTeX Warning: Citation `EvoluzioneMappeBilanciate' on page 8 undefined on inpu
+t line 84.
+
+
+LaTeX Warning: Citation `SviluppoDiUnFramework' on page 8 undefined on input li
+ne 88.
+
+
+LaTeX Warning: Citation `DesignerJob' on page 8 undefined on input line 92.
+
+<images/olstedGenerativeProcess.png, id=44, 1204.5pt x 532.99126pt>
+File: images/olstedGenerativeProcess.png Graphic file (type png)
+<use images/olstedGenerativeProcess.png>
+Package pdftex.def Info: images/olstedGenerativeProcess.png  used on input line
+ 95.
+(pdftex.def)             Requested size: 360.0pt x 159.29678pt.
+
+LaTeX Warning: Citation `DesignerJob' on page 8 undefined on input line 96.
+
+
+LaTeX Warning: Citation `DesignerJob' on page 8 undefined on input line 96.
+
+
+LaTeX Warning: Citation `10.1007/978-3-662-45212-7_19' on page 8 undefined on i
+nput line 102.
+
+[8]
+
+LaTeX Warning: Citation `MultiLevelEvolution' on page 9 undefined on input line
+ 106.
+
+<images/multiLevelEvolution.jpg, id=48, 1316.92pt x 690.58pt>
+File: images/multiLevelEvolution.jpg Graphic file (type jpg)
+<use images/multiLevelEvolution.jpg>
+Package pdftex.def Info: images/multiLevelEvolution.jpg  used on input line 109
+.
+(pdftex.def)             Requested size: 360.0pt x 188.77731pt.
+
+LaTeX Warning: Citation `MultiLevelEvolution' on page 9 undefined on input line
+ 110.
+
+
+LaTeX Warning: Citation `MultiLevelEvolution' on page 9 undefined on input line
+ 110.
+
+[9 <./images/olstedGenerativeProcess.png>]
+Underfull \vbox (badness 2368) has occurred while \output is active []
+
+ [10 <./images/multiLevelEvolution.jpg>]
+Underfull \hbox (badness 10000) in paragraph at lines 124--125
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 128--129
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 132--133
+
+ []
+
+[11]
+Underfull \hbox (badness 10000) in paragraph at lines 140--141
+
+ []
+
+[12]
+Underfull \hbox (badness 10000) in paragraph at lines 152--153
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 156--157
+
+ []
+
+) [13]
 \openout2 = `chapters/chapter3.aux'.
 
  (chapters/chapter3.tex)
@@ -1101,7 +1131,7 @@ R MAPS \OT1/cmr/m/n/10.95 7
 (chapters/chapter6.tex)
 \openout2 = `chapters/chapter7.aux'.
 
- (chapters/chapter7.tex) [8
+ (chapters/chapter7.tex) [14
 
 
 
@@ -1122,18 +1152,15 @@ No file main.bbl.
 
 LaTeX Warning: There were undefined references.
 
-
-LaTeX Warning: There were multiply-defined labels.
-
  ) 
 Here is how much of TeX's memory you used:
- 14328 strings out of 493303
- 293095 string characters out of 3138856
- 315078 words of memory out of 3000000
- 17724 multiletter control sequences out of 15000+200000
- 541836 words of font info for 64 fonts, out of 3000000 for 9000
+ 14352 strings out of 493303
+ 293736 string characters out of 3138856
+ 315057 words of memory out of 3000000
+ 17744 multiletter control sequences out of 15000+200000
+ 542488 words of font info for 66 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 42i,8n,40p,10380b,378s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 42i,8n,42p,10380b,516s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Pr
 ogram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Program Fi
 les/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MiKTe
@@ -1142,10 +1169,11 @@ ts/type1/public/amsfonts/cm/cmr17.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/
 public/amsfonts/cm/cmr6.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/ams
 fonts/cm/cmr8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/c
 mr9.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsl10.pfb>
-<C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti10.pfb>
-Output written on main.pdf (10 pages, 254721 bytes).
+<C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Prog
+ram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti9.pfb>
+Output written on main.pdf (16 pages, 505480 bytes).
 PDF statistics:
- 78 PDF objects out of 1000 (max. 8388607)
+ 104 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 16 words of extra memory for PDF output out of 10000 (max. 10000000)
 
