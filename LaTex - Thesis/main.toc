@@ -1,3 +1,8 @@
+\contentsline {chapter}{Abstract}{iii}
+\contentsline {chapter}{Sommario}{v}
+\contentsline {chapter}{\textit {Thanks}}{vii}
+\contentsline {chapter}{List of figures}{ix}
+\contentsline {chapter}{List of tables}{xi}
 \contentsline {chapter}{\numberline {1}Introduction}{1}
 \contentsline {section}{\numberline {1.1}Motivations and purpose}{2}
 \contentsline {section}{\numberline {1.2}Synopsis}{2}
