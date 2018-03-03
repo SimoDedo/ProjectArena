@@ -1,15 +1,25 @@
 \documentclass[11pt,letterpaper,twoside,openrigth]{book}
 
 \usepackage{amsmath}
-\usepackage{emptypage} 
+\usepackage{emptypage}
+\usepackage{fancyhdr}
 \usepackage{graphicx}
 \usepackage[utf8]{inputenc}
 \usepackage{setspace}
 \usepackage{siunitx}
 \usepackage{subcaption}
 \usepackage{titlepic}
+\usepackage[nottoc]{tocbibind}
 
 % SETUP %
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[RO]{\slshape\nouppercase{\textnormal{\leftmark}}}
+\fancyhead[LE]{\slshape\nouppercase{\textnormal{\rightmark}}}
+\fancyfoot{}
+\fancyfoot[RO]{\thepage}
+\fancyfoot[LE]{\thepage}
 
 \sisetup{
   round-mode = places,
@@ -23,17 +33,13 @@
 \newcommand{\nocontentsline}[3]{}
 \newcommand{\tocless}[2]{\bgroup\let\addcontentsline=\nocontentsline#1{#2}\egroup}
 
+\let\LaTeXStandardTableOfContents\tableofcontents
+\renewcommand{\tableofcontents}{\begingroup\renewcommand{\itshape}{\relax}\LaTeXStandardTableOfContents\endgroup}
+
 % MACROS %
 
 \def\<#1>{\textit{#1}}
 \def\[#1]{\textbf{#1}}
-
-% TITLE %
-
-\title{A framework to research procedural content generation in First Person Shooters}
-\author{Marco Ballabio}
-\titlepic{\includegraphics[width=5cm]{polimi}}
-\date{\vspace{-5ex}}
 
 % FRONT MATTER %
 
@@ -41,7 +47,36 @@
 
 \frontmatter
 
-\maketitle
+% TITLE PAGE
+
+\begin{titlepage}
+\centering
+
+{\scshape\LARGE Politecnico di Milano \par}
+{\Large Corso di Laurea Magistrale in Ingegneria Informatica \par}
+{\Large Dipartimento di Elettronica, Informazione e Bioingegneria}
+
+\vspace{1cm} \includegraphics[width=0.3\textwidth]{polimi}\par \vspace{1cm}
+
+{\scshape\LARGE Development of a framework for user-based validation of FPS-oriented level design research}
+
+\raggedright
+\vfill\Large Supervisor: Professor Daniele LOIACONO
+
+\vfill \begin{minipage}[t]{0.4\textwidth}\end{minipage} \hfill
+\begin{minipage}[t]{0.59\textwidth} \begin{flushright}
+\raggedright Final thesis by: \par Marco BALLABIO Matr. 857169
+\end{flushright} \end{minipage}
+
+\centering
+\vfill\Large Academic year 2017/2018
+
+\end{titlepage}
+
+% \title{}
+% \author{Marco Ballabio}
+% \titlepic{\includegraphics[width=5cm]{polimi}}
+% \date{\vspace{-5ex}}
 
 % ABSTRACTS AND THANKS %
 
@@ -49,10 +84,8 @@
 
 \tableofcontents
 
-\addcontentsline{toc}{chapter}{List of figures}
 \listoffigures
 
-\addcontentsline{toc}{chapter}{List of tables}
 \listoftables
 
 % MAIN MATTER %
