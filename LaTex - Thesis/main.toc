@@ -1,6 +1,5 @@
 \contentsline {chapter}{Abstract}{iii}
 \contentsline {chapter}{Sommario}{v}
-\contentsline {chapter}{\textit {Thanks}}{vii}
 \contentsline {chapter}{List of figures}{ix}
 \contentsline {chapter}{List of tables}{xi}
 \contentsline {chapter}{\numberline {1}Introduction}{1}
