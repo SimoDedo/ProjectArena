@@ -11,15 +11,14 @@
 \usepackage{titlepic}
 \usepackage[nottoc]{tocbibind}
 
-% SETUP %
+% GENERAL SETUP %
 
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[RO]{\slshape\nouppercase{\textnormal{\leftmark}}}
-\fancyhead[LE]{\slshape\nouppercase{\textnormal{\rightmark}}}
+\fancyhead[LE]{\slshape\nouppercase{\textnormal{\leftmark}}}
+\fancyhead[RO]{\slshape\nouppercase{\textnormal{\rightmark}}}
 \fancyfoot{}
-\fancyfoot[RO]{\thepage}
-\fancyfoot[LE]{\thepage}
+\fancyfoot[RO, LE]{\thepage}
 
 \sisetup{
   round-mode = places,
@@ -35,6 +34,11 @@
 
 \let\LaTeXStandardTableOfContents\tableofcontents
 \renewcommand{\tableofcontents}{\begingroup\renewcommand{\itshape}{\relax}\LaTeXStandardTableOfContents\endgroup}
+
+% PDF SETUP %
+
+\setlength\oddsidemargin{\dimexpr(\paperwidth-\textwidth)/2 - 1in\relax}
+\setlength\evensidemargin{\oddsidemargin}
 
 % MACROS %
 
@@ -72,11 +76,6 @@
 \vfill\Large Academic year 2017/2018
 
 \end{titlepage}
-
-% \title{}
-% \author{Marco Ballabio}
-% \titlepic{\includegraphics[width=5cm]{polimi}}
-% \date{\vspace{-5ex}}
 
 % ABSTRACTS AND THANKS %
 
