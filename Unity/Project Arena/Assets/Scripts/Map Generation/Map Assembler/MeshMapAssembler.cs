@@ -2,13 +2,17 @@
 using UnityEngine;
 
 /// <summary>
-/// MeshMapAssembler is an implementation of MapAssebler that assembles the maps using meshes.
+/// MeshMapAssembler is an implementation of MapAssembler that assembles the maps using meshes.
 /// </summary>
-public class MeshMapAssembler : MapAssebler {
+public class MeshMapAssembler : MapAssembler {
 
-    [SerializeField] private Material topMaterial;
-    [SerializeField] private Material wallMaterial;
-    [SerializeField] private Material floorMaterial;
+    [Header("Mesh materials")]
+    [SerializeField]
+    private Material topMaterial;
+    [SerializeField]
+    private Material wallMaterial;
+    [SerializeField]
+    private Material floorMaterial;
 
     private SquareGrid squareGrid;
     private MeshFilter topMeshFilter;
@@ -27,8 +31,6 @@ public class MeshMapAssembler : MapAssebler {
     List<List<int>> outlines = new List<List<int>>();
     // We use this so that if we have checked a vertex we won't check it again;
     HashSet<int> checkedVertices = new HashSet<int>();
-
-    private float wallHeigth;
 
     private void Start() {
         GameObject childObject;
@@ -68,10 +70,7 @@ public class MeshMapAssembler : MapAssebler {
     }
 
     // Generates the Mesh.
-    public override void AssembleMap(char[,] map, char wallChar, char roomChar, float squareSize,
-        float h) {
-        wallHeigth = h;
-
+    public override void AssembleMap(char[,] map, char wallChar, char roomChar) {
         outlines.Clear();
         checkedVertices.Clear();
         triangleDictionary.Clear();
@@ -91,11 +90,11 @@ public class MeshMapAssembler : MapAssebler {
 
         CreateWallMesh();
 
-        CreateFloorMesh(map.GetLength(0), map.GetLength(1), squareSize, h);
+        CreateFloorMesh(map.GetLength(0), map.GetLength(1), squareSize, wallHeight);
     }
 
     public override void AssembleMap(List<char[,]> maps, char wallChar, char roomChar,
-        char voidChar, float squareSize, float h) { }
+        char voidChar) { }
 
     // Creates the top mesh.
     private void CreateTopMesh() {
@@ -126,9 +125,9 @@ public class MeshMapAssembler : MapAssebler {
                 // Rigth vertex of the wall panel.
                 wallVertices.Add(vertices[outline[i + 1]]);
                 // Bottom left vertex of the wall panel.
-                wallVertices.Add(vertices[outline[i]] - Vector3.up * wallHeigth);
+                wallVertices.Add(vertices[outline[i]] - Vector3.up * wallHeight);
                 // Bottom rigth vertex of the wall panel.
-                wallVertices.Add(vertices[outline[i + 1]] - Vector3.up * wallHeigth);
+                wallVertices.Add(vertices[outline[i + 1]] - Vector3.up * wallHeight);
 
                 // The wall will be seen from inside so we wind them anticlockwise.
                 wallTriangles.Add(startIndex + 0);

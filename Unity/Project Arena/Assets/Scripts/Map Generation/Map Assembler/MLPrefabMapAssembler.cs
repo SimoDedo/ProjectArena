@@ -8,15 +8,16 @@ using UnityEngine;
 /// </summary>
 public class MLPrefabMapAssembler : PrefabMapAssembler {
 
-    [Header("ML parameters")] [SerializeField] private GameObject floorPrefab;
-    [SerializeField] private int additionalWallLevels = 0;
+    [Header("ML parameters")]
+    [SerializeField]
+    private GameObject floorPrefab;
+    [SerializeField]
+    private int additionalWallLevels = 0;
 
     // Maps.
     private List<char[,]> maps;
     // Char that denotes a void tile.
     private char voidChar;
-    // Height of each level.
-    private float levelHeight;
     // Comulative mask.
     private char[,] comulativeMask;
     // Mask composed by room chars only.
@@ -26,12 +27,10 @@ public class MLPrefabMapAssembler : PrefabMapAssembler {
         SetReady(true);
     }
 
-    public override void AssembleMap(List<char[,]> ms, char wChar, char rChar, char vChar,
-        float squareSize, float h) {
+    public override void AssembleMap(List<char[,]> ms, char wChar, char rChar, char vChar) {
         wallChar = wChar;
         roomChar = rChar;
         voidChar = vChar;
-        levelHeight = h;
         width = ms[0].GetLength(0);
         height = ms[0].GetLength(1);
         maps = ms;
@@ -54,7 +53,7 @@ public class MLPrefabMapAssembler : PrefabMapAssembler {
                                 break;
                             }
                         }
-                        AddPrefab(floorPrefab, x, y, squareSize, 0, levelHeight * i);
+                        AddPrefab(floorPrefab, x, y, squareSize, 0, wallHeight * i);
                     }
                 }
             }
@@ -91,8 +90,7 @@ public class MLPrefabMapAssembler : PrefabMapAssembler {
         }
     }
 
-    public override void AssembleMap(char[,] m, char wChar, char rChar, float squareSize,
-        float prefabHeight) { }
+    public override void AssembleMap(char[,] m, char wChar, char rChar) { }
 
     // Adds a wall recursevely.
     private void AddWallRecursevely(int currentLevel, int x, int y, float squareSize,
@@ -101,13 +99,13 @@ public class MLPrefabMapAssembler : PrefabMapAssembler {
         if (currentMask != roomMask) {
             ProcessedTilePrefab currentPrefab = GetPrefabFromMask(currentMask);
             AddPrefab(currentPrefab.prefab, x, y, squareSize, currentPrefab.rotation,
-                levelHeight * currentLevel);
+                wallHeight * currentLevel);
             if (currentLevel < maps.Count - 1 && maps[currentLevel + 1][x, y] != roomChar) {
                 AddWallRecursevely(currentLevel + 1, x, y, squareSize, currentMask);
             } else if (currentLevel == maps.Count - 1 && additionalWallLevels > 0) {
                 for (int i = 1; i <= additionalWallLevels; i++) {
                     AddPrefab(currentPrefab.prefab, x, y, squareSize, currentPrefab.rotation,
-                        levelHeight * (currentLevel + i));
+                        wallHeight * (currentLevel + i));
                 }
             }
         }

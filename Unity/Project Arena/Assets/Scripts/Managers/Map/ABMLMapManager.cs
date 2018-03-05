@@ -7,7 +7,9 @@ using UnityEngine;
 /// </summary>
 public class ABMLMapManager : MLMapManager {
 
-    [Header("AB generation")] [SerializeField] private MapGenerator diggerGeneratorScript;
+    [Header("AB generation")]
+    [SerializeField]
+    private MapGenerator diggerGeneratorScript;
 
     private List<bool> usesDiggerGeneratorList;
 
@@ -46,7 +48,7 @@ public class ABMLMapManager : MLMapManager {
             // Resize all the maps.
             ResizeAllMaps();
             // Add the stairs.
-            stairsGeneratorScript.GenerateStairs(maps, usesDiggerGeneratorList, mapGeneratorScript, 
+            stairsGeneratorScript.GenerateStairs(maps, usesDiggerGeneratorList, mapGeneratorScript,
                 GenomeHasObjects(seed));
             // Save the map.
             if (export) {
@@ -58,12 +60,11 @@ public class ABMLMapManager : MLMapManager {
         if (assembleMap) {
             // Assemble the map.
             mapAssemblerScript.AssembleMap(maps, mapGeneratorScript.GetWallChar(),
-                mapGeneratorScript.GetRoomChar(), stairsGeneratorScript.GetVoidChar(),
-                mapGeneratorScript.GetSquareSize(), mapGeneratorScript.GetWallHeight());
+                mapGeneratorScript.GetRoomChar(), stairsGeneratorScript.GetVoidChar());
             // Displace the objects.
             for (int i = 0; i < maps.Count; i++) {
-                objectDisplacerScript.DisplaceObjects(maps[i], mapGeneratorScript.GetSquareSize(),
-                    mapGeneratorScript.GetWallHeight() * i);
+                objectDisplacerScript.DisplaceObjects(maps[i], mapAssemblerScript.GetSquareSize(),
+                    mapAssemblerScript.GetWallHeight() * i);
             }
         }
     }

@@ -8,8 +8,11 @@ using UnityEngine;
 /// </summary>
 public class MLMapManager : MapManager {
 
-    [Header("ML generation")] [SerializeField] protected int levelsCount;
-    [SerializeField] protected StairsGenerator stairsGeneratorScript;
+    [Header("ML generation")]
+    [SerializeField]
+    protected int levelsCount;
+    [SerializeField]
+    protected StairsGenerator stairsGeneratorScript;
 
     protected List<char[,]> maps = new List<char[,]>();
 
@@ -46,12 +49,11 @@ public class MLMapManager : MapManager {
         if (assembleMap) {
             // Assemble the map.
             mapAssemblerScript.AssembleMap(maps, mapGeneratorScript.GetWallChar(),
-                mapGeneratorScript.GetRoomChar(), stairsGeneratorScript.GetVoidChar(),
-                mapGeneratorScript.GetSquareSize(), mapGeneratorScript.GetWallHeight());
+                mapGeneratorScript.GetRoomChar(), stairsGeneratorScript.GetVoidChar());
             // Displace the objects.
             for (int i = 0; i < maps.Count; i++) {
-                objectDisplacerScript.DisplaceObjects(maps[i], mapGeneratorScript.GetSquareSize(),
-                    mapGeneratorScript.GetWallHeight() * i);
+                objectDisplacerScript.DisplaceObjects(maps[i], mapAssemblerScript.GetSquareSize(),
+                    mapAssemblerScript.GetWallHeight() * i);
             }
         }
     }
@@ -166,7 +168,7 @@ public class MLMapManager : MapManager {
             for (int x = 0; x < maps[i].GetLength(0); x++) {
                 for (int y = 0; y < maps[i].GetLength(1); y++) {
                     if (maps[i][x, y] != wallChar && maps[i][x, y] != roomChar)
-                    genomes[i] += ("<" + x + "," + y + "," + maps[i][x, y] + ">");
+                        genomes[i] += ("<" + x + "," + y + "," + maps[i][x, y] + ">");
                 }
             }
         }

@@ -29,8 +29,7 @@ public class SLPrefabMapAssembler : PrefabMapAssembler {
         SetReady(true);
     }
 
-    public override void AssembleMap(char[,] m, char wChar, char rChar, float squareSize,
-        float prefabHeight) {
+    public override void AssembleMap(char[,] m, char wChar, char rChar) {
         wallChar = wChar;
         roomChar = rChar;
         width = m.GetLength(0);
@@ -46,7 +45,7 @@ public class SLPrefabMapAssembler : PrefabMapAssembler {
                     string currentMask = GetNeighbourhoodMask(x, y);
                     foreach (ProcessedTilePrefab p in processedTilePrefabs) {
                         if (p.mask == currentMask) {
-                            AddPrefab(p.prefab, x, y, squareSize, p.rotation, prefabHeight);
+                            AddPrefab(p.prefab, x, y, squareSize, p.rotation, wallHeight);
                             break;
                         }
                     }
@@ -55,14 +54,14 @@ public class SLPrefabMapAssembler : PrefabMapAssembler {
         }
 
         // Generate floor and ceil colliders.
-        floorCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, prefabHeight +
+        floorCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, wallHeight +
             floorHeight, false);
-        ceilCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, prefabHeight +
+        ceilCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, wallHeight +
             ceilHeight, true);
     }
 
     public override void AssembleMap(List<char[,]> maps, char wallChar, char roomChar,
-        char voidChar, float squareSize, float h) { }
+        char voidChar) { }
 
     // Gets the neighbours of a cell as a mask.
     protected string GetNeighbourhoodMask(int gridX, int gridY) {

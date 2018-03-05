@@ -10,37 +10,49 @@ using MapManipulation;
 /// </summary>
 public abstract class MapGenerator : CoreComponent {
 
+    [Header("Seed")]
     // Do I have to generate my seed?
-    [Header("Seed")] [SerializeField] protected bool useRandomSeed = true;
+    [SerializeField]
+    protected bool useRandomSeed = true;
     // Seed used to generate the map.
-    [SerializeField] protected string seed = null;
+    [SerializeField]
+    protected string seed = null;
 
+    [Header("Generation")]
     // Map width.
-    [Header("Generation")] [SerializeField] protected int width = 100;
+    [SerializeField]
+    protected int width = 100;
     // Map height.
-    [SerializeField] protected int height = 100;
-    // Wall height.
-    [SerializeField] protected float wallHeight = 5f;
-    // Square size.
-    [SerializeField] protected float squareSize = 1f;
+    [SerializeField]
+    protected int height = 100;
     // Minimum distance of an object w.r.t another object.
-    [SerializeField] protected int objectToObjectDistance = 5;
+    [SerializeField]
+    protected int objectToObjectDistance = 5;
     // Minimum distance of an object w.r.t a wall.
-    [SerializeField,] protected int objectToWallDistance = 2;
+    [SerializeField]
+    protected int objectToWallDistance = 2;
     // Border size.
-    [SerializeField] protected int borderSize = 5;
+    [SerializeField]
+    protected int borderSize = 5;
 
+    [Header("Representation")]
     // Char that denotes a room
-    [Header("Representation")] [SerializeField] protected char roomChar = 'r';
+    [SerializeField]
+    protected char roomChar = 'r';
     // Char that denotes a wall;
-    [SerializeField] protected char wallChar = 'w';
+    [SerializeField]
+    protected char wallChar = 'w';
     // Custom objects that will be added to the map.
-    [SerializeField] protected MapObject[] mapObjects;
+    [SerializeField]
+    protected MapObject[] mapObjects;
 
+    [Header("Export")]
     // Do I have to create a .txt output?
-    [Header("Export")] [SerializeField] protected bool createTextFile = false;
+    [SerializeField]
+    protected bool createTextFile = false;
     // Path where to save the text map.
-    [SerializeField] protected string textFilePath = null;
+    [SerializeField]
+    protected string textFilePath = null;
 
     // Map, defined as a grid of chars.
     protected char[,] map;
@@ -99,14 +111,14 @@ public abstract class MapGenerator : CoreComponent {
 
             // Place the objects.
             foreach (MapObject o in mapObjects) {
-                switch (o.generationMethod) {
-                    case ObjectGenerationMethod.Rain:
+                switch (o.positioningMethod) {
+                    case ObjectPositioningMethod.Rain:
                         GenerateObjectsRain(o, restrictedMap);
                         break;
-                    case ObjectGenerationMethod.RainDistanced:
+                    case ObjectPositioningMethod.RainDistanced:
                         GenerateObjectsRainDistanced(o, restrictedMap);
                         break;
-                    case ObjectGenerationMethod.RainShared:
+                    case ObjectPositioningMethod.RainShared:
                         GenerateObjectsRainShared(o, restrictedMap);
                         break;
                 }
@@ -118,7 +130,7 @@ public abstract class MapGenerator : CoreComponent {
         char[,] supportMap = restrictedMap.Clone() as char[,];
 
         // Restrict again if there are object that need a further restriction.
-        if (!o.placeAnywere && objectToWallDistance > 1) {
+        if (!o.placeAnywhere && objectToWallDistance > 1) {
             for (int i = 1; i < objectToWallDistance; i++) {
                 MapEdit.ErodeMap(supportMap, wallChar);
             }
@@ -144,7 +156,7 @@ public abstract class MapGenerator : CoreComponent {
         char[,] supportMap = restrictedMap.Clone() as char[,];
 
         // Restrict again if there are object that need a further restriction.
-        if (!o.placeAnywere && objectToWallDistance > 1) {
+        if (!o.placeAnywhere && objectToWallDistance > 1) {
             for (int i = 1; i < objectToWallDistance; i++) {
                 MapEdit.ErodeMap(supportMap, wallChar);
             }
@@ -172,7 +184,7 @@ public abstract class MapGenerator : CoreComponent {
         char[,] supportMap = restrictedMap.Clone() as char[,];
 
         // Restrict again if there are object that need a further restriction.
-        if (!o.placeAnywere && objectToWallDistance > 1) {
+        if (!o.placeAnywhere && objectToWallDistance > 1) {
             for (int i = 1; i < objectToWallDistance; i++) {
                 MapEdit.ErodeMap(supportMap, wallChar);
             }
@@ -185,7 +197,7 @@ public abstract class MapGenerator : CoreComponent {
                 int selected = pseudoRandomGen.Next(0, roomTiles.Count);
                 map[roomTiles[selected].tileX, roomTiles[selected].tileY] = o.objectChar;
                 MapEdit.DrawCircle(roomTiles[selected].tileX, roomTiles[selected].tileY,
-                    (o.placeAnywere) ? 1 : objectToObjectDistance, supportMap, wallChar);
+                    (o.placeAnywhere) ? 1 : objectToObjectDistance, supportMap, wallChar);
                 roomTiles = MapInfo.GetFreeTiles(supportMap, roomChar);
             } else {
                 ManageError(Error.SOFT_ERROR, "Error while populating the map, no more free " +
@@ -276,14 +288,6 @@ public abstract class MapGenerator : CoreComponent {
         return roomChar;
     }
 
-    public float GetSquareSize() {
-        return squareSize;
-    }
-
-    public float GetWallHeight() {
-        return wallHeight;
-    }
-
     public float GetHeight() {
         return height;
     }
@@ -294,7 +298,7 @@ public abstract class MapGenerator : CoreComponent {
 
     /* CUTSOM OBJECTS */
 
-    public enum ObjectGenerationMethod {
+    public enum ObjectPositioningMethod {
         Rain,
         RainDistanced,
         RainShared
@@ -308,9 +312,9 @@ public abstract class MapGenerator : CoreComponent {
         // Number of objects to be put in the map.
         public int numObjPerMap;
         // The object must respect placement restrictions?
-        public bool placeAnywere;
-        // Generation method used for the object.
-        public ObjectGenerationMethod generationMethod;
+        public bool placeAnywhere;
+        // Positioning method used for the object.
+        public ObjectPositioningMethod positioningMethod;
     }
 
 }

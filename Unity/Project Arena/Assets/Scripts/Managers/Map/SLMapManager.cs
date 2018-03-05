@@ -29,11 +29,10 @@ public class SLMapManager : MapManager {
         if (assembleMap) {
             // Assemble the map.
             mapAssemblerScript.AssembleMap(map, mapGeneratorScript.GetWallChar(),
-                mapGeneratorScript.GetRoomChar(), mapGeneratorScript.GetSquareSize(),
-                mapGeneratorScript.GetWallHeight());
+                mapGeneratorScript.GetRoomChar());
             // Displace the objects.
-            objectDisplacerScript.DisplaceObjects(map, mapGeneratorScript.GetSquareSize(),
-                mapGeneratorScript.GetWallHeight());
+            objectDisplacerScript.DisplaceObjects(map, mapAssemblerScript.GetSquareSize(),
+                mapAssemblerScript.GetWallHeight());
         }
     }
 

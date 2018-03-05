@@ -9,7 +9,7 @@ using UnityEngine;
 public abstract class MapManager : CoreComponent {
 
     [Header("Core components")] [SerializeField] protected MapGenerator mapGeneratorScript;
-    [SerializeField] protected MapAssebler mapAssemblerScript;
+    [SerializeField] protected MapAssembler mapAssemblerScript;
     [SerializeField] protected ObjectDisplacer objectDisplacerScript;
 
     // Do I have to load the map from a .txt?
@@ -84,6 +84,11 @@ public abstract class MapManager : CoreComponent {
     // Returns the Map Generator.
     public MapGenerator GetMapGenerator() {
         return mapGeneratorScript;
+    }
+
+    // Returns the Map Assembler.
+    public MapAssembler GetMapAssembler() {
+        return mapAssemblerScript;
     }
 
     public bool GetFlip() {

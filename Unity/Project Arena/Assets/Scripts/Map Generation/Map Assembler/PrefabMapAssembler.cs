@@ -3,19 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// PrefabMapAssembler is an implementation of MapAssebler that assembles the maps using differet 
+/// PrefabMapAssembler is an implementation of MapAssembler that assembles the maps using differet 
 /// prefabs.
 /// </summary>
-public abstract class PrefabMapAssembler : MapAssebler {
+public abstract class PrefabMapAssembler : MapAssembler {
 
+    [Header("Prefab parameters")]
     // Ceil height.
-    [SerializeField] protected float ceilHeight = 0;
+    [SerializeField]
+    protected float ceilHeight = 0;
     // Floor height.
-    [SerializeField] protected float floorHeight = 0;
+    [SerializeField]
+    protected float floorHeight = 0;
     // Rotation correction angle.
-    [SerializeField] protected int rotationCorrection = 0;
+    [SerializeField]
+    protected int rotationCorrection = 0;
     // List of prefabs.
-    [SerializeField] protected List<TilePrefab> tilePrefabs;
+    [SerializeField]
+    protected List<TilePrefab> tilePrefabs;
 
     // List of processed prefabs.
     protected List<ProcessedTilePrefab> processedTilePrefabs;
