@@ -44,8 +44,8 @@ The \<Map Manager> controls the generation, the import and the assembly of the m
 
 \par
 
-Maps are represented as matrices of characters, where each character corresponds to a tile. Depending on the character, a tile can represent a wall, a room or an object inside a room. If a tile corresponds to a wall we say it is \<filled>, if it corresponds to a room we say it is \<empty>.
- 
+Maps are structured as a grid of orthogonal \<tiles> and are represented as matrices of characters, where each cell corresponds to a specific \<tile>. Depending on the character, a cell can represent a wall, a floor or an object on the floor. If a cell corresponds to a wall we say it is \<filled>, if it corresponds to a floor we say it is \<empty>.
+
 \subsection{The Map Generator}
 
 The \<Map Generator> controls the generation of the map. Each implementation of the \<Map Generator> defines a different topology depending on the used generation algorithm and on how its parametric setting are tuned. Some of these setting are shared by all the implementations, whereas some of them are implementation-specific.
@@ -82,61 +82,62 @@ The framework provides three different algorithms to position the objects inside
 \item \<Rain Distanced>, positions the objects selecting random cells from the ones that are empty and satisfy the  \<ObjectToWallDistance> constraint and the \<ObjectToObjectDistance> constraint on the objects with the same \<ObjectChar>.
 \end{itemize}
 
-We now analyze the available implementations of the  \<Map Generator>.
+All of the following implementations of the \<Map Generator> are deterministic, since they require a \<seed> value as input that constrains the output to a specific map.
 
 \subsubsection{Cellular generation}
 
-The \<Cellular Generator> employs a parametric \<cellular automaton>\footnote{A \<cellular automaton> consists of a grid of cells, each in one of a finite number of states, such as on and off. For each cell, a set of cells called its neighborhood is defined, usually composed by the cells that share at least one vertex with it (referred as \<8-neighbors>). Given the current state of the grid, a new generation is created, according to some fixed rule that determines the new state of each cell depending on the current state of the cell itself and of the cells in its neighborhood.} to generate a natural looking map. The algorithm (see Algorithm \ref{alg:cellular}) depends on the following parameters:
+The \<Cellular Generator> employs a parametric \<cellular automaton>\footnote{A \<cellular automaton> consists of a grid of cells, each in one of a finite number of states, such as on and off. For each cell, a set of cells called its neighborhood is defined, usually composed by the cells that share at least one vertex with it (referred as \<8-neighbors>). Given the current state of the grid, a new generation is created, according to some fixed rule that determines the new state of each cell depending on the current state of the cell itself and of the cells in its neighborhood.} to generate a natural looking map. 
+
+\par
+
+The algorithm starts by filling some tiles of the map selected at random, then it applies the cellular automaton for a certain number of generations and finally it performs some refinements (for more details, see Algorithm \ref{alg:cellular}). The resulting topology depends on the following parameters:
 
 \begin{itemize}
-\item \<RandomFillPercent>, the percentage of tiles that are randomly filled during the initialization of the algorithm.
-\item \<SmoothingInteration>, the number of generations the cellular automaton is ran for.
+\item \<RandomFillPercent>, the percentage of tiles that are randomly filled during the initialization of the algorithm. High values promote narrow spaces, small values promote wide open areas.
+\item \<SmoothingInteration>, the number of generations the cellular automaton is ran for. High values penalize small features and make the walls smoother. 
 \item \<NeighbourTileLimitLow>, the minimum number of neighbors a cell must have to became filled.
 \item \<NeighbourTileLimitHigh>, the maximum number of neighbors a cell must have to became empty.
-\item \<WallThresholdSize>, the minimum number of cells that an isolated filled region must include to not be deleted.
-\item \<RoomThresholdSize>, the minimum number of cells that an isolated void region must include to not be deleted.
+\item \<WallThresholdSize>, the minimum number of cells that an isolated filled region must include to not be deleted. High  values penalize small filled regions.
+\item \<RoomThresholdSize>, the minimum number of cells that an isolated void region must include to not be deleted. High  values penalize small empty regions.
 \item \<PassageWidth>, the width of a passage connecting two different areas, expressed in number of cells.
 \end{itemize}
 
 \par
 
-% How these parameters influence the map
+Figure \ref{fig:cellulars} shows how these parameters influence the topology of a map.
 
-% Six different maps with different values
-
-\begin{algorithm}[H]
-\label{alg:cellular}
+\begin{algorithm}[tp]
 \SetAlgoLined
 
 \For{every cell in the map}{
 	empty the current cell\;
 }
 
-\While{the percentage of filled cells is less than RandomFillPercent} {
+\While{percentage of filled cells $<$ RandomFillPercent} {
 	select a random cell\;
 	fill the selected cell\;
 }
 
-\For{\#SmoothingInteration iterations} {
+\For{iteration from 0 to SmoothingIterations} {
 	\For{every cell in the map}{
 		count the 8-neighbors of the cell\;
-		\If{the cell has more than NeighbourTileLimitLow neighbors}{
+		\If{cell neighborhood $>$ NeighbourTileLimitLow}{
   			fill the current cell\;
    		}
-		\If{the cell has less than NeighbourTileLimitHigh neighbors}{
+		\If{cell neighborhood $<$ NeighbourTileLimitHigh }{
   			empty the current cell\;
    		} 
 	}
 }
 
 \For{every connected region of empty cells}{
-	\If{the number of cells in the region is less than RoomThresholdSize}{
+	\If{\#cells in the region $<$ RoomThresholdSize}{
 		fill all the cells in the region\;
 	}
 }
 
 \For{every connected region of filled cells}{
-	\If{the number of cells in the region is less than WallThresholdSize}{
+	\If{\#cells in the region $<$ WallThresholdSize}{
 		empty all the cells  in the region\;
 	}
 }
@@ -145,7 +146,39 @@ connect all the regions composed by filled cells\;
 place the objects\;
 
 \caption{Cellular generation algorithm}
+\label{alg:cellular}
 \end{algorithm}
+
+\begin{figure}[tp]
+	\centering
+  	\begin{subfigure}[t]{0.325\linewidth}
+		\includegraphics[width=\linewidth]{cellular_default}
+     		\caption{Cellular map generated with the default settings.}
+ 	\end{subfigure}
+  	\begin{subfigure}[t]{0.325\linewidth}
+    		\includegraphics[width=\linewidth]{cellular_rfp40}
+    		\caption{Cellular map generated with $Ran\-dom\-Fill\-Per\-cent = 40\%$.}
+  	\end{subfigure}
+  	\begin{subfigure}[t]{0.325\linewidth}
+    		\includegraphics[width=\linewidth]{cellular_rfp50}
+    		\caption{Cellular map generated with $Ran\-dom\-Fill\-Per\-cent = 50\%$.}
+  	\end{subfigure}
+  	\begin{subfigure}[t]{0.325\linewidth}
+		\includegraphics[width=\linewidth]{cellular_si1}
+     		\caption{Cellular map generated with $Smooth\-ing\-It\-er\-a\-tions = 1$.}
+ 	\end{subfigure}
+  	\begin{subfigure}[t]{0.325\linewidth}
+    		\includegraphics[width=\linewidth]{cellular_si3}
+     		\caption{Cellular map generated with $Smooth\-ing\-It\-er\-a\-tions = 3$.}
+  	\end{subfigure}
+  	\begin{subfigure}[t]{0.325\linewidth}
+    		\includegraphics[width=\linewidth]{cellular_wts5}
+     		\caption{Cellular map generated with $Wall\-Thresh\-old\-Size = 5$.}
+  	\end{subfigure}	
+	\caption{Some maps generated by the Cellular Generator using ''\<ANotSoRandomSeed>'' as seed, but different settings.}
+	\caption*{By default, the Cellular Generator has \<RandomFillPercent> set to $45\%$, \<SmoothingIterations> set to $2$,  \<NeighbourTileLimitHigh> set to $4$,  \<NeighbourTileLimitLow> set to $4$,  \<WallThresholdSize> set to $40$ and \<RoomThresholdSize> set to $100$.}
+	\label{fig:cellulars}
+\end{figure}
 
 \subsubsection{Divisive generation}
 
