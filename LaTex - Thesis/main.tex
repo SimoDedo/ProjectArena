@@ -1,9 +1,12 @@
 \documentclass[11pt,letterpaper,twoside,openrigth]{book}
 
-\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+\usepackage[ruled]{algorithm2e}
 \usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{caption}
 \usepackage{emptypage}
 \usepackage{fancyhdr}
+\usepackage[hang,flushmargin]{footmisc}
 \usepackage{graphicx}
 \usepackage[utf8]{inputenc}
 \usepackage{setspace}
@@ -14,6 +17,7 @@
 
 % GENERAL SETUP %
 
+% Customize header and footer.
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[LE]{\slshape\nouppercase{\textnormal{\leftmark}}}
@@ -21,23 +25,37 @@
 \fancyfoot{}
 \fancyfoot[RO, LE]{\thepage}
 
+% Force footnotes to stay on the same page they are defined.
+% \interfootnotelinepenalty=10000
+
+% Limit decimal to 2 digits.
 \sisetup{
   round-mode = places,
   round-precision = 2,
 }
 
+% Limit the TOC to the subsubsections.
 \setcounter{tocdepth}{3}
 
+% Set the image folder path.
 \graphicspath{ {images/} }
 
-\newcommand{\nocontentsline}[3]{}
-\newcommand{\tocless}[2]{\bgroup\let\addcontentsline=\nocontentsline#1{#2}\egroup}
-
+% Relax italics in the TOC.
 \let\LaTeXStandardTableOfContents\tableofcontents
 \renewcommand{\tableofcontents}{\begingroup\renewcommand{\itshape}{\relax}\LaTeXStandardTableOfContents\endgroup}
 
+% Define footnote for algorithms.
+\makeatletter
+\newcommand{\algorithmfootnote}[2][\footnotesize]{
+	\let\old@algocf@finish\@algocf@finish
+	\def\@algocf@finish{\old@algocf@finish
+	\leavevmode\rlap{\begin{minipage}{\linewidth}
+	#1#2\end{minipage}}}
+}
+
 % PDF SETUP %
 
+% Set the left and the right margin to the same width.
 \setlength\oddsidemargin{\dimexpr(\paperwidth-\textwidth)/2 - 1in\relax}
 \setlength\evensidemargin{\oddsidemargin}
 

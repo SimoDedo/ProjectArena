@@ -84,18 +84,20 @@ The framework provides three different algorithms to position the objects inside
 
 All of the following implementations of the \<Map Generator> are deterministic, since they require a \<seed> value as input that constrains the output to a specific map.
 
+% CELLULAR GENERATION %
+
 \subsubsection{Cellular generation}
 
-The \<Cellular Generator> employs a parametric \<cellular automaton>\footnote{A \<cellular automaton> consists of a grid of cells, each in one of a finite number of states, such as on and off. For each cell, a set of cells called its neighborhood is defined, usually composed by the cells that share at least one vertex with it (referred as \<8-neighbors>). Given the current state of the grid, a new generation is created, according to some fixed rule that determines the new state of each cell depending on the current state of the cell itself and of the cells in its neighborhood.} to generate a natural looking map. 
+The \<Cellular Generator> employs a parametric \<cellular automaton>\footnote{A \<cellular automaton> consists of a grid of cells, each in one of a finite number of states, such as on and off. For each cell, a set of cells called its neighborhood is defined, usually composed by the ones that share at least one vertex with it (referred as \<8-neighbors>). Given the current state of the grid, a new generation is created, according to some fixed rule that determines the new state of each cell depending on the current state of the cell and of its neighbors.} to generate a natural looking map. 
 
 \par
 
-The algorithm starts by filling some tiles of the map selected at random, then it applies the cellular automaton for a certain number of generations and finally it performs some refinements (for more details, see Algorithm \ref{alg:cellular}). The resulting topology depends on the following parameters:
+The algorithm starts by filling some tiles of the map selected at random, then it applies the cellular automaton for a certain number of generations and finally it performs some refinements (for more details, see algorithm \ref{alg:cellular}). The resulting topology depends on the following parameters:
 
 \begin{itemize}
 \item \<RandomFillPercent>, the percentage of tiles that are randomly filled during the initialization of the algorithm. High values promote narrow spaces, small values promote wide open areas.
 \item \<SmoothingInteration>, the number of generations the cellular automaton is ran for. High values penalize small features and make the walls smoother. 
-\item \<NeighbourTileLimitLow>, the minimum number of neighbors a cell must have to became filled.
+\item \<NeighbourTileLimitLow>, the minimum number of neighbors a cell must have to became filled. Its value must be lesser or equal than the one of \<NeighbourTileLimitHigh>. The map becomes noisier the more they diverge.
 \item \<NeighbourTileLimitHigh>, the maximum number of neighbors a cell must have to became empty.
 \item \<WallThresholdSize>, the minimum number of cells that an isolated filled region must include to not be deleted. High  values penalize small filled regions.
 \item \<RoomThresholdSize>, the minimum number of cells that an isolated void region must include to not be deleted. High  values penalize small empty regions.
@@ -108,6 +110,9 @@ Figure \ref{fig:cellulars} shows how these parameters influence the topology of 
 
 \begin{algorithm}[tp]
 \SetAlgoLined
+\caption{Cellular generation algorithm.}
+\algorithmfootnote{This algorithm is a modified version of the one proposed by Sebastian Lague\cite{lague}.}
+\label{alg:cellular}
 
 \For{every cell in the map}{
 	empty the current cell\;
@@ -118,16 +123,17 @@ Figure \ref{fig:cellulars} shows how these parameters influence the topology of 
 	fill the selected cell\;
 }
 
-\For{iteration from 0 to SmoothingIterations} {
+\For{generation from 0 to SmoothingIterations} {
 	\For{every cell in the map}{
 		count the 8-neighbors of the cell\;
 		\If{cell neighborhood $>$ NeighbourTileLimitLow}{
-  			fill the current cell\;
+  			mark the current cell as filled for the next generation\;
    		}
 		\If{cell neighborhood $<$ NeighbourTileLimitHigh }{
-  			empty the current cell\;
+  			mark the current cell as empty for the next generation\;
    		} 
 	}
+	update the map to the next generation\;
 }
 
 \For{every connected region of empty cells}{
@@ -142,11 +148,9 @@ Figure \ref{fig:cellulars} shows how these parameters influence the topology of 
 	}
 }
 
-connect all the regions composed by filled cells\;
+connect all the regions composed by empty cells\;
 place the objects\;
 
-\caption{Cellular generation algorithm}
-\label{alg:cellular}
 \end{algorithm}
 
 \begin{figure}[tp]
@@ -179,6 +183,8 @@ place the objects\;
 	\caption*{By default, the Cellular Generator has \<RandomFillPercent> set to $45\%$, \<SmoothingIterations> set to $2$,  \<NeighbourTileLimitHigh> set to $4$,  \<NeighbourTileLimitLow> set to $4$,  \<WallThresholdSize> set to $40$ and \<RoomThresholdSize> set to $100$.}
 	\label{fig:cellulars}
 \end{figure}
+
+% DIVISIVE GENERATION %
 
 \subsubsection{Divisive generation}
 

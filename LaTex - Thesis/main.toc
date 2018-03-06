@@ -28,13 +28,13 @@
 \contentsline {subsection}{\numberline {3.2.3}The Map Manager}{19}
 \contentsline {subsection}{\numberline {3.2.4}The Map Generator}{19}
 \contentsline {subsubsection}{Cellular generation}{21}
-\contentsline {subsubsection}{Divisive generation}{24}
-\contentsline {subsubsection}{Random digger generation}{24}
-\contentsline {subsubsection}{Multi-level generation}{24}
-\contentsline {subsection}{\numberline {3.2.5}The Map Assembler}{24}
-\contentsline {subsection}{\numberline {3.2.6}The Object Displacer}{24}
-\contentsline {section}{\numberline {3.3}Map representation}{24}
-\contentsline {section}{\numberline {3.4}Weapons and objects}{24}
-\contentsline {section}{\numberline {3.5}Game modes}{24}
-\contentsline {section}{\numberline {3.6}Logging}{24}
-\contentsline {section}{\numberline {3.7}Experiment management}{24}
+\contentsline {subsubsection}{Divisive generation}{22}
+\contentsline {subsubsection}{Random digger generation}{22}
+\contentsline {subsubsection}{Multi-level generation}{22}
+\contentsline {subsection}{\numberline {3.2.5}The Map Assembler}{22}
+\contentsline {subsection}{\numberline {3.2.6}The Object Displacer}{22}
+\contentsline {section}{\numberline {3.3}Map representation}{22}
+\contentsline {section}{\numberline {3.4}Weapons and objects}{22}
+\contentsline {section}{\numberline {3.5}Game modes}{22}
+\contentsline {section}{\numberline {3.6}Logging}{22}
+\contentsline {section}{\numberline {3.7}Experiment management}{22}
