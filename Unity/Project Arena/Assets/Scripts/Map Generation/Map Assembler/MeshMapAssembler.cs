@@ -6,6 +6,9 @@ using UnityEngine;
 /// </summary>
 public class MeshMapAssembler : MapAssembler {
 
+    [SerializeField]
+    private bool isSkyVisibile;
+
     [Header("Mesh materials")]
     [SerializeField]
     private Material topMaterial;
@@ -20,6 +23,7 @@ public class MeshMapAssembler : MapAssembler {
     private MeshFilter floorMeshFilter;
     private MeshCollider wallsCollider;
     private MeshCollider floorCollider;
+    private MeshCollider topCollider;
 
     private List<Vector3> vertices;
     private List<int> triangles;
@@ -66,6 +70,13 @@ public class MeshMapAssembler : MapAssembler {
         childObject.transform.localPosition = Vector3.zero;
         floorCollider = childObject.AddComponent<MeshCollider>();
 
+        if (!isSkyVisibile) {
+            childObject = new GameObject("Top - Collider");
+            childObject.transform.parent = transform;
+            childObject.transform.localPosition = Vector3.zero;
+            topCollider = childObject.AddComponent<MeshCollider>();
+        }
+
         SetReady(true);
     }
 
@@ -86,26 +97,31 @@ public class MeshMapAssembler : MapAssembler {
             }
         }
 
-        CreateTopMesh();
+        CreateTopMesh(map.GetLength(0), map.GetLength(1));
 
         CreateWallMesh();
 
-        CreateFloorMesh(map.GetLength(0), map.GetLength(1), squareSize, wallHeight);
+        CreateFloorMesh(map.GetLength(0), map.GetLength(1));
     }
 
     public override void AssembleMap(List<char[,]> maps, char wallChar, char roomChar,
         char voidChar) { }
 
     // Creates the top mesh.
-    private void CreateTopMesh() {
+    private void CreateTopMesh(int sizeX, int sizeY) {
+        if (isSkyVisibile) {
+            Mesh topMesh = new Mesh {
+                vertices = vertices.ToArray(),
+                triangles = triangles.ToArray()
+            };
+            topMesh.RecalculateNormals();
+            topMeshFilter.mesh = topMesh;
+        } else {
+            Mesh topMesh = CreateRectangularMesh(sizeX, sizeY, squareSize, 0, isSkyVisibile);
+            topMeshFilter.mesh = topMesh;
+            topCollider.sharedMesh = topMesh;
+        }
 
-        Mesh topMesh = new Mesh {
-            vertices = vertices.ToArray(),
-            triangles = triangles.ToArray()
-        };
-        topMesh.RecalculateNormals();
-
-        topMeshFilter.mesh = topMesh;
     }
 
     // Creates the wall mesh.
@@ -150,27 +166,40 @@ public class MeshMapAssembler : MapAssembler {
     }
 
     // Creates the floor mesh.
-    private void CreateFloorMesh(int sizeX, int sizeY, float squareSize, float height) {
-        Mesh floorMesh = new Mesh();
-
-        Vector3[] floorVertices = new Vector3[4];
-
-        floorVertices[0] = new Vector3(-squareSize / 2, -height, -squareSize / 2);
-        floorVertices[1] = new Vector3(-squareSize / 2, -height,
-            sizeY * squareSize + squareSize / 2);
-        floorVertices[2] = new Vector3(sizeX * squareSize + squareSize / 2, -height,
-            -squareSize / 2);
-        floorVertices[3] = new Vector3(sizeX * squareSize + squareSize / 2, -height,
-            sizeY * squareSize + squareSize / 2);
-
-        int[] floorTriangles = new int[] { 0, 1, 2, 2, 1, 3 };
-
-        floorMesh.vertices = floorVertices;
-        floorMesh.triangles = floorTriangles;
-        floorMesh.RecalculateNormals();
+    private void CreateFloorMesh(int sizeX, int sizeY) {
+        Mesh floorMesh = CreateRectangularMesh(sizeX, sizeY, squareSize, wallHeight, true);
 
         floorMeshFilter.mesh = floorMesh;
         floorCollider.sharedMesh = floorMesh;
+    }
+
+    // Creates a rectangular mesh.
+    private Mesh CreateRectangularMesh(int sizeX, int sizeY, float squareSize, float height,
+        bool facingUpwards) {
+        Mesh mesh = new Mesh();
+
+        Vector3[] vertices = new Vector3[4];
+
+        vertices[0] = new Vector3(-squareSize / 2, -height, -squareSize / 2);
+        vertices[1] = new Vector3(-squareSize / 2, -height,
+            sizeY * squareSize + squareSize / 2);
+        vertices[2] = new Vector3(sizeX * squareSize + squareSize / 2, -height,
+            -squareSize / 2);
+        vertices[3] = new Vector3(sizeX * squareSize + squareSize / 2, -height,
+            sizeY * squareSize + squareSize / 2);
+
+        int[] triangles;
+        if (facingUpwards) {
+            triangles = new int[] { 0, 1, 2, 2, 1, 3 };
+        } else {
+            triangles = new int[] { 3, 1, 2, 2, 1, 0 };
+        }
+
+        mesh.vertices = vertices;
+        mesh.triangles = triangles;
+        mesh.RecalculateNormals();
+
+        return mesh;
     }
 
     // Depending on the configuration of a Square I create the rigth mesh.

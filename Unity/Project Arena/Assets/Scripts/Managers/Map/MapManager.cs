@@ -8,17 +8,26 @@ using UnityEngine;
 /// </summary>
 public abstract class MapManager : CoreComponent {
 
-    [Header("Core components")] [SerializeField] protected MapGenerator mapGeneratorScript;
-    [SerializeField] protected MapAssembler mapAssemblerScript;
-    [SerializeField] protected ObjectDisplacer objectDisplacerScript;
+    [Header("Core components")]
+    [SerializeField]
+    protected MapGenerator mapGeneratorScript;
+    [SerializeField]
+    protected MapAssembler mapAssemblerScript;
+    [SerializeField]
+    protected ObjectDisplacer objectDisplacerScript;
 
+    [Header("Import")]
     // Do I have to load the map from a .txt?
-    [Header("Import")] [SerializeField] protected bool loadMapFromFile = false;
+    [SerializeField]
+    protected bool loadMapFromFile = false;
     // Path of the map to be laoded.
-    [SerializeField] protected string textFilePath = null;
+    [SerializeField]
+    protected string textFilePath = null;
 
+    [Header("Other")]
     // Category of the spawn point gameobjects in the object displacer. 
-    [Header("Other")] [SerializeField] protected string spawnPointCategory;
+    [SerializeField]
+    protected string spawnPointCategory;
 
     protected string seed;
     protected bool export;

@@ -10,16 +10,27 @@ using UnityEngine;
 /// </summary>
 public class DiggerMapGenerator : MapGenerator {
 
-    [Header("Digger generation")] [SerializeField, Range(0, 100)] private int forwardProbability;
-    [SerializeField, Range(0, 100)] private int leftProbability;
-    [SerializeField, Range(0, 100)] private int rigthProbability;
-    [SerializeField, Range(0, 100)] private int visitedProbability;
-    [SerializeField, Range(0, 100)] private int stairProbability;
-    [SerializeField, Range(0, 100)] private int roomPercentage;
+    [Header("Digger generation")]
+    [SerializeField, Range(0, 100)]
+    private int forwardProbability;
+    [SerializeField, Range(0, 100)]
+    private int leftProbability;
+    [SerializeField, Range(0, 100)]
+    private int rigthProbability;
+    [SerializeField, Range(0, 100)]
+    private int visitedProbability;
+    [SerializeField, Range(0, 100)]
+    private int stairProbability;
+    [SerializeField, Range(0, 100)]
+    private int roomPercentage;
 
-    [Header("Stair generation")] [SerializeField] private char[] stairChars = new char[4];
+    [Header("Stairs generation")]
+    [SerializeField]
+    private char[] stairChars = new char[4];
 
-    [Header("AB generation")] [SerializeField] private bool useABGeneration;
+    [Header("AB generation")]
+    [SerializeField]
+    private bool useABGeneration;
 
     private List<ABTile> tiles;
 

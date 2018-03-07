@@ -9,20 +9,28 @@ using UnityEngine;
 /// </summary>
 public class CellularMapGenerator : MapGenerator {
 
+    [Header("Cellular generation")]
     // How much the map will be randomly filled at the beginning.
-    [Header("Cellular generation")] [SerializeField, Range(0, 100)] private int ramdomFillPercent = 50;
+    [SerializeField, Range(0, 100)]
+    private int ramdomFillPercent = 50;
     // Number of smoothing iterations to be done.
-    [SerializeField, Range(0, 3)] private int smoothingIterations = 3;
+    [SerializeField, Range(0, 3)]
+    private int smoothingIterations = 3;
     // You must have more than this number of neighbour to became wall.
-    [SerializeField, Range(0, 9)] private int neighbourTileLimitHigh = 4;
+    [SerializeField, Range(0, 9)]
+    private int neighbourTileLimitHigh = 4;
     // You must have less than this number of neighbour to became room.
-    [SerializeField, Range(0, 9)] private int neighbourTileLimitLow = 4;
+    [SerializeField, Range(0, 9)]
+    private int neighbourTileLimitLow = 4;
     // Minimum size of a wall region.
-    [SerializeField] private int wallThresholdSize = 50;
+    [SerializeField]
+    private int wallThresholdSize = 50;
     // Minimum size of a room region.
-    [SerializeField] private int roomThresholdSize = 50;
+    [SerializeField]
+    private int roomThresholdSize = 50;
     // Passage width.
-    [SerializeField] private int passageWidth = 5;
+    [SerializeField]
+    private int passageWidth = 5;
 
     private void Start() {
         SetReady(true);
@@ -35,8 +43,9 @@ public class CellularMapGenerator : MapGenerator {
 
         RandomFillMap();
 
-        for (int i = 0; i < smoothingIterations; i++)
+        for (int i = 0; i < smoothingIterations; i++) {
             SmoothMap();
+        }
 
         ProcessMap();
 
