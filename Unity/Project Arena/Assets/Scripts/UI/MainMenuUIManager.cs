@@ -12,53 +12,99 @@ using UnityEngine.UI;
 /// </summary>
 public class MainMenuUIManager : MonoBehaviour {
 
-    [Header("Scenes")] [SerializeField] Mode[] singleplayerModes;
-    [SerializeField] Mode[] multiplayerModes;
+    [Header("Scenes")]
+    [SerializeField]
+    Mode[] singleplayerModes;
+    [SerializeField]
+    Mode[] multiplayerModes;
 
     [Header("UI sections")] [SerializeField] private GameObject main;
-    [SerializeField] private GameObject singleplayer;
-    [SerializeField] private GameObject multiplayer;
-    [SerializeField] private GameObject settings;
-    [SerializeField] private GameObject loading;
+    [SerializeField]
+    private GameObject singleplayer;
+    [SerializeField]
+    private GameObject multiplayer;
+    [SerializeField]
+    private GameObject settings;
+    [SerializeField]
+    private GameObject loading;
 
-    [Header("Main menu fields")] [SerializeField] private Button quitButton;
-    [SerializeField] private Button experimentButton;
+    [Header("Main menu fields")]
+    [SerializeField]
+    private Button quitButton;
+    [SerializeField]
+    private Button experimentButton;
 
-    [Header("Singleplayer fields")] [SerializeField] private GameObject nextModeSP;
-    [SerializeField] private GameObject previousModeSP;
-    [SerializeField] private GameObject nextMapSP;
-    [SerializeField] private GameObject previousMapSP;
-    [SerializeField] private GameObject nextGenerationSP;
-    [SerializeField] private GameObject previousGenerationSP;
-    [SerializeField] private Text generationTextSP;
-    [SerializeField] private Text modeTextSP;
-    [SerializeField] private Text exportTextSP;
-    [SerializeField] private Text mapTextSP;
-    [SerializeField] private InputField inputSP;
-    [SerializeField] private Toggle exportSP;
+    [Header("Singleplayer fields")]
+    [SerializeField]
+    private GameObject nextModeSP;
+    [SerializeField]
+    private GameObject previousModeSP;
+    [SerializeField]
+    private GameObject nextMapSP;
+    [SerializeField]
+    private GameObject previousMapSP;
+    [SerializeField]
+    private GameObject nextGenerationSP;
+    [SerializeField]
+    private GameObject previousGenerationSP;
+    [SerializeField]
+    private Text generationTextSP;
+    [SerializeField]
+    private Text modeTextSP;
+    [SerializeField]
+    private Text exportTextSP;
+    [SerializeField]
+    private Text mapTextSP;
+    [SerializeField]
+    private InputField inputSP;
+    [SerializeField]
+    private Toggle exportSP;
 
-    [Header("Multiplayer fields")] [SerializeField] private GameObject nextModeMP;
-    [SerializeField] private GameObject previousModeMP;
-    [SerializeField] private GameObject nextMapMP;
-    [SerializeField] private GameObject previousMapMP;
-    [SerializeField] private GameObject nextGenerationMP;
-    [SerializeField] private GameObject previousGenerationMP;
-    [SerializeField] private Text generationTextMP;
-    [SerializeField] private Text modeTextMP;
-    [SerializeField] private Text exportTextMP;
-    [SerializeField] private Text mapTextMP;
-    [SerializeField] private InputField inputMP;
-    [SerializeField] private Toggle exportMP;
+    [Header("Multiplayer fields")]
+    [SerializeField]
+    private GameObject nextModeMP;
+    [SerializeField]
+    private GameObject previousModeMP;
+    [SerializeField]
+    private GameObject nextMapMP;
+    [SerializeField]
+    private GameObject previousMapMP;
+    [SerializeField]
+    private GameObject nextGenerationMP;
+    [SerializeField]
+    private GameObject previousGenerationMP;
+    [SerializeField]
+    private Text generationTextMP;
+    [SerializeField]
+    private Text modeTextMP;
+    [SerializeField]
+    private Text exportTextMP;
+    [SerializeField]
+    private Text mapTextMP;
+    [SerializeField]
+    private InputField inputMP;
+    [SerializeField]
+    private Toggle exportMP;
 
-    [Header("Settings fields")] [SerializeField] private GameObject import;
-    [SerializeField] private GameObject export;
-    [SerializeField] private GameObject importButton;
-    [SerializeField] private GameObject exportButton;
-    [SerializeField] private Slider sensibilitySlider;
+    [Header("Settings fields")]
+    [SerializeField]
+    private GameObject import;
+    [SerializeField]
+    private GameObject export;
+    [SerializeField]
+    private GameObject importButton;
+    [SerializeField]
+    private GameObject exportButton;
+    [SerializeField]
+    private Slider sensibilitySlider;
 
-    [Header("Loading fields")] [SerializeField] private Text loadingText;
+    [Header("Loading fields")]
+    [SerializeField]
+    private Text loadingText;
 
-    [Header("Other")] [SerializeField] private RotateTranslateByAxis backgroundScript;
+    [Header("Other")]
+    [SerializeField]
+    private RotateTranslateByAxis backgroundScript;
 
     private GameObject openedSection;
 

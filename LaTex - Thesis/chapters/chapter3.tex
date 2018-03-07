@@ -4,7 +4,7 @@
 
 In this chapter we describe the \<framework> that we have developed to perform user-based online validation for researches in procedural content generation of multiplayer levels for Firsts Person Shooters. In the first partition we give an overview of the framework, of its features and of its components, analyzing them one by one in the following sections.
 
-% FRAMEWORK OVERVIEW 
+% FRAMEWORK OVERVIEW %
 
 \section{Overview}
 
@@ -14,6 +14,8 @@ We designed our framework with the objective of providing a valid alternative to
 
 Since the purpose of this tool is to be used in research, we decided to support many map representation formats used in previous works and we designed our framework to be as modular, expansible and configurable as possible.
 
+% FRAMEWORK STRUCTURE % 
+
 \section{The framework structure}
 
 The framework collects data by assigning to the users \<matches> to play. A match is defined by the \<game mode> and by the \<map type>: which in turn is defined by the \<map topology> and by the \<map appearance>. The \<map topology> defines how the map is going to \<be> and depends on the algorithm used to generate it, whereas the \<map appearance> defines how the map is going to \<look> and depends on how the map is assembled. This implies that the map type defines a whole array of procedurally generated maps that share the same topology and appearance. Therefore, when referring to a match we are considering a specific game-mode played in a procedurally generated map. If needed, it is possible to use a pre-generated map instead of generating a new one, by providing it as input in one of the supported formats. In this case the \<map topology> defines how to interpret the input, that is then displayed considering the \<map appearance>.
@@ -21,6 +23,8 @@ The framework collects data by assigning to the users \<matches> to play. A matc
 \par
 
 A match is defined by combining different modular \<Manager> objects, each of which controls a different aspect of the match. To assure their interchangeability, most modules are defined by their own abstract class.
+
+% GAME MANAGER %
 
 \subsection{The Game Manager}
 
@@ -34,9 +38,13 @@ The \<Game Manager> is the module responsible for the overall behavior of a matc
 \item \<Score>: the \<Game Manager> stops the game and displays the final score.
 \end{itemize}
 
+% SPAWN POINT MANAGER %
+
 \subsection{The Spawn Point Manager}
 
 The \<Spawn Point Manager> contains a list of all the spawn points displaced on the map, that is populated during the \<Generation> phase by the \<Game Manager>. When the \<Game Manager> needs to spawn an entity, the \<Spawn Point Manager> provides a random spawn point from the ones that have not been used in a certain amount of time. If no spawn point meets this condition, the extraction is made from the complete pool.
+
+% MAP MANAGER %
 
 \subsection{The Map Manager}
 
@@ -46,9 +54,44 @@ The \<Map Manager> controls the generation, the import and the assembly of the m
 
 Maps are structured as a grid of orthogonal \<tiles> and are represented as matrices of characters, where each cell corresponds to a specific \<tile>. Depending on the character, a cell can represent a wall, a floor or an object on the floor. If a cell corresponds to a wall we say it is \<filled>: if it corresponds to a floor we say it is \<empty>.
 
+\par
+
+The framework provides three different implementations of the \<Map Manager>.
+
+\subsubsection{Single-Level Map Manager}
+
+The \<Single-Level Map Manager> is used for any kind of single level map. It can generate maps, import them from file or decode them from All-Black notation.
+
+\subsubsection{Multi-Level Map Manager}
+
+The \<Multi-Level Map Manager> is used for any kind of map that has more than one floor. It can generate multi-level maps or import them from file, but it cannot perform All-Black decoding. In addition to the standard modules, it employs a \<Stairs Generator> to position flight of stairs to connect the different floors. 
+
+\par
+
+Multi-level maps are obtained by using at least one generator to produce the desired number of floors. Since this allows to combine different kind of generators, we were able to obtain maps similar to the ones evolved by Cachia et al.\cite{MultiLevelEvolution} (see figure \ref{fig:multilevel_digger}), as well as maps with a more complex and interesting layout than the ones obtained by previous works (see figure \ref{fig:multilevel_divisive}).
+
+\begin{figure}[tb]
+\begin{minipage}[t]{0.48\linewidth}
+	\includegraphics[width=\linewidth]{multilevel_digger}
+	\caption{Multilevel map with a divisive floor (in blue) and a digger floor (in red).}
+	\label{fig:multilevel_digger}
+\end{minipage}
+\begin{minipage}[t]{0.48\linewidth}
+	\includegraphics[width=\linewidth]{multilevel_divisive}
+	\caption{Multilevel map with three divisive floors.}
+	\label{fig:multilevel_divisive}
+\end{minipage}
+\end{figure}
+
+\subsubsection{All-Black Multi-Level Map Manager}
+
+The \<All-Black Multi-Level Map Manager> is used to decode multi-level maps saved in All-Black format. If no stairs were found, it employs a \<Stairs Generator> to position them.
+
+% MAP GENERATOR %
+
 \subsection{The Map Generator}
 
-The \<Map Generator> controls the generation of the map. Each implementation of the \<Map Generator> defines a different topology depending on the used generation algorithm and on how its parametric setting are tuned. Some of these setting are shared by all the implementations, whereas some of them are implementation-specific.
+The \<Map Generator> controls the generation of the map. Each implementation of the \<Map Generator> defines a different topology depending on the used generation algorithm and on how its parametric setting are tuned. Some of these settings are shared by all the implementations, whereas some of them are implementation-specific.
 
 \par
 
@@ -58,10 +101,10 @@ The shared settings are used to define the size of the map and its encoding, to 
 \item \<Width>: the width of the matrix that represents the map.
 \item \<Height>: the height of the matrix that represents the map.
 \item \<ObjectToObjectDistance>: the minimum number of cells that must separate two objects. 
-\item \<ObjectToWallDistance>: the minimum number of cells  that must separate an objects and a wall.
+\item \<ObjectToWallDistance>: the minimum number of cells that must separate an object and a wall.
 \item \<BorderSize>: the width of the border placed all around the map once it has been generated, expressed in number of cells.
 \item \<RoomChar>: the character used to represent a clear cell where the player can walk.
-\item \<WallChar>:  the character used to represent a filled cell where the player can not walk.
+\item \<WallChar>: the character used to represent a filled cell where the player cannot walk.
 \item \<MapObjects>: a list of the objects that must be placed in the map.
 \end{itemize}
 
@@ -69,7 +112,7 @@ The objects contained in \<MapObjects> can represent spawn points, resources or 
 
 \begin{itemize}
 \item \<ObjectChar>: the character used to represent the object.
-\item \<NumObjPerMap>:  the number of objects of that kind that must be placed in the map.
+\item \<NumObjPerMap>: the number of objects of that kind that must be placed in the map.
 \item \<PlaceAnywhere>: if this value is set to true, the restriction on the distance from the walls is ignored.
 \item \<PositioningMode>: the algorithm used to position the object in the map.
 \end{itemize}
@@ -77,9 +120,9 @@ The objects contained in \<MapObjects> can represent spawn points, resources or 
 The framework provides three different algorithms to position the objects inside the map:
 
 \begin{itemize}
-\item \<Rain>: positions the objects selecting random cells from the ones that are empty and satisfy the  \<ObjectToWallDistance> constraint.
-\item \<Rain Shared>: positions the objects selecting random cells from the ones that are empty and satisfy the  \<ObjectToWallDistance> constraint and the \<ObjectToObjectDistance> constraint on the objects that have been placed using \<Rain Shared>.
-\item \<Rain Distanced>: positions the objects selecting random cells from the ones that are empty and satisfy the  \<ObjectToWallDistance> constraint and the \<ObjectToObjectDistance> constraint on the objects with the same \<ObjectChar>.
+\item \<Rain>: positions the objects selecting random cells from the ones that are empty and satisfy the \<ObjectToWallDistance> constraint.
+\item \<Rain Shared>: positions the objects selecting random cells from the ones that are empty and satisfy the \<ObjectToWallDistance> constraint and the \<ObjectToObjectDistance> constraint on the objects that have been placed using \<Rain Shared>.
+\item \<Rain Distanced>: positions the objects selecting random cells from the ones that are empty and satisfy the \<ObjectToWallDistance> constraint and the \<ObjectToObjectDistance> constraint on the objects with the same \<ObjectChar>.
 \end{itemize}
 
 All of the following implementations of the \<Map Generator> are deterministic, since they require a \<seed> value as input that constrains the output to a specific map.
@@ -99,8 +142,8 @@ The algorithm starts by filling some tiles of the map selected at random, then i
 \item \<SmoothingInteration>: the number of generations the cellular automaton is ran for. High values penalize small features and make the walls smoother. 
 \item \<NeighbourTileLimitLow>: the minimum number of neighbors a cell must have to became filled. Its value must be lesser or equal than the one of \<NeighbourTileLimitHigh>. The map becomes noisier the more they diverge.
 \item \<NeighbourTileLimitHigh>: the maximum number of neighbors a cell must have to became empty.
-\item \<WallThresholdSize>: the minimum number of cells that an isolated filled region must include to not be deleted. High  values penalize small filled regions.
-\item \<RoomThresholdSize>: the minimum number of cells that an isolated void region must include to not be deleted. High  values penalize small empty regions.
+\item \<WallThresholdSize>: the minimum number of cells that an isolated filled region must include to not be deleted. High values penalize small filled regions.
+\item \<RoomThresholdSize>: the minimum number of cells that an isolated void region must include to not be deleted. High values penalize small empty regions.
 \item \<PassageWidth>: the width of a passage connecting two different areas, expressed in number of cells.
 \end{itemize}
 
@@ -177,7 +220,7 @@ place the objects\;
     		\includegraphics[width=\linewidth]{cellular_wts5}
      		\caption{Cellular map generated with $Wall\-Thresh\-old\-Size = 5$.}
   	\end{subfigure}	
-	\caption{Some maps generated by the Cellular Generator using ''\<ANotSoRandomSeed>'' as seed, but different settings.}
+	\caption{Some maps generated by the Cellular Generator using ``\<ANotSoRandomSeed>'' as seed, but different settings.}
 	\caption*{By default, the Cellular Generator has \<RandomFillPercent> set to $45\%$, \<SmoothingIterations> set to $2$,  \<NeighbourTileLimitHigh> set to $4$,  \<NeighbourTileLimitLow> set to $4$,  \<WallThresholdSize> set to $40$ and \<RoomThresholdSize> set to $100$.}
 	\label{fig:cellulars}
 \end{figure}
@@ -276,7 +319,7 @@ place the objects\;
     		\includegraphics[width=\linewidth]{divisive_mrd7}
      		\caption{Divisive map generated with $Min\-i\-mum\-Room\-Di\-men\-sion = 7$.}
   	\end{subfigure}	
-	\caption{Some maps generated by the Divisive Generator using ''\<AModeratelyRandomSeed>'' as seed, but different settings.}
+	\caption{Some maps generated by the Divisive Generator using ``\<AModeratelyRandomSeed>'' as seed, but different settings.}
 	\caption*{By default, the Cellular Generator has \<Room\-Di\-vide\-Prob\-a\-bil\-i\-ty> set to $80\%$, \<Map\-Room\-Per\-cent\-age> set to $90\%$,  \<Di\-vide\-Low\-er\-Bound> set to $10\%$,  \<Di\-vide\-Up\-per\-Bound> set to $90\%$,  \<Min\-i\-mum\-Room\-Di\-men\-sion> set to $3$, \<Min\-i\-mum\-Depth> set to $4$, \<Pas\-sage\-Width> set to $3$ and \<Max\-Ran\-dom\-Pas\-sages> set to $12$.}
 	\label{fig:divisives}
 \end{figure}
@@ -289,62 +332,104 @@ The \<Digger Generator> employs a simple algorithm to generate a man-made lookin
 
 \par
 
-The algorithm is iterative and its state is defined by the current cell and by the current direction, that together with a randomly selected action determine the next cell that the algorithm is going to visit. Starting from the central cell of a completely filled map, at each iteration the algorithm empties the current cell and randomly decides if moving forward, turning left and then moving forwards, turning right and then moving forward, jumping to a random visited cell or placing a flight of stairs, if controlled by a \<Multi-Level Generator>. The algorithm stops when a certain percentage of cells has been emptied. The resulting topology depends on the following parameters:
+The algorithm is iterative and its state is defined by the current cell and by the current direction, that together with a randomly selected action determine the next cell that the algorithm is going to visit. Starting from the central cell of a filled map, at each iteration the algorithm empties the current cell and randomly decides if moving forward, turning left and then moving forwards, turning right and then moving forward, jumping to a random visited cell or placing a flight of stairs, if controlled by a \<Multi-Level Generator>. The algorithm stops when a certain percentage of cells has been emptied. The resulting topology depends on the following parameters:
 
 \begin{itemize}
 \item \<ForwardProbability>: probability of moving forward in the next iteration. High values promote long corridors. 
 \item \<LeftProbability>: probability of moving forward in the next iteration. High values promote wide open areas. 
-\item \<RightProbability>: probability of moving rigthward in the next iteration. High values promote wide open areas. 
+\item \<RightProbability>: probability of moving rightward in the next iteration. High values promote wide open areas. 
 \item \<VisitedProbability>: probability of jumping to a visited cell in the next iteration. High values promote a more complex topology. 
-\item \<StairProbability>:  probability of placing a flight of stairs.
+\item \<StairProbability>: probability of placing a flight of stairs.
 \item \<RoomPercentage>: percentage of tiles of the map that must be empty.
 \end{itemize}
 
 \begin{figure}[tp]
-	\centering
-  	\begin{subfigure}[t]{0.48\linewidth}
-		\includegraphics[width=\linewidth]{digger_default}
-     		\caption{Digger map generated with the default settings.}
- 	\end{subfigure}
-  	\begin{subfigure}[t]{0.48\linewidth}
-    		\includegraphics[width=\linewidth]{digger_roomp20}
-    		\caption{Digger map generated with $Room\-Per\-cent\-age = 20\%$.}
-  	\end{subfigure}
-  	\begin{subfigure}[t]{0.48\linewidth}
-    		\includegraphics[width=\linewidth]{digger_fp60}
-    		\caption{Digger map generated with $For\-ward\-Prob\-a\-bil\-i\-ty = 60\%$, $Right\-Prob\-a\-bil\-i\-ty = 19\%$ and $Left\-ward\-Prob\-a\-bil\-i\-ty = 19\%$.}
-  	\end{subfigure}
-  	\begin{subfigure}[t]{0.48\linewidth}
-		\includegraphics[width=\linewidth]{digger_fp96}
-    		\caption{Digger map generated with $For\-ward\-Prob\-a\-bil\-i\-ty = 96\%$, $Right\-Prob\-a\-bil\-i\-ty = 1\%$ and $Left\-ward\-Prob\-a\-bil\-i\-ty = 1\%$.}
- 	\end{subfigure}
-	\caption{Some maps generated by the Digger Generator using ''\<AFairlyRandomSeed>'' as seed, but different settings.}
-	\caption*{By default, the Digger Generator has \<For\-ward\-Prob\-a\-bil\-i\-ty> set to $90\%$, \<Left\-Prob\-a\-bil\-i\-ty> set to $4\%$, \<Right\-Prob\-a\-bil\-i\-ty> set to $4\%$, \<Vis\-it\-ed\-Prob\-a\-bil\-i\-ty> set to $2\%$, \<Stair\-Prob\-a\-bil\-i\-ty> set to $0\%$ and \<Room\-Per\-cent\-age> set to $50\%$.}
-	\label{fig:diggers}
+\centering
+\begin{subfigure}[t]{0.48\linewidth}
+\includegraphics[width=\linewidth]{digger_default}
+\caption{Digger map generated with the default settings.}
+\end{subfigure}
+\begin{subfigure}[t]{0.48\linewidth}
+\includegraphics[width=\linewidth]{digger_roomp20}
+\caption{Digger map generated with $Room\-Per\-cent\-age = 20\%$.}
+\end{subfigure}
+\begin{subfigure}[t]{0.48\linewidth}
+\includegraphics[width=\linewidth]{digger_fp60}
+\caption{Digger map generated with $For\-ward\-Prob\-a\-bil\-i\-ty = 60\%$, $Right\-Prob\-a\-bil\-i\-ty = 19\%$ and $Left\-ward\-Prob\-a\-bil\-i\-ty = 19\%$.}
+\end{subfigure}
+\begin{subfigure}[t]{0.48\linewidth}
+\includegraphics[width=\linewidth]{digger_fp96}
+\caption{Digger map generated with $For\-ward\-Prob\-a\-bil\-i\-ty = 96\%$, $Right\-Prob\-a\-bil\-i\-ty = 1\%$ and $Left\-ward\-Prob\-a\-bil\-i\-ty = 1\%$.}
+\end{subfigure}
+\caption{Some maps generated by the Digger Generator using ``\<AFairlyRandomSeed>'' as seed, but different settings.}
+\caption*{By default, the Digger Generator has \<For\-ward\-Prob\-a\-bil\-i\-ty> set to $90\%$, \<Left\-Prob\-a\-bil\-i\-ty> set to $4\%$, \<Right\-Prob\-a\-bil\-i\-ty> set to $4\%$, \<Vis\-it\-ed\-Prob\-a\-bil\-i\-ty> set to $2\%$, \<Stair\-Prob\-a\-bil\-i\-ty> set to $0\%$ and \<Room\-Per\-cent\-age> set to $50\%$.}
+\label{fig:diggers}
 \end{figure}
-
 
 Figure \ref{fig:diggers} shows how these parameters influence the topology of a map.
 
-% MULTI-LEVEL GENERATOR %
+% ALL-BLACK GENERATOR &
 
-\subsubsection{Multi-level Generator}
+\subsubsection{All-Black Generator}
+
+This simple generator parses the All-Black notation, extracting rooms and corridors. If no objects are specified, it adds them to the map.
+
+% MAP ASSEMBLER %
 
 \subsection{The Map Assembler}
 
 The \<Map Assembler> controls the assembly of the map. Each different implementation of the Map Assembler corresponds to a different appearance.
 
-\par
-
-They are light and simple.
-
 % MESH ASSEMBLER %
 
 \subsubsection{Mesh Assembler}
 
+The \<Mesh Assembler> produces a 3D model of the map using an implementation of the \<marching squares algorithm>\footnote{\<Marching squares > is a computer graphics algorithm that generates contours for a \<two-dimensional scalar field>, i.e. a rectangular array of individual numerical values.} to generate three meshes: one for the floor, one for the walls and one for the ceiling. As it can be seen in figure \ref{fig:cellular_assembled}, the result is a natural-looking environment.
+
 % PREFAB ASSEMBLER %
 
 \subsubsection{Prefab Assembler}
+
+The \<Prefab Assembler> produces a 3D model of the map by associating to each tile a specific 3D model, or \<prefab>, depending on the value of the tile and of its 8-neighbors (see figure \ref{fig:prefabs}). Figure \ref{fig:divisive_assembled} shows a map assembled with this algorithm.
+
+\begin{figure}
+\includegraphics[width=0.48\linewidth]{prefabs}
+\caption{Some prefabs and the masks they are associated to.}
+\label{fig:prefabs}
+\end{figure}
+
+% MULTI-LEVEL PREFAB ASSEMBLER %
+
+\subsubsection{Multi-Level Prefab Assembler}
+
+Like the \<Prefab Assembler>, the \<Multi-Level Prefab Assembler> produces a 3D model of the map by combining prefabs, but it employs additional logic to menage the overlap of multiple floors. Figure \ref{fig:multi_assembled} shows a map assembled with this algorithm.
+
+\begin{figure}[tp]
+\centering
+\begin{subfigure}[t]{0.48\linewidth}
+\includegraphics[width=\linewidth]{cellular_assembled}
+\caption{Cellular map assembled with the \<Mesh Assembler>}
+\label{fig:cellular_assembled}
+\end{subfigure}
+\begin{subfigure}[t]{0.48\linewidth}
+\includegraphics[width=\linewidth]{digger_assembled}
+\caption{Digger map assembled with the \<Mesh Assembler>}
+\label{fig:digger_assembled}
+\end{subfigure}
+\begin{subfigure}[t]{0.48\linewidth}
+\includegraphics[width=\linewidth]{divisive_assembled}
+\caption{Divisive map assembled with the \<Prefab Assembler>}
+\label{fig:divisive_assembled}
+\end{subfigure}
+\begin{subfigure}[t]{0.48\linewidth}
+\includegraphics[width=\linewidth]{multi_assembled}
+\caption{Multi-level map assembled with the \<Prefab Assembler>}
+\label{fig:multi_assembled}
+\end{subfigure}
+\caption{Some possible combinations of generators and assemblers.}
+\end{figure}
+
+% OBJECT DISPLACER %
 
 \subsection{The Object Displacer}
 
@@ -369,3 +454,4 @@ The \<Object Displacer> associates a character that represents neither a wall or
 % EXPERIMENT MANAGEMENT %
 
 \section{Experiment management}
+
