@@ -106,10 +106,8 @@ public class DiggerMapGenerator : MapGenerator {
                 MoveDiggerForward();
             } else if (nextAction < leftProbability) {
                 direction = CircularIncrease(direction, 1, 4, false);
-                MoveDiggerForward();
             } else if (nextAction < rigthProbability) {
                 direction = CircularIncrease(direction, 1, 4, false);
-                MoveDiggerForward();
             } else if (nextAction < visitedProbability) {
                 MoveDiggerRandomly();
             } else {

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  7 MAR 2018 13:18
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  8 MAR 2018 11:18
 entering extended mode
 **./main.tex
 (main.tex
@@ -1121,9 +1121,9 @@ LaTeX Warning: Citation `MultiLevelEvolution' on page xi undefined on input lin
 e 7.
 
 
-Overfull \hbox (1.69405pt too wide) in paragraph at lines 11--11
+Overfull \hbox (1.69405pt too wide) in paragraph at lines 13--13
  [][] []\OT1/cmr/m/n/10.95 Some maps gen-er-ated by the Di-vi-sive Gen-er-a-tor
- us-ing ''\OT1/cmr/m/it/10.95 AMod- 
+ us-ing ``\OT1/cmr/m/it/10.95 AMod- 
  []
 
 )
@@ -1298,191 +1298,237 @@ Chapter 3.
 
 
 ]
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 30.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 34.
  ("C:\Program Files\MiKTeX 2.9\tex\latex\base\omscmr.fd"
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 30.
- [18] [19]
-[20] [21]
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 34.
+ [18]
 
-LaTeX Warning: Citation `lague' on page 22 undefined on input line 152.
+LaTeX Warning: Citation `MultiLevelEvolution' on page 19 undefined on input lin
+e 71.
 
-<images/cellular_default.png, id=132, 559.08875pt x 559.08875pt>
+[19]
+<images/multilevel_digger.png, id=126, 451.6875pt x 451.6875pt>
+File: images/multilevel_digger.png Graphic file (type png)
+<use images/multilevel_digger.png>
+Package pdftex.def Info: images/multilevel_digger.png  used on input line 75.
+(pdftex.def)             Requested size: 172.79846pt x 172.80092pt.
+<images/multilevel_divisive.png, id=127, 496.85625pt x 496.85625pt>
+File: images/multilevel_divisive.png Graphic file (type png)
+<use images/multilevel_divisive.png>
+Package pdftex.def Info: images/multilevel_divisive.png  used on input line 80.
+
+(pdftex.def)             Requested size: 172.79846pt x 172.7954pt.
+ [20 <./images/multilevel_digger.png> <./images/multilevel_divisive.png>]
+[21] [22]
+
+LaTeX Warning: Citation `lague' on page 23 undefined on input line 195.
+
+<images/cellular_default.png, id=139, 559.08875pt x 559.08875pt>
 File: images/cellular_default.png Graphic file (type png)
 <use images/cellular_default.png>
-Package pdftex.def Info: images/cellular_default.png  used on input line 157.
+Package pdftex.def Info: images/cellular_default.png  used on input line 200.
 (pdftex.def)             Requested size: 116.9989pt x 116.99408pt.
-<images/cellular_rfp40.png, id=133, 563.10374pt x 563.10374pt>
+<images/cellular_rfp40.png, id=140, 563.10374pt x 563.10374pt>
 File: images/cellular_rfp40.png Graphic file (type png)
 <use images/cellular_rfp40.png>
-Package pdftex.def Info: images/cellular_rfp40.png  used on input line 161.
+Package pdftex.def Info: images/cellular_rfp40.png  used on input line 204.
 (pdftex.def)             Requested size: 116.9989pt x 116.9922pt.
 
-Underfull \hbox (badness 2012) in paragraph at lines 162--162
+Underfull \hbox (badness 2012) in paragraph at lines 205--205
 []\OT1/cmr/m/n/10 (b) |Cel-lu-lar map gen-er-
  []
 
 
-Underfull \hbox (badness 6268) in paragraph at lines 162--162
+Underfull \hbox (badness 6268) in paragraph at lines 205--205
 \OT1/cmr/m/n/10 ated with $\OML/cmm/m/it/10 Ran\OT1/cmr/m/n/10 -\OML/cmm/m/it/1
 0 dom\OT1/cmr/m/n/10 -\OML/cmm/m/it/10 Fill\OT1/cmr/m/n/10 -
  []
 
-<images/cellular_rfp50.png, id=134, 537.00626pt x 550.055pt>
+<images/cellular_rfp50.png, id=141, 537.00626pt x 550.055pt>
 File: images/cellular_rfp50.png Graphic file (type png)
 <use images/cellular_rfp50.png>
-Package pdftex.def Info: images/cellular_rfp50.png  used on input line 165.
+Package pdftex.def Info: images/cellular_rfp50.png  used on input line 208.
 (pdftex.def)             Requested size: 116.9989pt x 119.83743pt.
 
-Underfull \hbox (badness 2547) in paragraph at lines 166--166
+Underfull \hbox (badness 2547) in paragraph at lines 209--209
 []\OT1/cmr/m/n/10 (c) |Cel-lu-lar map gen-er-
  []
 
 
-Underfull \hbox (badness 6268) in paragraph at lines 166--166
+Underfull \hbox (badness 6268) in paragraph at lines 209--209
 \OT1/cmr/m/n/10 ated with $\OML/cmm/m/it/10 Ran\OT1/cmr/m/n/10 -\OML/cmm/m/it/1
 0 dom\OT1/cmr/m/n/10 -\OML/cmm/m/it/10 Fill\OT1/cmr/m/n/10 -
  []
 
-<images/cellular_si1.png, id=135, 563.10374pt x 563.10374pt>
-File: images/cellular_si1.png Graphic file (type png)
-<use images/cellular_si1.png>
-Package pdftex.def Info: images/cellular_si1.png  used on input line 169.
+<images/cellular_si0.png, id=142, 563.10374pt x 563.10374pt>
+File: images/cellular_si0.png Graphic file (type png)
+<use images/cellular_si0.png>
+Package pdftex.def Info: images/cellular_si0.png  used on input line 212.
 (pdftex.def)             Requested size: 116.9989pt x 116.9922pt.
 
-Underfull \hbox (badness 2012) in paragraph at lines 170--170
+Underfull \hbox (badness 2012) in paragraph at lines 213--213
 []\OT1/cmr/m/n/10 (d) |Cel-lu-lar map gen-er-
  []
 
-<images/cellular_si3.png, id=136, 555.07375pt x 559.08875pt>
+<images/cellular_si3.png, id=143, 555.07375pt x 559.08875pt>
 File: images/cellular_si3.png Graphic file (type png)
 <use images/cellular_si3.png>
-Package pdftex.def Info: images/cellular_si3.png  used on input line 173.
+Package pdftex.def Info: images/cellular_si3.png  used on input line 216.
 (pdftex.def)             Requested size: 116.9989pt x 117.83864pt.
 
-Underfull \hbox (badness 2547) in paragraph at lines 174--174
+Underfull \hbox (badness 2547) in paragraph at lines 217--217
 []\OT1/cmr/m/n/10 (e) |Cel-lu-lar map gen-er-
  []
 
-<images/cellular_wts5.png, id=137, 559.08875pt x 559.08875pt>
+<images/cellular_wts5.png, id=144, 559.08875pt x 559.08875pt>
 File: images/cellular_wts5.png Graphic file (type png)
 <use images/cellular_wts5.png>
-Package pdftex.def Info: images/cellular_wts5.png  used on input line 177.
+Package pdftex.def Info: images/cellular_wts5.png  used on input line 220.
 (pdftex.def)             Requested size: 116.9989pt x 116.99408pt.
 
-Underfull \hbox (badness 2875) in paragraph at lines 178--178
+Underfull \hbox (badness 2875) in paragraph at lines 221--221
 []\OT1/cmr/m/n/10 (f) |Cel-lu-lar map gen-er-
  []
 
-[22] [23] [24 <./images/cellular_default.png> <./images/cellular_rfp40.png> <./
-images/cellular_rfp50.png> <./images/cellular_si1.png> <./images/cellular_si3.p
+[23] [24] [25 <./images/cellular_default.png> <./images/cellular_rfp40.png> <./
+images/cellular_rfp50.png> <./images/cellular_si0.png> <./images/cellular_si3.p
 ng> <./images/cellular_wts5.png>]
-<images/divisive_default.png, id=156, 338.76563pt x 338.76563pt>
+<images/divisive_default.png, id=163, 338.76563pt x 338.76563pt>
 File: images/divisive_default.png Graphic file (type png)
 <use images/divisive_default.png>
-Package pdftex.def Info: images/divisive_default.png  used on input line 256.
+Package pdftex.def Info: images/divisive_default.png  used on input line 299.
 (pdftex.def)             Requested size: 116.9989pt x 116.99832pt.
-<images/divisive_rdp20.png, id=157, 338.76563pt x 338.76563pt>
+<images/divisive_rdp20.png, id=164, 338.76563pt x 338.76563pt>
 File: images/divisive_rdp20.png Graphic file (type png)
 <use images/divisive_rdp20.png>
-Package pdftex.def Info: images/divisive_rdp20.png  used on input line 260.
+Package pdftex.def Info: images/divisive_rdp20.png  used on input line 303.
 (pdftex.def)             Requested size: 116.9989pt x 116.99832pt.
 
-Underfull \hbox (badness 1939) in paragraph at lines 261--261
+Underfull \hbox (badness 1939) in paragraph at lines 304--304
 []\OT1/cmr/m/n/10 (b) |Di-vi-sive map gen-er-
  []
 
 
-Underfull \hbox (badness 4660) in paragraph at lines 261--261
+Underfull \hbox (badness 4660) in paragraph at lines 304--304
 \OT1/cmr/m/n/10 ated with $\OML/cmm/m/it/10 Room\OT1/cmr/m/n/10 -\OML/cmm/m/it/
 10 Di\OT1/cmr/m/n/10 -\OML/cmm/m/it/10 vide\OT1/cmr/m/n/10 -
  []
 
-<images/divisive_md1.png, id=158, 338.76563pt x 338.76563pt>
+<images/divisive_md1.png, id=165, 338.76563pt x 338.76563pt>
 File: images/divisive_md1.png Graphic file (type png)
 <use images/divisive_md1.png>
-Package pdftex.def Info: images/divisive_md1.png  used on input line 264.
+Package pdftex.def Info: images/divisive_md1.png  used on input line 307.
 (pdftex.def)             Requested size: 116.9989pt x 116.99832pt.
-<images/divisive_md8.png, id=159, 338.76563pt x 338.76563pt>
+<images/divisive_md8.png, id=166, 338.76563pt x 338.76563pt>
 File: images/divisive_md8.png Graphic file (type png)
 <use images/divisive_md8.png>
-Package pdftex.def Info: images/divisive_md8.png  used on input line 268.
+Package pdftex.def Info: images/divisive_md8.png  used on input line 311.
 (pdftex.def)             Requested size: 116.9989pt x 116.99832pt.
-<images/divisive_mrd1.png, id=160, 338.76563pt x 338.76563pt>
+<images/divisive_mrd1.png, id=167, 338.76563pt x 338.76563pt>
 File: images/divisive_mrd1.png Graphic file (type png)
 <use images/divisive_mrd1.png>
-Package pdftex.def Info: images/divisive_mrd1.png  used on input line 272.
+Package pdftex.def Info: images/divisive_mrd1.png  used on input line 315.
 (pdftex.def)             Requested size: 116.9989pt x 116.99832pt.
 
-Underfull \hbox (badness 4144) in paragraph at lines 273--273
+Underfull \hbox (badness 4144) in paragraph at lines 316--316
 \OT1/cmr/m/n/10 with $\OML/cmm/m/it/10 Min\OT1/cmr/m/n/10 -\OML/cmm/m/it/10 i\O
 T1/cmr/m/n/10 -\OML/cmm/m/it/10 mum\OT1/cmr/m/n/10 -\OML/cmm/m/it/10 Room\OT1/c
 mr/m/n/10 -\OML/cmm/m/it/10 Di\OT1/cmr/m/n/10 -
  []
 
-<images/divisive_mrd7.png, id=161, 338.76563pt x 338.76563pt>
+<images/divisive_mrd7.png, id=168, 338.76563pt x 338.76563pt>
 File: images/divisive_mrd7.png Graphic file (type png)
 <use images/divisive_mrd7.png>
-Package pdftex.def Info: images/divisive_mrd7.png  used on input line 276.
+Package pdftex.def Info: images/divisive_mrd7.png  used on input line 319.
 (pdftex.def)             Requested size: 116.9989pt x 116.99832pt.
 
-Underfull \hbox (badness 4144) in paragraph at lines 277--277
+Underfull \hbox (badness 4144) in paragraph at lines 320--320
 \OT1/cmr/m/n/10 with $\OML/cmm/m/it/10 Min\OT1/cmr/m/n/10 -\OML/cmm/m/it/10 i\O
 T1/cmr/m/n/10 -\OML/cmm/m/it/10 mum\OT1/cmr/m/n/10 -\OML/cmm/m/it/10 Room\OT1/c
 mr/m/n/10 -\OML/cmm/m/it/10 Di\OT1/cmr/m/n/10 -
  []
 
-<images/digger_default.png, id=162, 346.29375pt x 346.29375pt>
+<images/digger_default.png, id=169, 346.29375pt x 346.29375pt>
 File: images/digger_default.png Graphic file (type png)
 <use images/digger_default.png>
-Package pdftex.def Info: images/digger_default.png  used on input line 306.
+Package pdftex.def Info: images/digger_default.png  used on input line 349.
 (pdftex.def)             Requested size: 172.79846pt x 172.80298pt.
-<images/digger_roomp20.png, id=163, 346.29375pt x 346.29375pt>
+<images/digger_roomp20.png, id=170, 346.29375pt x 346.29375pt>
 File: images/digger_roomp20.png Graphic file (type png)
 <use images/digger_roomp20.png>
-Package pdftex.def Info: images/digger_roomp20.png  used on input line 310.
+Package pdftex.def Info: images/digger_roomp20.png  used on input line 353.
 (pdftex.def)             Requested size: 172.79846pt x 172.80298pt.
-<images/digger_fp60.png, id=164, 346.29375pt x 346.29375pt>
+<images/digger_fp60.png, id=171, 346.29375pt x 346.29375pt>
 File: images/digger_fp60.png Graphic file (type png)
 <use images/digger_fp60.png>
-Package pdftex.def Info: images/digger_fp60.png  used on input line 314.
+Package pdftex.def Info: images/digger_fp60.png  used on input line 357.
 (pdftex.def)             Requested size: 172.79846pt x 172.80298pt.
-<images/digger_fp96.png, id=165, 346.29375pt x 346.29375pt>
+<images/digger_fp96.png, id=172, 346.29375pt x 346.29375pt>
 File: images/digger_fp96.png Graphic file (type png)
 <use images/digger_fp96.png>
-Package pdftex.def Info: images/digger_fp96.png  used on input line 318.
+Package pdftex.def Info: images/digger_fp96.png  used on input line 361.
 (pdftex.def)             Requested size: 172.79846pt x 172.80298pt.
-[25] [26] [27 <./images/divisive_default.png> <./images/divisive_rdp20.png> <./
+[26] [27] [28 <./images/divisive_default.png> <./images/divisive_rdp20.png> <./
 images/divisive_md1.png> <./images/divisive_md8.png> <./images/divisive_mrd1.pn
-g> <./images/divisive_mrd7.png>] [28 <./images/digger_default.png> <./images/di
-gger_roomp20.png> <./images/digger_fp60.png> <./images/digger_fp96.png>])
-[29]
+g> <./images/divisive_mrd7.png>] [29 <./images/digger_default.png> <./images/di
+gger_roomp20.png> <./images/digger_fp60.png> <./images/digger_fp96.png>]
+<images/prefabs.png, id=196, 623.32875pt x 489.83pt>
+File: images/prefabs.png Graphic file (type png)
+<use images/prefabs.png>
+Package pdftex.def Info: images/prefabs.png  used on input line 397.
+(pdftex.def)             Requested size: 270.0pt x 212.17741pt.
+
+Underfull \vbox (badness 1824) has occurred while \output is active []
+
+ [30 <./images/prefabs.png>]
+<images/cellular_assembled.png, id=201, 1216.545pt x 684.30656pt>
+File: images/cellular_assembled.png Graphic file (type png)
+<use images/cellular_assembled.png>
+Package pdftex.def Info: images/cellular_assembled.png  used on input line 412.
+
+(pdftex.def)             Requested size: 172.79846pt x 97.191pt.
+<images/digger_assembled.png, id=202, 1216.545pt x 684.30656pt>
+File: images/digger_assembled.png Graphic file (type png)
+<use images/digger_assembled.png>
+Package pdftex.def Info: images/digger_assembled.png  used on input line 417.
+(pdftex.def)             Requested size: 172.79846pt x 97.191pt.
+
+Underfull \hbox (badness 1019) in paragraph at lines 418--418
+[]\OT1/cmr/m/n/10 (b) |Dig-ger map as-sem-bled with the
+ []
+
+<images/divisive_assembled.png, id=203, 1216.545pt x 684.30656pt>
+File: images/divisive_assembled.png Graphic file (type png)
+<use images/divisive_assembled.png>
+Package pdftex.def Info: images/divisive_assembled.png  used on input line 422.
+
+(pdftex.def)             Requested size: 172.79846pt x 97.191pt.
+<images/multi_assembled.png, id=204, 1216.545pt x 684.30656pt>
+File: images/multi_assembled.png Graphic file (type png)
+<use images/multi_assembled.png>
+Package pdftex.def Info: images/multi_assembled.png  used on input line 427.
+(pdftex.def)             Requested size: 172.79846pt x 97.191pt.
+)
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [31 <./images/cellular_assembled.png> <./images/digger_assembled.png> <./image
+s/divisive_assembled.png> <./images/multi_assembled.png>] [32]
 \openout2 = `chapters/chapter4.aux'.
 
  (chapters/chapter4.tex)
 \openout2 = `chapters/chapter5.aux'.
 
- (chapters/chapter5.tex)
+
+(chapters/chapter5.tex)
 \openout2 = `chapters/chapter6.aux'.
 
  (chapters/chapter6.tex)
 \openout2 = `chapters/chapter7.aux'.
 
-
-(chapters/chapter7.tex) [30
-
-
-
-
-
-
-
-
-
-
-]
+ (chapters/chapter7.tex)
 No file main.bbl.
 (main.aux (chapters/chapter0.aux) (chapters/chapter1.aux)
 (chapters/chapter2.aux) (chapters/chapter3.aux) (chapters/chapter4.aux)
@@ -1492,11 +1538,11 @@ LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 16087 strings out of 493303
- 320659 string characters out of 3138856
- 347160 words of memory out of 3000000
- 19399 multiletter control sequences out of 15000+200000
- 546498 words of font info for 84 fonts, out of 3000000 for 9000
+ 16134 strings out of 493303
+ 321952 string characters out of 3138856
+ 347277 words of memory out of 3000000
+ 19439 multiletter control sequences out of 15000+200000
+ 546844 words of font info for 85 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  41i,14n,43p,10380b,629s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Pr
@@ -1512,9 +1558,9 @@ r6.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:
 iles/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Files/MiK
 TeX 2.9/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Program Files/MiKTeX 2.9/
 fonts/type1/public/amsfonts/cm/cmti9.pfb>
-Output written on main.pdf (44 pages, 918035 bytes).
+Output written on main.pdf (46 pages, 1276406 bytes).
 PDF statistics:
- 241 PDF objects out of 1000 (max. 8388607)
+ 257 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 101 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 136 words of extra memory for PDF output out of 10000 (max. 10000000)
 

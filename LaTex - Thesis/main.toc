@@ -26,17 +26,21 @@
 \contentsline {subsection}{\numberline {3.2.1}The Game Manager}{18}
 \contentsline {subsection}{\numberline {3.2.2}The Spawn Point Manager}{19}
 \contentsline {subsection}{\numberline {3.2.3}The Map Manager}{19}
-\contentsline {subsection}{\numberline {3.2.4}The Map Generator}{19}
-\contentsline {subsubsection}{Cellular Generator}{21}
-\contentsline {subsubsection}{Divisive Generator}{22}
-\contentsline {subsubsection}{Digger Generator}{25}
-\contentsline {subsubsection}{Multi-level Generator}{25}
-\contentsline {subsection}{\numberline {3.2.5}The Map Assembler}{25}
-\contentsline {subsubsection}{Mesh Assembler}{29}
-\contentsline {subsubsection}{Prefab Assembler}{29}
-\contentsline {subsection}{\numberline {3.2.6}The Object Displacer}{29}
-\contentsline {section}{\numberline {3.3}Map representation}{29}
-\contentsline {section}{\numberline {3.4}Weapons and objects}{29}
-\contentsline {section}{\numberline {3.5}Game modes}{29}
-\contentsline {section}{\numberline {3.6}Logging}{29}
-\contentsline {section}{\numberline {3.7}Experiment management}{29}
+\contentsline {subsubsection}{Single-Level Map Manager}{19}
+\contentsline {subsubsection}{Multi-Level Map Manager}{19}
+\contentsline {subsubsection}{All-Black Multi-Level Map Manager}{20}
+\contentsline {subsection}{\numberline {3.2.4}The Map Generator}{20}
+\contentsline {subsubsection}{Cellular Generator}{22}
+\contentsline {subsubsection}{Divisive Generator}{23}
+\contentsline {subsubsection}{Digger Generator}{26}
+\contentsline {subsubsection}{All-Black Generator}{26}
+\contentsline {subsection}{\numberline {3.2.5}The Map Assembler}{26}
+\contentsline {subsubsection}{Mesh Assembler}{30}
+\contentsline {subsubsection}{Prefab Assembler}{30}
+\contentsline {subsubsection}{Multi-Level Prefab Assembler}{31}
+\contentsline {subsection}{\numberline {3.2.6}The Object Displacer}{31}
+\contentsline {section}{\numberline {3.3}Map representation}{32}
+\contentsline {section}{\numberline {3.4}Weapons and objects}{32}
+\contentsline {section}{\numberline {3.5}Game modes}{32}
+\contentsline {section}{\numberline {3.6}Logging}{32}
+\contentsline {section}{\numberline {3.7}Experiment management}{32}

@@ -2,23 +2,75 @@
 
 % INTRODUCTION %
 
-In this chapter we describe the \<framework> that we have developed to perform user-based online validation for researches in procedural content generation of multiplayer levels for Firsts Person Shooters. In the first partition we give an overview of the framework, of its features and of its components, analyzing them one by one in the following sections.
+In this chapter we describe the \<framework> that we have developed to perform user-based online validation of procedurally generated maps for multiplayer Firsts Person Shooters. After a quick overview, we present the map formats that the framework supports and we extensively analyze its structure, its components and its features.
 
-% FRAMEWORK OVERVIEW %
+% DESCRIPTION %
 
-\section{Overview}
+\section{Description of the framework}
 
-We designed our framework with the objective of providing a valid alternative to the games currently employed as a validation tool in this research field. All the available options, like \<Cube 2: Sauerbraten>: are powerful tools to perform validation via artificial agents, but they are not suitable for user-based validation. A data-collection campaign based on these games requires to download the game or to take part in real-life play-test sessions, but these options discourage potential participants because they are significantly time-consuming. For this reason, we decided to develop a framework that is as light as possible, with a WebGL build weighting less than 10MB that can be played using any browser. The framework was developed with Unity.
+We designed our framework with the objective of providing a valid alternative to the games currently employed as a validation tool in this research field. All the available options, like \<Cube 2: Sauerbraten>, are powerful tools to perform validation via artificial agents, but are not suitable for user-based validation. A data-collection campaign based on these games requires to download the game or to take part in real-life play-test sessions, but these options discourage potential participants because they are significantly time-consuming. For this reason, we decided to develop a \<Unity>\footnote{Unity Technologies, 2005. \<Unity> is a game development environment that includes a game editor and a game engine. Currently, it is the most used game development tool.} framework that is as light as possible, with a WebGL build weighting less than 10MB that can be played using any browser.
 
 \par
 
 Since the purpose of this tool is to be used in research, we decided to support many map representation formats used in previous works and we designed our framework to be as modular, expansible and configurable as possible.
 
+% SUPPORTED REPRESENTATION %
+
+\section{Map representation}
+
+Maps are structured as grids of orthogonal \<tiles> and are internally represented  by matrices of characters, where each cell corresponds to a specific \<tile>. Depending on the character, a cell can represent a wall, a floor or an object on the floor. If a cell corresponds to a wall we say it is \<filled>, if it corresponds to a floor we say it is \<empty>.
+
+\par
+
+The framework allows to represent maps in two more formats, that are converted to the internal one when provided as input.
+
+% FILE %
+
+\subsection{Text file representation}
+
+The text file representation allows to encode the map as a text file, of which each line corresponds to a row of the internal matrix representation and each character corresponds to a cell. For multi-level maps, the format is the same, with the exception of blank lines used to separate the floors, that are encoded from the lower one to the higher one.
+
+% ALL-BLACK %
+
+\subsection{All-Black representation}
+
+Our All-Black representation is an extended version of the one defined by Cardamone et al.\cite{Cardamone:2011:EIM:2008402.2008411}, to which we have added the support for objects and multi-level maps. In their work, the All-Black representation encodes the empty areas of an otherwise filled map, consisting in square rooms and corridors of fixed width. Rooms are defined by $\langle x,y,s \rangle$ triples, where $x$ and $y$ define the coordinates of the center of the room and $s$ defines its width. Corridors are rectangular areas with a fixed width of $3$ cells and are defined by $\langle x,y,l \rangle$ triples, where $x$ and $y$ define the point in which the corridor starts and $l$ defines its length. $l$ also provides the direction of the corridor: if $l$ is positive the corridor extends along the $x\text{-axis}$, otherwise it extends along the $y\text{-axis}$. With respect to this representation, we changed the encoding of the rooms by considering $x$ and $y$ as the inferior corner of the room for both axis.
+
+\par
+
+For allowing the encoding of objects, we added a third kind of triple, $\langle x,y,o \rangle$, that uses $x$ and $y$ to denote the coordinates of the tile that hosts the objects and $o$ to denote the object itself, encoded as a character. In our representation, first we store the triples representing the rooms, then the triples representing the corridors and finally the triples representing the objects. These groups are separated by the special character ``$\mid$'' and can have any number of elements, with the exception of the one denoting the rooms, that must have at least one triple.
+
+\par
+
+We have also extended the All-Black representation including the one defined by Cachia et al.\cite{MultiLevelEvolution}, that allows to encode maps generated with a random digger algorithm, i.e. an algorithm that randomly moves in a filled map emptying all the cells it crosses (for more details see subsubsection \ref{sssec:digger}). The map is encoded by a quintuple $\langle f,l,r,v,s \rangle$, where $f$ encodes the probability of moving forwards, $l$ encodes the probability of turning left, $r$ encodes the probability of turning right, $v$ encodes the probability of jumping to a visited cell and $s$ encodes the probability of placing a flight of stairs, if in a multi-level setting. With respect to the representation defined by Cachia et al., we added the possibility of encoding objects, which group of triples is separated by the digger quintuple by the special character ``$\mid$''.
+
+\par
+
+Multi-level maps are represented by encoding the floors from the lower one to the higher one using one of the two single-level All-Black formats that we have defined. The floor representations are separated with the double special characters ``$\mid\mid$''.
+
+\par
+
+Figure \ref{fig:allblack} shows some maps associated with their All-Black representation.
+
+\begin{figure}[tp]
+	\centering
+  	\begin{subfigure}[t]{0.45\linewidth}
+		\includegraphics[width=\linewidth]{ab_divisive_1}
+     		\caption{Map represented by $\langle 5, $\ $ 5, $\ $ 9 \rangle $\ $ \langle 10, $\ $ 10, $\ $ 7 \rangle $\ $  \langle 15, $\ $ 25, $\ $ 3 \rangle\ $\ $ \mid $\ $  \langle 5, $\ $ 15, $\ $ 15 \rangle $\ $  \langle 11, $\ $ 15, $\ $ -7 \rangle $\ $  \mid $\ $  \langle 5, $\ $ 5, $\ $ s \rangle $\ $  \langle 7, $\ $ 7, $\ $ d \rangle$.}
+ 	\end{subfigure}
+  	\begin{subfigure}[t]{0.45\linewidth}
+    		\includegraphics[width=\linewidth]{ab_divisive_2}
+     		\caption{Map represented by $\langle 1,$\ $2, $\ $5  \rangle $\ $\langle4,$\ $6,$\ $8\rangle $\ $ \mid $\ $ \langle5,$\ $6,$\ $-10\rangle $\ $ \langle10,$\ $15,$\ $-6\rangle $\ $ \mid $\ $ \langle3, $\ $7, $\ $s\rangle $\ $ \langle1, $\ $1, $\ $d\rangle$.}
+  	\end{subfigure}
+\caption{Two simple maps with their All-Black representation.}
+\label{fig:allblack}
+\end{figure}
+
 % FRAMEWORK STRUCTURE % 
 
 \section{The framework structure}
 
-The framework collects data by assigning to the users \<matches> to play. A match is defined by the \<game mode> and by the \<map type>: which in turn is defined by the \<map topology> and by the \<map appearance>. The \<map topology> defines how the map is going to \<be> and depends on the algorithm used to generate it, whereas the \<map appearance> defines how the map is going to \<look> and depends on how the map is assembled. This implies that the map type defines a whole array of procedurally generated maps that share the same topology and appearance. Therefore, when referring to a match we are considering a specific game-mode played in a procedurally generated map. If needed, it is possible to use a pre-generated map instead of generating a new one, by providing it as input in one of the supported formats. In this case the \<map topology> defines how to interpret the input, that is then displayed considering the \<map appearance>.
+The framework collects data by assigning to the users \<matches> to play. A match is defined by the \<game mode> and by the \<map type>: which in turn is defined by the \<map topology> and by the \<map appearance>. The \<map topology> defines how the map is going to \<be> and depends on the algorithm used to generate it, whereas the \<map appearance> defines how the map is going to \<look> and depends on how the map is assembled. This implies that the map type defines a whole array of procedurally generated maps that share the same topology and appearance. Therefore, when referring to a match we are considering a specific game-mode played in a procedurally generated map. If needed, it is possible to use a pre-generated map instead of generating a new one, by providing it as input using one of the supported formats. In this case the \<map topology> defines how to interpret the input, that is then displayed considering the \<map appearance>.
 
 \par
 
@@ -42,17 +94,13 @@ The \<Game Manager> is the module responsible for the overall behavior of a matc
 
 \subsection{The Spawn Point Manager}
 
-The \<Spawn Point Manager> contains a list of all the spawn points displaced on the map, that is populated during the \<Generation> phase by the \<Game Manager>. When the \<Game Manager> needs to spawn an entity, the \<Spawn Point Manager> provides a random spawn point from the ones that have not been used in a certain amount of time. If no spawn point meets this condition, the extraction is made from the complete pool.
+The \<Spawn Point Manager> contains a list of all the spawn points displaced on the map, that is populated at the end of the \<Generation> phase by the \<Game Manager>. When the \<Game Manager> needs to spawn an entity, the \<Spawn Point Manager> provides a random spawn point from the ones that have not been used in a certain amount of time. If no spawn point meets this condition, the extraction is performed from the complete pool.
 
 % MAP MANAGER %
 
 \subsection{The Map Manager}
 
-The \<Map Manager> controls the generation, the import and the assembly of the map and the displacement of objects inside it. It leans on the \<Map Generator> for the generation, on the \<Map Assembler> for the <assembly>\footnote{With \<assembly> we mean the operation of creating a 3D model of the map starting from its matrix representation.}, on the \<Object Displacer> for the \<displacement>\footnote{With \<displacement> we mean the operation of placing the 3D models of the objects in the assembled map, according to their position defined by the \<Map Generator> trough a \<positioning> algorithm.}, whereas it performs the import itself. If the map is provided as input, the \<Map Generator> is not called.
-
-\par
-
-Maps are structured as a grid of orthogonal \<tiles> and are represented as matrices of characters, where each cell corresponds to a specific \<tile>. Depending on the character, a cell can represent a wall, a floor or an object on the floor. If a cell corresponds to a wall we say it is \<filled>: if it corresponds to a floor we say it is \<empty>.
+The \<Map Manager> controls the generation, the import and the assembly of the map and the displacement of objects inside it. It leans on the \<Map Generator> for the generation, on the \<Map Assembler> for the \<assembly>\footnote{With \<assembly> we mean the operation of creating a 3D model of the map starting from its matrix representation.} and on the \<Object Displacer> for the \<displacement>\footnote{With \<displacement> we mean the operation of placing the 3D models of the objects in the assembled map, according to their position defined by the \<Map Generator> trough a \<positioning> algorithm.}, whereas it performs the import itself. If the map is provided in input as a text file, the \<Map Generator> is not called, whereas it is used to perform decoding if the map is provided in All-Black format.
 
 \par
 
@@ -60,7 +108,7 @@ The framework provides three different implementations of the \<Map Manager>.
 
 \subsubsection{Single-Level Map Manager}
 
-The \<Single-Level Map Manager> is used for any kind of single level map. It can generate maps, import them from file or decode them from All-Black notation.
+The \<Single-Level Map Manager> is used for any kind of single level map. It can generate maps, import them from file or decode them from All-Black format.
 
 \subsubsection{Multi-Level Map Manager}
 
@@ -227,7 +275,7 @@ place the objects\;
 
 % DIVISIVE GENERATOR %
 
-\subsubsection{Divisive Generator}
+\subsubsection{Divisive Generator}\label{sssec:digger}
 
 The \<Divisive Generator> employs a \<binary space partitioning algorithm> to generate a man-made looking map.
 
@@ -332,11 +380,11 @@ The \<Digger Generator> employs a simple algorithm to generate a man-made lookin
 
 \par
 
-The algorithm is iterative and its state is defined by the current cell and by the current direction, that together with a randomly selected action determine the next cell that the algorithm is going to visit. Starting from the central cell of a filled map, at each iteration the algorithm empties the current cell and randomly decides if moving forward, turning left and then moving forwards, turning right and then moving forward, jumping to a random visited cell or placing a flight of stairs, if controlled by a \<Multi-Level Generator>. The algorithm stops when a certain percentage of cells has been emptied. The resulting topology depends on the following parameters:
+The algorithm is iterative and its state is defined by the current cell and by the current direction, that together with a randomly selected action determine the next cell that the algorithm is going to visit. Starting from the central cell of a filled map, at each iteration the algorithm empties the current cell and randomly decides if moving forward, turning left, turning right, jumping to a random visited cell or placing a flight of stairs, if controlled by a \<Multi-Level Generator>. The algorithm stops when a certain percentage of cells has been emptied. The resulting topology depends on the following parameters:
 
 \begin{itemize}
 \item \<ForwardProbability>: probability of moving forward in the next iteration. High values promote long corridors. 
-\item \<LeftProbability>: probability of moving forward in the next iteration. High values promote wide open areas. 
+\item \<LeftProbability>: probability of moving leftward in the next iteration. High values promote wide open areas. 
 \item \<RightProbability>: probability of moving rightward in the next iteration. High values promote wide open areas. 
 \item \<VisitedProbability>: probability of jumping to a visited cell in the next iteration. High values promote a more complex topology. 
 \item \<StairProbability>: probability of placing a flight of stairs.
@@ -372,7 +420,13 @@ Figure \ref{fig:diggers} shows how these parameters influence the topology of a 
 
 \subsubsection{All-Black Generator}
 
-This simple generator parses the All-Black notation, extracting rooms and corridors. If no objects are specified, it adds them to the map.
+This simple generator parses the All-Black format, extracting rooms and corridors. If no objects are specified, it adds them to the map.
+
+% STAIRS GENERATOR %
+
+\subsection{The Stairs Generator}
+
+The \<Stairs Generator> places stairs in the map after having analyzed it to find possible positions, but if stairs have already been placed by the \<Map Generator> (this happens with the \<Digger Generator>), it just validates them.
 
 % MAP ASSEMBLER %
 
@@ -393,8 +447,10 @@ The \<Mesh Assembler> produces a 3D model of the map using an implementation of 
 The \<Prefab Assembler> produces a 3D model of the map by associating to each tile a specific 3D model, or \<prefab>, depending on the value of the tile and of its 8-neighbors (see figure \ref{fig:prefabs}). Figure \ref{fig:divisive_assembled} shows a map assembled with this algorithm.
 
 \begin{figure}
-\includegraphics[width=0.48\linewidth]{prefabs}
+\centering
+\includegraphics[width=0.75\linewidth]{prefabs}
 \caption{Some prefabs and the masks they are associated to.}
+\caption*{Green denotes empty cells, red denotes filled cell, half-green and half-red denotes cells that are ignored by the mask. The masks can be rotated to obtain all the possible configurations.}
 \label{fig:prefabs}
 \end{figure}
 
@@ -407,22 +463,22 @@ Like the \<Prefab Assembler>, the \<Multi-Level Prefab Assembler> produces a 3D 
 \begin{figure}[tp]
 \centering
 \begin{subfigure}[t]{0.48\linewidth}
-\includegraphics[width=\linewidth]{cellular_assembled}
+\includegraphics[width=\linewidth]{isometric_canyon}
 \caption{Cellular map assembled with the \<Mesh Assembler>}
 \label{fig:cellular_assembled}
 \end{subfigure}
 \begin{subfigure}[t]{0.48\linewidth}
-\includegraphics[width=\linewidth]{digger_assembled}
+\includegraphics[width=\linewidth]{isometric_mine}
 \caption{Digger map assembled with the \<Mesh Assembler>}
 \label{fig:digger_assembled}
 \end{subfigure}
 \begin{subfigure}[t]{0.48\linewidth}
-\includegraphics[width=\linewidth]{divisive_assembled}
+\includegraphics[width=\linewidth]{isometric_factory}
 \caption{Divisive map assembled with the \<Prefab Assembler>}
 \label{fig:divisive_assembled}
 \end{subfigure}
 \begin{subfigure}[t]{0.48\linewidth}
-\includegraphics[width=\linewidth]{multi_assembled}
+\includegraphics[width=\linewidth]{isometric_suburbs}
 \caption{Multi-level map assembled with the \<Prefab Assembler>}
 \label{fig:multi_assembled}
 \end{subfigure}
@@ -435,17 +491,17 @@ Like the \<Prefab Assembler>, the \<Multi-Level Prefab Assembler> produces a 3D 
 
 The \<Object Displacer> associates a character that represents neither a wall or a clear cell to the corresponding object, displacing it in the correct position. During this process, it populates a dictionary containing all the objects in the map divided by category, that is used by the \<Game Manager> to populate the list of spawn points used by the \<Spawn Point Manager>.
 
-% MAP REPRESENTATION %
-
-\section{Map representation}
-
-% WEAPONS AND OBJECTS %
-
-\section{Weapons and objects}
-
 % GAME MODES %
 
 \section{Game modes}
+
+% WEAPONS %
+
+\section{Weapon}
+
+% OBJECTS %
+
+\section{Objects}
 
 % LOGGING %
 
