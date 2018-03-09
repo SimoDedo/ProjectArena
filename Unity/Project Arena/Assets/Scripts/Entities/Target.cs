@@ -7,10 +7,13 @@ using UnityEngine;
 /// </summary>
 public class Target : Entity, ILoggable {
 
-    [Header("Target")] [SerializeField] private GameObject target;
-    [SerializeField] private int totalHealthTarget;
-    [SerializeField] private int bonusTime;
-    [SerializeField] private int bonusScore;
+    [Header("Target")]
+    [SerializeField]
+    private GameObject target;
+    [SerializeField]
+    private int bonusTime;
+    [SerializeField]
+    private int bonusScore;
 
     Vector3 originalScale;
 
@@ -27,7 +30,7 @@ public class Target : Entity, ILoggable {
         int id) {
         originalScale = target.transform.localScale;
         gameManagerScript = gms;
-        health = totalHealthTarget;
+        health = totalHealth;
 
         originalLayer = transform.gameObject.layer;
         ChangeLayersRecursively(transform, disabledLayer);
@@ -48,6 +51,10 @@ public class Target : Entity, ILoggable {
         }
 
         StartCoroutine(FadeIn());
+    }
+
+    public override void SetupEntity(GameManager gms, int id) {
+        SetupEntity(totalHealth, activeGuns, gms, id);
     }
 
     private IEnumerator FadeIn() {
@@ -81,7 +88,7 @@ public class Target : Entity, ILoggable {
         if (inGame) {
             health -= damage;
 
-            target.transform.localScale = originalScale * ((float)health / (float)totalHealthTarget
+            target.transform.localScale = originalScale * ((float)health / (float)totalHealth
                 / 4f + 0.75f);
 
             // Log if needed.

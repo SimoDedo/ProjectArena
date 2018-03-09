@@ -3,7 +3,7 @@
 /// </summary>
 public class Opponent : Entity {
 
-    // Sets up all the player parameter and does the same with all its guns.
+    // Sets up all the opponent parameters and does the same with all its guns.
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id) {
         activeGuns = ag;
         gameManagerScript = gms;
@@ -21,6 +21,11 @@ public class Opponent : Entity {
                 guns[i].SetActive(true);
             }
         }
+    }
+
+    // Sets up all the opponent parameters and does the same with all its guns.
+    public override void SetupEntity(GameManager gms, int id) {
+        SetupEntity(totalHealth, activeGuns, gms, id);
     }
 
     // Applies damage to the opponent and eventually manages its death.

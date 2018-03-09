@@ -7,13 +7,15 @@ using UnityEngine;
 /// </summary>
 public abstract class Entity : MonoBehaviour {
 
-    // Guns.
-    [SerializeField] protected List<GameObject> guns;
-    [SerializeField] protected int disabledLayer;
-
-    // Informations about the entity.
-    protected bool[] activeGuns;
+    [SerializeField]
     protected int totalHealth;
+    [SerializeField]
+    protected int disabledLayer;
+    [SerializeField]
+    protected List<GameObject> guns;
+    [SerializeField]
+    protected bool[] activeGuns;
+
     protected int health;
     protected int entityID;
     protected int currentGun;
@@ -24,6 +26,9 @@ public abstract class Entity : MonoBehaviour {
 
     // Sets all the entity parameters.
     public abstract void SetupEntity(int th, bool[] ag, GameManager gms, int id);
+
+    // Sets all the entity parameters.
+    public abstract void SetupEntity(GameManager gms, int id);
 
     // Applies damage to the entity and eventually manages its death.
     public abstract void TakeDamage(int damage, int killerID);

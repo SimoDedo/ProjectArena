@@ -3,15 +3,18 @@
 \usepackage[ruled]{algorithm2e}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{booktabs} 
 \usepackage{caption}
 \usepackage{emptypage}
 \usepackage{fancyhdr}
 \usepackage[hang,flushmargin]{footmisc}
 \usepackage{graphicx}
 \usepackage[utf8]{inputenc}
+\usepackage{ragged2e}
 \usepackage{setspace}
 \usepackage{siunitx}
 \usepackage{subcaption}
+\usepackage{tabularx}
 \usepackage{titlepic}
 \usepackage[nottoc]{tocbibind}
 
@@ -56,6 +59,9 @@
 % Add ''and'' and ''or'' keywords to the algorithm environment.
 \SetKw{And}{and}
 \SetKw{Or}{or}
+
+% Define centering column with automatic newline in table.
+\newcolumntype{C}{>{\Centering\arraybackslash}X}
 
 % PDF SETUP %
 

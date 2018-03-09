@@ -112,6 +112,11 @@ public class Player : Entity, ILoggable {
         }
     }
 
+    // Sets up all the player parameters and does the same with all its guns.
+    public override void SetupEntity(GameManager gms, int id) {
+        SetupEntity(totalHealth, activeGuns, gms, id);
+    }
+
     // Applies damage to the player and eventually manages its death.
     public override void TakeDamage(int damage, int killerID) {
         if (inGame) {
