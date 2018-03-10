@@ -68,7 +68,7 @@ Figure \ref{fig:allblack} shows some maps associated with their All-Black repres
 
 % FRAMEWORK STRUCTURE % 
 
-\section{The framework structure}
+\section{Framework structure}
 
 The framework collects data by assigning to the users \<matches> to play. A match is defined by the \<game mode> and by the \<map type>: which in turn is defined by the \<map topology> and by the \<map appearance>. The \<map topology> defines how the map is going to \<be> and depends on the algorithm used to generate it, whereas the \<map appearance> defines how the map is going to \<look> and depends on how the map is assembled. This implies that the map type defines a whole array of procedurally generated maps that share the same topology and appearance. Therefore, when referring to a match we are considering a specific game-mode played in a procedurally generated map. If needed, it is possible to use a pre-generated map instead of generating a new one, by providing it as input using one of the supported formats. In this case the \<map topology> defines how to interpret the input, that is then displayed considering the \<map appearance>.
 
@@ -201,6 +201,60 @@ Figure \ref{fig:cellulars} shows how these parameters influence the topology of 
 
 The \<Cellular Generator> can perform import and export using the text representation.
 
+% DIVISIVE GENERATOR %
+
+\subsubsection{Divisive Generator}\label{sssec:digger}
+
+The \<Divisive Generator> employs a \<binary space partitioning algorithm> to generate a man-made looking map.
+
+\par
+
+The algorithm starts by obtaining partitions of the map by recursively dividing it in two sides of random size along one of the axes, then it selects some of these partitions as rooms and finally it connects them with corridors (for more details, see algorithm \ref{alg:divisive}). The resulting topology depends on the following parameters:
+
+\begin{itemize}
+\item \<RoomDivideProbability>: probability of a partition being divided again. High values promote small rooms.
+\item \<MapRoomPercentage>: minimum percentage of tiles of the map that must be empty. High values promote close rooms separated by walls, low values promote distant rooms connected by corridors.
+\item \<DivideLowerBound>: minimum division point expressed as percentage of the dimension of the room.
+\item \<DivideUpperBound>: maximum division point expressed as percentage of the dimension of the room.
+\item \<MinimumRoomDimension>: minimum width expressed in number of cells that a partition must have to be divided again. High values promote large rooms.
+\item \<MinimumDepth>: the minimum number of recursive divisions that each partition must have experienced.
+\item \<PassageWidth>: the width expressed in number of cells of the corridors connecting the rooms.
+\item \<MaxRandomPassages>: the number of additional corridors to place, if possible, once that all the rooms are connected.
+\end{itemize}
+
+Figure \ref{fig:divisives} shows how these parameters influence the topology of a map.
+
+\par
+
+The \<Divisive Generator> can perform both import and export using the text representation, whereas the All-Black format is used only for export. The latter matches perfectly with this generator, since both are based on the concept of rooms and corridors.
+
+% DIGGER GENERATOR &
+
+\subsubsection{Digger Generator}
+
+The \<Digger Generator> employs a simple algorithm to generate a man-made looking map.
+
+\par
+
+The algorithm is iterative and its state is defined by the current cell and by the current direction, that together with a randomly selected action determine the next cell that the algorithm is going to visit. Starting from the central cell of a filled map, at each iteration the algorithm empties the current cell and randomly decides if moving forward, turning left, turning right, jumping to a random visited cell or placing a flight of stairs, if controlled by a \<Multi-Level Generator>. The algorithm stops when a certain percentage of cells has been emptied. The resulting topology depends on the following parameters:
+
+\begin{itemize}
+\item \<ForwardProbability>: probability of moving forward in the next iteration. High values promote long corridors. 
+\item \<LeftProbability>: probability of moving leftward in the next iteration. High values promote wide open areas. 
+\item \<RightProbability>: probability of moving rightward in the next iteration. High values promote wide open areas. 
+\item \<VisitedProbability>: probability of jumping to a visited cell in the next iteration. High values promote a more complex topology. 
+\item \<StairProbability>: probability of placing a flight of stairs.
+\item \<RoomPercentage>: percentage of tiles of the map that must be empty.
+\end{itemize}
+
+Figure \ref{fig:diggers} shows how these parameters influence the topology of a map.
+
+\par
+
+The \<Digger Generator> can perform both import and export using the text representation, whereas its custom All-Black format is used only for import.
+
+% GENERATORS ALGORITHMS AND IMAGES  %
+
 \begin{algorithm}[tp]
 \SetAlgoLined
 \caption{Cellular generation algorithm.}
@@ -276,33 +330,6 @@ place the objects\;
 	\caption*{By default, the Cellular Generator has \<RandomFillPercent> set to $45\%$, \<SmoothingIterations> set to $2$,  \<NeighbourTileLimitHigh> set to $4$,  \<NeighbourTileLimitLow> set to $4$,  \<WallThresholdSize> set to $40$ and \<RoomThresholdSize> set to $100$.}
 	\label{fig:cellulars}
 \end{figure}
-
-% DIVISIVE GENERATOR %
-
-\subsubsection{Divisive Generator}\label{sssec:digger}
-
-The \<Divisive Generator> employs a \<binary space partitioning algorithm> to generate a man-made looking map.
-
-\par
-
-The algorithm starts by obtaining partitions of the map by recursively dividing it in two sides of random size along one of the axes, then it selects some of these partitions as rooms and finally it connects them with corridors (for more details, see algorithm \ref{alg:divisive}). The resulting topology depends on the following parameters:
-
-\begin{itemize}
-\item \<RoomDivideProbability>: probability of a partition being divided again. High values promote small rooms.
-\item \<MapRoomPercentage>: minimum percentage of tiles of the map that must be empty. High values promote close rooms separated by walls, low values promote distant rooms connected by corridors.
-\item \<DivideLowerBound>: minimum division point expressed as percentage of the dimension of the room.
-\item \<DivideUpperBound>: maximum division point expressed as percentage of the dimension of the room.
-\item \<MinimumRoomDimension>: minimum width expressed in number of cells that a partition must have to be divided again. High values promote large rooms.
-\item \<MinimumDepth>: the minimum number of recursive divisions that each partition must have experienced.
-\item \<PassageWidth>: the width expressed in number of cells of the corridors connecting the rooms.
-\item \<MaxRandomPassages>: the number of additional corridors to place, if possible, once that all the rooms are connected.
-\end{itemize}
-
-Figure \ref{fig:divisives} shows how these parameters influence the topology of a map.
-
-\par
-
-The \<Divisive Generator> can perform both import and export using the text representation, whereas the All-Black format is used only for export. The latter matches perfectly with this generator, since both are based on the concept of rooms and corridors.
 
 \begin{algorithm}[tp]
 \SetAlgoLined
@@ -380,25 +407,6 @@ place the objects\;
 	\label{fig:divisives}
 \end{figure}
 
-% DIGGER GENERATOR &
-
-\subsubsection{Digger Generator}
-
-The \<Digger Generator> employs a simple algorithm to generate a man-made looking map.
-
-\par
-
-The algorithm is iterative and its state is defined by the current cell and by the current direction, that together with a randomly selected action determine the next cell that the algorithm is going to visit. Starting from the central cell of a filled map, at each iteration the algorithm empties the current cell and randomly decides if moving forward, turning left, turning right, jumping to a random visited cell or placing a flight of stairs, if controlled by a \<Multi-Level Generator>. The algorithm stops when a certain percentage of cells has been emptied. The resulting topology depends on the following parameters:
-
-\begin{itemize}
-\item \<ForwardProbability>: probability of moving forward in the next iteration. High values promote long corridors. 
-\item \<LeftProbability>: probability of moving leftward in the next iteration. High values promote wide open areas. 
-\item \<RightProbability>: probability of moving rightward in the next iteration. High values promote wide open areas. 
-\item \<VisitedProbability>: probability of jumping to a visited cell in the next iteration. High values promote a more complex topology. 
-\item \<StairProbability>: probability of placing a flight of stairs.
-\item \<RoomPercentage>: percentage of tiles of the map that must be empty.
-\end{itemize}
-
 \begin{figure}[tp]
 \centering
 \begin{subfigure}[t]{0.48\linewidth}
@@ -417,16 +425,10 @@ The algorithm is iterative and its state is defined by the current cell and by t
 \includegraphics[width=\linewidth]{digger_fp96}
 \caption{Digger map generated with $For\-ward\-Prob\-a\-bil\-i\-ty = 96\%$, $Right\-Prob\-a\-bil\-i\-ty = 1\%$ and $Left\-ward\-Prob\-a\-bil\-i\-ty = 1\%$.}
 \end{subfigure}
-\caption{Six maps generated by the Digger Generator using ``\<AFairlyRandomSeed>'' as seed, but different settings.}
+\caption{Four maps generated by the Digger Generator using ``\<AFairlyRandomSeed>'' as seed, but different settings.}
 \caption*{By default, the Digger Generator has \<For\-ward\-Prob\-a\-bil\-i\-ty> set to $90\%$, \<Left\-Prob\-a\-bil\-i\-ty> set to $4\%$, \<Right\-Prob\-a\-bil\-i\-ty> set to $4\%$, \<Vis\-it\-ed\-Prob\-a\-bil\-i\-ty> set to $2\%$, \<Stair\-Prob\-a\-bil\-i\-ty> set to $0\%$ and \<Room\-Per\-cent\-age> set to $50\%$.}
 \label{fig:diggers}
 \end{figure}
-
-Figure \ref{fig:diggers} shows how these parameters influence the topology of a map.
-
-\par
-
-The \<Digger Generator> can perform both import and export using the text representation, whereas its custom All-Black format is used only for import.
 
 % ALL-BLACK GENERATOR &
 
@@ -503,6 +505,79 @@ Like the \<Prefab Assembler>, the \<Multi-Level Prefab Assembler> produces a 3D 
 
 The \<Object Displacer> associates a character that represents neither a wall or a clear cell to the corresponding object, displacing it in the correct position. During this process, it populates a dictionary containing all the objects in the map divided by category, that is used by the \<Game Manager> to populate the list of spawn points used by the \<Spawn Point Manager>.
 
+% EXPERIMENT MENAGER %
+
+\subsection{The Experiment Manager}
+
+The \<Experiment Manager> is a stand alone module that allows to create and menage the experiments used to perform user-based validation. Once that an experiment has been defined, the \<Experiment Manager> automatically assigns to the users the matches to play and collects the desired information.
+
+\paragraph{Experiment definition}
+
+\mbox{}\\
+
+{\setlength{\parindent}{0cm}
+An experiment is defined by a \<tutorial>, a list of \<studies> and a \<survey>.}
+
+\par
+
+The \<tutorial> is optional and consists in a match with a simple objective used to explain the commands to the user.
+
+\par
+
+The \<studies> are not optional and each one of them consists in a list of \<cases>. Each case contains a pool of maps and a single game mode, that is used to play the maps in the pool. The maps in the pool are the object of validation, whereas the game mode is the employed validation method.
+
+\par
+
+The \<survey> is optional and consist in a list of multiple-choice questions that are presented to the player at the end of the experiment.
+
+\par
+
+All these elements are can be easily customized, as well as the number of test cases that an user will play in a single experiment session, defined by the parametric variable \<CasesPerUsers>. The \<Experiment Manager> also allows to diagonally flip the maps, which is an useful method to avoid the rise of a bias due to memorization when the player is presented with different versions of the same map.
+
+\paragraph{Experiment management}
+
+\mbox{}\\
+
+{\setlength{\parindent}{0cm}
+Once that an experiment has been defined, it is possible to provide it to user to collect the required information.}
+
+\par
+
+Each time that a user participates in an experiment, the \<Experiment Manager> selects the least played case of the least played study, in a round robin fashion. This allows to have equally distributed data for each study and is possible thanks to the completion tracking provided by the \<Experiment Manager> itself. Then, for each case that the user is going to play, a pre-generated map is extracted from the pool and presented to the player as a match of the game mode specified by the case. In a complete experiment, the player will consecutively play the tutorial, one ore more matches and finally answer to the survey.
+
+\par
+
+The experiment can be performed \<offline> or \<online>. In the former, the computed data and the experiment completion are stored locally, whereas in the latter, they are stored on a server. If the experiment is provided via an executable, then it is possible to configure it as \<offline>, \<online> or both, with the completion that is stored on a server and the computed data that is stored both locally and remotely. If the experiment is provided via a web build playable via browser, the only supported configuration is the \<online> one. 
+
+\paragraph{Logging}
+
+\mbox{}\\
+
+{\setlength{\parindent}{0cm}
+By default, the \<Experiment Manager> produces a complete log of each match, saving the following information:}
+
+\begin{itemize}
+\item \<MapInfo>: this field contains general information about the map featured in the match, as its name, its dimension, the size of its tiles and if it has been flipped.
+\item \<GameInfo>: this field contains general information about the map featured in the match, as the experiment name, the game mode and the duration.
+\item \<SpawnLogs>: this field contains a list of all the spawn events. Each entry contains the timestamp, the coordinates of the spawn point and the name of the spawned entity.
+\item \<PositionLogs>: this field contains a discretized list of the positions occupied by the player during the match, acquired with a given frequency. Each entry contains the timestamp, the coordinates of the player and the direction he is facing expressed in degrees.
+\item \<ShotLogs>: this field contains a list of all the shots fired by the player. Each entry contains the same fields of the \<PositionLogs>, plus the identifier of the firing weapon, the number of projectiles in its magazine and its total available ammunition.
+\item \<ReloadLogs>: this field contains a list of all the reloading performed by the player. Each entry contains the timestamp, the identifier of the weapon that is being reloaded, the number of projectiles in its magazine and its total available ammunition, both before the reloading.
+\item \<HitLogs>: this field contains a list of all the shots that hitted an entity. Each entry contains the timestamp, the coordinates of the hitted entity, the name of the hitted entity, the name of the hitter entity and the caused damage.
+\item \<KillLogs>: this field contains a list of all the killings. Each entry contains the timestamp, the coordinates of the killed entity, the name of the killed entity and the name of the killer entity.
+\end{itemize}
+
+It is possible to customize the \<Experiment Manager> to have it compute and save specific metrics in a different log. Moreover, if the experiment includes a survey, the answers of the user are saved in a dedicated log.
+
+\paragraph{Data retrieval}
+
+The framework provides a simple interface for downloading the logs stored on the server. Since a limit to the size of the each can be set, to better match various server configurations, the log are automatically merged on download and logs with missing parts are marked as such.
+
+\mbox{}\\
+
+{\setlength{\parindent}{0cm}
+Download logs, recompose them, get missing data from log, mark them as incomplete or regenerated, filter desired logs.}
+
 % ENTITIES %
 
 \section{Entities}
@@ -529,43 +604,6 @@ The framework includes three different kind of agents:
 \caption*{From the first to the third are simple targets, from the fourth to the sixth are targets equipped with two opposing laser guns, from the seventh to the ninth are``\<core>'' targets equipped with an increasing number of radial laser guns. The size of each target is proportional to its \<TotalHealth>.}
 \label{fig:targets}
 \end{figure}
-
-% GAME MODES %
-
-\section{Game modes}
-
-The framework comes with three different game modes, that have been designed to highlight specific aspects of a multiplayer FPS. Each game mode is defined by a different implementation of the \<Game Manager>.
-
-\subsection{Duel}
-
-In the \<Duel> game mode is a classic \<deathmatch> redistricted to two entities, with one of the two being the player. Each time that an entity eliminates the other one, it scores one point, whereas it loses one if it destroys itself by accident. When an entity has been eliminated, it \<respawns>\footnote{In video games, \<respawn> denotes the reappearing in a specific location, called \<spawn-point>, of an entity which has been eliminated.} at a random spawn point. At the end of the match, which is marked by a time limit, the winner is the contender who has scored the highest number of points.
-
-\par
-
-Of the game modes that the framework provides, this one is the most complete, because it contains all the dynamics that characterize a multiplayer FPS match, and the most important, since it is the one that is usually used to perform validation in this research field.
-
-\subsection{Target Rush}
-
-In the \<Target Rush> game mode the player faces increasingly difficult waves of enemies, trying to obtain a score as high as possible before the end of the game, that is triggered by the player death or by the running out of time. The player earns score points and additional time when he destroys an enemy or he completes a wave. The number of waves is parametric, as well as the content of each one. By default, this mode has twenty waves and uses targets as enemies, that start as harmless but became more and more numerous and dangerous with each wave (see figure \ref{fig:targets}). 
-
-\par
-
-This game mode has been designed to force the player to explore the map, through the research of enemies, med-kits and ammunition, that quickly become indispensable as the match progresses.
-
-\begin{figure}
-\centering
-\includegraphics[width=0.95\linewidth]{rush20}
-\caption{Targets equipped with laser guns in the final wave of a \<Target Rush> match.}
-\label{fig:targets}
-\end{figure}
-
-\subsection{Target Hunt}
-
-In the \<Target Hunt> game mode the player needs to find and eliminate a series of enemies in a given amount of time. The  enemies that the player is going to face are stored in a parametric list that is read circularly and are spawned one at a time, as soon the previous one has been eliminated. To each enemy is assigned a score.
-
-\par
-
-This game mode has been designed to force the player to search a specific objective in the map.
 
 % WEAPONS %
 
@@ -627,7 +665,7 @@ There are three weapons of this class that the player can use:
 
 The only weapon of this class that the player can use is the \<Rocket Launcher>, a long range weapon with a slow fire rate, a small magazine and no dispersion which shots explosive projectiles. The projectiles of this weapon are slow and explode on impact, dealing an high damage that decreases radially from the center of the explosion. Figure \ref{fig:rocket} shows its model and table \ref{tab:gunconfig} shows its parametric configuration.
 
-\begin{figure}
+\begin{figure}[p]
 \centering
 \begin{subfigure}[t]{0.48\linewidth}
 \includegraphics[width=\linewidth]{gun_assault}
@@ -652,7 +690,7 @@ The only weapon of this class that the player can use is the \<Rocket Launcher>,
 \caption{The weapons that the player can use.}
 \end{figure}
 
-\begin{table}[ht!]
+\begin{table}[p]
 \setlength\extrarowheight{2pt}
 \begin{tabularx}{\textwidth}{|l|C|C|C|C|}
 \cline{2-5}
@@ -703,11 +741,47 @@ The only weapon of this class that the player can use is the \<Rocket Launcher>,
 
 \section{Objects}
 
-% LOGGING %
+Beyond \<decorations>, that are simple 3D models with no logic used to graphically enrich the map, the framework provides \<spawners>, i.e. objects that spawn a resource that can be collected by the entities. Once that the resource is collected, it disappears for an interval  of time defined by the parametric variable  \<Cooldown>. The framework comes with two different \<spawners>:
 
-\section{Logging}
+\begin{itemize}
+\item \<Med-kit Spawner>: it spawns med-kits, that partially restore the health of the entity. The healed amount of health is defined by \<RestoredHealth>.
+\item \<Ammunition Spawner>: it spawns ammunition crates, that supply the entity with ammunition. \<SuppliedGuns> defines which guns the crates can supply, whereas \<AmmoAmounts> defines how many ammunition are provided to the entity for each supplied weapon.
 
-% EXPERIMENT MANAGEMENT %
+\end{itemize}
 
-\section{Experiment management}
+% GAME MODES %
 
+\section{Game modes}
+
+The framework comes with three different game modes, that have been designed to highlight specific aspects of a multiplayer FPS. Each game mode is defined by a different implementation of the \<Game Manager>.
+
+\subsection{Duel}
+
+In the \<Duel> game mode is a classic \<deathmatch> redistricted to two entities, with one of the two being the player. Each time that an entity eliminates the other one, it scores one point, whereas it loses one if it destroys itself by accident. When an entity has been eliminated, it \<respawns>\footnote{In video games, \<respawn> denotes the reappearing in a specific location, called \<spawn-point>, of an entity which has been eliminated.} at a random spawn point. At the end of the match, which is marked by a time limit, the winner is the contender who has scored the highest number of points.
+
+\par
+
+Of the game modes that the framework provides, this one is the most complete, because it contains all the dynamics that characterize a multiplayer FPS match, and the most important, since it is the one that is usually used to perform validation in this research field.
+
+\subsection{Target Rush}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.95\linewidth]{rush20}
+\caption{Targets equipped with laser guns in the final wave of a \<Target Rush> match.}
+\label{fig:targets}
+\end{figure}
+
+In the \<Target Rush> game mode the player faces increasingly difficult waves of enemies, trying to obtain a score as high as possible before the end of the game, that is triggered by the player death or by the running out of time. The player earns score points and additional time when he destroys an enemy or he completes a wave. The number of waves is parametric, as well as the content of each one. By default, this mode has twenty waves and uses targets as enemies, that start as harmless but became more and more numerous and dangerous with each wave (see figure \ref{fig:targets}). 
+
+\par
+
+This game mode has been designed to force the player to explore the map, through the research of enemies, med-kits and ammunition, that quickly become indispensable as the match progresses.
+
+\subsection{Target Hunt}
+
+In the \<Target Hunt> game mode the player needs to find and eliminate a series of enemies in a given amount of time. The  enemies that the player is going to face are stored in a parametric list that is read circularly and are spawned one at a time, as soon the previous one has been eliminated. To each enemy is assigned a score.
+
+\par
+
+This game mode has been designed to force the player to search a specific objective in the map.
