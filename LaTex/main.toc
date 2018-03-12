@@ -25,33 +25,37 @@
 \contentsline {section}{\numberline {3.2}Map representation}{18}
 \contentsline {subsection}{\numberline {3.2.1}Text representation}{18}
 \contentsline {subsection}{\numberline {3.2.2}All-Black representation}{18}
-\contentsline {section}{\numberline {3.3}The framework structure}{20}
+\contentsline {section}{\numberline {3.3}Framework structure}{20}
 \contentsline {subsection}{\numberline {3.3.1}The Game Manager}{20}
-\contentsline {subsection}{\numberline {3.3.2}The Spawn Point Manager}{21}
-\contentsline {subsection}{\numberline {3.3.3}The Map Manager}{21}
+\contentsline {subsection}{\numberline {3.3.2}The Map Manager}{21}
 \contentsline {subsubsection}{Single-Level Map Manager}{21}
 \contentsline {subsubsection}{Multi-Level Map Manager}{21}
-\contentsline {subsubsection}{All-Black Multi-Level Map Manager}{22}
-\contentsline {subsection}{\numberline {3.3.4}The Map Generator}{22}
+\contentsline {subsubsection}{All-Black Multi-Level Map Manager}{21}
+\contentsline {subsection}{\numberline {3.3.3}The Map Generator}{22}
 \contentsline {subsubsection}{Cellular Generator}{24}
 \contentsline {subsubsection}{Divisive Generator}{25}
-\contentsline {subsubsection}{Digger Generator}{28}
-\contentsline {subsubsection}{All-Black Generator}{32}
-\contentsline {subsection}{\numberline {3.3.5}The Stairs Generator}{32}
-\contentsline {subsection}{\numberline {3.3.6}The Map Assembler}{32}
+\contentsline {subsubsection}{Digger Generator}{26}
+\contentsline {subsubsection}{All-Black Generator}{26}
+\contentsline {subsection}{\numberline {3.3.4}The Stairs Generator}{32}
+\contentsline {subsection}{\numberline {3.3.5}The Map Assembler}{32}
 \contentsline {subsubsection}{Mesh Assembler}{32}
 \contentsline {subsubsection}{Prefab Assembler}{32}
 \contentsline {subsubsection}{Multi-Level Prefab Assembler}{32}
+\contentsline {subsection}{\numberline {3.3.6}The Spawn Point Manager}{32}
 \contentsline {subsection}{\numberline {3.3.7}The Object Displacer}{35}
-\contentsline {section}{\numberline {3.4}Entities}{35}
-\contentsline {section}{\numberline {3.5}Game modes}{35}
-\contentsline {subsection}{\numberline {3.5.1}Duel}{36}
-\contentsline {subsection}{\numberline {3.5.2}Target Rush}{36}
-\contentsline {subsection}{\numberline {3.5.3}Target Hunt}{37}
-\contentsline {section}{\numberline {3.6}Weapons}{37}
-\contentsline {paragraph}{Raycast guns}{38}
+\contentsline {subsection}{\numberline {3.3.8}The Experiment Manager}{35}
+\contentsline {paragraph}{Experiment definition}{35}
+\contentsline {paragraph}{Experiment management}{35}
+\contentsline {paragraph}{Logging}{36}
+\contentsline {paragraph}{Data retrieval}{37}
+\contentsline {section}{\numberline {3.4}Entities}{37}
+\contentsline {section}{\numberline {3.5}Weapons}{38}
+\contentsline {paragraph}{Raycast guns}{39}
 \contentsline {paragraph}{Projectile guns}{39}
-\contentsline {paragraph}{Laser guns}{39}
-\contentsline {section}{\numberline {3.7}Objects}{40}
-\contentsline {section}{\numberline {3.8}Logging}{41}
-\contentsline {section}{\numberline {3.9}Experiment management}{41}
+\contentsline {paragraph}{Laser guns}{40}
+\contentsline {section}{\numberline {3.6}Objects}{40}
+\contentsline {section}{\numberline {3.7}Game modes}{40}
+\contentsline {subsection}{\numberline {3.7.1}Duel}{42}
+\contentsline {subsection}{\numberline {3.7.2}Target Rush}{42}
+\contentsline {subsection}{\numberline {3.7.3}Target Hunt}{43}
+\contentsline {section}{\numberline {3.8}Summary}{43}
