@@ -5,6 +5,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 ### STRUCTS ##################################################################
+
 class Room:
     originX = None
     originY = None

@@ -20,7 +20,7 @@
 \contentsline {paragraph}{Today: A time of stagnation}{15}
 \contentsline {section}{\numberline {2.5}Graph Theory in video games}{16}
 \contentsline {section}{\numberline {2.6}Summary}{16}
-\contentsline {chapter}{\numberline {3}Features of the research framework}{17}
+\contentsline {chapter}{\numberline {3}The research framework}{17}
 \contentsline {section}{\numberline {3.1}Description of the framework}{17}
 \contentsline {section}{\numberline {3.2}Map representation}{18}
 \contentsline {subsection}{\numberline {3.2.1}Text representation}{18}
@@ -59,3 +59,15 @@
 \contentsline {subsection}{\numberline {3.7.2}Target Rush}{42}
 \contentsline {subsection}{\numberline {3.7.3}Target Hunt}{43}
 \contentsline {section}{\numberline {3.8}Summary}{43}
+\contentsline {chapter}{\numberline {4}The graph-based tool}{45}
+\contentsline {section}{\numberline {4.1}Description of the tool}{45}
+\contentsline {section}{\numberline {4.2}Analysis of pre-generated maps}{45}
+\contentsline {subsection}{\numberline {4.2.1}Outlines graph}{46}
+\contentsline {subsection}{\numberline {4.2.2}Reachability graphs}{46}
+\contentsline {subsubsection}{Tiles graph}{46}
+\contentsline {subsubsection}{Rooms graph}{46}
+\contentsline {subsubsection}{Rooms and resources graph}{47}
+\contentsline {subsection}{\numberline {4.2.3}Visibility graph}{47}
+\contentsline {subsection}{\numberline {4.2.4}Interesting metrics}{47}
+\contentsline {section}{\numberline {4.3}Populating of pre-generated maps}{49}
+\contentsline {section}{\numberline {4.4}Summary}{49}

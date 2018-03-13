@@ -1,4 +1,4 @@
-\chapter{Features of the research framework}
+\chapter{The research framework}
 
 % INTRODUCTION %
 
@@ -741,7 +741,7 @@ The only weapon of this class that the player can use is the \<Rocket Launcher>,
 Beyond \<decorations>, that are simple 3D models with no logic used to graphically enrich the map, the framework provides \<spawners>, i.e. objects that spawn a resource that can be collected by the entities. Once that the resource is collected, it disappears for an interval  of time defined by the parametric variable  \<Cooldown>. The framework comes with two different \<spawners>:
 
 \begin{itemize}
-\item \<Med-kit Spawner>: it spawns med-kits, that partially restore the health of the entity. The healed amount of health is defined by \<RestoredHealth>.
+\item \<Health pack Spawner>: it spawns health packs, that partially restore the health of the entity. The healed amount of health is defined by \<RestoredHealth>.
 \item \<Ammunition Spawner>: it spawns ammunition crates, that supply the entity with ammunition. \<SuppliedGuns> defines which guns the crates can supply, whereas \<AmmoAmounts> defines how many ammunition are provided to the entity for each supplied weapon.
 
 \end{itemize}
@@ -754,7 +754,7 @@ The framework comes with three different game modes, that have been designed to 
 
 \subsection{Duel}
 
-The \<Duel> game mode is a classic \<deathmatch> redistricted to two entities, with one of the two being the player. Each time that an entity eliminates the other one, it scores one point, whereas it loses one if it destroys itself by accident. When an entity has been eliminated, it \<respawns>\footnote{In video games, \<respawn> denotes the reappearing in a specific location, called \<spawn-point>, of an entity which has been eliminated.} at a random spawn point. At the end of the match, which is marked by a time limit, the winner is the contender who has scored the highest number of points.
+The \<Duel> game mode is a classic \<deathmatch> redistricted to two entities, with one of the two being the player. Each time that an entity eliminates the other one, it scores one point, whereas it loses one if it destroys itself by accident. When an entity has been eliminated, it \<respawns>\footnote{In video games, \<respawn> denotes the reappearing in a specific location, called \<spawn point>, of an entity which has been eliminated.} at a random spawn point. At the end of the match, which is marked by a time limit, the winner is the contender who has scored the highest number of points.
 
 \par
 
@@ -773,7 +773,7 @@ In the \<Target Rush> game mode the player faces increasingly difficult waves of
 
 \par
 
-This game mode has been designed to force the player to explore the map, through the research of enemies, med-kits and ammunition, that quickly become indispensable as the match progresses.
+This game mode has been designed to force the player to explore the map, through the research of enemies, health packs and ammunition, that quickly become indispensable as the match progresses.
 
 \subsection{Target Hunt}
 
