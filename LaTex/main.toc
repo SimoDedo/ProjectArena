@@ -73,9 +73,8 @@
 \contentsline {subsection}{\numberline {4.3.1}FPS map analysis}{50}
 \contentsline {subsection}{\numberline {4.3.2}Spawn points placement}{51}
 \contentsline {subsubsection}{Low risk heuristic}{51}
-\contentsline {subsubsection}{High risk heuristic}{52}
-\contentsline {subsubsection}{Uniform heuristic}{52}
-\contentsline {subsubsection}{Random heuristic}{52}
-\contentsline {subsection}{\numberline {4.3.3}Ammunition placement}{52}
-\contentsline {subsection}{\numberline {4.3.4}Health packs placement}{52}
-\contentsline {section}{\numberline {4.4}Summary}{52}
+\contentsline {subsubsection}{Uniform heuristic}{53}
+\contentsline {subsubsection}{Random heuristic}{53}
+\contentsline {subsection}{\numberline {4.3.3}Ammunition placement}{53}
+\contentsline {subsection}{\numberline {4.3.4}Health packs placement}{53}
+\contentsline {section}{\numberline {4.4}Summary}{53}

@@ -394,8 +394,7 @@ def addSpawnPointsUniformly(map, rooms, spawnPoint):
             bestRoom = roomGraph.node[random.choice(list(roomGraph.nodes))]
 
         print("Done.")
-
-
+        
         candidateTiles = [(x, y, tileFit(x, y, visibilityFit[x][y], bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], \
         placedObjects, diagonal, [1, 0.5, 0.5])) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]
         bestTile = max(candidateTiles, key = lambda x: x[2])

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  14 MAR 2018 14:58
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  14 MAR 2018 19:00
 entering extended mode
 **./main.tex
 (main.tex
@@ -957,18 +957,18 @@ LaTeX Warning: Label `fig:targets' multiply defined.
 (chapters/chapter7.aux))
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 99.
-LaTeX Font Info:    ... okay on input line 99.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 99.
-LaTeX Font Info:    ... okay on input line 99.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 99.
-LaTeX Font Info:    ... okay on input line 99.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 99.
-LaTeX Font Info:    ... okay on input line 99.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 99.
-LaTeX Font Info:    ... okay on input line 99.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 99.
-LaTeX Font Info:    ... okay on input line 99.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: End \AtBeginDocument code.
 
@@ -1038,7 +1038,7 @@ G,.JBIG2,.JB2,.eps]
 (grfext)             \AppendGraphicsExtensions on input line 456.
 )
 ABD: EverySelectfont initializing macros
-LaTeX Info: Redefining \selectfont on input line 99.
+LaTeX Info: Redefining \selectfont on input line 112.
 Now handling font encoding TS1 ...
 ... processing UTF-8 mapping file for font encoding TS1
 
@@ -1122,12 +1122,12 @@ Dictionary: translator-basic-dictionary, Language: English
 File: siunitx-abbreviations.cfg 2017/11/26 v2.7k siunitx: Abbreviated units
 )
 \c__siunitx_mathsf_int=\count292
-LaTeX Font Info:    Try loading font information for U+msa on input line 99.
+LaTeX Font Info:    Try loading font information for U+msa on input line 112.
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\umsa.fd"
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 99.
+LaTeX Font Info:    Try loading font information for U+msb on input line 112.
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\umsb.fd"
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
@@ -1136,7 +1136,7 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 <images/polimi.png, id=1, 312.16624pt x 312.16624pt>
 File: images/polimi.png Graphic file (type png)
 <use images/polimi.png>
-Package pdftex.def Info: images/polimi.png  used on input line 112.
+Package pdftex.def Info: images/polimi.png  used on input line 125.
 (pdftex.def)             Requested size: 108.0011pt x 107.99754pt.
  [1
 
@@ -1709,11 +1709,11 @@ aph_visibility.png>]
 LaTeX Warning: Citation `great1vs1' on page 49 undefined on input line 128.
 
 [49] [50] [51]
-Overfull \hbox (6.5952pt too wide) detected at line 184
+Overfull \hbox (7.04152pt too wide) detected at line 187
 []
  []
 
-) [52]
+[52]) [53]
 \openout2 = `chapters/chapter5.aux'.
 
  (chapters/chapter5.tex)
@@ -1722,7 +1722,17 @@ Overfull \hbox (6.5952pt too wide) detected at line 184
  (chapters/chapter6.tex)
 \openout2 = `chapters/chapter7.aux'.
 
- (chapters/chapter7.tex)
+
+(chapters/chapter7.tex) [54
+
+
+
+
+
+
+
+
+]
 No file main.bbl.
 (main.aux (chapters/chapter0.aux) (chapters/chapter1.aux)
 (chapters/chapter2.aux) (chapters/chapter3.aux) (chapters/chapter4.aux)
@@ -1735,10 +1745,10 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 16501 strings out of 493303
- 327701 string characters out of 3138856
- 357308 words of memory out of 3000000
- 19774 multiletter control sequences out of 15000+200000
+ 16509 strings out of 493303
+ 327749 string characters out of 3138856
+ 357481 words of memory out of 3000000
+ 19782 multiletter control sequences out of 15000+200000
  546844 words of font info for 85 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  41i,17n,43p,10380b,629s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -1759,9 +1769,9 @@ e1/public/amsfonts/cm/cmsy6.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public
 /amsfonts/cm/cmsy8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts
 /cm/cmti10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti
 9.pfb>
-Output written on main.pdf (68 pages, 2110813 bytes).
+Output written on main.pdf (70 pages, 2115317 bytes).
 PDF statistics:
- 375 PDF objects out of 1000 (max. 8388607)
+ 381 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  206 words of extra memory for PDF output out of 10000 (max. 10000000)
 
