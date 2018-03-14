@@ -77,6 +77,23 @@
 % Macro for bold.
 \def\[#1]{\textbf{#1}}
 
+% MATHEMATICAL OPERATORS %
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\degcent}{deg}
+\DeclareMathOperator*{\spl}{shortest\,path\,length}
+\DeclareMathOperator*{\diam}{diameter}
+\DeclareMathOperator*{\neigh}{neighborhood}
+
+% Do something about argmin and argmax.
+\newcommand{\cs}[1]{\texttt{\symbol{`\\}#1}}
+% Define new sizes for the parenthesis.
+\makeatletter
+\newcommand{\vast}{\bBigg@{3.5}}
+\newcommand{\Vast}{\bBigg@{4}}
+\makeatother
+
 % FRONT MATTER %
 
 \begin{document}

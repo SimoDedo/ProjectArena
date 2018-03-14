@@ -475,7 +475,7 @@ def getNormalizedDegree(roomGraph, discardDeadEnds=False):
     degree = roomGraph.degree
     minDeg = min(degree, key = lambda x: x[1])[1]
     maxDeg = max(degree, key = lambda x: x[1])[1]
-    return [(deg[0], (deg[1] / (maxDeg + minDeg))) for deg in roomGraph.degree if (discardDeadEnds is False or deg[1] > 1)]
+    return [(deg[0], (deg[1] - minDeg) / (maxDeg - minDeg)) for deg in roomGraph.degree if (discardDeadEnds is False or deg[1] > 1)]
 
 # Computes how much each normalized degree fits the specified interval.
 def getNormalizedDegreeFit(normalizedDegree, minimum, maximum):
@@ -521,7 +521,7 @@ def getVisibilityMatrix(map):
 # one of the specified resources.
 def resourceDistance(graph, diameter, node, resources):
     return min([(shortestPathLength(graph, node, sNode)) if "resource" in data and data["resource"] in resources \
-                     else math.inf for sNode, data in graph.nodes(data=True)]) / diameter
+                     else diameter for sNode, data in graph.nodes(data=True)]) / diameter
 
 # Returns how many resource of a give type are in the neighbourhood of the
 # node.
@@ -557,7 +557,8 @@ def getBestTile(graph, diameter, diagonal, object, objects, placedObjects, degre
                       placedObjects, diagonal, tileWeigths)) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]
     return max(candidateTiles, key = lambda x: x[2])
 
-# Returns the node which has the maximum minimum distance from the resource nodes.
+# Returns the node which has the maximum minimum distance from the resource
+# nodes.
 def getMostIsolatedNode(graph, resource):
     nodes = [(node1, min([nx.shortest_path_length(graph, node1, node2) for node2, data2 in graph.nodes(data = True) if ("resource" in data2 and data2["resource"] == resource)])) \
                       for node1, data1 in graph.nodes(data = True) if ("resource" not in data1)]
@@ -924,7 +925,7 @@ def filesMenu():
 
 # Mengaes the map population menu.
 def populateMenu():
-    index = 0;
+    index = 0
 
     while True:
         print("\n[MAP POPULATION] Select an option:")
