@@ -81,7 +81,7 @@
 
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
-\DeclareMathOperator*{\degcent}{degree}
+\DeclareMathOperator*{\degcent}{deg}
 \DeclareMathOperator*{\spl}{shortest\,path\,length}
 \DeclareMathOperator*{\diam}{diameter}
 \DeclareMathOperator*{\neigh}{neighborhood}
@@ -89,22 +89,17 @@
 \DeclareMathOperator*{\maxwalld}{maximum\,wall\,distance}
 \DeclareMathOperator*{\cartd}{Cartesian\,distance}
 \DeclareMathOperator*{\mapd}{map\,diagonal}
+\DeclareMathOperator*{\intd}{interval\,distance}
 
 % Do something about argmin and argmax.
 \newcommand{\cs}[1]{\texttt{\symbol{`\\}#1}}
 
 % Define new sizes for the parenthesis.
 \makeatletter
+\newcommand{\biggg}{\bBigg@{2.25}}
+\newcommand{\Biggg}{\bBigg@{2.5}}
 \newcommand{\vast}{\bBigg@{3.5}}
 \newcommand{\Vast}{\bBigg@{4}}
-\makeatother
-
-% Set space after equation equal to the one before it.
-\makeatletter
-\g@addto@macro\normalsize{%
-  \setlength\belowdisplayskip{25pt}
-  \setlength\belowdisplayshortskip{25pt}
-}
 \makeatother
 
 % FRONT MATTER %

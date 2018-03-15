@@ -2,7 +2,7 @@
 
 % INTRODUCTION %
 
-In this chapter we describe the tool that we have developed to perform analysis and populating of pre-generated maps using \<Graph Theory>. After a quick overview, we introduce the analysis capabilities of this tool and then we present how we have employed them, together with Graph Theory, to strategically place resources in pre-generated maps.
+In this chapter we describe the tool that we have developed to perform analysis and populating of pre-generated maps using \<Graph Theory>. After a quick overview, we introduce the analysis capabilities of this tool and then we present how we have employed them, together with Graph Theory, to strategically place resources (including the spawn points) in pre-generated maps.
 
 % DESCRIPTION %
 
@@ -12,7 +12,7 @@ This tool generates different kind of graphs, starting from the text and the All
 
 \par
 
-The use of All-Black format is convenient, because it provides by default a logical division of the map in different areas and it allows our tool to be applied by other researchers, since as we have seen the All-Black format is widely used in this field. We have used this tool to position resources in a pre-generated map, but, for instance, it could be used to address the identification and definition of design patterns from an unfamiliar perspective or for \<direct evaluation> in Search Based PCG.
+The use of All-Black format is convenient, because it provides by default a logical division of the map in different areas and it allows our tool to be applied by other researchers, since as we have seen the All-Black format is widely used in this field. We have used this tool to position objects in a pre-generated map, but, for instance, it could be used to address the identification and definition of design patterns from an unfamiliar perspective or for \<direct evaluation> in Search Based PCG.
 
 \par 
 
@@ -105,10 +105,10 @@ This graph can be used to analyze which areas of the map are more exposed and wh
 
 \subsection{Interesting metrics}
 
-Considering the graphs, in particular the ones with rooms and corridors as nodes, the following metrics defined by Graph Theory provide interesting information about the layout of a map:
+Considering the graphs, in particular the ones with room nodes, the following metrics defined by Graph Theory provide interesting information about the layout of a map:
 
 \begin{itemize}
-\item \<Degree centrality>: defined for a node, it is the number of edges that the node has. If the node represents a room, it measures how many entrance or exits the room has.
+\item \<Degree centrality>: defined for a node, it is the number of edges that the node has. If the node represents a room, it measures how many entrance or exits the room has. 
 \item \<Normalized degree centrality>: defined for a node, it is obtained by normalizing the degree centrality, associating 0 to the node with the minimum centrality and 1 to the node with the maximum centrality.
 \item \<Closeness centrality>: defined for a node, it measures its centrality in the graph, computed as the sum of the lengths of the shortest paths between the node and all other nodes in the graph. If the node represents a room, it measures how central the room is.
 \item \<Betweenness centrality>: defined for a node, it measures its centrality in the graph, computed as the number of shortest paths connecting the nodes in the graph that pass through the node. If the node represents a room, it measures how central the room is.
@@ -127,8 +127,7 @@ Considering the graphs, in particular the ones with rooms and corridors as nodes
 
 We have defined multiple heuristics to populate a map with spawn points and resources using the metrics that can be extracted from a graph. These heuristic are a mathematical transposition of rules and patterns concerning resource placement that we have extracted from the work of Tim Schäfer\cite{great1vs1}, who has performed an in depth analysis of multiplayer 1vs1 maps for \<Quake 2>\footnote{Id Software, 1997}.
 
-
-\subsection{FPS map analysis}
+\subsection{Rules and patterns for resources positioning}
 
 The balance of a deathmatch game radically changes each time that a player is killed. If the game has more than two players, the player who won the fight does not gain any strategic advantage, since he still has the other players to face, whereas the defeated player is put at considerable disadvantage, because on death he loses all the weapons and ammunition that he collected. In a 1vs1 match, a kill has an even stronger influence, since the surviving player has more weapons and ammunition and gains the complete control of the map, that comes with the chance of scoring another easy kill, as soon as the other player respawns, or of searching for additional equipment. Schäfer refers to the surviving player as \[up-player] and to the defeated one as \[down-player].
 
@@ -160,51 +159,108 @@ Power-ups grant temporary advantages to the player who collects them, like invis
 
 The position of a weapon and of its ammunition depends on the weapon itself. We can divide the weapons in three categories: weak, medium and strong. Weak weapons are of a certain interest for the down-player, if he has not collected any other weapon yet, and of no interest for the up-player, so they are placed near spawn-points or in gaps where no other weapon is available, together with their ammunition. Medium weapons are of high interest for the down-player, since he needs to get one of them as soon as possible if he wants to face the up-player, so they are placed in areas that are easy to reach and the same goes for their ammunition. Finally, the strong weapons should be placed in areas that are strategically disadvantageous, like dead ends or vertically dominated areas, or difficult to reach. If a weapon is very contextual, i.e. it is useful in very few situations, it is usually placed in an area that allows to take advantage of its features, whereas a weapon that is strong in almost any situation is usually placed in an area where it cannot be used optimally (e.g. a rocket launcher in a small room).
 
+\subsection{Placement process}
+\label{ss:placement}
+
+Starting from these considerations, we defined a process based on heuristics that allows to position any kind of resource. This process consists in two phases: the selection of a room and the selection of a tile inside the room.
+
+\par
+
+The selection of a room is performed considering two suitability criteria:
+
+\begin{itemize}
+\item \<Degree suitability>: defined by the function $D(n)$, where $r$ is a room node, it measures how much the degree centrality of the node matches with the desired one.
+\item \<Resources closeness suitability>: defined by the function $C_{res}(r)$, where $r$ is a room node, it measures how much the proximity of the node with already placed resource nodes matches with the desired one.
+\end{itemize}
+
+Given $G$ the rooms and corridors graph and $R \subset G$ the subset of room nodes, the room node which is selected is the one which maximizes the following weighted sum of the functions:
+
+\begin{align}
+room = \argmax_{r \in R} (w_D  \times D(r) + w_{C_{res}}  \times C_{res}(r))
+\end{align}
+
+\noindent
+Both functions should be defined to output a value in the range $[0,1]$.
+
+\par
+
+Once that the room is selected, the selection of a tile is performed considering three suitability criteria:
+
+\begin{itemize}
+\item \<Visibility suitability>: defined by the function $v(t)$, where $r$ is a tile node, it measures how much the visibility of the node matches with the desired one.
+\item \<Wall closeness suitability>: defined by the function $c_{wall}(t)$, where $r$ is a tile node, it measures how much the proximity of the node to the walls matches with the desired one.
+\item \<Resources closeness suitability>: defined by the function $c_{res}(t)$, where $r$ is a tile node, it measures how much the proximity of the node with already placed resource nodes matches with the desired one.
+\end{itemize}
+
+Given $G$ the tiles graph and $T \subset G$ the subset of tiles contained in the selected room, the tile which is selected is the one which maximizes the following weighted sum of the functions:
+
+\begin{align}
+room = \argmax_{t \in T} (w_v \times v(t) + w_{c_{wall}}  \times c_{wall}(r) + w_{c_{res}}  \times c_{res}(r))
+\end{align}
+
+\noindent
+All three functions should be defined to output a value in the range $[0,1]$.
+
+\par
+
+The process can repeated as many time as needed, after having updated the graphs with the newly added resource. To obtain the best result, the resources should be placed in the order their heuristic are presented.
+
 \subsection{Spawn points placement}
 
-We have defined four heuristics for the placement of spawn points. 
+We have defined three heuristics for the placement of spawn points, the first one follows the process defined in subsection \ref{ss:placement}, the other two do not.
 
 \subsubsection{Low risk heuristic}
 
-This method selects rooms that have a low number of entrances, are not dead ends and are distant from each other and for each one of them places the spawn point on the tile that offers the best balance between low visibility and distance from the walls. In this way spawn points are placed in passageways that are sheltered and easy to leave. 
+This method selects rooms that have a low number of connections, are not dead ends and are distant from each other and for each one of them places the spawn point on the tile that offers the best balance between low visibility and distance from the walls. In this way spawn points are placed in passageways that are sheltered and easy to leave. 
 
 \par
 
-Given $G$ the rooms and corridors graph, $R \subset G$ the subset of room nodes, $S \subset G$ the subset of resource nodes (that in this case is composed exclusively by the already positioned spawn points) and $n$ the total number of spawn points that must be added to the map, the most suitable room for containing  a spawn point is selected with the following heuristic:
+Given $G$ the rooms and corridors graph, $R \subset G$ the subset of room nodes, $S \subset G$ the subset of resource nodes (composed exclusively by the already positioned spawn points) and $n$ the total number of spawn points that must be added to the map, the most suitable room for containing a spawn point is selected using:
 
-\begin{align*}
- &  room = \argmax_{r \in R}\vast(  w_2 \times \min_{n \in G}
+\begin{align}
+\label{eq:lowriskdeg}
+D(r) = \begin{cases}
+    		\hfil 0 & \text{if } \degcent((r)) = 1 \\
+    		1 - \cfrac{\degcent(r) - \min_{r' \in R}\degcent(r')}{\max_{r' \in R}\degcent(r') - \min_{r' \in R}\degcent(r')} & \text{if } \degcent(r) \neq 1 \
+  	\end{cases}
+\end{align}
+
+\begin{align}
+\label{eq:lowriskres}
+C_{res}(r) = \min_{n \in G}
   	\begin{cases}
     		\hfil 1 & \text{if } n \in S \\
     		\cfrac{\spl(r, n)}{\diam(G)} & \text{if } n \in S \
-  	\end{cases} \vast\} \\ 
-  	 & + w_1 \times
-	\begin{cases}
-    		\hfil 0 & \text{if } \degcent(s) = 1 \\
-    		1 - \cfrac{\degcent(r) - \min_{r' \in R}\degcent(r')}{\max_{r' \in R}\degcent(r') - \min_{r' \in R}\degcent(r')} & \text{if } \degcent(r) \neq 1 \
-  	\end{cases} \vast\}
-	\vast)
-\end{align*}
+  	\end{cases}
+\end{align}
 
-The first component of the equation, which is weighted by $w_2$, promotes rooms with few passages but that are not dead ends, whereas the second component, which is weighted by $w_1$, promotes rooms that are distant from the already placed spawn points. Both are normalized to the interval $[0,1]$ and their influence is proportional to their weights. We experimentally found that the values which provide the best results are $ w_1 = 1 $ and $ w_2 = 0.5 $.
+\noindent
+Where $deg$ denotes the connectivity degree of a node. Equation \ref{eq:lowriskdeg} promotes rooms with few passages but that are not dead ends, whereas equation \ref{eq:lowriskres} promotes rooms that are distant from the already placed spawn points. Both are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $w_D = 1 $ and $ w_{C_{res}} = 0.5 $.
 
 \par
 
-Once that the room has been found, one of its tiles is selected with the support of the visibility graph. Given G the visibility graph, $T \subset G$ the subset of nodes that belong to the room, $S \subset G$ the subset of nodes that contain resources (that in this case is composed exclusively by the already positioned spawn points), the most suitable tile for containing a spawn point is selected with the following heuristic:
+Given G the visibility graph, $T \subset G$ the subset of tile nodes that belong to the room, $R \subset G$ the subset of tile nodes which contain a resource (composed exclusively by the already positioned spawn points), the most suitable tile for containing a spawn point is selected using:
 
-\begin{align*}
-tile = \argmax_{t \in T} & \vast( w_1 \times \vast( 
-    		1 - \cfrac{\degcent(t) - \min_{t' \in G}\degcent(t')}{\max_{t' \in G}\degcent(t') - \min_{t' \in G}\degcent(t')} \vast) \\
-  	 &\quad +  w_2 \times \cfrac{\walld(t, room)}{ \maxwalld(room)} \\
-  	 &\quad  + w_3 \times
-  	\begin{cases}
+\begin{align}
+\label{eq:lowvis}
+v(t) = 1 - \cfrac{\degcent(t) - \min_{t' \in G}\degcent(t')}{\max_{t' \in G}\degcent(t') - \min_{t' \in G}\degcent(t')}
+\end{align}
+
+\begin{align}
+\label{eq:lowwallclos}
+c_{wall}(r) = \cfrac{\walld(t, room)}{ \maxwalld(room)}
+\end{align}
+
+\begin{align}
+\label{eq:lowresclos}
+ c_{res}(r) = \begin{cases}
     		\hfil 0 & \text{if } | S | = 0 \\
     		\min_{s \in S}\cfrac{\cartd(t, s)}{d}& \text{if }  | S | > 0 \
-  	\end{cases} \vast\}
-	\vast)
-\end{align*}
+  	\end{cases} 
+\end{align}
 
-The first component of the equation, which is weighted by $w_1$, promotes tiles with low visibility, the second component, which is weighted by $w_2$, promotes tiles that are distant from the walls, whereas the third component, which is weighted by $w_3$, promotes tiles that are distant from already placed spawn points. All three components are normalized to the interval $[0,1]$ and their influence is proportional to their weights. We experimentally found that the values which provide the best results are $ w_1 = 1 $ and $ w_2 = 0.5 $ and $ w_3 = 0.5 $.
+\noindent
+Where \<wall distance> is the distance of a tile from the walls of the room, computed as the sum of the minimum distances from the horizontal and vertical walls, and \<maximum wall distance> is the wall distance of the central tile of the room. Equation  \ref{eq:lowvis} promotes tiles with low visibility, equation \ref{eq:lowwallclos} promotes tiles that are distant from the walls, whereas equation \cite{eq:lowresclos} promotes tiles that are distant from already placed spawn points. All three are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $ w_v = 1 $ and $ w_{c_{wall}} = 0.5 $ and $ w_{c_{res}}  = 0.5 $.
 
 \subsubsection{Uniform heuristic}
 
@@ -212,21 +268,82 @@ This method selects rooms that are uniformly distributed in the map and for each
 
 \par
 
-The first room is selected at random, then, given $G$ the rooms and corridors graph, $R \subset G$ the subset of room nodes, $S \subset G$ the subset of resource nodes (that in this case is composed exclusively by the already positioned spawn points), the remaining rooms are selected with the following heuristic:
+The first room is selected at random, then, given $G$ the rooms and corridors graph, $R \subset G$ the subset of room nodes, $S \subset G$ the subset of resource nodes (composed exclusively by the already positioned spawn points), the remaining rooms are selected with the following heuristic:
 
-\begin{align*}
+\begin{align}
 	room = \argmax_{r \in R} ( \min_{s \in S} (\spl(r, s) ))
-\end{align*}
+\end{align}
 
-\par
-
-Once that the room has been found, one of its tiles is selected using the low risk heuristic. 
+Once that the room has been found, one of its tiles is selected using equations \ref{eq:lowvis}, \ref{eq:lowwallclos} and\ref{eq:lowresclos} with weights  $ w_{c_{wall}} = 0.5 $ and $ w_{c_{res}}  = 0.5 $.
 
 \subsubsection{Random heuristic}
 
-\subsection{Ammunition placement}
+This method selects rooms at random and for each one of them places the spawn point on the tile that offers the best balance between low visibility and distance from the walls, using using equations \ref{eq:lowvis}, \ref{eq:lowwallclos} and\ref{eq:lowresclos} with weights  $ w_{c_{wall}} = 0.5 $ and $ w_{c_{res}}  = 0.5 $.
 
 \subsection{Health packs placement}
+
+Heath packs are placed in rooms that have a low-medium number of connections and are distant from each other on the tile that offers the best balance between medium visibility and distance from the walls. In this way the heath packs are placed in areas that are easy to reach and are not to exposed.
+
+\par
+
+Given $G$ the rooms and corridors graph, $R \subset G$ the subset of room nodes, $S \subset G$ the subset of resource nodes (composed by the already positioned spawn points and health packs) and $n$ the total number of health packs that must be added to the map, the most suitable room for containing a health pack is selected using:
+
+\begin{align}
+\label{eq:lowriskdegh}
+D(r) = \begin{cases}
+    		\hfil 0 & \text{if } \degcent((r)) = 1 \\
+    		1 - \cfrac{f_{deg}(r) - \min_{r' \in R}f_{deg}(r')}{\max_{r' \in R}f_{deg}(r') - \min_{r' \in R}f_{deg}(r')} & \text{if } f_{deg}(r) \neq 1 \
+  	\end{cases}
+\end{align}
+
+\begin{align}
+\label{eq:lowriskresh}
+C_{res}(r) = \min_{n \in G}
+  	\begin{cases}
+    		\hfil 1 & \text{if } n \in S \\
+    		\cfrac{\spl(r, n)}{\diam(G)} & \text{if } n \in S \
+  	\end{cases}
+\end{align}
+
+\noindent
+With:
+
+\begin{align}
+\label{eq:degfit}
+f_{deg} = \intd(\degcent(r),0.3,0.5)
+\end{align}
+
+\begin{align}
+\label{eq:intervaldistance}
+\intd(v, v_{min}, v_{max}) = | ( |v_{min}| - |v | ) | + | (|v_{max}| - |v | )| 
+\end{align}
+
+\noindent
+\<interval distance> is the distance of a value form the extremes of an interval and is used to estimate how a value fits in an interval. Equation \ref{eq:lowriskdegh} promotes rooms with a low-medium number of passages, whereas equation \ref{eq:lowriskresh} promotes rooms that are distant from the already placed resources. Both are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $w_D = 1 $ and $ w_{C_{res}} = 0.5 $.
+
+\par
+
+Given G the visibility graph, $T \subset G$ the subset of tile nodes that belong to the room, $R \subset G$ the subset of tile nodes which contain a resource (composed exclusively by the already positioned spawn points), the most suitable tile for containing a health pack is selected using:
+
+\begin{align}
+\label{eq:lowvish}
+v(t) = 1 - \biggg| 0.5 - \cfrac{\degcent(t) - \min_{t' \in G}\degcent(t')}{\max_{t' \in G}\degcent(t') - \min_{t' \in G}\degcent(t')} \biggg| 
+\end{align}
+
+\noindent
+Equation \ref{eq:lowvish} promotes tiles with medium visibility. Equations \ref{eq:lowwallclos} and \ref{eq:lowresclos} are used for $c_{wall}(r)$ and $c_{res}(r)$ , respectively. All three are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $ w_v = 1 $ and $ w_{c_{wall}} = 0.25 $ and $ w_{c_{res}}  = 0.5 $.
+
+\subsection{Ammunition placement}
+
+\subsection{Weapon placement}
+
+For what concerns the weapons provided by the framework we have not defined any specific function yet, but, beside the assault rifle which is always available to the player, they should be placed as follows:
+
+\begin{itemize}
+\item \<Shotgun>: since it is a medium damage weapon it should be positioned in a room that has a medium number of connections and relatively close to a spawn point. 
+\item \<Rocket launcher>: since it is a high damage weapon it should be positioned in a room that has a high number of connections, creating an interesting collision point, or in a dead end, where its utility is limited.
+\item \<Sniper rifle>:since it is a high damage weapon it should be positioned in a room that has a high number of connections, creating an interesting collision point.
+\end{itemize}
 
 % SUMMARY %
 
