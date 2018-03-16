@@ -69,7 +69,7 @@
 \contentsline {subsubsection}{Rooms and resources graph}{47}
 \contentsline {subsection}{\numberline {4.2.3}Visibility graph}{47}
 \contentsline {subsection}{\numberline {4.2.4}Interesting metrics}{47}
-\contentsline {section}{\numberline {4.3}Populating of pre-generated maps}{50}
+\contentsline {section}{\numberline {4.3}Populating of pre-generated maps}{49}
 \contentsline {subsection}{\numberline {4.3.1}Rules and patterns for resources positioning}{50}
 \contentsline {subsection}{\numberline {4.3.2}Placement process}{51}
 \contentsline {subsection}{\numberline {4.3.3}Spawn points placement}{52}

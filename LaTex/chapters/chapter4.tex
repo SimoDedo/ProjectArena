@@ -168,11 +168,11 @@ Starting from these considerations, we defined a process based on heuristics tha
 The selection of a room is performed considering two suitability criteria:
 
 \begin{itemize}
-\item \<Degree suitability>: defined by the function $D(r)$, where $r$ is a room node, it measures how much the degree centrality of the node matches with the desired one.
-\item \<Resources closeness suitability>: defined by the function $C_{res}(r)$, where $r$ is a room node, it measures how much the proximity of the node with already placed resource nodes matches with the desired one.
+\item \<Degree suitability>: defined by the function $D(r)$, where $r$ is a room node, it measures how much the degree centrality of the node matches the desired one.
+\item \<Resources closeness suitability>: defined by the function $C_{res}(r)$, where $r$ is a room node, it measures how much the closeness of the node to the already placed resource nodes matches the desired one.
 \end{itemize}
 
-Given $G$ the rooms and corridors graph and $R \subset G$ the subset of room nodes, the room node which is selected is the one which maximizes the following weighted sum of the functions:
+Given $G$ the rooms and corridors graph and $R \subset G$ the subset of room nodes, the room node which is selected is the one which maximizes the following weighted sum of functions:
 
 \begin{align}
 room = \argmax_{r \in R} (w_D  \times D(r) + w_{C_{res}}  \times C_{res}(r))
@@ -186,15 +186,15 @@ Both functions should be defined to output a value in the range $[0,1]$.
 Once that the room is selected, the selection of a tile is performed considering three suitability criteria:
 
 \begin{itemize}
-\item \<Visibility suitability>: defined by the function $v(t)$, where $r$ is a tile node, it measures how much the visibility of the node matches with the desired one.
-\item \<Wall closeness suitability>: defined by the function $c_{wall}(t)$, where $r$ is a tile node, it measures how much the proximity of the node to the walls matches with the desired one.
-\item \<Resources closeness suitability>: defined by the function $c_{res}(t)$, where $r$ is a tile node, it measures how much the proximity of the node with already placed resource nodes matches with the desired one.
+\item \<Visibility suitability>: defined by the function $v(t)$, where $t$ is a tile node, it measures how much the visibility of the node matches the desired one.
+\item \<Wall closeness suitability>: defined by the function $c_{wall}(t)$, where $t$ is a tile node, it measures how much the proximity of the corresponding tile to the walls matches the desired one.
+\item \<Resources closeness suitability>: defined by the function $c_{res}(t)$, where $t$ is a tile node, it measures how much the proximity of the node with already placed resource nodes matches the desired one.
 \end{itemize}
 
-Given $G$ the tiles graph and $T \subset G$ the subset of tiles contained in the selected room, the tile which is selected is the one which maximizes the following weighted sum:
+Given $G$ the tiles graph and $T \subset G$ the subset of tiles contained by the selected room, the tile which is selected is the one which maximizes the following weighted sum of functions:
 
 \begin{align}
-room = \argmax_{t \in T} (w_v \times v(t) + w_{c_{wall}}  \times c_{wall}(r) + w_{c_{res}}  \times c_{res}(r))
+room = \argmax_{t \in T} (w_v \times v(t) + w_{c_{wall}}  \times c_{wall}(t) + w_{c_{res}}  \times c_{res}(t))
 \end{align}
 
 \noindent
@@ -202,7 +202,7 @@ All three functions should be defined to output a value in the range $[0,1]$.
 
 \par
 
-The process can be repeated as many time as needed, after having updated the graphs with the newly added resource. To obtain the best result, the resources should be placed in the order their heuristic are presented.
+The process can be repeated as many time as needed, after having updated the graphs with the newly added resource. To obtain the best result, the resources should be placed in the order their heuristics are presented.
 
 \subsection{Spawn points placement}
 
@@ -228,7 +228,7 @@ D(r) = \begin{cases}
 \label{eq:lowriskres}
 C_{res}(r) = \min_{n \in G}
   	\begin{cases}
-    		\hfil 1 & \text{if } n \in S \\
+    		\hfil 1 & \text{if } n \notin S \\
     		\cfrac{\spl(r, n)}{\diam(G)} & \text{if } n \in S \
   	\end{cases}
 \end{align}
@@ -259,7 +259,7 @@ c_{wall}(r) = \cfrac{\walld(t, room)}{ \maxwalld(room)}
 \end{align}
 
 \noindent
-where \<wall distance> is the distance of a tile from the walls of the room, computed as the sum of the minimum distances from the horizontal and vertical walls, and \<maximum wall distance> is the wall distance of the central tile of the room. Equation  \ref{eq:lowvis} promotes tiles with low visibility, equation \ref{eq:lowwallclos} promotes tiles that are distant from the walls, whereas equation \cite{eq:lowresclos} promotes tiles that are distant from already placed spawn points. All three are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $ w_v = 1 $ and $ w_{c_{wall}} = 0.5 $ and $ w_{c_{res}}  = 0.5 $.
+where \<wall distance> is the distance of a tile from the walls of the room, computed as the sum of the minimum distances from the horizontal and vertical walls, and \<maximum wall distance> is the wall distance of the central tile of the room. Equation  \ref{eq:lowvis} promotes tiles with low visibility, equation \ref{eq:lowwallclos} promotes tiles that are distant from the walls, whereas equation \ref{eq:lowresclos} promotes tiles that are distant from the already placed spawn points. All three are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $ w_v = 1 $ , $ w_{c_{wall}} = 0.5 $ and $ w_{c_{res}}  = 0.5 $.
 
 \subsubsection{Uniform heuristic}
 
@@ -273,7 +273,7 @@ The first room is selected at random, then, given $G$ the rooms and corridors gr
 	room = \argmax_{r \in R} ( \min_{s \in S} (\spl(r, s) ))
 \end{align}
 
-Once that the room has been found, one of its tiles is selected using equations \ref{eq:lowvis}, \ref{eq:lowwallclos} and\ref{eq:lowresclos} with weights  $ w_{c_{wall}} = 0.5 $ and $ w_{c_{res}}  = 0.5 $.
+Once that the room has been found, one of its tiles is selected using equations \ref{eq:lowvis}, \ref{eq:lowwallclos} and \ref{eq:lowresclos} with weights  $ w_{c_{wall}} = 0.5 $ and $ w_{c_{res}}  = 0.5 $.
 
 \subsubsection{Random heuristic}
 
@@ -281,7 +281,7 @@ This method selects rooms at random and for each one of them places the spawn po
 
 \subsection{Health packs placement}
 
-Heath packs are placed in rooms that have a low-medium number of connections and are distant from each other on the tile that offers the best balance between medium visibility and distance from the walls. In this way the heath packs are placed in areas that are easy to reach and are not to exposed.
+Heath packs are placed in rooms that have a low-medium number of connections and are distant from each other on the tile that offers the best balance between medium visibility and distance from the walls. In this way the heath packs are placed in areas that are easy to reach and are not too exposed.
 
 \par
 
@@ -289,17 +289,14 @@ Given $G$ the rooms and corridors graph, $R \subset G$ the subset of room nodes,
 
 \begin{align}
 \label{eq:lowriskdegh}
-D(r) = \begin{cases}
-    		\hfil 0 & \text{if } \degcent((r)) = 1 \\
-    		1 - \cfrac{f_{deg}(r) - \min_{r' \in R}f_{deg}(r')}{\max_{r' \in R}f_{deg}(r') - \min_{r' \in R}f_{deg}(r')} & \text{if } f_{deg}(r) \neq 1 \
-  	\end{cases}
+D(r) = \cfrac{f_{deg}(r) - \min_{r' \in R}f_{deg}(r')}{\max_{r' \in R}f_{deg}(r') - \min_{r' \in R}f_{deg}(r')} 
 \end{align}
 
 \begin{align}
 \label{eq:lowriskresh}
 C_{res}(r) = \min_{n \in G}
   	\begin{cases}
-    		\hfil 1 & \text{if } n \in S \\
+    		\hfil 1 & \text{if } n \notin S \\
     		\cfrac{\spl(r, n)}{\diam(G)} & \text{if } n \in S \
   	\end{cases}
 \end{align}
@@ -318,11 +315,11 @@ f_{deg} = \intd(\degcent(r),0.3,0.5)
 \end{align}
 
 \noindent
-where \<interval distance> is the distance of a value form the extremes of an interval and it is used to estimate how a value fits in an interval. Equation \ref{eq:lowriskdegh} promotes rooms with a low-medium number of passages, whereas equation \ref{eq:lowriskresh} promotes rooms that are distant from the already placed resources. Both are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $w_D = 1 $ and $ w_{C_{res}} = 0.5 $.
+where \<interval distance> is the distance of a value form the extremes of an interval and it is used to estimate how a value fits an interval. Equation \ref{eq:lowriskdegh} promotes rooms with a low-medium number of passages, whereas equation \ref{eq:lowriskresh} promotes rooms that are distant from the already placed resources. Both are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $w_D = 1 $ and $ w_{C_{res}} = 0.5 $.
 
 \par
 
-Given G the visibility graph, $T \subset G$ the subset of tile nodes that belong to the room, $R \subset G$ the subset of tile nodes which contain a resource (composed exclusively by the already positioned spawn points), the most suitable tile for containing a health pack is selected using
+Given G the visibility graph, $T \subset G$ the subset of tile nodes that belong to the room, $R \subset G$ the subset of tile nodes which contain a resource, the most suitable tile for containing a health pack is selected using
 
 \begin{align}
 \label{eq:lowvish}
@@ -330,11 +327,11 @@ v(t) = 1 - \biggg| 0.5 - \cfrac{\degcent(t) - \min_{t' \in G}\degcent(t')}{\max_
 \end{align}
 
 \noindent
-that promotes tiles with medium visibility. Equations \ref{eq:lowwallclos} and \ref{eq:lowresclos} are used for $c_{wall}(r)$ and $c_{res}(r)$ , respectively. All three are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $ w_v = 1 $ and $ w_{c_{wall}} = 0.25 $ and $ w_{c_{res}}  = 0.5 $.
+that promotes tiles with medium visibility. Equations \ref{eq:lowwallclos} and \ref{eq:lowresclos} are used for $c_{wall}(r)$ and $c_{res}(r)$ , respectively. All three are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $ w_v = 1 $, $ w_{c_{wall}} = 0.25 $ and $ w_{c_{res}}  = 0.5 $.
 
 \subsection{Ammunition placement}
 
-Ammunition is placed in rooms that have an either a low-medium or a medium-high number of connections and are distant from each other on the tile that offers the best balance between high visibility and distance from the walls. In this way ammunition is placed in areas that are either easy or difficult to reach and easy to spot.
+Ammunition is placed in rooms that have either a low-medium or a high number of connections and are distant from each other on the tile that offers the best balance between high visibility and distance from the walls. In this way ammunition is placed in areas that are either easy or difficult to reach and easy to spot.
 
 \par
 
@@ -354,11 +351,11 @@ f_{deg} = \intd(\degcent(r),0.8,0.9)
 \end{align}
 
 \noindent
-for obtaining rooms with a medium-high number of connections. We experimentally found that the weights which provide the best results are $w_D = 1 $ and $ w_{C_{res}} = 0.25 $.
+for obtaining rooms with a high number of connections. We experimentally found that the weights which provide the best results are $w_D = 1 $ and $ w_{C_{res}} = 0.25 $.
 
 \par
 
-Given G the visibility graph, $T \subset G$ the subset of tile nodes that belong to the room, $R \subset G$ the subset of tile nodes which contain a resource (composed exclusively by the already positioned spawn points), the most suitable tile for containing ammunition is selected using
+Given G the visibility graph, $T \subset G$ the subset of tile nodes that belong to the room, $R \subset G$ the subset of tile nodes which contain a resource, the most suitable tile for containing ammunition is selected using
 
 \begin{align}
 \label{eq:highvisa}
@@ -366,20 +363,20 @@ v(t) = \cfrac{\degcent(r) - \min_{r' \in R}\degcent(r')}{\max_{r' \in R}\degcent
 \end{align}
 
 \noindent
-that promotes tiles with high visibility. Equations \ref{eq:lowwallclos} and \ref{eq:lowresclos} are used for $c_{wall}(r)$ and $c_{res}(r)$ , respectively. All three are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $ w_v = 1 $ and $ w_{c_{wall}} = 0.25 $ and $ w_{c_{res}}  = 0.5 $.
+that promotes tiles with high visibility. Equations \ref{eq:lowwallclos} and \ref{eq:lowresclos} are used for $c_{wall}(r)$ and $c_{res}(r)$, respectively. All three are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $ w_v = 1 $, $ w_{c_{wall}} = 0.25 $ and $ w_{c_{res}}  = 0.5 $.
 
 \subsection{Weapon placement}
 
-For what concerns the weapons provided by the framework we have not defined any specific function yet, but, beside the assault rifle which is always available to the player, they should be placed as follows:
+For what concerns the weapons provided by the framework we have not defined any specific function yet, but, beside the assault rifle which is always available to the player, they could be placed as follows:
 
 \begin{itemize}
-\item \<Shotgun>: since it is a medium damage weapon it should be positioned in a room that has a medium number of connections and relatively close to a spawn point. 
-\item \<Rocket launcher>: since it is a high damage weapon it should be positioned in a room that has a high number of connections, creating an interesting collision point, or in a dead end, where its utility is limited.
-\item \<Sniper rifle>: since it is a high damage weapon it should be positioned in a room that has a high number of connections, creating an interesting collision point.
+\item \<Shotgun>: since it is a medium damage weapon it could be positioned in a room that has a medium number of connections and is relatively close to a spawn point. 
+\item \<Rocket launcher>: since it is a high damage weapon it could be positioned in a room that has a high number of connections, creating an interesting collision point, or in a dead end, where its utility is limited.
+\item \<Sniper rifle>: since it is a high damage weapon it could be positioned in a room that has a high number of connections, creating an interesting collision point.
 \end{itemize}
 
 % SUMMARY %
 
 \section{Summary}
 
-In this chapter we analyzed the tool that we have developed to perform map analysis and populating using Graph Theory. After an overview of the graphs and metrics that highlight interesting information about a map, we listed the rules and patterns commonly used to position resources in deathmatch maps and we described how we coveted them into heuristics.
+In this chapter we analyzed the tool that we have developed to perform map analysis and populating using Graph Theory. After an overview of the graphs and metrics that allow to highlight interesting information about a map, we listed the rules and patterns commonly used to position resources in deathmatch maps and we described how we converted them into heuristics.
