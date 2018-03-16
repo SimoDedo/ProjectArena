@@ -261,14 +261,14 @@ def addEverything(map, rooms, spawnPoint, medkit, ammo):
     visibilityFit = visibilityMatrix
 
     for i in range(math.floor(ammo[1] / 2)):
-        bestTile = getBestTile(roomGraph, diameter, diagonal, ammo, [ammo[0], medkit[0]], placedObjects, degreeFit, visibilityFit, [1, 0.25, -2], [1, 0.25, 0.5])
+        bestTile = getBestTile(roomGraph, diameter, diagonal, ammo, [ammo[0], medkit[0]], placedObjects, degreeFit, visibilityFit, [1, 0.25, 0], [1, 0.25, 0.5])
         addResource(bestTile[0], bestTile[1], ammo[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], ammo[0]])
 
     degreeFit = getNormalizedDegreeFit(normalizedDegree, 0.8, 0.9)
 
     for i in range(math.ceil(ammo[1] / 2)):
-        bestTile = getBestTile(roomGraph, diameter, diagonal, ammo, [ammo[0], medkit[0]], placedObjects, degreeFit, visibilityFit, [1, 0.25, -2], [1, 0.25, 0.5])
+        bestTile = getBestTile(roomGraph, diameter, diagonal, ammo, [ammo[0], medkit[0]], placedObjects, degreeFit, visibilityFit, [1, 0.25, 0], [1, 0.25, 0.5])
         addResource(bestTile[0], bestTile[1], ammo[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], ammo[0]])
 
