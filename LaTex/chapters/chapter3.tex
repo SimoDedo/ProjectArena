@@ -77,13 +77,13 @@ The framework collects data by assigning to the users \<matches> to play. A matc
 
 \par
 
-A match is defined by combining different modular \<Manager> objects, each of which controls a different aspect of the match. To assure their interchangeability, most modules are defined by their own abstract class.
+A match is defined by combining different modules, called \<Managers>, each of which controls a different aspect of the match.
 
 % GAME MANAGER %
 
 \subsection{The Game Manager}
 
-The \<Game Manager> is the module responsible for the overall behavior of a match. Each game mode consists in a different implementation of the \<Game Manager>. It leans on the \<Map Manager> for the generation and the assembly of the map and on the \<Spawn Point Manager> for the spawn of entities. The \<Game Manager> controls the life-cycle of the match, that can be divided in the following phases:
+The \<Game Manager> is the module responsible for the overall behavior of a match. Each game mode consists in a different version of the \<Game Manager>. It leans on the \<Map Manager> for the generation and the assembly of the map and on the \<Spawn Point Manager> for the spawn of entities. The \<Game Manager> controls the life-cycle of the match, that can be divided in the following phases:
 
 \begin{itemize}
 \item \<Setup>: all the modules are initialized.
@@ -101,7 +101,7 @@ The \<Map Manager> controls the generation, the import and the assembly of the m
 
 \par
 
-The framework provides three different implementations of the \<Map Manager>.
+The framework provides three different versions of the \<Map Manager>.
 
 \subsubsection{Single-Level Map Manager}
 
@@ -141,7 +141,7 @@ The \<All-Black Multi-Level Map Manager> is used to decode multi-level maps save
 
 \subsection{The Map Generator}
 
-The \<Map Generator> controls the generation of the map. Each implementation of the \<Map Generator> defines a different \<map topology> depending on the used generation algorithm and on how its parametric setting are tuned. Some of these settings are shared by all the implementations, whereas some of them are implementation-specific.
+The \<Map Generator> controls the generation of the map. Each version of the \<Map Generator> defines a different \<map topology> depending on the used generation algorithm and on how its parametric settings are tuned. Some of these settings are shared by all the versions, whereas some of them are version-specific.
 
 \par
 
@@ -458,7 +458,7 @@ The \<Stairs Generator> places stairs in the map after having analyzed it to fin
 
 \subsection{The Map Assembler}
 
-The \<Map Assembler> controls the assembly of the map. Each different implementation of the Map Assembler corresponds to a different \<map appearance>.
+The \<Map Assembler> controls the assembly of the map. Each version of the Map Assembler corresponds to a different \<map appearance>.
 
 % MESH ASSEMBLER %
 
@@ -601,7 +601,7 @@ The framework provides a simple interface for downloading the logs stored on the
 
 \section{Entities}
 
-The \<entities> are the \<agents> that take part in a match. All the entities share some common features, but are further characterized by their specific implementation; these features are:
+The \<entities> are the \<agents> that take part in a match. All the entities share the following common features:
 
 \begin{itemize}
 \item \<TotalHealth>: the maximum number of health points of the entity, i.e. the quantity of damage the entity can receive before being destroyed.
@@ -612,7 +612,7 @@ The framework includes three different kind of agents:
 
 \begin{itemize}
 \item \<Player>: the entity that is controlled by the user. It can walk, jump, aim, deal and receive damage and pick resources.
-\item \<Opponent>: this implementation is similar to the one of the \<Player>, but in the current version of the framework it has no active logic, beside the one that controls its health.
+\item \<Opponent>: this entity is similar to the one of the \<Player>, but in the current version of the framework it has no active logic, beside the one that controls its health.
 \item \<Target>: this simple entity rotates in place. Besides receiving damage, it can harm the player thanks to the laser gun it can be equipped it. Figure \ref{fig:targets} shows different kind of targets.
 \end{itemize}
 
@@ -628,7 +628,7 @@ The framework includes three different kind of agents:
 
 \section{Weapons}
 
-The framework allows to easily define any kind of fire arm with the extension of a common parametric structure, that characterizes the basic behavior of a gun with the following variables: 
+The framework allows to easily define any kind of fire arm starting from a common parametric structure that characterizes the basic behavior of a gun with the following variables: 
 
 \begin{itemize}
 \item \<Damage>: the damage inflicted by a single projectile.
@@ -647,19 +647,19 @@ The framework allows to easily define any kind of fire arm with the extension of
 
 \par 
 
-The framework comes with three different class of weapons already implemented.
+The framework comes with three different categories of weapons already implemented.
 
 \paragraph{Raycast guns}
 
 \mbox{}\\
 
 {\setlength{\parindent}{0cm}
-\<Raycast guns> are weapons which projectiles have no \<time of flight>, but instantly hit the target once shot. The only additional parameter that this class introduces is \<Range>, which can be used to limit the reach of the weapon.
+\<Raycast guns> are weapons which projectiles have no \<time of flight>, but instantly hit the target once shot. The only additional parameter that this category introduces is \<Range>, which can be used to limit the reach of the weapon.
 }
 
 \par
 
-There are three weapons of this class that the player can use:
+There are three weapons of this category that the player can use:
 
 \begin{itemize}
 \item \<Assault Rifle>: a medium range weapon with a high fire rate, a capacious magazine and no dispersion which shots single medium damage projectiles. Figure \ref{fig:assault} shows its model and table \ref{tab:gunconfig} shows its parameters.
@@ -672,7 +672,7 @@ There are three weapons of this class that the player can use:
 \mbox{}\\
 
 {\setlength{\parindent}{0cm}
-\<Projectile guns> are weapons that shoot projectiles with a limited flight speed. This class introduces two additional parameters:
+\<Projectile guns> are weapons that shoot projectiles with a limited flight speed. This category introduces two additional parameters:
 }
 
 \begin{itemize}
@@ -680,7 +680,7 @@ There are three weapons of this class that the player can use:
 \item \<ProjectileSpeed>: the speed of the projectile.
 \end{itemize}
 
-The only weapon of this class that the player can use is the \<Rocket Launcher>, a long range weapon with a slow fire rate, a small magazine and no dispersion which shots explosive projectiles. The projectiles of this weapon are slow and explode on impact, dealing an high damage that decreases radially from the center of the explosion. Figure \ref{fig:rocket} shows its model and table \ref{tab:gunconfig} shows its parameters.
+The only weapon of this category that the player can use is the \<Rocket Launcher>, a long range weapon with a slow fire rate, a small magazine and no dispersion which shots explosive projectiles. The projectiles of this weapon are slow and explode on impact, dealing an high damage that decreases radially from the center of the explosion. Figure \ref{fig:rocket} shows its model and table \ref{tab:gunconfig} shows its parameters.
 
 \begin{figure}[p]
 \centering
@@ -751,7 +751,7 @@ The only weapon of this class that the player can use is the \<Rocket Launcher>,
 \mbox{}\\
 
 {\setlength{\parindent}{0cm}
-\<Laser guns> are a separate class of weapons, since they are not based on the structure extended by the previous two. Laser guns emit a continuous ray that deals damage over time to everything it touches. Their only configurable parameter is \<DPS> (\<damage per second>), i.e. the damage the the gun deals in a second when continuously hitting a target.
+\<Laser guns> are not based on the same structure of the previous categories. Laser guns emit a continuous ray that deals damage over time to everything it touches. Their only configurable parameter is \<DPS> (\<damage per second>), i.e. the damage the the gun deals in a second when continuously hitting a target.
 }
 
 % OBJECTS %
@@ -770,7 +770,7 @@ Beyond \<decorations>, that are simple 3D models with no logic used to graphical
 
 \section{Game modes}
 
-The framework comes with three different game modes, that have been designed to highlight specific aspects of a multiplayer FPS. Each game mode is defined by a different implementation of the \<Game Manager>.
+The framework comes with three different game modes, that have been designed to highlight specific aspects of a multiplayer FPS. Each game mode is defined by a different version of the \<Game Manager>.
 
 \subsection{Duel}
 
