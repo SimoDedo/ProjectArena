@@ -781,7 +781,13 @@ def blendColor(h1, h2, alpha):
 
 # Tells how well a value fits in an interval.
 def intervalDistance(min, max, value):
-    return abs(abs(min) - abs(value)) + abs(abs(max) - abs(value))
+    #return abs(abs(min) - abs(value)) + abs(abs(max) - abs(value))
+    if (value >= min and value <= max):
+        return 0
+    elif (value < min):
+        return abs(min - value)
+    else:
+        return abs(value - max)
 
 # Computes the shortest path length between two nodes menaging the exception.
 def shortestPathLength(graph, n1, n2):

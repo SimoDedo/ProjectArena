@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  16 MAR 2018 15:30
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  17 MAR 2018 16:36
 entering extended mode
 **./main.tex
 (main.tex
@@ -953,8 +953,7 @@ LaTeX Warning: Unused global option(s):
 
 LaTeX Warning: Label `fig:targets' multiply defined.
 
-) (chapters/chapter4.aux) (chapters/chapter5.aux) (chapters/chapter6.aux)
-(chapters/chapter7.aux))
+) (chapters/chapter4.aux) (chapters/chapter5.aux) (chapters/chapter6.aux))
 \openout1 = `main.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 107.
@@ -1708,24 +1707,14 @@ aph_visibility.png>]
 
 LaTeX Warning: Citation `great1vs1' on page 49 undefined on input line 127.
 
-[49] [50] [51] [52]
-
-LaTeX Warning: Citation `eq:lowresclos' on page 53 undefined on input line 262.
-
-
-[53] [54] [55] [56]) [57]
+[49] [50] [51] [52] [53] [54] [55] [56]) [57]
 \openout2 = `chapters/chapter5.aux'.
 
  (chapters/chapter5.tex)
 \openout2 = `chapters/chapter6.aux'.
 
- (chapters/chapter6.tex)
-\openout2 = `chapters/chapter7.aux'.
 
-
-(chapters/chapter7.tex) [58
-
-
+(chapters/chapter6.tex) [58
 
 
 
@@ -1736,7 +1725,7 @@ LaTeX Warning: Citation `eq:lowresclos' on page 53 undefined on input line 262.
 No file main.bbl.
 (main.aux (chapters/chapter0.aux) (chapters/chapter1.aux)
 (chapters/chapter2.aux) (chapters/chapter3.aux) (chapters/chapter4.aux)
-(chapters/chapter5.aux) (chapters/chapter6.aux) (chapters/chapter7.aux))
+(chapters/chapter5.aux) (chapters/chapter6.aux))
 
 LaTeX Warning: There were undefined references.
 
@@ -1745,13 +1734,13 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 16528 strings out of 493303
- 327984 string characters out of 3138856
- 357628 words of memory out of 3000000
- 19801 multiletter control sequences out of 15000+200000
+ 16519 strings out of 493303
+ 327701 string characters out of 3138856
+ 357179 words of memory out of 3000000
+ 19799 multiletter control sequences out of 15000+200000
  546844 words of font info for 85 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 41i,17n,43p,10380b,629s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 41i,20n,43p,10380b,629s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Pr
 ogram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Program Fi
 les/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx9.pfb><C:/Program Files/MiKTe
@@ -1769,7 +1758,7 @@ fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Program Files/MiKTeX 2.9/fonts/type
 /amsfonts/cm/cmsy6.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts
 /cm/cmsy8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti1
 0.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti9.pfb>
-Output written on main.pdf (74 pages, 2137250 bytes).
+Output written on main.pdf (74 pages, 2141081 bytes).
 PDF statistics:
  399 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
