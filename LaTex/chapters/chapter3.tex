@@ -1,14 +1,14 @@
-\chapter{The research framework}
+\chapter{Map design and generation framework}
 
 % INTRODUCTION %
 
-In this chapter we describe the \<framework> that we have developed to perform user-based online validation of procedurally generated maps for multiplayer Firsts Person Shooters. After a quick overview, we present the map formats that the framework supports and we extensively analyze its structure, its components and its features.
+In this chapter we describe the \<framework> that we have developed to study the design and generation of maps for multiplayer Firsts Person Shooters. After a quick overview, we present the map formats that the framework supports and we extensively analyze its structure, its components and its features.
 
 % DESCRIPTION %
 
 \section{Description of the framework}
 
-We designed our framework with the objective of providing a valid alternative to the games currently employed as a validation tool in this research field. All the available options, like \<Cube 2: Sauerbraten>, are powerful tools to perform validation via artificial agents, but they are not suitable for user-based validation. A data-collection campaign based on these games requires to download the game or to take part in real-life play-test sessions, but these options discourage potential participants because they are significantly time-consuming. For this reason, we decided to develop a \<Unity>\footnote{Unity Technologies, 2005. \<Unity> is a game development environment that includes a game editor and a game engine. Currently, it is the most used game development tool.} framework that is as light as possible, with a WebGL build weighting less than 10MB that can be played using any browser.
+We designed our framework with the objective of providing a valid alternative to the games currently employed as a tool in this research field. All the available options, like \<Cube 2: Sauerbraten>, are powerful tools to perform studies involving artificial agents, but they are not suitable for user-based studies. A data-collection campaign based on these games requires either downloading the game or taking part in real-life play-test sessions, but these options discourage potential participants because they are significantly time-consuming. For this reason, we decided to develop a \<Unity>\footnote{Unity Technologies, 2005. \<Unity> is a game development environment that includes a game editor and a game engine. Currently, it is the most used game development tool.} framework that is as light as possible, with a WebGL build weighting less than 10MB that can be played using any browser.
 
 \par
 
@@ -34,15 +34,15 @@ The text representation allows to encode the map as a text, of which each line c
 
 \subsection{All-Black representation}
 
-Our All-Black representation is an extended version of the one defined by Cardamone et al.\cite{Cardamone:2011:EIM:2008402.2008411}, to which we have added the support for objects and multi-level maps. In their work, the All-Black representation encodes the empty areas of an otherwise filled map, consisting in square rooms and corridors of fixed width. Rooms are defined by $\langle x,y,s \rangle$ triples, where $x$ and $y$ define the coordinates of the center of the room and $s$ defines its width. Corridors are rectangular areas with a fixed width of $3$ cells and are defined by $\langle x,y,l \rangle$ triples, where $x$ and $y$ define the point in which the corridor starts and $l$ defines its length. $l$ also provides the direction of the corridor: if $l$ is positive the corridor extends along the $x\text{-axis}$, otherwise it extends along the $y\text{-axis}$. With respect to this representation, we changed the encoding of the rooms by considering $x$ and $y$ as the coordinates of the corner closer to the origin; this change allows to remove any ambiguity deriving from the position of the center of a room of even width.
+Our All-Black representation is an extended version of the one defined by Cardamone et al.\cite{Cardamone:2011:EIM:2008402.2008411}, to which we have added the support for objects and multi-level maps. In their work, the All-Black representation encodes the empty areas of an otherwise filled map, consisting in square rooms and corridors of fixed width. Rooms are defined by $\langle x,y,s \rangle$ triplets, where $x$ and $y$ define the coordinates of the center of the room and $s$ defines its width. Corridors are rectangular areas with a fixed width of $3$ cells and are defined by $\langle x,y,l \rangle$ triplets, where $x$ and $y$ define the point in which the corridor starts and $l$ defines its length. $l$ also provides the direction of the corridor: if $l$ is positive the corridor extends along the $x\text{-axis}$, otherwise it extends along the $y\text{-axis}$. With respect to this representation, we changed the encoding of the rooms by considering $x$ and $y$ as the coordinates of the corner closer to the origin; this change allows to remove any ambiguity deriving from the position of the center of a room of even width.
 
 \par
 
-For allowing the encoding of objects, we added a third kind of triple, $\langle x,y,o \rangle$, that uses $x$ and $y$ to denote the coordinates of the tile that hosts the objects and $o$ to denote the object itself, encoded as a character. In our representation, first we store the triples representing the rooms, then the triples representing the corridors and finally the triples representing the objects. These groups are separated by the special character ``$\mid$'' and can have any number of elements, with the exception of the one denoting the rooms, that must have at least one triple.
+For allowing the encoding of objects, we added a third kind of triplet, $\langle x,y,o \rangle$, that uses $x$ and $y$ to denote the coordinates of the tile that hosts the objects and $o$ to denote the object itself, encoded as a character. In our representation, first we store the triplets representing the rooms, then the triplets representing the corridors and finally the triplets representing the objects. These groups are separated by the special character ``$\mid$'' and can have any number of elements, with the exception of the one denoting the rooms, that must have at least one triplet.
 
 \par
 
-We have also extended the All-Black representation including the one defined by Cachia et al.\cite{MultiLevelEvolution}, that allows to encode maps generated with a random digger algorithm, i.e. an algorithm that randomly moves in a filled map emptying all the cells it crosses (for more details see subsubsection \ref{sssec:digger}). The map is encoded by a quintuple $\langle f,l,r,v,s \rangle$, where $f$ encodes the probability of moving forwards, $l$ encodes the probability of turning left, $r$ encodes the probability of turning right, $v$ encodes the probability of jumping to a visited cell and $s$ encodes the probability of placing a flight of stairs, if in a multi-level setting. With respect to the representation defined by Cachia et al., we added the possibility of encoding objects, which group of triples is separated by the digger quintuple by the special character ``$\mid$''.
+We have also extended the All-Black representation including the one defined by Cachia et al.\cite{MultiLevelEvolution}, that allows to encode maps generated with a random digger algorithm, i.e. an algorithm that randomly moves in a filled map emptying all the cells it crosses (for more details see subsubsection \ref{sssec:digger}). The map is encoded by a quintuple $\langle f,l,r,v,s \rangle$, where $f$ encodes the probability of moving forwards, $l$ encodes the probability of turning left, $r$ encodes the probability of turning right, $v$ encodes the probability of jumping to a visited cell and $s$ encodes the probability of placing a flight of stairs, if in a multi-level setting. With respect to the representation defined by Cachia et al., we added the possibility of encoding objects, which group of triplets is separated by the digger quintuple by the special character ``$\mid$''.
 
 \par
 
@@ -54,14 +54,17 @@ Figure \ref{fig:allblack} shows two maps with their All-Black representation.
 
 \begin{figure}[tp]
 	\centering
+	\hfill
   	\begin{subfigure}[t]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{ab_divisive_1}
      		\caption{Map represented by $\langle 5, $\ $ 5, $\ $ 9 \rangle $\ $ \langle 10, $\ $ 10, $\ $ 7 \rangle $\ $  \langle 15, $\ $ 25, $\ $ 3 \rangle\ $\ $ \mid $\ $  \langle 5, $\ $ 15, $\ $ 15 \rangle $\ $  \langle 11, $\ $ 15, $\ $ -7 \rangle $\ $  \mid $\ $  \langle 5, $\ $ 5, $\ $ s \rangle $\ $  \langle 7, $\ $ 7, $\ $ d \rangle$.}
  	\end{subfigure}
+ 	\hfill
   	\begin{subfigure}[t]{0.45\linewidth}
     		\includegraphics[width=\linewidth]{ab_divisive_2}
      		\caption{Map represented by $\langle 1,$\ $2, $\ $5  \rangle $\ $\langle4,$\ $6,$\ $8\rangle $\ $ \mid $\ $ \langle5,$\ $6,$\ $-10\rangle $\ $ \langle10,$\ $15,$\ $-6\rangle $\ $ \mid $\ $ \langle3, $\ $7, $\ $s\rangle $\ $ \langle1, $\ $1, $\ $d\rangle$.}
   	\end{subfigure}
+  	\hfill
 \caption{Two simple maps with their All-Black representation.}
 \label{fig:allblack}
 \end{figure}
@@ -112,17 +115,22 @@ The \<Multi-Level Map Manager> is used for any kind of map that has more than on
 
 Multi-level maps are obtained by using at least one generator to produce the desired number of floors. Since this allows to combine different kind of generators, we were able to obtain maps similar to the ones evolved by Cachia et al.\cite{MultiLevelEvolution} (see figure \ref{fig:multilevel_digger}), as well as maps with a more complex and interesting layout than the ones obtained by previous works (see figure \ref{fig:multilevel_divisive}).
 
-\begin{figure}[tb]
-\begin{minipage}[t]{0.48\linewidth}
+\begin{figure}[tp]
+	\centering
+	\hfill
+  	\begin{subfigure}[t]{0.45\linewidth}
 	\includegraphics[width=\linewidth]{multilevel_digger}
-	\caption{Multilevel map with a divisive floor (in blue) and a digger floor (in red).}
+	\caption{Multilevel map which floors have different topologies.}
 	\label{fig:multilevel_digger}
-\end{minipage}
-\begin{minipage}[t]{0.48\linewidth}
-	\includegraphics[width=\linewidth]{multilevel_divisive}
-	\caption{Multilevel map with three divisive floors.}
+ 	\end{subfigure}
+ 	\hfill
+  	\begin{subfigure}[t]{0.45\linewidth}
+    			\includegraphics[width=\linewidth]{multilevel_divisive}
+	\caption{Multilevel map which floors share the same topology.}
 	\label{fig:multilevel_divisive}
-\end{minipage}
+  	\end{subfigure}
+  	\hfill
+\caption{Two multilevel maps.}
 \end{figure}
 
 \subsubsection{All-Black Multi-Level Map Manager}
@@ -167,7 +175,7 @@ The shared settings are used to define the size of the map and its encoding, to 
 \item \<Rain Distanced>: positions the objects selecting random cells from the ones that are empty and satisfy the \<ObjectToWallDistance> constraint and the \<ObjectToObjectDistance> constraint on the objects with the same \<ObjectChar>.
 \end{itemize}
 
-All of the following implementations of the \<Map Generator> are deterministic, since they require a \<seed> value as input that constrains the output to a specific map.
+All of the following versions of the \<Map Generator> are deterministic, since they require a \<seed> value as input that constrains the output to a specific map.
 
 % CELLULAR GENERATOR %
 
@@ -182,8 +190,8 @@ The algorithm starts by filling some tiles of the map selected at random, then i
 \begin{itemize}
 \item \<RandomFillPercent>: the percentage of tiles that are randomly filled during the initialization of the algorithm. High values promote narrow spaces, small values promote wide open areas.
 \item \<SmoothingInteration>: the number of generations the cellular automaton is ran for. High values penalize small features and make the walls smoother. 
-\item \<NeighbourTileLimitLow>: the minimum number of neighbors a cell must have to became filled. Its value must be lesser or equal than the one of \<NeighbourTileLimitHigh>. The map becomes noisier the more they diverge.
-\item \<NeighbourTileLimitHigh>: the maximum number of neighbors a cell must have to became empty.
+\item \<NeighbourTileLimitLow>: the maximum number of neighbors a cell must have to became empty. Its value must be lesser or equal than the one of \<NeighbourTileLimitHigh>. The map becomes noisier the more they diverge.
+\item \<NeighbourTileLimitHigh>: the minimum number of neighbors a cell must have to became filled.
 \item \<WallThresholdSize>: the minimum number of cells that an isolated filled region must include to not be deleted. High values penalize small filled regions.
 \item \<RoomThresholdSize>: the minimum number of cells that an isolated void region must include to not be deleted. High values penalize small empty regions.
 \item \<PassageWidth>: the width of a passage connecting two different areas, expressed in number of cells.
@@ -296,32 +304,36 @@ place the objects\;
 
 \begin{figure}[tp]
 	\centering
-  	\begin{subfigure}[t]{0.325\linewidth}
+  	\begin{subfigure}[t]{0.315\linewidth}
 		\includegraphics[width=\linewidth]{cellular_default}
      		\caption{Cellular map generated with the default settings.}
  	\end{subfigure}
-  	\begin{subfigure}[t]{0.325\linewidth}
+ 	\hfill
+  	\begin{subfigure}[t]{0.315\linewidth}
     		\includegraphics[width=\linewidth]{cellular_rfp40}
     		\caption{Cellular map generated with $Ran\-dom\-Fill\-Per\-cent = 40\%$.}
   	\end{subfigure}
-  	\begin{subfigure}[t]{0.325\linewidth}
+  	\hfill
+	\begin{subfigure}[t]{0.315\linewidth}
     		\includegraphics[width=\linewidth]{cellular_rfp50}
     		\caption{Cellular map generated with $Ran\-dom\-Fill\-Per\-cent = 50\%$.}
   	\end{subfigure}
-  	\begin{subfigure}[t]{0.325\linewidth}
+  	
+  	\begin{subfigure}[t]{0.315\linewidth}
 		\includegraphics[width=\linewidth]{cellular_si0}
      		\caption{Cellular map generated with $Smooth\-ing\-It\-er\-a\-tions = 0$.}
  	\end{subfigure}
-  	\begin{subfigure}[t]{0.325\linewidth}
+  	\hfill
+  	\begin{subfigure}[t]{0.315\linewidth}
     		\includegraphics[width=\linewidth]{cellular_si3}
      		\caption{Cellular map generated with $Smooth\-ing\-It\-er\-a\-tions = 3$.}
   	\end{subfigure}
-  	\begin{subfigure}[t]{0.325\linewidth}
+  	\hfill
+  	\begin{subfigure}[t]{0.315\linewidth}
     		\includegraphics[width=\linewidth]{cellular_wts5}
      		\caption{Cellular map generated with $Wall\-Thresh\-old\-Size = 5$.}
   	\end{subfigure}	
-	\caption{Six maps generated by the Cellular Generator using ``\<ANotSoRandomSeed>'' as seed, but different settings.}
-	\caption*{By default, the Cellular Generator has \<RandomFillPercent> set to $45\%$, \<SmoothingIterations> set to $2$,  \<NeighbourTileLimitHigh> set to $4$,  \<NeighbourTileLimitLow> set to $4$,  \<WallThresholdSize> set to $40$ and \<RoomThresholdSize> set to $100$.}
+	\caption[Six maps generated by the Cellular Generator using ``\<ANotSoRandomSeed>'' as seed, but different settings.]{Six maps generated by the Cellular Generator using ``\<ANotSoRandomSeed>'' as seed, but different settings. By default, the Cellular Generator has \<RandomFillPercent> set to $45\%$, \<SmoothingIterations> set to $2$,  \<NeighbourTileLimitHigh> set to $4$,  \<NeighbourTileLimitLow> set to $4$,  \<WallThresholdSize> set to $40$ and \<RoomThresholdSize> set to $100$.}
 	\label{fig:cellulars}
 \end{figure}
 
@@ -372,32 +384,36 @@ place the objects\;
 
 \begin{figure}[tp]
 	\centering
-  	\begin{subfigure}[t]{0.325\linewidth}
+  	\begin{subfigure}[t]{0.315\linewidth}
 		\includegraphics[width=\linewidth]{divisive_default}
      		\caption{Divisive map generated with the default settings.}
  	\end{subfigure}
-  	\begin{subfigure}[t]{0.325\linewidth}
+	\hfill
+  	\begin{subfigure}[t]{0.315\linewidth}
     		\includegraphics[width=\linewidth]{divisive_rdp20}
     		\caption{Divisive map generated with $Room\-Di\-vide\-Prob\-a\-bil\-i\-ty = 20\%$.}
   	\end{subfigure}
-  	\begin{subfigure}[t]{0.325\linewidth}
+	\hfill
+  	\begin{subfigure}[t]{0.315\linewidth}
     		\includegraphics[width=\linewidth]{divisive_md1}
     		\caption{Divisive map generated with $Min\-i\-mum\-Depth = 1$.}
   	\end{subfigure}
-  	\begin{subfigure}[t]{0.325\linewidth}
+  	
+  	\begin{subfigure}[t]{0.315\linewidth}
 		\includegraphics[width=\linewidth]{divisive_md8}
      		\caption{Divisive map generated with $Min\-i\-mum\-Depth= 8$.}
  	\end{subfigure}
-  	\begin{subfigure}[t]{0.325\linewidth}
+ 	\hfill
+  	\begin{subfigure}[t]{0.315\linewidth}
     		\includegraphics[width=\linewidth]{divisive_mrd1}
      		\caption{Divisive map generated with $Min\-i\-mum\-Room\-Di\-men\-sion = 1$.}
   	\end{subfigure}
-  	\begin{subfigure}[t]{0.325\linewidth}
+	\hfill
+  	\begin{subfigure}[t]{0.315\linewidth}
     		\includegraphics[width=\linewidth]{divisive_mrd7}
      		\caption{Divisive map generated with $Min\-i\-mum\-Room\-Di\-men\-sion = 7$.}
   	\end{subfigure}	
-	\caption{Six maps generated by the Divisive Generator using ``\<AModeratelyRandomSeed>'' as seed, but different settings.}
-	\caption*{By default, the Cellular Generator has \<Room\-Di\-vide\-Prob\-a\-bil\-i\-ty> set to $80\%$, \<Map\-Room\-Per\-cent\-age> set to $90\%$,  \<Di\-vide\-Low\-er\-Bound> set to $10\%$,  \<Di\-vide\-Up\-per\-Bound> set to $90\%$,  \<Min\-i\-mum\-Room\-Di\-men\-sion> set to $3$, \<Min\-i\-mum\-Depth> set to $4$, \<Pas\-sage\-Width> set to $3$ and \<Max\-Ran\-dom\-Pas\-sages> set to $12$.}
+	\caption[Six maps generated by the Divisive Generator using ``\<AModeratelyRandomSeed>'' as seed, but different settings.]{Six maps generated by the Divisive Generator using ``\<AModeratelyRandomSeed>'' as seed, but different settings. By default, the Cellular Generator has \<Room\-Di\-vide\-Prob\-a\-bil\-i\-ty> set to $80\%$, \<Map\-Room\-Per\-cent\-age> set to $90\%$,  \<Di\-vide\-Low\-er\-Bound> set to $10\%$,  \<Di\-vide\-Up\-per\-Bound> set to $90\%$,  \<Min\-i\-mum\-Room\-Di\-men\-sion> set to $3$, \<Min\-i\-mum\-Depth> set to $4$, \<Pas\-sage\-Width> set to $3$ and \<Max\-Ran\-dom\-Pas\-sages> set to $12$.}
 	\label{fig:divisives}
 \end{figure}
 
@@ -407,20 +423,22 @@ place the objects\;
 \includegraphics[width=\linewidth]{digger_default}
 \caption{Digger map generated with the default settings.}
 \end{subfigure}
+\hfill
 \begin{subfigure}[t]{0.48\linewidth}
 \includegraphics[width=\linewidth]{digger_roomp20}
 \caption{Digger map generated with $Room\-Per\-cent\-age = 20\%$.}
 \end{subfigure}
+
 \begin{subfigure}[t]{0.48\linewidth}
 \includegraphics[width=\linewidth]{digger_fp60}
 \caption{Digger map generated with $For\-ward\-Prob\-a\-bil\-i\-ty = 60\%$, $Right\-Prob\-a\-bil\-i\-ty = 19\%$ and $Left\-ward\-Prob\-a\-bil\-i\-ty = 19\%$.}
 \end{subfigure}
+\hfill
 \begin{subfigure}[t]{0.48\linewidth}
 \includegraphics[width=\linewidth]{digger_fp96}
 \caption{Digger map generated with $For\-ward\-Prob\-a\-bil\-i\-ty = 96\%$, $Right\-Prob\-a\-bil\-i\-ty = 1\%$ and $Left\-ward\-Prob\-a\-bil\-i\-ty = 1\%$.}
 \end{subfigure}
-\caption{Four maps generated by the Digger Generator using ``\<AFairlyRandomSeed>'' as seed, but different settings.}
-\caption*{By default, the Digger Generator has \<For\-ward\-Prob\-a\-bil\-i\-ty> set to $90\%$, \<Left\-Prob\-a\-bil\-i\-ty> set to $4\%$, \<Right\-Prob\-a\-bil\-i\-ty> set to $4\%$, \<Vis\-it\-ed\-Prob\-a\-bil\-i\-ty> set to $2\%$, \<Stair\-Prob\-a\-bil\-i\-ty> set to $0\%$ and \<Room\-Per\-cent\-age> set to $50\%$.}
+\caption[Four maps generated by the Digger Generator using ``\<AFairlyRandomSeed>'' as seed, but different settings.]{Four maps generated by the Digger Generator using ``\<AFairlyRandomSeed>'' as seed, but different settings. By default, the Digger Generator has \<For\-ward\-Prob\-a\-bil\-i\-ty> set to $90\%$, \<Left\-Prob\-a\-bil\-i\-ty> set to $4\%$, \<Right\-Prob\-a\-bil\-i\-ty> set to $4\%$, \<Vis\-it\-ed\-Prob\-a\-bil\-i\-ty> set to $2\%$, \<Stair\-Prob\-a\-bil\-i\-ty> set to $0\%$ and \<Room\-Per\-cent\-age> set to $50\%$.}
 \label{fig:diggers}
 \end{figure}
 
@@ -457,8 +475,7 @@ The \<Prefab Assembler> produces a 3D model of the map by associating to each ti
 \begin{figure}
 \centering
 \includegraphics[width=0.95\linewidth]{prefabs}
-\caption{Some prefabs and the masks they are associated to.}
-\caption*{Each model refers to the central cell of the corresponding mask. Green denotes empty cells, red denotes filled cell, half-green and half-red denotes cells that are ignored by the mask. The masks can be rotated to obtain all the possible configurations.}
+\caption[Some prefabs and the masks they are associated to.]{Some prefabs and the masks they are associated to. Each model refers to the central cell of the corresponding mask. Green denotes empty cells, red denotes filled cell, half-green and half-red denotes cells that are ignored by the mask. The masks can be rotated to obtain all the possible configurations.}
 \label{fig:prefabs}
 \end{figure}
 
@@ -466,7 +483,7 @@ The \<Prefab Assembler> produces a 3D model of the map by associating to each ti
 
 \subsubsection{Multi-Level Prefab Assembler}
 
-Like the \<Prefab Assembler>, the \<Multi-Level Prefab Assembler> produces a 3D model of the map by combining prefabs, but it employs additional logic to menage the overlap of multiple floors. Figure \ref{fig:multi_assembled} shows a map assembled with this algorithm.
+Like the \<Prefab Assembler>, the \<Multi-Level Prefab Assembler> produces a 3D model of the map by combining prefabs, but it employs additional logic to manage the overlap of multiple floors. Figure \ref{fig:multi_assembled} shows a map assembled with this algorithm.
 
 \begin{figure}
 \centering
@@ -475,16 +492,19 @@ Like the \<Prefab Assembler>, the \<Multi-Level Prefab Assembler> produces a 3D 
 \caption{Cellular map assembled with the \<Mesh Assembler>}
 \label{fig:cellular_assembled}
 \end{subfigure}
+\hfill
 \begin{subfigure}[t]{0.48\linewidth}
 \includegraphics[width=\linewidth]{isometric_mine}
 \caption{Digger map assembled with the \<Mesh Assembler>}
 \label{fig:digger_assembled}
 \end{subfigure}
+
 \begin{subfigure}[t]{0.48\linewidth}
 \includegraphics[width=\linewidth]{isometric_factory}
 \caption{Divisive map assembled with the \<Prefab Assembler>}
 \label{fig:divisive_assembled}
 \end{subfigure}
+\hfill
 \begin{subfigure}[t]{0.48\linewidth}
 \includegraphics[width=\linewidth]{isometric_suburbs}
 \caption{Multi-level map assembled with the \<Prefab Assembler>}
@@ -509,7 +529,7 @@ The \<Object Displacer> associates a character that represents neither a wall or
 
 \subsection{The Experiment Manager}
 
-The \<Experiment Manager> is a stand alone module that allows to create and menage the experiments used to perform user-based validation. Once that an experiment has been defined, the \<Experiment Manager> automatically assigns to the users the matches to play and collects the desired information.
+The \<Experiment Manager> is a stand alone module that allows to create and manage the experiments used to perform user-based validation. Once that an experiment has been defined, the \<Experiment Manager> automatically assigns to the users the matches to play and collects the desired information.
 
 \paragraph{Experiment definition}
 
@@ -532,7 +552,7 @@ The \<survey> is optional and consists in a list of multiple-choice questions th
 
 \par
 
-All these elements can be easily customized, as well as the number of test cases that an user has to play in a single experiment session, defined by the parametric variable \<CasesPerUsers>. The \<Experiment Manager> also allows to diagonally flip the maps, which is an useful method to avoid the rise of a bias due to memorization when the player is presented with different versions of the same map.
+All these elements can be easily customized, as well as the number of test cases that an user has to play in a single experiment session, defined by the parameter \<CasesPerUsers>. The \<Experiment Manager> also allows to diagonally flip the maps, which is an useful method to avoid the rise of a bias due to memorization when the player is presented with different versions of the same map.
 
 \paragraph{Experiment management}
 
@@ -642,9 +662,9 @@ The framework comes with three different class of weapons already implemented.
 There are three weapons of this class that the player can use:
 
 \begin{itemize}
-\item \<Assault Rifle>: a medium range weapon with a high fire rate, a capacious magazine and no dispersion which shots single medium damage projectiles. Figure \ref{fig:assault} shows its model and table \ref{tab:gunconfig} shows its parametric configuration.
-\item \<Shotgun>: a short range weapon with a slow fire rate, a small magazine and high dispersion which shots multiple low damage projectiles. Figure \ref{fig:shotgun} shows its model and table \ref{tab:gunconfig} shows its parametric configuration.
-\item \<Sniper Rifle>: a long range weapon with a slow fire rate, a small magazine and no dispersion which shots single high damage projectiles. It is equipped with a scope. Figure \ref{fig:sniper} shows its model and table \ref{tab:gunconfig} shows its parametric configuration.
+\item \<Assault Rifle>: a medium range weapon with a high fire rate, a capacious magazine and no dispersion which shots single medium damage projectiles. Figure \ref{fig:assault} shows its model and table \ref{tab:gunconfig} shows its parameters.
+\item \<Shotgun>: a short range weapon with a slow fire rate, a small magazine and high dispersion which shots multiple low damage projectiles. Figure \ref{fig:shotgun} shows its model and table \ref{tab:gunconfig} shows its parameters.
+\item \<Sniper Rifle>: a long range weapon with a slow fire rate, a small magazine and no dispersion which shots single high damage projectiles. It is equipped with a scope. Figure \ref{fig:sniper} shows its model and table \ref{tab:gunconfig} shows its parameters.
 \end{itemize}
 
 \paragraph{Projectile guns}
@@ -660,7 +680,7 @@ There are three weapons of this class that the player can use:
 \item \<ProjectileSpeed>: the speed of the projectile.
 \end{itemize}
 
-The only weapon of this class that the player can use is the \<Rocket Launcher>, a long range weapon with a slow fire rate, a small magazine and no dispersion which shots explosive projectiles. The projectiles of this weapon are slow and explode on impact, dealing an high damage that decreases radially from the center of the explosion. Figure \ref{fig:rocket} shows its model and table \ref{tab:gunconfig} shows its parametric configuration.
+The only weapon of this class that the player can use is the \<Rocket Launcher>, a long range weapon with a slow fire rate, a small magazine and no dispersion which shots explosive projectiles. The projectiles of this weapon are slow and explode on impact, dealing an high damage that decreases radially from the center of the explosion. Figure \ref{fig:rocket} shows its model and table \ref{tab:gunconfig} shows its parameters.
 
 \begin{figure}[p]
 \centering
@@ -738,7 +758,7 @@ The only weapon of this class that the player can use is the \<Rocket Launcher>,
 
 \section{Objects}
 
-Beyond \<decorations>, that are simple 3D models with no logic used to graphically enrich the map, the framework provides \<spawners>, i.e. objects that spawn a resource that can be collected by the entities. Once that the resource is collected, it disappears for an interval  of time defined by the parametric variable  \<Cooldown>. The framework comes with two different \<spawners>:
+Beyond \<decorations>, that are simple 3D models with no logic used to graphically enrich the map, the framework provides \<spawners>, i.e. objects that spawn a resource that can be collected by the entities. Once that the resource is collected, it disappears for an interval  of time defined by the parameter \<Cooldown>. The framework comes with two different \<spawners>:
 
 \begin{itemize}
 \item \<Health pack Spawner>: it spawns health packs, that partially restore the health of the entity. The healed amount of health is defined by \<RestoredHealth>.

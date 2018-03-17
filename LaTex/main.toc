@@ -10,9 +10,9 @@
 \contentsline {section}{\numberline {2.1}Level Design Theory}{5}
 \contentsline {section}{\numberline {2.2}Procedural Content Generation}{7}
 \contentsline {section}{\numberline {2.3}Procedural Content Generation for FPS maps}{9}
-\contentsline {section}{\numberline {2.4}History of Level Design in FPSes}{12}
-\contentsline {subsection}{\numberline {2.4.1}Level Design evolution in FPSes}{13}
-\contentsline {paragraph}{Before 1992: The first FPSes}{13}
+\contentsline {section}{\numberline {2.4}History of Level Design in FPS}{12}
+\contentsline {subsection}{\numberline {2.4.1}Level Design evolution in FPS}{13}
+\contentsline {paragraph}{Before 1992: The first FPS}{13}
 \contentsline {paragraph}{1992: Wolfenstein 3D defines a new genre}{13}
 \contentsline {paragraph}{1993 - 1995: Doom and its legacy}{13}
 \contentsline {paragraph}{1996 - 2000: A constant evolution}{14}

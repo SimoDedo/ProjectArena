@@ -28,7 +28,7 @@ Today, the level designer is a well-defined and fundamental figure in the develo
 
 \par
 
-The level designer has a really significant role in the development of a good game, since he is responsible for the creation of the world and for how the player interacts with it. The level designer takes an idea, which is the game design, and makes it tangible. Despite the importance of this role, after all this years it has not been established a common ground or a set of standards yet, instead, level design is often considered as a form of art, based on heuristics, observation, previous solutions and personal sensibility.
+The level designer has a really significant role in the development of a good game, since he is responsible for the creation of the world and for how the player interacts with it. The level designer takes an idea and makes it tangible. Despite the importance of this process, after all this years it has not been established a common ground or a set of standards and level design is still considered as a form of art, based on heuristics, observation, previous solutions and personal sensibility.
 
 \par
 
@@ -40,7 +40,7 @@ One of the core components of level design is the \[``level flow'']. For single 
 
 \par
 
-In multiplayer games the level flow is defined by how the players interact with each other and with the environment. Because of this, the control of the level designer is less direct and is exercised almost exclusively by modeling the map. Considering FPSes, the level flow changes depending on how much an area is attractive for a player. The more an area is easy to navigate or offers tactical advantage, such as covers, resources or high ground, the more players will be comfortable moving in it. This doesn't mean that all areas need to be designed like this, since zones with a ``bad'' flow but an attractive reward, such as a powerful weapon, force the player to evaluate risks and benefits, making the gameplay more engaging. The conformation of the map and the positioning of interesting resources are used to obtain what Güttler et al.\cite{Guttler:2003:SPL:963900.963915} define as ``points of collisions'', i.e. zones of the map were the majority of the fights are bound to happen. 
+In multiplayer games the level flow is defined by how the players interact with each other and with the environment. Because of this, the control of the level designer is less direct and is exercised almost exclusively by modeling the map. Considering FPS, the level flow changes depending on how much an area is attractive for a player. The more an area is easy to navigate or offers tactical advantage, such as covers, resources or high ground, the more players will be comfortable moving in it. This doesn't mean that all areas need to be designed like this, since zones with a ``bad'' flow but an attractive reward, such as a powerful weapon, force the player to evaluate risks and benefits, making the gameplay more engaging. The conformation of the map and the positioning of interesting resources are used to obtain what Güttler et al.\cite{Guttler:2003:SPL:963900.963915} define as ``points of collisions'', i.e. zones of the map were the majority of the fights are bound to happen. 
 
 \par
 
@@ -58,7 +58,7 @@ The first popular game to use this technique was \<Rogue>\footnote{Michael Toy, 
 
 \par
 
-As computer hardware advanced and CDs become more and more capacious, procedural generation of game worlds was generally put aside, since it could not compete with the level of detail that hand-crafted worlds were able to achieve.
+As computer hardware advanced and the size of the memory increased, procedural generation of game worlds was generally put aside, since it could not compete with the level of detail that hand-crafted worlds were able to achieve.
 
 \par
 
@@ -80,19 +80,19 @@ All the algorithms used by these games and middleware are designed to be as fast
 
 \section{Procedural Content Generation for FPS maps}
 
-We have really few examples of commercial FPSes that use PCG to generate their maps: with the exception of \<Soldier of Fortune II: Double Helix>\footnote{ Raven Software, 2002.}, that employs these techniques to generate whole missions, the few other cases we have are all roguelikes with a FPS gameplay, like \<STRAFE>\footnote{Pixel Titans, 2017.}.
+We have really few examples of commercial FPS that use PCG to generate their maps: with the exception of \<Soldier of Fortune II: Double Helix>\footnote{ Raven Software, 2002.}, that employs these techniques to generate whole missions, the few other cases we have are all roguelikes with a FPS gameplay, like \<STRAFE>\footnote{Pixel Titans, 2017.}.
 
 \par
 
-Despite the total lack of FPSes using procedural generation to obtain multiplayer maps, researchers have proved that search-based procedural content generation can be an useful tool in this field. This method has been applied for the first time by Cardamone et al.\cite{Cardamone:2011:EIM:2008402.2008411}, who tried to understand which kind of \<deathmatch>\footnote{A widely used multiplayer game mode where the goal of each player is to kill as many other players as possible until a certain end condition is reached, commonly being a kill limit or a time limit.} maps created the most enjoyable gameplay possible. To achieve this, the authors generate maps for \<Cube 2: Sauerbraten>\footnote{Wouter van Oortmerssen, 2004} by maximizing a fitness function computed on \<fight time> data collected from \<simulations>\footnote{In the field of search-based procedural generation, fitness function based on simulation are computed on the data collected from a match between artificial agents in the map at issue. They differ from \<direct> and \<interactive> functions, that evaluate, respectively, the generated content and the interaction with a real player.}, with the fight time being the time between the start of a fight and the death of one of the two contenders. The choice of this fitness function is based on the consideration that a long fight is correlated with the presence of interesting features in the map, such as escape or flanking routes, hideouts and well positioned resources. 
+Despite the total lack of FPS using procedural generation to obtain multiplayer maps, researchers have proved that search-based procedural content generation can be an useful tool in this field. In a seminal work, Cardamone et al.\cite{Cardamone:2011:EIM:2008402.2008411} tried to understand which kind of \<deathmatch>\footnote{A widely used multiplayer game mode where the goal of each player is to kill as many other players as possible until a certain end condition is reached, commonly being a kill limit or a time limit.} maps created the most enjoyable gameplay possible. To achieve this, the authors generated maps for \<Cube 2: Sauerbraten>\footnote{Wouter van Oortmerssen, 2004} by maximizing a fitness function computed on \<fight time> data collected from \<simulations>\footnote{In the field of search-based procedural generation, fitness function based on simulation are computed on the data collected from a match between artificial agents in the map at issue. They differ from \<direct> and \<interactive> functions, that evaluate, respectively, the generated content and the interaction with a real player.}, with the fight time being the time between the start of a fight and the death of one of the two contenders. The choice of this fitness function is based on the consideration that a long fight is correlated with the presence of interesting features in the map, such as escape or flanking routes, hideouts and well positioned resources. 
 
 \par
 
-Stucchi\cite{EvoluzioneMappeBilanciate}, yet remaining in the same field, attempted a completely different use of procedural generation, by producing balanced maps for player with different weapons or different levels of skill. For doing so, he generates procedural maps via evolutionary algorithms, evaluating them with a fitness function based on simulation that computes the entropy of kills. Starting from a situation where one of the two players has a significant advantage, Stucchi is able to prove that changes in the map structure allow to achieve a significant balance increase.
+Stucchi et al.\cite{EvoluzioneMappeBilanciate}, yet remaining in the same field, attempted a completely different use of procedural generation, by producing balanced maps for player with different weapons or different levels of skill. For doing so, they generated procedural maps via evolutionary algorithms, evaluating them with a fitness function based on simulation that computes the entropy of kills. Starting from a situation where one of the two players has a significant advantage, they proved that changes in the map structure allow to achieve a significant balance increase.
 
 \par
 
-Arnaboldi\cite{SviluppoDiUnFramework} combined these two approaches, creating a framework that automatically produces maps using a genetic process like the one of Cardamone. In Arnaboldi's work, however, the fitness function is way more complex, since it considers a high number of gameplay metrics, and the AI of the \<bots>\footnote{The artificial players of a video game.} is closer to the one of a human player, thanks to a series of adjustments made to the stock \<Cube 2> one. These improvements significantly increase the scientific accuracy and the overall quality of the output, allowing to identify and analyze some recurring patterns and their relationship with the statistics gathered during the simulations. 
+Arnaboldi\cite{SviluppoDiUnFramework} combined these two approaches, creating a framework that automatically produces maps using a genetic process like the one of Cardamone. In Arnaboldi's work, however, the fitness function is way more complex, since it considers a high number of gameplay metrics, and the AI of the \<bots>\footnote{The artificial players of a video game.} is closer to the one of a human player, thanks to a series of adjustments made to the stock \<Cube 2> one. These improvements significantly increase the flexibility of the framework and the overall quality of the output, allowing to identify and analyze some recurring patterns and their relationship with the statistics gathered during the simulations. 
 
 \par
 
@@ -106,7 +106,7 @@ Arnaboldi\cite{SviluppoDiUnFramework} combined these two approaches, creating a 
 
 \par
 
-A completely different approach from the ones listed above is the one of Anand and Wong\cite{10.1007/978-3-662-45212-7_19}, who employed search-based procedural generation to create \<online>, automatically and rapidly multiplayer maps for the \<Capture and Hold>\footnote{A multiplayer game mode where players, divided in two teams, fight for the control of some strategic areas. The score of each team increases over time proportionally to the number of controlled points until one of the two teams reaches a given limit, winning the game.} game mode, without compromising the quality of the final output. To achieve this, they employ a genetic approach, which fitness function is evaluated directly on the topology of the map, considering four different factors: the connectivity between regions, the number of points of collision, the balancing in the positioning of control points and spawn points. With no need to simulate matches, this process can be completed in a matter of seconds. The algorithm starts by generating three maps, that are then evolved by mutation. To obtain the initial maps, Anand and Wong populate a grid with random tiles, they clean it of undesired artifacts and they identify regions within it, that are then populated with strategic points, resources, spawn points and covers. Despite its good results, this approach is not sound enough on a scientific stand point, since it directly depends on the validity of the selected topological metrics and, as we have seen, it is still not clear which the good elements of a level are.
+A completely different approach from the ones listed above is the one of Anand and Wong\cite{10.1007/978-3-662-45212-7_19}, who employed search-based procedural generation to create \<online>, automatically and rapidly multiplayer maps for the \<Capture and Hold>\footnote{A multiplayer game mode where players, divided in two teams, fight for the control of some strategic areas. The score of each team increases over time proportionally to the number of controlled points until one of the two teams reaches a given limit, winning the game.} game mode, without compromising the quality of the final output. To achieve this, they employ a genetic approach, which fitness function is evaluated directly on the topology of the map, considering four different factors: the connectivity between regions, the number of points of collision, the balancing in the positioning of control points and spawn points. With no need to simulate matches, this process can be completed in a matter of seconds. The algorithm starts by generating three maps, that are then evolved by mutation. To obtain the initial maps, Anand and Wong populate a grid with random tiles, they clean it of undesired artifacts and they identify regions within it, that are then populated with strategic points, resources, spawn points and covers. Despite its good results, this approach heavily relies on the validity of the selected topological metrics and, as we have seen, it is still not clear which the good elements of a level are.
 
 \par
 
@@ -120,15 +120,15 @@ Finally, Cachia et al.\cite{MultiLevelEvolution} extended search-based procedura
 
 % FPS DESIGN %
 
-\section{History of Level Design in FPSes}
+\section{History of Level Design in FPS}
 
 \<First Person Shooter> are a video game genre which main features are the first-person player perspective and a weapon-based combat gameplay. During the years this genre has been consonantly evolving, as new elements started to emerge from the very aggressive and fast-paced gameplay of the first games of this kind, like \<Doom>\footnote{ID Software, 1993.}. Games like \<Half-Life>\footnote{Valve Software, 1998.} highlighted the importance of the story and of the setting, games like \<Deus Ex>\footnote{Ion Storm, 2000.} introduced role-play and stealth mechanics and games like \<Quake III: Arena>\footnote{id Software, 1999.} and \<Unreal Tournament>\footnote{Epic Games, 1999.} moved the focus from single player to multiplayer. Finally, Modern Military Shooters introduced a slower and more realistic gameplay and radically changed the setting from fictional conflicts to contemporary ones.
 
-\subsection{Level Design evolution in FPSes}
+\subsection{Level Design evolution in FPS}
 
 The evolution of the mechanics of this genre was supported by a constant refinement of level design and of the used tools.
 
-\paragraph{Before 1992: The first FPSes}
+\paragraph{Before 1992: The first FPS}
 
 \mbox{}\\
 
@@ -166,7 +166,7 @@ In the next years, many games continued what Doom started, bringing constant imp
 
 \par
 
-Released in 1996, \<Quake>\footnote{id Software, 1996.} was one of the first and most successful FPSes with a real 3D engine, that allowed an incredible jump forward in terms of realism, level design and interactivity. Quake had also a rich multiplayer, with a lot of maps, game modes and special features, like clans and modding. Two years later, \<Unreal>\footnote{Epic Games, 1998.} brought a new improvement in terms of realism and level design, thanks to its engine capable of displaying huge outdoors settings.
+Released in 1996, \<Quake>\footnote{id Software, 1996.} was one of the first and most successful FPS with a real 3D engine, that allowed an incredible jump forward in terms of realism, level design and interactivity. Quake had also a rich multiplayer, with a lot of maps, game modes and special features, like clans and modding. Two years later, \<Unreal>\footnote{Epic Games, 1998.} brought a new improvement in terms of realism and level design, thanks to its engine capable of displaying huge outdoors settings.
 
 \par
 
@@ -177,7 +177,7 @@ In those years many new sub-genres started to spawn, obtained by emphasizing cer
 \mbox{}\\
 
 {\setlength{\parindent}{0cm}
-In 2001, \<Halo: Combat Evolved>\footnote{Bungie, 2001.} revolutionized the genre, introducing some of the mechanics on which modern FPSes are based, as the limited amount of weapons that the player can carry and the regeneration of health over time. This slower and more strategic approach to gameplay matched perfectly with consoles and their twin-stick-controllers, that were not suitable for the extremely fast paced action of the past. Over time, this new approach to gameplay overshadowed almost completely all the others, thanks to the diffusion of consoles and to the increase of production costs, that made PC exclusives economically disadvantageous. From the standpoint of level design, this change required to increase the complexity of the levels and the addition of strategically placed covers.
+In 2001, \<Halo: Combat Evolved>\footnote{Bungie, 2001.} revolutionized the genre, introducing some of the mechanics on which modern FPS are based, as the limited amount of weapons that the player can carry and the regeneration of health over time. This slower and more strategic approach to gameplay matched perfectly with consoles and their twin-stick-controllers, that were not suitable for the extremely fast paced action of the past. Over time, this new approach to gameplay overshadowed almost completely all the others, thanks to the diffusion of consoles and to the increase of production costs, that made PC exclusives economically disadvantageous. From the standpoint of level design, this change required to increase the complexity of the levels and the addition of strategically placed covers.
 }
 
 \paragraph{Today: A time of stagnation}
