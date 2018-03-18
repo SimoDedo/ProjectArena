@@ -183,7 +183,7 @@ The selection of a room is performed considering two suitability criteria:
 \item \<Resources closeness suitability>: defined by the function $C_{res}(r)$, where $r$ is a room node, it measures how much the closeness of the node to the already placed resource nodes matches the desired one.
 \end{itemize}
 
-Given $G_{rr}$ the rooms and resources graph and $R \subset G_{rr}$ the subset of room nodes, the room node which is selected is the one which maximizes the following weighted sum of functions:
+Given $G_{rr}$ the rooms and resources graph and $R \subseteq G_{rr}$ the subset of room nodes, the room node which is selected is the one which maximizes the following weighted sum of functions:
 
 \begin{align}
 room = \argmax_{r \in R} (w_D  \times D(r) + w_{C_{res}}  \times C_{res}(r))
@@ -197,7 +197,7 @@ Both functions should be defined to output a value in the range $[0,1]$.
 Once that the room is selected, the selection of a tile is performed considering three suitability criteria:
 
 \begin{itemize}
-\item \<Visibility suitability>: defined by the function $v(t)$, where $t$ is a tile node, it measures how much the visibility of the node matches the desired one.
+\item \<Visibility suitability>: defined by the function $v(t)$, where $t$ is a tile node, it measures how much the visibility of the corresponding tile matches the desired one.
 \item \<Wall closeness suitability>: defined by the function $c_{wall}(t)$, where $t$ is a tile node, it measures how much the proximity of the corresponding tile to the walls matches the desired one.
 \item \<Resources closeness suitability>: defined by the function $c_{res}(t)$, where $t$ is a tile node, it measures how much the proximity of the node with already placed resource nodes matches the desired one.
 \end{itemize}
@@ -223,11 +223,11 @@ We have defined three heuristics for the placement of spawn points, the first on
 
 \subsubsection{Low risk heuristic}
 
-This method selects rooms that have a small number of connections, are not dead ends and are distant from each other and for each one of them places the spawn point on the tile that offers the best balance between low visibility and distance from the walls. In this way spawn points are placed in passageways that are sheltered and easy to leave. 
+This method selects rooms that have a small number of connections, are not dead ends and are distant from each other and for each one of them places a spawn point on the tile that offers the best balance between low visibility and distance from the walls. In this way spawn points are placed in passageways that are sheltered and easy to leave. 
 
 \par
 
-Given $G_{rr}$ the rooms and resources graph, $R \subset G_{rr}$ the subset of room nodes and $S \subset G_{rr}$ the subset of resource nodes (composed exclusively by the already positioned spawn points), the most suitable room for containing a spawn point is selected using
+Given $G_{rr}$ the rooms and resources graph, $R \subseteq G_{rr}$ the subset of room nodes and $S \subset G_{rr}$ the subset of resource nodes, the most suitable room for containing a spawn point is selected using
 
 \begin{align}
 \label{eq:lowriskdeg}
@@ -247,11 +247,11 @@ C_{res}(r) = \min_{n \in G_{rr}}
 \end{align}
 
 \noindent
-where $\degcent$ denotes the connectivity degree of a node, $\diam$ the diameter of the graph and $\spl$ the length of the shortest path that connects two nodes, found using Dijkstra's algorithm. Equation \ref{eq:lowriskdeg} promotes rooms with few passages but that are not dead ends, whereas equation \ref{eq:lowriskres} promotes rooms that are distant from the already placed spawn points. Both are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $w_D = 1 $ and $ w_{C_{res}} = 0.5 $.
+where $\degcent(n)$ denotes the connectivity degree of the node $n$, $\diam(G)$ the diameter of the graph $G$ and $\spl(n, m)$ the length of the shortest path that connects the two nodes $n$ and $m$, found using Dijkstra's algorithm. Equation \ref{eq:lowriskdeg} promotes rooms with few passages but that are not dead ends, whereas equation \ref{eq:lowriskres} promotes rooms that are distant from the already placed resources. Both are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $w_D = 1 $ and $ w_{C_{res}} = 0.5 $.
 
 \par
 
-Given $G_v$ the visibility graph, $T \subset G_v$ the subset of tile nodes that belong to the room, $H \subset G_v$ the subset of tile nodes which contain a resource (composed exclusively by the already positioned spawn points) and $l_d$ the length of the diagonal of the map, the most suitable tile for containing a spawn point is selected using
+Given $G_v$ the visibility graph, $T \subset G_v$ the subset of tile nodes that belong to the room, $H \subset G_v$ the subset of tile nodes which contain a resource and $l_d$ the length of the diagonal of the map, the most suitable tile for containing a spawn point is selected using
 
 \begin{align}
 \label{eq:lowvis}
@@ -272,7 +272,7 @@ c_{wall}(t) = \cfrac{\walld(t, room)}{\max_{t' \in T}\walld(t', room)}
 \end{align}
 
 \noindent
-where $\walld$ is the distance of a tile from the walls of the room, computed as the sum of the minimum distances from the horizontal and vertical walls, $\cartd$ is the Cartesian distance of the coordinates associated to two tiles. Equation \ref{eq:lowvis} promotes tiles with low visibility, equation \ref{eq:lowwallclos} promotes tiles that are distant from the walls, whereas equation \ref{eq:lowresclos} promotes tiles that are distant from the already placed spawn points. All three are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $ w_v = 1 $, $ w_{c_{wall}} = 0.5 $ and $ w_{c_{res}}  = 0.5 $.
+where $\walld(n, room)$ is the distance of the coordinates associated to the node $n$ from the walls of the room $room$, computed as the sum of the minimum distances from the horizontal and vertical walls, and $\cartd(n, m)$ is the Cartesian distance of the coordinates associated to the nodes $n$ and $m$. Equation \ref{eq:lowvis} promotes tiles with low visibility, equation \ref{eq:lowwallclos} promotes tiles that are distant from the walls, whereas equation \ref{eq:lowresclos} promotes tiles that are distant from the already placed resources. All three are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $ w_v = 1 $, $ w_{c_{wall}} = 0.5 $ and $ w_{c_{res}}  = 0.5 $.
 
 % UNIFORM SPAWN POINTS %
 
@@ -282,19 +282,19 @@ This method selects rooms that are uniformly distributed in the map and for each
 
 \par
 
-The first room is selected at random, then, given $G_{rr}$ the rooms and corridors graph, $R \subset G_{rr}$ the subset of room nodes, $S \subset G_{rr}$ the subset of resource nodes (composed exclusively by the already positioned spawn points), the remaining rooms are selected with the following heuristic:
+The first room is selected at random, then, given $G_{rr}$ the rooms and corridors graph, $R \subseteq G_{rr}$ the subset of room nodes, $S \subset G_{rr}$ the subset of resource nodes, the remaining rooms are selected with the following heuristic:
 
 \begin{align}
 	room = \argmax_{r \in R} ( \min_{s \in S} (\spl(r, s) ))
 \end{align}
 
-Once that the room has been found, one of its tiles is selected using equations \ref{eq:lowvis}, \ref{eq:lowwallclos} and \ref{eq:lowresclos} with weights  $ w_{c_{wall}} = 0.5 $ and $ w_{c_{res}}  = 0.5 $.
+Once that the room has been found, one of its tiles is selected using equations \ref{eq:lowvis}, \ref{eq:lowwallclos} and \ref{eq:lowresclos} with weights $ w_v = 1 $, $ w_{c_{wall}} = 0.5 $ and $ w_{c_{res}}  = 0.5 $.
 
 % RANDOM SPAWN POINTS %
 
 \subsubsection{Random heuristic}
 
-This method selects rooms at random and for each one of them places the spawn point on the tile that offers the best balance between low visibility and distance from the walls, using using equations \ref{eq:lowvis}, \ref{eq:lowwallclos} and\ref{eq:lowresclos} with weights  $ w_{c_{wall}} = 0.5 $ and $ w_{c_{res}}  = 0.5 $.
+This method selects rooms at random and for each one of them places the spawn point on the tile that offers the best balance between low visibility and distance from the walls, using using equations \ref{eq:lowvis}, \ref{eq:lowwallclos} and \ref{eq:lowresclos} with weights $ w_v = 1 $, $ w_{c_{wall}} = 0.5 $ and $ w_{c_{res}}  = 0.5 $.
 
 % HEALTH PACKS %
 
@@ -304,20 +304,11 @@ Heath packs are placed in rooms that have a low-medium number of connections and
 
 \par
 
-Given $G_{rr}$ the rooms and corridors graph, $R \subset G_{rr}$ the subset of room nodes and $S \subset G_{rr}$ the subset of resource nodes (composed by the already positioned spawn points and health packs), the most suitable room for containing a health pack is selected using
+Given $G_{rr}$ the rooms and corridors graph, $R \subseteq G_{rr}$ the subset of room nodes and $S \subset G_{rr}$ the subset of resource nodes, the most suitable room for containing a health pack is selected using
 
 \begin{align}
 \label{eq:lowriskdegh}
 D(r) = 1 - \cfrac{f_{deg}(r) - \min_{r' \in R}f_{deg}(r')}{\max_{r' \in R}f_{deg}(r') - \min_{r' \in R}f_{deg}(r')} 
-\end{align}
-
-\begin{align}
-\label{eq:lowriskresh}
-C_{res}(r) = \min_{n \in G_{rr}}
-  	\begin{cases}
-    		\hfil 1 & \text{if } n \notin S \\
-    		\cfrac{\spl(r, n)}{\diam(G_{rr})} & \text{if } n \in S \
-  	\end{cases}
 \end{align}
 
 \noindent
@@ -332,14 +323,14 @@ f_{deg}(r) = \intd(\degcent(r),0.3,0.5)
 \label{eq:intervaldistance}
 \intd(v, v_{min}, v_{max}) = %| ( |v_{min}| - |v | ) | + | (|v_{max}| - |v | )| 
 	\begin{cases}
-    		\hfil |v_{min} - v| & \text{if } v <  v_{min} \\
+    		\hfil v_{min} - v & \text{if } v <  v_{min} \\
     		\hfil 0 & \text{if } v_{min} \leq v \leq v_{max} \\
-    		\hfil |v - v_{max} | & \text{if } v > v_{max} \
+    		\hfil v - v_{max}  & \text{if } v > v_{max} \
   	\end{cases}  	 
 \end{align}
 
 \noindent
-where $\intd$ is a function that measures the distance of a value from an interval of desired ones. Equation \ref{eq:lowriskdegh} promotes rooms with a low-medium number of passages, whereas equation \ref{eq:lowriskresh} promotes rooms that are distant from the already placed resources. Both are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $w_D = 1 $ and $ w_{C_{res}} = 0.5 $.
+where $\intd$ is a function that measures the distance of a value from an interval of desired ones. Equation \ref{eq:lowriskres} is used for $C_{res}$. Equation \ref{eq:lowriskdegh} promotes rooms with a low-medium number of passages. Both are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $w_D = 1 $ and $ w_{C_{res}} = 0.5 $.
 
 \par
 
@@ -351,7 +342,7 @@ v(t) = 1 - \biggg| 0.5 - \cfrac{\degcent(t) - \min_{t' \in G_v}\degcent(t')}{\ma
 \end{align}
 
 \noindent
-that promotes tiles with medium visibility. Equations \ref{eq:lowwallclos} and \ref{eq:lowresclos} are used for $c_{wall}(t)$ and $c_{res}(t)$ , respectively. All three are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $ w_v = 1 $, $ w_{c_{wall}} = 0.25 $ and $ w_{c_{res}}  = 0.5 $.
+that promotes tiles with medium visibility. Equations \ref{eq:lowwallclos} and \ref{eq:lowresclos} are used for $c_{wall}(t)$ and $c_{res}(t)$, respectively. All three are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $ w_v = 1 $, $ w_{c_{wall}} = 0.25 $ and $ w_{c_{res}}  = 0.5 $.
 
 % AMMUNITION %
 
@@ -361,7 +352,7 @@ Ammunition is placed in rooms that have either a low-medium or a high number of 
 
 \par
 
-Given $G_{rr}$ the rooms and corridors graph, $R \subset G_{rr}$ the subset of room nodes and $S \subset G_{rr}$ the subset of resource nodes (composed by the already positioned spawn points, health packs and ammunition), the most suitable room for containing ammunition is selected using equations \ref{eq:lowriskresh} and \ref{eq:lowriskdegh}, with
+Given $G_{rr}$ the rooms and corridors graph, $R \subseteq G_{rr}$ the subset of room nodes and $S \subset G_{rr}$ the subset of resource nodes, the most suitable room for containing ammunition is selected using equations \ref{eq:lowriskres} and \ref{eq:lowriskdegh}, with
 
 \begin{align}
 \label{eq:degfita1}
