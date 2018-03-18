@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  18 MAR 2018 11:50
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  18 MAR 2018 13:19
 entering extended mode
 **./main.tex
 (main.tex
@@ -1360,16 +1360,16 @@ ed on input line 37.
 LaTeX Warning: Citation `MultiLevelEvolution' on page 19 undefined on input lin
 e 45.
 
-<images/ab_divisive_1.png, id=130, 511.9125pt x 578.16pt>
+<images/ab_divisive_1.png, id=130, 558.085pt x 624.3325pt>
 File: images/ab_divisive_1.png Graphic file (type png)
 <use images/ab_divisive_1.png>
 Package pdftex.def Info: images/ab_divisive_1.png  used on input line 59.
-(pdftex.def)             Requested size: 161.9989pt x 182.95944pt.
-<images/ab_divisive_2.png, id=131, 511.9125pt x 578.16pt>
+(pdftex.def)             Requested size: 161.9989pt x 181.22327pt.
+<images/ab_divisive_2.png, id=131, 568.1225pt x 634.37pt>
 File: images/ab_divisive_2.png Graphic file (type png)
 <use images/ab_divisive_2.png>
 Package pdftex.def Info: images/ab_divisive_2.png  used on input line 64.
-(pdftex.def)             Requested size: 161.9989pt x 182.95944pt.
+(pdftex.def)             Requested size: 161.9989pt x 180.88445pt.
 [19 <./images/ab_divisive_1.png> <./images/ab_divisive_2.png>]
 LaTeX Font Info:    Try loading font information for OMS+cmr on input line 89.
 
@@ -1462,27 +1462,27 @@ Underfull \hbox (badness 2460) in paragraph at lines 334--334
 10 Thresh\OT1/cmr/m/n/10 -
  []
 
-<images/divisive_default.png, id=166, 338.76563pt x 338.76563pt>
+<images/divisive_default.png, id=166, 331.2375pt x 331.2375pt>
 File: images/divisive_default.png Graphic file (type png)
 <use images/divisive_default.png>
 Package pdftex.def Info: images/divisive_default.png  used on input line 388.
-(pdftex.def)             Requested size: 113.40088pt x 113.40059pt.
-<images/divisive_rdp20.png, id=167, 338.76563pt x 338.76563pt>
+(pdftex.def)             Requested size: 113.40088pt x 113.39761pt.
+<images/divisive_rdp20.png, id=167, 331.2375pt x 331.2375pt>
 File: images/divisive_rdp20.png Graphic file (type png)
 <use images/divisive_rdp20.png>
 Package pdftex.def Info: images/divisive_rdp20.png  used on input line 393.
-(pdftex.def)             Requested size: 113.40088pt x 113.40059pt.
+(pdftex.def)             Requested size: 113.40088pt x 113.39761pt.
 
 Underfull \hbox (badness 1603) in paragraph at lines 394--394
 \OT1/cmr/m/n/10 ated with $\OML/cmm/m/it/10 Room\OT1/cmr/m/n/10 -\OML/cmm/m/it/
 10 Di\OT1/cmr/m/n/10 -\OML/cmm/m/it/10 vide\OT1/cmr/m/n/10 -
  []
 
-<images/divisive_md1.png, id=168, 338.76563pt x 338.76563pt>
+<images/divisive_md1.png, id=168, 331.2375pt x 331.2375pt>
 File: images/divisive_md1.png Graphic file (type png)
 <use images/divisive_md1.png>
 Package pdftex.def Info: images/divisive_md1.png  used on input line 398.
-(pdftex.def)             Requested size: 113.40088pt x 113.40059pt.
+(pdftex.def)             Requested size: 113.40088pt x 113.39761pt.
 
 Underfull \hbox (badness 5756) in paragraph at lines 399--399
 []\OT1/cmr/m/n/10 (c) |Di-vi-sive map gen-
@@ -1494,11 +1494,11 @@ Underfull \hbox (badness 2486) in paragraph at lines 399--399
 t/10 i\OT1/cmr/m/n/10 -\OML/cmm/m/it/10 mum\OT1/cmr/m/n/10 -
  []
 
-<images/divisive_md8.png, id=169, 338.76563pt x 338.76563pt>
+<images/divisive_md8.png, id=169, 331.2375pt x 331.2375pt>
 File: images/divisive_md8.png Graphic file (type png)
 <use images/divisive_md8.png>
 Package pdftex.def Info: images/divisive_md8.png  used on input line 403.
-(pdftex.def)             Requested size: 113.40088pt x 113.40059pt.
+(pdftex.def)             Requested size: 113.40088pt x 113.39761pt.
 
 Underfull \hbox (badness 4819) in paragraph at lines 404--404
 []\OT1/cmr/m/n/10 (d) |Di-vi-sive map gen-
@@ -1510,11 +1510,11 @@ Underfull \hbox (badness 2486) in paragraph at lines 404--404
 t/10 i\OT1/cmr/m/n/10 -\OML/cmm/m/it/10 mum\OT1/cmr/m/n/10 -
  []
 
-<images/divisive_mrd1.png, id=170, 338.76563pt x 338.76563pt>
+<images/divisive_mrd1.png, id=170, 331.2375pt x 331.2375pt>
 File: images/divisive_mrd1.png Graphic file (type png)
 <use images/divisive_mrd1.png>
 Package pdftex.def Info: images/divisive_mrd1.png  used on input line 408.
-(pdftex.def)             Requested size: 113.40088pt x 113.40059pt.
+(pdftex.def)             Requested size: 113.40088pt x 113.39761pt.
 
 Underfull \hbox (badness 5756) in paragraph at lines 409--409
 []\OT1/cmr/m/n/10 (e) |Di-vi-sive map gen-
@@ -1526,11 +1526,11 @@ Underfull \hbox (badness 2486) in paragraph at lines 409--409
 t/10 i\OT1/cmr/m/n/10 -\OML/cmm/m/it/10 mum\OT1/cmr/m/n/10 -
  []
 
-<images/divisive_mrd7.png, id=171, 338.76563pt x 338.76563pt>
+<images/divisive_mrd7.png, id=171, 331.2375pt x 331.2375pt>
 File: images/divisive_mrd7.png Graphic file (type png)
 <use images/divisive_mrd7.png>
 Package pdftex.def Info: images/divisive_mrd7.png  used on input line 413.
-(pdftex.def)             Requested size: 113.40088pt x 113.40059pt.
+(pdftex.def)             Requested size: 113.40088pt x 113.39761pt.
 
 Underfull \hbox (badness 6316) in paragraph at lines 414--414
 []\OT1/cmr/m/n/10 (f) |Di-vi-sive map gen-
@@ -1781,7 +1781,7 @@ fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Program Files/MiKTeX 2.9/fonts/type
 /amsfonts/cm/cmsy6.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts
 /cm/cmsy8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti1
 0.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti9.pfb>
-Output written on main.pdf (74 pages, 2076604 bytes).
+Output written on main.pdf (74 pages, 2073919 bytes).
 PDF statistics:
  399 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
