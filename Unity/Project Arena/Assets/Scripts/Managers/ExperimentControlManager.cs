@@ -92,8 +92,6 @@ public static class ExperimentControlManager {
             }
 
             if (mergeLogs) {
-                bool generateIncompleteDirectory = false;
-
                 // Merge the game logs.
                 foreach (JsonGameLog gameLog in gameLogs) {
                     if (gameLog.logPart == 0) {
@@ -131,9 +129,6 @@ public static class ExperimentControlManager {
                         // Set the part to -1 if the log is incomplete, to 0 if it is complete.
                         if (lastPart != count) {
                             refinedGameLog.logPart = -1;
-                            if (!generateIncompleteDirectory) {
-                                generateIncompleteDirectory = true;
-                            }
                         } else {
                             refinedGameLog.logPart = 0;
                         }
@@ -148,21 +143,13 @@ public static class ExperimentControlManager {
                         JsonStatisticsLog refinedStatisticLog = statisticsLog;
 
                         foreach (JsonStatisticsLog sl in statisticsLogs) {
-                            bool started = false;
-
                             if (sl.testID == statisticsLog.testID &&
                                 sl.mapInfo.name == statisticsLog.mapInfo.name && sl.logPart > 0) {
-                                if (!started) {
-                                    break;
-                                }
+
                                 refinedStatisticLog.finalStatistics = sl.finalStatistics;
+
                                 refinedStatisticLog.targetStatisticsLogs.AddRange(
                                     sl.targetStatisticsLogs);
-                            } else {
-                                // When I stop seing inherent logs I stop.
-                                if (started) {
-                                    break;
-                                }
                             }
                         }
 
