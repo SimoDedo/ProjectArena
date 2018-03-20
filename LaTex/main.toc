@@ -80,3 +80,8 @@
 \contentsline {subsection}{\numberline {4.3.5}Ammunition placement}{56}
 \contentsline {subsection}{\numberline {4.3.6}Weapon placement}{56}
 \contentsline {section}{\numberline {4.4}Summary}{57}
+\contentsline {chapter}{\numberline {5}Experiment on spawn points placement heuristic}{59}
+\contentsline {section}{\numberline {5.1}Description}{59}
+\contentsline {section}{\numberline {5.2}Setup}{60}
+\contentsline {section}{\numberline {5.3}Results}{61}
+\contentsline {section}{\numberline {5.4}Conclusions}{61}

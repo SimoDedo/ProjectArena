@@ -38,6 +38,38 @@ def getArrayFromData(data, column, conversion=0):
 
     return array
 
+### MENU FUNCTIONS ############################################################
+
+# Mengaes the graph menu.
+def graphMenu():
+    index = 0
+
+    while True:
+        print("\n[GRAPHS] Select a graph to generate:")
+        print("[1] Total bar diagram")
+        print("[2] Total bar diagram divided per map")
+        print("[3] Kill time")
+        print("[4] Kill distance")
+        print("[0] Back\n")
+
+        option = input("Option: ")
+    
+        while option != "1" and option != "2" and option != "3" and option != "4" and option != "0":
+            option = input("Invalid choice. Option: ")
+    
+        if option == "1":
+            print("\nGenerating graph...")  
+        elif option == "2":
+            print("\nGenerating graph...")  
+        elif option == "3":
+            print("\nGenerating graph...")  
+        elif option == "4":
+            print("\nGenerating graph...")  
+        elif option == "5":
+            print("\nGenerating graph...")  
+        elif option == "0":
+            return
+
 ### MAIN ######################################################################
 
 # Create the input folder if needed.
@@ -54,12 +86,13 @@ while True:
     print("[MENU] Select an option:")
     print("[1] Wilcoxon signed-rank test")
     print("[2] Bernulli validation")
-    print("[3] Change file")
+    print("[3] Generate graphs")
+    print("[4] Change file")
     print("[0] Quit\n")
 
     option = input("Option: ")
 
-    while option != "1" and option != "2" and option != "3" and option != "0":
+    while option != "1" and option != "2" and option != "3" and option != "4" and option != "0":
         option = input("Invalid choice. Option: ")
 
     if option == "1":
@@ -83,6 +116,8 @@ while True:
         print("#equal = " + str(equalCount))
         print("p-value = " + str(pvalue) + "\n")
     elif option == "3":
+        graphMenu()
+    elif option == "4":
         data = getData(inputDir)
     elif option == "0":
         break
