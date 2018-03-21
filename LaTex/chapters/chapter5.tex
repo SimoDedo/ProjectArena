@@ -51,13 +51,19 @@ The performance of the player is measured by \<AvgKillTime>, that is also an ind
 We have selected three procedurally generated maps that present radically different layouts and we populated each one of them using both the low risk and the uniform heuristic:
 
 \begin{itemize}
-\item \<Arena>: this map presents a wide open arena, two sides of which are adjacent to parallel corridors with many openings. The central arena allows to control most of the map, whereas the corridors offer some repair and perfect spots to place spawn points. Figure \ref{img:arena_safe} shows the spawn points positioned using the low risk heuristic, whereas figure \ref{img:arena_uniform} shows one of the five configuration produced using the uniform heuristic.
-\item \<Corridors>: this map presents many small rooms connected by long corridors. There is no area that allows to control the others. Figure \ref{img:corridors_safe} shows the spawn points positioned using the low risk heuristic, whereas figure \ref{img:corridors_uniform} shows one of the five configuration produced using the uniform heuristic.
-\item \<Intense>: this map presents a layout which is between the previous two, since it has both open areas and small rooms connected by corridors. Figure \ref{img:intense_safe} shows the spawn points positioned using the low risk heuristic, whereas figure \ref{img:intense_uniform} shows one of the five configuration produced using the uniform heuristic.
+\item \<Arena>: this map presents a wide open arena, two sides of which are adjacent to parallel corridors with many openings. As the visibility heatmap in figure \ref{img:arena_visibility} shows, the central arena allows to control most of the map, whereas the corridors offer some repair and perfect spots to place spawn points. Figure \ref{img:arena_safe} shows the spawn points positioned using the low risk heuristic, whereas figure \ref{img:arena_uniform} shows one of the five configuration produced using the uniform heuristic.
+\item \<Corridors>: this map presents many small rooms connected by long corridors. As it can be seen in figure \ref{img:corridors_visibility}, there is no area that allows to control the others and the only point with high visibility are the ones where corridors intersect. Figure \ref{img:corridors_safe} shows the spawn points positioned using the low risk heuristic, whereas figure \ref{img:corridors_uniform} shows one of the five configuration produced using the uniform heuristic.
+\item \<Intense>: compared to the previous two, this map presents an intermediate layout, since it has both open areas and small rooms connected by corridors. As it can be seen in figure \ref{img:intense_visibility}, this reflects also on the visibility, that is high in the central open arenas and low in the remaining sections of the map. Figure \ref{img:intense_safe} shows the spawn points positioned using the low risk heuristic, whereas figure \ref{img:intense_uniform} shows one of the five configuration produced using the uniform heuristic.
 \end{itemize}
 
 \begin{figure}[tp]
 	\centering
+	\begin{subfigure}[t]{0.3\linewidth}
+    		\includegraphics[width=\linewidth]{arena_visibility}
+     		\caption{Heatmap showing the visibility of the level.}
+		\label{img:arena_visibility}
+  	\end{subfigure}  	
+  	\hfil
   	\begin{subfigure}[t]{0.3\linewidth}
     		\includegraphics[width=\linewidth]{arena_safe}
      		\caption{Spawn points (in red) placed using the safe heuristic.}
@@ -68,12 +74,18 @@ We have selected three procedurally generated maps that present radically differ
     		\includegraphics[width=\linewidth]{arena_uniform}
      		\caption{Spawn points (in red) placed using the uniform heuristic.}
 		\label{img:arena_uniform}
-  	\end{subfigure}  	
+  	\end{subfigure}  
 	\caption{``Arena'' map used in the experiment.}
 \end{figure}
 
 \begin{figure}[tp]
 	\centering
+  	\begin{subfigure}[t]{0.3\linewidth}
+    		\includegraphics[width=\linewidth]{corridors_visibility}
+     		\caption{Heatmap showing the visibility of the level.}
+		\label{img:corridors_visibility}
+  	\end{subfigure}  	  
+  	\hfil
   	\begin{subfigure}[t]{0.3\linewidth}
     		\includegraphics[width=\linewidth]{corridors_safe}
      		\caption{Spawn points (in red) placed using the safe heuristic.}
@@ -84,12 +96,18 @@ We have selected three procedurally generated maps that present radically differ
     		\includegraphics[width=\linewidth]{corridors_uniform}
      		\caption{Spawn points (in red) placed using the uniform heuristic.}
 		\label{img:corridors_uniform}
-  	\end{subfigure}	  	
+  	\end{subfigure}	
 	\caption{``Corridors'' map used in the experiment.}
 \end{figure}
 
 \begin{figure}[tp]
 	\centering  	
+  	\begin{subfigure}[t]{0.3\linewidth}
+    		\includegraphics[width=\linewidth]{intense_visibility}
+     		\caption{Heatmap showing the visibility of the level.}
+		\label{img:intense_visibility}
+  	\end{subfigure}  	
+  	\hfil
   	\begin{subfigure}[t]{0.3\linewidth}
     		\includegraphics[width=\linewidth]{intense_safe}
      		\caption{Spawn points (in red) placed using the safe heuristic.}
@@ -100,7 +118,7 @@ We have selected three procedurally generated maps that present radically differ
     		\includegraphics[width=\linewidth]{intense_uniform}
      		\caption{Spawn points (in red) placed using the uniform heuristic.}
 		\label{img:intense_uniform}
-  	\end{subfigure}  	
+  	\end{subfigure}
 	\caption{``Intense'' map used in the experiment.}
 	
 \end{figure}
