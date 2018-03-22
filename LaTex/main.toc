@@ -83,5 +83,5 @@
 \contentsline {chapter}{\numberline {5}Experiment on spawn points placement heuristics}{59}
 \contentsline {section}{\numberline {5.1}Description}{59}
 \contentsline {section}{\numberline {5.2}Setup}{60}
-\contentsline {section}{\numberline {5.3}Results}{63}
-\contentsline {section}{\numberline {5.4}Conclusions}{63}
+\contentsline {section}{\numberline {5.3}Results}{65}
+\contentsline {section}{\numberline {5.4}Conclusions}{65}

@@ -134,20 +134,43 @@ It is important to observe that the low risk and the uniform heuristics select r
 \section{Results}
 
 \begin{figure}[tp]
-	\centering  	
-  	\begin{subfigure}[t]{0.48\linewidth}
+ 	\centering
+  	\begin{subfigure}[t]{0.8\linewidth}
     		\includegraphics[width=\linewidth]{bar_lowrisk}
      		\caption{Low risk heuristic.}
 		\label{img:bar_lowrisk}
   	\end{subfigure}  	
-  	\hfil
-  	\begin{subfigure}[t]{0.48\linewidth}
+  	\begin{subfigure}[t]{0.8\linewidth}
     		\includegraphics[width=\linewidth]{bar_uniform}
      		\caption{Uniform heuristic.}
      		\label{img:bar_uniform}
   	\end{subfigure}
 	\caption[Distribution of the matches by number of kills for the two heuristics.]{Distribution of the matches by number of kills for the two heuristics. The matches are also classified by map.}
-	\label{img:intense}	
+	\label{img:match_distribution}	
+\end{figure}
+
+\begin{figure}[tp]
+ 	\centering
+  	\begin{subfigure}[t]{0.48\linewidth}
+    		\includegraphics[width=\linewidth]{scatter_kills}
+     		\caption{Kills.}
+		\label{img:bar_lowrisk}
+  	\end{subfigure}
+  	\hfill
+  	\begin{subfigure}[t]{0.48\linewidth}
+    		\includegraphics[width=\linewidth]{scatter_avg}
+     		\caption{AvgKillDistance.}
+     		\label{img:bar_uniform}
+  	\end{subfigure}
+	\caption[Experiment outcomes by metrics.]{Experiment outcomes by metrics. The outcome associated to the low risk heuristics is on the horizontal axis, the one associated to the uniform heuristics is on the vertical axis.}
+	\label{img:metrics}	
+\end{figure}
+
+\begin{figure}[tp]
+ 	\centering
+	\includegraphics[width=0.8\linewidth]{percived}
+	\caption{Comparison between the effective and the perceived difficulty.}
+	\label{img:percived}		
 \end{figure}
 
 % CONCLUSIONS %

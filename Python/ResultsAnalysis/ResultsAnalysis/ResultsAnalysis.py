@@ -89,7 +89,7 @@ def generateBarDiagramKills(data, safe):
 
     pArena = plt.bar(ind, killsSafeArena, width)
     pCorridors = plt.bar(ind, killsSafeCorridors, width, bottom = killsSafeArena)
-    pIntense = plt.bar(ind, killsSafeIntense, width, bottom = [sum(x) for x in zip(killsSafeArena, killsSafeCorridors)])
+    pIntense = plt.bar(ind, killsSafeIntense, width, bottom =  [sum(x) for x in zip(killsSafeArena, killsSafeCorridors)])
 
     # Plot.
     plt.ylabel('Number of matches')
@@ -110,6 +110,10 @@ def generateBarDiagramDifficulty(data):
     equal = compareOutcomes(realDifficulty, perceivedDifficulty, "equal")
     uniform = compareOutcomes(realDifficulty, perceivedDifficulty, "uniform")
 
+    s = [safe[0], equal[0], uniform[0]]
+    e = [safe[1], equal[1], uniform[1]]
+    u = [safe[2], equal[2], uniform[2]]
+
     # Setup the graph.
     N = len(safe)
     ind = np.arange(N)
@@ -121,15 +125,15 @@ def generateBarDiagramDifficulty(data):
     # ax.spines['right'].set_visible(False)
     # ax.spines['top'].set_visible(False)
 
-    uniformBar = plt.bar(ind, uniform, width)
-    equalBar = plt.bar(ind, equal, width, bottom = uniform)
-    safeBar = plt.bar(ind, safe, width, bottom = [sum(x) for x in zip(uniform, equal)])
+    safeBar = plt.bar(ind, s, width)
+    equalBar = plt.bar(ind, e, width, bottom = s)
+    uniformBar = plt.bar(ind, u, width, bottom = [sum(x) for x in zip(s, e)])
 
     # Plot.
     plt.xlabel('Heuristic of the map with least kills')
     plt.ylabel('Number of test sessions')
     plt.title('Comparison between the effective and the percived difficulty')
-    plt.yticks(np.arange(0, 14, 1))
+    plt.yticks(np.arange(0, 18, 1))
     plt.xticks(ind, ("Low risk","No difference","Uniform"))
     plt.legend((uniformBar[0], equalBar[0], safeBar[0]), ('Uniform heuristic map percived as harder', 
                                                           'No difference percived', 
