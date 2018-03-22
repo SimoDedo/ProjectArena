@@ -18,7 +18,7 @@ To highlight this particular dynamic, we designed a game mode where the user, wh
 
 \section{Setup}
 
-For this experiment, we setup the \<Experiment Manager> to propose in each play session a quick tutorial, two matches and a survey. The experiment was composed by three \<studies>, corresponding to different pre-generated maps, each one composed by two \<cases>, one that corresponded to the \<low risk> spawn points distribution and one that corresponded to a pool of five \<uniform> spawn point distributions. In a play session, the user played the same map twice, once with the low risk distribution and once with one of the uniform distributions, in a random order and in with the map flipped in one of the two matches. We used the survey to profile how much the user was familiar with video games and FPS, to evaluate his skill and to get a feedback about in which of the two maps it was harder to find the targets.
+For this experiment, we setup the \<Experiment Manager> to propose in each play session a quick tutorial, two matches and a survey. The experiment was composed by three \<studies>, corresponding to different pre-generated maps, each one composed by two \<cases>, one that corresponded to the \<low risk> spawn points distribution and one that corresponded to a pool of five \<uniform> spawn point distributions. In a play session, the user played the same map twice, once with the low risk distribution and once with one of the uniform distributions, in a random order and with the map flipped in one of the two matches. We used the survey to profile how much the user was familiar with video games and FPS, to evaluate his skill and to get a feedback about in which of the two maps it was harder to find the targets. The experiment was deployed online and played by the users via browser on their own computer.
 
 \par
 
@@ -56,6 +56,10 @@ We have selected three procedurally generated maps that present radically differ
 \item \<Intense>: compared to the previous two, this map presents an intermediate layout, since it has both open areas and small rooms connected by corridors. As it can be seen in figure \ref{img:intense_visibility}, this reflects also on the visibility, that is high in the central open arenas and low in the remaining sections of the map. Figure \ref{img:intense_safe} shows the spawn points positioned using the low risk heuristic, whereas figure \ref{img:intense_uniform} shows one of the five configuration produced using the uniform heuristic.
 \end{itemize}
 
+\par
+
+It is important to observe that the low risk and the uniform heuristics select rooms to place a spawn point with two different criteria, but they employ the same logic when selecting a tile inside a room. This means that the two heuristics select tiles which have similar visibility conditions, so the player's performance difference depends exclusively on how the rooms have been selected. This is observable in figures \ref{img:arena}, \ref{img:corridors} and \ref{img:intense}: when the uniform heuristics happens to select a room that has been selected also by the low risk one, the spawn point is placed exactly on the same tile.
+
 \begin{figure}[tp]
 	\centering
 	\begin{subfigure}[t]{0.3\linewidth}
@@ -76,6 +80,7 @@ We have selected three procedurally generated maps that present radically differ
 		\label{img:arena_uniform}
   	\end{subfigure}  
 	\caption{``Arena'' map used in the experiment.}
+	\label{img:arena}
 \end{figure}
 
 \begin{figure}[tp]
@@ -98,6 +103,7 @@ We have selected three procedurally generated maps that present radically differ
 		\label{img:corridors_uniform}
   	\end{subfigure}	
 	\caption{``Corridors'' map used in the experiment.}
+	\label{img:corridors}
 \end{figure}
 
 \begin{figure}[tp]
@@ -120,11 +126,29 @@ We have selected three procedurally generated maps that present radically differ
 		\label{img:intense_uniform}
   	\end{subfigure}
 	\caption{``Intense'' map used in the experiment.}
-	
+	\label{img:intense}	
 \end{figure}
+
 % RESULTS %
 
 \section{Results}
+
+\begin{figure}[tp]
+	\centering  	
+  	\begin{subfigure}[t]{0.48\linewidth}
+    		\includegraphics[width=\linewidth]{bar_lowrisk}
+     		\caption{Low risk heuristic.}
+		\label{img:bar_lowrisk}
+  	\end{subfigure}  	
+  	\hfil
+  	\begin{subfigure}[t]{0.48\linewidth}
+    		\includegraphics[width=\linewidth]{bar_uniform}
+     		\caption{Uniform heuristic.}
+     		\label{img:bar_uniform}
+  	\end{subfigure}
+	\caption[Distribution of the matches by number of kills for the two heuristics.]{Distribution of the matches by number of kills for the two heuristics. The matches are also classified by map.}
+	\label{img:intense}	
+\end{figure}
 
 % CONCLUSIONS %
 

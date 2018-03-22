@@ -4,7 +4,7 @@
 \contentsline {chapter}{List of Figures}{xiii}
 \contentsline {chapter}{List of Tables}{xv}
 \contentsline {chapter}{\numberline {1}Introduction}{1}
-\contentsline {section}{\numberline {1.1}Motivations and purpose}{2}
+\contentsline {section}{\numberline {1.1}Motivations and purpose}{1}
 \contentsline {section}{\numberline {1.2}Synopsis}{2}
 \contentsline {chapter}{\numberline {2}State of the art}{5}
 \contentsline {section}{\numberline {2.1}Level Design Theory}{5}
@@ -36,13 +36,13 @@
 \contentsline {subsubsection}{Divisive Generator}{25}
 \contentsline {subsubsection}{Digger Generator}{26}
 \contentsline {subsubsection}{All-Black Generator}{26}
-\contentsline {subsection}{\numberline {3.3.4}The Stairs Generator}{32}
+\contentsline {subsection}{\numberline {3.3.4}The Stairs Generator}{26}
 \contentsline {subsection}{\numberline {3.3.5}The Map Assembler}{32}
 \contentsline {subsubsection}{Mesh Assembler}{32}
 \contentsline {subsubsection}{Prefab Assembler}{32}
 \contentsline {subsubsection}{Multi-Level Prefab Assembler}{32}
 \contentsline {subsection}{\numberline {3.3.6}The Spawn Point Manager}{32}
-\contentsline {subsection}{\numberline {3.3.7}The Object Displacer}{35}
+\contentsline {subsection}{\numberline {3.3.7}The Object Displacer}{32}
 \contentsline {subsection}{\numberline {3.3.8}The Experiment Manager}{35}
 \contentsline {paragraph}{Experiment definition}{35}
 \contentsline {paragraph}{Experiment management}{35}
@@ -52,16 +52,16 @@
 \contentsline {section}{\numberline {3.5}Weapons}{38}
 \contentsline {paragraph}{Raycast guns}{39}
 \contentsline {paragraph}{Projectile guns}{39}
-\contentsline {paragraph}{Laser guns}{40}
-\contentsline {section}{\numberline {3.6}Objects}{40}
-\contentsline {section}{\numberline {3.7}Game modes}{40}
-\contentsline {subsection}{\numberline {3.7.1}Duel}{42}
+\contentsline {paragraph}{Laser guns}{41}
+\contentsline {section}{\numberline {3.6}Objects}{41}
+\contentsline {section}{\numberline {3.7}Game modes}{41}
+\contentsline {subsection}{\numberline {3.7.1}Duel}{41}
 \contentsline {subsection}{\numberline {3.7.2}Target Rush}{42}
 \contentsline {subsection}{\numberline {3.7.3}Target Hunt}{43}
 \contentsline {section}{\numberline {3.8}Summary}{43}
-\contentsline {chapter}{\numberline {4}Graph-based map analysis tool}{45}
-\contentsline {section}{\numberline {4.1}Description of the tool}{45}
-\contentsline {section}{\numberline {4.2}Analysis of pre-generated maps}{46}
+\contentsline {chapter}{\numberline {4}Graph-based map analysis}{45}
+\contentsline {section}{\numberline {4.1}Overview}{45}
+\contentsline {section}{\numberline {4.2}Analysis of the map}{45}
 \contentsline {subsection}{\numberline {4.2.1}Outlines graph}{46}
 \contentsline {subsection}{\numberline {4.2.2}Reachability graphs}{46}
 \contentsline {subsubsection}{Tiles graph}{46}
@@ -69,19 +69,19 @@
 \contentsline {subsubsection}{Rooms and resources graph}{47}
 \contentsline {subsection}{\numberline {4.2.3}Visibility graph}{47}
 \contentsline {subsection}{\numberline {4.2.4}Interesting metrics}{47}
-\contentsline {section}{\numberline {4.3}Populating of pre-generated maps}{50}
-\contentsline {subsection}{\numberline {4.3.1}Rules and patterns for resources positioning}{50}
+\contentsline {section}{\numberline {4.3}Placement of game elements on the map}{49}
+\contentsline {subsection}{\numberline {4.3.1}Rules and patterns for resources placement}{50}
 \contentsline {subsection}{\numberline {4.3.2}Placement process}{51}
-\contentsline {subsection}{\numberline {4.3.3}Spawn points placement}{53}
+\contentsline {subsection}{\numberline {4.3.3}Spawn points placement}{52}
 \contentsline {subsubsection}{Low risk heuristic}{53}
 \contentsline {subsubsection}{Uniform heuristic}{54}
 \contentsline {subsubsection}{Random heuristic}{54}
-\contentsline {subsection}{\numberline {4.3.4}Health packs placement}{55}
+\contentsline {subsection}{\numberline {4.3.4}Health packs placement}{54}
 \contentsline {subsection}{\numberline {4.3.5}Ammunition placement}{56}
 \contentsline {subsection}{\numberline {4.3.6}Weapon placement}{56}
 \contentsline {section}{\numberline {4.4}Summary}{57}
 \contentsline {chapter}{\numberline {5}Experiment on spawn points placement heuristics}{59}
 \contentsline {section}{\numberline {5.1}Description}{59}
 \contentsline {section}{\numberline {5.2}Setup}{60}
-\contentsline {section}{\numberline {5.3}Results}{61}
-\contentsline {section}{\numberline {5.4}Conclusions}{61}
+\contentsline {section}{\numberline {5.3}Results}{63}
+\contentsline {section}{\numberline {5.4}Conclusions}{63}

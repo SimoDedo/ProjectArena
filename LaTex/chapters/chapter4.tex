@@ -1,56 +1,40 @@
-\chapter{Graph-based map analysis tool}
+\chapter{Graph-based map analysis}
 
 % INTRODUCTION %
 
-In this chapter we describe the tool that we have developed to perform analysis and populating of pre-generated maps using \<Graph Theory>. After a quick overview, we introduce the analysis capabilities of this tool and then we present how we have employed them, together with Graph Theory, to strategically place resources (including spawn points) in pre-generated maps.
+In this chapter we describe the approach that we have developed to perform analysis and populating of pre-generated maps using \<Graph Theory>. After a quick overview, we introduce the analysis capabilities of this approach and then we present how we employed it to strategically place resources (including spawn points) in pre-generated maps.
 
 % DESCRIPTION %
 
-\section{Description of the tool}
+\section{Overview}
 
-This tool generates different kind of graphs, starting from the text and the All-Black representation of a map, that are used to perform various analysis and manipulation operations.
+Our approach consists of generating different kind of graphs, starting from the text and the All-Black representation of a map, that are used to perform various analysis and manipulation operations.
 
 \par
 
-The use of All-Black format is convenient, because it provides by default a logical division of the map in different areas and it allows our tool to be applied by other researchers, since as we have seen the All-Black format is widely used in this field. We have used this tool to position objects in a pre-generated map, but, for instance, it could be used to address the identification and definition of design patterns from an unfamiliar perspective or for \<direct evaluation> in Search Based PCG.
-
-\par 
-
-We developed this tool in \<Python>, since it offers many solid Graph Theory libraries, as \<NetworkX>, that is the one we used.
+The use of All-Black format is convenient, because it provides by default a logical division of the map in different areas and it allows our approach to be applied by other researchers, since as we have seen the All-Black format is widely used in the literature. In this thesis we focused on positioning objects in pre-generated maps, but, for instance, the same approach could be used to address the identification and definition of design patterns from an unfamiliar perspective or for \<direct evaluation> in Search Based PCG.
 
 % ANALYSIS %
 
-\section{Analysis of pre-generated maps}
+\section{Analysis of the map}
 
-The analysis is performed by generating different kind of undirected graphs, each one used to highlight a different feature of the map in question.
+The analysis is performed by generating different kind of undirected graphs, each one used to highlight a different feature of the map in question, using a \<Python> tool based on \<NetworkX>\footnote{A solid graph theory library (\url{https://networkx.github.io/}).} that we developed.
 
 \subsection{Outlines graph}
 
-The \<outlines graph> is generated starting from the All-Black representation of a map and is obtained by associating a node to every vertex of every room and corridor and by connecting the non-adjacent ones that belong to the same outline. This graph has a single kind of node (\<vertex node>) that contains the coordinates of the tile it represents, which are used to position the node when the graph is visualized. Figure \ref{img:graph_out} shows an example of this graph.
-
-\par
-
-This graph can be used to visualize the rooms which compose the map.
+The \<outlines graph> is generated starting from the All-Black representation of a map and is obtained by associating a node to every vertex of every room and corridor and by connecting the non-adjacent ones that belong to the same outline. This graph has a single kind of node (\<vertex node>) that contains the coordinates of the tile it represents, which are used to position the node when the graph is visualized. Figure \ref{img:graph_out} shows an example of this graph. This graph can be used to visualize the rooms which compose the map.
 
 \subsection{Reachability graphs}
 
-Our tool can generate various kinds of \<reachability graphs> that represent various ways in which an entity can navigate a map. In these graphs a node represents a position that an entity can reach, whereas an edge indicates a viable path from a position to another.
+Our tool can generate various kinds of \<reachability graphs> that represent various ways in which it is possible to navigate the map. In these graphs a node represents a reachable position, whereas an edge indicates a viable path from a position to another.
 
 \subsubsection{Tiles graph}
 
-The \<tiles graph> is generated starting from the text representation of a map and is obtained by associating a node to each empty tile and by connecting each node to its corresponding 8-neighbors. The horizontal and vertical edges have cost $1$, whereas the diagonal ones have cost $\sqrt{2}$. This graph has a single kind of node (\<tile node>) that contains the coordinates of the tile it represents, which are used to position the node when the graph is visualized. Figure \ref{img:graph_tile} shows an example of this graph.
-
-\par
-
-This graph can be used to find the minimum distance that separates two cells, along with the shortest path that connects them.
+The \<tiles graph> is generated starting from the text representation of a map and is obtained by associating a node to each empty tile and by connecting each node to its 8-neighbors. The horizontal and vertical edges have cost $1$, whereas the diagonal ones have cost $\sqrt{2}$. This graph has a single kind of node (\<tile node>) that contains the coordinates of the tile it represents, which are used to position the node when the graph is visualized. Figure \ref{img:graph_tile} shows an example of this graph. This graph can be used to find the minimum distance that separates two cells, along with the shortest path that connects them.
 
 \subsubsection{Rooms graph}
 
-The \<rooms graph> is generated starting from the All-Black representation of a map and is obtained by associating a node to each room and corridor and by connecting nodes which corresponding rooms or corridors overlap, using as weight the Euclidean distance of their central tile. This graph has a single kind of node (\<room node>) used to represent both rooms and corridors that contains the coordinates of the closest and furthest vertex of the room from the origin. When visualized, each node is positioned on the coordinates of the central tile of the room it represents. Figure \ref{img:graph_room} shows an example of this graph.
-
-\par
-
-This graph can be used to analyze the topology of a map, in order to find loops, choke points, central areas and other kind of structures.
+The \<rooms graph> is generated starting from the All-Black representation of a map and is obtained by associating a node to each room and corridor and by connecting nodes which corresponding rooms or corridors overlap, using as weight the Euclidean distance of their central tile. This graph has a single kind of node (\<room node>), used to represent both rooms and corridors that contains the coordinates of the closest and furthest vertex of the room from the origin. When visualized, each node is positioned on the coordinates of the central tile of the room it represents. Figure \ref{img:graph_room} shows an example of this graph. This graph can be used to analyze the topology of a map, in order to find loops, choke points, central areas and other kind of structures.
 
 \subsubsection{Rooms and resources graph}
 
@@ -58,15 +42,11 @@ The \<rooms and resources graph> is an extension of the room graph, which also i
 
 \subsection{Visibility graph}
 
-The \<visibility graph> is generated starting from the text representation of a map and is obtained by associating a node to each empty tile and by connecting each node to all the tiles that are visible from that node. For two tiles to be respectively visible, it must be possible to connect them with a line without crossing any filled tile. This graph has a single kind of node (\<visibility node>) that contains the coordinates of the tile it represents, which are used to position the node when the graph is visualized, and its \<degree centrality>, i.e. the number of edges incident to that node. 
+The \<visibility graph> is generated starting from the text representation of a map and is obtained by associating a node to each empty tile and by connecting each node to all the tiles that are visible from that node. For two tiles to be respectively visible, it must be possible to connect them with a line without crossing any filled tile. This graph has a single kind of node (\<visibility node>) that contains the coordinates of the tile it represents, which are used to position the node when the graph is visualized, and its \<visibility>, which is computed as the \<degree centrality>, i.e. the number of edges incident to that node. A tile with high visibility allows to control a wide portion of a map, but at the same time an entity standing on it is easy to spot.
 
 \par
 
-To make this graph easier to read by the user, the tool associates a color to the nodes, which ranges from blue, for the ones with the minimum visibility, to red, for the ones with the maximum visibility. This can be seen in figure \ref{img:graph_visibility}.
-
-\par
-
-This graph can be used to analyze which areas of the map are more exposed and which ones are more repaired.
+To make this graph easier to read by the user, the tool associates a color to the nodes, which ranges from blue, for the ones with the minimum visibility, to red, for the ones with the maximum visibility. This can be seen in figure \ref{img:graph_visibility}. This graph can be used to analyze which areas of the map are more exposed and which ones are more repaired.
 
 \begin{figure}[]
 	\centering
@@ -111,7 +91,7 @@ This graph can be used to analyze which areas of the map are more exposed and wh
      		\label{img:graph_visibility}
   	\end{subfigure}	
   	\hfill
-	\caption{A map and all the graphs that the tool can generate from it.}
+	\caption{A map and all the graphs that can be generated from it.}
 \end{figure}
 
 \subsection{Interesting metrics}
@@ -133,17 +113,17 @@ Considering the graphs, in particular the ones with room nodes, the following me
 
 % POPULATING %
 
-\section{Populating of pre-generated maps}
+\section{Placement of game elements on the map}
 
 We have defined multiple heuristics to populate a map with spawn points and other resources using the metrics that can be extracted from a graph. These heuristic are a mathematical transposition of rules and patterns concerning resource placement that we have extracted from the work of Tim Schäfer\cite{great1vs1}, who has performed an in depth analysis of multiplayer 1vs1 maps for \<Quake 2>\footnote{Id Software, 1997}.
 
-\subsection{Rules and patterns for resources positioning}
+\subsection{Rules and patterns for resources placement}
 
 The balance of a deathmatch game radically changes each time that a player is killed. If the game has more than two players, the player who won the fight does not gain any strategic advantage, since he still has the other players to face, whereas the defeated player is put at considerable disadvantage, because on death he loses all the weapons and ammunition that he has collected. In a 1vs1 match, a kill has an even stronger influence, since the surviving player has more weapons and ammunition and gains the complete control of the map, that comes with the chance of scoring another easy kill, as soon as the other player respawns, or of searching for additional equipment. Schäfer refers to the surviving player as \[up-player] and to the defeated one as \[down-player].
 
 \par
 
-To obtain a multiplayer map that is interesting and fun to play, it is important to consider the up-player vs down-player dynamic both when defining the map layout and when positioning resources.
+To design a multiplayer map that is interesting and fun to play, it is important to consider the up-player vs down-player dynamic both when defining the map layout and when positioning resources.
 
 \par
 
@@ -172,44 +152,44 @@ The position of a weapon and of its ammunition depends on the weapon itself. We 
 \subsection{Placement process}
 \label{ss:placement}
 
-Starting from these considerations, we defined a process based on heuristics that allows to position any kind of resource. This process consists in two phases: the selection of a room and the selection of a tile inside the room.
+Starting from these considerations, we defined a process based on heuristics that allows to position any kind of resource. This process consists of two steps: the selection of a room and the selection of a tile inside the room.
 
 \par
 
 The selection of a room is performed considering two suitability criteria:
 
 \begin{itemize}
-\item \<Degree suitability>: defined by the function $D(r)$, where $r$ is a room node, it measures how much the degree centrality of the node matches the desired one.
-\item \<Resources closeness suitability>: defined by the function $C_{res}(r)$, where $r$ is a room node, it measures how much the closeness of the node to the already placed resource nodes matches the desired one.
+\item \<Degree heuristic>: defined by the function $D(r)$, where $r$ is a room node, it measures how much the degree centrality of the node matches the desired one.
+\item \<Resources closeness heuristic>: defined by the function $C_{res}(r)$, where $r$ is a room node, it measures how much the closeness of the node to the already placed resource nodes matches the desired one.
 \end{itemize}
 
-Given $G_{rr}$ the rooms and resources graph and $R \subseteq G_{rr}$ the subset of room nodes, the room node which is selected is the one which maximizes the following weighted sum of functions:
+Given the rooms and resources graph of a map ($G_{rr}$) and the subset of room nodes ($R \subseteq G_{rr}$), the room node which is selected is the one which maximizes the following weighted sum of functions:
 
 \begin{align}
-room = \argmax_{r \in R} (w_D  \times D(r) + w_{C_{res}}  \times C_{res}(r))
+r^* = \argmax_{r \in R} (w_D  \times D(r) + w_{C_{res}}  \times C_{res}(r))
 \end{align}
 
 \noindent
-Both functions should be defined to output a value in the range $[0,1]$.
+The weights $w_D$ and $w_{C_{res}}$ allow to define how much each one of the two heuristics influences the selection of a room. Both functions should be defined to output a value in the range $[0,1]$, in order to have the same influence for equal weight.
 
 \par
 
 Once that the room is selected, the selection of a tile is performed considering three suitability criteria:
 
 \begin{itemize}
-\item \<Visibility suitability>: defined by the function $v(t)$, where $t$ is a tile node, it measures how much the visibility of the corresponding tile matches the desired one.
-\item \<Wall closeness suitability>: defined by the function $c_{wall}(t)$, where $t$ is a tile node, it measures how much the proximity of the corresponding tile to the walls matches the desired one.
-\item \<Resources closeness suitability>: defined by the function $c_{res}(t)$, where $t$ is a tile node, it measures how much the proximity of the node with already placed resource nodes matches the desired one.
+\item \<Visibility heuristic>: defined by the function $v(t)$, where $t$ is a tile node, it measures how much the visibility of the corresponding tile matches the desired one.
+\item \<Wall closeness heuristic>: defined by the function $c_{wall}(t)$, where $t$ is a tile node, it measures how much the proximity of the corresponding tile to the walls matches the desired one.
+\item \<Resources closeness heuristic>: defined by the function $c_{res}(t)$, where $t$ is a tile node, it measures how much the proximity of the node with already placed resource nodes matches the desired one.
 \end{itemize}
 
 Given $G_v$ the visibility graph and $T \subset G_v$ the subset of tiles contained by the selected room, the tile which is selected is the one which maximizes the following weighted sum of functions:
 
 \begin{align}
-tile = \argmax_{t \in T} (w_v \times v(t) + w_{c_{wall}}  \times c_{wall}(t) + w_{c_{res}}  \times c_{res}(t))
+t^* = \argmax_{t \in T} (w_v \times v(t) + w_{c_{wall}}  \times c_{wall}(t) + w_{c_{res}}  \times c_{res}(t))
 \end{align}
 
 \noindent
-All three functions should be defined to output a value in the range $[0,1]$.
+The weights $w_v $, $w_{c_{wall}}$ and $w_{c_{res}}$ allow to define how much each one of the three heuristics influences the selection of a tile. All three functions should be defined to output a value in the range $[0,1]$, in order to have the same influence for equal weight.
 
 \par
 
@@ -228,7 +208,7 @@ This method selects rooms that have a small number of connections, are not dead 
 
 \par
 
-Given $G_{rr}$ the rooms and resources graph, $R \subseteq G_{rr}$ the subset of room nodes and $S \subset G_{rr}$ the subset of resource nodes, the most suitable room for containing a spawn point is selected using
+Given the rooms and resources graph of the map ($G_{rr}$ ), the subset of room nodes ($R \subseteq G_{rr}$ ) and the subset of resource nodes ($S \subset G_{rr}$), the most suitable room for containing a spawn point is selected using the following heuristics:
 
 \begin{align}
 \label{eq:lowriskdeg}
@@ -248,11 +228,11 @@ C_{res}(r) = \min_{n \in G_{rr}}
 \end{align}
 
 \noindent
-where $\degcent(n)$ denotes the connectivity degree of the node $n$, $\diam(G)$ the diameter of the graph $G$ and $\spl(n, m)$ the length of the shortest path that connects the two nodes $n$ and $m$, found using Dijkstra's algorithm. Equation \ref{eq:lowriskdeg} promotes rooms with few passages but that are not dead ends, whereas equation \ref{eq:lowriskres} promotes rooms that are distant from the already placed resources. Both are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $w_D = 1 $ and $ w_{C_{res}} = 0.5 $.
+where $\degcent(n)$ denotes the connectivity degree of the node $n$, $\diam(G)$ the diameter of the graph $G$ and $\spl(n, m)$ the length of the shortest path that connects the two nodes $n$ and $m$, found using Dijkstra's algorithm. Equation \ref{eq:lowriskdeg} promotes rooms with few passages but that are not dead ends, whereas equation \ref{eq:lowriskres} promotes rooms that are distant from the already placed resources. Both are normalized in the range $[0,1]$. We empirically set the weighs to $w_D = 1 $ and $ w_{C_{res}} = 0.5 $.
 
 \par
 
-Given $G_v$ the visibility graph, $T \subset G_v$ the subset of tile nodes that belong to the room, $H \subset G_v$ the subset of tile nodes which contain a resource and $l_d$ the length of the diagonal of the map, the most suitable tile for containing a spawn point is selected using
+Given the visibility graph of the map ($G_v$), the subset of tile nodes that belong to the room ($T \subset G_v$), the subset of tile nodes which contain a resource ($H \subset G_v$) and the length of the diagonal of the map  $l_d$), the most suitable tile for containing a spawn point is selected using the following heuristics:
 
 \begin{align}
 \label{eq:lowvis}
@@ -273,7 +253,7 @@ c_{wall}(t) = \cfrac{\walld(t, room)}{\max_{t' \in T}\walld(t', room)}
 \end{align}
 
 \noindent
-where $\walld(n, room)$ is the distance of the coordinates associated to the node $n$ from the walls of the room $room$, computed as the sum of the minimum distances from the horizontal and vertical walls, and $\cartd(n, m)$ is the Cartesian distance of the coordinates associated to the nodes $n$ and $m$. Equation \ref{eq:lowvis} promotes tiles with low visibility, equation \ref{eq:lowwallclos} promotes tiles that are distant from the walls, whereas equation \ref{eq:lowresclos} promotes tiles that are distant from the already placed resources. All three are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $ w_v = 1 $, $ w_{c_{wall}} = 0.5 $ and $ w_{c_{res}}  = 0.5 $.
+where $\walld(n, room)$ is the distance of the coordinates associated to the node $n$ from the walls of the room $room$, computed as the sum of the minimum distances from the horizontal and vertical walls, and $\cartd(n, m)$ is the distance of the coordinates associated to the nodes $n$ and $m$. Equation \ref{eq:lowvis} promotes tiles with low visibility, equation \ref{eq:lowwallclos} promotes tiles that are distant from the walls, whereas equation \ref{eq:lowresclos} promotes tiles that are distant from the already placed resources. All three are normalized in the range $[0,1]$. We empirically set the weights as $ w_v = 1 $, $ w_{c_{wall}} = 0.5 $ and $ w_{c_{res}}  = 0.5 $.
 
 % UNIFORM SPAWN POINTS %
 
@@ -284,10 +264,10 @@ This method selects rooms that are uniformly distributed in the map and for each
 
 \par
 
-The first room is selected at random, then, given $G_{rr}$ the rooms and corridors graph, $R \subseteq G_{rr}$ the subset of room nodes, $S \subset G_{rr}$ the subset of resource nodes, the remaining rooms are selected with the following heuristic:
+The first room is selected at random, then, given the rooms and corridors graph ($G_{rr}$), the subset of room nodes ($R \subseteq G_{rr}$), the subset of resource nodes ($S \subset G_{rr}$), the remaining rooms are selected with the following heuristic:
 
 \begin{align}
-	room = \argmax_{r \in R} ( \min_{s \in S} (\spl(r, s) ))
+	r^* = \argmax_{r \in R} ( \min_{s \in S} (\spl(r, s) ))
 \end{align}
 
 Once that the room has been found, one of its tiles is selected using equations \ref{eq:lowvis}, \ref{eq:lowwallclos} and \ref{eq:lowresclos} with weights $ w_v = 1 $, $ w_{c_{wall}} = 0.5 $ and $ w_{c_{res}}  = 0.5 $.
@@ -306,7 +286,7 @@ Heath packs are placed in rooms that have a low-medium number of connections and
 
 \par
 
-Given $G_{rr}$ the rooms and corridors graph, $R \subseteq G_{rr}$ the subset of room nodes and $S \subset G_{rr}$ the subset of resource nodes, the most suitable room for containing a health pack is selected using
+Given the rooms and corridors graph of the map ($G_{rr}$), the subset of room nodes ($R \subseteq G_{rr}$) and the subset of resource nodes ($S \subset G_{rr}$), the most suitable room for containing a health pack is selected using the following heuristic:
 
 \begin{align}
 \label{eq:lowriskdegh}
@@ -336,7 +316,7 @@ where $\intd$ is a function that measures the distance of a value from an interv
 
 \par
 
-Given $G_v$ the visibility graph, $T \subset G_v$ the subset of tile nodes that belong to the room and $H \subset G_v$ the subset of tile nodes which contain a resource, the most suitable tile for containing a health pack is selected using
+Given the visibility graph of the map $G_v$, the subset of tile nodes that belong to the room ( $T \subset G_v$) and the subset of tile nodes which contain a resource ($H \subset G_v$), the most suitable tile for containing a health pack is selected using the following heuristic:
 
 \begin{align}
 \label{eq:lowvish}
@@ -344,7 +324,7 @@ v(t) = 1 - \biggg| 0.5 - \cfrac{\degcent(t) - \min_{t' \in G_v}\degcent(t')}{\ma
 \end{align}
 
 \noindent
-that promotes tiles with medium visibility. Equations \ref{eq:lowwallclos} and \ref{eq:lowresclos} are used for $c_{wall}(t)$ and $c_{res}(t)$, respectively. All three are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $ w_v = 1 $, $ w_{c_{wall}} = 0.25 $ and $ w_{c_{res}}  = 0.5 $.
+that promotes tiles with medium visibility. Equations \ref{eq:lowwallclos} and \ref{eq:lowresclos} are used for $c_{wall}(t)$ and $c_{res}(t)$, respectively. All three are normalized in the range $[0,1]$. We empirically set the weighs to $ w_v = 1 $, $ w_{c_{wall}} = 0.25 $ and $ w_{c_{res}}  = 0.5 $.
 
 % AMMUNITION %
 
@@ -354,7 +334,7 @@ Ammunition is placed in rooms that have either a low-medium or a high number of 
 
 \par
 
-Given $G_{rr}$ the rooms and corridors graph, $R \subseteq G_{rr}$ the subset of room nodes and $S \subset G_{rr}$ the subset of resource nodes, the most suitable room for containing ammunition is selected using equations \ref{eq:lowriskres} and \ref{eq:lowriskdegh}, with
+Given the rooms and corridors graph of the map ($G_{rr}$), the subset of room nodes ($R \subseteq G_{rr}$) and the subset of resource nodes ($S \subset G_{rr}$), the most suitable room for containing ammunition is selected using equations \ref{eq:lowriskres} and \ref{eq:lowriskdegh}, with
 
 \begin{align}
 \label{eq:degfita1}
@@ -370,11 +350,11 @@ f_{deg}(r) = \intd(\degcent(r),0.8,0.9)
 \end{align}
 
 \noindent
-for obtaining rooms with a high number of connections. We experimentally found that the weights which provide the best results are $w_D = 1 $ and $ w_{C_{res}} = 0.25 $.
+for obtaining rooms with a high number of connections. We empirically set the weighs to $w_D = 1 $ and $ w_{C_{res}} = 0.25 $.
 
 \par
 
-Given $G_v$ the visibility graph, $T \subset G_v$ the subset of tile nodes that belong to the room and $H\subset G_v$ the subset of tile nodes which contain a resource, the most suitable tile for containing ammunition is selected using
+Given the visibility graph ($G_v$), the subset of tile nodes that belong to the room ($T \subset G_v$) and the subset of tile nodes which contain a resource ($H\subset G_v$), the most suitable tile for containing ammunition is selected using the following heuristic:
 
 \begin{align}
 \label{eq:highvisa}
@@ -382,13 +362,13 @@ v(t) = \cfrac{\degcent(t) - \min_{t' \in T}\degcent(t')}{\max_{t' \in T}\degcent
 \end{align}
 
 \noindent
-that promotes tiles with high visibility. Equations \ref{eq:lowwallclos} and \ref{eq:lowresclos} are used for $c_{wall}(t)$ and $c_{res}(t)$, respectively. All three are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $ w_v = 1 $, $ w_{c_{wall}} = 0.25 $ and $ w_{c_{res}}  = 0.5 $.
+that promotes tiles with high visibility. Equations \ref{eq:lowwallclos} and \ref{eq:lowresclos} are used for $c_{wall}(t)$ and $c_{res}(t)$, respectively. All three are normalized in the range $[0,1]$. We empirically set the weights to $ w_v = 1 $, $ w_{c_{wall}} = 0.25 $ and $ w_{c_{res}}  = 0.5 $.
 
 % WEAPONS %
 
 \subsection{Weapon placement}
 
-For what concerns the weapons provided by the framework we have not defined any specific function yet, but, beside the assault rifle which is always available to the player, they could be placed as follows:
+For what concerns the weapons provided by the framework we have not defined any specific function, but, beside the assault rifle which is always available to the player, they could be placed as follows:
 
 \begin{itemize}
 \item \<Shotgun>: since it is a medium damage weapon it could be positioned in a room that has a medium number of connections and is relatively close to a spawn point. 
@@ -400,4 +380,4 @@ For what concerns the weapons provided by the framework we have not defined any 
 
 \section{Summary}
 
-In this chapter we analyzed the tool that we have developed to perform map analysis and populating using Graph Theory. After an overview of the graphs and metrics that allow to highlight interesting information about a map, we listed the rules and patterns commonly used to position resources in deathmatch maps and we described how we converted them into heuristics.
+In this chapter we analyzed the approach that we have defined to perform map analysis and populating using Graph Theory. After an overview of the graphs and metrics that allow to highlight interesting information about a map, we listed the rules and patterns commonly used to position resources in deathmatch maps and we described how we converted them into heuristics.
