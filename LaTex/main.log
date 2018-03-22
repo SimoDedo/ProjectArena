@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  22 MAR 2018 15:26
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  22 MAR 2018 19:30
 entering extended mode
 **./main.tex
 (main.tex
@@ -953,20 +953,7 @@ LaTeX Warning: Unused global option(s):
 
 LaTeX Warning: Label `fig:targets' multiply defined.
 
-) (chapters/chapter4.aux) (chapters/chapter5.aux
-
-LaTeX Warning: Label `img:bar_lowrisk' multiply defined.
-
-
-LaTeX Warning: Label `sub@img:bar_lowrisk' multiply defined.
-
-
-LaTeX Warning: Label `img:bar_uniform' multiply defined.
-
-
-LaTeX Warning: Label `sub@img:bar_uniform' multiply defined.
-
-) (chapters/chapter6.aux))
+) (chapters/chapter4.aux) (chapters/chapter5.aux) (chapters/chapter6.aux))
 \openout1 = `main.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 107.
@@ -1851,35 +1838,43 @@ Package pdftex.def Info: images/bar_uniform.png  used on input line 144.
 
 LaTeX Warning: Float too large for page by 8.08803pt on input line 150.
 
-<images/scatter_kills.png, id=355, 363.60844pt x 361.35pt>
+[61] [62 <./images/arena_visibility.png> <./images/arena_safe.png> <./images/ar
+ena_uniform.png> <./images/corridors_visibility.png> <./images/corridors_safe.p
+ng> <./images/corridors_uniform.png> <./images/intense_visibility.png> <./image
+s/intense_safe.png> <./images/intense_uniform.png>] [63 <./images/bar_lowrisk.p
+ng> <./images/bar_uniform.png>]
+<images/scatter_kills.png, id=376, 363.60844pt x 361.35pt>
 File: images/scatter_kills.png Graphic file (type png)
 <use images/scatter_kills.png>
-Package pdftex.def Info: images/scatter_kills.png  used on input line 155.
+Package pdftex.def Info: images/scatter_kills.png  used on input line 165.
 (pdftex.def)             Requested size: 187.19833pt x 186.03943pt.
-<images/scatter_avg.png, id=356, 363.60844pt x 361.35pt>
+<images/scatter_avg.png, id=377, 363.60844pt x 361.35pt>
 File: images/scatter_avg.png Graphic file (type png)
 <use images/scatter_avg.png>
-Package pdftex.def Info: images/scatter_avg.png  used on input line 161.
+Package pdftex.def Info: images/scatter_avg.png  used on input line 171.
 (pdftex.def)             Requested size: 187.19833pt x 186.03943pt.
-<images/percived.png, id=357, 550.30594pt x 472.76625pt>
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: Reference `img:scatter_distance' on page 64 undefined on input l
+ine 179.
+
+[64]
+<images/percived.png, id=381, 550.30594pt x 472.76625pt>
 File: images/percived.png Graphic file (type png)
 <use images/percived.png>
-Package pdftex.def Info: images/percived.png  used on input line 171.
+Package pdftex.def Info: images/percived.png  used on input line 187.
 (pdftex.def)             Requested size: 312.00119pt x 268.044pt.
-) [61] [62 <./images/arena_visibility.png> <./images/arena_safe.png> <./images/
-arena_uniform.png> <./images/corridors_visibility.png> <./images/corridors_safe
-.png> <./images/corridors_uniform.png> <./images/intense_visibility.png> <./ima
-ges/intense_safe.png> <./images/intense_uniform.png>] [63 <./images/bar_lowrisk
-.png> <./images/bar_uniform.png>] [64 <./images/scatter_kills.png> <./images/sc
-atter_avg.png> <./images/percived.png>] [65]
+
+Underfull \vbox (badness 1997) has occurred while \output is active []
+
+ [65 <./images/scatter_kills.png> <./images/scatter_avg.png>]) [66 <./images/pe
+rcived.png>]
 \openout2 = `chapters/chapter6.aux'.
 
- (chapters/chapter6.tex) [66
-
-
-
-
-]
+(chapters/chapter6.tex)
 No file main.bbl.
 (main.aux (chapters/chapter0.aux) (chapters/chapter1.aux)
 (chapters/chapter2.aux) (chapters/chapter3.aux) (chapters/chapter4.aux)
@@ -1892,10 +1887,10 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 16614 strings out of 493303
- 330184 string characters out of 3138856
- 358495 words of memory out of 3000000
- 19884 multiletter control sequences out of 15000+200000
+ 16619 strings out of 493303
+ 330286 string characters out of 3138856
+ 358537 words of memory out of 3000000
+ 19889 multiletter control sequences out of 15000+200000
  546242 words of font info for 83 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  41i,20n,43p,10380b,629s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -1917,7 +1912,7 @@ ic/amsfonts/cm/cmsy6.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfon
 ts/cm/cmsy8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmt
 i10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti12.pfb>
 <C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on main.pdf (82 pages, 2269759 bytes).
+Output written on main.pdf (82 pages, 2275742 bytes).
 PDF statistics:
  456 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
