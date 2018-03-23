@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  22 MAR 2018 19:30
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  23 MAR 2018 12:28
 entering extended mode
 **./main.tex
 (main.tex
@@ -1857,24 +1857,27 @@ Package pdftex.def Info: images/scatter_avg.png  used on input line 171.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-
-LaTeX Warning: Reference `img:scatter_distance' on page 64 undefined on input l
-ine 179.
-
 [64]
-<images/percived.png, id=381, 550.30594pt x 472.76625pt>
+Underfull \vbox (badness 4739) has occurred while \output is active []
+
+ [65 <./images/scatter_kills.png> <./images/scatter_avg.png>]
+<images/percived.png, id=386, 550.30594pt x 472.76625pt>
 File: images/percived.png Graphic file (type png)
 <use images/percived.png>
 Package pdftex.def Info: images/percived.png  used on input line 187.
 (pdftex.def)             Requested size: 312.00119pt x 268.044pt.
 
-Underfull \vbox (badness 1997) has occurred while \output is active []
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [65 <./images/scatter_kills.png> <./images/scatter_avg.png>]) [66 <./images/pe
-rcived.png>]
+ [66 <./images/percived.png>]) [67]
 \openout2 = `chapters/chapter6.aux'.
 
-(chapters/chapter6.tex)
+ (chapters/chapter6.tex) [68
+
+
+
+
+]
 No file main.bbl.
 (main.aux (chapters/chapter0.aux) (chapters/chapter1.aux)
 (chapters/chapter2.aux) (chapters/chapter3.aux) (chapters/chapter4.aux)
@@ -1887,10 +1890,10 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 16619 strings out of 493303
- 330286 string characters out of 3138856
+ 16618 strings out of 493303
+ 330264 string characters out of 3138856
  358537 words of memory out of 3000000
- 19889 multiletter control sequences out of 15000+200000
+ 19888 multiletter control sequences out of 15000+200000
  546242 words of font info for 83 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  41i,20n,43p,10380b,629s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -1912,9 +1915,9 @@ ic/amsfonts/cm/cmsy6.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfon
 ts/cm/cmsy8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmt
 i10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti12.pfb>
 <C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on main.pdf (82 pages, 2275742 bytes).
+Output written on main.pdf (84 pages, 2277617 bytes).
 PDF statistics:
- 456 PDF objects out of 1000 (max. 8388607)
+ 462 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  276 words of extra memory for PDF output out of 10000 (max. 10000000)
 
