@@ -66,11 +66,11 @@
 \contentsline {subsection}{\numberline {4.2.2}Reachability graphs}{46}
 \contentsline {subsubsection}{Tiles graph}{46}
 \contentsline {subsubsection}{Rooms graph}{46}
-\contentsline {subsubsection}{Rooms and resources graph}{47}
+\contentsline {subsubsection}{Rooms and game elements graph}{47}
 \contentsline {subsection}{\numberline {4.2.3}Visibility graph}{47}
 \contentsline {subsection}{\numberline {4.2.4}Interesting metrics}{47}
 \contentsline {section}{\numberline {4.3}Placement of game elements on the map}{49}
-\contentsline {subsection}{\numberline {4.3.1}Rules and patterns for resources placement}{50}
+\contentsline {subsection}{\numberline {4.3.1}Rules and patterns for game elements placement}{50}
 \contentsline {subsection}{\numberline {4.3.2}Placement process}{51}
 \contentsline {subsection}{\numberline {4.3.3}Spawn points placement}{52}
 \contentsline {subsubsection}{Low risk heuristic}{53}
