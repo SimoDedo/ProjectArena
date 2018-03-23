@@ -152,11 +152,16 @@ The position of a weapon and of its ammunition depends on the weapon itself. We 
 \subsection{Placement process}
 \label{ss:placement}
 
-Starting from these considerations, we defined a process based on heuristics that allows to position any kind of game element. This process consists of two steps: the selection of a room and the selection of a tile inside the room.
+Starting from these considerations, we defined a process that allows to position any kind of game element in two steps: the selection of a room and the selection of a tile inside the room. This process can be repeated as many time as needed, after having updated the graphs with the newly added game element.
 
-\par
+\subsubsection{Room selection}
 
-The selection of a room is performed considering two suitability criteria:
+The selection of a room can be heuristic-based, uniform or random.
+
+\paragraph{Heuristic-based room selection}\mbox{}\\
+
+{\setlength{\parindent}{0cm}
+This method selects rooms considering three suitability criteria:
 
 \begin{itemize}
 \item \<Degree heuristic>: defined by the function $D(r)$, where $r$ is a room node, it measures how much the degree centrality of the node matches the desired one.
@@ -172,9 +177,28 @@ r^* = \argmax_{r \in R} (w_D  \times D(r) + w_{H_e}  \times H_e(r))
 \noindent
 The weights $w_D$ and $w_{H_e}$ allow to define how much each one of the two heuristics influences the selection of a room. Both functions should be defined to output a value in the range $[0,1]$, in order to have the same influence for equal weight.
 
-\par
+\paragraph{Uniform room selection}\label{sss:uniform}\mbox{}\\
 
-Once that the room is selected, the selection of a tile is performed considering three suitability criteria:
+{\setlength{\parindent}{0cm}
+This method selects rooms that are uniformly distributed in the map. The first room is selected at random, then, given the rooms and corridors graph ($G_{rr}$), the subset of room nodes ($R \subseteq G_{rr}$), the subset of element nodes ($S \subset G_{rr}$), the remaining rooms are selected with the following heuristic:
+
+\begin{align}
+	r^* = \argmax_{r \in R} ( \min_{s \in S} (\spl(r, s) ))
+\end{align}
+
+\paragraph{Random room selection}\mbox{}\\
+
+{\setlength{\parindent}{0cm}
+This method simply selects rooms at random.
+
+\subsubsection{Tile selection}
+
+The selection of a tile can be heuristic-based, uniform or random.
+
+\paragraph{Heuristic-based tile selection}\mbox{}\\
+
+{\setlength{\parindent}{0cm}
+This method selects tiles considering three suitability criteria:
 
 \begin{itemize}
 \item \<Visibility heuristic>: defined by the function $v(t)$, where $t$ is a tile node, it measures how much the visibility of the corresponding tile matches the desired one.
@@ -191,9 +215,15 @@ t^* = \argmax_{t \in T} (w_v \times v(t) + w_{H_w}  \times H_w(t) + w_{H_e}  \ti
 \noindent
 The weights $w_v $, $w_{H_w}$ and $w_{H_e}$ allow to define how much each one of the three heuristics influences the selection of a tile. All three functions should be defined to output a value in the range $[0,1]$, in order to have the same influence for equal weight.
 
-\par
+\paragraph{Uniform tile selection}\mbox{}\\
 
-The process can be repeated as many time as needed, after having updated the graphs with the newly added game element. To obtain the best result, the game elements should be placed in the order their heuristics are presented.
+{\setlength{\parindent}{0cm}
+This method selects tiles that are uniformly distributed in the room. If no game element has been placed, the central tile is selected, otherwise it is picked out the one that maximizes the distance from the already positioned game elements but is not to close to the walls.
+
+\paragraph{Random tile selection}\mbox{}\\
+
+{\setlength{\parindent}{0cm}
+This method simply selects tiles at random from the room.
 
 \subsection{Spawn points placement}
 
