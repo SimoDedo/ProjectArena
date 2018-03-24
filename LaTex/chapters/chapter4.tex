@@ -117,7 +117,7 @@ Considering the graphs, in particular the ones with room nodes, the following me
 
 We have defined multiple heuristics to populate a map with game elements using the metrics that can be extracted from a graph. These heuristic are a mathematical transposition of rules and patterns concerning game elements placement that we have extracted from the work of Tim Schäfer\cite{great1vs1}, who has performed an in depth analysis of multiplayer 1vs1 maps for \<Quake 2>\footnote{Id Software, 1997}.
 
-\subsection{Rules and patterns for game elements placement}
+\subsection{Rules for the placement of game elements}
 
 The balance of a deathmatch game radically changes each time that a player is killed. If the game has more than two players, the player who won the fight does not gain any strategic advantage, since he still has the other players to face, whereas the defeated player is put at considerable disadvantage, because on death he loses all the weapons and ammunition that he has collected. In a 1vs1 match, a kill has an even stronger influence, since the surviving player has more weapons and ammunition and gains the complete control of the map, that comes with the chance of scoring another easy kill, as soon as the other player respawns, or of searching for additional equipment. Schäfer refers to the surviving player as \[up-player] and to the defeated one as \[down-player].
 
@@ -149,18 +149,23 @@ Power-ups grant temporary advantages to the player who collects them, like invis
 
 The position of a weapon and of its ammunition depends on the weapon itself. We can divide the weapons in three categories: \<weak>, \<medium> and \<strong>. Weak weapons are of a certain interest for the down-player, if he has not collected any other weapon yet, and of no interest for the up-player, so they are placed near spawn-points or in gaps where no other weapon is available, together with their ammunition. Medium weapons are of high interest for the down-player, since he needs to get one of them as soon as possible if he wants to face the up-player, so they are placed in areas that are easy to reach and the same goes for their ammunition. Finally, the strong weapons should be placed in areas that are strategically disadvantageous, like dead ends or vertically dominated areas, or difficult to reach. If a weapon is very contextual, i.e. it is useful in very few situations, it is usually placed in an area that allows to take advantage of its features, whereas a weapon that is strong in almost any situation is usually placed in an area where it cannot be used optimally (e.g. a rocket launcher in a small room).
 
+% PLACEMENT PROCESS % 
+
 \subsection{Placement process}
 \label{ss:placement}
 
 Starting from these considerations, we defined a process that allows to position any kind of game element in two steps: the selection of a room and the selection of a tile inside the room. This process can be repeated as many time as needed, after having updated the graphs with the newly added game element.
 
+% ROOM %
+
 \subsubsection{Room selection}
 
 The selection of a room can be heuristic-based, uniform or random.
 
-\paragraph{Heuristic-based room selection}\mbox{}\\
+% HEURISTIC ROOM %
 
-{\setlength{\parindent}{0cm}
+\paragraph{Heuristic-based room selection} 
+
 This method selects rooms considering three suitability criteria:
 
 \begin{itemize}
@@ -172,32 +177,42 @@ Given the rooms and game elements graph of a map ($G_{rr}$) and the subset of ro
 
 \begin{align}
 r^* = \argmax_{r \in R} (w_D  \times D(r) + w_{H_e}  \times H_e(r))
+\label{eq:room_heuristic}
 \end{align}
 
 \noindent
 The weights $w_D$ and $w_{H_e}$ allow to define how much each one of the two heuristics influences the selection of a room. Both functions should be defined to output a value in the range $[0,1]$, in order to have the same influence for equal weight.
 
-\paragraph{Uniform room selection}\label{sss:uniform}\mbox{}\\
+% UNIFORM ROOM %
 
-{\setlength{\parindent}{0cm}
-This method selects rooms that are uniformly distributed in the map. The first room is selected at random, then, given the rooms and corridors graph ($G_{rr}$), the subset of room nodes ($R \subseteq G_{rr}$), the subset of element nodes ($S \subset G_{rr}$), the remaining rooms are selected with the following heuristic:
+\paragraph{Uniform room selection} 
+
+This method selects rooms that are uniformly distributed in the map. The first room is selected at random, then, given the rooms and corridors graph ($G_{rr}$), the subset of room nodes ($R \subseteq G_{rr}$) and the subset of element nodes ($S \subset G_{rr}$), the remaining rooms are selected with the following heuristic:
 
 \begin{align}
 	r^* = \argmax_{r \in R} ( \min_{s \in S} (\spl(r, s) ))
+	\label{eq:tile_heuristic}
 \end{align}
 
-\paragraph{Random room selection}\mbox{}\\
+\noindent
+where $\spl(n, m)$ denotes the length of the shortest path that connects the two nodes $n$ and $m$, found using Dijkstra's algorithm.
 
-{\setlength{\parindent}{0cm}
+% RANDOM ROOM %
+
+\paragraph{Random room selection} 
+
 This method simply selects rooms at random.
+
+% TILE %
 
 \subsubsection{Tile selection}
 
 The selection of a tile can be heuristic-based, uniform or random.
 
-\paragraph{Heuristic-based tile selection}\mbox{}\\
+% HEURISTIC TILE %
 
-{\setlength{\parindent}{0cm}
+\paragraph{Heuristic-based tile selection} 
+
 This method selects tiles considering three suitability criteria:
 
 \begin{itemize}
@@ -215,30 +230,35 @@ t^* = \argmax_{t \in T} (w_v \times v(t) + w_{H_w}  \times H_w(t) + w_{H_e}  \ti
 \noindent
 The weights $w_v $, $w_{H_w}$ and $w_{H_e}$ allow to define how much each one of the three heuristics influences the selection of a tile. All three functions should be defined to output a value in the range $[0,1]$, in order to have the same influence for equal weight.
 
-\paragraph{Uniform tile selection}\mbox{}\\
+% UNIFORM TILE %
 
-{\setlength{\parindent}{0cm}
-This method selects tiles that are uniformly distributed in the room. If no game element has been placed, the central tile is selected, otherwise it is picked out the one that maximizes the distance from the already positioned game elements but is not to close to the walls.
+\paragraph{Uniform tile selection} 
 
-\paragraph{Random tile selection}\mbox{}\\
+This method selects tiles that are uniformly distributed in the room. If no game element has been placed, the central tile is selected, otherwise it is picked out the one that maximizes the distance from the already positioned game elements but is not too close to the walls.
 
-{\setlength{\parindent}{0cm}
-This method simply selects tiles at random from the room.
+% RANDOM TILE %
 
-\subsection{Spawn points placement}
+\paragraph{Random tile selection} 
 
-We have defined three heuristics for the placement of spawn points, the first one follows the process defined in subsection \ref{ss:placement}, the other two do not.
+This method simply selects tiles from the room at random.
 
-% LOW RISK SPAWN POINTS %
+% HEURISTICS %
 
-\subsubsection{Low risk heuristic}
-\label{sss:lowrisk}
+\subsection{Heuristics for the placement of game elements}
 
-This method selects rooms that have a small number of connections, are not dead ends and are distant from each other and for each one of them places a spawn point on the tile that offers the best balance between low visibility and distance from the walls. In this way spawn points are placed in passageways that are sheltered and easy to leave. 
+Depending on how a game element needs to be placed inside the map, we have defined different heuristics to perform heuristic-based selection of rooms and tiles.
 
-\par
+% SPAWN POINTS %
 
-Given the rooms and game elements graph of the map ($G_{rr}$ ), the subset of room nodes ($R \subseteq G_{rr}$ ) and the subset of element nodes ($S \subset G_{rr}$), the most suitable room for containing a spawn point is selected using the following heuristics:
+\subsubsection{Spawn points}
+
+For spawn points, the heuristic-based approaches for rooms and tiles respectively select rooms that have a small number of connections, are not dead ends and are distant from each other and tiles that offer the best balance between low visibility and distance from the walls. In this way spawn points are placed in passageways that are sheltered and easy to leave. 
+
+% ROOM %
+
+\paragraph{Room selection}
+
+Considering equation \ref{eq:room_heuristic} and given the rooms and game elements graph of the map ($G_{rr}$ ), the subset of room nodes ($R \subseteq G_{rr}$ ) and the subset of element nodes ($S \subset G_{rr}$), the most suitable room for containing a spawn point is selected using the following heuristics:
 
 \begin{align}
 \label{eq:lowriskdeg}
@@ -258,11 +278,13 @@ H_e(r) = \min_{n \in G_{rr}}
 \end{align}
 
 \noindent
-where $\degcent(n)$ denotes the connectivity degree of the node $n$, $\diam(G)$ the diameter of the graph $G$ and $\spl(n, m)$ the length of the shortest path that connects the two nodes $n$ and $m$, found using Dijkstra's algorithm. Equation \ref{eq:lowriskdeg} promotes rooms with few passages but that are not dead ends, whereas equation \ref{eq:lowriskres} promotes rooms that are distant from the already placed game elements. Both are normalized in the range $[0,1]$. We empirically set the weighs to $w_D = 1 $ and $ w_{H_e} = 0.5 $.
+where $\degcent(n)$ denotes the connectivity degree of the node $n$ and $\diam(G)$ the diameter of the graph $G$. Equation \ref{eq:lowriskdeg} promotes rooms with few passages but that are not dead ends, whereas equation \ref{eq:lowriskres} promotes rooms that are distant from the already placed game elements. Both are normalized in the range $[0,1]$. We empirically set the weighs to $w_D = 1 $ and $ w_{H_e} = 0.5 $.
 
-\par
+% TILE %
 
-Given the visibility graph of the map ($G_v$), the subset of tile nodes that belong to the room ($T \subset G_v$), the subset of tile nodes which contain a game element ($H \subset G_v$) and the length of the diagonal of the map  $l_d$), the most suitable tile for containing a spawn point is selected using the following heuristics:
+\paragraph{Tile selection}
+
+Considering equation \ref{eq:tile_heuristic} and given the visibility graph of the map ($G_v$), the subset of tile nodes that belong to the room ($T \subset G_v$), the subset of tile nodes of the room which contain a game element ($H \subset T$) and the length of the diagonal of the room  ($l_d$), the most suitable tile for containing a spawn point is selected using the following heuristics:
 
 \begin{align}
 \label{eq:lowvis}
@@ -271,7 +293,7 @@ v(t) = 1 - \cfrac{\degcent(t) - \min_{t' \in G_v}\degcent(t')}{\max_{t' \in G_v}
 
 \begin{align}
 \label{eq:lowwallclos}
-H_w(t) = \cfrac{\walld(t, room)}{\max_{t' \in T}\walld(t', room)}
+H_w(t) = \cfrac{\walld(t, r^*)}{\max_{t' \in T}\walld(t', r^*)}
 \end{align}
 
 \begin{align}
@@ -283,40 +305,19 @@ H_w(t) = \cfrac{\walld(t, room)}{\max_{t' \in T}\walld(t', room)}
 \end{align}
 
 \noindent
-where $\walld(n, room)$ is the distance of the coordinates associated to the node $n$ from the walls of the room $room$, computed as the sum of the minimum distances from the horizontal and vertical walls, and $\cartd(n, m)$ is the distance of the coordinates associated to the nodes $n$ and $m$. Equation \ref{eq:lowvis} promotes tiles with low visibility, equation \ref{eq:lowwallclos} promotes tiles that are distant from the walls, whereas equation \ref{eq:lowresclos} promotes tiles that are distant from the already placed game elements. All three are normalized in the range $[0,1]$. We empirically set the weights as $ w_v = 1 $, $ w_{H_w} = 0.5 $ and $ w_{H_e}  = 0.5 $.
-
-% UNIFORM SPAWN POINTS %
-
-\subsubsection{Uniform heuristic}
-\label{sss:uniform}
-
-This method selects rooms that are uniformly distributed in the map and for each one of them places the spawn point on the tile that offers the best balance between low visibility and distance from the walls. 
-
-\par
-
-The first room is selected at random, then, given the rooms and corridors graph ($G_{rr}$), the subset of room nodes ($R \subseteq G_{rr}$), the subset of element nodes ($S \subset G_{rr}$), the remaining rooms are selected with the following heuristic:
-
-\begin{align}
-	r^* = \argmax_{r \in R} ( \min_{s \in S} (\spl(r, s) ))
-\end{align}
-
-Once that the room has been found, one of its tiles is selected using equations \ref{eq:lowvis}, \ref{eq:lowwallclos} and \ref{eq:lowresclos} with weights $ w_v = 1 $, $ w_{H_w} = 0.5 $ and $ w_{H_e}  = 0.5 $.
-
-% RANDOM SPAWN POINTS %
-
-\subsubsection{Random heuristic}
-
-This method selects rooms at random and for each one of them places the spawn point on the tile that offers the best balance between low visibility and distance from the walls, using using equations \ref{eq:lowvis}, \ref{eq:lowwallclos} and \ref{eq:lowresclos} with weights $ w_v = 1 $, $ w_{H_w} = 0.5 $ and $ w_{H_e}  = 0.5 $.
+where $\walld(n, r)$ is the distance of the coordinates associated to the node $n$ from the walls of the room $r$, computed as the sum of the minimum distances from the horizontal and vertical walls, and $\cartd(n, m)$ is the distance of the coordinates associated to the nodes $n$ and $m$. Equation \ref{eq:lowvis} promotes tiles with low visibility, equation \ref{eq:lowwallclos} promotes tiles that are distant from the walls, whereas equation \ref{eq:lowresclos} promotes tiles that are distant from the already placed game elements inside the room. All three are normalized in the range $[0,1]$. We empirically set the weights as $ w_v = 1 $, $ w_{H_w} = 0.5 $ and $ w_{H_e}  = 0.5 $.
 
 % HEALTH PACKS %
 
-\subsection{Health packs placement}
+\subsubsection{Health packs}
 
-Heath packs are placed in rooms that have a low-medium number of connections and are distant from each other on the tile that offers the best balance between medium visibility and distance from the walls. In this way the heath packs are placed in areas that are easy to reach and are not too exposed.
+For heath packs, the heuristic-based approaches for rooms and tiles respectively select rooms that have a low-medium number of connections and are distant from each other and tiles that offer the best balance between medium visibility and distance from the walls. In this way the heath packs are placed in areas that are easy to reach and are not too exposed.
 
-\par
+% ROOM %
 
-Given the rooms and corridors graph of the map ($G_{rr}$), the subset of room nodes ($R \subseteq G_{rr}$) and the subset of element nodes ($S \subset G_{rr}$), the most suitable room for containing a health pack is selected using the following heuristic:
+\paragraph{Room selection}
+
+Considering equation \ref{eq:room_heuristic}  and given the rooms and corridors graph of the map ($G_{rr}$), the subset of room nodes ($R \subseteq G_{rr}$) and the subset of element nodes ($S \subset G_{rr}$), the most suitable room for containing a health pack is selected using the following heuristic:
 
 \begin{align}
 \label{eq:lowriskdegh}
@@ -342,11 +343,13 @@ f_{deg}(r) = \intd(\degcent(r),0.3,0.5)
 \end{align}
 
 \noindent
-where $\intd$ is a function that measures the distance of a value from an interval of desired ones. Equation \ref{eq:lowriskres} is used for $H_e$. Equation \ref{eq:lowriskdegh} promotes rooms with a low-medium number of passages. Both are normalized in the range $[0,1]$. We experimentally found that the weights which provide the best results are $w_D = 1 $ and $ w_{H_e} = 0.5 $.
+where $\intd$ is a function that measures the distance of a value from an interval of desired ones. Equation \ref{eq:lowriskres} is used for $H_e$. Equation \ref{eq:lowriskdegh} promotes rooms with a low-medium number of passages. Both are normalized in the range $[0,1]$. We empirically set the weights as $w_D = 1 $ and $ w_{H_e} = 0.5 $.
 
-\par
+% TILE %
 
-Given the visibility graph of the map $G_v$, the subset of tile nodes that belong to the room ( $T \subset G_v$) and the subset of tile nodes which contain a game element ($H \subset G_v$), the most suitable tile for containing a health pack is selected using the following heuristic:
+\paragraph{Tile selection}
+
+Considering equation \ref{eq:tile_heuristic}  and given the visibility graph of the map $G_v$, the subset of tile nodes that belong to the room ( $T \subset G_v$) and the subset of tile nodes of the room which contain a game element ($H \subset T$), the most suitable tile for containing a health pack is selected using the following heuristic:
 
 \begin{align}
 \label{eq:lowvish}
@@ -358,13 +361,15 @@ that promotes tiles with medium visibility. Equations \ref{eq:lowwallclos} and \
 
 % AMMUNITION %
 
-\subsection{Ammunition placement}
+\subsubsection{Ammunition}
 
-Ammunition is placed in rooms that have either a low-medium or a high number of connections and are distant from each other on the tile that offers the best balance between high visibility and distance from the walls. In this way ammunition is placed in areas that are either easy or difficult to reach and easy to spot.
+For ammunition, the heuristic-based approaches for rooms and tiles respectively select rooms that have either a low-medium or a high number of connections and are distant from each other and tiles that offer the best balance between high visibility and distance from the walls. In this way ammunition is placed in areas that are either easy or difficult to reach and easy to spot.
 
-\par
+% ROOM %
 
-Given the rooms and corridors graph of the map ($G_{rr}$), the subset of room nodes ($R \subseteq G_{rr}$) and the subset of element nodes ($S \subset G_{rr}$), the most suitable room for containing ammunition is selected using equations \ref{eq:lowriskres} and \ref{eq:lowriskdegh}, with
+\paragraph{Room selection}
+
+Considering equation \ref{eq:room_heuristic}  and given the rooms and corridors graph of the map ($G_{rr}$), the subset of room nodes ($R \subseteq G_{rr}$) and the subset of element nodes ($S \subset G_{rr}$), the most suitable room for containing ammunition is selected using equations \ref{eq:lowriskres} and \ref{eq:lowriskdegh}, with
 
 \begin{align}
 \label{eq:degfita1}
@@ -382,9 +387,11 @@ f_{deg}(r) = \intd(\degcent(r),0.8,0.9)
 \noindent
 for obtaining rooms with a high number of connections. We empirically set the weighs to $w_D = 1 $ and $ w_{H_e} = 0.25 $.
 
-\par
+% TILE %
 
-Given the visibility graph ($G_v$), the subset of tile nodes that belong to the room ($T \subset G_v$) and the subset of tile nodes which contain a game element ($H\subset G_v$), the most suitable tile for containing ammunition is selected using the following heuristic:
+\paragraph{Tile selection}
+
+Considering equation \ref{eq:tile_heuristic} and given the visibility graph ($G_v$), the subset of tile nodes that belong to the room ($T \subset G_v$) and the subset of tile nodes of the room which contain a game element ($H \subset T$), the most suitable tile for containing ammunition is selected using the following heuristic:
 
 \begin{align}
 \label{eq:highvisa}
@@ -392,13 +399,13 @@ v(t) = \cfrac{\degcent(t) - \min_{t' \in T}\degcent(t')}{\max_{t' \in T}\degcent
 \end{align}
 
 \noindent
-that promotes tiles with high visibility. Equations \ref{eq:lowwallclos} and \ref{eq:lowresclos} are used for $H_w(t)$ and $H_e(t)$, respectively. All three are normalized in the range $[0,1]$. We empirically set the weights to $ w_v = 1 $, $ w_{H_w} = 0.25 $ and $ w_{H_e}  = 0.5 $.
+that promotes tiles with high visibility. Equations \ref{eq:lowwallclos} and \ref{eq:lowresclos} are used for $H_w(t)$ and $H_e(t)$, respectively. All three are normalized in the range $[0,1]$. We empirically set the weights as $ w_v = 1 $, $ w_{H_w} = 0.25 $ and $ w_{H_e}  = 0.5 $.
 
 % WEAPONS %
 
 \subsection{Weapon placement}
 
-For what concerns the weapons provided by the framework we have not defined any specific function, but, beside the assault rifle which is always available to the player, they could be placed as follows:
+For what concerns the weapons provided by the framework we have not defined any specific heuristic, but, beside the assault rifle which is always available to the player, they could be placed as follows:
 
 \begin{itemize}
 \item \<Shotgun>: since it is a medium damage weapon it could be positioned in a room that has a medium number of connections and is relatively close to a spawn point. 
@@ -410,4 +417,4 @@ For what concerns the weapons provided by the framework we have not defined any 
 
 \section{Summary}
 
-In this chapter we analyzed the approach that we have defined to perform map analysis and populating using Graph Theory. After an overview of the graphs and metrics that allow to highlight interesting information about a map, we listed the rules and patterns commonly used to position game elements in deathmatch maps and we described how we converted them into heuristics.
+In this chapter we analyzed the approach that we have defined to perform map analysis and placement of game elements using Graph Theory. After an overview of the graphs and metrics that allow to highlight interesting information about a map, we listed the rules and patterns commonly used to position game elements in deathmatch maps and we described how we converted them into heuristics.

@@ -28,19 +28,19 @@
 \contentsline {section}{\numberline {3.3}Framework structure}{20}
 \contentsline {subsection}{\numberline {3.3.1}The Game Manager}{20}
 \contentsline {subsection}{\numberline {3.3.2}The Map Manager}{21}
-\contentsline {subsubsection}{Single-Level Map Manager}{21}
-\contentsline {subsubsection}{Multi-Level Map Manager}{21}
-\contentsline {subsubsection}{All-Black Multi-Level Map Manager}{21}
+\contentsline {subsubsection}{\numberline {3.3.2.1}Single-Level Map Manager}{21}
+\contentsline {subsubsection}{\numberline {3.3.2.2}Multi-Level Map Manager}{21}
+\contentsline {subsubsection}{\numberline {3.3.2.3}All-Black Multi-Level Map Manager}{21}
 \contentsline {subsection}{\numberline {3.3.3}The Map Generator}{22}
-\contentsline {subsubsection}{Cellular Generator}{24}
-\contentsline {subsubsection}{Divisive Generator}{25}
-\contentsline {subsubsection}{Digger Generator}{26}
-\contentsline {subsubsection}{All-Black Generator}{26}
+\contentsline {subsubsection}{\numberline {3.3.3.1}Cellular Generator}{24}
+\contentsline {subsubsection}{\numberline {3.3.3.2}Divisive Generator}{25}
+\contentsline {subsubsection}{\numberline {3.3.3.3}Digger Generator}{26}
+\contentsline {subsubsection}{\numberline {3.3.3.4}All-Black Generator}{26}
 \contentsline {subsection}{\numberline {3.3.4}The Stairs Generator}{26}
 \contentsline {subsection}{\numberline {3.3.5}The Map Assembler}{32}
-\contentsline {subsubsection}{Mesh Assembler}{32}
-\contentsline {subsubsection}{Prefab Assembler}{32}
-\contentsline {subsubsection}{Multi-Level Prefab Assembler}{32}
+\contentsline {subsubsection}{\numberline {3.3.5.1}Mesh Assembler}{32}
+\contentsline {subsubsection}{\numberline {3.3.5.2}Prefab Assembler}{32}
+\contentsline {subsubsection}{\numberline {3.3.5.3}Multi-Level Prefab Assembler}{32}
 \contentsline {subsection}{\numberline {3.3.6}The Spawn Point Manager}{32}
 \contentsline {subsection}{\numberline {3.3.7}The Object Displacer}{32}
 \contentsline {subsection}{\numberline {3.3.8}The Experiment Manager}{35}
@@ -64,29 +64,33 @@
 \contentsline {section}{\numberline {4.2}Analysis of the map}{45}
 \contentsline {subsection}{\numberline {4.2.1}Outlines graph}{46}
 \contentsline {subsection}{\numberline {4.2.2}Reachability graphs}{46}
-\contentsline {subsubsection}{Tiles graph}{46}
-\contentsline {subsubsection}{Rooms graph}{46}
-\contentsline {subsubsection}{Rooms and game elements graph}{47}
+\contentsline {subsubsection}{\numberline {4.2.2.1}Tiles graph}{46}
+\contentsline {subsubsection}{\numberline {4.2.2.2}Rooms graph}{46}
+\contentsline {subsubsection}{\numberline {4.2.2.3}Rooms and game elements graph}{47}
 \contentsline {subsection}{\numberline {4.2.3}Visibility graph}{47}
 \contentsline {subsection}{\numberline {4.2.4}Interesting metrics}{47}
 \contentsline {section}{\numberline {4.3}Placement of game elements on the map}{49}
-\contentsline {subsection}{\numberline {4.3.1}Rules and patterns for game elements placement}{50}
+\contentsline {subsection}{\numberline {4.3.1}Rules for the placement of game elements}{50}
 \contentsline {subsection}{\numberline {4.3.2}Placement process}{51}
-\contentsline {subsubsection}{Room selection}{51}
+\contentsline {subsubsection}{\numberline {4.3.2.1}Room selection}{51}
 \contentsline {paragraph}{Heuristic-based room selection}{51}
 \contentsline {paragraph}{Uniform room selection}{52}
 \contentsline {paragraph}{Random room selection}{52}
-\contentsline {subsubsection}{Tile selection}{52}
+\contentsline {subsubsection}{\numberline {4.3.2.2}Tile selection}{52}
 \contentsline {paragraph}{Heuristic-based tile selection}{52}
 \contentsline {paragraph}{Uniform tile selection}{53}
 \contentsline {paragraph}{Random tile selection}{53}
-\contentsline {subsection}{\numberline {4.3.3}Spawn points placement}{53}
-\contentsline {subsubsection}{Low risk heuristic}{53}
-\contentsline {subsubsection}{Uniform heuristic}{55}
-\contentsline {subsubsection}{Random heuristic}{55}
-\contentsline {subsection}{\numberline {4.3.4}Health packs placement}{55}
-\contentsline {subsection}{\numberline {4.3.5}Ammunition placement}{56}
-\contentsline {subsection}{\numberline {4.3.6}Weapon placement}{57}
+\contentsline {subsection}{\numberline {4.3.3}Heuristics for the placement of game elements}{53}
+\contentsline {subsubsection}{\numberline {4.3.3.1}Spawn points}{53}
+\contentsline {paragraph}{Room selection}{54}
+\contentsline {paragraph}{Tile selection}{54}
+\contentsline {subsubsection}{\numberline {4.3.3.2}Health packs}{55}
+\contentsline {paragraph}{Room selection}{55}
+\contentsline {paragraph}{Tile selection}{56}
+\contentsline {subsubsection}{\numberline {4.3.3.3}Ammunition}{56}
+\contentsline {paragraph}{Room selection}{56}
+\contentsline {paragraph}{Tile selection}{56}
+\contentsline {subsection}{\numberline {4.3.4}Weapon placement}{57}
 \contentsline {section}{\numberline {4.4}Summary}{57}
 \contentsline {chapter}{\numberline {5}Experiment on spawn points placement heuristics}{59}
 \contentsline {section}{\numberline {5.1}Description}{59}
