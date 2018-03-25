@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.lines as lines
 from scipy.stats import wilcoxon, binom_test
+from matplotlib.font_manager import FontProperties
 
 ### FUNCTIONS ###############################################################
 
@@ -94,10 +95,16 @@ def generateBarDiagramKills(data, safe):
     # Plot.
     plt.ylabel('Number of matches')
     plt.xlabel('Kills')
-    plt.title('Kills in maps with ' + ('low risk' if safe else 'uniform') + ' heuristic')
+    # plt.title('Kills in maps with ' + ('heuristic' if safe else 'uniform') + ' placement')
     plt.xticks(ind, range(3, 17))
-    plt.yticks(np.arange(0, 11, 1))
-    plt.legend((pArena[0], pCorridors[0], pIntense[0]), ('Arena', 'Corridors', 'Intense'))
+    plt.yticks(np.arange(0, 8, 1))
+    ax = plt.subplot(111)
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0 + box.height * 0.1,
+                 box.width, box.height * 0.9])
+    lg = ax.legend((pArena[0], pCorridors[0], pIntense[0]), ('Arena', 'Corridors', 'Intense'),
+               loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol = 3)
+    lg.draw_frame(False)
     plt.show()
 
 # Generate the bar diagram of the difficulty.
@@ -130,14 +137,19 @@ def generateBarDiagramDifficulty(data):
     uniformBar = plt.bar(ind, u, width, bottom = [sum(x) for x in zip(s, e)])
 
     # Plot.
-    plt.xlabel('Heuristic of the map with least kills')
+    plt.xlabel('Placement used in the map with least kills')
     plt.ylabel('Number of test sessions')
-    plt.title('Comparison between the effective and the percived difficulty')
+    # plt.title('Comparison between the effective and the percived difficulty')
     plt.yticks(np.arange(0, 18, 1))
-    plt.xticks(ind, ("Low risk","No difference","Uniform"))
-    plt.legend((uniformBar[0], equalBar[0], safeBar[0]), ('Uniform heuristic map percived as harder', 
-                                                          'No difference percived', 
-                                                          'Low risk heuristic map percived as harder'))
+    plt.xticks(ind, ("Heuristic","No difference","Uniform"))
+    ax = plt.subplot(111)
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0 + box.height * 0.1,
+                 box.width, box.height * 0.9])
+    lg = ax.legend((uniformBar[0], equalBar[0], safeBar[0]), ('Uniform placement percived as harder', 
+                    'No difference percived', 'Heuristic placement  percived as harder'),
+                    loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol = 3)
+    lg.draw_frame(False)
     plt.show()
 
 # Counts the occurencies.
@@ -164,7 +176,7 @@ def generateScatterDiagram(data, column1, column2, showTicks, xlabel, ylabel, ti
     fig, ax = plt.subplots()
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
-    plt.title(title)
+    # plt.title(title)
     if (showTicks):
         plt.xticks(np.arange(0, maxData, 1))
         plt.yticks(np.arange(0, maxData, 1))
@@ -206,12 +218,12 @@ def graphMenu(data):
             generateBarDiagramKills(data, False)
         elif option == "3":
             print("\nGenerating graph...")  
-            generateScatterDiagram(data, 6, 13, True, 'Kills (low risk heuristic)', 
-                                   'Kills (uniform heuristic)', 'Experiment outcome')
+            generateScatterDiagram(data, 6, 13, True, 'Kills (heuristic)', 
+                                   'Kills (uniform)', 'Experiment outcome')
         elif option == "4":
             print("\nGenerating graph...")
-            generateScatterDiagram(data, 8, 15, False, 'AvgKillDistance (low risk heuristic)', 
-                                   'AvgKillDistance (uniform heuristic)', 'Experiment outcome')
+            generateScatterDiagram(data, 8, 15, False, 'AvgKillDistance (heuristic)', 
+                                   'AvgKillDistance (uniform)', 'Experiment outcome')
         elif option == "5":
             print("\nGenerating graph...")
             generateBarDiagramDifficulty(data)

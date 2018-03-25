@@ -1,4 +1,4 @@
-\chapter{Experiment on spawn points placement heuristics}
+\chapter{Experiment on spawn points placement}
 
 % INTRODUCTION %
 
@@ -8,28 +8,27 @@ In this chapter we describe the experiment that we have performed for validating
 
 \section{Description}
 
-With this experiment we analyzed how the placement of spawn points influences the up-player vs down-player dynamic. The experiment tries to recreate the situation where the up-player, once killed his opponent, tries to find him as soon as possible, just after his respawn, to score another easy kill. As we have seen, a well-designed map should slow down this operation by having its spawn points in areas that are not central, are easy to leave and covered. The \<low risk> heuristic described in chapter \ref{sss:lowrisk} has been designed to place the spawn points according to such criteria, so, to prove its effectiveness, we decided to confront how this facet of the up-player vs down-player dynamic changes with respect to spawn points placed with the \<uniform> heuristic, defined as well in chapter \ref{sss:uniform}, which selects the areas to contain spawn to be distributed evenly inside the map.
+We designed this experiment to analyze how our methods for the placement of spawn points influence the up-player vs down-player dynamic and to prove their effectiveness. We tried to recreate the situation where the up-player, once killed his opponent, tries to find him as soon as possible, just after his respawn, to score another easy kill. As we have seen, a well-designed map should slow down this operation by having its spawn points in areas that are not central, are easy to leave and covered. In this experiment we compared two approaches: the \<uniform> one, that selects rooms with the uniform method (see chapter \ref{sss:room_selection}) and tiles with the heuristic defined for spawn points, and the \<heuristic> one, that selects both rooms and tiles with the heuristics defined for spawn points (see chapter \ref{sss:sph}) and should allow to obtain a placement of spawn point coherent with the one described above. These two approaches use the same method to select tiles to focus on the effects of room selection, since the ones of tile selection are rather obvious (an object on a tile with a low visibility is difficult to find).
 
 \par
 
-To highlight this particular dynamic, we designed a game mode where the user, which represents the up-player, must find and destroy a static target, which represents the down-player, as many times as possible before times runs out. Each time that the user destroys a target, it respawns at a random spawn point. The user cannot die and has infinite ammunition, so he does not have to look for resources.
+To highlight this gameplay dynamic, we designed a game mode where the user, which represents the up-player, must find and destroy a static target, which represents the down-player, as many times as possible before times runs out. Each time that the user destroys a target, it respawns at a random spawn point. The user cannot die and has infinite ammunition, so he does not have to look for resources.
 
 % SETUP %
 
 \section{Setup}
 
-For this experiment, we setup the \<Experiment Manager> to propose in each play session a quick tutorial, two matches and a survey. The experiment was composed by three \<studies>, corresponding to different pre-generated maps, each one composed by two \<cases>, one that corresponded to the \<low risk> spawn points distribution and one that corresponded to a pool of five \<uniform> spawn point distributions. In a play session, the user played the same map twice, once with the low risk distribution and once with one of the uniform distributions, in a random order and with the map flipped in one of the two matches. We used the survey to profile how much the user was familiar with video games and FPS, to evaluate his skill and to get a feedback about in which of the two maps it was harder to find the targets. The experiment was deployed online and played by the users via browser on their own computer.
+For this experiment, we setup the \<Experiment Manager> to propose in each play session a quick tutorial, two matches and a survey. The experiment was composed by three \<studies>, corresponding to three different maps, each one composed by two \<cases>, one corresponding to the map populated with the heuristic approach and one corresponding to a pool of five versions of the map populated with the uniform approach\footnote{When selecting rooms with the uniform method the first one is chosen at random. This allows to obtain multiple versions of the same map.}. In a play session, the user played the same map twice, once with the heuristic distribution and once with the uniform distribution, in a random order and with the map flipped in one of the two matches. We used the survey to profile each user according to their skill and familiarity with video games and FPS and to get a feedback about the match in which they found it harder to locate the targets. The experiment was deployed online and played by the users via browser on their own computers.
 
 \par
 
-Each match had \<Target Hunt> as game mode. The duration of the match was set to three minutes, the list of spawnable entities consisted of just one target and the only weapon available to the player was the \<assault rifle> with infinite ammunition. The pre-generated maps were stored as text files and were loaded by the \<Divisive Generator> and displayed with the \<Prefab Assembler>. 
+As game mode, we used \<Target Hunt>, with the game duration set to three minutes, the list of spawnable entities composed of just one target and an \<assault rifle> with infinite ammunition as the only weapon available to the player. The maps were stored as text files and were loaded by the \<Divisive Generator> and displayed with the \<Prefab Assembler>. 
 
 \par
- 
+
 For each match, a complete game log was saved, along with the following performance metrics, saved in a separate log:
- 
- \begin{itemize}
-\item \<TargetLogs>: this field contains a list of all the targets that the user managed to destroyed. Each entry contains a timestamp of when the target was destroyed, the coordinates of the target, the coordinates of the user, the distance covered by the user and the time passed during the lifespan of the target.
+\begin{itemize}
+\item \<TargetLogs>: this field contains a list of all the targets that the user managed to destroy. Each entry contains a timestamp, the coordinates of the destroyed target, the coordinates of the user, the distance covered by the user and the time passed during the lifespan of the target.
 \item \<Shots>: the total number of projectiles shot by the user.
 \item \<Hits>: the number of projectiles that hit a target.
 \item \<Accuracy>: the percentage of projectiles that hit a target.
@@ -40,169 +39,153 @@ For each match, a complete game log was saved, along with the following performa
 \end{itemize}
 
 \noindent
-The answers to the survey were saved as well.
- 
- \par
- 
-The performance of the player is measured by \<AvgKillTime>, that is also an indicator of how difficult it is to find targets in the map.
+The performance of the player is measured by \<AvgKillTime>, that is also an indicator of how difficult it is to find targets in the map. The answers to the survey were saved as well.
 
 \par
-  
-We have selected three procedurally generated maps that present radically different layouts and we populated each one of them using both the low risk and the uniform heuristic:
+
+The three maps that we have selected for this experiment have very different layouts:
 
 \begin{itemize}
-\item \<Arena>: this map presents a wide open arena, two sides of which are adjacent to parallel corridors with many openings. As the visibility heatmap in figure \ref{img:arena_visibility} shows, the central arena allows to control most of the map, whereas the corridors offer some repair and perfect spots to place spawn points. Figure \ref{img:arena_safe} shows the spawn points positioned using the low risk heuristic, whereas figure \ref{img:arena_uniform} shows one of the five configuration produced using the uniform heuristic.
-\item \<Corridors>: this map presents many small rooms connected by long corridors. As it can be seen in figure \ref{img:corridors_visibility}, there is no area that allows to control the others and the only point with high visibility are the ones where corridors intersect. Figure \ref{img:corridors_safe} shows the spawn points positioned using the low risk heuristic, whereas figure \ref{img:corridors_uniform} shows one of the five configuration produced using the uniform heuristic.
-\item \<Intense>: compared to the previous two, this map presents an intermediate layout, since it has both open areas and small rooms connected by corridors. As it can be seen in figure \ref{img:intense_visibility}, this reflects also on the visibility, that is high in the central open arenas and low in the remaining sections of the map. Figure \ref{img:intense_safe} shows the spawn points positioned using the low risk heuristic, whereas figure \ref{img:intense_uniform} shows one of the five configuration produced using the uniform heuristic.
+\item \<Arena>: this map presents a wide arena, two sides of which are adjacent to parallel corridors with many openings. As the visibility heatmap in figure \ref{img:arena_visibility} shows, the central arena allows to control most of the map, whereas the corridors offer some repair and perfect spots to place spawn points. Figure \ref{img:arena_safe} shows the spawn points positioned using the heuristic approach, whereas figure \ref{img:arena_uniform} shows one of the five configuration produced with the uniform approach.
+\item \<Corridors>: this map presents many small rooms connected by long corridors. As it can be seen in figure \ref{img:corridors_visibility}, there is no area that allows to control the others and the only points with high visibility are the ones where corridors intersect. Figure \ref{img:corridors_safe} shows the spawn points positioned using the heuristic approach, whereas figure \ref{img:corridors_uniform} shows one of the five configuration produced using the uniform approach.
+\item \<Intense>: compared to the previous two, this map presents an intermediate layout, since it has both open areas and small rooms connected by corridors. As it can be seen in figure \ref{img:intense_visibility}, this reflects also on the visibility, that is high in the open areas and low in the remaining sections of the map. Figure \ref{img:intense_safe} shows the spawn points positioned using the heuristic approach, whereas figure \ref{img:intense_uniform} shows one of the five configuration produced using the uniform approach.
 \end{itemize}
 
-\par
-
-It is important to observe that the low risk and the uniform heuristics select rooms to place a spawn point with two different criteria, but they employ the same logic when selecting a tile inside a room. This means that the two heuristics select tiles which have similar visibility conditions, so the player's performance difference depends exclusively on how the rooms have been selected. This is observable in figures \ref{img:arena}, \ref{img:corridors} and \ref{img:intense}: when the uniform heuristics happens to select a room that has been selected also by the low risk one, the spawn point is placed exactly on the same tile.
-
-\begin{figure}[tp]
-	\centering
-	\begin{subfigure}[t]{0.3\linewidth}
-    		\includegraphics[width=\linewidth]{arena_visibility}
-     		\caption{Heatmap showing the visibility of the level.}
-		\label{img:arena_visibility}
-  	\end{subfigure}  	
-  	\hfil
-  	\begin{subfigure}[t]{0.3\linewidth}
-    		\includegraphics[width=\linewidth]{arena_safe}
-     		\caption{Spawn points (in red) placed using the safe heuristic.}
-     		\label{img:arena_safe}
-  	\end{subfigure}
-  	\hfil
-  	\begin{subfigure}[t]{0.3\linewidth}
-    		\includegraphics[width=\linewidth]{arena_uniform}
-     		\caption{Spawn points (in red) placed using the uniform heuristic.}
-		\label{img:arena_uniform}
-  	\end{subfigure}  
-	\caption{``Arena'' map used in the experiment.}
-	\label{img:arena}
+\begin{figure}[p]
+\centering
+\begin{subfigure}[t]{0.3\linewidth}
+\includegraphics[width=\linewidth]{arena_visibility}
+\caption{Heatmap showing the visibility of the level.}
+\label{img:arena_visibility}
+\end{subfigure} 
+\hfil
+\begin{subfigure}[t]{0.3\linewidth}
+\includegraphics[width=\linewidth]{arena_safe}
+\caption{Spawn points (in red) placed using the heuristic approach.}
+\label{img:arena_safe}
+\end{subfigure}
+\hfil
+\begin{subfigure}[t]{0.3\linewidth}
+\includegraphics[width=\linewidth]{arena_uniform}
+\caption{Spawn points (in red) placed using the uniform approach.}
+\label{img:arena_uniform}
+\end{subfigure} 
+\caption{``Arena'' map used in the experiment.}
+\label{img:arena}
+\vspace{0.4cm}
+\begin{subfigure}[t]{0.3\linewidth}
+\includegraphics[width=\linewidth]{corridors_visibility}
+\caption{Heatmap showing the visibility of the level.}
+\label{img:corridors_visibility}
+\end{subfigure} 
+\hfil
+\begin{subfigure}[t]{0.3\linewidth}
+\includegraphics[width=\linewidth]{corridors_safe}
+\caption{Spawn points (in red) placed using the heuristic approach.}
+\label{img:corridors_safe}
+\end{subfigure}
+\hfil
+\begin{subfigure}[t]{0.3\linewidth}
+\includegraphics[width=\linewidth]{corridors_uniform}
+\caption{Spawn points (in red) placed using the uniform approach.}
+\label{img:corridors_uniform}
+\end{subfigure} 
+\caption{``Corridors'' map used in the experiment.}
+\label{img:corridors}
+\vspace{0.4cm}
+\begin{subfigure}[t]{0.3\linewidth}
+\includegraphics[width=\linewidth]{intense_visibility}
+\caption{Heatmap showing the visibility of the level.}
+\label{img:intense_visibility}
+\end{subfigure} 
+\hfil
+\begin{subfigure}[t]{0.3\linewidth}
+\includegraphics[width=\linewidth]{intense_safe}
+\caption{Spawn points (in red) placed using the heuristic approach.}
+\label{img:intense_safe}
+\end{subfigure}
+\hfil
+\begin{subfigure}[t]{0.3\linewidth}
+\includegraphics[width=\linewidth]{intense_uniform}
+\caption{Spawn points (in red) placed using the uniform approach.}
+\label{img:intense_uniform}
+\end{subfigure}
+\caption{``Intense'' map used in the experiment.}
+\label{img:intense} 
 \end{figure}
 
-\begin{figure}[tp]
-	\centering
-  	\begin{subfigure}[t]{0.3\linewidth}
-    		\includegraphics[width=\linewidth]{corridors_visibility}
-     		\caption{Heatmap showing the visibility of the level.}
-		\label{img:corridors_visibility}
-  	\end{subfigure}  	  
-  	\hfil
-  	\begin{subfigure}[t]{0.3\linewidth}
-    		\includegraphics[width=\linewidth]{corridors_safe}
-     		\caption{Spawn points (in red) placed using the safe heuristic.}
-     		\label{img:corridors_safe}
-  	\end{subfigure}
-  	\hfil
-  	\begin{subfigure}[t]{0.3\linewidth}
-    		\includegraphics[width=\linewidth]{corridors_uniform}
-     		\caption{Spawn points (in red) placed using the uniform heuristic.}
-		\label{img:corridors_uniform}
-  	\end{subfigure}	
-	\caption{``Corridors'' map used in the experiment.}
-	\label{img:corridors}
-\end{figure}
-
-\begin{figure}[tp]
-	\centering  	
-  	\begin{subfigure}[t]{0.3\linewidth}
-    		\includegraphics[width=\linewidth]{intense_visibility}
-     		\caption{Heatmap showing the visibility of the level.}
-		\label{img:intense_visibility}
-  	\end{subfigure}  	
-  	\hfil
-  	\begin{subfigure}[t]{0.3\linewidth}
-    		\includegraphics[width=\linewidth]{intense_safe}
-     		\caption{Spawn points (in red) placed using the safe heuristic.}
-     		\label{img:intense_safe}
-  	\end{subfigure}
-  	\hfil
-  	\begin{subfigure}[t]{0.3\linewidth}
-    		\includegraphics[width=\linewidth]{intense_uniform}
-     		\caption{Spawn points (in red) placed using the uniform heuristic.}
-		\label{img:intense_uniform}
-  	\end{subfigure}
-	\caption{``Intense'' map used in the experiment.}
-	\label{img:intense}	
-\end{figure}
+As we have said, the heuristic and the uniform approaches select rooms with two different criteria, but they employ the same logic when selecting tiles. This means that the two heuristics select tiles which have similar visibility conditions, so the player's performance depends exclusively on how the rooms have been selected. This is observable in figures \ref{img:arena}, \ref{img:corridors} and \ref{img:intense}: when the uniform approach happens to select a room that has been selected also by the heuristic one, the spawn point is placed exactly on the same tile.
 
 % RESULTS %
 
 \section{Results}
 
 \begin{figure}
- 	\centering
-  	\begin{subfigure}[t]{0.8\linewidth}
-    		\includegraphics[width=\linewidth]{bar_lowrisk}
-     		\caption{Low risk heuristic.}
-		\label{img:bar_lowrisk}
-  	\end{subfigure}  	
-  	\begin{subfigure}[t]{0.8\linewidth}
-    		\includegraphics[width=\linewidth]{bar_uniform}
-     		\caption{Uniform heuristic.}
-     		\label{img:bar_uniform}
-  	\end{subfigure}
-	\caption[Distribution of the matches by number of kills for the two heuristics.]{Distribution of the matches by number of kills for the two heuristics. The matches are also classified by map.}
-	\label{img:match_distribution}	
+\centering
+\begin{subfigure}[t]{0.8\linewidth}
+\includegraphics[width=\linewidth]{bar_lowrisk}
+\caption{Heuristic placement.}
+\label{img:bar_lowrisk}
+\end{subfigure} 
+\begin{subfigure}[t]{0.8\linewidth}
+\includegraphics[width=\linewidth]{bar_uniform}
+\caption{Uniform placement.}
+\label{img:bar_uniform}
+\end{subfigure}
+\caption[Distribution of the matches by number of kills for the two methods.]{Distribution of the matches by number of kills for the two methods. The matches are also classified by map.}
+\label{img:match_distribution} 
 \end{figure}
 
-The data collection campaign for this experiment produced a dataset composed of 27 samples, which distribution between the three maps can be seen in figure \ref{img:match_distribution}. Of 27 samples, 10 are pairs of matches played in map ``Arena'', 9 are pairs of matches played in map ``Corridors'' and 8 are pairs of matches played in map ``Intense''. 
+The data collection campaign performed for this experiment produced a dataset composed of 27 samples, which distribution between the three maps can be seen in figure \ref{img:match_distribution}: of 27 samples, 10 are pairs of matches played in map ``Arena'', 9 are pairs of matches played in map ``Corridors'' and 8 are pairs of matches played in map ``Intense''. 
 
 \par
 
-As we have seen, the performance of the player is measured by \<AvgKillTime> and by computing its mean value we observed that the users performed better in the matches associated to the uniform distribution with respect to the ones associated to the the low risk distribution. For the former the mean value of \<AvgKillTime> is $16.06$ seconds and the one of \<kills> is $11.88$ kills, whereas for the latter  the mean value of \<AvgKillTime> is $20.24$ seconds and the one of \<kills> is $10.06$ kills. The increase of 4 seconds on the average time needed to find a target confirms that spawn points placed with the low risk heuristic are more difficult to find than the ones placed with the uniform heuristic.
+As we have seen, the performance of the player is measured by \<AvgKillTime> and by computing its mean value we observed that the users performed better in the matches associated to the uniform approach with respect to the ones associated to heuristic approach. For the former the mean value of \<AvgKillTime> is $16.06$ seconds and the one of \<kills> is $11.88$ kills, whereas for the latter the mean value of \<AvgKillTime> is $20.24$ seconds and the one of \<kills> is $10.06$ kills. The increase of 4 seconds on the average time needed to find a target confirms that spawn points placed with the heuristic approach are more difficult to find than the ones placed with the uniform approach.
 
 \par
 
-To prove the statistic soundness of this result, we performed the \<Wilcoxon> statistical test\footnote{The \<Wilcoxon signed-rank test> is a \<non-parametric statistical hypothesis test> used to compare two matched samples to assess whether their population mean ranks differ.} by \<Pratt>\footnote{With respect to the standard Wilcoxon test, the one by Pratt considers also the observations for which the difference of the elements in the pair is zero. Since we have 4 cases where the number of kills is the same, we opted for this approach.}, using as matched samples the number of kills in maps with low risk heuristic and in maps with uniform heuristic. The test was passed with $\alpha < 0.005$, one-tiled.
+To prove the statistic soundness of this result, we performed the \<Wilcoxon> statistical test\footnote{The \<Wilcoxon signed-rank test> is a \<non-parametric statistical hypothesis test> used to compare two matched samples to assess whether their population mean ranks differ.} by \<Pratt>\footnote{With respect to the standard Wilcoxon test, the one by Pratt considers also the observations for which the difference of the elements in the pair is zero. Since we have 4 cases where the number of kills is the same, we opted for this approach.}, using as matched samples the number of kills in maps with heuristic placement and in maps with uniform placement. The test was passed with $\alpha < 0.005$, one-tiled.
 
 \begin{figure}[h]
- 	\centering
-  	\begin{subfigure}[t]{0.48\linewidth}
-    		\includegraphics[width=\linewidth]{scatter_kills}
-     		\caption{Kills.}
-		\label{img:scatter_kills}
-  	\end{subfigure}
-  	\hfill
-  	\begin{subfigure}[t]{0.48\linewidth}
-    		\includegraphics[width=\linewidth]{scatter_avg}
-     		\caption{AvgKillDistance.}
-     		\label{img:scatter_avg}
-  	\end{subfigure}
-	\caption[Experiment outcomes by metrics.]{Experiment outcomes by metrics. The outcome associated to the low risk heuristics is on the horizontal axis, the one associated to the uniform heuristics is on the vertical axis.}
-	\label{img:metrics}	
+\centering
+\begin{subfigure}[t]{0.48\linewidth}
+\includegraphics[width=\linewidth]{scatter_kills}
+\caption{Kills.}
+\label{img:scatter_kills}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+\includegraphics[width=\linewidth]{scatter_avg}
+\caption{AvgKillDistance.}
+\label{img:scatter_avg}
+\end{subfigure}
+\caption[Experiment outcomes by metrics.]{Experiment outcomes by metrics. The outcome associated to the heuristic approach is on the horizontal axis, the one associated to the uniform approach is on the vertical axis.}
+\label{img:metrics} 
 \end{figure}
 
-The effect of the heuristics on the metrics that we have defined can be observed by plotting their values, assigning to the horizontal axis the value of the metric in maps populated with the low risk heuristic and to the vertical axis the value of the metric in maps populated with the uniform heuristic. Each point of such graph represents the outcome of a test whose coordinates are the value of the metric in the two matches. By tracing the bisector, it is easy to see for which of the two heuristics a metric is higher. If the points are scattered under the bisector, it means that the metric tends to be higher for the low risk heuristic, if they are scattered around the bisector it means that there is no significant difference and if they are scattered above the bisector it meas that the metric tends to be higher for the uniform heuristic. Figure \ref{img:scatter_kills} shows how the heuristics influence the number of kills: of 27 tests, 17 have more kills in the map  populated using the uniform heuristic, 6 have more kills in the map populated using the safe heuristic and 4 have the same number of kills. Figure \ref{img:scatter_avg} shows how the heuristics influence the average distance covered to find a target, which tends to be higher in maps whose spawn points have been placed using the low risk heuristics.
+The effect of the two approaches on the metrics that we have defined can be observed by plotting their values, assigning to the horizontal axis the value of the metric in maps with heuristic placement and to the vertical axis the value of the metric in maps with uniform placement. Each point of such graph represents the outcome of a test whose coordinates are the value of the metric in the two matches. By tracing the bisector, it is easy to see for which of the two approaches a metric is higher. If the points are scattered under the bisector, it means that the metric tends to be higher for the heuristic approach, if they are scattered around the bisector it means that there is no significant difference and if they are scattered above the bisector it means that the metric tends to be higher for the uniform approach. Figure \ref{img:scatter_kills} shows how the placement influence the number of kills: of 27 tests, 17 have more kills in the map with the uniform placement, 6 have more kills in the map with the heuristic placement and 4 have the same number of kills. Figure \ref{img:scatter_avg} shows how the two approaches influence the average distance covered to find a target, which tends to be higher in maps whose spawn points have been placed using the heuristic approach.
 
 \par
 
-We also observed that the effects of the change of heuristic were considerably different depending on the layout on the map. With the low risk distribution, map ``Arena'' had a mean number of kills of $10.75$, map ``Corridors'' of $10.44$ and map ``Intense'' of $8.75$. We expected the one of ``Arena'' to be the highest, because of its central area that dominates the rest of the map, but we did not expect the ones of ``Corridors'' to be almost as high, since its structure is more complex to navigate. Moreover, we expected an intermediate number of kills in ``Intense'', since it merges the features of the two other maps, but it proved to be the map where targets were harder to find. This could be explained by the fact that ``Corridors'', even if more complex than ``Arena'', has a rather regular structure and its long corridors allow to easily spot a target. Instead, for what concerns ``Intense'', its structure is rather complex and difficult to navigate and since the central open area does not allow to control all of the map the tactical advantage it provides is not so strong. With the uniform heuristic the mean number of kills of ``Arena'' increased to $11.88$, the one of ``Corridors'' remained almost the same ($10.67$) and the one of ``Intense'' increased dramatically to $12.75$. The reasons for such different answers to the change of heuristics lies in the layout of each map. The central area of ``Arena'' allows to control all of the surroundings, so the positioning of spawn points in areas that are less visible has a relevant effect. ``Corridors'', instead, has a regular structure and the number of intersections between its corridors is almost always the same, so it is not relevant where spawn points are placed, since all the rooms have the same features. Finally, the tangled structure of ``Intense'' offers to the low risk heuristic a lot of interesting spots were to place spawn points and the presence of an area that offers a partial control of the map makes this choice even more meaningful. This shows that the low risk heuristic performs better in maps which layout is not uniform.
+We also observed that the effects of the placement were considerably different depending on the layout of the map. With the heuristic placement, map ``Arena'' had a mean number of kills of $10.75$, map ``Corridors'' of $10.44$ and map ``Intense'' of $8.75$. We expected the one of ``Arena'' to be the highest, because of its central area that dominates the rest of the map, but we did not expect the ones of ``Corridors'' to be almost as high, since its structure is more difficult to navigate. Moreover, we expected an intermediate number of kills in ``Intense'', since it merges the features of the two other maps, but it proved to be the map where targets were harder to find. This could be explained by the fact that ``Corridors'', even if more complex than ``Arena'', has a rather regular structure and its long corridors allow to easily spot a target. Instead, for what concerns ``Intense'', its structure is rather complex and difficult to navigate and since the central open area does not allow to control all of the map the tactical advantage it provides is not so strong. With the uniform placement the mean number of kills of ``Arena'' increased to $11.88$, the one of ``Corridors'' remained almost the same ($10.67$) and the one of ``Intense'' increased dramatically to $12.75$. The reasons for such different reactions lies in the layout of each map. The central area of ``Arena'' allows to control all of the surroundings, so the placement of spawn points in areas that are less visible has a relevant effect. ``Corridors'', instead, has a regular structure and the number of intersections between its corridors is almost always the same, so it is not relevant where spawn points are placed, since all the rooms have the same features. Finally, the tangled structure of ``Intense'' offers to the heuristic approach a lot of interesting spots where to place spawn points and the presence of an area that allows a partial control of the map makes this choice even more meaningful. This shows that the effects of the heuristic approach are more pronounced in maps which layout is not uniform.
 
 \begin{figure}
- 	\centering
-	\includegraphics[width=0.8\linewidth]{percived}
-	\caption{Comparison between the effective and the perceived difficulty.}
-	\label{img:percived}		
+\centering
+\includegraphics[width=0.8\linewidth]{percived}
+\caption{Comparison between the effective and the perceived difficulty.}
+\label{img:percived} 
 \end{figure}
 
-It is also interesting to notice how the employed heuristic affected the level of difficulty perceived by the user. As it can be seen in figure \ref{img:percived}, to the question proposed at the end of the experiment about which map they found more difficult the users generally answered with the map where they performed worst, but some of them answered with the one where they performed better.
-
-\par
-
-Finally, it was interesting to notice that the intuition of flipping one of the two maps was correct, since some users believed to have played two completely different maps.  
+It is also interesting to notice how the difficulty in finding the targets was perceived by the users. As it can be seen in figure \ref{img:percived}, in the survey the majority of the users classified as more difficult the match where they performed worst, but some of them answered with the one where they performed better. Finally, the intuition of flipping one of the two maps was correct, since many users believed to have played two completely different maps. 
 
 % CONCLUSIONS %
 
 \section{Considerations}
 
-The results of this experiment proved that our heuristic is effective in placing spawn points in positions that are difficult to reach according to the up-player vs down-player dynamic. Furthermore, the simplicity with which we collected samples confirms the suitability of our framework for this kind of research.
+The results of this experiment proved that our heuristics are effective in placing spawn points in positions that are difficult to reach according to the up-player vs down-player dynamic. Furthermore, the simplicity with which we collected samples confirms the suitability of our framework for this kind of research.
 
 % SUMMARY %
 
 \section{Summary}
 
-In this chapter we analyzed the experiment that we setup and its results, that proved the effectiveness of our heuristic and our framework.
+In this chapter we analyzed the experiment that we setup and its results, that proved the effectiveness of our heuristics and of our framework.

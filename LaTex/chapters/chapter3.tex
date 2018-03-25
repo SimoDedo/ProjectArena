@@ -188,7 +188,7 @@ The \<Cellular Generator> employs a parametric \<cellular automaton>\footnote{A 
 The algorithm starts by filling some tiles of the map selected at random, then it applies the cellular automaton for a certain number of generations and finally it performs some refinements (for more details, see algorithm \ref{alg:cellular}). The resulting topology depends on the following parameters:
 
 \begin{itemize}
-\item \<RandomFillPercent>: the percentage of tiles that are randomly filled during the initialization of the algorithm. High values promote narrow spaces, small values promote wide open areas.
+\item \<RandomFillPercent>: the percentage of tiles that are randomly filled during the initialization of the algorithm. High values promote narrow spaces, small values promote wide areas.
 \item \<SmoothingInteration>: the number of generations the cellular automaton is ran for. High values penalize small features and make the walls smoother. 
 \item \<NeighbourTileLimitLow>: the maximum number of neighbors a cell must have to became empty. Its value must be lesser or equal than the one of \<NeighbourTileLimitHigh>. The map becomes noisier the more they diverge.
 \item \<NeighbourTileLimitHigh>: the minimum number of neighbors a cell must have to became filled.
@@ -242,8 +242,8 @@ The algorithm is iterative and its state is defined by the current cell and by t
 
 \begin{itemize}
 \item \<ForwardProbability>: probability of moving forward in the next iteration. High values promote long corridors. 
-\item \<LeftProbability>: probability of moving leftward in the next iteration. High values promote wide open areas. 
-\item \<RightProbability>: probability of moving rightward in the next iteration. High values promote wide open areas. 
+\item \<LeftProbability>: probability of moving leftward in the next iteration. High values promote wide areas. 
+\item \<RightProbability>: probability of moving rightward in the next iteration. High values promote wide areas. 
 \item \<VisitedProbability>: probability of jumping to a visited cell in the next iteration. High values promote a more complex topology. 
 \item \<StairProbability>: probability of placing a flight of stairs.
 \item \<RoomPercentage>: percentage of tiles of the map that must be empty.

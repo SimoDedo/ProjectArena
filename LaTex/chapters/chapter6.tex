@@ -1,0 +1,41 @@
+\chapter{Conclusions}
+
+% CONCLUSIONS %
+
+The purpose of this thesis was to create a framework to perform research in procedural content generation for First Person Shooters. Past works have employed open source games, like Cube 2, that allow to perform validation via artificial agents but present many limitations when it is needed to collect information from real users. There was therefore the need of a way to collect data online, in an easy and quick way, and we answered to it by designing our framework to deploy browser playable experiments, that once defined collect data automatically.
+
+\par
+
+Being aimed at research, we wanted our framework to be as versatile as possible, so we opted for a modular and parametric design that is easy to customize and we included many generation algorithms and map representation formats that have been used in previous works. We included the All Black format, defined by Cardamone et al.\cite{Cardamone:2011:EIM:2008402.2008411}, that is a standard in the literature, but we extended it to be more complete and flexible, introducing variable genome size, game elements codification and multi-level support. Because we expect multi-level generation to be a topic of great interest in the years to come, we included the multi-level map format defined by Cachia et al.\cite{MultiLevelEvolution}, who were the first to evolve multi-level maps, but we also extended the classic All-Black representation to be multi-level. This, together with the possibility of including the position of game elements and stairs, should allow to perform evolution of multi-level maps starting from what has already been done in single level research. 
+
+\par
+
+Moreover, we explored how Graph Theory can be applied to level design, with regard to both map analysis and placement of game elements, and we found various graphs and metrics that allow to extract interesting information from a map starting from its All-Black representation. Then, we designed an approach that allows to employ this information to place game element in a meaningful way, considering the different requirements of each object, that we defined by analyzing how level design influences the up-player vs down-player dynamic.
+
+\par
+
+Finally, we tested our framework by performing an experiment to analyze how the placement of spawn points influences the up-player vs down-player dynamic. With this experiment we were able to validate the placement methods that we have defined and we managed to observe how the map layout influences the disposition of game elements. In this way, we proved our graph-based approach to be useful both for map analysis and for the contextual positioning of game elements.
+
+% ISSUES %
+
+\section{Known issues and possible criticism}
+
+The main issue with the framework is that it does not have neither artificial agents nor the support for online multiplayer and this limits its possible applications.
+
+\par
+
+For what concerns graph analysis, the rules that we have defined for placing game elements could be criticized for a lack of a strong theoretical basis, since as we have seen there is still no common ground for what concerns level design. Moreover, we assigned the weights used in the placement heuristics empirically, making various attempts and choosing the weights that produced the disposition of game elements most coherent with the rules we defined. Despite this, the experiment proved both the rules and the weight assignment to be effective.
+
+% FUTURE %
+
+\section{Future developments}
+
+Two major features that should be implemented in the framework are an artificial intelligence for agents and the support for online multiplayer, since they would allow to significantly increase the possible applications of our work. Moreover, to make the framework more complete and allow to directly generate well designed maps, it would be a great improvement to implement the map analysis and the game element placement directly in the framework, instead of performing them using an external tool. Unlucky, we were forced to keep them separated since \<C\#>, that we used to develop the framework, does not have any solid graph library.
+
+\par
+
+In chapter \ref{ss:interesting_metrics} we listed many metrics that can give interesting information about the layout of a map, but we have used only some of them to define the placement heuristics. An interesting development would be to include more of them, in particular the ones that allow to define areas of the map, like \<Periphery> and \<Center>. As we have highlighted, weapons require a specific treatment when positioned, since their overall damage, strengths and weakness should influence their place in the map, and such metrics can be employed to define the areas that better suit each weapon. Another improvement would be the extension of the analysis performed via graph to multi-level maps. Moreover, as we have already highlighted in the thesis, the graphs we have defined could be used for the individuation and analysis of design patterns.
+
+\par
+
+Finally, it would be interesting to design an evolutionary process that generates maps and places resources using a fitness function addressed to the up-player vs down-player dynamic.
