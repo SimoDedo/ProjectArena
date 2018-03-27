@@ -1,12 +1,12 @@
-\chapter{Experiment on spawn points placement}
+\chapter{Experimental analysis on spawn points placement}
 
 % INTRODUCTION %
 
-In this chapter we describe the experiment that we have performed for validating the placement heuristics for spawn points described in the previous chapter and, at the same time, for testing the data-collection capabilities of our framework, that was used to setup and manage the experiment.
+In this chapter we describe the experiment that we have performed with real users to validate the placement heuristics for spawn points and, at the same time, to test the data-collection capabilities of our framework, that was used to setup and manage the experiment.
 
 % DESCRIPTION %
 
-\section{Description}
+\section{Goals}
 
 We designed this experiment to analyze how our methods for the placement of spawn points influence the up-player vs down-player dynamic and to prove their effectiveness. We tried to recreate the situation where the up-player, once killed his opponent, tries to find him as soon as possible, just after his respawn, to score another easy kill. As we have seen, a well-designed map should slow down this operation by having its spawn points in areas that are not central, are easy to leave and covered. In this experiment we compared two approaches: the \<uniform> one, that selects rooms with the uniform method (see chapter \ref{sss:room_selection}) and tiles with the heuristic defined for spawn points, and the \<heuristic> one, that selects both rooms and tiles with the heuristics defined for spawn points (see chapter \ref{sss:sph}) and should allow to obtain a placement of spawn point coherent with the one described above. These two approaches use the same method to select tiles to focus on the effects of room selection, since the ones of tile selection are rather obvious (an object on a tile with a low visibility is difficult to find).
 
@@ -16,7 +16,7 @@ To highlight this gameplay dynamic, we designed a game mode where the user, whic
 
 % SETUP %
 
-\section{Setup}
+\section{Experimental design}
 
 For this experiment, we setup the \<Experiment Manager> to propose in each play session a quick tutorial, two matches and a survey. The experiment was composed by three \<studies>, corresponding to three different maps, each one composed by two \<cases>, one corresponding to the map populated with the heuristic approach and one corresponding to a pool of five versions of the map populated with the uniform approach\footnote{When selecting rooms with the uniform method the first one is chosen at random. This allows to obtain multiple versions of the same map.}. In a play session, the user played the same map twice, once with the heuristic distribution and once with the uniform distribution, in a random order and with the map flipped in one of the two matches. We used the survey to profile each user according to their skill and familiarity with video games and FPS and to get a feedback about the match in which they found it harder to locate the targets. The experiment was deployed online and played by the users via browser on their own computers.
 
@@ -132,11 +132,56 @@ As we have said, the heuristic and the uniform approaches select rooms with two 
 \caption{Uniform placement.}
 \label{img:bar_uniform}
 \end{subfigure}
-\caption[Distribution of the matches by number of kills for the two methods.]{Distribution of the matches by number of kills for the two methods. The matches are also classified by map.}
+\caption[Distribution of the matches by number of kills for the two methods.]{Distribution of the matches by number of kills for the two methods. Colors encode the map where data were collected.}
 \label{img:match_distribution} 
 \end{figure}
 
-The data collection campaign performed for this experiment produced a dataset composed of 27 samples, which distribution between the three maps can be seen in figure \ref{img:match_distribution}: of 27 samples, 10 are pairs of matches played in map ``Arena'', 9 are pairs of matches played in map ``Corridors'' and 8 are pairs of matches played in map ``Intense''. 
+\begin{table}
+\setlength\extrarowheight{2pt}
+\begin{tabularx}{\textwidth}{|l|C|C|C|C|C|}
+\cline{3-6}
+\multicolumn{2}{c|}{} & Total & Arena & Corridors & Intense \\
+\hline
+\multicolumn{2}{|l|}{Samples} & 27 & 10 & 9 & 8 \\
+\hline
+\multirow{ 2}{*}{\<Shots>} & Heuristic & 129.78 & 131.60 & 158.78 & 94.88 \\
+\cline{2-6}
+& Uniform & 121.63 & 133.30 & 111.00 & 119.00 \\
+\hline
+\multirow{ 2}{*}{\<Hits>} & Heuristic & 41.00 & 44.80 & 41.78 & 35.38 \\
+\cline{2-6}
+& Uniform & 48.63 & 52.00 & 42.67 & 51.13 \\
+\hline
+\multirow{ 2}{*}{\<Accuracy>} & Heuristic & 0.42 & 0.39 & 0.46 & 0.40 \\
+\cline{2-6}
+& Uniform & 0.46 & 0.42 & 0.48 & 0.48 \\
+\hline
+\multirow{ 2}{*}{\<Kills>} & Heuristic & 10.06 & 10.75 & 10.44 & 8.75 \\
+\cline{2-6}
+& Uniform & 11.88 & 12.27 & 10.67 & 12.75 \\
+\hline
+\multirow{ 2}{*}{\<Distance>} & Heuristic & 675.22 & 633.56 & 675.43 & 716.68 \\
+\cline{2-6}
+& Uniform & 680.79 & 649.62 & 688.34 & 704.42 \\
+\hline
+\multirow{ 2}{*}{\<AvgKillTime>} & Heuristic & 20.24 & 21.09 & 18.25 & 21.40  \\
+\cline{2-6}
+& Uniform & 16.06 & 15.50 & 17.46 & 15.18 \\
+\hline
+\multirow{ 2}{*}{\<AvgKillDistance>} & Heuristic & 73.34 & 64.21 & 70.90 & 84.90 \\
+\cline{2-6}
+& Uniform & 60.70 & 55.24 & 68.13 & 58.72 \\
+\hline
+\multirow{ 2}{*}{Difficulty} & Effective & heuristic & heuristic & uniform & heuristic \\
+\cline{2-6}
+& Percived & heuristic & heuristic & equal & heuristic \\
+\hline
+\end{tabularx}
+\caption{The average values (with the exception of Difficulty, which is the mode) of the metrics that we have defined.}
+\label{tab:means}
+\end{table}
+
+The data collection campaign performed for this experiment produced a dataset composed of 27 samples, which distribution between the three maps can be seen in figure \ref{img:match_distribution}: of 27 samples, 10 are pairs of matches played in map ``Arena'', 9 are pairs of matches played in map ``Corridors'' and 8 are pairs of matches played in map ``Intense''. Table \ref{tab:means} shows the average values of the metrics that we have defined divided by map and placement method.
 
 \par
 
@@ -144,7 +189,7 @@ As we have seen, the performance of the player is measured by \<AvgKillTime> and
 
 \par
 
-To prove the statistic soundness of this result, we performed the \<Wilcoxon> statistical test\footnote{The \<Wilcoxon signed-rank test> is a \<non-parametric statistical hypothesis test> used to compare two matched samples to assess whether their population mean ranks differ.} by \<Pratt>\footnote{With respect to the standard Wilcoxon test, the one by Pratt considers also the observations for which the difference of the elements in the pair is zero. Since we have 4 cases where the number of kills is the same, we opted for this approach.}, using as matched samples the number of kills in maps with heuristic placement and in maps with uniform placement. The test was passed with $\alpha < 0.005$, one-tiled.
+To test the statistical significance of this result, we performed the \<Wilcoxon> statistical test\footnote{The \<Wilcoxon signed-rank test> is a \<non-parametric statistical hypothesis test> used to compare two matched samples to assess whether their population mean ranks differ.} by \<Pratt>\footnote{With respect to the standard Wilcoxon test, the one by Pratt considers also the observations for which the difference of the elements in the pair is zero. Since we have 4 cases where the number of kills is the same, we opted for this approach.}, using as matched samples the number of kills in maps with heuristic placement and in maps with uniform placement. The test was passed with $\alpha = 0.00347 < 0.005$, one-tiled.
 
 \begin{figure}[h]
 \centering
@@ -163,7 +208,7 @@ To prove the statistic soundness of this result, we performed the \<Wilcoxon> st
 \label{img:metrics} 
 \end{figure}
 
-The effect of the two approaches on the metrics that we have defined can be observed by plotting their values, assigning to the horizontal axis the value of the metric in maps with heuristic placement and to the vertical axis the value of the metric in maps with uniform placement. Each point of such graph represents the outcome of a test whose coordinates are the value of the metric in the two matches. By tracing the bisector, it is easy to see for which of the two approaches a metric is higher. If the points are scattered under the bisector, it means that the metric tends to be higher for the heuristic approach, if they are scattered around the bisector it means that there is no significant difference and if they are scattered above the bisector it means that the metric tends to be higher for the uniform approach. Figure \ref{img:scatter_kills} shows how the placement influence the number of kills: of 27 tests, 17 have more kills in the map with the uniform placement, 6 have more kills in the map with the heuristic placement and 4 have the same number of kills. Figure \ref{img:scatter_avg} shows how the two approaches influence the average distance covered to find a target, which tends to be higher in maps whose spawn points have been placed using the heuristic approach.
+The effect of the two approaches on the metrics that we have defined can be observed by plotting their values, assigning to the horizontal axis the value of the metric in maps with heuristic placement and to the vertical axis the value of the metric in maps with uniform placement. Each point of such graph represents the outcome of a test whose coordinates are the value of the metric in the two matches. By tracing the bisector, it is easy to see for which of the two approaches a metric is higher. If the points are scattered under the bisector it means that the metric tends to be higher for the heuristic approach, whereas if they are scattered above the bisector it means that the metric tends to be higher for the uniform approach. Figure \ref{img:scatter_kills} shows how the placement influence the number of kills: of 27 tests, 17 have more kills in the map with the uniform placement, 6 have more kills in the map with the heuristic placement and 4 have the same number of kills. Figure \ref{img:scatter_avg} shows how the two approaches influence the average distance covered to find a target, which tends to be higher in maps whose spawn points have been placed using the heuristic approach.
 
 \par
 
@@ -182,7 +227,7 @@ It is also interesting to notice how the difficulty in finding the targets was p
 
 \section{Considerations}
 
-The results of this experiment proved that our heuristics are effective in placing spawn points in positions that are difficult to reach according to the up-player vs down-player dynamic. Furthermore, the simplicity with which we collected samples confirms the suitability of our framework for this kind of research.
+The results of this experiment proved that our heuristics are effective in placing spawn points in positions that are difficult to reach according to the up-player vs down-player dynamic. Furthermore, the experiment allowed us to also test the capabilities of the framework to collect data for this kind of research.
 
 % SUMMARY %
 
