@@ -82,14 +82,14 @@
 \contentsline {paragraph}{Random tile selection}{53}
 \contentsline {subsection}{\numberline {4.3.3}Heuristics for the placement of game elements}{53}
 \contentsline {subsubsection}{\numberline {4.3.3.1}Spawn points}{53}
-\contentsline {paragraph}{Room selection}{54}
+\contentsline {paragraph}{Room selection}{53}
 \contentsline {paragraph}{Tile selection}{54}
 \contentsline {subsubsection}{\numberline {4.3.3.2}Health packs}{55}
 \contentsline {paragraph}{Room selection}{55}
 \contentsline {paragraph}{Tile selection}{56}
 \contentsline {subsubsection}{\numberline {4.3.3.3}Ammunition}{56}
 \contentsline {paragraph}{Room selection}{56}
-\contentsline {paragraph}{Tile selection}{56}
+\contentsline {paragraph}{Tile selection}{57}
 \contentsline {subsection}{\numberline {4.3.4}Weapon placement}{57}
 \contentsline {section}{\numberline {4.4}Summary}{57}
 \contentsline {chapter}{\numberline {5}Experiment on spawn points placement}{59}

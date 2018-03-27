@@ -2,15 +2,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>96cf3737-362c-43fc-aeab-a3684662e41c</ProjectGuid>
+    <ProjectGuid>c4df23dd-1af4-41a6-bf3b-161b9d88de8c</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>ResultsAnalysis.py</StartupFile>
+    <StartupFile>ResultAnalyzer.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>ResultsAnalysis</Name>
-    <RootNamespace>ResultsAnalysis</RootNamespace>
+    <Name>ResultAnalyzer</Name>
+    <RootNamespace>ResultAnalyzer</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,7 +21,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ResultsAnalysis.py" />
+    <Compile Include="ResultAnalyzer.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

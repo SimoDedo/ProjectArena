@@ -176,12 +176,12 @@ This method selects rooms considering three suitability criteria:
 \end{itemize}
 
 Given the rooms and game elements graph of a map ($G_{rr}$) and the subset of room nodes ($R \subseteq G_{rr}$), the room node which is selected is the one which maximizes the following weighted sum of functions:
-
+%
 \begin{align}
 r^* = \argmax_{r \in R} (w_D  \times D(r) + w_{H_e}  \times H_e(r))
 \label{eq:room_heuristic}
 \end{align}
-
+%
 \noindent
 The weights $w_D$ and $w_{H_e}$ allow to define how much each one of the two heuristics influences the selection of a room. Both functions should be defined to output a value in the range $[0,1]$, in order to have the same influence for equal weight.
 
@@ -190,12 +190,12 @@ The weights $w_D$ and $w_{H_e}$ allow to define how much each one of the two heu
 \paragraph{Uniform room selection} 
 
 This method selects rooms that are uniformly distributed in the map. The first room is selected at random, then, given the rooms and corridors graph ($G_{rr}$), the subset of room nodes ($R \subseteq G_{rr}$) and the subset of element nodes ($S \subset G_{rr}$), the remaining rooms are selected with the following heuristic:
-
+%
 \begin{align}
 	r^* = \argmax_{r \in R} ( \min_{s \in S} (\spl(r, s) ))
 	\label{eq:tile_heuristic}
 \end{align}
-
+%
 \noindent
 where $\spl(n, m)$ denotes the length of the shortest path that connects the two nodes $n$ and $m$, found using Dijkstra's algorithm.
 
@@ -224,11 +224,11 @@ This method selects tiles considering three suitability criteria:
 \end{itemize}
 
 Given $G_v$ the visibility graph and $T \subset G_v$ the subset of tiles contained by the selected room, the tile which is selected is the one which maximizes the following weighted sum of functions:
-
+%
 \begin{align}
 t^* = \argmax_{t \in T} (w_v \times v(t) + w_{H_w}  \times H_w(t) + w_{H_e}  \times H_e(t))
 \end{align}
-
+%
 \noindent
 The weights $w_v $, $w_{H_w}$ and $w_{H_e}$ allow to define how much each one of the three heuristics influences the selection of a tile. All three functions should be defined to output a value in the range $[0,1]$, in order to have the same influence for equal weight.
 
@@ -270,7 +270,7 @@ D(r) = \begin{cases}
     		1 - \cfrac{\degcent(r) - \min_{r' \in R}\degcent(r')}{\max_{r' \in R}\degcent(r') - \min_{r' \in R}\degcent(r')} & \text{if } \degcent(r) \neq 1 \
   	\end{cases}
 \end{align}
-
+%
 \begin{align}
 \label{eq:lowriskres}
 H_e(r) = \min_{n \in G_{rr}}
@@ -279,26 +279,40 @@ H_e(r) = \min_{n \in G_{rr}}
     		\cfrac{\spl(r, n)}{\diam(G_{rr})} & \text{if } n \in S \
   	\end{cases}
 \end{align}
-
+%
 \noindent
-where $\degcent(n)$ denotes the connectivity degree of the node $n$ and $\diam(G)$ the diameter of the graph $G$. Equation \ref{eq:lowriskdeg} promotes rooms with few passages but that are not dead ends, whereas equation \ref{eq:lowriskres} promotes rooms that are distant from the already placed game elements. Both are normalized in the range $[0,1]$. We empirically set the weighs to $w_D = 1 $ and $ w_{H_e} = 0.5 $.
+where $\degcent(n)$ denotes the connectivity degree of the node $n$ and $\diam(G)$ the diameter of the graph $G$. Equation \ref{eq:lowriskdeg} promotes rooms with few passages but that are not dead ends (see figure \ref{fig:degree}), whereas equation \ref{eq:lowriskres} promotes rooms that are distant from the already placed game elements. Both are normalized in the range $[0,1]$. We empirically set the weighs to $w_D = 1 $ and $ w_{H_e} = 0.5 $.
+
+\begin{figure}
+\begin{minipage}[t]{0.4825\linewidth}
+\includegraphics[width=\linewidth]{degree}
+\caption{How the \<degree heuristic> defined for spawn points varies depending on the room node degree.}
+\label{fig:degree}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4825\linewidth}
+\includegraphics[width=\linewidth]{visibility_low}
+\caption{How the \<visibility heuristic> defined for spawn points varies depending on the tile node degree.}
+\label{fig:visibility_low}
+\end{minipage}
+\end{figure}
 
 % TILE %
 
 \paragraph{Tile selection}
 
 Considering equation \ref{eq:tile_heuristic} and given the visibility graph of the map ($G_v$), the subset of tile nodes that belong to the room ($T \subset G_v$), the subset of tile nodes of the room which contain a game element ($H \subset T$) and the length of the diagonal of the room  ($l_d$), the most suitable tile for containing a spawn point is selected using the following heuristics:
-
+%
 \begin{align}
 \label{eq:lowvis}
 v(t) = 1 - \cfrac{\degcent(t) - \min_{t' \in G_v}\degcent(t')}{\max_{t' \in G_v}\degcent(t') - \min_{t' \in G_v}\degcent(t')}
 \end{align}
-
+%
 \begin{align}
 \label{eq:lowwallclos}
 H_w(t) = \cfrac{\walld(t, r^*)}{\max_{t' \in T}\walld(t', r^*)}
 \end{align}
-
+%
 \begin{align}
 \label{eq:lowresclos}
  H_e(t) = \begin{cases}
@@ -306,9 +320,9 @@ H_w(t) = \cfrac{\walld(t, r^*)}{\max_{t' \in T}\walld(t', r^*)}
     		\min_{h \in H}\cfrac{\cartd(t, h)}{l_d}& \text{if } | H | > 0 \
   	\end{cases} 
 \end{align}
-
+%
 \noindent
-where $\walld(n, r)$ is the distance of the coordinates associated to the node $n$ from the walls of the room $r$, computed as the sum of the minimum distances from the horizontal and vertical walls, and $\cartd(n, m)$ is the distance of the coordinates associated to the nodes $n$ and $m$. Equation \ref{eq:lowvis} promotes tiles with low visibility, equation \ref{eq:lowwallclos} promotes tiles that are distant from the walls, whereas equation \ref{eq:lowresclos} promotes tiles that are distant from the already placed game elements inside the room. All three are normalized in the range $[0,1]$. We empirically set the weights as $ w_v = 1 $, $ w_{H_w} = 0.5 $ and $ w_{H_e}  = 0.5 $.
+where $\walld(n, r)$ is the distance of the coordinates associated to the node $n$ from the walls of the room $r$, computed as the sum of the minimum distances from the horizontal and vertical walls, and $\cartd(n, m)$ is the distance of the coordinates associated to the nodes $n$ and $m$. Equation \ref{eq:lowvis} promotes tiles with low visibility (see figure \ref{fig:visibility_low}), equation \ref{eq:lowwallclos} promotes tiles that are distant from the walls, whereas equation \ref{eq:lowresclos} promotes tiles that are distant from the already placed game elements inside the room. All three are normalized in the range $[0,1]$. We empirically set the weights as $ w_v = 1 $, $ w_{H_w} = 0.5 $ and $ w_{H_e}  = 0.5 $.
 
 % HEALTH PACKS %
 
@@ -321,20 +335,20 @@ For heath packs, the heuristic-based approaches for rooms and tiles respectively
 \paragraph{Room selection}
 
 Considering equation \ref{eq:room_heuristic}  and given the rooms and corridors graph of the map ($G_{rr}$), the subset of room nodes ($R \subseteq G_{rr}$) and the subset of element nodes ($S \subset G_{rr}$), the most suitable room for containing a health pack is selected using the following heuristic:
-
+%
 \begin{align}
 \label{eq:lowriskdegh}
 D(r) = 1 - \cfrac{f_{deg}(r) - \min_{r' \in R}f_{deg}(r')}{\max_{r' \in R}f_{deg}(r') - \min_{r' \in R}f_{deg}(r')} 
 \end{align}
-
+%
 \noindent
 with
-
+%
 \begin{align}
 \label{eq:degfit}
 f_{deg}(r) = \intd(\degcent(r),0.3,0.5)
 \end{align}
-
+%
 \begin{align}
 \label{eq:intervaldistance}
 \intd(v, v_{min}, v_{max}) = %| ( |v_{min}| - |v | ) | + | (|v_{max}| - |v | )| 
@@ -344,23 +358,38 @@ f_{deg}(r) = \intd(\degcent(r),0.3,0.5)
     		\hfil v - v_{max}  & \text{if } v > v_{max} \
   	\end{cases}  	 
 \end{align}
-
+%
 \noindent
-where $\intd$ is a function that measures the distance of a value from an interval of desired ones. Equation \ref{eq:lowriskres} is used for $H_e$. Equation \ref{eq:lowriskdegh} promotes rooms with a low-medium number of passages. Both are normalized in the range $[0,1]$. We empirically set the weights as $w_D = 1 $ and $ w_{H_e} = 0.5 $.
+where $\intd$ is a function that measures the distance of a value from an interval of desired ones (see figure \ref{fig:interval}). Equation \ref{eq:lowriskres} is used for $H_e$. Equation \ref{eq:lowriskdegh} promotes rooms with a low-medium number of passages. Both are normalized in the range $[0,1]$. We empirically set the weights as $w_D = 1 $ and $ w_{H_e} = 0.5 $.
+
+\begin{figure}
+\centering
+\begin{minipage}[t]{0.4825\linewidth}
+\includegraphics[width=\linewidth]{interval}
+\caption{The values assumed by $\intd$ with $[0.3, 0.5]$ set as interval of desired values.}
+\label{fig:interval}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.4825\linewidth}
+\includegraphics[width=\linewidth]{visibility_medium}
+\caption{How the \<visibility heuristic> defined for health packs varies depending on the tile node degree.}
+\label{fig:visibility_medium}
+\end{minipage}
+\end{figure}
 
 % TILE %
 
 \paragraph{Tile selection}
 
 Considering equation \ref{eq:tile_heuristic}  and given the visibility graph of the map $G_v$, the subset of tile nodes that belong to the room ( $T \subset G_v$) and the subset of tile nodes of the room which contain a game element ($H \subset T$), the most suitable tile for containing a health pack is selected using the following heuristic:
-
+%
 \begin{align}
 \label{eq:lowvish}
 v(t) = 1 - \biggg| 0.5 - \cfrac{\degcent(t) - \min_{t' \in G_v}\degcent(t')}{\max_{t' \in G_v}\degcent(t') - \min_{t' \in G_v}\degcent(t')} \biggg| 
 \end{align}
-
+%
 \noindent
-that promotes tiles with medium visibility. Equations \ref{eq:lowwallclos} and \ref{eq:lowresclos} are used for $H_w(t)$ and $H_e(t)$, respectively. All three are normalized in the range $[0,1]$. We empirically set the weighs to $ w_v = 1 $, $ w_{H_w} = 0.25 $ and $ w_{H_e}  = 0.5 $.
+that promotes tiles with medium visibility (see figure \ref{visibility_medium}). Equations \ref{eq:lowwallclos} and \ref{eq:lowresclos} are used for $H_w(t)$ and $H_e(t)$, respectively. All three are normalized in the range $[0,1]$. We empirically set the weighs to $ w_v = 1 $, $ w_{H_w} = 0.25 $ and $ w_{H_e}  = 0.5 $.
 
 % AMMUNITION %
 
@@ -373,20 +402,20 @@ For ammunition, the heuristic-based approaches for rooms and tiles respectively 
 \paragraph{Room selection}
 
 Considering equation \ref{eq:room_heuristic}  and given the rooms and corridors graph of the map ($G_{rr}$), the subset of room nodes ($R \subseteq G_{rr}$) and the subset of element nodes ($S \subset G_{rr}$), the most suitable room for containing ammunition is selected using equations \ref{eq:lowriskres} and \ref{eq:lowriskdegh}, with
-
+%
 \begin{align}
 \label{eq:degfita1}
 f_{deg}(r) = \intd(\degcent(r),0.2,0.4)
 \end{align}
-
+%
 \noindent
 for obtaining rooms with a low-medium number of connections and
- 
+ %
 \begin{align}
 \label{eq:degfita2}
 f_{deg}(r) = \intd(\degcent(r),0.8,0.9)
 \end{align}
-
+%
 \noindent
 for obtaining rooms with a high number of connections. We empirically set the weighs to $w_D = 1 $ and $ w_{H_e} = 0.25 $.
 
@@ -395,12 +424,12 @@ for obtaining rooms with a high number of connections. We empirically set the we
 \paragraph{Tile selection}
 
 Considering equation \ref{eq:tile_heuristic} and given the visibility graph ($G_v$), the subset of tile nodes that belong to the room ($T \subset G_v$) and the subset of tile nodes of the room which contain a game element ($H \subset T$), the most suitable tile for containing ammunition is selected using the following heuristic:
-
+%
 \begin{align}
 \label{eq:highvisa}
 v(t) = \cfrac{\degcent(t) - \min_{t' \in T}\degcent(t')}{\max_{t' \in T}\degcent(t') - \min_{t' \in T}\degcent(t')}
 \end{align}
-
+%
 \noindent
 that promotes tiles with high visibility. Equations \ref{eq:lowwallclos} and \ref{eq:lowresclos} are used for $H_w(t)$ and $H_e(t)$, respectively. All three are normalized in the range $[0,1]$. We empirically set the weights as $ w_v = 1 $, $ w_{H_w} = 0.25 $ and $ w_{H_e}  = 0.5 $.
 

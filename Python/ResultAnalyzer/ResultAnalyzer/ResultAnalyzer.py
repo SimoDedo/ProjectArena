@@ -18,7 +18,7 @@ def getData(inputDir):
 
     while inputAcquired == False:
         if os.path.isfile(inputDir + "/" + fileName):
-            print("File found.\n")
+            print("File found.")
             inputAcquired = True
             # Parse the data.
             with open(inputDir + "/" + fileName) as csvfile:
@@ -105,7 +105,9 @@ def generateBarDiagramKills(data, safe):
     lg = ax.legend((pArena[0], pCorridors[0], pIntense[0]), ('Arena', 'Corridors', 'Intense'),
                loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol = 3)
     lg.draw_frame(False)
-    plt.show()
+    plt.savefig(exportDir + "/" + ("bar_lowrisk" if safe else "bar_uniform"), dpi = 200, bbox_inches = "tight")
+    # plt.show()
+    plt.clf()
 
 # Generate the bar diagram of the difficulty.
 def generateBarDiagramDifficulty(data):
@@ -140,7 +142,7 @@ def generateBarDiagramDifficulty(data):
     plt.xlabel('Placement used in the map with least kills')
     plt.ylabel('Number of test sessions')
     # plt.title('Comparison between the effective and the percived difficulty')
-    plt.yticks(np.arange(0, 18, 1))
+    plt.yticks(np.arange(0, 20, 2))
     plt.xticks(ind, ("Heuristic","No difference","Uniform"))
     ax = plt.subplot(111)
     box = ax.get_position()
@@ -148,9 +150,11 @@ def generateBarDiagramDifficulty(data):
                  box.width, box.height * 0.9])
     lg = ax.legend((uniformBar[0], equalBar[0], safeBar[0]), ('Uniform placement percived as harder', 
                     'No difference percived', 'Heuristic placement  percived as harder'),
-                    loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol = 3)
+                    loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol = 1)
     lg.draw_frame(False)
-    plt.show()
+    plt.savefig(exportDir + "/percived", dpi = 200, bbox_inches = "tight")
+    # plt.show()
+    plt.clf()
 
 # Counts the occurencies.
 def countOccurencies(array1, array2, i):
@@ -169,7 +173,8 @@ def generateScatterDiagram(data, column1, column2, showTicks, xlabel, ylabel, ti
     data2 = getArrayFromData(data, column2, 1)
     maxData = max([max(data1), max(data2)]) + 1
     maxData = maxData + maxData * 0.025
-
+    mean1 = np.mean(data1)
+    mean2 = np.mean(data2)
     area = [(np.pi * (30 * countOccurencies(data1, data2, i))) for i in range(len(data1))]
 
     # Plot.
@@ -178,27 +183,48 @@ def generateScatterDiagram(data, column1, column2, showTicks, xlabel, ylabel, ti
     plt.xlabel(xlabel)
     # plt.title(title)
     if (showTicks):
-        plt.xticks(np.arange(0, maxData, 1))
-        plt.yticks(np.arange(0, maxData, 1))
+        plt.xticks(np.arange(0, maxData, 2))
+        plt.yticks(np.arange(0, maxData, 2))
     plt.xlim(0, maxData)
     plt.ylim(0, maxData)
     plt.gca().set_aspect('equal', adjustable='box')
+    plt.plot(np.arange(0, maxData, 0.01), np.arange(0, maxData, 0.01), "r--")  
     ax.scatter(data1, data2, area)
-    line = lines.Line2D([0, 1], [0, 1], color='red')
-    transform = ax.transAxes
-    line.set_transform(transform)
-    ax.add_line(line)
-    plt.show()
+    plt.plot(mean1, mean2, "ro")
+    plt.savefig(exportDir + "/" + title, dpi = 200, bbox_inches = "tight")
+    # plt.show()
+    plt.clf()
+
+### FUNCTIONS #################################################################
+
+def degree(d, min, max, discardDeadEnd = True):
+    if (d == 1 and discardDeadEnd):
+        return 0
+    else:
+        return (1 - (d - min) / (max - min))
+
+def degreeMedium(d, min, max):
+    return (1 - abs(0.5 - (d - min) / (max - min)))
+
+# Tells how well a value fits in an interval.
+def intervalDistance(min, max, value):
+    #return abs(abs(min) - abs(value)) + abs(abs(max) - abs(value))
+    if (value >= min and value <= max):
+        return 0
+    elif (value < min):
+        return abs(min - value)
+    else:
+        return abs(value - max)
 
 ### MENU FUNCTIONS ############################################################
 
-# Mengaes the graph menu.
+# Menages the graph menu.
 def graphMenu(data):
     index = 0
 
     while True:
         print("\n[GRAPHS] Select a graph to generate:")
-        print("[1] Low risk bar diagram")
+        print("[1] Heuristic bar diagram")
         print("[2] Uniform bar diagram")
         print("[3] Kills")
         print("[4] Distance")
@@ -219,16 +245,105 @@ def graphMenu(data):
         elif option == "3":
             print("\nGenerating graph...")  
             generateScatterDiagram(data, 6, 13, True, 'Kills (heuristic)', 
-                                   'Kills (uniform)', 'Experiment outcome')
+                                   'Kills (uniform)', 'scatter_kills')
         elif option == "4":
             print("\nGenerating graph...")
             generateScatterDiagram(data, 8, 15, False, 'AvgKillDistance (heuristic)', 
-                                   'AvgKillDistance (uniform)', 'Experiment outcome')
+                                   'AvgKillDistance (uniform)', 'scatter_avg')
         elif option == "5":
             print("\nGenerating graph...")
             generateBarDiagramDifficulty(data)
         elif option == "0":
             return
+
+# Menages the function menu.
+def functionMenu():
+    index = 0
+
+    while True:
+        print("\n[FUNCTIONS] Select a function to plot:")
+        print("[1] [ROOM] Degree heuristic")
+        print("[2] [TILE] Low visibility heuristic")
+        print("[3] [TILE] Medium visibility heuristic")
+        print("[4] Interval fit")
+        print("[0] Back\n")
+
+        option = input("Option: ")
+    
+        while option != "1" and option != "2" and option != "3" and option != "4" and option != "0":
+            option = input("Invalid choice. Option: ")
+    
+        if option == "1":
+            print("\nPlotting function...") 
+            t1 = np.arange(0, 16, 1)
+            t2 = np.arange(0, 15, 0.001)
+            plt.ylabel(r'$D(r)$')
+            plt.xlabel(r'$deg(r)$')
+            plt.xticks(np.arange(0, 16, 2))
+            plt.yticks(np.arange(0, 1.1, 0.2))
+            plt.plot(t2, [degree(t, 0, 15) for t in t2], t1, [degree(t, 0, 15) for t in t1], "ro", lw = 2)
+            plt.savefig(exportDir + "/degree", dpi = 200, bbox_inches = "tight")
+            # plt.show()  
+            plt.clf()
+        elif option == "2":
+            print("\nPlotting function...")
+            t1 = np.arange(0, 16, 1)
+            t2 = np.arange(0, 15, 0.001)
+            plt.ylabel(r'$v(t)$')
+            plt.xlabel(r'$deg(t)$')
+            plt.xticks(np.arange(0, 16, 2))
+            plt.yticks(np.arange(0, 1.1, 0.2))
+            plt.plot(t2, [degree(t, 0, 15, False) for t in t2], t1, [degree(t, 0, 15, False) for t in t1], 'ro', lw = 2)
+            plt.savefig(exportDir + "/visibility_low", dpi = 200, bbox_inches = "tight")
+            # plt.show()
+            plt.clf()        
+        elif option == "3":
+            print("\nPlotting function...")
+            t1 = np.arange(0, 16, 1)
+            t2 = np.arange(0, 15, 0.001)
+            plt.ylabel(r'$v(t)$')
+            plt.xlabel(r'$deg(t)$')
+            plt.xticks(np.arange(0, 16, 2))
+            plt.yticks(np.arange(0, 1.1, 0.2))
+            plt.plot(t2, [degreeMedium(t, 0, 15) for t in t2], t1, [degreeMedium(t, 0, 15) for t in t1], 'ro', lw = 2)
+            plt.savefig(exportDir + "/visibility_medium", dpi = 200, bbox_inches = "tight")
+            # plt.show()
+            plt.clf()
+        elif option == "4":
+            print("\nPlotting function...")
+            t1 = np.arange(0, 1.1, 0.1)
+            t2 = np.arange(0, 1.02, 0.02)
+            plt.xlabel(r'$x$')
+            plt.ylabel(r'$d_{int}(x)$')
+            plt.xticks(np.arange(0, 1.1, 0.2))
+            plt.yticks(np.arange(0, 1.1, 0.2))
+            plt.plot(t2, [intervalDistance(0.3, 0.5, t) for t in t2], t1, [intervalDistance(0.3, 0.5, t) for t in t1], 'ro', lw = 2)
+            plt.savefig(exportDir + "/interval", dpi = 200, bbox_inches = "tight")
+            # plt.show()
+            plt.clf()
+        elif option == "0":
+            return
+
+# Change the font size
+def fontMenu():
+    userInput = input("\n[FONT] Insert the desired font size: ")
+
+    done = False
+
+    while done is False:
+        try:
+            val = float(userInput)
+            done = True
+        except ValueError:
+            option = input("Invalid value. Size: ")
+    
+    font = {'family' : 'serif',
+            'serif': ['Computer Modern'],
+            'weight' : 'normal',
+            'size'   : val}
+
+    plt.rc('text', usetex=True)
+    plt.rc('font', **font)
 
 ### MAIN ######################################################################
 
@@ -237,22 +352,36 @@ inputDir = "./Input"
 if not os.path.exists(inputDir):
     os.makedirs(inputDir)
 
+exportDir = "./Export"
+if not os.path.exists(exportDir):
+    os.makedirs(exportDir)
+
+font = {'family' : 'serif',
+        'serif': ['Computer Modern'],
+        'weight' : 'normal',
+        'size'   : 12.5}
+
+plt.rc('text', usetex=True)
+plt.rc('font', **font)
+
 print("RESULT ANALYSIS")
 
 # Get the files and process them.
 data = getData(inputDir)
 
 while True:
-    print("[MENU] Select an option:")
+    print("\n[MENU] Select an option:")
     print("[1] Wilcoxon signed-rank test")
     print("[2] Bernulli validation")
     print("[3] Generate graphs")
-    print("[4] Change file")
+    print("[4] Plot functions")
+    print("[5] Change font size")
+    print("[6] Change file")
     print("[0] Quit\n")
 
     option = input("Option: ")
 
-    while option != "1" and option != "2" and option != "3" and option != "4" and option != "0":
+    while option != "1" and option != "2" and option != "3" and option != "4" and option != "5" and option != "6" and option != "0":
         option = input("Invalid choice. Option: ")
 
     if option == "1":
@@ -262,7 +391,7 @@ while True:
         print("\n[WILCOXON SIGNED-RANK TEST] Results:")
         print("statistics = " + str(statistic))
         print("p-value (two-tiled) = " + str(pvalue))
-        print("p-value (one-tiled) = " + str(pvalue / 2) + "\n")
+        print("p-value (one-tiled) = " + str(pvalue / 2))
     elif option == "2":
         harder = getArrayFromData(data, 16)
         safeCount = len([1 for x in harder if x == "safe"])
@@ -274,10 +403,14 @@ while True:
         print("#safe = " + str(safeCount))
         print("#uniform = " + str(uniformCount))
         print("#equal = " + str(equalCount))
-        print("p-value = " + str(pvalue) + "\n")
+        print("p-value = " + str(pvalue))
     elif option == "3":
         graphMenu(data)
     elif option == "4":
+        functionMenu()
+    elif option == "5":
+        fontMenu()
+    elif option == "5":
         data = getData(inputDir)
     elif option == "0":
         break
