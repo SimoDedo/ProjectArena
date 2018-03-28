@@ -71,6 +71,11 @@ public class ExperimentControlUIManager : MonoBehaviour {
         StartCoroutine(DowloadAllAttempt());
     }
 
+    public void CreateHeatDataset() {
+        SetButtonsInteractable(false);
+        StartCoroutine(CreateHeatDatasetAttempt());
+    }
+
     private IEnumerator ResetCompletionAttempt() {
         yield return StartCoroutine(ExperimentControlManager.ResetCompletionAttempt());
 
@@ -80,6 +85,13 @@ public class ExperimentControlUIManager : MonoBehaviour {
     private IEnumerator DowloadAllAttempt() {
         yield return StartCoroutine(ExperimentControlManager.DowloadAllAttempt(downloadDirectory,
             mergeLogs));
+
+        SetButtonsInteractable(true);
+    }
+
+    private IEnumerator CreateHeatDatasetAttempt() {
+        yield return StartCoroutine(
+            ExperimentControlManager.CreateHeatDatasetAttempt(downloadDirectory));
 
         SetButtonsInteractable(true);
     }

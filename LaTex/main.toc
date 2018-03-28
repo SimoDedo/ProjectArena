@@ -96,8 +96,8 @@
 \contentsline {section}{\numberline {5.1}Goals}{59}
 \contentsline {section}{\numberline {5.2}Experimental design}{60}
 \contentsline {section}{\numberline {5.3}Results}{63}
-\contentsline {section}{\numberline {5.4}Considerations}{67}
-\contentsline {section}{\numberline {5.5}Summary}{67}
+\contentsline {section}{\numberline {5.4}Considerations}{68}
+\contentsline {section}{\numberline {5.5}Summary}{68}
 \contentsline {chapter}{\numberline {6}Conclusions}{69}
 \contentsline {section}{\numberline {6.1}Known issues and possible criticism}{70}
 \contentsline {section}{\numberline {6.2}Future developments}{70}

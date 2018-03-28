@@ -2,10 +2,13 @@
 using JsonObjects.Logging.Game;
 using JsonObjects.Logging.Statistics;
 using JsonObjects.Logging.Survey;
+using MapManipulation;
 using Polimi.GameCollective.Connectivity;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 /// <summary>
@@ -232,6 +235,74 @@ public static class ExperimentControlManager {
                 }
 
             }
+        } catch {
+        } finally { }
+    }
+
+    // Download all the logs of the current experiment and creates a dataset for each map with the 
+    // set of cordinates of the player.
+    public static IEnumerator CreateHeatDatasetAttempt(string downloadDirectory) {
+        RemoteDataManager.Instance.GetLastEntry();
+
+        while (!RemoteDataManager.Instance.IsResultReady) {
+            yield return new WaitForSeconds(0.25f);
+        }
+
+        try {
+            int downloadCount = JsonUtility.FromJson<JsonCompletionTracker>(
+                 RemoteDataManager.Instance.Result.Split('|')[4]).logsCount;
+
+            RemoteDataManager.Instance.GetLastEntries(downloadCount);
+
+            while (!RemoteDataManager.Instance.IsResultReady) {
+                yield return new WaitForSeconds(0.25f);
+            }
+
+            string[] results = RemoteDataManager.Instance.Result.Split('\n');
+
+            List<List<Coord>> coords = new List<List<Coord>>();
+            Dictionary<string, int> mapIndexDictionary = new Dictionary<string, int>();
+
+            foreach (string result in results) {
+                string[] resultFields = result.Split('|');
+                if (resultFields.Length == 6 && resultFields[2] ==
+                    ConnectionSettings.SERVER_GAME_LABEL) {
+                    JsonGameLog jGameLog =
+                        JsonUtility.FromJson<JsonGameLog>(resultFields[3]);
+
+                    // Remove the placement ID from the map name.
+                    string name = Regex.Replace(jGameLog.mapInfo.name, @"[\d-]", string.Empty);
+                    int index;
+
+                    if (mapIndexDictionary.ContainsKey(name)) {
+                        index = mapIndexDictionary[name];
+                    } else {
+                        index = coords.Count;
+                        mapIndexDictionary.Add(name, index);
+                        coords.Add(new List<Coord>());
+                    }
+
+                    foreach (JsonPosition position in jGameLog.positionLogs) {
+                        if (jGameLog.mapInfo.flip) {
+                            coords[index].Add(new Coord((int)position.y, (int)position.x));
+                        } else {
+                            coords[index].Add(new Coord((int)position.x, (int)position.y));
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < coords.Count; i++) {
+                string data = "";
+
+                foreach (Coord coord in coords[i]) {
+                    data += (coord.tileX + ";" + coord.tileY + "\n");
+                }
+
+                File.WriteAllText(downloadDirectory + "/heatmap_" +
+                    mapIndexDictionary.FirstOrDefault(x => x.Value == i).Key + ".csv", data);
+            }
+        } catch {
         } finally { }
     }
 

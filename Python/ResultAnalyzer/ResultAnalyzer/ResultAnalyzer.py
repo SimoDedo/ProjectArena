@@ -271,6 +271,17 @@ def difficultyHeatmap():
     plt.savefig(exportDir + "/difficulty", dpi = 200, bbox_inches = "tight")
     plt.clf()
 
+def positionHeatmap(dataset):
+    # Extract the data.
+    with open(inputDir + "/" + dataset) as csvfile:
+        reader = csv.reader(csvfile, delimiter = ';', quotechar = '|')
+        positions = list(reader)
+        x = getArrayFromData(positions, 0, 1)
+        y = getArrayFromData(positions, 1, 1)
+        plt.hist2d(x, y, bins = [np.arange(0, 50, 1), np.arange(0, 50, 1)])
+        plt.show()
+        plt.clf()
+
 ### FUNCTIONS #################################################################
 
 def degree(d, min, max, discardDeadEnd = True):
@@ -307,11 +318,12 @@ def graphMenu(data):
         print("[5] Shots")
         print("[6] Accuracy")
         print("[7] Perception")
+        print("[8] Heatmaps")
         print("[0] Back\n")
 
         option = input("Option: ")
     
-        while option != "1" and option != "2" and option != "3" and option != "4" and option != "5" and option != "6" and option != "7"  and option != "0":
+        while option != "1" and option != "2" and option != "3" and option != "4" and option != "5" and option != "6" and option != "7" and option != "8"  and option != "0":
             option = input("Invalid choice. Option: ")
     
         if option == "1":
@@ -340,6 +352,14 @@ def graphMenu(data):
             print("\nGenerating graph...")
             # generateBarDiagramDifficulty(data)
             difficultyHeatmap()
+        elif option == "8":
+            print("\nGenerating graph...")
+            positionHeatmap("heatmap_arena_SS.csv")
+            positionHeatmap("heatmap_arena_SUD.csv")
+            positionHeatmap("heatmap_corridors_SS.csv")
+            positionHeatmap("heatmap_corridors_SUD.csv")
+            positionHeatmap("heatmap_intense_SS.csv")
+            positionHeatmap("heatmap_intense_SUD.csv")
         elif option == "0":
             return
 
