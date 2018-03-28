@@ -1,10 +1,13 @@
 import os
 import csv
 import numpy as np
+import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.lines as lines
+import matplotlib.ticker as ticker
 from scipy.stats import wilcoxon, binom_test
 from matplotlib.font_manager import FontProperties
+import pandas as pd
 
 ### FUNCTIONS ###############################################################
 
@@ -195,6 +198,79 @@ def generateScatterDiagram(data, column1, column2, showTicks, xlabel, ylabel, ti
     # plt.show()
     plt.clf()
 
+# Generate scatter diagram of kills.
+def generateScatterKills():
+    # Extract the data.
+    df = pd.read_csv(inputDir + "/datasb.csv", sep = ";", index_col=0)    
+    g = sns.JointGrid(x="Kills (heuristic)", y="Kills (uniform)", data=df, xlim = [0, 20], ylim = [0, 20])
+    g = g.plot_joint(plt.scatter, color = "m",  alpha=.6)
+    _ = g.ax_marg_x.hist(df["Kills (heuristic)"], color = "b", alpha=.6)
+    _ = g.ax_marg_y.hist(df["Kills (uniform)"], color = "r", alpha=.6, orientation="horizontal")    
+    _ = g.ax_joint.xaxis.set_major_locator(ticker.MultipleLocator(2))
+    _ = g.ax_joint.yaxis.set_major_locator(ticker.MultipleLocator(2))
+    plt.savefig(exportDir + "/scatter_kills", dpi = 200, bbox_inches = "tight")
+    plt.clf()
+
+# Generate scatter diagram of distance.
+def generateScatterDistance():
+    # Extract the data.
+    df = pd.read_csv(inputDir + "/datasb.csv", sep = ";", index_col=0)    
+    g = sns.JointGrid(x="Distance (heuristic)", y="Distance (uniform)", data=df, xlim = [400, 800], ylim = [400, 800])
+    g = g.plot_joint(plt.scatter, color = "m",  alpha=.6)
+    _ = g.ax_marg_x.hist(df["Distance (heuristic)"], color = "b", alpha=.6)
+    _ = g.ax_marg_y.hist(df["Distance (uniform)"], color = "r", alpha=.6, orientation="horizontal")    
+    _ = g.ax_joint.xaxis.set_major_locator(ticker.MultipleLocator(100))
+    _ = g.ax_joint.yaxis.set_major_locator(ticker.MultipleLocator(100))
+    plt.savefig(exportDir + "/scatter_distance", dpi = 200, bbox_inches = "tight")
+    plt.clf()
+
+# Generate scatter diagram of shots.
+def generateScatterShots():
+    # Extract the data.
+    df = pd.read_csv(inputDir + "/datasb.csv", sep = ";", index_col=0)    
+    g = sns.JointGrid(x="Shots (heuristic)", y="Shots (uniform)", data=df, xlim = [0, 300], ylim = [0, 300])
+    g = g.plot_joint(plt.scatter, color = "m",  alpha=.6)
+    _ = g.ax_marg_x.hist(df["Shots (heuristic)"], color = "b", alpha=.6)
+    _ = g.ax_marg_y.hist(df["Shots (uniform)"], color = "r", alpha=.6, orientation="horizontal")    
+    _ = g.ax_joint.xaxis.set_major_locator(ticker.MultipleLocator(50))
+    _ = g.ax_joint.yaxis.set_major_locator(ticker.MultipleLocator(50))
+    plt.savefig(exportDir + "/scatter_shots", dpi = 200, bbox_inches = "tight")
+    plt.clf()
+
+# Generate scatter diagram of accuracy.
+def generateScatterAccuracy():
+    # Extract the data.
+    df = pd.read_csv(inputDir + "/datasb.csv", sep = ";", index_col=0)    
+    g = sns.JointGrid(x="Accuracy (heuristic)", y="Accuracy (uniform)", data=df, xlim = [0, 1], ylim = [0, 1])
+    g = g.plot_joint(plt.scatter, color = "m",  alpha=.6)
+    _ = g.ax_marg_x.hist(df["Accuracy (heuristic)"], color = "b", alpha=.6)
+    _ = g.ax_marg_y.hist(df["Accuracy (uniform)"], color = "r", alpha=.6, orientation="horizontal")    
+    _ = g.ax_joint.xaxis.set_major_locator(ticker.MultipleLocator(0.1))
+    _ = g.ax_joint.yaxis.set_major_locator(ticker.MultipleLocator(0.1))
+    plt.savefig(exportDir + "/scatter_accuracy", dpi = 200, bbox_inches = "tight")
+    plt.clf()
+
+# Generate heatmap diagram of difficulty.
+def generateScatterAccuracy():
+    # Extract the data.
+    df = pd.read_csv(inputDir + "/datasb.csv", sep = ";", index_col=0)    
+    g = sns.JointGrid(x="Accuracy (heuristic)", y="Accuracy (uniform)", data=df, xlim = [0, 1], ylim = [0, 1])
+    g = g.plot_joint(plt.scatter, color = "m",  alpha=.6)
+    _ = g.ax_marg_x.hist(df["Accuracy (heuristic)"], color = "b", alpha=.6)
+    _ = g.ax_marg_y.hist(df["Accuracy (uniform)"], color = "r", alpha=.6, orientation="horizontal")    
+    _ = g.ax_joint.xaxis.set_major_locator(ticker.MultipleLocator(0.2))
+    _ = g.ax_joint.yaxis.set_major_locator(ticker.MultipleLocator(0.2))
+    plt.savefig(exportDir + "/scatter_accuracy", dpi = 200, bbox_inches = "tight")
+    plt.clf()
+
+def difficultyHeatmap():
+    # Extract the data.
+    df = pd.DataFrame({'Effective': ['heuristic', 'heuristic', 'heuristic', 'equal', 'equal', 'equal', 'uniform', 'uniform', 'uniform'], 'Perceived': ['heuristic', 'equal', 'uniform', 'heuristic', 'equal', 'uniform', 'heuristic', 'equal', 'uniform'], 'value': [10, 4, 3, 2, 1, 1, 1, 3, 2]})  
+    result = df.pivot(index='Effective', columns='Perceived', values='value')
+    sns.heatmap(result, annot = True, square = True, cmap = "viridis")
+    plt.savefig(exportDir + "/difficulty", dpi = 200, bbox_inches = "tight")
+    plt.clf()
+
 ### FUNCTIONS #################################################################
 
 def degree(d, min, max, discardDeadEnd = True):
@@ -228,12 +304,14 @@ def graphMenu(data):
         print("[2] Uniform bar diagram")
         print("[3] Kills")
         print("[4] Distance")
-        print("[5] Perception")
+        print("[5] Shots")
+        print("[6] Accuracy")
+        print("[7] Perception")
         print("[0] Back\n")
 
         option = input("Option: ")
     
-        while option != "1" and option != "2" and option != "3" and option != "4" and option != "5"  and option != "0":
+        while option != "1" and option != "2" and option != "3" and option != "4" and option != "5" and option != "6" and option != "7"  and option != "0":
             option = input("Invalid choice. Option: ")
     
         if option == "1":
@@ -244,15 +322,24 @@ def graphMenu(data):
             generateBarDiagramKills(data, False)
         elif option == "3":
             print("\nGenerating graph...")  
-            generateScatterDiagram(data, 6, 13, True, 'Kills (heuristic)', 
-                                   'Kills (uniform)', 'scatter_kills')
+            # generateScatterDiagram(data, 6, 13, True, 'Kills (heuristic)', 
+            #                        'Kills (uniform)', 'scatter_kills')
+            generateScatterKills()
         elif option == "4":
             print("\nGenerating graph...")
-            generateScatterDiagram(data, 8, 15, False, 'AvgKillDistance (heuristic)', 
-                                   'AvgKillDistance (uniform)', 'scatter_avg')
+            # generateScatterDiagram(data, 8, 15, False, 'AvgKillDistance (heuristic)', 
+            #                        'AvgKillDistance (uniform)', 'scatter_avg')
+            generateScatterDistance()
         elif option == "5":
             print("\nGenerating graph...")
-            generateBarDiagramDifficulty(data)
+            generateScatterShots()
+        elif option == "6":
+            print("\nGenerating graph...")
+            generateScatterAccuracy()
+        elif option == "7":
+            print("\nGenerating graph...")
+            # generateBarDiagramDifficulty(data)
+            difficultyHeatmap()
         elif option == "0":
             return
 
@@ -339,7 +426,7 @@ def fontMenu():
     
     font = {'family' : 'serif',
             'serif': ['Computer Modern'],
-            'weight' : 'normal',
+            'weight' : 'bold',
             'size'   : val}
 
     plt.rc('text', usetex=True)
@@ -358,7 +445,7 @@ if not os.path.exists(exportDir):
 
 font = {'family' : 'serif',
         'serif': ['Computer Modern'],
-        'weight' : 'normal',
+        'weight' : 'bold',
         'size'   : 12.5}
 
 plt.rc('text', usetex=True)

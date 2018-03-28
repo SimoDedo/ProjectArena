@@ -120,22 +120,6 @@ As we have said, the heuristic and the uniform approaches select rooms with two 
 
 \section{Results}
 
-\begin{figure}
-\centering
-\begin{subfigure}[t]{0.8\linewidth}
-\includegraphics[width=\linewidth]{bar_lowrisk}
-\caption{Heuristic placement.}
-\label{img:bar_lowrisk}
-\end{subfigure} 
-\begin{subfigure}[t]{0.8\linewidth}
-\includegraphics[width=\linewidth]{bar_uniform}
-\caption{Uniform placement.}
-\label{img:bar_uniform}
-\end{subfigure}
-\caption[Distribution of the matches by number of kills for the two methods.]{Distribution of the matches by number of kills for the two methods. Colors encode the map where data were collected.}
-\label{img:match_distribution} 
-\end{figure}
-
 \begin{table}
 \setlength\extrarowheight{2pt}
 \begin{tabularx}{\textwidth}{|l|C|C|C|C|C|}
@@ -191,20 +175,32 @@ As we have seen, the performance of the player is measured by \<AvgKillTime> and
 
 To test the statistical significance of this result, we performed the \<Wilcoxon> statistical test\footnote{The \<Wilcoxon signed-rank test> is a \<non-parametric statistical hypothesis test> used to compare two matched samples to assess whether their population mean ranks differ.} by \<Pratt>\footnote{With respect to the standard Wilcoxon test, the one by Pratt considers also the observations for which the difference of the elements in the pair is zero. Since we have 4 cases where the number of kills is the same, we opted for this approach.}, using as matched samples the number of kills in maps with heuristic placement and in maps with uniform placement. The test was passed with $\alpha = 0.00347 < 0.005$, one-tiled.
 
-\begin{figure}[h]
+\begin{figure}
 \centering
-\begin{subfigure}[t]{0.48\linewidth}
+\begin{subfigure}[t]{0.49\linewidth}
 \includegraphics[width=\linewidth]{scatter_kills}
 \caption{Kills.}
 \label{img:scatter_kills}
 \end{subfigure}
 \hfill
-\begin{subfigure}[t]{0.48\linewidth}
-\includegraphics[width=\linewidth]{scatter_avg}
-\caption{AvgKillDistance.}
-\label{img:scatter_avg}
+\begin{subfigure}[t]{0.49\linewidth}
+\includegraphics[width=\linewidth]{scatter_distance}
+\caption{Distance.}
+\label{img:scatter_distance}
 \end{subfigure}
-\caption[Experiment outcomes by metrics.]{Experiment outcomes by metrics. The outcome associated to the heuristic approach is on the horizontal axis, the one associated to the uniform approach is on the vertical axis. The red point is the mean value.}
+
+\begin{subfigure}[t]{0.49\linewidth}
+\includegraphics[width=\linewidth]{scatter_shots}
+\caption{Kills.}
+\label{img:scatter_shots}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.49\linewidth}
+\includegraphics[width=\linewidth]{scatter_accuracy}
+\caption{Distance.}
+\label{img:scatter_accuracy}
+\end{subfigure}
+\caption[Experiment outcomes by metrics.]{Experiment outcomes by metrics. The outcome associated to the heuristic approach is on the horizontal axis, the one associated to the uniform approach is on the vertical axis.}
 \label{img:metrics} 
 \end{figure}
 
@@ -216,7 +212,7 @@ We also observed that the effects of the placement were considerably different d
 
 \begin{figure}
 \centering
-\includegraphics[width=0.8\linewidth]{percived}
+\includegraphics[width=0.8\linewidth]{difficulty}
 \caption{Comparison between the effective and the perceived difficulty.}
 \label{img:percived} 
 \end{figure}

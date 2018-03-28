@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  27 MAR 2018 17:40
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  28 MAR 2018 11:24
 entering extended mode
 **./main.tex
 (main.tex
@@ -2146,27 +2146,27 @@ d se-lects tiles con-sid-er-ing three
  []
 
 [52] [53]
-<images/degree.png, id=325, 1099.10625pt x 740.7675pt>
+<images/degree.png, id=325, 443.0151pt x 343.64384pt>
 File: images/degree.png Graphic file (type png)
 <use images/degree.png>
 Package pdftex.def Info: images/degree.png  used on input line 288.
-(pdftex.def)             Requested size: 188.17429pt x 126.82175pt.
-<images/visibility_low.png, id=326, 1099.10625pt x 740.7675pt>
+(pdftex.def)             Requested size: 188.17429pt x 145.96542pt.
+<images/visibility_low.png, id=326, 443.0151pt x 343.64384pt>
 File: images/visibility_low.png Graphic file (type png)
 <use images/visibility_low.png>
 Package pdftex.def Info: images/visibility_low.png  used on input line 294.
-(pdftex.def)             Requested size: 188.17429pt x 126.82175pt.
+(pdftex.def)             Requested size: 188.17429pt x 145.96542pt.
  [54 <./images/degree.png> <./images/visibility_low.png>]
-<images/interval.png, id=332, 1099.10625pt x 733.23938pt>
+<images/interval.png, id=332, 443.0151pt x 340.75305pt>
 File: images/interval.png Graphic file (type png)
 <use images/interval.png>
 Package pdftex.def Info: images/interval.png  used on input line 368.
-(pdftex.def)             Requested size: 188.17429pt x 125.53291pt.
-<images/visibility_medium.png, id=333, 1099.10625pt x 733.23938pt>
+(pdftex.def)             Requested size: 188.17429pt x 144.73753pt.
+<images/visibility_medium.png, id=333, 443.0151pt x 343.64384pt>
 File: images/visibility_medium.png Graphic file (type png)
 <use images/visibility_medium.png>
 Package pdftex.def Info: images/visibility_medium.png  used on input line 374.
-(pdftex.def)             Requested size: 188.17429pt x 125.53291pt.
+(pdftex.def)             Requested size: 188.17429pt x 145.96542pt.
  [55]
 
 LaTeX Warning: Reference `visibility_medium' on page 56 undefined on input line
@@ -2274,47 +2274,60 @@ File: images/intense_uniform.png Graphic file (type png)
 <use images/intense_uniform.png>
 Package pdftex.def Info: images/intense_uniform.png  used on input line 109.
 (pdftex.def)             Requested size: 117.00119pt x 117.00119pt.
-<images/bar_lowrisk.png, id=364, 910.90312pt x 685.05937pt>
-File: images/bar_lowrisk.png Graphic file (type png)
-<use images/bar_lowrisk.png>
-Package pdftex.def Info: images/bar_lowrisk.png  used on input line 126.
-(pdftex.def)             Requested size: 312.00119pt x 234.64188pt.
-<images/bar_uniform.png, id=365, 910.90312pt x 685.05937pt>
-File: images/bar_uniform.png Graphic file (type png)
-<use images/bar_uniform.png>
-Package pdftex.def Info: images/bar_uniform.png  used on input line 131.
-(pdftex.def)             Requested size: 312.00119pt x 234.64188pt.
+
+Overfull \hbox (1.99104pt too wide) in paragraph at lines 163--163
+ []|\OT1/cmr/m/n/12 Corridors| 
+ []
+
 [61] [62 <./images/arena_visibility.png> <./images/arena_safe.png> <./images/ar
 ena_uniform.png> <./images/corridors_visibility.png> <./images/corridors_safe.p
 ng> <./images/corridors_uniform.png> <./images/intense_visibility.png> <./image
 s/intense_safe.png> <./images/intense_uniform.png>]
-Overfull \hbox (1.99104pt too wide) in paragraph at lines 179--179
- []|\OT1/cmr/m/n/12 Corridors| 
- []
 
-[63] [64 <./images/bar_lowrisk.png> <./images/bar_uniform.png>]
-Overfull \hbox (2.76492pt too wide) in paragraph at lines 192--193
+LaTeX Warning: Reference `img:match_distribution' on page 63 undefined on input
+ line 168.
+
+[63]
+Overfull \hbox (2.76492pt too wide) in paragraph at lines 176--177
 []\OT1/cmr/m/n/12 To test the sta-tis-ti-cal sig-nif-i-cance of this re-sult, w
 e per-formed the \OT1/cmr/m/it/12 Wilcoxon
  []
 
-<images/scatter_kills.png, id=390, 903.375pt x 721.19438pt>
+<images/scatter_kills.png, id=383, 395.67825pt x 395.67825pt>
 File: images/scatter_kills.png Graphic file (type png)
 <use images/scatter_kills.png>
-Package pdftex.def Info: images/scatter_kills.png  used on input line 197.
-(pdftex.def)             Requested size: 187.19833pt x 149.44145pt.
-<images/scatter_avg.png, id=391, 903.375pt x 737.75626pt>
-File: images/scatter_avg.png Graphic file (type png)
-<use images/scatter_avg.png>
-Package pdftex.def Info: images/scatter_avg.png  used on input line 203.
-(pdftex.def)             Requested size: 187.19833pt x 152.8733pt.
-[65 <./images/scatter_kills.png> <./images/scatter_avg.png>]
-<images/percived.png, id=397, 941.01563pt x 794.97pt>
-File: images/percived.png Graphic file (type png)
-<use images/percived.png>
-Package pdftex.def Info: images/percived.png  used on input line 219.
-(pdftex.def)             Requested size: 312.00119pt x 263.5782pt.
- [66]) [67 <./images/percived.png>]
+Package pdftex.def Info: images/scatter_kills.png  used on input line 181.
+(pdftex.def)             Requested size: 191.10214pt x 191.10072pt.
+<images/scatter_distance.png, id=384, 395.67825pt x 395.67825pt>
+File: images/scatter_distance.png Graphic file (type png)
+<use images/scatter_distance.png>
+Package pdftex.def Info: images/scatter_distance.png  used on input line 187.
+(pdftex.def)             Requested size: 191.10214pt x 191.10072pt.
+<images/scatter_shots.png, id=385, 395.67825pt x 395.67825pt>
+File: images/scatter_shots.png Graphic file (type png)
+<use images/scatter_shots.png>
+Package pdftex.def Info: images/scatter_shots.png  used on input line 193.
+(pdftex.def)             Requested size: 191.10214pt x 191.10072pt.
+<images/scatter_accuracy.png, id=386, 395.67825pt x 395.67825pt>
+File: images/scatter_accuracy.png Graphic file (type png)
+<use images/scatter_accuracy.png>
+Package pdftex.def Info: images/scatter_accuracy.png  used on input line 199.
+(pdftex.def)             Requested size: 191.10214pt x 191.10072pt.
+
+LaTeX Warning: Reference `img:scatter_avg' on page 64 undefined on input line 2
+07.
+
+[64] [65 <./images/scatter_kills.png> <./images/scatter_distance.png> <./images
+/scatter_shots.png> <./images/scatter_accuracy.png>]
+<images/difficulty.png, id=397, 777.65532pt x 663.98062pt>
+File: images/difficulty.png Graphic file (type png)
+<use images/difficulty.png>
+Package pdftex.def Info: images/difficulty.png  used on input line 215.
+(pdftex.def)             Requested size: 312.00119pt x 266.39806pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [66 <./images/difficulty.png>]) [67]
 \openout2 = `chapters/chapter6.aux'.
 
  (chapters/chapter6.tex [68
@@ -2347,10 +2360,10 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 36776 strings out of 493303
- 888725 string characters out of 3138856
- 1003949 words of memory out of 3000000
- 39684 multiletter control sequences out of 15000+200000
+ 36777 strings out of 493303
+ 888836 string characters out of 3138856
+ 1010938 words of memory out of 3000000
+ 39685 multiletter control sequences out of 15000+200000
  546242 words of font info for 83 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  69i,20n,98p,10380b,640s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -2372,7 +2385,7 @@ ic/amsfonts/cm/cmsy6.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfon
 ts/cm/cmsy8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmt
 i10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti12.pfb>
 <C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on main.pdf (88 pages, 2569786 bytes).
+Output written on main.pdf (88 pages, 2538569 bytes).
 PDF statistics:
  486 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
