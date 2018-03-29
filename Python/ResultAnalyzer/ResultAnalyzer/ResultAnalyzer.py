@@ -5,7 +5,9 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.lines as lines
 import matplotlib.ticker as ticker
+import matplotlib.cm as cm
 from scipy.stats import wilcoxon, binom_test
+from scipy.ndimage.filters import gaussian_filter
 from matplotlib.font_manager import FontProperties
 import pandas as pd
 
@@ -278,8 +280,11 @@ def positionHeatmap(dataset):
         positions = list(reader)
         x = getArrayFromData(positions, 0, 1)
         y = getArrayFromData(positions, 1, 1)
-        plt.hist2d(x, y, bins = [np.arange(0, 50, 1), np.arange(0, 50, 1)])
-        plt.show()
+        heatmap, xedges, yedges = np.histogram2d(x, y, bins = 70)
+        heatmap = gaussian_filter(heatmap, sigma = 2)
+        plt.imshow(heatmap.T, origin = 'lower', cmap = cm.jet)
+        plt.axis('off')
+        plt.savefig(exportDir + "/" + dataset.replace('.csv', '') + ".png", bbox_inches='tight')
         plt.clf()
 
 ### FUNCTIONS #################################################################
@@ -323,7 +328,7 @@ def graphMenu(data):
 
         option = input("Option: ")
     
-        while option != "1" and option != "2" and option != "3" and option != "4" and option != "5" and option != "6" and option != "7" and option != "8"  and option != "0":
+        while option != "1" and option != "2" and option != "3" and option != "4" and option != "5" and option != "6" and option != "7" and option != "0":
             option = input("Invalid choice. Option: ")
     
         if option == "1":
@@ -352,14 +357,6 @@ def graphMenu(data):
             print("\nGenerating graph...")
             # generateBarDiagramDifficulty(data)
             difficultyHeatmap()
-        elif option == "8":
-            print("\nGenerating graph...")
-            positionHeatmap("heatmap_arena_SS.csv")
-            positionHeatmap("heatmap_arena_SUD.csv")
-            positionHeatmap("heatmap_corridors_SS.csv")
-            positionHeatmap("heatmap_corridors_SUD.csv")
-            positionHeatmap("heatmap_intense_SS.csv")
-            positionHeatmap("heatmap_intense_SUD.csv")
         elif option == "0":
             return
 
@@ -452,6 +449,40 @@ def fontMenu():
     plt.rc('text', usetex=True)
     plt.rc('font', **font)
 
+# Menages the heatmap menu.
+def heatmapMenu():
+    index = 0
+
+    while True:
+        print("\n[HEATMAPS] Select a heatmap to generate:")
+        print("[1] Arena (heuristic)")
+        print("[2] Arena (uniform)")
+        print("[3] Corridors (heuristic)")
+        print("[4] Corridors (uniform)")
+        print("[5] Intense (heuristic)")
+        print("[6] Intense (uniform)")
+        print("[0] Back\n")
+
+        option = input("Option: ")
+    
+        while option != "1" and option != "2" and option != "3" and option != "4" and option != "5" and option != "6"  and option != "0":
+            option = input("Invalid choice. Option: ")
+    
+        if option == "1":
+            positionHeatmap("heatmap_arena_SS.csv")
+        elif option == "2":
+            positionHeatmap("heatmap_arena_SUD.csv") 
+        elif option == "3":
+            positionHeatmap("heatmap_corridors_SS.csv")
+        elif option == "4":
+            positionHeatmap("heatmap_corridors_SUD.csv")
+        elif option == "5":
+            positionHeatmap("heatmap_intense_SS.csv")
+        elif option == "6":
+            positionHeatmap("heatmap_intense_SUD.csv")   
+        elif option == "0":
+            return
+
 ### MAIN ######################################################################
 
 # Create the input folder if needed.
@@ -482,15 +513,15 @@ while True:
     print("[2] Bernulli validation")
     print("[3] Generate graphs")
     print("[4] Plot functions")
-    print("[5] Change font size")
-    print("[6] Change file")
+    print("[5] Generate position heatmaps")
+    print("[6] Change font size")
+    print("[7] Change file")
     print("[0] Quit\n")
 
     option = input("Option: ")
 
-    while option != "1" and option != "2" and option != "3" and option != "4" and option != "5" and option != "6" and option != "0":
+    while option != "1" and option != "2" and option != "3" and option != "4" and option != "5" and option != "6" and option != "7" and option != "0":
         option = input("Invalid choice. Option: ")
-
     if option == "1":
         killsSafe = getArrayFromData(data, 6, 1)
         killsUniform = getArrayFromData(data, 13, 1)
@@ -516,8 +547,10 @@ while True:
     elif option == "4":
         functionMenu()
     elif option == "5":
+        heatmapMenu()
+    elif option == "6":
         fontMenu()
-    elif option == "5":
+    elif option == "7":
         data = getData(inputDir)
     elif option == "0":
         break

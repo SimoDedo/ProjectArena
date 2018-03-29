@@ -85,7 +85,6 @@ public class ExperimentControlUIManager : MonoBehaviour {
     private IEnumerator DowloadAllAttempt() {
         yield return StartCoroutine(ExperimentControlManager.DowloadAllAttempt(downloadDirectory,
             mergeLogs));
-
         SetButtonsInteractable(true);
     }
 

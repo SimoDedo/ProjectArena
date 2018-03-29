@@ -25,7 +25,7 @@ public static class ExperimentControlManager {
         }
     }
 
-    // Download all the logs of the current experiment and eventually merge them and reconstruct the
+    // Downloads all the logs of the current experiment and eventually merge them and reconstruct the
     // statistics log.
     public static IEnumerator DowloadAllAttempt(string downloadDirectory, bool mergeLogs) {
         RemoteDataManager.Instance.GetLastEntry();
@@ -239,7 +239,7 @@ public static class ExperimentControlManager {
         } finally { }
     }
 
-    // Download all the logs of the current experiment and creates a dataset for each map with the 
+    // Downloads all the logs of the current experiment and creates a dataset for each map with the 
     // set of cordinates of the player.
     public static IEnumerator CreateHeatDatasetAttempt(string downloadDirectory) {
         RemoteDataManager.Instance.GetLastEntry();
@@ -276,15 +276,19 @@ public static class ExperimentControlManager {
 
                     if (mapIndexDictionary.ContainsKey(name)) {
                         index = mapIndexDictionary[name];
+                        // Debug.Log("Retrieved index " + index + " for map " + name + ".");
                     } else {
                         index = coords.Count;
                         mapIndexDictionary.Add(name, index);
+                        // Debug.Log("Added " + name + " with index " + index + " to the dictionary");
                         coords.Add(new List<Coord>());
                     }
 
                     foreach (JsonPosition position in jGameLog.positionLogs) {
                         if (jGameLog.mapInfo.flip) {
-                            coords[index].Add(new Coord((int)position.y, (int)position.x));
+                            coords[index].Add(new Coord(
+                                (int)jGameLog.mapInfo.height - (int)position.y - 1,
+                                (int)jGameLog.mapInfo.width - (int)position.x - 1));
                         } else {
                             coords[index].Add(new Coord((int)position.x, (int)position.y));
                         }
@@ -301,6 +305,34 @@ public static class ExperimentControlManager {
 
                 File.WriteAllText(downloadDirectory + "/heatmap_" +
                     mapIndexDictionary.FirstOrDefault(x => x.Value == i).Key + ".csv", data);
+            }
+        } catch {
+        } finally { }
+    }
+
+    // Gets the starting index of a log given its identifier.
+    public static IEnumerator GetLogIndexAttempt(string id, int range) {
+        try {
+            RemoteDataManager.Instance.GetLastEntries(range);
+
+            while (!RemoteDataManager.Instance.IsResultReady) {
+                yield return new WaitForSeconds(0.25f);
+            }
+
+            string[] results = RemoteDataManager.Instance.Result.Split('\n');
+
+            for (int i = results.Length - 1; i >= 0; i--) {
+                string[] resultFields = results[i].Split('|');
+                if (resultFields.Length == 6 && resultFields[2] ==
+                    ConnectionSettings.SERVER_GAME_LABEL) {
+                    JsonGameLog jGameLog =
+                        JsonUtility.FromJson<JsonGameLog>(resultFields[3]);
+
+                    if (jGameLog.testID == id) {
+                        Debug.Log("The index of '" + id + "' is " + i + ".");
+                        break;
+                    }
+                }
             }
         } catch {
         } finally { }
