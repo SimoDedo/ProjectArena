@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  28 MAR 2018 17:37
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  29 MAR 2018 19:22
 entering extended mode
 **./main.tex
 (main.tex
@@ -2385,29 +2385,76 @@ Package pdftex.def Info: images/scatter_accuracy.png  used on input line 199.
 (pdftex.def)             Requested size: 191.10214pt x 191.10072pt.
 [64] [65 <./images/scatter_kills.png> <./images/scatter_distance.png> <./images
 /scatter_shots.png> <./images/scatter_accuracy.png>]
-<images/difficulty.png, id=397, 777.65532pt x 663.98062pt>
+<images/heat_arena_safe.png, id=397, 432.86719pt x 432.86719pt>
+File: images/heat_arena_safe.png Graphic file (type png)
+<use images/heat_arena_safe.png>
+Package pdftex.def Info: images/heat_arena_safe.png  used on input line 222.
+(pdftex.def)             Requested size: 150.14786pt x 150.14514pt.
+<images/heat_arena_uniform.png, id=398, 432.86719pt x 432.86719pt>
+File: images/heat_arena_uniform.png Graphic file (type png)
+<use images/heat_arena_uniform.png>
+Package pdftex.def Info: images/heat_arena_uniform.png  used on input line 228.
+
+(pdftex.def)             Requested size: 150.14786pt x 150.14514pt.
+<images/heat_corridors_safe.png, id=399, 432.86719pt x 432.86719pt>
+File: images/heat_corridors_safe.png Graphic file (type png)
+<use images/heat_corridors_safe.png>
+Package pdftex.def Info: images/heat_corridors_safe.png  used on input line 236
+.
+(pdftex.def)             Requested size: 150.14786pt x 150.14514pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 237--237
+[]\OT1/cmr/m/n/10.95 (c) |Map ``Cor-ri-dors'' with
+ []
+
+<images/heat_corridors_uniform.png, id=400, 432.86719pt x 432.86719pt>
+File: images/heat_corridors_uniform.png Graphic file (type png)
+<use images/heat_corridors_uniform.png>
+Package pdftex.def Info: images/heat_corridors_uniform.png  used on input line 
+242.
+(pdftex.def)             Requested size: 150.14786pt x 150.14514pt.
+<images/heat_intense_heuristic.png, id=401, 432.86719pt x 432.86719pt>
+File: images/heat_intense_heuristic.png Graphic file (type png)
+<use images/heat_intense_heuristic.png>
+Package pdftex.def Info: images/heat_intense_heuristic.png  used on input line 
+250.
+(pdftex.def)             Requested size: 150.14786pt x 150.14514pt.
+<images/heat_intense_uniform.png, id=402, 432.86719pt x 432.86719pt>
+File: images/heat_intense_uniform.png Graphic file (type png)
+<use images/heat_intense_uniform.png>
+Package pdftex.def Info: images/heat_intense_uniform.png  used on input line 25
+6.
+(pdftex.def)             Requested size: 150.14786pt x 150.14514pt.
+
+Underfull \vbox (badness 5533) has occurred while \output is active []
+
+ [66]
+[67 <./images/heat_arena_safe.png> <./images/heat_arena_uniform.png> <./images/
+heat_corridors_safe.png> <./images/heat_corridors_uniform.png> <./images/heat_i
+ntense_heuristic.png> <./images/heat_intense_uniform.png>]
+<images/difficulty.png, id=415, 777.65532pt x 663.98062pt>
 File: images/difficulty.png Graphic file (type png)
 <use images/difficulty.png>
-Package pdftex.def Info: images/difficulty.png  used on input line 220.
+Package pdftex.def Info: images/difficulty.png  used on input line 269.
 (pdftex.def)             Requested size: 312.00119pt x 266.39806pt.
- [66] [67 <./images/difficulty.png>]) [68]
+ [68 <./images/difficulty.png>]) [69]
 \openout2 = `chapters/chapter6.aux'.
 
- (chapters/chapter6.tex
+ (chapters/chapter6.tex [70
+
+
+
+]
 Chapter 6.
 
-LaTeX Warning: Citation `Cardamone:2011:EIM:2008402.2008411' on page 69 undefin
+LaTeX Warning: Citation `Cardamone:2011:EIM:2008402.2008411' on page 71 undefin
 ed on input line 9.
 
 
-LaTeX Warning: Citation `MultiLevelEvolution' on page 69 undefined on input lin
+LaTeX Warning: Citation `MultiLevelEvolution' on page 71 undefined on input lin
 e 9.
 
-[69
-
-
-
-] [70]) [71] [72
+[71] [72]) [73] [74
 
 
 ]
@@ -2423,10 +2470,10 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 36777 strings out of 493303
- 888804 string characters out of 3138856
- 1011951 words of memory out of 3000000
- 39685 multiletter control sequences out of 15000+200000
+ 36820 strings out of 493303
+ 890124 string characters out of 3138856
+ 1012088 words of memory out of 3000000
+ 39722 multiletter control sequences out of 15000+200000
  546242 words of font info for 83 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  69i,20n,98p,10380b,640s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -2448,9 +2495,9 @@ ic/amsfonts/cm/cmsy6.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfon
 ts/cm/cmsy8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmt
 i10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti12.pfb>
 <C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on main.pdf (88 pages, 2541433 bytes).
+Output written on main.pdf (90 pages, 4496414 bytes).
 PDF statistics:
- 486 PDF objects out of 1000 (max. 8388607)
+ 504 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 308 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 338 words of extra memory for PDF output out of 10000 (max. 10000000)
 

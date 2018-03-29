@@ -33,7 +33,7 @@ For each match, a complete game log was saved, along with the following performa
 \item \<Hits>: the number of projectiles that hit a target.
 \item \<Accuracy>: the percentage of projectiles that hit a target.
 \item \<Kills>: the total number of targets destroyed by the user.
-\item \<Distance>: the total distance covered by the user during the match, considering his complete trajectory and cells of unitary width.
+\item \<Distance>: the total distance covered by the user during the match, considering his complete trajectory and cells of unitary width as reference unit.
 \item \<AvgKillTime>: the duration of the match divided by the number of kills.
 \item \<AvgKillDistance>: the total distance divided by the number of kills.
 \end{itemize}
@@ -210,19 +210,72 @@ The effect of the two approaches on the metrics can also be analyzed by plotting
 \item \<Kills>: as figure \ref{img:scatter_kills} shows, the number of kills tends to be higher with the uniform placement ($11.88 > 10.06$, considering the mean values). This result is rather obvious, since, as we have seen analyzing \<AvgKillTime> and \<AvgKillDistance>, targets are more difficult to find with the heuristic placement.
 \item \<Distance>: as figure \ref{img:scatter_distance} shows, the total distance covered by users is not influenced by the used placement method ($680.79\approx675.22$, considering the mean values). This is due to the fact that for finding targets users are constantly moving and the agility with which they navigate the map depends exclusively on their familiarity with FPS games and on the layout of the map.
 \item \<Shots>: as figure \ref{img:scatter_shots} shows, the number of shots tends to be higher with the heuristic placement ($129.78 >  121.63$, considering the mean values). This result is the opposite of what we expected, since it would be reasonable to think that the number of shots is directly proportional to the number of destroyed targets.
-\item \<Accuracy>: as figure \ref{img:scatter_accuracy} shows, the accuracy tends to be higher with the uniform positioning ($46\% > 42\%$, considering the mean values). This result is due to the fact that the heuristic approach selects rooms that are more repaired and targets inside these rooms are then more difficult to hit. Moreover, this explains the strange behavior of \<Shots>: with the uniform placement the number of shots is lower because the accuracy is higher.
+\item \<Accuracy>: as figure \ref{img:scatter_accuracy} shows, the accuracy tends to be higher with the uniform positioning ($46\% > 42\%$, considering the mean values). This result is due to the fact that the heuristic approach selects rooms that are more repaired and targets inside these rooms are, therefore, more difficult to hit. Moreover, this explains the strange behavior of \<Shots>: with the uniform placement the number of shots is lower because the accuracy is higher.
 \end{itemize}
 
 We also observed that the effects of the placement were considerably different depending on the layout of the map. With the heuristic placement, map ``Arena'' had a mean number of kills of $10.75$, map ``Corridors'' of $10.44$ and map ``Intense'' of $8.75$. We expected the one of ``Arena'' to be the highest, because of its central area that dominates the rest of the map, but we did not expect the ones of ``Corridors'' to be almost as high, since its structure is more difficult to navigate. Moreover, we expected an intermediate number of kills in ``Intense'', since it merges the features of the two other maps, but it proved to be the map where targets were harder to find. This could be explained by the fact that ``Corridors'', even if more complex than ``Arena'', has a rather regular structure and its long corridors allow to easily spot a target. Instead, for what concerns ``Intense'', its structure is rather complex and difficult to navigate and since the central open area does not allow to control all of the map the tactical advantage it provides is not so strong. With the uniform placement the mean number of kills of ``Arena'' increased to $11.88$, the one of ``Corridors'' remained almost the same ($10.67$) and the one of ``Intense'' increased dramatically to $12.75$. The reasons for such different reactions lies in the layout of each map. The central area of ``Arena'' allows to control all of the surroundings, so the placement of spawn points in areas that are less visible has a relevant effect. ``Corridors'', instead, has a regular structure and the number of intersections between its corridors is almost always the same, so it is not relevant where spawn points are placed, since all the rooms have the same features. Finally, the tangled structure of ``Intense'' offers to the heuristic approach a lot of interesting spots where to place spawn points and the presence of an area that allows a partial control of the map makes this choice even more meaningful. This shows that the effects of the heuristic approach are more pronounced in maps which layout is not uniform.
 
 \begin{figure}
+	\centering
+	\hfill
+  	\begin{subfigure}[t]{0.385\linewidth}
+		\includegraphics[width=\linewidth]{heat_arena_safe}
+     		\caption{Map ``Arena'' with heuristic placement.}
+     		\label{img:heat_arena_safe}
+ 	\end{subfigure}
+ 	\hfill
+  	\begin{subfigure}[t]{0.385\linewidth}
+    		\includegraphics[width=\linewidth]{heat_arena_uniform}
+     		\caption{Map ``Arena'' with uniform placement.}
+     		\label{img:heat_arena_uniform}
+  	\end{subfigure}
+  	\hfill
+  	
+  	\hfill
+  	\begin{subfigure}[t]{0.385\linewidth}
+		\includegraphics[width=\linewidth]{heat_corridors_safe}
+     		\caption{Map ``Corridors'' with heuristic placement.}
+     		\label{img:heat_corridors_safe}
+ 	\end{subfigure}
+ 	\hfill
+  	\begin{subfigure}[t]{0.385\linewidth}
+    		\includegraphics[width=\linewidth]{heat_corridors_uniform}
+     		\caption{Map ``Corridors'' with uniform placement.}
+     		\label{img:heat_corridors_uniform}
+  	\end{subfigure}
+ 	\hfill
+ 	
+ 	\hfill
+  	\begin{subfigure}[t]{0.385\linewidth}
+		\includegraphics[width=\linewidth]{heat_intense_heuristic}
+     		\caption{Map ``Intense'' with heuristic placement.}
+     		\label{img:heat_intense_heuristic}
+ 	\end{subfigure}
+ 	\hfill
+  	\begin{subfigure}[t]{0.385\linewidth}
+    		\includegraphics[width=\linewidth]{heat_intense_uniform}
+     		\caption{Map ``Intense'' with uniform placement.}
+     		\label{img:heat_intense_uniform}
+  	\end{subfigure}	
+  	\hfill
+	\caption[Heat maps of the player position for the three maps used in the experiment.]{Heat maps of the player positions for the three maps used in the experiment. The red circles represent spawn points.}
+	\label{img:heat}
+\end{figure}
+
+The position of spawn points also influenced the way in which users moved across the maps. Figure \ref{img:heat} shows, for each map and for each placement method, the heat maps of the sections that where crossed more frequently by the users. It is possible to notice that users, once understood the topology of the map, started to follow well defined \<farming routes>\footnote{In video games, \<farming routes> are regular circular paths defined to maximize the collection of certain resources in a specific map.}. These routes tend to be circular and to skirt the perimeter of the maps, with deviations that are influenced by the position of spawn points. The overall circularity is remarked by the heat maps associated to the uniform positioning, that being obtained by a set of five different uniform placements\footnote{The uniform \<study> has five \<cases>, whereas the heuristic \<study> has just one.}, represent an average route with respect to the possible position of spawn points.
+
+\begin{figure}
 \centering
 \includegraphics[width=0.8\linewidth]{difficulty}
-\caption[Comparison between the effective and the perceived difficulty.]{Comparison between the effective and the perceived difficulty. Each square contains the number of samples where the user performed worst in the match with placement \<Effective> and evaluated as more difficult the match with placement \<Percived>. The match where a user performed worst is the one with the highest \<AvgKillDistance>.}
+\caption[Comparison between the effective and the perceived difficulty.]{Comparison between the effective and the perceived difficulty. Each square contains the number of samples where the user performed worst in the match with placement \<Effective> and evaluated as more difficult the match with placement \<Percived>. The match where a user performed worst is the one with the highest \<AvgKillTime>.}
 \label{img:percived} 
 \end{figure}
 
-It is also interesting to notice how the difficulty in finding the targets was perceived by the users. As it can be seen in figure \ref{img:percived}, in the survey the majority of the users classified as more difficult the match where they performed worst, but some of them answered with the one where they performed better. Finally, the intuition of flipping one of the two maps was correct, since many users believed to have played two completely different maps. 
+It is also interesting to notice how the difficulty in finding the targets was perceived by the users. As it can be seen in figure \ref{img:percived}, in the survey the majority of the users classified as more difficult the match where they performed worst, but some of them answered with the one where they performed better. 
+
+\par
+
+Finally, the intuition of flipping one of the two maps was correct, since many users believed to have played two completely different maps. 
 
 % CONCLUSIONS %
 
@@ -234,4 +287,4 @@ The results of this experiment proved that our heuristics are effective in placi
 
 \section{Summary}
 
-In this chapter we analyzed the experiment that we setup and its results, that proved the effectiveness of our heuristics and of our framework. We observed that the heuristic placement makes the targets harder to find, that the total distance covered by the user is not influenced by the placement method and that the shooting accuracy increases with the uniform placement. We also discovered that our heuristics work better with maps that do not have an uniform topology.
+In this chapter we analyzed the experiment that we setup and its results, that proved the effectiveness of our heuristics and of our framework. We observed that the heuristic placement makes the targets harder to find, that the total distance covered by the user is not influenced by the placement method and that the shooting accuracy increases with the uniform placement. We also discovered that our heuristics work better with maps that do not have an uniform topology and we observed that users tend to define and follow specific routes when performing a research.
