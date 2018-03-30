@@ -12,15 +12,15 @@ Despite the importance of level design for the FPS genre, the video game industr
 
 \par
 
-In the last years, instead, academic environments started to address this discipline with increasing interest. The researches performed in this field revolve around the identification and definition of design patterns and design techniques, with a deep analysis of how and why they work, and the creation of novel approaches to level design. Some of these techniques try to automate the design process by employing \<procedural generation>, often combined with \<evolutionary algorithms>.
+In the last years, instead, academic environments started to address this discipline with increasing interest. The researches performed in this field revolve around the identification and definition of design patterns and design techniques, with a deep analysis of how and why they work, and the creation of novel approaches to level design. Some of these techniques try to automate the design process by employing \<procedural generation>, often combined with \<evolutionary algorithms>. 
 
 \par
 
-These methods have achieved interesting results, but they are often criticized for employing matches played by \<artificial agents> as a \<validation method>. Since the behavior of an AI, no matter how advanced, is way less complex than the one of a human player, this approach decreases the scientific value of the final results. Nevertheless, researchers are forced to use AI to fasten up their experiment, because organizing play-test sessions requires too much time and resources. 
+A problem peculiar to this kind of research is how difficult it is to obtain information from real users, since this requires them to either download a specific game or to take part in play-test sessions and both option discourage participation.
 
 \par
 
-The aim of this thesis is to solve this problem, by introducing an open-source \<framework> capable of deploying online experiments to collect data from real users via a browser FPS game. Using this framework, we also explore the possibility of using \<Graph Theory> to populate procedural generated maps with \<game elements>, i.e. spawn-points and various kinds of resources.
+The aim of this thesis is to solve this problem and to attempt a novel approach to map analysis and game element placement. The former was addressed by designing an open-source \<framework> capable of generating and importing single-level and multi-level maps and of deploying online experiments to collect data from real users via a browser-playable FPS game. The latter, instead, was achieved by using \<Graph Theory> to compute topological metrics from multiple graph representation of the maps, each one highlighting different features, and by using the information provided by these metrics to strategically place game elements, paying attention to the gameplay dynamics associated with each one of them.
 
 \section{Synopsis}
 
@@ -38,12 +38,12 @@ In the third chapter we present the framework that we have developed, analyzing 
 \par
 \mbox{}
 
-In the fourth chapter we present a tool that uses Graph Theory to place game elements in procedurally generated levels, with an overview of the theory and the assumptions behind it.
+In the fourth chapter we present an approach that uses Graph Theory to place game elements in procedurally generated levels, with an overview of the theory and the assumptions behind it.
 
 \par
 \mbox{}
 
-In the fifth chapter we describe an experiment performed with our framework aimed at validating the framework itself and the tool described in the previous chapter.
+In the fifth chapter we describe an experiment performed with our framework for validating the heuristics that we have defined for the placement of spawn points.
 
 \par 
 \mbox{}
