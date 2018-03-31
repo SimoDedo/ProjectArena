@@ -38,18 +38,19 @@ def getArrayFromData(data, column, conversion=0):
     array = list()
 
     for i in range(len(data)):
-        if (conversion == 1):
-            try:
-                array.append(int(float(data[i][column])))
-            except:
-                pass
-        elif (conversion == 2):
-            try:
-                array.append(float(data[i][column]))
-            except:
-                pass
-        else:
-            array.append(data[i][column])
+        if (data[i][column] != ""):
+            if (conversion == 1):
+                try:
+                    array.append(int(float(data[i][column])))
+                except:
+                    pass
+            elif (conversion == 2):
+                try:
+                    array.append(float(data[i][column]))
+                except:
+                    pass
+            else:
+                array.append(data[i][column])
 
     return array
 
@@ -287,8 +288,6 @@ def positionHeatmap(dataset):
         plt.savefig(exportDir + "/" + dataset.replace('.csv', '') + ".png", bbox_inches='tight')
         plt.clf()
 
-### FUNCTIONS #################################################################
-
 def degree(d, min, max, discardDeadEnd = True):
     if (d == 1 and discardDeadEnd):
         return 0
@@ -307,6 +306,16 @@ def intervalDistance(min, max, value):
         return abs(min - value)
     else:
         return abs(value - max)
+
+# Performs Wicoxon test.
+def wilcoxonTest(data, safeColumn, uniformCoulumn):
+    safe = getArrayFromData(data, safeColumn, 1)
+    uniform = getArrayFromData(data, uniformCoulumn, 1)
+    statistic, pvalue = wilcoxon(safe, uniform, 'pratt')
+    print("\n[WILCOXON TEST] Results:")
+    print("statistics = " + str(statistic))
+    print("p-value (two-tiled) = " + str(pvalue))
+    print("p-value (one-tiled) = " + str(pvalue / 2))
 
 ### MENU FUNCTIONS ############################################################
 
@@ -483,6 +492,40 @@ def heatmapMenu():
         elif option == "0":
             return
 
+# Menages the Wilcoxon menu.
+def wilcoxonMenu(data):
+    index = 0
+
+    while True:
+        print("\n[WILCOXON TEST] Select the metric to perform the test:")
+        print("[1] AvgKillTime")
+        print("[2] AvgKillDistance")
+        print("[3] Kills")
+        print("[4] Distance")
+        print("[5] Shots")
+        print("[6] Accuracy")
+        print("[0] Back\n")
+
+        option = input("Option: ")
+    
+        while option != "1" and option != "2" and option != "3" and option != "4" and option != "5" and option != "6" and option != "0":
+            option = input("Invalid choice. Option: ")
+    
+        if option == "1":
+            wilcoxonTest(data, 7, 14)
+        elif option == "2":
+            wilcoxonTest(data, 8, 15) 
+        elif option == "3":
+            wilcoxonTest(data, 6, 13)
+        elif option == "4":
+            wilcoxonTest(data, 5, 12) 
+        elif option == "5":
+            wilcoxonTest(data, 2, 9) 
+        elif option == "6":
+            wilcoxonTest(data, 4, 11) 
+        elif option == "0":
+            return
+
 ### MAIN ######################################################################
 
 # Create the input folder if needed.
@@ -523,13 +566,7 @@ while True:
     while option != "1" and option != "2" and option != "3" and option != "4" and option != "5" and option != "6" and option != "7" and option != "0":
         option = input("Invalid choice. Option: ")
     if option == "1":
-        killsSafe = getArrayFromData(data, 6, 1)
-        killsUniform = getArrayFromData(data, 13, 1)
-        statistic, pvalue = wilcoxon(killsSafe, killsUniform, 'pratt')
-        print("\n[WILCOXON SIGNED-RANK TEST] Results:")
-        print("statistics = " + str(statistic))
-        print("p-value (two-tiled) = " + str(pvalue))
-        print("p-value (one-tiled) = " + str(pvalue / 2))
+        wilcoxonMenu(data);
     elif option == "2":
         harder = getArrayFromData(data, 16)
         safeCount = len([1 for x in harder if x == "safe"])

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  30 MAR 2018 20:14
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.26)  31 MAR 2018 15:10
 entering extended mode
 **./main.tex
 (main.tex
@@ -2179,179 +2179,179 @@ Chapter 5.
 <images/arena_visibility.png, id=355, 432.86719pt x 432.86719pt>
 File: images/arena_visibility.png Graphic file (type png)
 <use images/arena_visibility.png>
-Package pdftex.def Info: images/arena_visibility.png  used on input line 57.
+Package pdftex.def Info: images/arena_visibility.png  used on input line 58.
 (pdftex.def)             Requested size: 117.00119pt x 117.00119pt.
 
-Underfull \hbox (badness 5787) in paragraph at lines 58--58
+Underfull \hbox (badness 5787) in paragraph at lines 59--59
 []\OT1/cmr/m/n/10.95 (a) |Heatmap show-ing
  []
 
 <images/arena_safe.png, id=356, 432.86719pt x 432.86719pt>
 File: images/arena_safe.png Graphic file (type png)
 <use images/arena_safe.png>
-Package pdftex.def Info: images/arena_safe.png  used on input line 63.
+Package pdftex.def Info: images/arena_safe.png  used on input line 64.
 (pdftex.def)             Requested size: 117.00119pt x 117.00119pt.
 
-Underfull \hbox (badness 3250) in paragraph at lines 64--64
+Underfull \hbox (badness 3250) in paragraph at lines 65--65
 []\OT1/cmr/m/n/10.95 (b) |Spawn points (in
  []
 
 
-Underfull \hbox (badness 2452) in paragraph at lines 64--64
+Underfull \hbox (badness 2452) in paragraph at lines 65--65
 \OT1/cmr/m/n/10.95 red) placed us-ing the
  []
 
 <images/arena_uniform.png, id=357, 432.86719pt x 432.86719pt>
 File: images/arena_uniform.png Graphic file (type png)
 <use images/arena_uniform.png>
-Package pdftex.def Info: images/arena_uniform.png  used on input line 69.
+Package pdftex.def Info: images/arena_uniform.png  used on input line 70.
 (pdftex.def)             Requested size: 117.00119pt x 117.00119pt.
 <images/corridors_visibility.png, id=358, 432.86719pt x 432.86719pt>
 File: images/corridors_visibility.png Graphic file (type png)
 <use images/corridors_visibility.png>
-Package pdftex.def Info: images/corridors_visibility.png  used on input line 77
+Package pdftex.def Info: images/corridors_visibility.png  used on input line 78
 .
 (pdftex.def)             Requested size: 117.00119pt x 117.00119pt.
 
-Underfull \hbox (badness 5787) in paragraph at lines 78--78
+Underfull \hbox (badness 5787) in paragraph at lines 79--79
 []\OT1/cmr/m/n/10.95 (a) |Heatmap show-ing
  []
 
 <images/corridors_safe.png, id=359, 432.86719pt x 432.86719pt>
 File: images/corridors_safe.png Graphic file (type png)
 <use images/corridors_safe.png>
-Package pdftex.def Info: images/corridors_safe.png  used on input line 83.
+Package pdftex.def Info: images/corridors_safe.png  used on input line 84.
 (pdftex.def)             Requested size: 117.00119pt x 117.00119pt.
 
-Underfull \hbox (badness 3250) in paragraph at lines 84--84
+Underfull \hbox (badness 3250) in paragraph at lines 85--85
 []\OT1/cmr/m/n/10.95 (b) |Spawn points (in
  []
 
 
-Underfull \hbox (badness 2452) in paragraph at lines 84--84
+Underfull \hbox (badness 2452) in paragraph at lines 85--85
 \OT1/cmr/m/n/10.95 red) placed us-ing the
  []
 
 <images/corridors_uniform.png, id=360, 432.86719pt x 432.86719pt>
 File: images/corridors_uniform.png Graphic file (type png)
 <use images/corridors_uniform.png>
-Package pdftex.def Info: images/corridors_uniform.png  used on input line 89.
+Package pdftex.def Info: images/corridors_uniform.png  used on input line 90.
 (pdftex.def)             Requested size: 117.00119pt x 117.00119pt.
 <images/intense_visibility.png, id=361, 432.86719pt x 432.86719pt>
 File: images/intense_visibility.png Graphic file (type png)
 <use images/intense_visibility.png>
-Package pdftex.def Info: images/intense_visibility.png  used on input line 97.
+Package pdftex.def Info: images/intense_visibility.png  used on input line 98.
 (pdftex.def)             Requested size: 117.00119pt x 117.00119pt.
 
-Underfull \hbox (badness 5787) in paragraph at lines 98--98
+Underfull \hbox (badness 5787) in paragraph at lines 99--99
 []\OT1/cmr/m/n/10.95 (a) |Heatmap show-ing
  []
 
 <images/intense_safe.png, id=362, 432.86719pt x 432.86719pt>
 File: images/intense_safe.png Graphic file (type png)
 <use images/intense_safe.png>
-Package pdftex.def Info: images/intense_safe.png  used on input line 103.
+Package pdftex.def Info: images/intense_safe.png  used on input line 104.
 (pdftex.def)             Requested size: 117.00119pt x 117.00119pt.
 
-Underfull \hbox (badness 3250) in paragraph at lines 104--104
+Underfull \hbox (badness 3250) in paragraph at lines 105--105
 []\OT1/cmr/m/n/10.95 (b) |Spawn points (in
  []
 
 
-Underfull \hbox (badness 2452) in paragraph at lines 104--104
+Underfull \hbox (badness 2452) in paragraph at lines 105--105
 \OT1/cmr/m/n/10.95 red) placed us-ing the
  []
 
 <images/intense_uniform.png, id=363, 432.86719pt x 432.86719pt>
 File: images/intense_uniform.png Graphic file (type png)
 <use images/intense_uniform.png>
-Package pdftex.def Info: images/intense_uniform.png  used on input line 109.
+Package pdftex.def Info: images/intense_uniform.png  used on input line 110.
 (pdftex.def)             Requested size: 117.00119pt x 117.00119pt.
-
-Overfull \hbox (5.39178pt too wide) in paragraph at lines 163--163
+[61] [62 <./images/arena_visibility.png> <./images/arena_safe.png> <./images/ar
+ena_uniform.png> <./images/corridors_visibility.png> <./images/corridors_safe.p
+ng> <./images/corridors_uniform.png> <./images/intense_visibility.png> <./image
+s/intense_safe.png> <./images/intense_uniform.png>]
+Overfull \hbox (5.39178pt too wide) in paragraph at lines 164--164
  []|\OT1/cmr/m/n/12 Corridors| 
  []
 
 
-Overfull \hbox (3.10292pt too wide) in paragraph at lines 163--163
+Overfull \hbox (3.10292pt too wide) in paragraph at lines 164--164
  []|\OT1/cmr/m/n/12 Heuristic| 
  []
 
 
-Overfull \hbox (3.10292pt too wide) in paragraph at lines 163--163
+Overfull \hbox (3.10292pt too wide) in paragraph at lines 164--164
  []|\OT1/cmr/m/n/12 Heuristic| 
  []
 
 
-Overfull \hbox (3.10292pt too wide) in paragraph at lines 163--163
+Overfull \hbox (3.10292pt too wide) in paragraph at lines 164--164
  []|\OT1/cmr/m/n/12 Heuristic| 
  []
 
 
-Overfull \hbox (3.10292pt too wide) in paragraph at lines 163--163
+Overfull \hbox (3.10292pt too wide) in paragraph at lines 164--164
  []|\OT1/cmr/m/n/12 Heuristic| 
  []
 
 
-Overfull \hbox (3.10292pt too wide) in paragraph at lines 163--163
+Overfull \hbox (3.10292pt too wide) in paragraph at lines 164--164
  []|\OT1/cmr/m/n/12 Heuristic| 
  []
 
 
-Overfull \hbox (3.10292pt too wide) in paragraph at lines 163--163
+Overfull \hbox (3.10292pt too wide) in paragraph at lines 164--164
  []|\OT1/cmr/m/n/12 Heuristic| 
  []
 
 
-Overfull \hbox (3.10292pt too wide) in paragraph at lines 163--163
+Overfull \hbox (3.10292pt too wide) in paragraph at lines 164--164
  []|\OT1/cmr/m/n/12 Heuristic| 
  []
 
 
-Overfull \hbox (1.24461pt too wide) in paragraph at lines 163--163
+Overfull \hbox (1.24461pt too wide) in paragraph at lines 164--164
  []|\OT1/cmr/m/n/12 Effective| 
  []
 
 
-Overfull \hbox (0.82239pt too wide) in paragraph at lines 163--163
+Overfull \hbox (0.82239pt too wide) in paragraph at lines 164--164
  []|\OT1/cmr/m/n/12 heuristic| 
  []
 
 
-Overfull \hbox (0.82239pt too wide) in paragraph at lines 163--163
+Overfull \hbox (0.82239pt too wide) in paragraph at lines 164--164
  []|\OT1/cmr/m/n/12 heuristic| 
  []
 
 
-Overfull \hbox (0.82239pt too wide) in paragraph at lines 163--163
+Overfull \hbox (0.82239pt too wide) in paragraph at lines 164--164
  []|\OT1/cmr/m/n/12 heuristic| 
  []
 
 
-Overfull \hbox (0.59184pt too wide) in paragraph at lines 163--163
+Overfull \hbox (0.59184pt too wide) in paragraph at lines 164--164
  []|\OT1/cmr/m/n/12 Percived| 
  []
 
 
-Overfull \hbox (0.82239pt too wide) in paragraph at lines 163--163
+Overfull \hbox (0.82239pt too wide) in paragraph at lines 164--164
  []|\OT1/cmr/m/n/12 heuristic| 
  []
 
 
-Overfull \hbox (0.82239pt too wide) in paragraph at lines 163--163
+Overfull \hbox (0.82239pt too wide) in paragraph at lines 164--164
  []|\OT1/cmr/m/n/12 heuristic| 
  []
 
 
-Overfull \hbox (0.82239pt too wide) in paragraph at lines 163--163
+Overfull \hbox (0.82239pt too wide) in paragraph at lines 164--164
  []|\OT1/cmr/m/n/12 heuristic| 
  []
 
-[61] [62 <./images/arena_visibility.png> <./images/arena_safe.png> <./images/ar
-ena_uniform.png> <./images/corridors_visibility.png> <./images/corridors_safe.p
-ng> <./images/corridors_uniform.png> <./images/intense_visibility.png> <./image
-s/intense_safe.png> <./images/intense_uniform.png>] [63]
-Overfull \hbox (2.76492pt too wide) in paragraph at lines 176--177
+[63]
+Overfull \hbox (2.76492pt too wide) in paragraph at lines 177--178
 []\OT1/cmr/m/n/12 To test the sta-tis-ti-cal sig-nif-i-cance of this re-sult, w
 e per-formed the \OT1/cmr/m/it/12 Wilcoxon
  []
@@ -2359,78 +2359,74 @@ e per-formed the \OT1/cmr/m/it/12 Wilcoxon
 <images/scatter_kills.png, id=383, 395.67825pt x 395.67825pt>
 File: images/scatter_kills.png Graphic file (type png)
 <use images/scatter_kills.png>
-Package pdftex.def Info: images/scatter_kills.png  used on input line 181.
+Package pdftex.def Info: images/scatter_kills.png  used on input line 182.
 (pdftex.def)             Requested size: 191.10214pt x 191.10072pt.
 <images/scatter_distance.png, id=384, 395.67825pt x 395.67825pt>
 File: images/scatter_distance.png Graphic file (type png)
 <use images/scatter_distance.png>
-Package pdftex.def Info: images/scatter_distance.png  used on input line 187.
+Package pdftex.def Info: images/scatter_distance.png  used on input line 188.
 (pdftex.def)             Requested size: 191.10214pt x 191.10072pt.
 <images/scatter_shots.png, id=385, 395.67825pt x 395.67825pt>
 File: images/scatter_shots.png Graphic file (type png)
 <use images/scatter_shots.png>
-Package pdftex.def Info: images/scatter_shots.png  used on input line 193.
+Package pdftex.def Info: images/scatter_shots.png  used on input line 194.
 (pdftex.def)             Requested size: 191.10214pt x 191.10072pt.
 <images/scatter_accuracy.png, id=386, 395.67825pt x 395.67825pt>
 File: images/scatter_accuracy.png Graphic file (type png)
 <use images/scatter_accuracy.png>
-Package pdftex.def Info: images/scatter_accuracy.png  used on input line 199.
+Package pdftex.def Info: images/scatter_accuracy.png  used on input line 200.
 (pdftex.def)             Requested size: 191.10214pt x 191.10072pt.
 [64] [65 <./images/scatter_kills.png> <./images/scatter_distance.png> <./images
-/scatter_shots.png> <./images/scatter_accuracy.png>]
-<images/heat_arena_safe.png, id=397, 432.86719pt x 432.86719pt>
+/scatter_shots.png> <./images/scatter_accuracy.png>] [66]
+<images/heat_arena_safe.png, id=400, 432.86719pt x 432.86719pt>
 File: images/heat_arena_safe.png Graphic file (type png)
 <use images/heat_arena_safe.png>
-Package pdftex.def Info: images/heat_arena_safe.png  used on input line 222.
+Package pdftex.def Info: images/heat_arena_safe.png  used on input line 223.
 (pdftex.def)             Requested size: 150.14786pt x 150.14514pt.
-<images/heat_arena_uniform.png, id=398, 432.86719pt x 432.86719pt>
+<images/heat_arena_uniform.png, id=401, 432.86719pt x 432.86719pt>
 File: images/heat_arena_uniform.png Graphic file (type png)
 <use images/heat_arena_uniform.png>
-Package pdftex.def Info: images/heat_arena_uniform.png  used on input line 228.
+Package pdftex.def Info: images/heat_arena_uniform.png  used on input line 229.
 
 (pdftex.def)             Requested size: 150.14786pt x 150.14514pt.
-<images/heat_corridors_safe.png, id=399, 432.86719pt x 432.86719pt>
+<images/heat_corridors_safe.png, id=402, 432.86719pt x 432.86719pt>
 File: images/heat_corridors_safe.png Graphic file (type png)
 <use images/heat_corridors_safe.png>
-Package pdftex.def Info: images/heat_corridors_safe.png  used on input line 236
+Package pdftex.def Info: images/heat_corridors_safe.png  used on input line 237
 .
 (pdftex.def)             Requested size: 150.14786pt x 150.14514pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 237--237
+Underfull \hbox (badness 10000) in paragraph at lines 238--238
 []\OT1/cmr/m/n/10.95 (c) |Map ``Cor-ri-dors'' with
  []
 
-<images/heat_corridors_uniform.png, id=400, 432.86719pt x 432.86719pt>
+<images/heat_corridors_uniform.png, id=403, 432.86719pt x 432.86719pt>
 File: images/heat_corridors_uniform.png Graphic file (type png)
 <use images/heat_corridors_uniform.png>
 Package pdftex.def Info: images/heat_corridors_uniform.png  used on input line 
-242.
+243.
 (pdftex.def)             Requested size: 150.14786pt x 150.14514pt.
-<images/heat_intense_heuristic.png, id=401, 432.86719pt x 432.86719pt>
+<images/heat_intense_heuristic.png, id=404, 432.86719pt x 432.86719pt>
 File: images/heat_intense_heuristic.png Graphic file (type png)
 <use images/heat_intense_heuristic.png>
 Package pdftex.def Info: images/heat_intense_heuristic.png  used on input line 
-250.
+251.
 (pdftex.def)             Requested size: 150.14786pt x 150.14514pt.
-<images/heat_intense_uniform.png, id=402, 432.86719pt x 432.86719pt>
+<images/heat_intense_uniform.png, id=405, 432.86719pt x 432.86719pt>
 File: images/heat_intense_uniform.png Graphic file (type png)
 <use images/heat_intense_uniform.png>
 Package pdftex.def Info: images/heat_intense_uniform.png  used on input line 25
-6.
+7.
 (pdftex.def)             Requested size: 150.14786pt x 150.14514pt.
-
-Underfull \vbox (badness 5533) has occurred while \output is active []
-
- [66]
-[67 <./images/heat_arena_safe.png> <./images/heat_arena_uniform.png> <./images/
-heat_corridors_safe.png> <./images/heat_corridors_uniform.png> <./images/heat_i
-ntense_heuristic.png> <./images/heat_intense_uniform.png>]
-<images/difficulty.png, id=415, 777.65532pt x 663.98062pt>
+<images/difficulty.png, id=406, 777.65532pt x 663.98062pt>
 File: images/difficulty.png Graphic file (type png)
 <use images/difficulty.png>
-Package pdftex.def Info: images/difficulty.png  used on input line 269.
+Package pdftex.def Info: images/difficulty.png  used on input line 270.
 (pdftex.def)             Requested size: 312.00119pt x 266.39806pt.
- [68 <./images/difficulty.png>]) [69]
+) [67] [68 <./images/heat_arena_safe.png> <./images/heat_arena_uniform.png> <./
+images/heat_corridors_safe.png> <./images/heat_corridors_uniform.png> <./images
+/heat_intense_heuristic.png> <./images/heat_intense_uniform.png>] [69 <./images
+/difficulty.png>]
 \openout2 = `chapters/chapter6.aux'.
 
  (chapters/chapter6.tex [70
@@ -2465,7 +2461,7 @@ LaTeX Warning: There were multiply-defined labels.
 Here is how much of TeX's memory you used:
  36820 strings out of 493303
  890124 string characters out of 3138856
- 1012088 words of memory out of 3000000
+ 1004088 words of memory out of 3000000
  39722 multiletter control sequences out of 15000+200000
  546242 words of font info for 83 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -2488,7 +2484,7 @@ ic/amsfonts/cm/cmsy6.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfon
 ts/cm/cmsy8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmt
 i10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti12.pfb>
 <C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on main.pdf (90 pages, 4529979 bytes).
+Output written on main.pdf (90 pages, 4529157 bytes).
 PDF statistics:
  504 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

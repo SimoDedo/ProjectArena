@@ -92,12 +92,11 @@
 \contentsline {paragraph}{Tile selection}{57}
 \contentsline {subsection}{\numberline {4.3.4}Weapon placement}{57}
 \contentsline {section}{\numberline {4.4}Summary}{58}
-\contentsline {chapter}{\numberline {5}Experimental analysis on spawn points placement}{59}
+\contentsline {chapter}{\numberline {5}A case study: spawn points placement}{59}
 \contentsline {section}{\numberline {5.1}Goals}{59}
 \contentsline {section}{\numberline {5.2}Experimental design}{60}
 \contentsline {section}{\numberline {5.3}Results}{63}
-\contentsline {section}{\numberline {5.4}Considerations}{69}
-\contentsline {section}{\numberline {5.5}Summary}{69}
+\contentsline {section}{\numberline {5.4}Summary}{67}
 \contentsline {chapter}{\numberline {6}Conclusions}{71}
 \contentsline {section}{\numberline {6.1}Known issues and possible criticism}{72}
 \contentsline {section}{\numberline {6.2}Future developments}{72}
