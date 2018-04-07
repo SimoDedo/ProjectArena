@@ -8,7 +8,7 @@ In this chapter we describe the \<framework> that we have developed to study the
 
 \section{Description of the framework}
 
-We designed our framework with the objective of providing a valid alternative to the games currently employed as a tool in this research field. All the available options, like \<Cube 2: Sauerbraten>, are powerful tools to perform studies involving artificial agents, but they are not suitable for user-based studies. A data-collection campaign based on these games requires either downloading the game or taking part in real-life play-test sessions, but these options discourage potential participants because they are significantly time-consuming. For this reason, we decided to develop a \<Unity>\footnote{Unity Technologies, 2005. \<Unity> is a game development environment that includes a game editor and a game engine. Currently, it is the most used game development tool.} framework that is as light as possible, with a WebGL build weighting less than 10MB that can be played using any browser.
+We designed our framework with the objective of providing a valid alternative to the games currently employed in this research field. All the available options, like \<Cube 2: Sauerbraten>, are powerful tools to perform studies involving artificial agents, but they are not suitable for user-based studies. A data-collection campaign based on these games requires either downloading the game or taking part in real-life play-test sessions, but these options discourage potential participants because they are significantly time-consuming. For this reason, we decided to develop a \<Unity>\footnote{Unity Technologies, 2005. \<Unity> is a game development environment that includes a game editor and a game engine. Currently, it is the most used game development tool.} framework that is as light as possible, with a WebGL build weighting less than 10MB that can be played using any browser.
 
 \par
 
@@ -18,7 +18,7 @@ Since the purpose of this tool is to be used in research, we decided to support 
 
 \section{Map representation}
 
-Maps are structured as grids of orthogonal \<tiles> and are internally represented  by matrices of characters, where each cell corresponds to a specific \<tile>. Depending on the character it contains, a cell can represent a wall, a floor or an object on the floor. If a cell corresponds to a wall tile we say it is \<filled>, if it corresponds to a floor tile we say it is \<empty>. The framework supports multi-level maps, which are represented by a list of matrices, with each matrix corresponding to a level.
+Maps are structured as grids of orthogonal \<tiles> and are internally represented  by matrices of characters, where each cell corresponds to a specific \<tile>. Depending on the character it contains, a cell can represent a wall, a floor or an object on the floor. If a cell corresponds to a wall tile we say it is \<filled>, if it corresponds to a floor tile we say it is \<empty>. The framework supports multi-level maps, which are represented by lists of matrices, with each matrix corresponding to a level.
 
 \par
 
@@ -34,7 +34,7 @@ The text representation allows to encode the map as a text, of which each line c
 
 \subsection{All-Black representation}
 
-Our All-Black representation is an extended version of the one defined by Cardamone et al.\cite{Cardamone:2011:EIM:2008402.2008411}, to which we have added the support for objects and multi-level maps. In their work, the All-Black representation encodes the empty areas of an otherwise filled map, consisting in square rooms and corridors of fixed width. Rooms are defined by $\langle x,y,s \rangle$ triplets, where $x$ and $y$ define the coordinates of the center of the room and $s$ defines its width. Corridors are rectangular areas with a fixed width of $3$ cells and are defined by $\langle x,y,l \rangle$ triplets, where $x$ and $y$ define the point in which the corridor starts and $l$ defines its length. $l$ also provides the direction of the corridor: if $l$ is positive the corridor extends along the $x\text{-axis}$, otherwise it extends along the $y\text{-axis}$. With respect to this representation, we changed the encoding of the rooms by considering $x$ and $y$ as the coordinates of the corner closer to the origin; this change allows to remove any ambiguity deriving from the position of the center of a room of even width.
+Our All-Black representation is an extended version of the one defined by Cardamone et al.\cite{Cardamone:2011:EIM:2008402.2008411}, to which we have added the support for objects and multi-level maps. In their work, the All-Black representation encodes the empty areas of an otherwise filled map, consisting in square rooms and corridors of fixed width. Rooms are defined by $\langle x,y,s \rangle$ triplets, where $x$ and $y$ define the coordinates of the center of the room and $s$ defines its width. Corridors are rectangular areas with a fixed width of $3$ cells and are defined by $\langle x,y,l \rangle$ triplets, where $x$ and $y$ define the point in which the corridor starts and $l$ defines its length. $l$ also provides the direction of the corridor: if $l$ is positive the corridor extends along the x-axis, otherwise it extends along the y-axis. With respect to this representation, we changed the encoding of the rooms by considering $x$ and $y$ as the coordinates of the corner closer to the origin; this change allows to remove any ambiguity deriving from the position of the center of a room of even width.
 
 \par
 
@@ -42,7 +42,7 @@ For allowing the encoding of objects, we added a third kind of triplet, $\langle
 
 \par
 
-We have also extended the All-Black representation including the one defined by Cachia et al.\cite{MultiLevelEvolution}, that allows to encode maps generated with a random digger algorithm, i.e. an algorithm that randomly moves in a filled map emptying all the cells it crosses (for more details see subsubsection \ref{sssec:digger}). The map is encoded by a quintuple $\langle f,l,r,v,s \rangle$, where $f$ encodes the probability of moving forwards, $l$ encodes the probability of turning left, $r$ encodes the probability of turning right, $v$ encodes the probability of jumping to a visited cell and $s$ encodes the probability of placing a flight of stairs, if in a multi-level setting. With respect to the representation defined by Cachia et al., we added the possibility of encoding objects, which group of triplets is separated by the digger quintuple by the special character ``$\mid$''.
+We extended the All-Black representation by also including the one defined by Cachia et al.\cite{MultiLevelEvolution}, that allows to encode maps generated with a random digger algorithm, i.e. an algorithm that randomly moves in a filled map emptying all the cells it crosses (for more details see subsubsection \ref{sssec:digger}). The map is encoded by a quintuple $\langle f,l,r,v,s \rangle$, where $f$ encodes the probability of moving forwards, $l$ encodes the probability of turning left, $r$ encodes the probability of turning right, $v$ encodes the probability of jumping to a visited cell and $s$ encodes the probability of placing a flight of stairs, if in a multi-level setting. With respect to the representation defined by Cachia et al., we added the possibility of encoding objects, which group of triplets is separated by the digger quintuple by the special character ``$\mid$''.
 
 \par
 
@@ -175,7 +175,7 @@ The shared settings are used to define the size of the map and its encoding, to 
 \item \<Rain Distanced>: positions the objects selecting random cells from the ones that are empty and satisfy the \<ObjectToWallDistance> constraint and the \<ObjectToObjectDistance> constraint on the objects with the same \<ObjectChar>.
 \end{itemize}
 
-All of the following versions of the \<Map Generator> are deterministic, since they require a \<seed> value as input that constrains the output to a specific map.
+All of the following versions of the \<Map Generator> are deterministic, since they require a \<seed value> as input that constrains the output to a specific map.
 
 % CELLULAR GENERATOR %
 
@@ -489,19 +489,19 @@ Like the \<Prefab Assembler>, the \<Multi-Level Prefab Assembler> produces a 3D 
 \centering
 \begin{subfigure}[t]{0.48\linewidth}
 \includegraphics[width=\linewidth]{isometric_canyon}
-\caption{Cellular map assembled with the \<Mesh Assembler>}
+\caption{Map generated with the \<Cellular Generator> and assembled with the \<Mesh Assembler>}
 \label{fig:cellular_assembled}
 \end{subfigure}
 \hfill
 \begin{subfigure}[t]{0.48\linewidth}
 \includegraphics[width=\linewidth]{isometric_mine}
-\caption{Digger map assembled with the \<Mesh Assembler>}
+\caption{Map generated with the \<Digger Generator> and assembled with the \<Mesh Assembler>}
 \label{fig:digger_assembled}
 \end{subfigure}
 
 \begin{subfigure}[t]{0.48\linewidth}
 \includegraphics[width=\linewidth]{isometric_factory}
-\caption{Divisive map assembled with the \<Prefab Assembler>}
+\caption{Map generated with the \<Divisive Generator> and assembled with the \<Prefab Assembler>}
 \label{fig:divisive_assembled}
 \end{subfigure}
 \hfill
@@ -517,7 +517,7 @@ Like the \<Prefab Assembler>, the \<Multi-Level Prefab Assembler> produces a 3D 
 
 \subsection{The Spawn Point Manager}
 
-The \<Spawn Point Manager> contains a list of all the spawn points displaced in the map, that is populated at the end of the \<Generation phase> by the \<Game Manager>. When the \<Game Manager> needs to spawn an entity, the \<Spawn Point Manager> provides a random spawn point from the ones that have not been used in a certain amount of time. If no spawn point meets this condition, the extraction is performed from the complete pool.
+The \<Spawn Point Manager> contains a list of all the spawn points displaced in the map, that is populated at the end of the \<generation phase> by the \<Game Manager>. When the \<Game Manager> needs to spawn an entity, the \<Spawn Point Manager> provides a random spawn point from the ones that have not been used in a certain amount of time. If no spawn point meets this condition, the extraction is performed from the complete pool.
 
 % OBJECT DISPLACER %
 
@@ -619,8 +619,7 @@ The framework includes three different kind of agents:
 \begin{figure}
 \centering
 \includegraphics[width=0.95\linewidth]{targets}
-\caption{Different ready-to-use target entities provided by the framework.}
-\caption*{From the first to the third are simple targets, from the fourth to the sixth are targets equipped with two opposing laser guns, from the seventh to the ninth are``\<core>'' targets equipped with an increasing number of radial laser guns. The size of each target is proportional to its \<TotalHealth>.}
+\caption[Different ready-to-use target entities provided by the framework.]{Different ready-to-use target entities provided by the framework. From the first to the third are simple targets, from the fourth to the sixth are targets equipped with two opposing laser guns, from the seventh to the ninth are``\<core>'' targets equipped with an increasing number of radial laser guns. The size of each target is proportional to its \<TotalHealth>.}
 \label{fig:targets}
 \end{figure}
 
@@ -751,7 +750,7 @@ The only weapon of this category that the player can use is the \<Rocket Launche
 \mbox{}\\
 
 {\setlength{\parindent}{0cm}
-\<Laser guns> are not based on the same structure of the previous categories. Laser guns emit a continuous ray that deals damage over time to everything it touches. Their only configurable parameter is \<DPS> (\<damage per second>), i.e. the damage the the gun deals in a second when continuously hitting a target.
+\<Laser guns> are not based on the same structure of the previous categories. Laser guns emit a continuous ray that deals damage over time to everything it touches. Their only configurable parameter is \<DPS> (\<damage per second>), i.e. the damage that the gun deals in a second when continuously hitting a target.
 }
 
 % OBJECTS %

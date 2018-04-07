@@ -813,6 +813,7 @@ def plotRoomsCorridorsGraph(G):
     nx.draw(G, pos, node_color = '#f44242', node_size = 75, node_shape = ",")
     # nx.draw_networkx_edge_labels(G, pos, edge_labels = edge_labels)
     plt.axis('equal')
+    plt.savefig(outputDir + "/plot_rooms_graph", dpi = 400)
     plt.show()
 
 # Plots the graph.
@@ -827,6 +828,7 @@ def plotRoomsCorridorsObjectsGraph(G):
     nx.draw(G, pos, node_color = colors, node_size = 75, node_shape = ",")
     # nx.draw_networkx_edge_labels(G, pos, edge_labels = edge_labels)
     plt.axis('equal')
+    plt.savefig(outputDir + "/plot_objects_graph", dpi = 400)
     plt.show()
 
 # Plots the graph.
@@ -837,6 +839,7 @@ def plotTilesGraph(G):
     nx.draw_networkx_labels(G, pos, labels = node_labels)
     nx.draw(G, pos, node_color = '#f44242', node_size = 75, node_shape = ",")
     plt.axis('equal')
+    plt.savefig(outputDir + "/plot_tiles_graph", dpi = 400)
     plt.show()
 
 # Plots the graph.
@@ -849,6 +852,7 @@ def plotVisibilityGraph(G):
     # node_labels = nx.get_node_attributes(G,'visibility')
     # nx.draw_networkx_labels(G, pos, labels = node_labels)
     plt.axis('equal')
+    plt.savefig(outputDir + "/plot_visibility_graph", dpi = 400)
     plt.show()
 
 # Plots the graph.
@@ -856,6 +860,7 @@ def plotOutlinesGraph(G):
     print("\n[CLOSE THE GRAPH TO CONTNUE]")
     nx.draw(G, dict([ (node, (data["x"], data["y"])) for node, data  in G.nodes(data=True)]), node_color = '#f44242', node_size = 75, node_shape = ",")
     plt.axis('equal')
+    plt.savefig(outputDir + "/plot_outlines_graph", dpi = 400)
     plt.show()
 
 ### MENU FUNCTIONS ############################################################
