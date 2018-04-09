@@ -5,8 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// CellularMapGenerator is an implementation of MapGenerator that generates the map by using a
-/// cellular automata.
+/// ABMapGenerator is an implementation of MapGenerator that generates the map by decoding its AB notation.
 /// </summary>
 public class ABMapGenerator : MapGenerator {
 

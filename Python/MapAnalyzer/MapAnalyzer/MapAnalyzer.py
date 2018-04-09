@@ -12,6 +12,7 @@ class Room:
     endX = None
     endY = None
     isCorridor = None
+    level = 0
 
 ### INPUT/OUTPUT FUNCTIONS ####################################################
 
@@ -34,62 +35,53 @@ def getFiles(inputDir):
 # Reads the map.
 def readMap(filePath):
     print("Reading the map file... ", end='', flush=True)
+    maps = []
     with open(filePath) as f:
-        lines = [x.strip() for x in f.readlines()]
-        map = [[lines[j][i] for i in range(len(lines[0]))] for j in range(len(lines))]
+        levels = f.read().split('\n\n')
+        for level in levels:
+            lines = level.split('\n')
+            maps.append([[lines[j][i] for i in range(len(lines[0]))] for j in range(len(lines))])
     print("Done.")
-    return map
+    if (len(maps) == 1):
+        return maps[0]
+    else:
+        return maps
 
 # Reads the AB file.
 def readAB(filePath):
     print("Reading the AB file... ", end='', flush=True)
     with open(filePath) as f:
-        genome = f.readline()
+        file = f.readline()
 
-        rooms = []
+        genomes = []
         currentValue = ""
         currentChar = 0
+        currentLevel = 0
+        rooms = []
 
-        while currentChar < len(genome) and genome[currentChar] == "<":
-            room = Room()
-            room.isCorridor = False
-            currentChar = currentChar + 1
-
-            # Get the x coordinate of the origin.
-            while genome[currentChar].isdigit():
-                currentValue = currentValue + genome[currentChar]
+        # Extract the genomes.
+        while currentChar < len(file):
+            if (currentChar < len(file) - 1 and file[currentChar] == '|' and \
+                file[currentChar + 1] == '|'):
+                genomes.append(currentValue);
+                currentValue = ""
                 currentChar = currentChar + 1
-            room.originX = int(currentValue)
+            elif (currentChar == len(file) - 1):
+                currentValue = currentValue + file[currentChar]
+                genomes.append(currentValue);
+            else:
+                currentValue = currentValue + file[currentChar]
+            currentChar = currentChar + 1
 
+        # Process each genome.
+        for genome in genomes:
             currentValue = ""
-            currentChar = currentChar + 1
+            currentChar = 0
 
-            # Get the y coordinate of the origin.
-            while genome[currentChar].isdigit():
-                currentValue = currentValue + genome[currentChar]
-                currentChar = currentChar + 1
-            room.originY = int(currentValue)
-
-            currentValue = ""
-            currentChar = currentChar + 1
-
-            # Get the size of the arena.
-            while genome[currentChar].isdigit():
-                currentValue = currentValue + genome[currentChar]
-                currentChar = currentChar + 1
-            room.endX = int(room.originX) + int(currentValue) - 1
-            room.endY = int(room.originY) + int(currentValue) - 1
-            rooms.append(room)
-
-            currentValue = ""
-            currentChar = currentChar + 1
-
-        if currentChar < len(genome) and genome[currentChar] == "|":
-            currentChar = currentChar + 1
-
-            while (currentChar < len(genome) and genome[currentChar] == "<"):
+            while currentChar < len(genome) and genome[currentChar] == "<":
                 room = Room()
-                room.isCorridor = True
+                room.level = currentLevel
+                room.isCorridor = False
                 currentChar = currentChar + 1
 
                 # Get the x coordinate of the origin.
@@ -110,23 +102,68 @@ def readAB(filePath):
                 currentValue = ""
                 currentChar = currentChar + 1
 
-                # Get the length of the corridor.
-                if genome[currentChar] == "-":
-                    currentValue = currentValue + genome[currentChar]
-                    currentChar = currentChar + 1        
+                # Get the size of the arena.
                 while genome[currentChar].isdigit():
                     currentValue = currentValue + genome[currentChar]
                     currentChar = currentChar + 1
-                if int(currentValue) > 0:
-                    room.endX = int(room.originX) + int(currentValue) - 1
-                    room.endY = int(room.originY) + 3 - 1
-                else:
-                    room.endX = int(room.originX) + 3 - 1
-                    room.endY = int(room.originY) - int(currentValue) - 1
+                room.endX = int(room.originX) + int(currentValue) - 1
+                room.endY = int(room.originY) + int(currentValue) - 1
                 rooms.append(room)
 
                 currentValue = ""
                 currentChar = currentChar + 1
+
+            if currentChar < len(genome) and genome[currentChar] == "|":
+                currentChar = currentChar + 1
+
+                while (currentChar < len(genome) and genome[currentChar] == "<"):
+                    room = Room()
+                    room.level = currentLevel
+                    room.isCorridor = True
+                    currentChar = currentChar + 1
+
+                    # Get the x coordinate of the origin.
+                    while genome[currentChar].isdigit():
+                        currentValue = currentValue + genome[currentChar]
+                        currentChar = currentChar + 1
+                    room.originX = int(currentValue)
+
+                    currentValue = ""
+                    currentChar = currentChar + 1
+
+                    # Get the y coordinate of the origin.
+                    while genome[currentChar].isdigit():
+                        currentValue = currentValue + genome[currentChar]
+                        currentChar = currentChar + 1
+                    room.originY = int(currentValue)
+
+                    currentValue = ""
+                    currentChar = currentChar + 1
+
+                    # If I am scanning a game element skip to next gene.
+                    if (genome[currentChar].isalpha() and genome[currentChar] != "-"):
+                        while (currentChar < len(genome) and genome[currentChar] != "<"):
+                            currentChar = currentChar + 1
+                    else:
+                        # Get the length of the corridor.
+                        if genome[currentChar] == "-":
+                            currentValue = currentValue + genome[currentChar]
+                            currentChar = currentChar + 1        
+                        while genome[currentChar].isdigit():
+                            currentValue = currentValue + genome[currentChar]
+                            currentChar = currentChar + 1
+                        if int(currentValue) > 0:
+                            room.endX = int(room.originX) + int(currentValue) - 1
+                            room.endY = int(room.originY) + 3 - 1
+                        else:
+                            room.endX = int(room.originX) + 3 - 1
+                            room.endY = int(room.originY) - int(currentValue) - 1
+                        rooms.append(room)
+
+                        currentValue = ""
+                        currentChar = currentChar + 1
+
+            currentLevel = currentLevel + 1
 
     print("Done.")
     return rooms
@@ -155,31 +192,21 @@ def mergeRooms(rooms):
 
     for room in rooms:
         if not room.isCorridor:
-            nextRoom = next((nextRoom for nextRoom in rooms if (nextRoom.originX > room.originX and nextRoom.originX <= room.endX + 1 and \
-                                                                nextRoom.originY == room.originY and nextRoom.endY == room.endY and \
-                                                                nextRoom.endY - nextRoom.originY == room.endY - room.originY)), None)
+            nextRoom = next((nextRoom for nextRoom in rooms if (nextRoom.level == room.level and \
+                            nextRoom.originX > room.originX and nextRoom.originX <= room.endX + 1 and \
+                            nextRoom.originY == room.originY and nextRoom.endY == room.endY and \
+                            nextRoom.endY - nextRoom.originY == room.endY - room.originY)), None)
             if nextRoom is not None and not nextRoom.isCorridor:
-                # print("Merging room <" + str(room.originX) + "," +
-                # str(room.originY) + ">" + "<" + str(room.endX) + "," +
-                # str(room.endY) + ">" + " and <" + \
-                #       str(nextRoom.originX) + "," + str(nextRoom.originY) +
-                #       ">" + "<" + str(nextRoom.endX) + "," +
-                #       str(nextRoom.endY) + ">.")
                 room.endX = nextRoom.endX
                 room.endY = nextRoom.endY
                 rooms.remove(nextRoom)
                 mergedCount = mergedCount + 1
             else:
-                nextRoom = next((nextRoom for nextRoom in rooms if (nextRoom.originY > room.originY and nextRoom.originY <= room.endY + 1 and \
-                                                                    nextRoom.originX == room.originX and nextRoom.endX == room.endX and \
-                                                                    nextRoom.endX - nextRoom.originX == room.endX - room.originX)), None) 
+                nextRoom = next((nextRoom for nextRoom in rooms if (nextRoom.level == room.level and \
+                                nextRoom.originY > room.originY and nextRoom.originY <= room.endY + 1 and \
+                                nextRoom.originX == room.originX and nextRoom.endX == room.endX and \
+                                nextRoom.endX - nextRoom.originX == room.endX - room.originX)), None)
                 if nextRoom is not None and not nextRoom.isCorridor:
-                    # print("Merging room <" + str(room.originX) + "," +
-                    # str(room.originY) + ">" + "<" + str(room.endX) + "," +
-                    # str(room.endY) + ">" + " and <" + \
-                    #       str(nextRoom.originX) + "," + str(nextRoom.originY)
-                    #       + ">" + "<" + str(nextRoom.endX) + "," +
-                    #       str(nextRoom.endY) + ">.")
                     room.endX = nextRoom.endX
                     room.endY = nextRoom.endY
                     rooms.remove(nextRoom)
@@ -195,9 +222,11 @@ def removeRooms(rooms):
     toBeRemoved = []
 
     for r1 in rooms:
-        for r2 in rooms:
-            if r1 is not r2 and r1.originX <= r2.originX and r1.originY <= r2.originY and r1.endX >= r2.endX and r1.endY >= r2.endY:
-                toBeRemoved.append(r2)
+        if (r1 not in toBeRemoved):
+            for r2 in rooms:
+                if r1 is not r2 and r1.level == r2.level and r1.originX <= r2.originX and \
+                    r1.originY <= r2.originY and r1.endX >= r2.endX and r1.endY >= r2.endY:
+                    toBeRemoved.append(r2)
 
     return [r for r in rooms if r not in toBeRemoved]
 
@@ -232,10 +261,12 @@ def addEverything(map, rooms, spawnPoint, medkit, ammo):
     print("Placing the spawn points... ", end='', flush=True)
 
     degreeFit = getNormalizedDegreeFit(normalizedDegree, 0.1, 0.3)
-    visibilityFit = [[(1 - visibilityMatrix[x][y]) for y in range(len(visibilityMatrix[0]))] for x in range(len(visibilityMatrix))]
+    visibilityFit = [[(1 - visibilityMatrix[x][y]) for y in range(len(visibilityMatrix[0]))] 
+                     for x in range(len(visibilityMatrix))]
 
     for i in range(spawnPoint[1]):
-        bestTile = getBestTile(roomGraph, diameter, diagonal, spawnPoint, [spawnPoint[0]], placedObjects, degreeFit, visibilityFit, [1, 0.25, -2], [1, 0.5, 0.5])
+        bestTile = getBestTile(roomGraph, diameter, diagonal, spawnPoint, [spawnPoint[0]], 
+                               placedObjects, degreeFit, visibilityFit, [1, 0.25, -2], [1, 0.5, 0.5])
         addResource(bestTile[0], bestTile[1], spawnPoint[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], spawnPoint[0]])
 
@@ -245,10 +276,12 @@ def addEverything(map, rooms, spawnPoint, medkit, ammo):
     print("Placing the medkits... ", end='', flush=True)
 
     degreeFit = getNormalizedDegreeFit(normalizedDegree, 0.3, 0.5)
-    visibilityFit = [[(1 - abs(0.5 - visibilityMatrix[x][y])) for y in range(len(visibilityMatrix[0]))] for x in range(len(visibilityMatrix))]
+    visibilityFit = [[(1 - abs(0.5 - visibilityMatrix[x][y])) for y in range(len(visibilityMatrix[0]))]
+                     for x in range(len(visibilityMatrix))]
 
     for i in range(medkit[1]):
-        bestTile = getBestTile(roomGraph, diameter, diagonal, medkit, [spawnPoint[0], medkit[0]], placedObjects, degreeFit, visibilityFit, [1, 0.25, 0], [1, 0.25, 0.5])
+        bestTile = getBestTile(roomGraph, diameter, diagonal, medkit, [spawnPoint[0], medkit[0]], 
+            placedObjects, degreeFit, visibilityFit, [1, 0.25, 0], [1, 0.25, 0.5])
         addResource(bestTile[0], bestTile[1], medkit[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], medkit[0]])
 
@@ -261,14 +294,17 @@ def addEverything(map, rooms, spawnPoint, medkit, ammo):
     visibilityFit = visibilityMatrix
 
     for i in range(math.floor(ammo[1] / 2)):
-        bestTile = getBestTile(roomGraph, diameter, diagonal, ammo, [ammo[0], medkit[0]], placedObjects, degreeFit, visibilityFit, [1, 0.25, 0], [1, 0.25, 0.5])
+        bestTile = getBestTile(roomGraph, diameter, diagonal, ammo, [ammo[0], medkit[0]], 
+                               placedObjects, degreeFit, visibilityFit, [1, 0.25, 0], 
+                               [1, 0.25, 0.5])
         addResource(bestTile[0], bestTile[1], ammo[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], ammo[0]])
 
     degreeFit = getNormalizedDegreeFit(normalizedDegree, 0.8, 0.9)
 
     for i in range(math.ceil(ammo[1] / 2)):
-        bestTile = getBestTile(roomGraph, diameter, diagonal, ammo, [ammo[0], medkit[0]], placedObjects, degreeFit, visibilityFit, [1, 0.25, 0], [1, 0.25, 0.5])
+        bestTile = getBestTile(roomGraph, diameter, diagonal, ammo, [ammo[0], medkit[0]], 
+                               placedObjects, degreeFit, visibilityFit, [1, 0.25, 0], [1, 0.25, 0.5])
         addResource(bestTile[0], bestTile[1], ammo[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], ammo[0]])
 
@@ -303,10 +339,12 @@ def addSpawnPointsSafe(map, rooms, spawnPoint):
     print("Placing the spawn points... ", end='', flush=True)
 
     degreeFit = dict([(fit[0], 1 - fit[1]) for fit in normalizedDegree])
-    visibilityFit = [[(1 - visibilityMatrix[x][y]) for y in range(len(visibilityMatrix[0]))] for x in range(len(visibilityMatrix))]
+    visibilityFit = [[(1 - visibilityMatrix[x][y]) for y in range(len(visibilityMatrix[0]))] 
+                     for x in range(len(visibilityMatrix))]
 
     for i in range(spawnPoint[1]):
-        bestTile = getBestTile(roomGraph, diameter, diagonal, spawnPoint, [spawnPoint[0]], placedObjects, degreeFit, visibilityFit, [1, 0.5, -2], [1, 0.5, 0.5])
+        bestTile = getBestTile(roomGraph, diameter, diagonal, spawnPoint, [spawnPoint[0]], 
+                               placedObjects, degreeFit, visibilityFit, [1, 0.5, -2], [1, 0.5, 0.5])
         addResource(bestTile[0], bestTile[1], spawnPoint[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], spawnPoint[0]])
 
@@ -346,14 +384,16 @@ def addSpawnPointsUnsafe(map, rooms, spawnPoint):
 
     for node in list(roomGraph.nodes(data = True)):
         if not roomGraph in normalizedDegree and deadEndCount < spawnPoint[1] / 2:
-            candidateTiles = [(x, y, visibilityFit[x][y]) for x in range(node[1]["originX"], node[1]["endX"]) for y in range(node[1]["originY"], node[1]["endY"])]
+            candidateTiles = [(x, y, visibilityFit[x][y]) for x in range(node[1]["originX"], node[1]["endX"]) 
+                              for y in range(node[1]["originY"], node[1]["endY"])]
             bestTile = max(candidateTiles, key = lambda x: x[2])
             addResource(bestTile[0], bestTile[1], spawnPoint[0], roomGraph, map)
             placedObjects.append([bestTile[0], bestTile[1], spawnPoint[0]])
             deadEndCount = deadEndCount + 1
 
     for i in range(spawnPoint[1] - deadEndCount):
-        bestTile = getBestTile(roomGraph, diameter, diagonal, spawnPoint, [spawnPoint[0]], placedObjects, degreeFit, visibilityFit, [1, 1.5, -2], [1, 0.75, 0.75])
+        bestTile = getBestTile(roomGraph, diameter, diagonal, spawnPoint, [spawnPoint[0]], 
+                               placedObjects, degreeFit, visibilityFit, [1, 1.5, -2], [1, 0.75, 0.75])
         addResource(bestTile[0], bestTile[1], spawnPoint[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], spawnPoint[0]])
 
@@ -385,7 +425,8 @@ def addSpawnPointsUniformly(map, rooms, spawnPoint):
     # Place the spawn points.
     print("Placing the spawn points... ", end='', flush=True)
 
-    visibilityFit = [[(1 - visibilityMatrix[x][y]) for y in range(len(visibilityMatrix[0]))] for x in range(len(visibilityMatrix))]
+    visibilityFit = [[(1 - visibilityMatrix[x][y]) for y in range(len(visibilityMatrix[0]))] 
+                     for x in range(len(visibilityMatrix))]
     
     for i in range(spawnPoint[1]):
         if (len(placedObjects) > 0):
@@ -395,8 +436,11 @@ def addSpawnPointsUniformly(map, rooms, spawnPoint):
 
         print("Done.")
         
-        candidateTiles = [(x, y, tileFit(x, y, visibilityFit[x][y], bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], \
-        placedObjects, diagonal, [1, 0.5, 0.5])) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]
+        candidateTiles = [(x, y, tileFit(x, y, visibilityFit[x][y], bestRoom["originX"], 
+                                         bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], 
+                                         placedObjects, diagonal, [1, 0.5, 0.5])) 
+                          for x in range(bestRoom["originX"], bestRoom["endX"]) 
+                          for y in range(bestRoom["originY"], bestRoom["endY"])]
         bestTile = max(candidateTiles, key = lambda x: x[2])
         addResource(bestTile[0], bestTile[1], spawnPoint[0], roomGraph, map)
         placedObjects.append([bestTile[0], bestTile[1], spawnPoint[0]])        
@@ -435,12 +479,15 @@ def addSpawnPointsRandom(map, rooms, spawnPoint):
 # Adds a resource to the map.
 def addResource(x, y, resource, roomGraph, map):
     width = len(map)
+    height = len(map[0])
 
-    roomGraph.add_node(subToInd(width, x, y), x = x, y = y, resource = resource)
+    roomGraph.add_node(subToInd(width, height, 0, x, y), x = x, y = y, resource = resource)
 
     for node in roomGraph.nodes(data=True):
-        if "originX" in node[1] and x >= node[1]["originX"] and x <= node[1]["endX"] and y >= node[1]["originY"] and y <= node[1]["endY"]:
-            roomGraph.add_edge(node[0], subToInd(width, x, y), weight = eulerianDistance(node[1]["originX"] / 2 + node[1]["endX"] / 2, node[1]["originY"] / 2 + node[1]["endY"] / 2, x, y))
+        if "originX" in node[1] and x >= node[1]["originX"] and x <= node[1]["endX"] and \
+            y >= node[1]["originY"] and y <= node[1]["endY"]: roomGraph.add_edge(node[0], 
+            subToInd(width, height, 0, x, y), weight = eulerianDistance(node[1]["originX"] / 2 + 
+            node[1]["endX"] / 2, node[1]["originY"] / 2 + node[1]["endY"] / 2, x, y))
 
     map[x][y] = resource
 
@@ -474,7 +521,8 @@ def getNormalizedDegree(roomGraph, discardDeadEnds=False):
     degree = roomGraph.degree
     minDeg = min(degree, key = lambda x: x[1])[1]
     maxDeg = max(degree, key = lambda x: x[1])[1]
-    return [(deg[0], (deg[1] - minDeg) / (maxDeg - minDeg)) for deg in roomGraph.degree if (discardDeadEnds is False or deg[1] > 1)]
+    return [(deg[0], (deg[1] - minDeg) / (maxDeg - minDeg)) for deg in roomGraph.degree if 
+            (discardDeadEnds is False or deg[1] > 1)]
 
 # Computes how much each normalized degree fits the specified interval.
 def getNormalizedDegreeFit(normalizedDegree, minimum, maximum):
@@ -520,7 +568,7 @@ def getVisibilityMatrix(map):
 # one of the specified resources.
 def resourceDistance(graph, diameter, node, resources):
     return min([(shortestPathLength(graph, node, sNode)) if "resource" in data and data["resource"] in resources \
-                     else diameter for sNode, data in graph.nodes(data=True)]) / diameter
+        else diameter for sNode, data in graph.nodes(data=True)]) / diameter
 
 # Returns how many resource of a give type are in the neighbourhood of the
 # node.
@@ -533,66 +581,60 @@ def resourceRedundancy(graph, node, resource):
 
 # Returns the fitness of a room.
 def roomFit(graph, diameter, node, degreeFit, object, objectList, weigths):
-    return weigths[0] * degreeFit + weigths[1] * resourceDistance(graph, diameter, node, objectList) + weigths[2] * resourceRedundancy(graph, node, object)
+    return weigths[0] * degreeFit + weigths[1] * resourceDistance(graph, diameter, node, objectList) \
+        + weigths[2] * resourceRedundancy(graph, node, object)
 
 # Returns the distance of a tile from the walls.
 def wallDistace(originX, originY, endX, endY, x, y):
-    return (min([abs(originX - x), abs(endX - x)]) + min([abs(originY - y), abs(endY - y)])) / ((endX - originX) / 2 + (endY - originY) / 2)
+    return (min([abs(originX - x), abs(endX - x)]) + min([abs(originY - y),
+        abs(endY - y)])) / ((endX - originX) / 2 + (endY - originY) / 2)
 
 # Returns the distance of a tile from the closest placed object.
 def objectDistance(x, y, placedObjects, diagonal):
-    return min([(eulerianDistance(x, y, object[0], object[1])) for object in placedObjects]) / diagonal if len(placedObjects) > 0 else 0
+    return min([(eulerianDistance(x, y, object[0], object[1])) for object in placedObjects]) / diagonal \
+        if len(placedObjects) > 0 else 0
 
 # Returns the fitness of a tile.
 def tileFit(x, y, visibility, originX, originY, endX, endY, placedObjects, diagonal, weigths):
-    return weigths[0] * visibility + weigths[1] * wallDistace(originX, originY, endX, endY, x, y) + weigths[2] * objectDistance(x, y, placedObjects, diagonal)
+    return weigths[0] * visibility + weigths[1] * wallDistace(originX, originY, endX, endY, x, y) + \
+        weigths[2] * objectDistance(x, y, placedObjects, diagonal)
 
 # Returns the best tile.
-def getBestTile(graph, diameter, diagonal, object, objects, placedObjects, degreeFit, visibilityFit, roomWeigths, tileWeigths):
-    candidateRooms = [(node, roomFit(graph, diameter, node, degreeFit[node], object, objects, roomWeigths)) \
-                      for node, data in graph.nodes(data = True) if (not "resource" in data and node in degreeFit)]
+def getBestTile(graph, diameter, diagonal, object, objects, placedObjects, degreeFit, visibilityFit, 
+                roomWeigths, tileWeigths):
+    candidateRooms = [(node, roomFit(graph, diameter, node, degreeFit[node], object, objects, 
+                      roomWeigths)) for node, data in graph.nodes(data = True) if 
+                      (not "resource" in data and node in degreeFit)]
     bestRoom = graph.node[max(candidateRooms, key = lambda x: x[1])[0]]
-    candidateTiles = [(x, y, tileFit(x, y, visibilityFit[x][y], bestRoom["originX"], bestRoom["originY"], bestRoom["endX"], bestRoom["endY"], \
-                      placedObjects, diagonal, tileWeigths)) for x in range(bestRoom["originX"], bestRoom["endX"]) for y in range(bestRoom["originY"], bestRoom["endY"])]
+    candidateTiles = [(x, y, tileFit(x, y, visibilityFit[x][y], bestRoom["originX"], bestRoom["originY"], 
+                      bestRoom["endX"], bestRoom["endY"], placedObjects, diagonal, tileWeigths)) 
+                      for x in range(bestRoom["originX"], bestRoom["endX"]) 
+                      for y in range(bestRoom["originY"], bestRoom["endY"])]
     return max(candidateTiles, key = lambda x: x[2])
 
 # Returns the node which has the maximum minimum distance from the resource
 # nodes.
 def getMostIsolatedNode(graph, resource):
-    nodes = [(node1, min([nx.shortest_path_length(graph, node1, node2) for node2, data2 in graph.nodes(data = True) if ("resource" in data2 and data2["resource"] == resource)])) \
-                      for node1, data1 in graph.nodes(data = True) if ("resource" not in data1)]
+    nodes = [(node1, min([nx.shortest_path_length(graph, node1, node2) 
+             for node2, data2 in graph.nodes(data = True) if ("resource" in data2 and data2["resource"] == resource)]))
+             for node1, data1 in graph.nodes(data = True) if ("resource" not in data1)]
     return graph.node[max(nodes, key = lambda x: x[1])[0]]
 
 ### GRAPH FUNCTIONS ###########################################################
 
 # Computes the tile graph.
-def getTileGraph(map, verbose=True):
+def getTileGraph(map, verbose = True):
     if verbose:
         print("\nGenerating the graph... ", end='', flush=True)
 
     G = nx.Graph()
-    width = len(map)
-    height = len(map[0])
 
-    # Add the nodes.
-    for x in range(width): 
-        for y in range(height): 
-            if not map[x][y] == "w":
-                G.add_node(subToInd(width, x, y), x = x, y = y, char = map[x][y])
+    if (len(map) > 0):
+        for i in range (len(map)):
+            getTileLevelNodes(map[i], i, G) 
+    else:
+        getTileLevelNodes(map, G)
 
-    # Add the edges.
-    for x in range(width): 
-        for y in range(height): 
-            if subToInd(width, x, y) in G:
-                if subToInd(width, x + 1, y) in G:
-                    G.add_edge(subToInd(width, x + 1, y), subToInd(width, x, y))
-                if subToInd(width, x + 1, y + 1) in G:
-                    G.add_edge(subToInd(width, x + 1, y + 1), subToInd(width, x, y))                  
-                if subToInd(width, x, y + 1) in G:
-                    G.add_edge(subToInd(width, x, y + 1), subToInd(width, x, y))
-                if subToInd(width, x - 1, y + 1) in G:
-                    G.add_edge(subToInd(width, x - 1, y + 1), subToInd(width, x, y))
-    
     if verbose:
         print("Done.\n")
         print("The tiles graph has:")
@@ -600,6 +642,35 @@ def getTileGraph(map, verbose=True):
         print("%i edges." % (nx.number_of_edges(G)))
     return G
 
+# Gets the tile graph for a single level.
+def getTileLevelNodes(map, level, graph):
+    width = len(map)
+    height = len(map[0])
+
+    # Add the nodes.
+    for x in range(width): 
+        for y in range(height): 
+            if not map[x][y] == "w":
+                graph.add_node(subToInd(width, height, level, x, y), x = x, y = y, char = map[x][y], 
+                               level = level)
+
+    # Add the edges.
+    for x in range(width): 
+        for y in range(height): 
+            if subToInd(width, height, level, x, y) in graph:
+                if subToInd(width, height, level, x + 1, y) in graph:
+                    graph.add_edge(subToInd(width, height, level, x + 1, y), 
+                                   subToInd(width, height, level, x, y))
+                if subToInd(width, height, level, x + 1, y + 1) in graph:
+                    graph.add_edge(subToInd(width, height, level, x + 1, y + 1), 
+                                   subToInd(width, height, level, x, y))                  
+                if subToInd(width, height, level, x, y + 1) in graph:
+                    graph.add_edge(subToInd(width, height, level, x, y + 1), 
+                                   subToInd(width, height, level, x, y))
+                if subToInd(width, height, level, x - 1, y + 1) in graph:
+                    graph.add_edge(subToInd(width, height, level, x - 1, y + 1), 
+                                   subToInd(width, height, level, x, y))
+    
 # Computes the rooms and corridors graph.
 def getRoomsCorridorsGraph(rooms, verbose=True):
     if verbose:
@@ -608,14 +679,19 @@ def getRoomsCorridorsGraph(rooms, verbose=True):
     G = nx.Graph()
 
     for i in range(len(rooms)):
-        G.add_node("r" + str(i), originX = rooms[i].originX, originY = rooms[i].originY, endX = rooms[i].endX, endY = rooms[i].endY, isCorridor = rooms[i].isCorridor)
+        G.add_node("r" + str(i), originX = rooms[i].originX, originY = rooms[i].originY, endX = rooms[i].endX, 
+                   endY = rooms[i].endY, isCorridor = rooms[i].isCorridor, level = rooms[i].level)
     
     for i in range(len(rooms)):
         for j in range(i, len(rooms)):
-            if j != i and not (rooms[i].originX >= rooms[j].endX + 1 or rooms[j].originX >= rooms[i].endX + 1) and \
-               not (rooms[i].originY >= rooms[j].endY + 1 or rooms[j].originY >= rooms[i].endY + 1):
-                G.add_edge("r" + str(i), "r" + str(j), weight = eulerianDistance((rooms[i].originX / 2 + rooms[i].endX / 2), (rooms[i].originY / 2 + rooms[i].endY / 2), (rooms[j].originX / 2 + rooms[j].endX / 2), \
-                                                            (rooms[j].originY / 2 + rooms[j].endY / 2)))
+            if (j != i and rooms[i].level == rooms[j].level and not (rooms[i].originX >= rooms[j].endX + 1 or \
+                rooms[j].originX >= rooms[i].endX + 1) and not (rooms[i].originY >= rooms[j].endY + 1 or \
+                rooms[j].originY >= rooms[i].endY + 1)):
+                G.add_edge("r" + str(i), "r" + str(j), 
+                           weight = eulerianDistance((rooms[i].originX / 2 + rooms[i].endX / 2), 
+                                                     (rooms[i].originY / 2 + rooms[i].endY / 2), 
+                                                     (rooms[j].originX / 2 + rooms[j].endX / 2),
+                                                     (rooms[j].originY / 2 + rooms[j].endY / 2)))
 
     if verbose:
         print("Done.\n")
@@ -631,17 +707,40 @@ def getRoomsCorridorsObjectsGraph(rooms, map, verbose=True):
 
     G = getRoomsCorridorsGraph(rooms, False)
 
-    width = len(map)
-    height = len(map[0])
+    if (isMultilevel(rooms)):
+        width = len(map[0])
+        height = len(map[0][0])
 
-    for x in range(width): 
-        for y in range(height): 
-            if not map[x][y] == "w" and not map[x][y] == "r" and not map[x][y] == "d":
-                G.add_node(subToInd(width, x, y), x = x, y = y, resource = map[x][y])
-                for node in G.nodes(data=True):
-                    if "originX" in node[1] and x >= node[1]["originX"] and x <= node[1]["endX"] and y >= node[1]["originY"] and y <= node[1]["endY"]:
-                        G.add_edge(node[0], subToInd(width, x, y), weight = eulerianDistance(node[1]["originX"] / 2 + node[1]["endX"] / 2, node[1]["originY"] / 2 + node[1]["endY"] / 2, \
-                                                           x, y))
+        for i in range(len(map)):
+            for x in range(width): 
+                for y in range(height): 
+                    if not map[i][x][y] == "w" and not map[i][x][y] == "r" and not map[i][x][y] == "d":
+                        G.add_node(subToInd(width, height, i, x, y), x = x, y = y, 
+                                   resource = map[i][x][y], level = i)
+                        for node in G.nodes(data=True):
+                            if (node[1]["level"] == i and "originX" in node[1] and 
+                                x >= node[1]["originX"] and x <= node[1]["endX"] and 
+                                y >= node[1]["originY"] and y <= node[1]["endY"]):
+                                G.add_edge(node[0], subToInd(width, height, i, x, y), weight = 
+                                           eulerianDistance(node[1]["originX"] / 2 + node[1]["endX"] / 2, 
+                                                            node[1]["originY"] / 2 + node[1]["endY"] / 2,
+                                                            x, y))
+    else:
+        width = len(map)
+        height = len(map[0])
+
+        for x in range(width): 
+            for y in range(height): 
+                if not map[x][y] == "w" and not map[x][y] == "r" and not map[x][y] == "d":
+                    G.add_node(subToInd(width, height, 0, x, y), x = x, y = y, resource = map[x][y], 
+                               level = 0)
+                    for node in G.nodes(data=True):
+                        if ("originX" in node[1] and x >= node[1]["originX"] and x <= node[1]["endX"] and 
+                            y >= node[1]["originY"] and y <= node[1]["endY"]):
+                            G.add_edge(node[0], subToInd(width, height, 0, x, y), weight = 
+                                       eulerianDistance(node[1]["originX"] / 2 + node[1]["endX"] / 2, 
+                                                        node[1]["originY"] / 2 + node[1]["endY"] / 2,
+                                                        x, y))
     if verbose:
         print("Done.\n")
         print("The rooms, corridors and objects graph has:")
@@ -662,12 +761,14 @@ def getVisibilityGraph(map, verbose=True):
     for x in range(width): 
         for y in range(height): 
             if not map[x][y] == "w":
-                G.add_node(subToInd(width, x, y), x = x, y = y, char = map[x][y], visibility = 0)
+                G.add_node(subToInd(width, height, 0, x, y), x = x, y = y, char = map[x][y], 
+                           visibility = 0)
      
     # Add the edges.
     for node1 in G.nodes(data=True):
         for node2 in G.nodes(data=True):
-            if node1 is not node2 and isTileVisible(node1[1]['x'], node1[1]['y'], node2[1]['x'], node2[1]['y'], map):
+            if node1 is not node2 and isTileVisible(node1[1]['x'], node1[1]['y'], node2[1]['x'], 
+                                                    node2[1]['y'], map):
                 G.add_edge(node1[0], node2[0])
 
     for node in G.nodes(data = True):
@@ -689,15 +790,15 @@ def getRoomsOutlineGraph(rooms):
     i = 0
 
     for room in rooms:
-        G.add_node(i, x = room.originX, y = room.originY)
+        G.add_node(i, x = room.originX, y = room.originY, level = room.level)
         i = i + 1
-        G.add_node(i, x = room.endX, y = room.originY)
+        G.add_node(i, x = room.endX, y = room.originY, level = room.level)
         G.add_edge(i, i - 1)
         i = i + 1
-        G.add_node(i, x = room.endX, y = room.endY)
+        G.add_node(i, x = room.endX, y = room.endY, level = room.level)
         G.add_edge(i, i - 1)
         i = i + 1
-        G.add_node(i, x = room.originX, y = room.endY)
+        G.add_node(i, x = room.originX, y = room.endY, level = room.level)
         G.add_edge(i, i - 1)
         G.add_edge(i, i - 3)
         i = i + 1
@@ -709,6 +810,13 @@ def getRoomsOutlineGraph(rooms):
     return G
 
 ### SUPPORT FUNCTIONS #########################################################
+
+# Tells if the current map is multilevel.
+def isMultilevel(rooms):
+    for room in rooms:
+        if room.level > 0:
+            return True;
+    return False;
 
 # Tells if a tile is visible from another tile.
 def isTileVisible(x1, y1, x2, y2, map):
@@ -746,13 +854,13 @@ def isInMapRange(x, y, map):
         return False
 
 # Converts from subscript to linear index.
-def subToInd(width, rows, cols):
-    return rows * width + cols
+def subToInd(width, height, level, rows, cols):
+    return rows * width + cols + level * width * height
 
 # Converts from linear to subscript index.
-def indToSub(width, ind):
-    rows = (ind.astype('int') / width)
-    cols = (ind.astype('int') % width)
+def indToSub(width, height, level, ind):
+    rows = ((ind.astype('int') - level * width * height) / width)
+    cols = ((ind.astype('int') - level * width * height) % width)
     return (rows, cols)
 
 # Computes the eulerian distance.
@@ -779,6 +887,14 @@ def blendColor(h1, h2, alpha):
     r2, g2, b2 = hexToRGB(h2)
     return RGBToHex(blend(r1, r2, alpha), blend(g1, g2, alpha), blend(b1, b2, alpha))
 
+# Darkens a color.
+def darkenColor(h, d):
+    r, g, b = hexToRGB(h)
+    r = r - r * d
+    g = g - r * d
+    b = b - r * d
+    return RGBToHex(r, g, b)
+
 # Tells how well a value fits in an interval.
 def intervalDistance(min, max, value):
     #return abs(abs(min) - abs(value)) + abs(abs(max) - abs(value))
@@ -800,67 +916,92 @@ def shortestPathLength(graph, n1, n2):
 def cls():
     os.system('cls' if os.name == 'nt' else 'clear')
 
+# Gets maximum level.
+def getMaxLevel(rooms):
+    max = 0
+
+    for room in rooms:
+        if room.level > max:
+            max = room.level
+
+    return max
+
 ### PLOT FUNCTIONS ############################################################
 
 # Plots the graph.
 def plotRoomsCorridorsGraph(G):
     print("\n[CLOSE THE GRAPH TO CONTNUE]")
-    pos = dict([(node, (data["originX"] / 2 + data["endX"] / 2, data["originY"] / 2 + data["endY"] / 2)) for node, data in G.nodes(data=True)])
+    pos = dict([(node, (data["originX"] / 2 + data["endX"] / 2, data["originY"] / 2 + data["endY"] / 2)) 
+                for node, data in G.nodes(data=True)])
     # edge_labels = dict([(key, "{:.2f}".format(value)) for key, value in
     # nx.get_edge_attributes(G,'weight').items()])
+    maxLevel = getMaxLevel(rooms)
+    colors = [(blendColor('#f44242', '#2EAA2E', data["level"] / maxLevel if maxLevel > 0 else 0)) 
+              for node, data in G.nodes(data=True)]
     node_labels = dict([(node, node) for node in G.nodes(data = False)])
     nx.draw_networkx_labels(G, pos, labels = node_labels)
-    nx.draw(G, pos, node_color = '#f44242', node_size = 75, node_shape = ",")
+    nx.draw(G, pos, node_color = colors, node_size = 75, node_shape = ",")
     # nx.draw_networkx_edge_labels(G, pos, edge_labels = edge_labels)
     plt.axis('equal')
-    plt.savefig(outputDir + "/plot_rooms_graph", dpi = 400)
     plt.show()
 
 # Plots the graph.
 def plotRoomsCorridorsObjectsGraph(G):
     print("\n[CLOSE THE GRAPH TO CONTNUE]")
-    pos = dict([(node, (data["originX"] / 2 + data["endX"] / 2, data["originY"] / 2 + data["endY"] / 2) if "originX" in data else (data["x"], data["y"])) for node, data  in G.nodes(data=True)])
+    pos = dict([(node, (data["originX"] / 2 + data["endX"] / 2, data["originY"] / 2 + data["endY"] / 2) 
+                 if "originX" in data else (data["x"], data["y"])) for node, data  in G.nodes(data=True)])
     # edge_labels = dict([(key, "{:.2f}".format(value)) for key, value in
     # nx.get_edge_attributes(G,'weight').items()])
-    colors = [('#f44242' if "originX" in data else "#0079a2") for node, data  in G.nodes(data=True)]
-    node_labels = dict([(node, node) if "resource" not in data else (node, data["resource"]) for node, data in G.nodes(data = True)])
+    maxLevel = getMaxLevel(rooms)
+    colors = [(blendColor('#f44242', '#2EAA2E', data["level"] / maxLevel if maxLevel > 0 else 0) 
+              if "originX" in data else blendColor("#0079a2", '#a20079', data["level"] / maxLevel 
+              if maxLevel > 0 else 0)) for node, data in G.nodes(data=True)]
+    node_labels = dict([(node, node) if "resource" not in data else (node, data["resource"]) for node, 
+                        data in G.nodes(data = True)])
     nx.draw_networkx_labels(G, pos, labels = node_labels)
     nx.draw(G, pos, node_color = colors, node_size = 75, node_shape = ",")
     # nx.draw_networkx_edge_labels(G, pos, edge_labels = edge_labels)
     plt.axis('equal')
-    plt.savefig(outputDir + "/plot_objects_graph", dpi = 400)
     plt.show()
 
 # Plots the graph.
 def plotTilesGraph(G):
     print("\n[CLOSE THE GRAPH TO CONTNUE]")
-    pos = dict([ (node, (data["x"], data["y"])) for node, data  in G.nodes(data=True)])
-    node_labels = dict([(node, data["char"]) for node, data in G.nodes(data = True) if data["char"] != "w" and data["char"] != "r"])
+    pos = dict([(node, (data["x"], data["y"])) for node, data  in G.nodes(data=True)])
+    maxLevel = getMaxLevel(rooms)
+    colors = [(blendColor('#f44242', '#2EAA2E', data["level"] / maxLevel if maxLevel > 0 else 0)) 
+              for node, data in G.nodes(data=True)]
+    node_labels = dict([(node, data["char"]) for node, data in G.nodes(data = True) 
+                        if data["char"] != "w" and data["char"] != "r"])
     nx.draw_networkx_labels(G, pos, labels = node_labels)
-    nx.draw(G, pos, node_color = '#f44242', node_size = 75, node_shape = ",")
+    nx.draw(G, pos, node_color = colors, node_size = 75, node_shape = ",", 
+            alpha = (2 / (maxLevel + 1) if maxLevel > 0 else 1))
     plt.axis('equal')
-    plt.savefig(outputDir + "/plot_tiles_graph", dpi = 400)
     plt.show()
 
 # Plots the graph.
 def plotVisibilityGraph(G):
     print("\n[CLOSE THE GRAPH TO CONTNUE]")
     minC, maxC = minMaxVisibility(G)
-    colors = [(blendColor("#0000ff", "#ff0000", (data["visibility"] - minC) / (maxC - minC))) for node, data in G.nodes(data=True)]
+    colors = [(blendColor("#0000ff", "#ff0000", (data["visibility"] - minC) / (maxC - minC))) 
+              for node, data in G.nodes(data=True)]
     pos = dict([ (node, (data["x"], data["y"])) for node, data in G.nodes(data=True)])
     nx.draw_networkx_nodes(G, pos, node_color = colors, node_size = 75, node_shape = ",")
     # node_labels = nx.get_node_attributes(G,'visibility')
     # nx.draw_networkx_labels(G, pos, labels = node_labels)
     plt.axis('equal')
-    plt.savefig(outputDir + "/plot_visibility_graph", dpi = 400)
     plt.show()
 
 # Plots the graph.
 def plotOutlinesGraph(G):
     print("\n[CLOSE THE GRAPH TO CONTNUE]")
-    nx.draw(G, dict([ (node, (data["x"], data["y"])) for node, data  in G.nodes(data=True)]), node_color = '#f44242', node_size = 75, node_shape = ",")
+    maxLevel = getMaxLevel(rooms)
+    colors = [(blendColor('#f44242', '#2EAA2E', data["level"] / maxLevel if maxLevel > 0 else 0))
+              for node, data in G.nodes(data=True)]
+    nx.draw(G, dict([ (node, (data["x"], data["y"])) for node, data  in G.nodes(data=True)]),
+            node_color = colors, node_size = 75, node_shape = ",", alpha = (2 / (maxLevel + 1)
+                                                                            if maxLevel > 0 else 1))
     plt.axis('equal')
-    plt.savefig(outputDir + "/plot_outlines_graph", dpi = 400)
     plt.show()
 
 ### MENU FUNCTIONS ############################################################
@@ -882,8 +1023,11 @@ def graphMenu():
         if option == "1":
             graphMenuReachability()
         elif option == "2":
-            G = getVisibilityGraph(map)
-            plotVisibilityGraph(G)
+            if (isMultilevel):
+                print("\n[ERROR] Visibility graph not supported for multi-level maps.")
+            else:
+                G = getVisibilityGraph(map)
+                plotVisibilityGraph(G)
         elif option == "3":
             G = getRoomsOutlineGraph(rooms)
             plotOutlinesGraph(G)
@@ -999,7 +1143,10 @@ while True:
         option = input("Invalid choice. Option: ")
 
     if option == "1":
-        populateMenu()
+        if (isMultilevel):
+            print("\n[ERROR] Population not supported for multi-level maps.")
+        else:
+            populateMenu()
     elif option == "2":
         graphMenu()
     elif option == "3":
