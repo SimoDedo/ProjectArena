@@ -627,11 +627,17 @@ def getTileGraph(map, verbose = True):
     if verbose:
         print("\nGenerating the graph... ", end='', flush=True)
 
-    G = nx.Graph()
+    if (len(map) > 0):
+        G = nx.DiGraph()
+    else:
+        G = nx.Graph()
 
     if (len(map) > 0):
         for i in range (len(map)):
-            getTileLevelNodes(map[i], i, G) 
+            getTileLevelNodes(map[i], i, G)
+        makeBidirectional(G)
+        addStairsEdgesTiles(G, map)
+        addJumpEdgesTiles(G, map)
     else:
         getTileLevelNodes(map, G)
 
@@ -641,42 +647,16 @@ def getTileGraph(map, verbose = True):
         print("%i nodes." % (nx.number_of_nodes(G)))
         print("%i edges." % (nx.number_of_edges(G)))
     return G
-
-# Gets the tile graph for a single level.
-def getTileLevelNodes(map, level, graph):
-    width = len(map)
-    height = len(map[0])
-
-    # Add the nodes.
-    for x in range(width): 
-        for y in range(height): 
-            if not map[x][y] == "w":
-                graph.add_node(subToInd(width, height, level, x, y), x = x, y = y, char = map[x][y], 
-                               level = level)
-
-    # Add the edges.
-    for x in range(width): 
-        for y in range(height): 
-            if subToInd(width, height, level, x, y) in graph:
-                if subToInd(width, height, level, x + 1, y) in graph:
-                    graph.add_edge(subToInd(width, height, level, x + 1, y), 
-                                   subToInd(width, height, level, x, y))
-                if subToInd(width, height, level, x + 1, y + 1) in graph:
-                    graph.add_edge(subToInd(width, height, level, x + 1, y + 1), 
-                                   subToInd(width, height, level, x, y))                  
-                if subToInd(width, height, level, x, y + 1) in graph:
-                    graph.add_edge(subToInd(width, height, level, x, y + 1), 
-                                   subToInd(width, height, level, x, y))
-                if subToInd(width, height, level, x - 1, y + 1) in graph:
-                    graph.add_edge(subToInd(width, height, level, x - 1, y + 1), 
-                                   subToInd(width, height, level, x, y))
     
 # Computes the rooms and corridors graph.
 def getRoomsCorridorsGraph(rooms, verbose=True):
     if verbose:
         print("\nGenerating the graph... ", end='', flush=True)
 
-    G = nx.Graph()
+    if (isMultilevel(rooms)):
+        G = nx.DiGraph()
+    else:
+        G = nx.Graph()
 
     for i in range(len(rooms)):
         G.add_node("r" + str(i), originX = rooms[i].originX, originY = rooms[i].originY, endX = rooms[i].endX, 
@@ -692,6 +672,9 @@ def getRoomsCorridorsGraph(rooms, verbose=True):
                                                      (rooms[i].originY / 2 + rooms[i].endY / 2), 
                                                      (rooms[j].originX / 2 + rooms[j].endX / 2),
                                                      (rooms[j].originY / 2 + rooms[j].endY / 2)))
+
+    if (isMultilevel(rooms)):
+        makeBidirectional(G)
 
     if verbose:
         print("Done.\n")
@@ -714,24 +697,29 @@ def getRoomsCorridorsObjectsGraph(rooms, map, verbose=True):
         for i in range(len(map)):
             for x in range(width): 
                 for y in range(height): 
-                    if not map[i][x][y] == "w" and not map[i][x][y] == "r" and not map[i][x][y] == "d":
+                    # I exclude decorations ("d") and stairs (uppercase chars) from the game elements.
+                    if (not map[i][x][y] == "w" and not map[i][x][y] == "r" and not map[i][x][y] == "d"
+                        and not map[i][x][y].isupper()):
                         G.add_node(subToInd(width, height, i, x, y), x = x, y = y, 
                                    resource = map[i][x][y], level = i)
                         for node in G.nodes(data=True):
                             if (node[1]["level"] == i and "originX" in node[1] and 
                                 x >= node[1]["originX"] and x <= node[1]["endX"] and 
                                 y >= node[1]["originY"] and y <= node[1]["endY"]):
-                                G.add_edge(node[0], subToInd(width, height, i, x, y), weight = 
-                                           eulerianDistance(node[1]["originX"] / 2 + node[1]["endX"] / 2, 
-                                                            node[1]["originY"] / 2 + node[1]["endY"] / 2,
-                                                            x, y))
+                                weight = eulerianDistance(node[1]["originX"] / 2 + node[1]["endX"] / 2, 
+                                                          node[1]["originY"] / 2 + node[1]["endY"] / 2,
+                                                          x, y)
+                                G.add_edge(node[0], subToInd(width, height, i, x, y), weight = weight)
+                                G.add_edge(subToInd(width, height, i, x, y), node[0], weight = weight)
     else:
         width = len(map)
         height = len(map[0])
 
         for x in range(width): 
-            for y in range(height): 
-                if not map[x][y] == "w" and not map[x][y] == "r" and not map[x][y] == "d":
+            for y in range(height):
+                # I exclude decorations ("d") and stairs (uppercase chars) from the game elements.
+                if (not map[x][y] == "w" and not map[x][y] == "r" and not map[x][y] == "d" 
+                    and not map[i][x][y].isupper()):
                     G.add_node(subToInd(width, height, 0, x, y), x = x, y = y, resource = map[x][y], 
                                level = 0)
                     for node in G.nodes(data=True):
@@ -809,7 +797,104 @@ def getRoomsOutlineGraph(rooms):
     print("%i edges." % (nx.number_of_edges(G)))
     return G
 
+### GRAPH SUPPORT FUNCTIONS ####################################################
+
+# Gets the tile graph for a single level.
+def getTileLevelNodes(map, level, graph):
+    width = len(map)
+    height = len(map[0])
+
+    # Add the nodes.
+    for x in range(width): 
+        for y in range(height): 
+            if not map[x][y] == "w":
+                graph.add_node(subToInd(width, height, level, x, y), x = x, y = y, char = map[x][y], 
+                               level = level)
+
+    # Add the edges.
+    for x in range(width): 
+        for y in range(height): 
+            if subToInd(width, height, level, x, y) in graph:
+                if subToInd(width, height, level, x + 1, y) in graph:
+                    graph.add_edge(subToInd(width, height, level, x + 1, y), 
+                                   subToInd(width, height, level, x, y))
+                if subToInd(width, height, level, x + 1, y + 1) in graph:
+                    graph.add_edge(subToInd(width, height, level, x + 1, y + 1), 
+                                   subToInd(width, height, level, x, y))                  
+                if subToInd(width, height, level, x, y + 1) in graph:
+                    graph.add_edge(subToInd(width, height, level, x, y + 1), 
+                                   subToInd(width, height, level, x, y))
+                if subToInd(width, height, level, x - 1, y + 1) in graph:
+                    graph.add_edge(subToInd(width, height, level, x - 1, y + 1), 
+                                   subToInd(width, height, level, x, y))
+
+# Adds edges where there are stairs.
+def addStairsEdgesTiles(G, map):
+    width = len(map[0])
+    height = len(map[0][0])
+
+    for i in range(len(map)):
+        for x in range(width): 
+            for y in range(height):
+                if (map[i][x][y].isupper()):
+                    if (map[i][x][y] == "W"):
+                        j = 1
+                        while(y + j < height and map[i][x][y + j] == "O"):
+                            j = j + 1
+                        j = j - 1
+                        G.add_edge(subToInd(width, height, i, x, y), 
+                                   subToInd(width, height, i - 1, x, y + j), weigth = j)
+                        G.add_edge(subToInd(width, height, i - 1, x, y + j), 
+                                   subToInd(width, height, i, x, y), weigth = j)
+                    elif (map[i][x][y] == "D"):
+                        j = 1
+                        while(x + j < width and map[i][x + j][y] == "O"):
+                            j = j + 1
+                        j = j - 1
+                        G.add_edge(subToInd(width, height, i, x, y), 
+                                   subToInd(width, height, i - 1, x + j, y), weigth = j)
+                        G.add_edge(subToInd(width, height, i - 1, x + j, y), 
+                                   subToInd(width, height, i, x, y), weigth = j)
+                    elif (map[i][x][y] == "S"):
+                        j = 1
+                        while(y - j >= 0 and map[i][x][y - j] == "O"):
+                            j = j + 1
+                        j = j - 1
+                        G.add_edge(subToInd(width, height, i, x, y), 
+                                   subToInd(width, height, i - 1, x, y - j), weigth = j)
+                        G.add_edge(subToInd(width, height, i - 1, x, y - j), 
+                                   subToInd(width, height, i, x, y), weigth = j)
+                    elif (map[i][x][y] == "A"):
+                        j = 1
+                        while(x - j >= 0 and map[i][x - j][y] == "O"):
+                            j = j + 1
+                        j = j - 1
+                        G.add_edge(subToInd(width, height, i, x, y), 
+                                   subToInd(width, height, i - 1, x - j, y), weigth = j)
+                        G.add_edge(subToInd(width, height, i - 1, x - j, y), 
+                                   subToInd(width, height, i, x, y), weigth = j)
+
+# Adds edges where there are jump.
+def addJumpEdgesTiles(G, map):
+    width = len(map[0])
+    height = len(map[0][0])
+
+    for i in range(1, len(map)):
+        for x in range(width): 
+            for y in range(height):
+                if (map[i][x][y] != "w" and map[i][x][y].islower()):
+                    for m in range (-1, 2):
+                        for n in range (-1, 2):
+                            if(map[i - 1][x + m][y + n] != "w" and map[i - 1][x + m][y + n].islower()):
+                                G.add_edge(subToInd(width, height, i, x, y), 
+                                   subToInd(width, height, i - 1, x + m, y + n))
+
 ### SUPPORT FUNCTIONS #########################################################
+
+# Makes alle the edges in a graph bi-directional.
+def makeBidirectional(G):
+    reversed = G.reverse()
+    G.add_edges_from(reversed.edges)
 
 # Tells if the current map is multilevel.
 def isMultilevel(rooms):
@@ -972,10 +1057,11 @@ def plotTilesGraph(G):
     colors = [(blendColor('#f44242', '#2EAA2E', data["level"] / maxLevel if maxLevel > 0 else 0)) 
               for node, data in G.nodes(data=True)]
     node_labels = dict([(node, data["char"]) for node, data in G.nodes(data = True) 
-                        if data["char"] != "w" and data["char"] != "r"])
+                        if data["char"] != "w" and data["char"] != "r" and data["char"] != "d" 
+                        and data["char"].islower()])
     nx.draw_networkx_labels(G, pos, labels = node_labels)
     nx.draw(G, pos, node_color = colors, node_size = 75, node_shape = ",", 
-            alpha = (2 / (maxLevel + 1) if maxLevel > 0 else 1))
+            alpha = (2 / (maxLevel + 1) if maxLevel > 0 else 1), arrowstyle = "fancy")
     plt.axis('equal')
     plt.show()
 
@@ -1023,7 +1109,7 @@ def graphMenu():
         if option == "1":
             graphMenuReachability()
         elif option == "2":
-            if (isMultilevel):
+            if (isMultilevel(rooms)):
                 print("\n[ERROR] Visibility graph not supported for multi-level maps.")
             else:
                 G = getVisibilityGraph(map)
@@ -1143,7 +1229,7 @@ while True:
         option = input("Invalid choice. Option: ")
 
     if option == "1":
-        if (isMultilevel):
+        if (isMultilevel(rooms)):
             print("\n[ERROR] Population not supported for multi-level maps.")
         else:
             populateMenu()
