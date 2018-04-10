@@ -675,6 +675,8 @@ def getRoomsCorridorsGraph(rooms, verbose=True):
 
     if (isMultilevel(rooms)):
         makeBidirectional(G)
+        addJumpEdgesRooms(rooms, G)
+        addStairsEdgesRooms(rooms, map, G)
 
     if verbose:
         print("Done.\n")
@@ -874,7 +876,7 @@ def addStairsEdgesTiles(G, map):
                         G.add_edge(subToInd(width, height, i - 1, x - j, y), 
                                    subToInd(width, height, i, x, y), weigth = j)
 
-# Adds edges where there are jump.
+# Adds edges where there are jumps.
 def addJumpEdgesTiles(G, map):
     width = len(map[0])
     height = len(map[0][0])
@@ -889,7 +891,95 @@ def addJumpEdgesTiles(G, map):
                                 G.add_edge(subToInd(width, height, i, x, y), 
                                    subToInd(width, height, i - 1, x + m, y + n))
 
+# Adds edges where there are jumps.
+def addJumpEdgesRooms(rooms, G):
+    for i in range(len(rooms)):
+        for j in range(len(rooms)):
+            if (i != j and rooms[i].level == rooms[j].level + 1):
+               if (canJumpFromTo(rooms[i], rooms[j])):
+                    G.add_edge("r" + str(i), "r" + str(j), 
+                               weight = eulerianDistance((rooms[i].originX / 2 + rooms[i].endX / 2), 
+                                                         (rooms[i].originY / 2 + rooms[i].endY / 2), 
+                                                         (rooms[j].originX / 2 + rooms[j].endX / 2),
+                                                         (rooms[j].originY / 2 + rooms[j].endY / 2)))
+
+# Adds edges where there are stairs.
+def addStairsEdgesRooms(rooms, map, G):
+    width = len(map[0])
+    height = len(map[0][0])
+
+    for i in range(len(rooms)):
+        for x in range(rooms[i].originX, rooms[i].endX + 1): 
+            for y in range(rooms[i].originY, rooms[i].endY + 1):
+                if (map[rooms[i].level][x][y].isupper()):
+                    level = rooms[i].level
+                    if (map[level][x][y] == "W"):
+                        j = 1
+                        while(y + j < height and map[level][x][y + j] == "O"):
+                            j = j + 1
+                        j = j - 1
+                        for r in getRoomsContainingCoord(x, y + j, level - 1, rooms):
+                            weight = eulerianDistance((rooms[i].originX / 2 + rooms[i].endX / 2), 
+                                                      (rooms[i].originY / 2 + rooms[i].endY / 2), 
+                                                      (rooms[r].originX / 2 + rooms[r].endX / 2),
+                                                      (rooms[r].originY / 2 + rooms[r].endY / 2))
+                            G.add_edge("r" + str(i), "r" + str(r), weight = weight)
+                            G.add_edge("r" + str(r), "r" + str(i), weight = weight)           
+                    elif (map[level][x][y] == "D"):
+                        j = 1
+                        while(x + j < width and map[level][x + j][y] == "O"):
+                            j = j + 1
+                        j = j - 1
+                        for r in getRoomsContainingCoord(x + j, y, level - 1, rooms):
+                            weight = eulerianDistance((rooms[i].originX / 2 + rooms[i].endX / 2), 
+                                                      (rooms[i].originY / 2 + rooms[i].endY / 2), 
+                                                      (rooms[r].originX / 2 + rooms[r].endX / 2),
+                                                      (rooms[r].originY / 2 + rooms[r].endY / 2))
+                            G.add_edge("r" + str(i), "r" + str(r), weight = weight)
+                            G.add_edge("r" + str(r), "r" + str(i), weight = weight)  
+                    elif (map[level][x][y] == "S"):
+                        j = 1
+                        while(y - j >= 0 and map[level][x][y - j] == "O"):
+                            j = j + 1
+                        j = j - 1
+                        for r in getRoomsContainingCoord(x, y - j, level - 1, rooms):
+                            weight = eulerianDistance((rooms[i].originX / 2 + rooms[i].endX / 2), 
+                                                      (rooms[i].originY / 2 + rooms[i].endY / 2), 
+                                                      (rooms[r].originX / 2 + rooms[r].endX / 2),
+                                                      (rooms[r].originY / 2 + rooms[r].endY / 2))
+                            G.add_edge("r" + str(i), "r" + str(r), weight = weight)
+                            G.add_edge("r" + str(r), "r" + str(i), weight = weight)  
+                    elif (map[level][x][y] == "A"):
+                        j = 1
+                        while(x - j >= 0 and map[level][x - j][y] == "O"):
+                            j = j + 1
+                        j = j - 1
+                        for r in getRoomsContainingCoord(x - j, y, level - 1, rooms):
+                            weight = eulerianDistance((rooms[i].originX / 2 + rooms[i].endX / 2), 
+                                                      (rooms[i].originY / 2 + rooms[i].endY / 2), 
+                                                      (rooms[r].originX / 2 + rooms[r].endX / 2),
+                                                      (rooms[r].originY / 2 + rooms[r].endY / 2))
+                            G.add_edge("r" + str(i), "r" + str(r), weight = weight)
+                            G.add_edge("r" + str(r), "r" + str(i), weight = weight)  
+
 ### SUPPORT FUNCTIONS #########################################################
+
+# Returns the indices of the rooms which contain a coordinate.
+def getRoomsContainingCoord(x, y, level, rooms):
+    containers = []
+    for r in range(len(rooms)):
+        if (rooms[r].level == level and rooms[r].originX <= x and rooms[r].endX >= x 
+            and rooms[r].originY <= y and rooms[r].endY >= y):
+            containers.append(r)
+            print("[" + str(x) + ", " + str(y) + "] contained in room r" + str(r) + "." )
+    return containers
+
+# Tells if it is possible to jump from a room to another.
+def canJumpFromTo(rf, rt):
+    return (not (rf.originX >= rt.endX + 1 or rt.originX >= rf.endX + 1) and 
+            not (rf.originY >= rt.endY + 1 or rt.originY >= rf.endY + 1) and
+            not (rf.originX <= rt.originX and rf.originY <= rt.originY 
+                 and rf.endX >= rt.endX and rf.endY >= rt.endY))
 
 # Makes alle the edges in a graph bi-directional.
 def makeBidirectional(G):
