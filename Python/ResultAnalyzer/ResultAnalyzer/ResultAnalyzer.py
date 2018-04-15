@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.lines as lines
 import matplotlib.ticker as ticker
 import matplotlib.cm as cm
-from scipy.stats import wilcoxon, binom_test
+from scipy.stats import wilcoxon, binom_test, norm
 from scipy.ndimage.filters import gaussian_filter
 from matplotlib.font_manager import FontProperties
 import pandas as pd
@@ -96,7 +96,8 @@ def generateBarDiagramKills(data, safe):
 
     pArena = plt.bar(ind, killsSafeArena, width)
     pCorridors = plt.bar(ind, killsSafeCorridors, width, bottom = killsSafeArena)
-    pIntense = plt.bar(ind, killsSafeIntense, width, bottom =  [sum(x) for x in zip(killsSafeArena, killsSafeCorridors)])
+    pIntense = plt.bar(ind, killsSafeIntense, width, bottom =  [sum(x) for x in zip(killsSafeArena, 
+                                                                                    killsSafeCorridors)])
 
     # Plot.
     plt.ylabel('Number of matches')
@@ -111,7 +112,8 @@ def generateBarDiagramKills(data, safe):
     lg = ax.legend((pArena[0], pCorridors[0], pIntense[0]), ('Arena', 'Corridors', 'Intense'),
                loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol = 3)
     lg.draw_frame(False)
-    plt.savefig(exportDir + "/" + ("bar_lowrisk" if safe else "bar_uniform"), dpi = 200, bbox_inches = "tight")
+    plt.savefig(exportDir + "/" + ("bar_lowrisk" if safe else "bar_uniform"), dpi = 200, 
+                bbox_inches = "tight")
     # plt.show()
     plt.clf()
 
@@ -218,7 +220,8 @@ def generateScatterKills():
 def generateScatterDistance():
     # Extract the data.
     df = pd.read_csv(inputDir + "/datasb.csv", sep = ";", index_col=0)    
-    g = sns.JointGrid(x="Distance (heuristic)", y="Distance (uniform)", data=df, xlim = [400, 800], ylim = [400, 800])
+    g = sns.JointGrid(x="Distance (heuristic)", y="Distance (uniform)", data=df, xlim = [400, 800],
+                      ylim = [400, 800])
     g = g.plot_joint(plt.scatter, color = "m",  alpha=.6)
     _ = g.ax_marg_x.hist(df["Distance (heuristic)"], color = "b", alpha=.6)
     _ = g.ax_marg_y.hist(df["Distance (uniform)"], color = "r", alpha=.6, orientation="horizontal")    
@@ -231,7 +234,8 @@ def generateScatterDistance():
 def generateScatterShots():
     # Extract the data.
     df = pd.read_csv(inputDir + "/datasb.csv", sep = ";", index_col=0)    
-    g = sns.JointGrid(x="Shots (heuristic)", y="Shots (uniform)", data=df, xlim = [0, 300], ylim = [0, 300])
+    g = sns.JointGrid(x="Shots (heuristic)", y="Shots (uniform)", data=df, xlim = [0, 300], 
+                      ylim = [0, 300])
     g = g.plot_joint(plt.scatter, color = "m",  alpha=.6)
     _ = g.ax_marg_x.hist(df["Shots (heuristic)"], color = "b", alpha=.6)
     _ = g.ax_marg_y.hist(df["Shots (uniform)"], color = "r", alpha=.6, orientation="horizontal")    
@@ -244,7 +248,8 @@ def generateScatterShots():
 def generateScatterAccuracy():
     # Extract the data.
     df = pd.read_csv(inputDir + "/datasb.csv", sep = ";", index_col=0)    
-    g = sns.JointGrid(x="Accuracy (heuristic)", y="Accuracy (uniform)", data=df, xlim = [0, 1], ylim = [0, 1])
+    g = sns.JointGrid(x="Accuracy (heuristic)", y="Accuracy (uniform)", data=df, xlim = [0, 1], 
+                      ylim = [0, 1])
     g = g.plot_joint(plt.scatter, color = "m",  alpha=.6)
     _ = g.ax_marg_x.hist(df["Accuracy (heuristic)"], color = "b", alpha=.6)
     _ = g.ax_marg_y.hist(df["Accuracy (uniform)"], color = "r", alpha=.6, orientation="horizontal")    
@@ -257,7 +262,8 @@ def generateScatterAccuracy():
 def generateScatterAccuracy():
     # Extract the data.
     df = pd.read_csv(inputDir + "/datasb.csv", sep = ";", index_col=0)    
-    g = sns.JointGrid(x="Accuracy (heuristic)", y="Accuracy (uniform)", data=df, xlim = [0, 1], ylim = [0, 1])
+    g = sns.JointGrid(x="Accuracy (heuristic)", y="Accuracy (uniform)", data=df, xlim = [0, 1], 
+                      ylim = [0, 1])
     g = g.plot_joint(plt.scatter, color = "m",  alpha=.6)
     _ = g.ax_marg_x.hist(df["Accuracy (heuristic)"], color = "b", alpha=.6)
     _ = g.ax_marg_y.hist(df["Accuracy (uniform)"], color = "r", alpha=.6, orientation="horizontal")    
@@ -268,7 +274,11 @@ def generateScatterAccuracy():
 
 def difficultyHeatmap():
     # Extract the data.
-    df = pd.DataFrame({'Effective': ['heuristic', 'heuristic', 'heuristic', 'equal', 'equal', 'equal', 'uniform', 'uniform', 'uniform'], 'Perceived': ['heuristic', 'equal', 'uniform', 'heuristic', 'equal', 'uniform', 'heuristic', 'equal', 'uniform'], 'value': [10, 4, 3, 2, 1, 1, 1, 3, 2]})  
+    df = pd.DataFrame({'Effective': ['heuristic', 'heuristic', 'heuristic', 'equal', 'equal', 
+                                     'equal', 'uniform', 'uniform', 'uniform'], 
+                       'Perceived': ['heuristic', 'equal', 'uniform', 'heuristic', 'equal', 
+                                     'uniform', 'heuristic', 'equal', 'uniform'],
+                      'value': [10, 4, 3, 2, 1, 1, 1, 3, 2]})  
     result = df.pivot(index='Effective', columns='Perceived', values='value')
     sns.heatmap(result, annot = True, square = True, cmap = "viridis")
     plt.savefig(exportDir + "/difficulty", dpi = 200, bbox_inches = "tight")
@@ -317,6 +327,27 @@ def wilcoxonTest(data, safeColumn, uniformCoulumn):
     print("p-value (two-tiled) = " + str(pvalue))
     print("p-value (one-tiled) = " + str(pvalue / 2))
 
+# Compare distribution.
+def compareDistributions(c1, c2, data, filename):
+    data1 = getArrayFromData(data, c1, 2)
+    data2 = getArrayFromData(data, c2, 2)
+    data1.sort()
+    data2.sort()
+    d1mean = np.mean(data1)
+    d2mean = np.mean(data2)
+    d1std = np.std(data1)
+    d2std = np.std(data2)
+    pdf1 = norm.pdf(data1, d1mean, d1std)
+    pdf2 = norm.pdf(data2, d2mean, d2std)
+
+    ax = plt.subplot(111)
+    plt.plot(data1, pdf1, label = "Heuristic")
+    plt.plot(data2, pdf2, label = "Uniform")
+    lg = ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.075), ncol = 2)
+    lg.draw_frame(False)
+    plt.savefig(exportDir + "/" + filename, dpi = 200, bbox_inches = "tight")
+    plt.clf()
+
 ### MENU FUNCTIONS ############################################################
 
 # Menages the graph menu.
@@ -332,12 +363,14 @@ def graphMenu(data):
         print("[5] Shots")
         print("[6] Accuracy")
         print("[7] Perception")
-        print("[8] Heatmaps")
+        print("[8] AvgKillTime")
+        print("[9] AvgKillDistance")
         print("[0] Back\n")
 
         option = input("Option: ")
     
-        while option != "1" and option != "2" and option != "3" and option != "4" and option != "5" and option != "6" and option != "7" and option != "0":
+        while (option != "1" and option != "2" and option != "3" and option != "4" and option != "5" 
+               and option != "6" and option != "7" and option != "8" and option != "9" and option != "0"):
             option = input("Invalid choice. Option: ")
     
         if option == "1":
@@ -366,6 +399,12 @@ def graphMenu(data):
             print("\nGenerating graph...")
             # generateBarDiagramDifficulty(data)
             difficultyHeatmap()
+        elif option == "8":
+            print("\nGenerating graph...")
+            compareDistributions(7, 14, data, "AvgKillTime_distribution")
+        elif option == "9":
+            print("\nGenerating graph...")
+            compareDistributions(8, 15, data, "AvgKillDistance_distribution")
         elif option == "0":
             return
 
@@ -406,7 +445,8 @@ def functionMenu():
             plt.xlabel(r'$deg(t)$')
             plt.xticks(np.arange(0, 16, 2))
             plt.yticks(np.arange(0, 1.1, 0.2))
-            plt.plot(t2, [degree(t, 0, 15, False) for t in t2], t1, [degree(t, 0, 15, False) for t in t1], 'ro', lw = 2)
+            plt.plot(t2, [degree(t, 0, 15, False) for t in t2], t1, 
+                     [degree(t, 0, 15, False) for t in t1], 'ro', lw = 2)
             plt.savefig(exportDir + "/visibility_low", dpi = 200, bbox_inches = "tight")
             # plt.show()
             plt.clf()        
@@ -418,7 +458,8 @@ def functionMenu():
             plt.xlabel(r'$deg(t)$')
             plt.xticks(np.arange(0, 16, 2))
             plt.yticks(np.arange(0, 1.1, 0.2))
-            plt.plot(t2, [degreeMedium(t, 0, 15) for t in t2], t1, [degreeMedium(t, 0, 15) for t in t1], 'ro', lw = 2)
+            plt.plot(t2, [degreeMedium(t, 0, 15) for t in t2], t1, 
+                     [degreeMedium(t, 0, 15) for t in t1], 'ro', lw = 2)
             plt.savefig(exportDir + "/visibility_medium", dpi = 200, bbox_inches = "tight")
             # plt.show()
             plt.clf()
@@ -430,7 +471,8 @@ def functionMenu():
             plt.ylabel(r'$d_{int}(x)$')
             plt.xticks(np.arange(0, 1.1, 0.2))
             plt.yticks(np.arange(0, 1.1, 0.2))
-            plt.plot(t2, [intervalDistance(0.3, 0.5, t) for t in t2], t1, [intervalDistance(0.3, 0.5, t) for t in t1], 'ro', lw = 2)
+            plt.plot(t2, [intervalDistance(0.3, 0.5, t) for t in t2], t1, 
+                     [intervalDistance(0.3, 0.5, t) for t in t1], 'ro', lw = 2)
             plt.savefig(exportDir + "/interval", dpi = 200, bbox_inches = "tight")
             # plt.show()
             plt.clf()
@@ -474,7 +516,8 @@ def heatmapMenu():
 
         option = input("Option: ")
     
-        while option != "1" and option != "2" and option != "3" and option != "4" and option != "5" and option != "6"  and option != "0":
+        while (option != "1" and option != "2" and option != "3" and option != "4" and option != "5" 
+               and option != "6"  and option != "0"):
             option = input("Invalid choice. Option: ")
     
         if option == "1":
@@ -508,7 +551,8 @@ def wilcoxonMenu(data):
 
         option = input("Option: ")
     
-        while option != "1" and option != "2" and option != "3" and option != "4" and option != "5" and option != "6" and option != "0":
+        while (option != "1" and option != "2" and option != "3" and option != "4" and option != "5" 
+               and option != "6" and option != "0"):
             option = input("Invalid choice. Option: ")
     
         if option == "1":
@@ -545,6 +589,11 @@ font = {'family' : 'serif',
 plt.rc('text', usetex=True)
 plt.rc('font', **font)
 
+'''
+plt.rcParams["font.family"] = "Calibri"
+plt.rcParams["font.size"] = 14.5
+'''
+
 print("RESULT ANALYSIS")
 
 # Get the files and process them.
@@ -563,7 +612,8 @@ while True:
 
     option = input("Option: ")
 
-    while option != "1" and option != "2" and option != "3" and option != "4" and option != "5" and option != "6" and option != "7" and option != "0":
+    while (option != "1" and option != "2" and option != "3" and option != "4" and option != "5" 
+           and option != "6" and option != "7" and option != "0"):
         option = input("Invalid choice. Option: ")
     if option == "1":
         wilcoxonMenu(data);
