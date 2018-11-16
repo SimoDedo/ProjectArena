@@ -12,6 +12,9 @@ public class ErrorUIManager : MonoBehaviour {
     [SerializeField] private Text errorText;
 
     void Start() {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
         if (ParameterManager.HasInstance()) {
             backgroundScript.SetRotation(ParameterManager.Instance.BackgroundRotation);
 

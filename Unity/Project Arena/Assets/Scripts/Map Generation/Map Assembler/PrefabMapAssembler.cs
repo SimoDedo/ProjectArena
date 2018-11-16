@@ -106,6 +106,23 @@ public abstract class PrefabMapAssembler : MapAssembler {
         return flatMesh;
     }
 
+    // Removes all prefabs except the ones in exceptions. Needed for multiple generations in the 
+    // same scene.
+    protected void DestroyAllPrefabs(List<string> exceptions) {
+        foreach (Transform child in transform) {
+            if (!exceptions.Contains(child.name)) {
+                GameObject.Destroy(child.gameObject);
+            }
+        }
+    }
+
+    // Removes all prefabs. Needed for multiple generations in the same scene.
+    protected void DestroyAllPrefabs() {
+        foreach (Transform child in transform) {
+            GameObject.Destroy(child.gameObject);
+        }
+    }
+
     // Custom prefab. 
     [Serializable]
     protected struct TilePrefab {

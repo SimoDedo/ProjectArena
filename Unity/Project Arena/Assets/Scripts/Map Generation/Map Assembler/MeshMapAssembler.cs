@@ -520,41 +520,6 @@ public class MeshMapAssembler : MapAssembler {
         }
     }
 
-    // Draws the map.
-    /* void NotOnDrawGizmos() {
-        if (squareGrid != null) {
-            for (int x = 0; x < squareGrid.squares.GetLength(0); x ++) {
-                for (int y = 0; y < squareGrid.squares.GetLength(1); y ++) {
-                    Gizmos.color = (squareGrid.squares[x, y].topLeft.active) ? Color.black : 
-                        Color.white;
-                    Gizmos.DrawCube(squareGrid.squares[x, y].topLeft.position, Vector3.one * .4f);
-
-                    Gizmos.color = (squareGrid.squares[x, y].topRight.active) ? Color.black : 
-                        Color.white;
-                    Gizmos.DrawCube(squareGrid.squares[x, y].topRight.position, Vector3.one * .4f);
-
-                    Gizmos.color = (squareGrid.squares[x, y].bottomRight.active) ? Color.black : 
-                        Color.white;
-                    Gizmos.DrawCube(squareGrid.squares[x, y].bottomRight.position, 
-                        Vector3.one * .4f);
-
-                    Gizmos.color = (squareGrid.squares[x, y].bottomLeft.active) ? Color.black : 
-                        Color.white;
-                    Gizmos.DrawCube(squareGrid.squares[x, y].bottomLeft.position, 
-                        Vector3.one * .4f);
-
-                    Gizmos.color = Color.grey;
-                    Gizmos.DrawCube(squareGrid.squares[x, y].centreTop.position, 
-                        Vector3.one * .15f);
-                    Gizmos.DrawCube(squareGrid.squares[x, y].centreRight.position, 
-                        Vector3.one * .15f);
-                    Gizmos.DrawCube(squareGrid.squares[x, y].centreBottom.position, 
-                        Vector3.one * .15f);
-                    Gizmos.DrawCube(squareGrid.squares[x, y].centreLeft.position, 
-                        Vector3.one * .15f);
-				}
-            }
-        }
-    } */
+    public override void ClearMap() { }
 
 }

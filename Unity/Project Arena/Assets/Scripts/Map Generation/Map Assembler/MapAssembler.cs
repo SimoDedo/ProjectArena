@@ -27,4 +27,6 @@ public abstract class MapAssembler : CoreComponent {
         return wallHeight;
     }
 
+    public abstract void ClearMap();
+
 }

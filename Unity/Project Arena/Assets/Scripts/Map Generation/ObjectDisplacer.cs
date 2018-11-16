@@ -64,9 +64,6 @@ public class ObjectDisplacer : CoreComponent {
 
     // Displace the custom objects inside the map.
     public void DisplaceObjects(char[,] map, float squareSize, float height) {
-        // categoryObjectsDictionary.Clear();
-        // DestroyAllCustomObjects();
-
         for (int x = 0; x < map.GetLength(0); x++) {
             for (int y = 0; y < map.GetLength(1); y++) {
                 if (charObjectsDictionary.ContainsKey(map[x, y])) {
@@ -93,7 +90,9 @@ public class ObjectDisplacer : CoreComponent {
     }
 
     // Remove all the custom objects.
-    private void DestroyAllCustomObjects() {
+    public void DestroyAllCustomObjects() {
+        categoryObjectsDictionary.Clear();
+
         foreach (Transform category in transform) {
             foreach (Transform child in category) {
                 GameObject.Destroy(child.gameObject);

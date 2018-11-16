@@ -46,7 +46,7 @@ public class DivisiveMapGenerator : MapGenerator {
     }
 
     public override char[,] GenerateMap() {
-        map = new char[width, height];
+        map = GetVoidMap();
 
         InitializePseudoRandomGenerator();
 

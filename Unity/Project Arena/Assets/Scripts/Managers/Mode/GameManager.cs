@@ -57,6 +57,7 @@ public abstract class GameManager : CoreComponent, ILoggable {
     public void Quit() {
         Time.timeScale = 1f;
         Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
         LoadNextScene("Menu");
     }
 

@@ -18,7 +18,7 @@ public class TutorialGameManager : GameManager {
     private bool tutorialCompleted = false;
     private float completionTime;
 
-    void Start() {
+    private void Start() {
         /* #if UNITY_EDITOR
             UnityEditor.SceneView.FocusWindowIfItsOpen(typeof(UnityEditor.SceneView));
         #endif */
@@ -28,7 +28,7 @@ public class TutorialGameManager : GameManager {
         tutorialGameUIManagerScript.Fade(0.7f, 1f, true, 0.5f);
     }
 
-    void Update() {
+    private void Update() {
         if (!IsReady() && mapManagerScript.IsReady() && spawnPointManagerScript.IsReady()
             && tutorialGameUIManagerScript.IsReady()) {
             // Generate the map.

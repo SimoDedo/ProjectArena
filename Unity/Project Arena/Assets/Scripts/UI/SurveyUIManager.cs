@@ -23,6 +23,7 @@ public class SurveyUIManager : MonoBehaviour {
 
     private void Start() {
         Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
 
         jQuestions = new List<JsonQuestion>();
         jAnswers = new List<JsonAnswer>();

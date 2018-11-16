@@ -254,6 +254,12 @@ public abstract class MapGenerator : CoreComponent {
     // Returns the map in AB notation.
     public abstract string ConvertMapToAB(bool exportObjects = true);
 
+    // Returns a new void map and saves its size.
+    protected char[,] GetVoidMap() {
+        SaveMapSize();
+        return new char[width, height];
+    }
+
     // Saves the original size of the map.
     public void SaveMapSize() {
         originalWidth = width;

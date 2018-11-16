@@ -2,7 +2,6 @@
 **/[Oo]bj/
 **/[Bb]uild/
 **/[Ll]ibrary/
-**/[Bb]uild/
 **/[Bb]uilds/
 **/Assets/AssetStoreTools*
 *.ogg
@@ -27,6 +26,7 @@ ExportedObj/
 
 # Unity3D generated meta files #
 *.pidb.meta
+.mat.meta
 
 # Unity3D Generated File On Crash Reports #
 sysinfo.txt

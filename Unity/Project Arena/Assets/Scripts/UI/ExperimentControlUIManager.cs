@@ -29,6 +29,7 @@ public class ExperimentControlUIManager : MonoBehaviour {
 
     void Awake() {
         Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
 
         if (ParameterManager.HasInstance()) {
             backgroundScript.SetRotation(ParameterManager.Instance.BackgroundRotation);

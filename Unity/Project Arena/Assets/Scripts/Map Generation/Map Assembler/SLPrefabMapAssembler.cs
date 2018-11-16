@@ -82,4 +82,9 @@ public class SLPrefabMapAssembler : PrefabMapAssembler {
         }
     }
 
+    // Clears the map.
+    public override void ClearMap() {
+        DestroyAllPrefabs(new List<string> { "Floor - Collider", "Ceil - Collider" });
+    }
+
 }

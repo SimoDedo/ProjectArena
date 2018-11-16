@@ -76,6 +76,7 @@ public class Player : Entity, ILoggable {
         if (Input.GetMouseButtonDown(0) && inputEnabled) {
             if (cursorLocked && Cursor.lockState != CursorLockMode.Locked) {
                 Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
             }
         }
 
@@ -252,8 +253,10 @@ public class Player : Entity, ILoggable {
 
         if (b) {
             Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         } else {
             Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
     }
 
@@ -279,12 +282,14 @@ public class Player : Entity, ILoggable {
     // Locks the cursor in the center of the screen.
     public void LockCursor() {
         Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         cursorLocked = true;
     }
 
     // Unlocks the cursor.
     public void UnlockCursor() {
         Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
         cursorLocked = false;
     }
 

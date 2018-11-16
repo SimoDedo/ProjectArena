@@ -176,4 +176,9 @@ public class MLPrefabMapAssembler : PrefabMapAssembler {
         return null;
     }
 
+    // Clears the map.
+    public override void ClearMap() {
+        DestroyAllPrefabs();
+    }
+
 }

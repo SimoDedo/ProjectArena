@@ -100,6 +100,13 @@ public abstract class MapManager : CoreComponent {
         return mapAssemblerScript;
     }
 
+    // Resets the map.
+    public void ResetMap() {
+        mapGeneratorScript.ResetMapSize();
+        mapAssemblerScript.ClearMap();
+        objectDisplacerScript.DestroyAllCustomObjects();
+    }
+
     public bool GetFlip() {
         return flip;
     }

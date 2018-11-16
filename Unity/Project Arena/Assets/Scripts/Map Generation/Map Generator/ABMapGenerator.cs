@@ -17,9 +17,6 @@ public class ABMapGenerator : MapGenerator {
     private List<ABTile> tiles;
 
     private void Start() {
-        originalWidth = width;
-        originalHeight = height;
-
         SetReady(true);
     }
 
@@ -224,7 +221,7 @@ public class ABMapGenerator : MapGenerator {
 
     // Initializes the map adding arenas and corridors.
     private void InitializeMap() {
-        map = new char[width, height];
+        map = GetVoidMap();
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {

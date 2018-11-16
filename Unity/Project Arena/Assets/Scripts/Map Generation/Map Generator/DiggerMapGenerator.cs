@@ -46,7 +46,7 @@ public class DiggerMapGenerator : MapGenerator {
 
     // Generates a map.
     public override char[,] GenerateMap() {
-        map = new char[width, height];
+        map = GetVoidMap();
 
         // Parse the genome if needed.
         if (useABGeneration) {

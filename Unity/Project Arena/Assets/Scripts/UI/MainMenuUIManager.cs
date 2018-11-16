@@ -123,6 +123,7 @@ public class MainMenuUIManager : MonoBehaviour {
 
     public void Start() {
         Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
 
         if (ParameterManager.HasInstance()) {
             if (ParameterManager.Instance.Version == ParameterManager.BuildVersion.COMPLETE) {
