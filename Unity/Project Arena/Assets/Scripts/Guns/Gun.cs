@@ -18,7 +18,14 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     [SerializeField] protected int maximumAmmo;
     [SerializeField] protected float reloadTime = 1f;
     [SerializeField] protected float cooldownTime = 0.1f;
+    [SerializeField] protected GunType gunType;
 
+    protected enum GunType
+    {
+        Raycast,
+        Projectile
+    }
+        
     [Header("Appearence")] [SerializeField] protected float muzzleFlashDuration = 0.05f;
     [SerializeField] protected float recoil = 0.05f;
 
@@ -31,7 +38,7 @@ public abstract class Gun : MonoBehaviour, ILoggable {
 
     [Header("UI")]
     [SerializeField]
-    protected bool hasUI = false;
+    protected bool hasUI;
 
     // Default ammo.
     protected int defaultAmmoInCharger;
@@ -59,9 +66,8 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     protected Entity ownerEntityScript;
 
     // Is the gun being used?
-    protected bool used = false;
+    protected bool used;
     // Is the input enabled?
-    private bool inputEnabled = true;
     // Gun identifier.
     protected int gunId;
 
@@ -75,29 +81,14 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     }
 
     protected void Update() {
-        if (used && inputEnabled) {
+        if (used) {
             if (reloading || coolingDown) {
                 UpdateTimers();
             }
-
-            if (aimEnabled) {
-                if (Input.GetButtonDown("Fire2")) {
-                    Aim(true);
-                }
-                if (Input.GetButtonUp("Fire2")) {
-                    Aim(false);
-                }
-                if (animatingAim) {
-                    AnimateAim();
-                }
-            }
-
-            if (Input.GetButton("Fire1") && CanShoot()) {
-                if (ammoInCharger > 0) {
-                    Shoot();
-                }
-            } else if (Input.GetButtonDown("Reload") && CanReload()) {
-                Reload();
+            
+            if (animatingAim)
+            {
+                AnimateAim();
             }
         }
     }
@@ -204,27 +195,27 @@ public abstract class Gun : MonoBehaviour, ILoggable {
 
         defaultAmmoInCharger = ammoInCharger;
         defaultTotalAmmo = totalAmmo;
-
-        if (hasUI) {
-            gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
-        }
     }
 
     // I can reload when I have ammo left, my charger isn't full and I'm not reloading.
-    protected bool CanReload() {
+    public bool CanReload() {
         return (totalAmmo > 0 || infinteAmmo) && ammoInCharger < chargerSize && !reloading;
     }
 
     // I can shoot when I'm not reloading and I'm not in cooldown.
-    protected bool CanShoot() {
-        return !reloading && !coolingDown;
+    public bool CanShoot() {
+        return !reloading && !coolingDown && ammoInCharger > 0;
+    }
+
+    public bool CanAim() {
+        return aimEnabled;
     }
 
     // Shots.
-    protected abstract void Shoot();
+    public abstract void Shoot();
 
     // Aims.
-    protected void Aim(bool aim) {
+    public void Aim(bool aim) {
         aiming = aim;
         animatingAim = true;
         aimStart = Time.time;
@@ -273,7 +264,7 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     }
 
     // Reloads.
-    protected void Reload() {
+    public void Reload() {
         SetReload();
 
         if (hasUI) {
@@ -353,12 +344,7 @@ public abstract class Gun : MonoBehaviour, ILoggable {
             gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
         }
     }
-
-    // Enables or disables the input.
-    public void EnableInput(bool b) {
-        inputEnabled = b;
-    }
-
+    
     // Setups stuff for the loggingGame.
     public void SetupLogging() {
         loggingGame = true;

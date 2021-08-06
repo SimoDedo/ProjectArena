@@ -21,7 +21,7 @@ public class ProjectileGun : Gun {
         projectiles.transform.localPosition = Vector3.zero;
     }
 
-    protected override void Shoot() {
+    public override void Shoot() {
         StartCoroutine(ShowMuzzleFlash());
 
         ammoInCharger -= 1;

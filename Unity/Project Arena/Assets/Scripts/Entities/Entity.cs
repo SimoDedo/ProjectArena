@@ -5,8 +5,9 @@ using UnityEngine;
 /// Entity is an abstract class used to implement any kind of agent. An entity can spawn, recive
 /// damage and die. An entity can also be healed, supplied with ammunitions and have weapons.
 /// </summary>
+[RequireComponent(typeof(PositionTracker))]
 public abstract class Entity : MonoBehaviour {
-
+    
     [SerializeField]
     protected int totalHealth;
     [SerializeField]
@@ -18,7 +19,7 @@ public abstract class Entity : MonoBehaviour {
 
     protected int health;
     protected int entityID;
-    protected int currentGun;
+    protected int currentGun = 0;
     protected bool inGame = false;
     protected int originalLayer;
 

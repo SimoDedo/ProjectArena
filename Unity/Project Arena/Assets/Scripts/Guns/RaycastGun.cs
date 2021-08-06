@@ -28,7 +28,7 @@ public class RaycastGun : Gun {
         sparks.transform.localPosition = Vector3.zero;
     }
 
-    protected override void Shoot() {
+    public override void Shoot() {
         StartCoroutine(ShowMuzzleFlash());
 
         ammoInCharger -= 1;
@@ -55,12 +55,10 @@ public class RaycastGun : Gun {
 
             if (Physics.Raycast(headCamera.transform.position, direction, out hit, range,
                 ignoredLayers)) {
-                if (!hit.transform.root.GetComponent<Player>()) {
+                var entityScript = hit.transform.root.GetComponent<Entity>();
+                if (entityScript != null) {
                     StartCoroutine(ShowSpark(hit));
-                    Entity entityScript = hit.transform.root.GetComponent<Entity>();
-                    if (entityScript != null) {
-                        entityScript.TakeDamage(damage, ownerEntityScript.GetID());
-                    }
+                    entityScript.TakeDamage(damage, ownerEntityScript.GetID());
                 }
             }
         }
