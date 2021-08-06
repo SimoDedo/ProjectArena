@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 /// <summary>
 /// MeshMapAssembler is an implementation of MapAssembler that assembles the maps using meshes.
@@ -46,30 +47,15 @@ public class MeshMapAssembler : MapAssembler {
         childObject.AddComponent<MeshRenderer>();
         childObject.GetComponent<MeshRenderer>().material = topMaterial;
 
-        childObject = new GameObject("Walls - Mesh Filter");
+        childObject = new GameObject("Walls");
         childObject.transform.parent = transform;
         childObject.transform.localPosition = Vector3.zero;
         wallsMeshFilter = childObject.AddComponent<MeshFilter>();
         childObject.AddComponent<MeshRenderer>();
         childObject.GetComponent<MeshRenderer>().material = wallMaterial;
-
-        childObject = new GameObject("Floor - Mesh Filter");
-        childObject.transform.parent = transform;
-        childObject.transform.localPosition = Vector3.zero;
-        floorMeshFilter = childObject.AddComponent<MeshFilter>();
-        childObject.AddComponent<MeshRenderer>();
-        childObject.GetComponent<MeshRenderer>().material = floorMaterial;
-
-        childObject = new GameObject("Walls - Collider");
-        childObject.transform.parent = transform;
-        childObject.transform.localPosition = Vector3.zero;
         wallsCollider = childObject.AddComponent<MeshCollider>();
-
-        childObject = new GameObject("Floor - Collider");
-        childObject.transform.parent = transform;
-        childObject.transform.localPosition = Vector3.zero;
-        floorCollider = childObject.AddComponent<MeshCollider>();
-
+        childObject.isStatic = true;
+        
         if (!isSkyVisibile) {
             childObject = new GameObject("Top - Collider");
             childObject.transform.parent = transform;
@@ -77,6 +63,14 @@ public class MeshMapAssembler : MapAssembler {
             topCollider = childObject.AddComponent<MeshCollider>();
         }
 
+        childObject = new GameObject("Floor");
+        childObject.transform.parent = transform;
+        childObject.transform.localPosition = Vector3.zero;
+        floorCollider = childObject.AddComponent<MeshCollider>();
+        floorMeshFilter = childObject.AddComponent<MeshFilter>();
+        childObject.AddComponent<MeshRenderer>();
+        childObject.GetComponent<MeshRenderer>().material = floorMaterial;
+        childObject.isStatic = true;
         SetReady(true);
     }
 
@@ -102,6 +96,10 @@ public class MeshMapAssembler : MapAssembler {
         CreateWallMesh();
 
         CreateFloorMesh(map.GetLength(0), map.GetLength(1));
+
+        var navMesh = floorCollider.gameObject.AddComponent<NavMeshSurface>();
+        navMesh.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+        navMesh.BuildNavMesh();
     }
 
     public override void AssembleMap(List<char[,]> maps, char wallChar, char roomChar,
