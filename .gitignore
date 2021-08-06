@@ -42,3 +42,8 @@ ehthumbs.db
 Thumbs.db
 Results/desktop.ini
 *.lnk
+Unity/Project Arena/Temp/
+
+Unity/Project Arena/Logs/
+
+Unity/Project Arena/.idea/
