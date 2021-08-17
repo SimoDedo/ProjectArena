@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using ScriptableObjectArchitecture;
 using UnityEngine;
 
 /// <summary>
@@ -46,8 +47,13 @@ public class Target : Entity, ILoggable {
         // Log if needed.
         if (gms.IsLogging()) {
             SetupLogging();
-            ExperimentManager.Instance.LogSpawn(transform.position.x, transform.position.z,
-                gameObject.name);
+            var position = transform.position;
+            SpawnInfoGameEvent.Instance.Raise(new SpawnInfo
+            {
+                x = position.x,
+                z = position.z,
+                spawnEntity = gameObject.name
+            });
         }
 
         StartCoroutine(FadeIn());
@@ -93,8 +99,15 @@ public class Target : Entity, ILoggable {
 
             // Log if needed.
             if (loggingGame) {
-                ExperimentManager.Instance.LogHit(transform.position.x, transform.position.z,
-                    gameObject.name, "Player " + killerID, damage);
+                var position = transform.position;
+                HitInfoGameEvent.Instance.Raise(new HitInfo
+                {
+                    damage = damage,
+                    hitEntity = gameObject.name,
+                    hitterEntity = "Player " + killerID,
+                    x = position.x,
+                    z = position.z
+                });
             }
 
             if (health < 1) {
@@ -108,9 +121,16 @@ public class Target : Entity, ILoggable {
         gameManagerScript.AddScore(bonusScore, bonusTime);
 
         // Log if needed.
-        if (loggingGame) {
-            ExperimentManager.Instance.LogKill(transform.position.x, transform.position.z,
-                gameObject.name, "Player " + id);
+        if (loggingGame)
+        {
+            var position = transform.position;
+            KillInfoGameEvent.Instance.Raise(new KillInfo
+            {
+                killedEntity = gameObject.name,
+                killerEntity =  "Player " + id,
+                x = position.x,
+                z = position.z
+            });
         }
 
         Destroy(gameObject);

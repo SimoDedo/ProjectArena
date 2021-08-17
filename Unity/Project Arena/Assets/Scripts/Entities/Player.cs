@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using ScriptableObjectArchitecture;
+using UnityEngine;
 
 /// <summary>
 /// Player is an implementation of Entity with a ILoggable interface, which allows its actions
@@ -129,8 +130,11 @@ public class Player : Entity, ILoggable
                 // Log if needed.
                 if (loggingGame && Time.time > lastPositionLog + 0.5)
                 {
-                    ExperimentManager.Instance.LogPosition(transform.position.x, transform.position.z,
-                        transform.eulerAngles.y);
+                    var t = transform;
+                    var position = t.position;
+                    PositionInfoGameEvent.Instance.Raise(
+                        new PositionInfo {x = position.x, z = position.z,
+                            dir = t.eulerAngles.y});
                     lastPositionLog = Time.time;
                 }
             }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ScriptableObjectArchitecture;
 using UnityEngine;
 
 /// <summary>
@@ -15,9 +16,11 @@ public class ProjectileGun : Gun {
 
     private Queue<GameObject> projectileList = new Queue<GameObject>();
     private GameObject projectiles;
-
-    private void Start() {
-        projectiles = new GameObject("Projectiles - " + transform.gameObject.name);
+    private Transform t;
+    private void Start()
+    {
+        t = transform;
+        projectiles = new GameObject("Projectiles - " + gameObject.name);
         projectiles.transform.localPosition = Vector3.zero;
     }
 
@@ -27,9 +30,19 @@ public class ProjectileGun : Gun {
         ammoInCharger -= 1;
 
         // Log if needed.
-        if (loggingGame) {
-            ExperimentManager.Instance.LogShot(transform.root.position.x, transform.root.position.z,
-                transform.root.eulerAngles.y, gunId, ammoInCharger, totalAmmo);
+        if (loggingGame)
+        {
+            var root = t.root;
+            var position = root.position;
+            ShotInfoGameEvent.Instance.Raise(new ShotInfo
+            {
+                x = position.x,
+                z = position.z,
+                ammoInCharger = ammoInCharger,
+                direction = root.eulerAngles.y,
+                gunID = gunId,
+                totalAmmo = totalAmmo
+            });
         }
 
         if (hasUI) {
@@ -40,9 +53,9 @@ public class ProjectileGun : Gun {
             Quaternion rotation;
 
             if (dispersion != 0) {
-                rotation = GetDeviatedRotation(transform.rotation, dispersion);
+                rotation = GetDeviatedRotation(t.rotation, dispersion);
             } else {
-                rotation = transform.rotation;
+                rotation = t.rotation;
             }
 
             InstantiateProjectile(rotation);

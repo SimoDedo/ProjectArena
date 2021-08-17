@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using ScriptableObjectArchitecture;
 using UnityEngine;
 
 /// <summary>
@@ -16,8 +17,10 @@ public class RaycastGun : Gun {
 
     private Queue<GameObject> sparkList = new Queue<GameObject>();
     private GameObject sparks;
-
-    private void Start() {
+    private Transform t;
+    private void Start()
+    {
+        t = transform;
         if (!limitRange) {
             range = Mathf.Infinity;
         }
@@ -34,9 +37,19 @@ public class RaycastGun : Gun {
         ammoInCharger -= 1;
 
         // Log if needed.
-        if (loggingGame) {
-            ExperimentManager.Instance.LogShot(transform.root.position.x, transform.root.position.z,
-                transform.root.eulerAngles.y, gunId, ammoInCharger, totalAmmo);
+        if (loggingGame)
+        {
+            var root = t.root;
+            var position = root.position;
+            ShotInfoGameEvent.Instance.Raise(new ShotInfo
+            {
+                x = position.x,
+                z = position.z,
+                ammoInCharger = ammoInCharger,
+                direction = root.eulerAngles.y,
+                gunID = gunId,
+                totalAmmo = totalAmmo
+            });
         }
 
         if (hasUI) {

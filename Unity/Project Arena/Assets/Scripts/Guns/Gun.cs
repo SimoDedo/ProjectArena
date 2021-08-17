@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using ScriptableObjectArchitecture;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -60,7 +61,6 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     protected float aimStart;
     protected float originalFOV;
 
-    protected GameManager gameManagerScript;
     protected GunUIManager gunUIManagerScript;
     protected PlayerUIManager playerUIManagerScript;
     protected Entity ownerEntityScript;
@@ -136,7 +136,12 @@ public abstract class Gun : MonoBehaviour, ILoggable {
             if (Time.time > reloadStart + reloadTime) {
                 // Log if needed.
                 if (loggingGame) {
-                    ExperimentManager.Instance.LogRelaod(gunId, ammoInCharger, totalAmmo);
+                    ReloadInfoGameEvent.Instance.Raise(new ReloadInfo
+                    {
+                        gunId = gunId,
+                        ammoInCharger = ammoInCharger,
+                        totalAmmo = totalAmmo
+                    });
                 }
                 // Stop the reloading.
                 reloading = false;
@@ -165,7 +170,6 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     // Called by player, sets references to the game manager, to the player script itself and to 
     // the player UI.
     public void SetupGun(GameManager gms, Entity e, PlayerUIManager puims, int id) {
-        gameManagerScript = gms;
         ownerEntityScript = e;
         playerUIManagerScript = puims;
 
@@ -184,7 +188,6 @@ public abstract class Gun : MonoBehaviour, ILoggable {
 
     // Called by the opponent, sets references to the game manager and to the player script itself.
     public void SetupGun(GameManager gms, Entity e) {
-        gameManagerScript = gms;
         ownerEntityScript = e;
 
         playerUIManagerScript = null;
