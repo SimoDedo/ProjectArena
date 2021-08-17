@@ -57,7 +57,7 @@ public class Opponent : Entity {
         gameManagerScript.AddScore(id, entityID);
         SetInGame(false);
         // Start the respawn process.
-        gameManagerScript.MenageEntityDeath(gameObject, this);
+        gameManagerScript.ManageEntityDeath(gameObject, this);
     }
 
     // Respawns the opponent.

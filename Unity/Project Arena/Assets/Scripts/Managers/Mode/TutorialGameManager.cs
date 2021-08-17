@@ -145,7 +145,7 @@ public class TutorialGameManager : GameManager {
         tutorialCompleted = true;
     }
 
-    public override void MenageEntityDeath(GameObject g, Entity e) {
+    public override void ManageEntityDeath(GameObject g, Entity e) {
     }
 
 }

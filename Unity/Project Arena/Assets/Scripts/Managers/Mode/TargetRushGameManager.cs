@@ -231,7 +231,7 @@ public class TargetRushGameManager : GameManager {
     }
 
     // Ends the game.
-    public override void MenageEntityDeath(GameObject g, Entity e) {
+    public override void ManageEntityDeath(GameObject g, Entity e) {
         startTime = Time.time - readyDuration - gameDuration;
     }
 

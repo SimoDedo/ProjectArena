@@ -73,7 +73,7 @@ public class AIEntity : Entity, ILoggable
         gameManagerScript.AddScore(id, entityID);
         SetInGame(false);
         // Start the respawn process.
-        gameManagerScript.MenageEntityDeath(gameObject, this);
+        gameManagerScript.ManageEntityDeath(gameObject, this);
     }
 
     public override void Respawn()

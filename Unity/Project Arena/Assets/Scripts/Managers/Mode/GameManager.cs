@@ -40,7 +40,7 @@ public abstract class GameManager : CoreComponent, ILoggable
     }
 
     // Menages the death of an entity.
-    public abstract void MenageEntityDeath(GameObject g, Entity e);
+    public abstract void ManageEntityDeath(GameObject g, Entity e);
 
     protected abstract void UpdateGamePhase();
 

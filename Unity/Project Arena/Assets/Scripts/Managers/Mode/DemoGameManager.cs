@@ -34,7 +34,7 @@ public class DemoGameManager : GameManager {
 
     public override void AddScore(int i, int j) { }
 
-    public override void MenageEntityDeath(GameObject g, Entity e) { }
+    public override void ManageEntityDeath(GameObject g, Entity e) { }
 
     public override void Pause() { }
 

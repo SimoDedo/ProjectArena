@@ -177,7 +177,7 @@ public class TargetHuntGameManager : GameManager {
     }
 
     // Ends the game.
-    public override void MenageEntityDeath(GameObject g, Entity e) {
+    public override void ManageEntityDeath(GameObject g, Entity e) {
         // Start the respawn process.
         StartCoroutine(WaitForRespawn(g, e));
     }

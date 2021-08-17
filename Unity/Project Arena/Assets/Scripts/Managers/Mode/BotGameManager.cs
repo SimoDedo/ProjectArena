@@ -179,7 +179,7 @@ public class BotGameManager : GameManager {
     }
 
     // Menages the death of an entity.
-    public override void MenageEntityDeath(GameObject g, Entity e) {
+    public override void ManageEntityDeath(GameObject g, Entity e) {
         // Start the respawn process.
         StartCoroutine(WaitForRespawn(g, e));
     }
