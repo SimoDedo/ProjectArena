@@ -8,6 +8,10 @@ public class AmmoPickable : Pickable {
     [SerializeField] private bool[] suppliedGuns;
     [SerializeField] private int[] ammoAmounts;
 
+    public bool[] SuppliedGuns => suppliedGuns;
+
+    public int[] AmmoAmounts => ammoAmounts;
+
     protected override bool CanBePicked(GameObject entity) {
         return entity.GetComponent<Entity>().CanBeSupllied(suppliedGuns);
     }

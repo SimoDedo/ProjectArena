@@ -1,4 +1,6 @@
-﻿/// <summary>
+﻿using UnityEngine;
+
+/// <summary>
 /// Opponent is a simple implementation of Entity with no extra logic.
 /// </summary>
 public class Opponent : Entity {
@@ -43,11 +45,11 @@ public class Opponent : Entity {
     }
 
     // Heals the opponent.
-    public override void Heal(int restoredHealth) {
-        if (health + restoredHealth > totalHealth)
+    public override void HealFromMedkit(MedkitPickable medkit) {
+        if (health + medkit.RestoredHealth > totalHealth)
             health = totalHealth;
         else
-            health += restoredHealth;
+            health += medkit.RestoredHealth;
     }
 
     // Kills the opponent.

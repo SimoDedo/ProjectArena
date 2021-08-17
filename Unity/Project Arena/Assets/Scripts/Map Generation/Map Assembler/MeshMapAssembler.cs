@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Others;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -25,6 +26,7 @@ public class MeshMapAssembler : MapAssembler {
     private MeshCollider wallsCollider;
     private MeshCollider floorCollider;
     private MeshCollider topCollider;
+    private GameObject navMeshObject;
 
     private List<Vector3> vertices;
     private List<int> triangles;
@@ -54,7 +56,11 @@ public class MeshMapAssembler : MapAssembler {
         childObject.AddComponent<MeshRenderer>();
         childObject.GetComponent<MeshRenderer>().material = wallMaterial;
         wallsCollider = childObject.AddComponent<MeshCollider>();
+        var wallSurfaceModifier = childObject.AddComponent<NavMeshModifier>();
+        wallSurfaceModifier.overrideArea = true;
+        wallSurfaceModifier.area = NavMesh.GetAreaFromName("Not Walkable");
         childObject.isStatic = true;
+        
         
         if (!isSkyVisibile) {
             childObject = new GameObject("Top - Collider");
@@ -72,6 +78,10 @@ public class MeshMapAssembler : MapAssembler {
         childObject.GetComponent<MeshRenderer>().material = floorMaterial;
         childObject.isStatic = true;
         SetReady(true);
+        
+        navMeshObject = new GameObject("NavMeshSurface");
+        navMeshObject.transform.parent = transform;
+        navMeshObject.transform.localPosition = Vector3.zero;
     }
 
     // Generates the Mesh.
@@ -96,10 +106,18 @@ public class MeshMapAssembler : MapAssembler {
         CreateWallMesh();
 
         CreateFloorMesh(map.GetLength(0), map.GetLength(1));
-
-        var navMesh = floorCollider.gameObject.AddComponent<NavMeshSurface>();
+        var humanoidInt = NavMeshUtils.GetAgentIDFromName("Humanoid");
+        var wandererInt = NavMeshUtils.GetAgentIDFromName("Wanderer");
+        
+        var navMesh = navMeshObject.AddComponent<NavMeshSurface>();
         navMesh.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+        navMesh.agentTypeID = humanoidInt;
         navMesh.BuildNavMesh();
+
+        var navMesh2 = navMeshObject.gameObject.AddComponent<NavMeshSurface>();
+        navMesh2.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+        navMesh2.agentTypeID = wandererInt;
+        navMesh2.BuildNavMesh();
     }
 
     public override void AssembleMap(List<char[,]> maps, char wallChar, char roomChar,

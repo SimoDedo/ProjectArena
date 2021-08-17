@@ -187,15 +187,15 @@ public class Player : Entity, ILoggable
     }
 
     // Heals the player.
-    public override void Heal(int restoredHealth)
+    public override void HealFromMedkit(MedkitPickable medkitPickable)
     {
-        if (health + restoredHealth > totalHealth)
+        if (health + medkitPickable.RestoredHealth > totalHealth)
         {
             health = totalHealth;
         }
         else
         {
-            health += restoredHealth;
+            health += medkitPickable.RestoredHealth;
         }
 
         playerUIManagerScript.SetHealth(health, totalHealth);

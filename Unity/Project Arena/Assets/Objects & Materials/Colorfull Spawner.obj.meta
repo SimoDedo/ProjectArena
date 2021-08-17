@@ -1,61 +1,155 @@
 fileFormatVersion: 2
 guid: 9fba33f31e3ba6b4fbf4024adf0ae90b
-timeCreated: 1507801020
-licenseType: Free
 ModelImporter:
-  serializedVersion: 21
-  fileIDToRecycleName:
-    100000: //RootNode
-    100002: mesh1072616308
-    100004: mesh1119179376
-    100006: mesh1566562205
-    100008: mesh1581092883
-    100010: mesh1586226101
-    100012: mesh1663703151
-    100014: mesh215038182
-    100016: mesh724387351
-    100018: mesh764987959
-    400000: //RootNode
-    400002: mesh1072616308
-    400004: mesh1119179376
-    400006: mesh1566562205
-    400008: mesh1581092883
-    400010: mesh1586226101
-    400012: mesh1663703151
-    400014: mesh215038182
-    400016: mesh724387351
-    400018: mesh764987959
-    2300000: mesh1072616308
-    2300002: mesh1119179376
-    2300004: mesh1566562205
-    2300006: mesh1581092883
-    2300008: mesh1586226101
-    2300010: mesh1663703151
-    2300012: mesh215038182
-    2300014: mesh724387351
-    2300016: mesh764987959
-    3300000: mesh1072616308
-    3300002: mesh1119179376
-    3300004: mesh1566562205
-    3300006: mesh1581092883
-    3300008: mesh1586226101
-    3300010: mesh1663703151
-    3300012: mesh215038182
-    3300014: mesh724387351
-    3300016: mesh764987959
-    4300000: mesh1072616308
-    4300002: mesh1119179376
-    4300004: mesh1566562205
-    4300006: mesh1581092883
-    4300008: mesh1586226101
-    4300010: mesh1663703151
-    4300012: mesh215038182
-    4300014: mesh724387351
-    4300016: mesh764987959
+  serializedVersion: 20200
+  internalIDToNameTable:
+  - first:
+      1: 100000
+    second: //RootNode
+  - first:
+      1: 100002
+    second: mesh1072616308
+  - first:
+      1: 100004
+    second: mesh1119179376
+  - first:
+      1: 100006
+    second: mesh1566562205
+  - first:
+      1: 100008
+    second: mesh1581092883
+  - first:
+      1: 100010
+    second: mesh1586226101
+  - first:
+      1: 100012
+    second: mesh1663703151
+  - first:
+      1: 100014
+    second: mesh215038182
+  - first:
+      1: 100016
+    second: mesh724387351
+  - first:
+      1: 100018
+    second: mesh764987959
+  - first:
+      4: 400000
+    second: //RootNode
+  - first:
+      4: 400002
+    second: mesh1072616308
+  - first:
+      4: 400004
+    second: mesh1119179376
+  - first:
+      4: 400006
+    second: mesh1566562205
+  - first:
+      4: 400008
+    second: mesh1581092883
+  - first:
+      4: 400010
+    second: mesh1586226101
+  - first:
+      4: 400012
+    second: mesh1663703151
+  - first:
+      4: 400014
+    second: mesh215038182
+  - first:
+      4: 400016
+    second: mesh724387351
+  - first:
+      4: 400018
+    second: mesh764987959
+  - first:
+      23: 2300000
+    second: mesh1072616308
+  - first:
+      23: 2300002
+    second: mesh1119179376
+  - first:
+      23: 2300004
+    second: mesh1566562205
+  - first:
+      23: 2300006
+    second: mesh1581092883
+  - first:
+      23: 2300008
+    second: mesh1586226101
+  - first:
+      23: 2300010
+    second: mesh1663703151
+  - first:
+      23: 2300012
+    second: mesh215038182
+  - first:
+      23: 2300014
+    second: mesh724387351
+  - first:
+      23: 2300016
+    second: mesh764987959
+  - first:
+      33: 3300000
+    second: mesh1072616308
+  - first:
+      33: 3300002
+    second: mesh1119179376
+  - first:
+      33: 3300004
+    second: mesh1566562205
+  - first:
+      33: 3300006
+    second: mesh1581092883
+  - first:
+      33: 3300008
+    second: mesh1586226101
+  - first:
+      33: 3300010
+    second: mesh1663703151
+  - first:
+      33: 3300012
+    second: mesh215038182
+  - first:
+      33: 3300014
+    second: mesh724387351
+  - first:
+      33: 3300016
+    second: mesh764987959
+  - first:
+      43: 4300000
+    second: mesh1072616308
+  - first:
+      43: 4300002
+    second: mesh1119179376
+  - first:
+      43: 4300004
+    second: mesh1566562205
+  - first:
+      43: 4300006
+    second: mesh1581092883
+  - first:
+      43: 4300008
+    second: mesh1586226101
+  - first:
+      43: 4300010
+    second: mesh1663703151
+  - first:
+      43: 4300012
+    second: mesh215038182
+  - first:
+      43: 4300014
+    second: mesh724387351
+  - first:
+      43: 4300016
+    second: mesh764987959
+  externalObjects: {}
   materials:
-    importMaterials: 1
+    materialImportMode: 1
     materialName: 0
     materialSearch: 1
+    materialLocation: 0
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
@@ -68,6 +162,8 @@ ModelImporter:
     animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
     animationCompression: 1
     animationRotationError: 0.5
     animationPositionError: 0.5
@@ -82,19 +178,31 @@ ModelImporter:
     globalScale: 1
     meshCompression: 0
     addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
     importVisibility: 1
     importBlendShapes: 1
     importCameras: 1
     importLights: 1
+    fileIdsGeneration: 1
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
-    optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    meshOptimizationFlags: -1
+    indexFormat: 1
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 0
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
     secondaryUVPackMargin: 4
     useFileScale: 1
   tangentSpace:
@@ -102,10 +210,13 @@ ModelImporter:
     normalImportMode: 0
     tangentImportMode: 3
     normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 1
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
   importAnimation: 1
-  copyAvatar: 0
   humanDescription:
-    serializedVersion: 2
+    serializedVersion: 3
     human: []
     skeleton: []
     armTwist: 0.5
@@ -115,14 +226,17 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
+    globalScale: 1
     rootMotionBoneName: 
-    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
     hasTranslationDoF: 0
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 0
   humanoidOversampling: 1
+  avatarSetup: 0
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 0
   additionalBone: 0
   userData: 
   assetBundleName: 

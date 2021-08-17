@@ -1571,8 +1571,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4557616418060572}
-  - component: {fileID: 65522411332608872}
   - component: {fileID: 114455730111213496}
+  - component: {fileID: 5211992987037661608}
   m_Layer: 2
   m_Name: Spawner - Ammo Crate
   m_TagString: Untagged
@@ -1588,27 +1588,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1319583826136552}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 20, y: 20, z: 20}
   m_Children:
-  - {fileID: 4435614642441346}
-  - {fileID: 4775204476576404}
+  - {fileID: 262330100943212857}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &65522411332608872
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1319583826136552}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.125, y: 0.25, z: 0.125}
-  m_Center: {x: 0, y: 0.10999999, z: 0}
 --- !u!114 &114455730111213496
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1625,6 +1611,19 @@ MonoBehaviour:
   pickable: {fileID: 1650310700060530}
   suppliedGuns: 01010101
   ammoAmounts: 2800000006000000040000000a000000
+--- !u!65 &5211992987037661608
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1319583826136552}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.15, y: 0.2, z: 0.15}
+  m_Center: {x: 0, y: 0.05, z: 0}
 --- !u!1 &1344566532368818
 GameObject:
   m_ObjectHideFlags: 0
@@ -3333,7 +3332,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1650310700060530}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0.0725, z: 0}
   m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
   m_Children:
@@ -3342,7 +3341,7 @@ Transform:
   - {fileID: 4020223118859846}
   - {fileID: 4179037322138630}
   - {fileID: 4528982376589912}
-  m_Father: {fileID: 4557616418060572}
+  m_Father: {fileID: 262330100943212857}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &114059422787875826
@@ -5061,7 +5060,7 @@ Transform:
   - {fileID: 4526969484518476}
   - {fileID: 4822596889269436}
   - {fileID: 4347465465352024}
-  m_Father: {fileID: 4557616418060572}
+  m_Father: {fileID: 262330100943212857}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1985188789100022
@@ -5226,3 +5225,35 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &2089944392428755654
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 262330100943212857}
+  m_Layer: 2
+  m_Name: PivotAdjuster
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &262330100943212857
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2089944392428755654}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.05, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 4435614642441346}
+  - {fileID: 4775204476576404}
+  m_Father: {fileID: 4557616418060572}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

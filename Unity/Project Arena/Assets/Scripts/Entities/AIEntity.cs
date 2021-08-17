@@ -1,15 +1,27 @@
 using System;
+using AI;
+using BehaviorDesigner.Runtime;
 using UnityEngine;
+using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 /// <summary>
 /// Class representing an entity which is played by a bot.
 /// </summary>
-public class AIEntity : Entity
+
+[RequireComponent(typeof(HealthKnowledgeBase))]
+public class AIEntity : Entity, ILoggable
 {
     [SerializeField] private GameObject head;
     [SerializeField] private float sensibility;
     [SerializeField] private float inputPenalty = 1f;
+    
+    // Do I have to log?
+    private bool loggingGame = false;
 
+    // Time of the last position log.
+    private float lastPositionLog = 0;
+    
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id)
     {
         activeGuns = ag;
@@ -19,13 +31,15 @@ public class AIEntity : Entity
         health = th;
         entityID = id;
 
-        for (int i = 0; i < ag.GetLength(0); i++)
+        for (var i = 0; i < ag.Length; i++)
         {
             // Setup the gun.
             var gun = guns[i].GetComponent<Gun>();
             gun.SetupGun(gms, this, null, i + 1);
-            gun.Wield();
         }
+        ActivateLowestGun();
+        
+        GetComponent<HealthKnowledgeBase>().DetectPickups();
     }
 
     public override void SetupEntity(GameManager gms, int id)
@@ -35,17 +49,53 @@ public class AIEntity : Entity
 
     public override void TakeDamage(int damage, int killerID)
     {
-        throw new System.NotImplementedException();
+        if (inGame)
+        {
+            health -= damage;
+
+            // If the health goes under 0, kill the entity and start the respawn process.
+            if (health <= 0f)
+            {
+                health = 0;
+                // Kill the entity.
+                Die(killerID);
+            }
+            else
+            {
+                GetComponent<BehaviorTree>().SendEvent("Damaged");
+            }
+        }
     }
 
     protected override void Die(int id)
     {
-        throw new System.NotImplementedException();
+        gameManagerScript.AddScore(id, entityID);
+        SetInGame(false);
+        // Start the respawn process.
+        gameManagerScript.MenageEntityDeath(gameObject, this);
     }
 
     public override void Respawn()
     {
-        throw new System.NotImplementedException();
+        health = totalHealth;
+        ResetAllAmmo();
+        ActivateLowestGun();
+        SetInGame(true);
+    }
+
+    private void Update()
+    {
+        if (loggingGame && Time.time > lastPositionLog + 0.5)
+        {
+            ExperimentManager.Instance.LogPosition(transform.position.x, transform.position.z,
+                transform.eulerAngles.y);
+            lastPositionLog = Time.time;
+        }
+    }
+
+    private void ActivateLowestGun()
+    {
+        guns[0].GetComponent<Gun>().Wield();
     }
 
     public override void SlowEntity(float penalty)
@@ -53,28 +103,27 @@ public class AIEntity : Entity
         inputPenalty = penalty;
     }
 
-    public override void Heal(int restoredHealth)
+    public override void HealFromMedkit(MedkitPickable medkit)
     {
-        throw new System.NotImplementedException();
+        if (health + medkit.RestoredHealth > totalHealth)
+        {
+            health = totalHealth;
+        }
+        else
+        {
+            health += medkit.RestoredHealth;
+        }
+
+        GetComponent<HealthKnowledgeBase>().MarkConsumed(medkit);
     }
 
     public override void SetInGame(bool b)
     {
-        throw new System.NotImplementedException();
+        GetComponent<NavMeshAgent>().enabled = b;
+        GetComponent<BehaviorTree>().enabled = b;
+        SetMeshVisible(transform, b);
+        inGame = b;
     }
-
-    private void Start()
-    {
-        SetupEntity(100, new[] {true}, null, 10);
-    }
-
-    [SerializeField] private Entity player;
-
-    private void Update()
-    {
-        TryAttack(player);
-    }
-
 
     /// <summary>
     /// This functions rotates head and body of the entity in order to look at the provided target.
@@ -107,20 +156,17 @@ public class AIEntity : Entity
 
     public void TryAttack(Entity entity)
     {
-        var entityGameObject = entity.gameObject;
-        var reflexDelay = 4; // TODO Calculate with Gaussian 
+        var reflexDelay = Math.Max(0, Random.Range(-3, 10)); // TODO Calculate with Gaussian 
 
         var positionTracker = entity.GetComponent<PositionTracker>();
         var position = positionTracker.GetPositionFromIndex(reflexDelay);
+        var realPosition = positionTracker.GetPositionFromIndex(0);
+        // Debug.Log("RealPosition " + realPosition + " delayed " + position);
         AimTowards(position);
-        if (Physics.Raycast(transform.position, transform.forward, out var point)
-            && point.collider.gameObject == entityGameObject)
-        {
+        var angle = Vector3.Angle(head.transform.forward, realPosition - head.transform.position);
+        if (angle < 40)
             if (CanShoot())
-            {
                 Shoot();
-            }
-        }
     }
 
 
@@ -146,5 +192,10 @@ public class AIEntity : Entity
     {
         var gun = guns[currentGun].GetComponent<Gun>();
         gun.Shoot();
+    }
+
+    public void SetupLogging()
+    {
+        loggingGame = true;
     }
 }

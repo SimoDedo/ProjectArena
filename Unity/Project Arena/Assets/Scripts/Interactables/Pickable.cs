@@ -10,13 +10,10 @@ public abstract class Pickable : MonoBehaviour {
     [SerializeField] protected float cooldown = 30f;
     [SerializeField] protected GameObject pickable;
 
-    protected float pickedUpTime = 0f;
-    protected bool isActive = true;
+    private float pickedUpTime;
 
-    protected float lastCheck = 0f;
-    protected float checkWait = 0.1f;
-
-    protected bool defaultShaderSet = false;
+    private float lastCheck;
+    private const float CHECK_WAIT = 0.1f;
 
     // Use this for initialization
     protected void Start() {
@@ -25,15 +22,19 @@ public abstract class Pickable : MonoBehaviour {
 
     // Update is called once per frame
     protected void Update() {
-        if (!isActive && Time.time > pickedUpTime + cooldown) {
+        if (!IsActive && Time.time > pickedUpTime + cooldown) {
             ActivatePickable();
         }
     }
 
+    public bool IsActive { get; private set; } = true;
+
+    public float Cooldown => cooldown;
+
     protected void OnTriggerStay(Collider other) {
         // Menage the interaction with the player.
-        if (other.gameObject.tag == "Player" && Time.time > lastCheck + checkWait) {
-            if (CanBePicked(other.gameObject) && isActive) {
+        if (other.gameObject.CompareTag("Player") && Time.time > lastCheck + CHECK_WAIT) {
+            if (CanBePicked(other.gameObject) && IsActive) {
                 PickUp(other.gameObject);
                 DeactivatePickable();
             }
@@ -43,22 +44,22 @@ public abstract class Pickable : MonoBehaviour {
     }
 
     // Tells if the player really needs the pickable.
-    abstract protected bool CanBePicked(GameObject player);
+    protected abstract bool CanBePicked(GameObject player);
 
     // Gives to the player the content of the pickable.
-    abstract protected void PickUp(GameObject player);
+    protected abstract void PickUp(GameObject player);
 
     // Activates the pickable.
-    protected void ActivatePickable() {
+    private void ActivatePickable() {
         pickable.SetActive(true);
-        isActive = true;
+        IsActive = true;
     }
 
     // Deactivate the pickable.
-    protected void DeactivatePickable() {
+    private void DeactivatePickable() {
         pickable.SetActive(false);
         pickedUpTime = Time.time;
-        isActive = false;
+        IsActive = false;
     }
 
 }

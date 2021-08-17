@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -17,7 +18,7 @@ public abstract class Entity : MonoBehaviour {
     [SerializeField]
     protected bool[] activeGuns;
 
-    protected int health;
+    public int health; //TODO return protected
     protected int entityID;
     protected int currentGun = 0;
     protected bool inGame = false;
@@ -39,6 +40,9 @@ public abstract class Entity : MonoBehaviour {
 
     // Respawns the entity.
     public abstract void Respawn();
+
+    // Returns whether the entity is in game or not
+    public bool isAlive => health > 0;
 
     // Slows down the entity.
     public abstract void SlowEntity(float penalty);
@@ -84,13 +88,13 @@ public abstract class Entity : MonoBehaviour {
     }
 
     // Heals the entity.
-    public abstract void Heal(int restoredHealth);
+    public abstract void HealFromMedkit(MedkitPickable medkit);
 
     // If the entity is enabled, tells if any of the weapons passed as 
     // parameters hasn't the maximum ammo.
     public bool CanBeSupllied(bool[] suppliedGuns) {
         if (inGame) {
-            for (int i = 0; i < suppliedGuns.GetLength(0); i++) {
+            for (int i = 0; i < Math.Min(suppliedGuns.Length, guns.Count); i++) {
                 if (suppliedGuns[i] && activeGuns[i] && !guns[i].GetComponent<Gun>().IsFull()) {
                     return true;
                 }

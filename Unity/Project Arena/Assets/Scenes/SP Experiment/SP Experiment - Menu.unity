@@ -1162,7 +1162,7 @@ MonoBehaviour:
     scene: SP Experiment - Survey
   playSurvey: 1
   logOffline: 1
-  logOnline: 1
+  logOnline: 0
   logGame: 1
   logStatistics: 1
 --- !u!1 &1404278619

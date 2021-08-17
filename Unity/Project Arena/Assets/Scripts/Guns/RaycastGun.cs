@@ -74,8 +74,7 @@ public class RaycastGun : Gun {
             spark = sparkList.Dequeue();
             spark.SetActive(true);
         } else {
-            spark = (GameObject)Instantiate(sparkPrefab);
-            spark.transform.parent = sparks.transform;
+            spark = (GameObject)Instantiate(sparkPrefab, sparks.transform, true);
             spark.name = sparkPrefab.name;
         }
         // Place the spark.

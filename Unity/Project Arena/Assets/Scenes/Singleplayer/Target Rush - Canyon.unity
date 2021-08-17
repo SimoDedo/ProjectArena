@@ -397,9 +397,24 @@ PrefabInstance:
       objectReference: {fileID: 1852813975}
     - target: {fileID: 114098398130181026, guid: 66c93abea399bf7418d3a787b715c80e,
         type: 3}
+      propertyPath: gameDuration
+      value: 400000
+      objectReference: {fileID: 0}
+    - target: {fileID: 114098398130181026, guid: 66c93abea399bf7418d3a787b715c80e,
+        type: 3}
+      propertyPath: readyDuration
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114098398130181026, guid: 66c93abea399bf7418d3a787b715c80e,
+        type: 3}
       propertyPath: mapManagerScript
       value: 
       objectReference: {fileID: 1209962436}
+    - target: {fileID: 114098398130181026, guid: 66c93abea399bf7418d3a787b715c80e,
+        type: 3}
+      propertyPath: totalHealthPlayer
+      value: 40000
+      objectReference: {fileID: 0}
     - target: {fileID: 114098398130181026, guid: 66c93abea399bf7418d3a787b715c80e,
         type: 3}
       propertyPath: spawnPointManagerScript

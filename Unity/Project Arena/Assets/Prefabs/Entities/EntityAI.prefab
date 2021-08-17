@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4433738170038784}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: Colorfull Rifle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -54,7 +54,7 @@ GameObject:
   - component: {fileID: 4304241938655880}
   - component: {fileID: 33313420313754274}
   - component: {fileID: 23964416925641006}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1458324142
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 4164618971337134}
   - component: {fileID: 33991290056434214}
   - component: {fileID: 23355381786827544}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh36427447
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -216,7 +216,7 @@ GameObject:
   - component: {fileID: 4902164129407710}
   - component: {fileID: 33481134646425406}
   - component: {fileID: 23372072495511336}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh392705271
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -297,7 +297,7 @@ GameObject:
   - component: {fileID: 4755860539037682}
   - component: {fileID: 33530636412961408}
   - component: {fileID: 23496307956162770}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1065459599
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -378,7 +378,7 @@ GameObject:
   - component: {fileID: 4320713818748542}
   - component: {fileID: 33220074321807888}
   - component: {fileID: 23785544613559530}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1777805579
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -459,7 +459,7 @@ GameObject:
   - component: {fileID: 4855881456466744}
   - component: {fileID: 33051061893987660}
   - component: {fileID: 23944465664790780}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1981820982
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -538,10 +538,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4921396627691554}
-  - component: {fileID: 143417535766577170}
   - component: {fileID: 3597659384659854098}
   - component: {fileID: 5647456198230708602}
   - component: {fileID: 4214875098204987728}
+  - component: {fileID: 6069983894062413340}
+  - component: {fileID: 5762629734706090189}
+  - component: {fileID: 3810383247524921496}
+  - component: {fileID: 1272100895109282999}
   m_Layer: 8
   m_Name: EntityAI
   m_TagString: Player
@@ -563,27 +566,10 @@ Transform:
   - {fileID: 4459335911987024}
   - {fileID: 4046259761385226}
   - {fileID: 2582760994329115392}
+  - {fileID: 3692451130798454729}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!143 &143417535766577170
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1128226087601874}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Height: 2
-  m_Radius: 0.25
-  m_SlopeLimit: 45
-  m_StepOffset: 0.5
-  m_SkinWidth: 0.0001
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &3597659384659854098
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -601,10 +587,10 @@ MonoBehaviour:
   guns:
   - {fileID: 1420662876468926}
   activeGuns: 
+  health: 0
   head: {fileID: 1523818027142824}
-  sensibility: 0
+  sensibility: 100
   inputPenalty: 1
-  player: {fileID: 0}
 --- !u!114 &5647456198230708602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -627,18 +613,115 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.2
-  m_Speed: 3.5
-  m_Acceleration: 8
+  m_Speed: 16
+  m_Acceleration: 100000
   avoidancePriority: 50
-  m_AngularSpeed: 120
+  m_AngularSpeed: 100000
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
+  m_AutoBraking: 0
   m_AutoRepath: 1
   m_Height: 2
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &6069983894062413340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1128226087601874}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d7b55c7ecdb49a4a89fa5e6f9022861, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startWhenEnabled: 1
+  asynchronousLoad: 0
+  pauseWhenDisabled: 0
+  restartWhenComplete: 0
+  logTaskChanges: 0
+  group: 0
+  resetValuesOnRestart: 0
+  externalBehavior: {fileID: 11400000, guid: 1189dce0eaa6ac3189f890331be880f6, type: 2}
+  mBehaviorSource:
+    behaviorName: BasicAI
+    behaviorDescription: 
+    mTaskData:
+      types: []
+      parentIndex: 
+      startIndex: 
+      variableStartIndex: 
+      JSONSerialization: '{"EntryTask":{"Type":"BehaviorDesigner.Runtime.Tasks.EntryTask","NodeData":{"Offset":"(-563.6904,-212.428513)"},"ID":0,"Name":"Entry","Instant":true},"RootTask":{"Type":"BehaviorDesigner.Runtime.Tasks.Repeater","NodeData":{"Offset":"(3.357544,115.701935)"},"ID":1,"Name":"Repeater","Instant":true,"SharedIntcount":{"Type":"BehaviorDesigner.Runtime.SharedInt","Name":null,"Int32mValue":0},"SharedBoolrepeatForever":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":null,"BooleanmValue":true},"SharedBoolendOnFailure":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":null,"BooleanmValue":false},"Children":[{"Type":"BehaviorDesigner.Runtime.Tasks.Selector","NodeData":{"Offset":"(0,110)"},"ID":2,"Name":"Selector","Instant":true,"AbortTypeabortType":"None","Children":[{"Type":"BehaviorDesigner.Runtime.Tasks.Sequence","NodeData":{"Offset":"(-962.290344,175.540573)"},"ID":3,"Name":"Sequence","Instant":true,"AbortTypeabortType":"LowerPriority","Children":[{"Type":"BehaviorDesigner.Runtime.Tasks.HasReceivedEvent","NodeData":{"Offset":"(-132.2103,177.312836)"},"ID":4,"Name":"Has
+        Received Event","Instant":true,"SharedStringeventName":{"Type":"BehaviorDesigner.Runtime.SharedString","Name":null,"StringmValue":"Damaged"}},{"Type":"BehaviorDesigner.Runtime.Tasks.BehaviorTreeReference","NodeData":{"Offset":"(164.285522,177.857147)"},"ID":5,"Name":"Attack
+        behaviour","Instant":true,"ExternalBehavior[]externalBehaviors":[0],"SharedNamedVariable[]variables":[{"Type":"BehaviorDesigner.Runtime.SharedNamedVariable","Name":null,"NamedVariablemValue":{"Stringname":"Enemy","Stringtype":"SharedGameObject","SharedVariablevalue":{"Type":"BehaviorDesigner.Runtime.SharedGameObject","Name":"Enemy","IsShared":true,"Tooltip":"The
+        enmy to pursuit and kill"}}}],"Booleancollapsed":false}]},{"Type":"BehaviorDesigner.Runtime.Tasks.Sequence","NodeData":{"Offset":"(-400,160)"},"ID":6,"Name":"Sequence","Instant":true,"AbortTypeabortType":"LowerPriority","Children":[{"Type":"AI.CanSeeOpponent","NodeData":{"Offset":"(-60,170)"},"ID":7,"Name":"Can
+        See Opponent","Instant":true,"SharedFloattimeBeforeDetection":{"Type":"BehaviorDesigner.Runtime.SharedFloat","Name":"TimeBeforeDetection","IsShared":true,"SinglemValue":0},"SharedFloatmaxDistance":{"Type":"BehaviorDesigner.Runtime.SharedFloat","Name":null,"SinglemValue":100},"SharedFloatfov":{"Type":"BehaviorDesigner.Runtime.SharedFloat","Name":null,"SinglemValue":90},"SharedGameObjectenemy":{"Type":"BehaviorDesigner.Runtime.SharedGameObject","Name":"Enemy","IsShared":true,"Tooltip":"The
+        enmy to pursuit and kill"}},{"Type":"BehaviorDesigner.Runtime.Tasks.BehaviorTreeReference","NodeData":{"Offset":"(130,170)"},"ID":8,"Name":"Attack
+        behaviour","Instant":true,"ExternalBehavior[]externalBehaviors":[1],"SharedNamedVariable[]variables":[{"Type":"BehaviorDesigner.Runtime.SharedNamedVariable","Name":null,"NamedVariablemValue":{"Stringname":"Enemy","Stringtype":"SharedGameObject","SharedVariablevalue":{"Type":"BehaviorDesigner.Runtime.SharedGameObject","Name":"Enemy","IsShared":true,"Tooltip":"The
+        enmy to pursuit and kill"}}}],"Booleancollapsed":false}]},{"Type":"BehaviorDesigner.Runtime.Tasks.Sequence","NodeData":{"Offset":"(-67.08374,189.642471)"},"ID":9,"Name":"Sequence","Instant":true,"AbortTypeabortType":"Both","Children":[{"Type":"AI.ShouldLookForHealth","NodeData":{"Offset":"(-4.22814941,142.499878)"},"ID":10,"Name":"Should
+        Look For Health","Instant":true,"SharedIntthresholdLowHealth":{"Type":"BehaviorDesigner.Runtime.SharedInt","Name":null,"Int32mValue":900}},{"Type":"AI.LookForHealth","NodeData":{"Offset":"(233.218018,144.8421)"},"ID":11,"Name":"Look
+        For Health","Instant":true}]},{"Type":"AI.Wander","NodeData":{"Offset":"(160,170)"},"ID":12,"Name":"Wander","Instant":true,"SharedIntmaxRetries":{"Type":"BehaviorDesigner.Runtime.SharedInt","Name":null,"Int32mValue":10},"SharedVector2levyParams":{"Type":"BehaviorDesigner.Runtime.SharedVector2","Name":"LevyParams","IsShared":true,"Vector2mValue":"(5,4)"},"SharedFloatstoppingDistance":{"Type":"BehaviorDesigner.Runtime.SharedFloat","Name":null,"SinglemValue":0.5}}]}]},"Variables":[{"Type":"BehaviorDesigner.Runtime.SharedGameObject","Name":"Enemy","IsShared":true,"Tooltip":"The
+        enmy to pursuit and kill"},{"Type":"BehaviorDesigner.Runtime.SharedVector2","Name":"LevyParams","IsShared":true,"Vector2mValue":"(5,4)"},{"Type":"BehaviorDesigner.Runtime.SharedFloat","Name":"TimeBeforeDetection","IsShared":true,"SinglemValue":0}]}'
+      fieldSerializationData:
+        typeName: []
+        fieldNameHash: 
+        startIndex: 
+        dataPosition: 
+        unityObjects:
+        - {fileID: 11400000, guid: 6d1acb2344588e9a4bad0cd8377b19c0, type: 2}
+        - {fileID: 11400000, guid: 6d1acb2344588e9a4bad0cd8377b19c0, type: 2}
+        byteData: 
+        byteDataArray: 
+      Version: 1.6.8
+  gizmoViewMode: 2
+  showBehaviorDesignerGizmo: 1
+--- !u!114 &5762629734706090189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1128226087601874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8574a74f46c074f2fbc065bd55e08fbe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxSightRange: 100
+  fov: 90
+  head: {fileID: 4459335911987024}
+--- !u!54 &3810383247524921496
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1128226087601874}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 90
+  m_CollisionDetection: 0
+--- !u!136 &1272100895109282999
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1128226087601874}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.2
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1136143575041094
 GameObject:
   m_ObjectHideFlags: 0
@@ -650,7 +733,7 @@ GameObject:
   - component: {fileID: 4904128250091820}
   - component: {fileID: 33234908754254218}
   - component: {fileID: 23857131240379890}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1686224423
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -729,7 +812,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4695068751231754}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: Colorfull Rifle - Flash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -765,7 +848,7 @@ GameObject:
   - component: {fileID: 4447213552628796}
   - component: {fileID: 33714428679936196}
   - component: {fileID: 23692004026504878}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh826053089
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -927,7 +1010,7 @@ GameObject:
   - component: {fileID: 4656231824012272}
   - component: {fileID: 114040892126706168}
   - component: {fileID: 114128907697292602}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: Rifle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1014,7 +1097,7 @@ GameObject:
   - component: {fileID: 4153350640318580}
   - component: {fileID: 33868830789801738}
   - component: {fileID: 23406514675563456}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh2053845300
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1095,7 +1178,7 @@ GameObject:
   - component: {fileID: 4169999567606454}
   - component: {fileID: 33602752003319868}
   - component: {fileID: 23465715365801580}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh205876905
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1176,7 +1259,7 @@ GameObject:
   - component: {fileID: 4921800073333124}
   - component: {fileID: 33900188219503016}
   - component: {fileID: 23429380451272226}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1291674878
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1255,7 +1338,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4545488238981758}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: Colorfull Bazooka - Flash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1288,7 +1371,7 @@ GameObject:
   - component: {fileID: 4381801932539524}
   - component: {fileID: 33782329132681626}
   - component: {fileID: 23768508950276224}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1527815478
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1369,7 +1452,7 @@ GameObject:
   - component: {fileID: 4832683348272850}
   - component: {fileID: 33422800611360740}
   - component: {fileID: 23620827495855084}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1572087321
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1450,7 +1533,7 @@ GameObject:
   - component: {fileID: 4482265910674310}
   - component: {fileID: 114187036404975674}
   - component: {fileID: 114718352753251754}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: Rocket Launcher
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1535,7 +1618,7 @@ GameObject:
   - component: {fileID: 4097178353913642}
   - component: {fileID: 33944973825276886}
   - component: {fileID: 23093222196736502}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh813794705
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1616,7 +1699,7 @@ GameObject:
   - component: {fileID: 4234367712866914}
   - component: {fileID: 33844260208249094}
   - component: {fileID: 23717609911596980}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1207380142
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1771,7 +1854,7 @@ GameObject:
   - component: {fileID: 4050831044643518}
   - component: {fileID: 33166392782861712}
   - component: {fileID: 23993097359969280}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1138809595
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1945,7 +2028,7 @@ GameObject:
   - component: {fileID: 4079534491022434}
   - component: {fileID: 114406827984555436}
   - component: {fileID: 114191837528411164}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: AK47
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2032,7 +2115,7 @@ GameObject:
   - component: {fileID: 4959517384387800}
   - component: {fileID: 33736801510500424}
   - component: {fileID: 23947140722680452}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh859198247
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2147,7 +2230,7 @@ GameObject:
   - component: {fileID: 4907220534686188}
   - component: {fileID: 33746863512973848}
   - component: {fileID: 23514453906039270}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh198898665
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2228,7 +2311,7 @@ GameObject:
   - component: {fileID: 4012204569687794}
   - component: {fileID: 33050195293094604}
   - component: {fileID: 23586934035400696}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh506402075
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2307,7 +2390,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4609525908970924}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: Colorfull Shotgun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2348,7 +2431,7 @@ GameObject:
   - component: {fileID: 4274437430534994}
   - component: {fileID: 33065726591036268}
   - component: {fileID: 23794801380909518}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh468475709
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2427,7 +2510,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4429226212224378}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: Colorfull Shotgun - Flash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2465,7 +2548,7 @@ GameObject:
   - component: {fileID: 4594591656274072}
   - component: {fileID: 33910751895806188}
   - component: {fileID: 23560404130716032}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1627079884
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2546,7 +2629,7 @@ GameObject:
   - component: {fileID: 4506108852990626}
   - component: {fileID: 33109738675295534}
   - component: {fileID: 23767102774007862}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh77402737
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2659,7 +2742,7 @@ GameObject:
   - component: {fileID: 4706024259202422}
   - component: {fileID: 33473376864412540}
   - component: {fileID: 23414954060468992}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1565512473
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2740,7 +2823,7 @@ GameObject:
   - component: {fileID: 4006124641265144}
   - component: {fileID: 33757797990710526}
   - component: {fileID: 23275668609031974}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1849940737
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2821,7 +2904,7 @@ GameObject:
   - component: {fileID: 4154333781269128}
   - component: {fileID: 33546702461415836}
   - component: {fileID: 23361466081892478}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh141542445
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2902,7 +2985,7 @@ GameObject:
   - component: {fileID: 4999761801298634}
   - component: {fileID: 33521184378711576}
   - component: {fileID: 23784691610474626}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh450594582
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2983,7 +3066,7 @@ GameObject:
   - component: {fileID: 4976130420868286}
   - component: {fileID: 33424304548917672}
   - component: {fileID: 23117416273535908}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1220418920
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3064,7 +3147,7 @@ GameObject:
   - component: {fileID: 4067369310958916}
   - component: {fileID: 33324448813600240}
   - component: {fileID: 23854004787176676}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh67601880
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3145,7 +3228,7 @@ GameObject:
   - component: {fileID: 4030246956192040}
   - component: {fileID: 33983942465376968}
   - component: {fileID: 23643846010319808}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh39852534
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3226,7 +3309,7 @@ GameObject:
   - component: {fileID: 4709544187128068}
   - component: {fileID: 33343468773912062}
   - component: {fileID: 23735363070318668}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1746627453
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3307,7 +3390,7 @@ GameObject:
   - component: {fileID: 4745216027303878}
   - component: {fileID: 33503509931287960}
   - component: {fileID: 23617776501193308}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh168758296
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3388,7 +3471,7 @@ GameObject:
   - component: {fileID: 4759083324844800}
   - component: {fileID: 114215182200902864}
   - component: {fileID: 114286380553423094}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: Shotgun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3475,7 +3558,7 @@ GameObject:
   - component: {fileID: 4481676379547078}
   - component: {fileID: 33212434050008930}
   - component: {fileID: 23420566574903396}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh384242299
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3556,7 +3639,7 @@ GameObject:
   - component: {fileID: 4203785321918852}
   - component: {fileID: 33036251218216614}
   - component: {fileID: 23720519999674776}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh991733189
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3637,7 +3720,7 @@ GameObject:
   - component: {fileID: 4855617890338606}
   - component: {fileID: 33171704646018378}
   - component: {fileID: 23111415705651800}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1064571246
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3718,7 +3801,7 @@ GameObject:
   - component: {fileID: 4133293778614710}
   - component: {fileID: 33529106754778670}
   - component: {fileID: 23581112669324188}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh2134746466
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3799,7 +3882,7 @@ GameObject:
   - component: {fileID: 4146004061948158}
   - component: {fileID: 33402966335745262}
   - component: {fileID: 23484243916058434}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1478953549
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3880,7 +3963,7 @@ GameObject:
   - component: {fileID: 4397048571522936}
   - component: {fileID: 33503373641975260}
   - component: {fileID: 23505383541130698}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh676176609
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3961,7 +4044,7 @@ GameObject:
   - component: {fileID: 4122511004857878}
   - component: {fileID: 33460903120293808}
   - component: {fileID: 23458324484875732}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh834424939
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4042,7 +4125,7 @@ GameObject:
   - component: {fileID: 4408681300489536}
   - component: {fileID: 33510390975857438}
   - component: {fileID: 23647423826654400}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh433219520
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4123,7 +4206,7 @@ GameObject:
   - component: {fileID: 4305621279483208}
   - component: {fileID: 33046548149371112}
   - component: {fileID: 23115901872866830}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh994837827
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4204,7 +4287,7 @@ GameObject:
   - component: {fileID: 4363339615024972}
   - component: {fileID: 33518053667837750}
   - component: {fileID: 23841470628553610}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh988900758
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4285,7 +4368,7 @@ GameObject:
   - component: {fileID: 4628500879400402}
   - component: {fileID: 33315796314960916}
   - component: {fileID: 23464069560641756}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh834846544
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4364,7 +4447,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4036242383117260}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: Colorfull Bazooka
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4404,7 +4487,7 @@ GameObject:
   - component: {fileID: 4704066069795818}
   - component: {fileID: 33724831983795808}
   - component: {fileID: 23707074586065326}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh920164344
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4483,7 +4566,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4941445504841324}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: Projectile Position
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4515,7 +4598,7 @@ GameObject:
   - component: {fileID: 4454797744138916}
   - component: {fileID: 33448478387771654}
   - component: {fileID: 23226136838411818}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh28542028
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4594,7 +4677,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4454959859539934}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: Colorfull AK47 - Flash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4629,7 +4712,7 @@ GameObject:
   - component: {fileID: 4204964199228402}
   - component: {fileID: 33781307898018040}
   - component: {fileID: 23123525614537028}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh842489828
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4710,7 +4793,7 @@ GameObject:
   - component: {fileID: 4058099012220850}
   - component: {fileID: 33206598011569104}
   - component: {fileID: 23882488521112754}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1500122055
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4791,7 +4874,7 @@ GameObject:
   - component: {fileID: 4341632412568476}
   - component: {fileID: 33285703308422382}
   - component: {fileID: 23647883108313070}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh725920552
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4872,7 +4955,7 @@ GameObject:
   - component: {fileID: 4429374414384194}
   - component: {fileID: 33287191044649550}
   - component: {fileID: 23456125615706788}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1286261176
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4953,7 +5036,7 @@ GameObject:
   - component: {fileID: 4010647716113408}
   - component: {fileID: 33743124375318598}
   - component: {fileID: 23750394334843438}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh977660613
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5032,7 +5115,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4889665818396754}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: Colorfull AK47
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5073,7 +5156,7 @@ GameObject:
   - component: {fileID: 4329259200349498}
   - component: {fileID: 33586864918415248}
   - component: {fileID: 23630245053308796}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1751968375
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5154,7 +5237,7 @@ GameObject:
   - component: {fileID: 4183318169053756}
   - component: {fileID: 33497024140786332}
   - component: {fileID: 23638147330334020}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh964330119
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5235,7 +5318,7 @@ GameObject:
   - component: {fileID: 4914651092938082}
   - component: {fileID: 33976909256509420}
   - component: {fileID: 23380678094216156}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh330032640
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5316,7 +5399,7 @@ GameObject:
   - component: {fileID: 4767358093615018}
   - component: {fileID: 33653837613722124}
   - component: {fileID: 23487669344093752}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: mesh1164827652
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5476,8 +5559,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2582760994329115392}
-  - component: {fileID: 3103667278090560868}
-  - component: {fileID: 4140313481816837871}
   m_Layer: 8
   m_Name: Opponent
   m_TagString: Untagged
@@ -5506,36 +5587,6 @@ Transform:
   m_Father: {fileID: 4921396627691554}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
---- !u!136 &3103667278090560868
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 665615833533163984}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.2
-  m_Height: 1.6
-  m_Direction: 1
-  m_Center: {x: 0, y: 0.03, z: 0}
---- !u!54 &4140313481816837871
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 665615833533163984}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 90
-  m_CollisionDetection: 0
 --- !u!1 &884380183414251147
 GameObject:
   m_ObjectHideFlags: 0
@@ -5617,6 +5668,80 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &900814110758346002
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3692451130798454729}
+  - component: {fileID: 9194108852967639590}
+  m_Layer: 8
+  m_Name: Camera
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3692451130798454729
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 900814110758346002}
+  m_LocalRotation: {x: 0.13935465, y: -0.0011779867, z: 0.00016622711, w: 0.9902418}
+  m_LocalPosition: {x: 0.0052882815, y: 1.5009552, z: -2.9909978}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4921396627691554}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!20 &9194108852967639590
+Camera:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 900814110758346002}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_ClearFlags: 1
+  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_projectionMatrixMode: 1
+  m_GateFitMode: 2
+  m_FOVAxisMode: 0
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_FocalLength: 50
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.3
+  far clip plane: 1000
+  field of view: 60
+  orthographic: 0
+  orthographic size: 5
+  m_Depth: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 0
+  m_TargetEye: 3
+  m_HDR: 1
+  m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
 --- !u!1 &1348231103467929781
 GameObject:
   m_ObjectHideFlags: 0

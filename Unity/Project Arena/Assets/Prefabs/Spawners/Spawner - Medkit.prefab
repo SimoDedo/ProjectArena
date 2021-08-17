@@ -279,7 +279,7 @@ Transform:
   - {fileID: 4517161273928118}
   - {fileID: 4705814906164146}
   - {fileID: 4491214815839628}
-  m_Father: {fileID: 4959712008786392}
+  m_Father: {fileID: 4848802008464679648}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1253627332028770
@@ -555,7 +555,7 @@ Transform:
   m_Children:
   - {fileID: 4341226916112926}
   - {fileID: 4546324263214688}
-  m_Father: {fileID: 4959712008786392}
+  m_Father: {fileID: 4848802008464679648}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &114246038761978998
@@ -594,11 +594,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4959712008786392}
-  - component: {fileID: 65382601506527228}
   - component: {fileID: 114776843932861342}
+  - component: {fileID: 161507454998530363}
   m_Layer: 2
   m_Name: Spawner - Medkit
-  m_TagString: Untagged
+  m_TagString: HealthPickup
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -611,27 +611,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1532998221839736}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 20, y: 20, z: 20}
   m_Children:
-  - {fileID: 4627602798019462}
-  - {fileID: 4838005383788602}
+  - {fileID: 4848802008464679648}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &65382601506527228
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1532998221839736}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.125, y: 0.25, z: 0.125}
-  m_Center: {x: 0, y: 0.10999999, z: 0}
 --- !u!114 &114776843932861342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -647,6 +633,19 @@ MonoBehaviour:
   cooldown: 30
   pickable: {fileID: 1531117037697720}
   restoredHealth: 50
+--- !u!65 &161507454998530363
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1532998221839736}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.15, y: 0.2, z: 0.15}
+  m_Center: {x: 0, y: 0.05, z: 0}
 --- !u!1 &1615838554484882
 GameObject:
   m_ObjectHideFlags: 0
@@ -1052,3 +1051,35 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &7015639600913128578
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4848802008464679648}
+  m_Layer: 2
+  m_Name: PivotAdjuster
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4848802008464679648
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7015639600913128578}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.05, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 4627602798019462}
+  - {fileID: 4838005383788602}
+  m_Father: {fileID: 4959712008786392}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

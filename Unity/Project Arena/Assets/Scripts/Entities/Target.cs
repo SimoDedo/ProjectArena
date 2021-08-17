@@ -121,7 +121,7 @@ public class Target : Entity, ILoggable {
         return c;
     }
 
-    public override void Heal(int restoredHealth) { }
+    public override void HealFromMedkit(MedkitPickable medkit) { }
 
     public override void Respawn() { }
 
