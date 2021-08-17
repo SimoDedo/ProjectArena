@@ -19,7 +19,7 @@ public class SLMapManager : MapManager {
             }
         } else {
             // Generate the map.
-            if (ParameterManager.HasInstance()) {
+            if (ParameterManager.HasInstance() && ParameterManager.Instance.GenerationMode != 5) {
                 map = mapGeneratorScript.GenerateMap(seed, export, exportPath);
             } else {
                 map = mapGeneratorScript.GenerateMap();

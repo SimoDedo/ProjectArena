@@ -25,9 +25,9 @@ public abstract class GameManager : CoreComponent, ILoggable {
     protected bool isPaused = false;
 
     // Do I have to handshake with the Experiment Manager?
-    protected bool handshaking = false;
+    protected bool handshaking = true;
     // Do I have to log?
-    protected bool loggingGame = false;
+    protected bool loggingGame = true;
 
     // Moves a gameobject to a free spawn point.
     public void Spawn(GameObject g) {

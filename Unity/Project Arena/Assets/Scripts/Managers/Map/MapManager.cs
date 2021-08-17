@@ -86,6 +86,11 @@ public abstract class MapManager : CoreComponent {
                     seed = ParameterManager.Instance.MapDNA;
                     textFilePath = null;
                     break;
+                case 5:
+                    loadMapFromFile = false;
+                    seed = null;
+                    textFilePath = null;
+                    break;
             }
         }
     }
