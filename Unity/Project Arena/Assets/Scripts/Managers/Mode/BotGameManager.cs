@@ -1,5 +1,6 @@
 using System.Collections;
 using Accord.Statistics.Kernels;
+using AI;
 using UnityEngine;
 
 /// <summary>
@@ -7,9 +8,11 @@ using UnityEngine;
 /// between two bots. Each time a bot kills his opponent he scores one point. If a bot
 /// kills himself he loses one point. Who has more points when time runs up wins.
 /// </summary>
-public class BotGameManager : GameManager {
+public class BotGameManager : GameManager
+{
+    [Header("Contenders")] [SerializeField]
+    private GameObject player;
 
-    [Header("Contenders")] [SerializeField] private GameObject player;
     [SerializeField] private GameObject opponent;
     [SerializeField] private string playerName = "Player 1";
     [SerializeField] private string opponentName = "Player 2";
@@ -17,8 +20,10 @@ public class BotGameManager : GameManager {
     [SerializeField] private int totalHealthOpponent = 100;
     [SerializeField] private bool[] activeGunsPlayer;
     [SerializeField] private bool[] activeGunsOpponent;
+    [SerializeField] AIMapTesting mapTesting;
 
-    [Header("Duel variables")] [SerializeField] protected DuelGameUIManager duelGameUIManagerScript;
+    [Header("Duel variables")] [SerializeField]
+    protected DuelGameUIManager duelGameUIManagerScript;
 
     private AIEntity firstAI;
     private AIEntity secondAI;
@@ -29,7 +34,8 @@ public class BotGameManager : GameManager {
     private int playerID = 1;
     private int opponentID = 2;
 
-    private void Start() {
+    private void Start()
+    {
         /* #if UNITY_EDITOR
             UnityEditor.SceneView.FocusWindowIfItsOpen(typeof(UnityEditor.SceneView));
         #endif */
@@ -38,15 +44,19 @@ public class BotGameManager : GameManager {
         secondAI = opponent.GetComponent<AIEntity>();
 
         duelGameUIManagerScript.Fade(0.7f, 1f, true, 0.5f);
+        mapTesting.StartLogging();
     }
 
-    private void Update() {
+    private void Update()
+    {
         if (!IsReady() && mapManagerScript.IsReady() && spawnPointManagerScript.IsReady()
-            && duelGameUIManagerScript.IsReady()) {
+            && duelGameUIManagerScript.IsReady())
+        {
             // Generate the map.
             mapManagerScript.ManageMap(true);
 
-            if (!generateOnly) {
+            if (!generateOnly)
+            {
                 // Set the spawn points.
                 spawnPointManagerScript.SetSpawnPoints(mapManagerScript.GetSpawnPoints());
 
@@ -64,21 +74,26 @@ public class BotGameManager : GameManager {
             }
 
             // If needed, tell the Experiment Manager it can start loggingGame.
-            if (handshaking) {
+            if (handshaking)
+            {
                 ExperimentManager.Instance.StartLogging();
             }
 
             SetReady(true);
-        } else if (IsReady() && !generateOnly) {
+        }
+        else if (IsReady() && !generateOnly)
+        {
             ManageGame();
         }
     }
 
     // Updates the phase of the game.
-    protected override void UpdateGamePhase() {
-        int passedTime = (int)(Time.time - startTime);
+    protected override void UpdateGamePhase()
+    {
+        int passedTime = (int) (Time.time - startTime);
         Debug.Log("Time passed: " + passedTime + " out of " + gameDuration);
-        if (gamePhase == -1) {
+        if (gamePhase == -1)
+        {
             // Disable the contenders movement and interactions, activate the ready UI, set the 
             // name of the players and set the phase.
             firstAI.SetInGame(false);
@@ -87,7 +102,9 @@ public class BotGameManager : GameManager {
             duelGameUIManagerScript.SetPlayersName(playerName, opponentName);
             duelGameUIManagerScript.SetReadyUI();
             gamePhase = 0;
-        } else if (gamePhase == 0 && passedTime >= readyDuration) {
+        }
+        else if (gamePhase == 0 && passedTime >= readyDuration)
+        {
             Debug.Log("In fase started");
             // Enable the contenders movement and interactions, activate the fight UI, set the 
             // kills to zero and set the phase.
@@ -97,7 +114,9 @@ public class BotGameManager : GameManager {
             duelGameUIManagerScript.SetKills(0, 0);
             duelGameUIManagerScript.ActivateFightUI();
             gamePhase = 1;
-        } else if (gamePhase == 1 && passedTime >= readyDuration + gameDuration) {
+        }
+        else if (gamePhase == 1 && passedTime >= readyDuration + gameDuration)
+        {
             Debug.Log("In fase score");
             // Disable the contenders movement and interactions, activate the score UI, set the 
             // winner and set the phase.
@@ -107,31 +126,38 @@ public class BotGameManager : GameManager {
             duelGameUIManagerScript.ActivateScoreUI();
             duelGameUIManagerScript.SetScoreUI(playerKillCount, opponentKillCount);
             gamePhase = 2;
-        } else if (gamePhase == 2 && passedTime >= readyDuration + gameDuration + scoreDuration)
+        }
+        else if (gamePhase == 2 && passedTime >= readyDuration + gameDuration + scoreDuration)
         {
             Debug.Log("In fase quitting");
-            Quit();
+            mapTesting.StopLogging();
+            // Quit();
+            Application.Quit();
             gamePhase = 3;
         }
     }
 
     // Manages the gamed depending on the current time.
-    protected override void ManageGame() {
+    protected override void ManageGame()
+    {
         UpdateGamePhase();
 
-        switch (gamePhase) {
+        switch (gamePhase)
+        {
             case 0:
                 // Update the countdown.
-                duelGameUIManagerScript.SetCountdown((int)(startTime + readyDuration - Time.time));
+                duelGameUIManagerScript.SetCountdown((int) (startTime + readyDuration - Time.time));
                 break;
             case 1:
                 // Update the time.
-                duelGameUIManagerScript.SetTime((int)(startTime + readyDuration + gameDuration
-                    - Time.time));
+                duelGameUIManagerScript.SetTime((int) (startTime + readyDuration + gameDuration
+                                                       - Time.time));
                 // Pause or unpause if needed.
-                if (Input.GetKeyDown(KeyCode.Escape)) {
+                if (Input.GetKeyDown(KeyCode.Escape))
+                {
                     Pause();
                 }
+
                 break;
             case 2:
                 // Do nothing.
@@ -140,17 +166,27 @@ public class BotGameManager : GameManager {
     }
 
     // Adds a kill to the kill counters.
-    public override void AddScore(int killerIdentifier, int killedID) {
-        if (killerIdentifier == killedID) {
-            if (killerIdentifier == playerID) {
+    public override void AddScore(int killerIdentifier, int killedID)
+    {
+        if (killerIdentifier == killedID)
+        {
+            if (killerIdentifier == playerID)
+            {
                 playerKillCount--;
-            } else {
+            }
+            else
+            {
                 opponentKillCount--;
             }
-        } else {
-            if (killerIdentifier == playerID) {
+        }
+        else
+        {
+            if (killerIdentifier == playerID)
+            {
                 playerKillCount++;
-            } else {
+            }
+            else
+            {
                 opponentKillCount++;
             }
         }
@@ -159,16 +195,21 @@ public class BotGameManager : GameManager {
     }
 
     // Sets the color of the UI.
-    public override void SetUIColor(Color c) {
+    public override void SetUIColor(Color c)
+    {
         duelGameUIManagerScript.SetColorAll(c);
     }
 
     // Pauses and unpauses the game.
-    public override void Pause() {
-        if (!isPaused) {
+    public override void Pause()
+    {
+        if (!isPaused)
+        {
             duelGameUIManagerScript.Fade(0f, 0.7f, false, 0.25f);
             duelGameUIManagerScript.ActivatePauseUI(true);
-        } else {
+        }
+        else
+        {
             duelGameUIManagerScript.Fade(0f, 0.7f, true, 0.25f);
             duelGameUIManagerScript.ActivatePauseUI(false);
         }
@@ -179,19 +220,21 @@ public class BotGameManager : GameManager {
     }
 
     // Menages the death of an entity.
-    public override void ManageEntityDeath(GameObject g, Entity e) {
+    public override void ManageEntityDeath(GameObject g, Entity e)
+    {
         // Start the respawn process.
         StartCoroutine(WaitForRespawn(g, e));
     }
 
     // Respawns an entity, but only if the game phase is still figth.
-    private IEnumerator WaitForRespawn(GameObject g, Entity e) {
+    private IEnumerator WaitForRespawn(GameObject g, Entity e)
+    {
         yield return new WaitForSeconds(respawnDuration);
 
-        if (gamePhase == 1) {
+        if (gamePhase == 1)
+        {
             Spawn(g);
             e.Respawn();
         }
     }
-
 }

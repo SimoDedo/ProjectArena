@@ -52,6 +52,7 @@ public class Target : Entity, ILoggable {
             {
                 x = position.x,
                 z = position.z,
+                entityId = entityID,
                 spawnEntity = gameObject.name
             });
         }
@@ -103,7 +104,9 @@ public class Target : Entity, ILoggable {
                 HitInfoGameEvent.Instance.Raise(new HitInfo
                 {
                     damage = damage,
+                    hitEntityID = entityID,
                     hitEntity = gameObject.name,
+                    hitterEntityID = killerID,
                     hitterEntity = "Player " + killerID,
                     x = position.x,
                     z = position.z
@@ -126,7 +129,9 @@ public class Target : Entity, ILoggable {
             var position = transform.position;
             KillInfoGameEvent.Instance.Raise(new KillInfo
             {
+                killedEntityID = entityID,
                 killedEntity = gameObject.name,
+                killerEntityID =  id,
                 killerEntity =  "Player " + id,
                 x = position.x,
                 z = position.z

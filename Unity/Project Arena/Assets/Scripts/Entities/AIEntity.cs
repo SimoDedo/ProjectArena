@@ -41,6 +41,14 @@ public class AIEntity : Entity, ILoggable
         ActivateLowestGun();
         
         GetComponent<HealthKnowledgeBase>().DetectPickups();
+        var position = transform.position;
+        SpawnInfoGameEvent.Instance.Raise(new SpawnInfo
+        {
+            x = position.x,
+            z = position.z,
+            entityId = entityID,
+            spawnEntity = gameObject.name
+        });
     }
 
     public override void SetupEntity(GameManager gms, int id)
@@ -54,6 +62,18 @@ public class AIEntity : Entity, ILoggable
         {
             health -= damage;
 
+            var position = transform.position;
+            HitInfoGameEvent.Instance.Raise(new HitInfo
+            {
+                damage = damage,
+                hitEntityID = entityID,
+                hitEntity = gameObject.name,
+                hitterEntityID = killerID,
+                hitterEntity = "Player " + killerID,
+                x = position.x,
+                z = position.z
+            });
+            
             // If the health goes under 0, kill the entity and start the respawn process.
             if (health <= 0f)
             {
@@ -70,6 +90,16 @@ public class AIEntity : Entity, ILoggable
 
     protected override void Die(int id)
     {
+        var position = transform.position;
+        KillInfoGameEvent.Instance.Raise(new KillInfo
+        {
+            killedEntity = gameObject.name,
+            killedEntityID = entityID,
+            killerEntity = "Player" + id,
+            killerEntityID = id,
+            x = position.x,
+            z = position.z
+        });
         gameManagerScript.AddScore(id, entityID);
         SetInGame(false);
         // Start the respawn process.
@@ -78,6 +108,14 @@ public class AIEntity : Entity, ILoggable
 
     public override void Respawn()
     {
+        var position = transform.position;
+        SpawnInfoGameEvent.Instance.Raise(new SpawnInfo
+        {
+            x = position.x,
+            z = position.z,
+            entityId = entityID,
+            spawnEntity = gameObject.name
+        });
         health = totalHealth;
         ResetAllAmmo();
         ActivateLowestGun();
@@ -92,7 +130,7 @@ public class AIEntity : Entity, ILoggable
             var position = t.position;
             PositionInfoGameEvent.Instance.Raise(
                 new PositionInfo {x = position.x, z = position.z,
-                dir = t.eulerAngles.y});
+                dir = t.eulerAngles.y, entityID = entityID});
             lastPositionLog = Time.time;
         }
     }

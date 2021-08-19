@@ -67,6 +67,7 @@ public abstract class GameManager : CoreComponent, ILoggable
         Time.timeScale = 1f;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+        
         LoadNextScene("Menu");
     }
 

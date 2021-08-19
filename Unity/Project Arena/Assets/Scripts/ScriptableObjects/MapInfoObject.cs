@@ -27,6 +27,7 @@ namespace ScriptableObjectArchitecture
         public float x;
         public float z;
         public float dir;
+        public int entityID;
     }
 
     public class BasePositionInfoGameEvent : GameEventBase<PositionInfo>
@@ -61,6 +62,7 @@ namespace ScriptableObjectArchitecture
     // TODO no reference to who is recharging?
     public struct ReloadInfo
     {
+        public int ownerId;
         public int gunId;
         public int ammoInCharger;
         public int totalAmmo;
@@ -82,6 +84,7 @@ namespace ScriptableObjectArchitecture
         public float x;
         public float z;
         public float direction;
+        public int ownerId;
         public int gunID;
         public int ammoInCharger;
         public int totalAmmo;
@@ -102,6 +105,7 @@ namespace ScriptableObjectArchitecture
     {
         public float x;
         public float z;
+        public int entityId;
         public string spawnEntity;
     }
 
@@ -120,7 +124,9 @@ namespace ScriptableObjectArchitecture
     {
         public float x;
         public float z;
+        public int killedEntityID;
         public string killedEntity;
+        public int killerEntityID;
         public string killerEntity;
     }
 
@@ -139,7 +145,9 @@ namespace ScriptableObjectArchitecture
     {
         public float x;
         public float z;
+        public int hitEntityID;
         public string hitEntity;
+        public int hitterEntityID;
         public string hitterEntity;
         public int damage;
     }

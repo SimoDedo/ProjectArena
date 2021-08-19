@@ -684,7 +684,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager>
     {
         if (loggingGame)
         {
-            JsonReload jReload = new JsonReload(Time.time - logStart, info.gunId, info.ammoInCharger,
+            JsonReload jReload = new JsonReload(Time.time - logStart, info.ownerId, info.gunId, info.ammoInCharger,
                 info.totalAmmo);
             jGameLog.reloadLogs.Add(jReload);
 
@@ -703,7 +703,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager>
             Coord coord = NormalizeFlipCoord(info.x, info.z);
 
             JsonShot jShot = new JsonShot(Time.time - logStart, coord.x, coord.z,
-                NormalizeFlipAngle(info.direction), info.gunID, info.ammoInCharger, info.totalAmmo);
+                NormalizeFlipAngle(info.direction), info.ownerId, info.gunID, info.ammoInCharger, info.totalAmmo);
             jGameLog.shotLogs.Add(jShot);
 
             if (logOnline)
@@ -726,7 +726,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager>
 
         if (loggingGame)
         {
-            JsonPosition jPosition = new JsonPosition(Time.time - logStart, coord.x, coord.z,
+            JsonPosition jPosition = new JsonPosition(Time.time - logStart, info.entityID, coord.x, coord.z,
                 NormalizeFlipAngle(info.dir));
             jGameLog.positionLogs.Add(jPosition);
 
@@ -758,7 +758,9 @@ public class ExperimentManager : SceneSingleton<ExperimentManager>
         if (loggingGame)
         {
             JsonSpawn jSpawn = new JsonSpawn(Time.time - logStart, coord.x, coord.z,
-                info.spawnEntity);
+                info.entityId,
+                info.spawnEntity
+                );
             jGameLog.spawnLogs.Add(jSpawn);
 
             if (logOnline)
@@ -782,8 +784,12 @@ public class ExperimentManager : SceneSingleton<ExperimentManager>
 
         if (loggingGame)
         {
-            JsonKill jKill = new JsonKill(Time.time - logStart, coord.x, coord.z, info.killedEntity,
-                info.killerEntity);
+            JsonKill jKill = new JsonKill(Time.time - logStart, coord.x, coord.z, 
+                info.killedEntityID,
+                info.killedEntity,
+                info.killerEntityID,
+                info.killerEntity
+                );
             jGameLog.killLogs.Add(jKill);
 
             if (logOnline)
@@ -807,8 +813,12 @@ public class ExperimentManager : SceneSingleton<ExperimentManager>
 
         if (loggingGame)
         {
-            JsonHit jHit = new JsonHit(Time.time - logStart, coord.x, coord.z, info.hitEntity,
-                info.hitterEntity, info.damage);
+            JsonHit jHit = new JsonHit(Time.time - logStart, coord.x, coord.z, 
+                info.hitEntityID,
+                info.hitEntity,
+                info.hitterEntityID,
+                info.hitterEntity,
+                info.damage);
             jGameLog.hitLogs.Add(jHit);
 
             if (logOnline)

@@ -131,13 +131,14 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     }
 
     // Ends the reload or the cooldown phases if possible. 
-    protected void UpdateTimers() {
+    private void UpdateTimers() {
         if (reloading) {
             if (Time.time > reloadStart + reloadTime) {
                 // Log if needed.
                 if (loggingGame) {
                     ReloadInfoGameEvent.Instance.Raise(new ReloadInfo
                     {
+                        ownerId = ownerEntityScript.GetID(),
                         gunId = gunId,
                         ammoInCharger = ammoInCharger,
                         totalAmmo = totalAmmo

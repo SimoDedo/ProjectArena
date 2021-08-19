@@ -134,7 +134,7 @@ public class Player : Entity, ILoggable
                     var position = t.position;
                     PositionInfoGameEvent.Instance.Raise(
                         new PositionInfo {x = position.x, z = position.z,
-                            dir = t.eulerAngles.y});
+                            dir = t.eulerAngles.y, entityID = entityID});
                     lastPositionLog = Time.time;
                 }
             }

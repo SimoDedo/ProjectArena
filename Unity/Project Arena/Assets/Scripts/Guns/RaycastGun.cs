@@ -47,6 +47,7 @@ public class RaycastGun : Gun {
                 z = position.z,
                 ammoInCharger = ammoInCharger,
                 direction = root.eulerAngles.y,
+                ownerId = ownerEntityScript.GetID(),
                 gunID = gunId,
                 totalAmmo = totalAmmo
             });
