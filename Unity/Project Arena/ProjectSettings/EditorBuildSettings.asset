@@ -11,19 +11,4 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Menu.unity
     guid: 45cfa3a5b4ebeac46bdee2ce1f152bf1
-  - enabled: 1
-    path: Assets/Scenes/SP Experiment/SP Experiment - Tutorial.unity
-    guid: d512746a68c327f4eaac2fa86d8aed57
-  - enabled: 1
-    path: Assets/Scenes/SP Experiment/SP Experiment - Target Hunt - Factory.unity
-    guid: 0f09b886ef2eb2c4182a75914555bf6c
-  - enabled: 1
-    path: Assets/Scenes/SP Experiment/SP Experiment - Survey.unity
-    guid: d60381137a49f304b89ce67f96187838
-  - enabled: 1
-    path: Assets/Scenes/SP Experiment/SP Experiment - Menu.unity
-    guid: 481e1c8bf15c07a47a45e5bf9fb0d867
-  - enabled: 1
-    path: Assets/Scenes/SP Experiment/SP Experiment - Control.unity
-    guid: 0d1cc6bab1a873940ba9d878ddcab350
   m_configObjects: {}

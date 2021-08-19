@@ -21,6 +21,8 @@ public class ExperimentInitializer : MonoBehaviour {
     [SerializeField] private bool logOnline;
     [SerializeField] private bool logGame;
     [SerializeField] private bool logStatistics;
+    
+    private ExperimentManager experimentManager;
 
     void Awake() {
         if (ParameterManager.HasInstance()) {
@@ -28,8 +30,11 @@ public class ExperimentInitializer : MonoBehaviour {
             logOffline = ParameterManager.Instance.LogOffline;
         }
 
-        if (!ExperimentManager.HasInstance()) {
-            ExperimentManager.Instance.Setup(tutorial, playTutorial, studies, casesPerUsers,
+        if (experimentManager == null)
+        {
+            var obj = new GameObject("ExperimentManager");
+            experimentManager = obj.AddComponent<ExperimentManager>();
+            experimentManager.Setup(tutorial, playTutorial, studies, casesPerUsers,
                 experimentName, survey, playSurvey, logOffline, logOnline, logGame, logStatistics);
         }
     }

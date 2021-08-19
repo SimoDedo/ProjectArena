@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using JsonObjects.Logging.Survey;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -157,6 +159,60 @@ namespace ScriptableObjectArchitecture
     }
 
     public sealed class HitInfoGameEvent : ScriptableObjectSingleton<BaseHitInfoGameEvent>
+    {
+    }
+}
+
+namespace ScriptableObjectArchitecture
+{
+    public class BaseStartLoggingGameEvent : GameEventBase
+    {
+    }
+
+    public sealed class StartLoggingGameEvent : ScriptableObjectSingleton<BaseStartLoggingGameEvent>
+    {
+    }
+}
+
+namespace ScriptableObjectArchitecture
+{
+    public class BaseLoadNextSceneGameEvent : GameEventBase
+    {
+    }
+
+    public sealed class LoadNextSceneGameEvent : ScriptableObjectSingleton<BaseLoadNextSceneGameEvent>
+    {
+    }
+}
+
+namespace ScriptableObjectArchitecture
+{
+    public class BaseStartNewExperimentGameEvent : GameEventBase
+    {
+    }
+
+    public sealed class StartNewExperimentGameEvent : ScriptableObjectSingleton<BaseStartNewExperimentGameEvent>
+    {
+    }
+}
+
+namespace ScriptableObjectArchitecture
+{
+    public class BaseSaveSurveyQuestionsGameEvent : GameEventBase<List<JsonQuestion>>
+    {
+    }
+
+    public sealed class SaveSurveyQuestionsGameEvent : ScriptableObjectSingleton<BaseSaveSurveyQuestionsGameEvent>
+    {
+    }
+}
+namespace ScriptableObjectArchitecture
+{
+    public class BaseSaveSurveyAnswersGameEvent : GameEventBase<List<JsonAnswer>>
+    {
+    }
+
+    public sealed class SaveSurveyAnswersGameEvent : ScriptableObjectSingleton<BaseSaveSurveyAnswersGameEvent>
     {
     }
 }

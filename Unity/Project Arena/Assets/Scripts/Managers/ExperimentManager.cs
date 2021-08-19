@@ -23,7 +23,7 @@ using UnityEngine.SceneManagement;
 /// from the server. When sending data to the server this information is stored in the comment field 
 /// of each entry as the sum of the retrieved completion and the completion progress stored locally.
 /// </summary>
-public class ExperimentManager : SceneSingleton<ExperimentManager>
+public class ExperimentManager : MonoBehaviour
 {
     private Case tutorial;
     private bool playTutorial;
@@ -154,6 +154,12 @@ public class ExperimentManager : SceneSingleton<ExperimentManager>
             StartCoroutine(ContactServer());
         }
 
+        StartLoggingGameEvent.Instance.AddListener(StartLogging);
+        LoadNextSceneGameEvent.Instance.AddListener(LoadNextScene);
+        StartNewExperimentGameEvent.Instance.AddListener(StartNewExperiment);
+        if (MustSaveSurvey()) 
+            SaveSurveyQuestionsGameEvent.Instance.AddListener(SaveSurvey);
+        SaveSurveyAnswersGameEvent.Instance.AddListener(SaveAnswers);
         PositionInfoGameEvent.Instance.AddListener(LogPosition);
         GameInfoGameEvent.Instance.AddListener(LogGameInfo);
         MapInfoGameEvent.Instance.AddListener(LogMapInfo);
@@ -162,7 +168,6 @@ public class ExperimentManager : SceneSingleton<ExperimentManager>
         SpawnInfoGameEvent.Instance.AddListener(LogSpawn);
         KillInfoGameEvent.Instance.AddListener(LogKill);
         HitInfoGameEvent.Instance.AddListener(LogHit);
-        
     }
 
     void OnEnable()
@@ -325,7 +330,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager>
     }
 
     // Starts a new experiment.
-    public IEnumerator StartNewExperiment()
+    private IEnumerator StartNewExperimentCoroutine()
     {
         if (logOnline)
         {
@@ -334,6 +339,11 @@ public class ExperimentManager : SceneSingleton<ExperimentManager>
 
         CreateNewList();
         LoadNextScene();
+    }
+
+    private void StartNewExperiment()
+    {
+        StartCoroutine(StartNewExperimentCoroutine());
     }
 
     // Retuns the next scene to be played.
@@ -485,7 +495,7 @@ public class ExperimentManager : SceneSingleton<ExperimentManager>
     }
 
     // Starts loggingGame.
-    public void StartLogging()
+    private void StartLogging()
     {
         logStart = Time.time;
 
@@ -721,7 +731,6 @@ public class ExperimentManager : SceneSingleton<ExperimentManager>
     // Logs the position (x and z respectively correspond to row and column in matrix notation).
     private void LogPosition(PositionInfo info)
     {
-        Debug.Log("Log position called by event");
         Coord coord = NormalizeFlipCoord(info.x, info.z);
 
         if (loggingGame)

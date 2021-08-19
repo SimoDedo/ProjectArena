@@ -74,9 +74,10 @@ public abstract class GameManager : CoreComponent, ILoggable
     // Loads the next scene
     private void LoadNextScene(string def)
     {
-        if (ExperimentManager.HasInstance() && ParameterManager.HasInstance())
+        // TODO not very clean...
+        if (LoadNextSceneGameEvent.Instance.HasAnyListener() && ParameterManager.HasInstance())
         {
-            ExperimentManager.Instance.LoadNextScene();
+            LoadNextSceneGameEvent.Instance.Raise();
         }
         else
         {
@@ -93,7 +94,7 @@ public abstract class GameManager : CoreComponent, ILoggable
     // Setups stuff for the loggingGame.
     public void SetupLogging()
     {
-        MapInfoGameEvent.Instance.Raise(new MapInfo()
+        MapInfoGameEvent.Instance.Raise(new MapInfo
         {
             height = mapManagerScript.GetMapGenerator().GetHeight(),
             width = mapManagerScript.GetMapGenerator().GetWidth(),

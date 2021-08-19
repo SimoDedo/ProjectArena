@@ -72,13 +72,6 @@ public class BotGameManager : GameManager
                 secondAI.SetupLogging();
                 startTime = Time.time;
             }
-
-            // If needed, tell the Experiment Manager it can start loggingGame.
-            if (handshaking)
-            {
-                ExperimentManager.Instance.StartLogging();
-            }
-
             SetReady(true);
         }
         else if (IsReady() && !generateOnly)
@@ -129,10 +122,8 @@ public class BotGameManager : GameManager
         }
         else if (gamePhase == 2 && passedTime >= readyDuration + gameDuration + scoreDuration)
         {
-            Debug.Log("In fase quitting");
             mapTesting.StopLogging();
-            // Quit();
-            Application.Quit();
+            Quit();
             gamePhase = 3;
         }
     }

@@ -15,7 +15,7 @@ public class TutorialGameManager : GameManager {
     [Header("Tutorial variables")] [SerializeField] protected TutorialGameUIManager tutorialGameUIManagerScript;
 
     private Player playerScript;
-    private bool tutorialCompleted = false;
+    private bool tutorialCompleted;
     private float completionTime;
 
     private void Start() {

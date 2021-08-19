@@ -1,14 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using ExperimentObjects;
 using JsonObjects.Logging;
 using JsonObjects.Logging.Game;
 using JsonObjects.Logging.Statistics;
 using ScriptableObjectArchitecture;
-using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -16,10 +13,10 @@ namespace AI
 {
     /// <summary>
     /// ExperimentManager allows to manage experiments. An experiment is composed of different studies 
-    /// (a set of maps), each one composed by cases (a set of map varaitions). Each time a new
+    /// (a set of maps), each one composed by cases (a set of map variations). Each time a new
     /// experiment is requested, a list of cases from the less played study is provided to the user
     /// to be played. A tutorial and a survey scene can be added at the beginning and at the end of
-    /// the experiment, respectevely. When ExperimentManager is used to log online data, before creating
+    /// the experiment, respectively. When ExperimentManager is used to log online data, before creating
     /// a new list of cases or before saving data on the server, the experiment completion is retrieved
     /// from the server. When sending data to the server this information is stored in the comment field 
     /// of each entry as the sum of the retrieved completion and the completion progress stored locally.
@@ -34,10 +31,7 @@ namespace AI
 
         // Support object to format the log.
         private JsonGameLog jGameLog;
-
-        // Length of the current game log.
-        private int gameLogLength;
-
+        
         // Label of the current statistic log.
         private string statisticsLabel;
 
@@ -50,19 +44,19 @@ namespace AI
         private float logStart;
 
         // Current distance.
-        private Dictionary<int, float> distancesBetweenKills = new Dictionary<int, float>();
+        private readonly Dictionary<int, float> distancesBetweenKills = new Dictionary<int, float>();
 
         // Total distance.
-        private Dictionary<int, float> totalDistances = new Dictionary<int, float>();
+        private readonly Dictionary<int, float> totalDistances = new Dictionary<int, float>();
 
         // Total shots.
-        private Dictionary<int, int> shotCounts = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> shotCounts = new Dictionary<int, int>();
 
         // Total hits.
-        private Dictionary<int, int> hitsTaken = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> hitsTaken = new Dictionary<int, int>();
 
         // Total destoryed targets.
-        private Dictionary<int, int> killCounts = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> killCounts = new Dictionary<int, int>();
 
         // Size of a maps tile.
         private float tileSize = 1;
@@ -74,12 +68,12 @@ namespace AI
         public string testID = GetTimeStamp();
 
         // Position of the player.
-        private Dictionary<int, Vector2> lastPositions = new Dictionary<int, Vector2>();
-        private Dictionary<int, Vector2> initialPositions = new Dictionary<int, Vector2>();
+        private readonly Dictionary<int, Vector2> lastPositions = new Dictionary<int, Vector2>();
+        private readonly Dictionary<int, Vector2> initialPositions = new Dictionary<int, Vector2>();
 
         private void Awake()
         {
-            var args = System.Environment.GetCommandLineArgs();
+            var args = Environment.GetCommandLineArgs();
             foreach (var arg in args)
                 if (arg.StartsWith("-experiment="))
                     experimentName = arg.Substring(12);
@@ -138,7 +132,6 @@ namespace AI
             logStart = Time.time;
 
             jGameLog = new JsonGameLog(testID);
-            gameLogLength = JsonUtility.ToJson(jGameLog).Length;
             jStatisticsLog = new JsonAIStatisticsLog(testID);
             foreach (var o in FindObjectsOfType(typeof(MonoBehaviour)))
             {

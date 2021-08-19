@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using ScriptableObjectArchitecture;
 using UnityEngine;
 
 /// <summary>
@@ -53,7 +54,7 @@ public class TargetHuntGameManager : GameManager {
 
             // If needed, tell the Experiment Manager it can start loggingGame.
             if (handshaking) {
-                ExperimentManager.Instance.StartLogging();
+                StartLoggingGameEvent.Instance.Raise();
             }
 
             SetReady(true);

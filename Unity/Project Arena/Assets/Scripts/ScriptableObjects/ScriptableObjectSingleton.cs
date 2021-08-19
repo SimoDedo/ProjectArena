@@ -1,11 +1,4 @@
-using System;
-using System.IO;
-using System.Linq;
-using JetBrains.Annotations;
-using UnityEditorInternal;
 using UnityEngine;
-using UnityEngine.Assertions;
-using Object = UnityEngine.Object;
 
 namespace ScriptableObjectArchitecture
 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace JsonObjects
 {
@@ -224,6 +225,8 @@ namespace JsonObjects
                 public string testID;
                 public JsonMapInfo mapInfo;
                 public JsonGameInfo gameInfo;
+                
+                // TODO atm Unity JSONUtility doesn't handle dictionaries...
                 public Dictionary<int, JsonFinalStatistics> finalStatistics;
 
                 public JsonAIStatisticsLog(string testID)

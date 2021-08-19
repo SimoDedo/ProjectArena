@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using Accord.Math;
+using ScriptableObjectArchitecture;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -45,7 +47,7 @@ public class ExperimentMenuUIManager : MonoBehaviour {
     // Loads the level indicated by the Experiment Manager.
     public void Play() {
         SetLoadingVisible(true);
-        StartCoroutine(ExperimentManager.Instance.StartNewExperiment());
+        StartNewExperimentGameEvent.Instance.Raise();
     }
 
     public void Exit() {
