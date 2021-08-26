@@ -31,7 +31,7 @@ namespace AI
 
         // Support object to format the log.
         private JsonGameLog jGameLog;
-        
+
         // Label of the current statistic log.
         private string statisticsLabel;
 
@@ -71,6 +71,9 @@ namespace AI
         private readonly Dictionary<int, Vector2> lastPositions = new Dictionary<int, Vector2>();
         private readonly Dictionary<int, Vector2> initialPositions = new Dictionary<int, Vector2>();
 
+        // Label of the current map log.
+        private string mapLabel;
+
         private void Awake()
         {
             var args = Environment.GetCommandLineArgs();
@@ -88,6 +91,13 @@ namespace AI
             SpawnInfoGameEvent.Instance.AddListener(LogSpawn);
             KillInfoGameEvent.Instance.AddListener(LogKill);
             HitInfoGameEvent.Instance.AddListener(LogHit);
+            SaveMapTextGameEvent.Instance.AddListener(SaveMapText);
+        }
+
+        private void SaveMapText(string textMap)
+        {
+            if (textMap != null)
+                File.WriteAllText(experimentDirectory + "/" + mapLabel + ".txt", textMap);
         }
 
         /* EXPERIMENT */
@@ -121,9 +131,9 @@ namespace AI
                 gm.LoggingHandshake();
             }
 
-            var time = GetTimeStamp();
-            gameLabel = time + "_game";
-            statisticsLabel = time + "_statistics";
+            gameLabel = SceneManager.GetActiveScene().name + "_game";
+            statisticsLabel = SceneManager.GetActiveScene().name + "_statistics";
+            mapLabel = SceneManager.GetActiveScene().name + "_map";
         }
 
         // Starts loggingGame.
@@ -150,7 +160,7 @@ namespace AI
             LogGameStatistics();
 
             var log = JsonUtility.ToJson(jStatisticsLog);
-            
+
             File.WriteAllText(experimentDirectory + "/" + statisticsLabel + ".json", log);
 
             // Save the game log, if any.
@@ -280,7 +290,7 @@ namespace AI
             if (hitsTaken.ContainsKey(info.hitEntityID))
                 hitsTaken[info.hitEntityID]++;
             else
-                hitsTaken[info.hitEntityID]=1;
+                hitsTaken[info.hitEntityID] = 1;
         }
 
 
@@ -298,12 +308,12 @@ namespace AI
                 var hitCount = hitsTaken.ContainsKey(entity) ? hitsTaken[entity] : 0;
                 var totalDistance = totalDistances.ContainsKey(entity) ? totalDistances[entity] : 0;
                 var killCount = killCounts.ContainsKey(entity) ? killCounts[entity] : 0;
-                    
-                    var statistic = new JsonFinalStatistics(shotCount, hitCount,
-                        (shotCount > 0) ? (hitCount / (float) shotCount) : 0,
-                        totalDistance, (killCount > 0) ? (jStatisticsLog.gameInfo.duration / killCount) : 0,
-                        (killCount > 0) ? (totalDistance / killCount) : 0);
-                    finalStatisticsMap[entity] = statistic;
+
+                var statistic = new JsonFinalStatistics(shotCount, hitCount,
+                    (shotCount > 0) ? (hitCount / (float) shotCount) : 0,
+                    totalDistance, (killCount > 0) ? (jStatisticsLog.gameInfo.duration / killCount) : 0,
+                    (killCount > 0) ? (totalDistance / killCount) : 0);
+                finalStatisticsMap[entity] = statistic;
             }
 
             jStatisticsLog.finalStatistics = finalStatisticsMap;

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using MapManipulation;
+using ScriptableObjectArchitecture;
+using MapInfo = MapManipulation.MapInfo;
 
 /// <summary>
 /// MapGenerator is an abstract class used to implement any kind of map generator. A map consist in
@@ -49,10 +51,10 @@ public abstract class MapGenerator : CoreComponent {
     [Header("Export")]
     // Do I have to create a .txt output?
     [SerializeField]
-    protected bool createTextFile = false;
+    protected bool createTextFile;
     // Path where to save the text map.
     [SerializeField]
-    protected string textFilePath = null;
+    protected string textFilePath;
 
     // Map, defined as a grid of chars.
     protected char[,] map;
@@ -225,23 +227,12 @@ public abstract class MapGenerator : CoreComponent {
     }
 
     // Saves the map in a text file.
-    protected void SaveMapAsText() {
+    protected void SaveMapAsText(string textMap) {
         if (textFilePath == null && !Directory.Exists(textFilePath)) {
             ManageError(Error.SOFT_ERROR, "Error while retrieving the folder, please insert a " +
                 "valid path.");
         } else {
             try {
-                string textMap = "";
-
-                for (int x = 0; x < width; x++) {
-                    for (int y = 0; y < height; y++) {
-                        textMap = textMap + map[x, y];
-                    }
-                    if (x < width - 1) {
-                        textMap = textMap + "\n";
-                    }
-                }
-
                 File.WriteAllText(@textFilePath + "/" + seed.ToString() + ".map.txt",
                     textMap);
             } catch (Exception) {
@@ -250,7 +241,22 @@ public abstract class MapGenerator : CoreComponent {
             }
         }
     }
+    
+    public string GetMapAsText()
+    {
+        var textMap = "";
+        for (var x = 0; x < width; x++) {
+            for (var y = 0; y < height; y++) {
+                textMap += map[x, y];
+            }
+            if (x < width - 1) {
+                textMap += "\n";
+            }
+        }
 
+        return textMap;
+    }
+    
     // Returns the map in AB notation.
     public abstract string ConvertMapToAB(bool exportObjects = true);
 

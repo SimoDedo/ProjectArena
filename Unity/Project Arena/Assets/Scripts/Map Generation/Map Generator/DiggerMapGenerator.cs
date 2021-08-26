@@ -2,7 +2,9 @@
 using MapManipulation;
 using System;
 using System.Collections.Generic;
+using ScriptableObjectArchitecture;
 using UnityEngine;
+using MapInfo = MapManipulation.MapInfo;
 
 /// <summary>
 /// DiggerMapGenerator is an implementation of MapGenerator that generates the map by using a random
@@ -78,8 +80,11 @@ public class DiggerMapGenerator : MapGenerator {
         width = map.GetLength(0);
         height = map.GetLength(1);
 
+        var textMap = GetMapAsText();
+        SaveMapTextGameEvent.Instance.Raise(textMap);
+        
         if (createTextFile && !useABGeneration) {
-            SaveMapAsText();
+            SaveMapAsText(textMap);
         }
 
         return map;

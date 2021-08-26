@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using MapManipulation;
+using ScriptableObjectArchitecture;
+using MapInfo = MapManipulation.MapInfo;
 
 /// <summary>
 /// DivisiveMapGenerator is an implementation of MapGenerator that generates the map by recursevly
@@ -80,8 +82,12 @@ public class DivisiveMapGenerator : MapGenerator {
             PopulateABObjects();
             AddBorderToAB(borderSize);
         }
+
+        var textMap = GetMapAsText();
+        SaveMapTextGameEvent.Instance.Raise(textMap);
+        
         if (createTextFile) {
-            SaveMapAsText();
+            SaveMapAsText(textMap);
             SaveMapAsAB();
         }
 
@@ -396,7 +402,7 @@ public class DivisiveMapGenerator : MapGenerator {
                 "valid path.");
         } else {
             try {
-                File.WriteAllText(@textFilePath + "/" + seed.ToString() + ".ab.txt",
+                File.WriteAllText(textFilePath + "/" + seed + ".ab.txt",
                     ConvertMapToAB());
             } catch (Exception) {
                 ManageError(Error.SOFT_ERROR, "Error while saving the map, please insert a valid " +

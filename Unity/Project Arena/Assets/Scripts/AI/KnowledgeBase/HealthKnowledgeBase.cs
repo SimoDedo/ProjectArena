@@ -1,16 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
-using Accord.Statistics.Kernels;
 using UnityEngine;
 
-namespace AI
+namespace AI.KnowledgeBase
 {
     public class HealthKnowledgeBase : MonoBehaviour
     {
         [SerializeField] private float maxSightRange;
         [SerializeField] private float fov;
         [SerializeField] private Transform head;
-        public Dictionary<GameObject, float> estimatedActivationTime = new Dictionary<GameObject, float>();
+        private readonly Dictionary<GameObject, float> estimatedActivationTime = new Dictionary<GameObject, float>();
 
         public void DetectPickups()
         {

@@ -2,7 +2,9 @@
 using MapManipulation;
 using System;
 using System.Collections.Generic;
+using ScriptableObjectArchitecture;
 using UnityEngine;
+using MapInfo = MapManipulation.MapInfo;
 
 /// <summary>
 /// ABMapGenerator is an implementation of MapGenerator that generates the map by decoding its AB notation.
@@ -36,11 +38,12 @@ public class ABMapGenerator : MapGenerator {
         width += borderSize * 2;
         height += borderSize * 2;
 
+        var textMap = GetMapAsText();
+        SaveMapTextGameEvent.Instance.Raise(textMap);
         if (createTextFile) {
             seed = seed.GetHashCode().ToString();
-            SaveMapAsText();
+            SaveMapAsText(textMap);
         }
-
         return map;
     }
 

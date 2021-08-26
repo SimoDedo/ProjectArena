@@ -1,5 +1,7 @@
 using System;
 using AI;
+using AI.KnowledgeBase;
+using AI.State;
 using BehaviorDesigner.Runtime;
 using ScriptableObjectArchitecture;
 using UnityEngine;
@@ -11,7 +13,8 @@ using Random = UnityEngine.Random;
 /// </summary>
 
 [RequireComponent(typeof(HealthKnowledgeBase))]
-public class AIEntity : Entity, ILoggable
+[RequireComponent(typeof(TargetKnowledgeBase))]
+public class AIEntity : Entity, ILoggable, IEntityDecisions
 {
     [SerializeField] private GameObject head;
     [SerializeField] private float sensibility;
@@ -22,6 +25,20 @@ public class AIEntity : Entity, ILoggable
 
     // Time of the last position log.
     private float lastPositionLog = 0;
+    
+    private IState currentState;
+
+    public void SetState(IState state)
+    {
+        currentState.Exit();
+        currentState = state;
+        state.Enter();
+    }
+
+    public IState GetState()
+    {
+        return currentState;
+    }
     
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id)
     {
@@ -240,4 +257,53 @@ public class AIEntity : Entity, ILoggable
     {
         loggingGame = true;
     }
+
+    public bool CanSeeEnemy()
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool IsCloseTo(GameObject obj)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool IsCloseToDestination()
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool HasLostTarget()
+    {
+        // TODO instead of querying the kb, I should have a personality module determining if I lost the target or not
+        return GetComponent<TargetKnowledgeBase>().HasLostTarget();
+    }
+
+    public bool ShouldLookForHealth()
+    {
+        // TODO
+        return health < 50;
+    }
+
+    public bool HasTakenDamage()
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool ReachedSearchTimeout(float startSearchTime)
+    {
+        throw new NotImplementedException();
+    }
+
+}
+
+public interface IEntityDecisions
+{
+    bool CanSeeEnemy();
+    bool IsCloseTo(GameObject obj);
+    bool IsCloseToDestination();
+    bool HasLostTarget();
+    bool ShouldLookForHealth();
+    bool HasTakenDamage();
+    bool ReachedSearchTimeout(float startSearchTime);
 }
