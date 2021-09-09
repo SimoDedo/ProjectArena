@@ -10,11 +10,11 @@ namespace AI
     {
         private GameObject target;
         private NavMeshAgent agent;
-        private HealthKnowledgeBase kb;
+        private PickupKnowledgeBase kb;
 
         public override void OnStart()
         {
-            kb = GetComponent<HealthKnowledgeBase>();
+            kb = GetComponent<PickupKnowledgeBase>();
             agent = GetComponent<NavMeshAgent>();
         }
 
@@ -28,7 +28,7 @@ namespace AI
         {
             if (target == null || !agent.hasPath)
             {
-                var possibleTargets = kb.GetProbablyActive();
+                var possibleTargets = kb.GetProbablyActive(Pickable.PickupType.MEDKIT);
                 if (possibleTargets.Count == 0)
                 {
                     Debug.LogError("For some reason no health pickups are available");

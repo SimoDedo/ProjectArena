@@ -540,9 +540,6 @@ GameObject:
   - component: {fileID: 4921396627691554}
   - component: {fileID: 3597659384659854098}
   - component: {fileID: 5647456198230708602}
-  - component: {fileID: 4214875098204987728}
-  - component: {fileID: 6069983894062413340}
-  - component: {fileID: 5762629734706090189}
   - component: {fileID: 3810383247524921496}
   - component: {fileID: 1272100895109282999}
   m_Layer: 8
@@ -566,7 +563,6 @@ Transform:
   - {fileID: 4459335911987024}
   - {fileID: 4046259761385226}
   - {fileID: 2582760994329115392}
-  - {fileID: 3692451130798454729}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -588,9 +584,20 @@ MonoBehaviour:
   - {fileID: 1420662876468926}
   activeGuns: 
   health: 0
+  speed: 16
+  acceleration: 100
+  angularSpeed: 10
   head: {fileID: 1523818027142824}
-  sensibility: 100
+  fov: 90
+  maxRange: 100
+  sensibility: 10
   inputPenalty: 1
+  memoryWindow: 0.5
+  timeBeforeReaction: 0.1
+  movementSkill: 0.5
+  curiosity: 0.5
+  premonition: 0.5
+  enemy: {fileID: 1128226087601874}
 --- !u!114 &5647456198230708602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -603,95 +610,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ecd8b4b78864d268cbf33720c88a316, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!195 &4214875098204987728
-NavMeshAgent:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1128226087601874}
-  m_Enabled: 1
-  m_AgentTypeID: 0
-  m_Radius: 0.2
-  m_Speed: 16
-  m_Acceleration: 100000
-  avoidancePriority: 50
-  m_AngularSpeed: 100000
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 0
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 1
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
---- !u!114 &6069983894062413340
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1128226087601874}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d7b55c7ecdb49a4a89fa5e6f9022861, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  startWhenEnabled: 1
-  asynchronousLoad: 0
-  pauseWhenDisabled: 0
-  restartWhenComplete: 0
-  logTaskChanges: 0
-  group: 0
-  resetValuesOnRestart: 0
-  externalBehavior: {fileID: 11400000, guid: 1189dce0eaa6ac3189f890331be880f6, type: 2}
-  mBehaviorSource:
-    behaviorName: BasicAI
-    behaviorDescription: 
-    mTaskData:
-      types: []
-      parentIndex: 
-      startIndex: 
-      variableStartIndex: 
-      JSONSerialization: '{"EntryTask":{"Type":"BehaviorDesigner.Runtime.Tasks.EntryTask","NodeData":{"Offset":"(-563.6904,-212.428513)"},"ID":0,"Name":"Entry","Instant":true},"RootTask":{"Type":"BehaviorDesigner.Runtime.Tasks.Repeater","NodeData":{"Offset":"(3.357544,115.701935)"},"ID":1,"Name":"Repeater","Instant":true,"SharedIntcount":{"Type":"BehaviorDesigner.Runtime.SharedInt","Name":null,"Int32mValue":0},"SharedBoolrepeatForever":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":null,"BooleanmValue":true},"SharedBoolendOnFailure":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":null,"BooleanmValue":false},"Children":[{"Type":"BehaviorDesigner.Runtime.Tasks.Selector","NodeData":{"Offset":"(0,110)"},"ID":2,"Name":"Selector","Instant":true,"AbortTypeabortType":"None","Children":[{"Type":"BehaviorDesigner.Runtime.Tasks.Sequence","NodeData":{"Offset":"(-962.290344,175.540573)"},"ID":3,"Name":"Sequence","Instant":true,"AbortTypeabortType":"LowerPriority","Children":[{"Type":"BehaviorDesigner.Runtime.Tasks.HasReceivedEvent","NodeData":{"Offset":"(-132.2103,177.312836)"},"ID":4,"Name":"Has
-        Received Event","Instant":true,"SharedStringeventName":{"Type":"BehaviorDesigner.Runtime.SharedString","Name":null,"StringmValue":"Damaged"}},{"Type":"BehaviorDesigner.Runtime.Tasks.BehaviorTreeReference","NodeData":{"Offset":"(164.285522,177.857147)"},"ID":5,"Name":"Attack
-        behaviour","Instant":true,"ExternalBehavior[]externalBehaviors":[0],"SharedNamedVariable[]variables":[{"Type":"BehaviorDesigner.Runtime.SharedNamedVariable","Name":null,"NamedVariablemValue":{"Stringname":"Enemy","Stringtype":"SharedGameObject","SharedVariablevalue":{"Type":"BehaviorDesigner.Runtime.SharedGameObject","Name":"Enemy","IsShared":true,"Tooltip":"The
-        enmy to pursuit and kill"}}}],"Booleancollapsed":false}]},{"Type":"BehaviorDesigner.Runtime.Tasks.Sequence","NodeData":{"Offset":"(-400,160)"},"ID":6,"Name":"Sequence","Instant":true,"AbortTypeabortType":"LowerPriority","Children":[{"Type":"AI.CanSeeOpponent","NodeData":{"Offset":"(-60,170)"},"ID":7,"Name":"Can
-        See Opponent","Instant":true,"SharedFloattimeBeforeDetection":{"Type":"BehaviorDesigner.Runtime.SharedFloat","Name":"TimeBeforeDetection","IsShared":true,"SinglemValue":0},"SharedFloatmaxDistance":{"Type":"BehaviorDesigner.Runtime.SharedFloat","Name":null,"SinglemValue":100},"SharedFloatfov":{"Type":"BehaviorDesigner.Runtime.SharedFloat","Name":null,"SinglemValue":90},"SharedGameObjectenemy":{"Type":"BehaviorDesigner.Runtime.SharedGameObject","Name":"Enemy","IsShared":true,"Tooltip":"The
-        enmy to pursuit and kill"}},{"Type":"BehaviorDesigner.Runtime.Tasks.BehaviorTreeReference","NodeData":{"Offset":"(130,170)"},"ID":8,"Name":"Attack
-        behaviour","Instant":true,"ExternalBehavior[]externalBehaviors":[1],"SharedNamedVariable[]variables":[{"Type":"BehaviorDesigner.Runtime.SharedNamedVariable","Name":null,"NamedVariablemValue":{"Stringname":"Enemy","Stringtype":"SharedGameObject","SharedVariablevalue":{"Type":"BehaviorDesigner.Runtime.SharedGameObject","Name":"Enemy","IsShared":true,"Tooltip":"The
-        enmy to pursuit and kill"}}}],"Booleancollapsed":false}]},{"Type":"BehaviorDesigner.Runtime.Tasks.Sequence","NodeData":{"Offset":"(-67.08374,189.642471)"},"ID":9,"Name":"Sequence","Instant":true,"AbortTypeabortType":"Both","Children":[{"Type":"AI.ShouldLookForHealth","NodeData":{"Offset":"(-4.22814941,142.499878)"},"ID":10,"Name":"Should
-        Look For Health","Instant":true,"SharedIntthresholdLowHealth":{"Type":"BehaviorDesigner.Runtime.SharedInt","Name":null,"Int32mValue":900}},{"Type":"AI.LookForHealth","NodeData":{"Offset":"(233.218018,144.8421)"},"ID":11,"Name":"Look
-        For Health","Instant":true}]},{"Type":"AI.Wander","NodeData":{"Offset":"(160,170)"},"ID":12,"Name":"Wander","Instant":true,"SharedIntmaxRetries":{"Type":"BehaviorDesigner.Runtime.SharedInt","Name":null,"Int32mValue":10},"SharedVector2levyParams":{"Type":"BehaviorDesigner.Runtime.SharedVector2","Name":"LevyParams","IsShared":true,"Vector2mValue":"(5,4)"},"SharedFloatstoppingDistance":{"Type":"BehaviorDesigner.Runtime.SharedFloat","Name":null,"SinglemValue":0.5}}]}]},"Variables":[{"Type":"BehaviorDesigner.Runtime.SharedGameObject","Name":"Enemy","IsShared":true,"Tooltip":"The
-        enmy to pursuit and kill"},{"Type":"BehaviorDesigner.Runtime.SharedVector2","Name":"LevyParams","IsShared":true,"Vector2mValue":"(5,4)"},{"Type":"BehaviorDesigner.Runtime.SharedFloat","Name":"TimeBeforeDetection","IsShared":true,"SinglemValue":0}]}'
-      fieldSerializationData:
-        typeName: []
-        fieldNameHash: 
-        startIndex: 
-        dataPosition: 
-        unityObjects:
-        - {fileID: 11400000, guid: 6d1acb2344588e9a4bad0cd8377b19c0, type: 2}
-        - {fileID: 11400000, guid: 6d1acb2344588e9a4bad0cd8377b19c0, type: 2}
-        byteData: 
-        byteDataArray: 
-      Version: 1.6.8
-  gizmoViewMode: 2
-  showBehaviorDesignerGizmo: 1
---- !u!114 &5762629734706090189
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1128226087601874}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8574a74f46c074f2fbc065bd55e08fbe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxSightRange: 100
-  fov: 90
-  head: {fileID: 4459335911987024}
 --- !u!54 &3810383247524921496
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5668,80 +5586,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &900814110758346002
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3692451130798454729}
-  - component: {fileID: 9194108852967639590}
-  m_Layer: 8
-  m_Name: Camera
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3692451130798454729
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 900814110758346002}
-  m_LocalRotation: {x: 0.13935465, y: -0.0011779867, z: 0.00016622711, w: 0.9902418}
-  m_LocalPosition: {x: 0.0052882815, y: 1.5009552, z: -2.9909978}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 4921396627691554}
-  m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!20 &9194108852967639590
-Camera:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 900814110758346002}
-  m_Enabled: 1
-  serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
-  m_projectionMatrixMode: 1
-  m_GateFitMode: 2
-  m_FOVAxisMode: 0
-  m_SensorSize: {x: 36, y: 24}
-  m_LensShift: {x: 0, y: 0}
-  m_FocalLength: 50
-  m_NormalizedViewPortRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
-  field of view: 60
-  orthographic: 0
-  orthographic size: 5
-  m_Depth: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingPath: -1
-  m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 0
-  m_TargetEye: 3
-  m_HDR: 1
-  m_AllowMSAA: 1
-  m_AllowDynamicResolution: 0
-  m_ForceIntoRT: 0
-  m_OcclusionCulling: 1
-  m_StereoConvergence: 10
-  m_StereoSeparation: 0.022
 --- !u!1 &1348231103467929781
 GameObject:
   m_ObjectHideFlags: 0

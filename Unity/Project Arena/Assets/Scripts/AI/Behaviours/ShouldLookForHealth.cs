@@ -14,7 +14,7 @@ namespace AI
 
         public override TaskStatus OnUpdate()
         {
-            return entity.health < thresholdLowHealth.Value ? TaskStatus.Success : TaskStatus.Failure;
+            return entity.Health < thresholdLowHealth.Value ? TaskStatus.Success : TaskStatus.Failure;
         }
     }
 }

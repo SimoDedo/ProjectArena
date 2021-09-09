@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using ScriptableObjectArchitecture;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 /// <summary>
@@ -19,13 +20,29 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     [SerializeField] protected int maximumAmmo;
     [SerializeField] protected float reloadTime = 1f;
     [SerializeField] protected float cooldownTime = 0.1f;
+    [FormerlySerializedAs("gunType")] [SerializeField] protected GunShootType gunShootType;
     [SerializeField] protected GunType gunType;
 
-    protected enum GunType
+    public GunType GetGunType()
+    {
+        return gunType;
+    }
+    
+    protected enum GunShootType
     {
         Raycast,
         Projectile
     }
+
+    public enum GunType
+    {
+        Sniper_Rifle,
+        Assault_Rifle,
+        Shotgun,
+        Rocket_Launcher
+    }
+    
+    
         
     [Header("Appearence")] [SerializeField] protected float muzzleFlashDuration = 0.05f;
     [SerializeField] protected float recoil = 0.05f;
@@ -73,6 +90,8 @@ public abstract class Gun : MonoBehaviour, ILoggable {
 
     // Do I have to log?
     protected bool loggingGame = false;
+
+    public bool IsReloading => reloading;
 
     protected void Awake() {
         if (aimEnabled) {
@@ -354,4 +373,8 @@ public abstract class Gun : MonoBehaviour, ILoggable {
         loggingGame = true;
     }
 
+    public int GetAmmo()
+    {
+        return totalAmmo;
+    }
 }

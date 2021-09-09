@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using ScriptableObjectArchitecture;
 using UnityEngine;
 
@@ -27,11 +29,17 @@ public class Target : Entity, ILoggable {
     // Do I have to log?
     private bool loggingGame = false;
 
+    private void Awake()
+    {
+        // TODO Check if can be removed
+        Guns = new List<Gun>();
+    }
+
     public override void SetupEntity(int th, bool[] ag, GameManager gms,
         int id) {
         originalScale = target.transform.localScale;
         gameManagerScript = gms;
-        health = totalHealth;
+        Health = totalHealth;
 
         originalLayer = transform.gameObject.layer;
         ChangeLayersRecursively(transform, disabledLayer);
@@ -58,10 +66,6 @@ public class Target : Entity, ILoggable {
         }
 
         StartCoroutine(FadeIn());
-    }
-
-    public override void SetupEntity(GameManager gms, int id) {
-        SetupEntity(totalHealth, activeGuns, gms, id);
     }
 
     private IEnumerator FadeIn() {
@@ -93,9 +97,9 @@ public class Target : Entity, ILoggable {
 
     public override void TakeDamage(int damage, int killerID) {
         if (inGame) {
-            health -= damage;
+            Health -= damage;
 
-            target.transform.localScale = originalScale * ((float)health / (float)totalHealth
+            target.transform.localScale = originalScale * ((float)Health / (float)totalHealth
                 / 4f + 0.75f);
 
             // Log if needed.
@@ -113,7 +117,7 @@ public class Target : Entity, ILoggable {
                 });
             }
 
-            if (health < 1) {
+            if (Health < 1) {
                 Die(killerID);
             }
         }

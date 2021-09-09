@@ -2417,6 +2417,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35137d41d54555c4da3189b9bc089cd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  type: 1
   cooldown: 30
   pickable: {fileID: 6176468068409987856}
   suppliedGuns: 01010101

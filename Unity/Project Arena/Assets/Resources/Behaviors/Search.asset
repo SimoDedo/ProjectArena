@@ -20,7 +20,11 @@ MonoBehaviour:
       parentIndex: 
       startIndex: 
       variableStartIndex: 
-      JSONSerialization: 
+      JSONSerialization: '{"EntryTask":{"Type":"BehaviorDesigner.Runtime.Tasks.EntryTask","NodeData":{"Offset":"(-2561.44434,-1160.65027)"},"ID":0,"Name":"Entry","Instant":true},"RootTask":{"Type":"BehaviorDesigner.Runtime.Tasks.Repeater","NodeData":{"Offset":"(11.1289577,96.3711243)"},"ID":1,"Name":"Repeater","Instant":true,"SharedIntcount":{"Type":"BehaviorDesigner.Runtime.SharedInt","Name":null,"Int32mValue":0},"SharedBoolrepeatForever":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":null,"BooleanmValue":true},"SharedBoolendOnFailure":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":null,"BooleanmValue":false},"Children":[{"Type":"BehaviorDesigner.Runtime.Tasks.Sequence","NodeData":{"Offset":"(0.291422844,113.259468)"},"ID":2,"Name":"Sequence","Instant":true,"AbortTypeabortType":"None","Children":[{"Type":"AI.Behaviours.NewBehaviours.SelectSearchTargetPath","NodeData":{"Offset":"(-78.7500153,119.999992)"},"ID":3,"Name":"Select
+        Search Target Path","Instant":true,"SharedSelectedPathInfoselectedPath":{"Type":"AI.Behaviours.NewBehaviours.Variables.SharedSelectedPathInfo","Name":"ChosenPath","IsShared":true,"IsDynamic":true}},{"Type":"BehaviorDesigner.Runtime.Tasks.ParallelComplete","NodeData":{"Offset":"(76.98074,118.395027)"},"ID":4,"Name":"Parallel
+        Complete","Instant":true,"AbortTypeabortType":"None","Children":[{"Type":"AI.Behaviours.NewBehaviours.LookAround","NodeData":{"Offset":"(-87.00521,121.58786)"},"ID":5,"Name":"Look
+        Around","Instant":true},{"Type":"AI.Behaviours.NewBehaviours.ApplyPathToAgent","NodeData":{"Offset":"(88.67106,121.58786)"},"ID":6,"Name":"Apply
+        Path To Agent","Instant":true,"SharedSelectedPathInfopathToApply":{"Type":"AI.Behaviours.NewBehaviours.Variables.SharedSelectedPathInfo","Name":"ChosenPath","IsShared":true,"IsDynamic":true}}]}]}]}}'
       fieldSerializationData:
         typeName: []
         fieldNameHash: 
@@ -29,4 +33,4 @@ MonoBehaviour:
         unityObjects: []
         byteData: 
         byteDataArray: 
-      Version: 
+      Version: 1.6.8

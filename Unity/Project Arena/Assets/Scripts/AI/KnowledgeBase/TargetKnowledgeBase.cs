@@ -1,86 +1,66 @@
-using System;
+using System.Collections.Generic;
+using System.Linq;
+using Entities.AI.Layer1.Sensors;
 using UnityEngine;
-using Utils;
 
 namespace AI.KnowledgeBase
 {
     public class TargetKnowledgeBase : MonoBehaviour
     {
-        private enum DetectionType
+        private GameObject target;
+        private AISightSensor sensor;
+        public float memoryWindow;
+        public float timeBeforeReaction;
+        private Dictionary<float, bool> results = new Dictionary<float, bool>();
+
+        public void SetParameters(AISightSensor sensor, GameObject target, float memoryWindow, float timeBeforeReaction)
         {
-            SEEN_FOR_N_CONSECUTIVE_FRAMES,
-            SEEN_FOR_N_FRAMES_IN_LAST_M_FRAMES
+            this.target = target;
+            this.sensor = sensor;
+            this.memoryWindow = memoryWindow;
+            this.timeBeforeReaction = timeBeforeReaction;
         }
-        [SerializeField] private GameObject target;
-        
-        [Header("Entity vision properties")]
-        [SerializeField] private float fov;
-        [SerializeField] private float maxDistance;
-        [SerializeField] private DetectionType detectionType;
-
-        [Header("Detection type: seen consecutively in last N frames")]
-        [SerializeField] private int consecutiveFramesBeforeDetection;
-
-        [Header("Detection type: seen non-consecutively N times in last M frames")]
-        [SerializeField] private int nonConsecutiveFramesBeforeDetection;
-        [SerializeField] private int numRememberedFrames;
-
-        [Header("Loss of sight parameters")]
-        [SerializeField] private int consecutiveFramesBeforeLossOfSight;
-
-        private readonly CircularQueue<VisibilityTestResult> results = new CircularQueue<VisibilityTestResult>(60);
 
         private void Update()
         {
-            results.Put(VisibilityUtils.CanSeeTarget(transform, target.transform, Physics.IgnoreRaycastLayer));
+            var result = sensor.CanSeeObject(target.transform, Physics.IgnoreRaycastLayer);
+            AddToListAndCompact(result);
         }
 
-        public bool IsTargetVisible()
+        private void AddToListAndCompact(bool result)
         {
-            return results.GetElem(0).isVisible;
+            results[Time.time] = result;
+            results = results.Where(it => it.Key >= Time.time - memoryWindow).ToDictionary(
+                pair => pair.Key, pair => pair.Value);
         }
 
-        private bool CanSeeTarget(VisibilityTestResult results)
-        {
-            return results.isVisible && results.distance < maxDistance && results.angle < fov;
-        }
-        
         public bool CanReactToTarget()
         {
-            switch (detectionType)
+            //Force updating since the enemy might have changed position since this component last update
+            // or update might not have been called yet
+            Update();
+
+            var keys = results.Keys.ToList();
+            var totalTimeDetected = 0f;
+            for (var i = 0; i < keys.Count - 1; i++)
             {
-                case DetectionType.SEEN_FOR_N_CONSECUTIVE_FRAMES:
-                    if (results.NumElems() < consecutiveFramesBeforeDetection) return false;
-                    for (var i = 0; i < consecutiveFramesBeforeDetection; i++)
-                    {
-                        var detection = results.GetElem(i);
-                        if (!CanSeeTarget(detection)) return false;
-                    }
-                    return true;
-                case DetectionType.SEEN_FOR_N_FRAMES_IN_LAST_M_FRAMES:
-                    var maxFrames = Math.Min(numRememberedFrames, results.NumElems());
-                    if (maxFrames < nonConsecutiveFramesBeforeDetection) return false;
-                    var numFramesSeen = 0;
-                    for (var i = 0; i < maxFrames; i++)
-                    {
-                        var detection = results.GetElem(i);
-                        if (CanSeeTarget(detection)) numFramesSeen++;
-                    }
-                    return numFramesSeen >= nonConsecutiveFramesBeforeDetection; 
-                default:
-                    throw new ArgumentOutOfRangeException();
+                if (results[keys[i]])
+                {
+                    totalTimeDetected += keys[i + 1] - keys[i];
+                }
             }
+
+            return totalTimeDetected > timeBeforeReaction;
         }
 
         public bool HasLostTarget()
         {
-            if (results.NumElems() < consecutiveFramesBeforeLossOfSight) return false;
-            for (var i = 0; i < consecutiveFramesBeforeLossOfSight; i++)
-            {
-                var detection = results.GetElem(i);
-                if (CanSeeTarget(detection)) return false;
-            }
-            return true;
+            //Force updating since the enemy might have changed position since this component last update
+            // or update might not have been called yet
+            // Update();
+
+            // TODO find better logic
+            return !CanReactToTarget();
         }
     }
 }

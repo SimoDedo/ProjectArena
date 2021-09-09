@@ -1,4 +1,6 @@
-﻿using ScriptableObjectArchitecture;
+﻿using System;
+using System.Linq;
+using ScriptableObjectArchitecture;
 using UnityEngine;
 
 /// <summary>
@@ -68,6 +70,11 @@ public class Player : Entity, ILoggable
     private float lastSwitched = 0f;
     private float switchWait = 0.05f;
 
+    private void Awake()
+    {
+        var guns = gameObject.GetComponentsInChildren<Gun>().ToList();
+    }
+
     private void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -100,7 +107,7 @@ public class Player : Entity, ILoggable
 
             if (inGame)
             {
-                var actualGun = guns[currentGun].GetComponent<Gun>();
+                var actualGun = Guns[currentGun].GetComponent<Gun>();
                 if (actualGun.CanAim())
                 {
                     if (Input.GetButtonDown("Fire2"))
@@ -144,15 +151,67 @@ public class Player : Entity, ILoggable
             }
         }
     }
+    
+    // Returns the next or the previous active gun.
+    private int GetActiveGun(int currentGun, bool next)
+    {
+        if (next)
+        {
+            // Try for the guns after it
+            for (int i = currentGun + 1; i < Guns.Count; i++)
+            {
+                if (ActiveGuns[i])
+                {
+                    return i;
+                }
+            }
+
+            // Try for the guns before it
+            for (int i = 0; i < currentGun; i++)
+            {
+                if (ActiveGuns[i])
+                {
+                    return i;
+                }
+            }
+
+            // There's no other gun, return itself.
+            return currentGun;
+        }
+        else
+        {
+            // Try for the guns before it
+            for (int i = currentGun - 1; i >= 0; i--)
+            {
+                if (ActiveGuns[i])
+                {
+                    return i;
+                }
+            }
+
+            // Try for the guns after it
+            for (int i = Guns.Count - 1; i > currentGun; i--)
+            {
+                if (ActiveGuns[i])
+                {
+                    return i;
+                }
+            }
+
+            // There's no other gun, return itself.
+            return currentGun;
+        }
+    }
+
 
     // Sets up all the player parameter and does the same with all its guns.
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id)
     {
-        activeGuns = ag;
+        ActiveGuns = ag.ToList();
         gameManagerScript = gms;
 
         totalHealth = th;
-        health = th;
+        Health = th;
         entityID = id;
 
         playerUIManagerScript.SetActiveGuns(ag);
@@ -160,14 +219,8 @@ public class Player : Entity, ILoggable
         for (int i = 0; i < ag.GetLength(0); i++)
         {
             // Setup the gun.
-            guns[i].GetComponent<Gun>().SetupGun(gms, this, playerUIManagerScript, i + 1);
+            Guns[i].GetComponent<Gun>().SetupGun(gms, this, playerUIManagerScript, i + 1);
         }
-    }
-
-    // Sets up all the player parameters and does the same with all its guns.
-    public override void SetupEntity(GameManager gms, int id)
-    {
-        SetupEntity(totalHealth, activeGuns, gms, id);
     }
 
     // Applies damage to the player and eventually manages its death.
@@ -175,17 +228,17 @@ public class Player : Entity, ILoggable
     {
         if (inGame)
         {
-            health -= damage;
+            Health -= damage;
 
             // If the health goes under 0, kill the entity and start the respawn process.
-            if (health <= 0f)
+            if (Health <= 0f)
             {
-                health = 0;
+                Health = 0;
                 // Kill the entity.
                 Die(killerID);
             }
 
-            playerUIManagerScript.SetHealth(health, totalHealth);
+            playerUIManagerScript.SetHealth(Health, totalHealth);
             playerUIManagerScript.ShowDamage();
         }
     }
@@ -193,16 +246,16 @@ public class Player : Entity, ILoggable
     // Heals the player.
     public override void HealFromMedkit(MedkitPickable medkitPickable)
     {
-        if (health + medkitPickable.RestoredHealth > totalHealth)
+        if (Health + medkitPickable.RestoredHealth > totalHealth)
         {
-            health = totalHealth;
+            Health = totalHealth;
         }
         else
         {
-            health += medkitPickable.RestoredHealth;
+            Health += medkitPickable.RestoredHealth;
         }
 
-        playerUIManagerScript.SetHealth(health, totalHealth);
+        playerUIManagerScript.SetHealth(Health, totalHealth);
     }
 
     // Kills the player.
@@ -217,18 +270,18 @@ public class Player : Entity, ILoggable
     // Respawns the player.
     public override void Respawn()
     {
-        health = totalHealth;
+        Health = totalHealth;
         ResetAllAmmo();
         ActivateLowestGun();
         SetInGame(true);
 
-        playerUIManagerScript.SetHealth(health, totalHealth);
+        playerUIManagerScript.SetHealth(Health, totalHealth);
     }
 
     // Activates the lowest ranked gun.
     private void ActivateLowestGun()
     {
-        for (int i = 0; i < activeGuns.GetLength(0); i++)
+        for (int i = 0; i < ActiveGuns.Count; i++)
         {
             // Activate it if is one among the active ones which has the lowest rank.
             if (i == GetActiveGun(-1, true))
@@ -253,9 +306,9 @@ public class Player : Entity, ILoggable
             }
             else
             {
-                for (int i = 0; i < guns.Count; i++)
+                for (int i = 0; i < Guns.Count; i++)
                 {
-                    if (i != currentGun && activeGuns[i] && Input.GetKeyDown(keyCodes[i]))
+                    if (i != currentGun && ActiveGuns[i] && Input.GetKeyDown(keyCodes[i]))
                     {
                         SwitchGuns(currentGun, i);
                     }
@@ -279,7 +332,7 @@ public class Player : Entity, ILoggable
     // Activates a gun.
     private void ActivateGun(int toActivate)
     {
-        guns[toActivate].GetComponent<Gun>().Wield();
+        Guns[toActivate].GetComponent<Gun>().Wield();
         currentGun = toActivate;
         SetUIColor();
     }
@@ -287,7 +340,7 @@ public class Player : Entity, ILoggable
     // Deactivates a gun.
     private void DeactivateGun(int toDeactivate)
     {
-        guns[toDeactivate].GetComponent<Gun>().Stow();
+        Guns[toDeactivate].GetComponent<Gun>().Stow();
     }
 
     // Updates the position.

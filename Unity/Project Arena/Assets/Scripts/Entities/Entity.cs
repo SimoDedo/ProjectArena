@@ -1,24 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Entity is an abstract class used to implement any kind of agent. An entity can spawn, recive
 /// damage and die. An entity can also be healed, supplied with ammunitions and have weapons.
 /// </summary>
 [RequireComponent(typeof(PositionTracker))]
-public abstract class Entity : MonoBehaviour {
-    
-    [SerializeField]
-    protected int totalHealth;
-    [SerializeField]
-    protected int disabledLayer;
-    [SerializeField]
-    protected List<GameObject> guns;
-    [SerializeField]
-    protected bool[] activeGuns;
+public abstract class Entity : MonoBehaviour
+{
+    [SerializeField] protected int totalHealth;
+    [SerializeField] protected int disabledLayer;
 
-    public int health; //TODO return protected
+    protected virtual List<bool> ActiveGuns
+    {
+        get { return Guns.Select(it => it.gameObject.activeSelf).ToList(); }
+        set
+        {
+            for (var i = 0; i < Math.Min(Guns.Count, value.Count); i++)
+                Guns[i].gameObject.SetActive(value[i]);
+        }
+    }
+    protected virtual List<Gun> Guns { get; set; }
+    public virtual int Health { get; protected set; }
+
     protected int entityID;
     protected int currentGun = 0;
     protected bool inGame = false;
@@ -28,10 +35,7 @@ public abstract class Entity : MonoBehaviour {
 
     // Sets all the entity parameters.
     public abstract void SetupEntity(int th, bool[] ag, GameManager gms, int id);
-
-    // Sets all the entity parameters.
-    public abstract void SetupEntity(GameManager gms, int id);
-
+    
     // Applies damage to the entity and eventually manages its death.
     public abstract void TakeDamage(int damage, int killerID);
 
@@ -42,49 +46,15 @@ public abstract class Entity : MonoBehaviour {
     public abstract void Respawn();
 
     // Returns whether the entity is in game or not
-    public bool isAlive => health > 0;
+    public bool isAlive => Health > 0;
 
     // Slows down the entity.
     public abstract void SlowEntity(float penalty);
-
-    // Returns the next or the previous active gun.
-    protected int GetActiveGun(int currentGun, bool next) {
-        if (next) {
-            // Try for the guns after it
-            for (int i = currentGun + 1; i < guns.Count; i++) {
-                if (activeGuns[i]) {
-                    return i;
-                }
-            }
-            // Try for the guns before it
-            for (int i = 0; i < currentGun; i++) {
-                if (activeGuns[i]) {
-                    return i;
-                }
-            }
-            // There's no other gun, return itself.
-            return currentGun;
-        } else {
-            // Try for the guns before it
-            for (int i = currentGun - 1; i >= 0; i--) {
-                if (activeGuns[i]) {
-                    return i;
-                }
-            }
-            // Try for the guns after it
-            for (int i = guns.Count - 1; i > currentGun; i--) {
-                if (activeGuns[i]) {
-                    return i;
-                }
-            }
-            // There's no other gun, return itself.
-            return currentGun;
-        }
-    }
-
+    
     // If the entity is enabled, tells if the it has full health.
-    public bool CanBeHealed() {
-        return health < totalHealth && inGame;
+    public bool CanBeHealed()
+    {
+        return Health < totalHealth && inGame;
     }
 
     // Heals the entity.
@@ -92,72 +62,79 @@ public abstract class Entity : MonoBehaviour {
 
     // If the entity is enabled, tells if any of the weapons passed as 
     // parameters hasn't the maximum ammo.
-    public bool CanBeSupllied(bool[] suppliedGuns) {
-        if (inGame) {
-            for (int i = 0; i < Math.Min(suppliedGuns.Length, guns.Count); i++) {
-                if (suppliedGuns[i] && activeGuns[i] && !guns[i].GetComponent<Gun>().IsFull()) {
+    public bool CanBeSupllied(bool[] suppliedGuns)
+    {
+        if (inGame)
+        {
+            for (int i = 0; i < Math.Min(suppliedGuns.Length, Guns.Count); i++)
+            {
+                if (suppliedGuns[i] && ActiveGuns[i] && !Guns[i].GetComponent<Gun>().IsFull())
+                {
                     return true;
                 }
             }
         }
+
         return false;
     }
 
     // Increases the ammo of the available guns.
-    public void SupplyGuns(bool[] suppliedGuns, int[] ammoAmounts) {
-        for (int i = 0; i < suppliedGuns.GetLength(0); i++) {
-            if (suppliedGuns[i] && activeGuns[i] && !guns[i].GetComponent<Gun>().IsFull()) {
-                guns[i].GetComponent<Gun>().AddAmmo(ammoAmounts[i]);
+    public void SupplyGuns(bool[] suppliedGuns, int[] ammoAmounts)
+    {
+        for (int i = 0; i < suppliedGuns.GetLength(0); i++)
+        {
+            if (suppliedGuns[i] && ActiveGuns[i] && !Guns[i].GetComponent<Gun>().IsFull())
+            {
+                Guns[i].GetComponent<Gun>().AddAmmo(ammoAmounts[i]);
             }
         }
     }
 
     // Sets if the entity is in game, i.e. if it can move, shoot, interact
     // with object and be hitten.
-    abstract public void SetInGame(bool b);
+    public abstract void SetInGame(bool b);
 
     // Returns the ID of the entity.
-    public int GetID() {
+    public int GetID()
+    {
         return entityID;
     }
 
-    // Hides/shows the meshe.
-    protected void SetMeshVisible(Transform father, bool isVisible) {
-        foreach (Transform children in father) {
-            if (children.GetComponent<MeshRenderer>()) {
-                children.GetComponent<MeshRenderer>().enabled = isVisible;
-            }
-            SetMeshVisible(children, isVisible);
-        }
-    }
-
     // Sets if the entity must be ignored by raycast.
-    protected void SetIgnoreRaycast(bool mustIgnore) {
-        if (mustIgnore) {
+    protected void SetIgnoreRaycast(bool mustIgnore)
+    {
+        if (mustIgnore)
+        {
             originalLayer = gameObject.layer;
             gameObject.layer = disabledLayer;
             ChangeLayersRecursively(transform, disabledLayer);
-        } else {
+        }
+        else
+        {
             gameObject.layer = originalLayer;
             ChangeLayersRecursively(transform, originalLayer);
         }
     }
 
     // Changes the layer recursively.
-    protected void ChangeLayersRecursively(Transform t, int l) {
-        foreach (Transform child in t) {
+    protected void ChangeLayersRecursively(Transform t, int l)
+    {
+        foreach (Transform child in t)
+        {
             child.gameObject.layer = l;
             ChangeLayersRecursively(child, l);
         }
     }
 
     // Resets the ammo of all the weapons.
-    protected void ResetAllAmmo() {
-        for (int i = 0; i < guns.Count; i++) {
-            if (activeGuns[i]) {
-                guns[i].GetComponent<Gun>().ResetAmmo();
+    protected void ResetAllAmmo()
+    {
+        for (int i = 0; i < Guns.Count; i++)
+        {
+            if (ActiveGuns[i])
+            {
+                Guns[i].GetComponent<Gun>().ResetAmmo();
             }
         }
     }
-
 }

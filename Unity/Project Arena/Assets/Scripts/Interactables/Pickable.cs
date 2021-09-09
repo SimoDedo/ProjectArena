@@ -6,14 +6,25 @@
 /// </summary>
 [RequireComponent(typeof(BoxCollider))]
 public abstract class Pickable : MonoBehaviour {
+    public enum PickupType
+    {
+        MEDKIT,
+        AMMO,
+        // WEAPON TODO
+    }
 
+    [SerializeField] private PickupType type;
     [SerializeField] protected float cooldown = 30f;
     [SerializeField] protected GameObject pickable;
-
+    
     private float pickedUpTime;
-
     private float lastCheck;
     private const float CHECK_WAIT = 0.1f;
+
+    public PickupType GetPickupType()
+    {
+        return type;
+    }
 
     // Use this for initialization
     protected void Start() {
