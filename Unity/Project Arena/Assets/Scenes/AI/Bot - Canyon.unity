@@ -709,8 +709,28 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
+      propertyPath: enemy
+      value: 
+      objectReference: {fileID: 590510138}
+    - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: curiosity
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
       propertyPath: sensibility
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: movementSkill
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: consecutiveTimeBeforeCanReact
+      value: 0.03
       objectReference: {fileID: 0}
     - target: {fileID: 4214875098204987728, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
