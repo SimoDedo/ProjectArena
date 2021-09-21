@@ -73,7 +73,7 @@ public class Player : Entity, ILoggable
 
     private void Awake()
     {
-        var guns = gameObject.GetComponentsInChildren<Gun>().ToList();
+        Guns = gameObject.GetComponentsInChildren<Gun>().ToList();
     }
 
     private void Start()

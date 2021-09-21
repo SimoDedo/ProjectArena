@@ -474,11 +474,31 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1272100895109282999, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
       propertyPath: enemy
       value: 
       objectReference: {fileID: 1812419185}
+    - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: aimingSkill
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: premonition
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: movementSkill
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6069983894062413340, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
       propertyPath: mBehaviorSource.mTaskData.JSONSerialization
@@ -715,6 +735,11 @@ PrefabInstance:
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
       propertyPath: curiosity
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: aimingSkill
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,

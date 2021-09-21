@@ -322,9 +322,16 @@ public class AIEntity : Entity, ILoggable
         return movementSkill;
     }
 
-    [Range(0f, 1f)] [SerializeField] private float curiosity = 0.2f;
+    [SerializeField] private CuriosityLevel curiosity = CuriosityLevel.Medium;
 
-    public float GetCuriosity()
+    public enum CuriosityLevel
+    {
+        Low,
+        Medium,
+        High,
+    } 
+
+    public CuriosityLevel GetCuriosity()
     {
         return curiosity;
     }
@@ -347,5 +354,11 @@ public class AIEntity : Entity, ILoggable
     {
         // TODO Choose with fuzzy logic or anything...
         return 0;
+    }
+
+    [SerializeField] [Range(0f, 1f)] private float aimingSkill = 0.5f;
+    public float GetAimingSkill()
+    {
+        return aimingSkill;
     }
 }

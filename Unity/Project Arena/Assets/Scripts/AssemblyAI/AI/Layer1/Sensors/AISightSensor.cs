@@ -45,5 +45,10 @@ namespace Entities.AI.Layer1.Sensors
                 ? maxSightRange
                 : hit.distance;
         }
+
+        public Vector3 GetLookDirection()
+        {
+            return head.transform.forward;
+        }
     }
 }

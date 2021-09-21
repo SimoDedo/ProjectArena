@@ -220,13 +220,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1258670199167970}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 24680209c76e5da4386c4f51d696b150, type: 3}
+  m_Script: {fileID: 11500000, guid: ed4d6d7711694586b9c0ad95f000dcdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   totalHealth: 0
-  disabledLayer: 9
-  guns: []
-  activeGuns: 
+  disabledLayer: 0
 --- !u!136 &136502257779531238
 CapsuleCollider:
   m_ObjectHideFlags: 0

@@ -21,9 +21,10 @@ namespace Entities.AI.Controller
         /// not be possible to immediately look at the target
         /// </summary>
         /// <param name="target">The point to look
+        /// <param name="sensibilityAdjustement">The speed change to use when moving
         /// <returns>The angle between the new look direction and the target</returns>
         /// </param>
-        public float LookAtPoint(Vector3 target)
+        public float LookAtPoint(Vector3 target, float sensibilityAdjustement = 1f)
         {
             var headTransform = head.transform;
             var position = headTransform.position;
@@ -39,7 +40,7 @@ namespace Entities.AI.Controller
             var currentHeadRotation = headTransform.localRotation;
             var currentBodyRotation = transform.localRotation;
 
-            var maxAngle = 2 * sensibility * inputPenalty;
+            var maxAngle = 2 * sensibility * inputPenalty * sensibilityAdjustement;
 
             var newHeadRotation = Quaternion.RotateTowards(currentHeadRotation, desiredHeadRotation, maxAngle);
             var newBodyRotation = Quaternion.RotateTowards(currentBodyRotation, desiredBodyRotation, maxAngle);
@@ -53,6 +54,11 @@ namespace Entities.AI.Controller
         public void SetInputPenalty(float inputPenalty)
         {
             this.inputPenalty = inputPenalty;
+        }
+
+        public Vector3 GetLookDirection()
+        {
+            return head.transform.forward;
         }
     }
 }

@@ -70,8 +70,13 @@ namespace Entities.AI.Layer2
                 validPoint = hit.position;
                 return true;
             }
-            validPoint = Vector3.zero;
+            validPoint = point;
             return false;
+        }
+        
+        public bool IsPointOnNavMesh(Vector3 point, out Vector3 validPoint)
+        {
+            return IsPointOnNavMesh(point, agent.agentTypeID, out validPoint);
         }
 
         public void SetPath(NavMeshPath path)

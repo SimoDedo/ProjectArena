@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 /// <summary>
 /// ParameterManager allows to exchange information between different scenes.
@@ -40,6 +41,9 @@ public class ParameterManager : SceneSingleton<ParameterManager> {
     void Awake() {
         ErrorCode = 0;
 
+        GenerationMode = 0;
+        MapDNA = DateTime.Now.ToString();
+
         LogOnline = true;
         LogOffline = true;
         LogSetted = false;
@@ -48,6 +52,8 @@ public class ParameterManager : SceneSingleton<ParameterManager> {
         MaxSensibility = 2.75f;
         DefaultSensibility = 1.75f;
         WebSensibilityDownscale = 3f;
+        
+        
 
         DontDestroyOnLoad(transform.gameObject);
     }
