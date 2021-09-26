@@ -831,12 +831,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   totalHealth: 0
   disabledLayer: 9
-  guns:
-  - {fileID: 1420662876468926}
-  - {fileID: 1686794995014334}
-  - {fileID: 1349010876380572}
-  - {fileID: 1215800273274650}
-  activeGuns: 
   head: {fileID: 1523818027142824}
   speed: 15
   jumpSpeed: 15
@@ -1417,7 +1411,6 @@ MonoBehaviour:
   maximumAmmo: 30
   reloadTime: 1
   cooldownTime: 0.5
-  gunType: 0
   muzzleFlashDuration: 0.1
   recoil: 0.05
   aimEnabled: 1
@@ -2096,7 +2089,6 @@ MonoBehaviour:
   maximumAmmo: 16
   reloadTime: 1
   cooldownTime: 0.75
-  gunType: 1
   muzzleFlashDuration: 0.1
   recoil: 0.05
   aimEnabled: 0
@@ -2903,7 +2895,6 @@ MonoBehaviour:
   maximumAmmo: 120
   reloadTime: 1
   cooldownTime: 0.1
-  gunType: 0
   muzzleFlashDuration: 0.05
   recoil: 0.02
   aimEnabled: 0
@@ -5596,7 +5587,6 @@ MonoBehaviour:
   maximumAmmo: 24
   reloadTime: 1
   cooldownTime: 0.75
-  gunType: 0
   muzzleFlashDuration: 0.1
   recoil: 0.05
   aimEnabled: 0
@@ -7008,7 +6998,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1845458571358680}
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0.33, y: -0.13, z: 0.8}
+  m_LocalPosition: {x: 0.08, y: -0.05, z: 0.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4482265910674310}
