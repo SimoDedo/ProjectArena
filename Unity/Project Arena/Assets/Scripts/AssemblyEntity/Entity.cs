@@ -23,6 +23,7 @@ public abstract class Entity : MonoBehaviour
                 Guns[i].gameObject.SetActive(value[i]);
         }
     }
+
     protected virtual List<Gun> Guns { get; set; }
     public virtual int Health { get; protected set; }
 
@@ -35,7 +36,7 @@ public abstract class Entity : MonoBehaviour
 
     // Sets all the entity parameters.
     public abstract void SetupEntity(int th, bool[] ag, GameManager gms, int id);
-    
+
     // Applies damage to the entity and eventually manages its death.
     public abstract void TakeDamage(int damage, int killerID);
 
@@ -50,7 +51,7 @@ public abstract class Entity : MonoBehaviour
 
     // Slows down the entity.
     public abstract void SlowEntity(float penalty);
-    
+
     // If the entity is enabled, tells if the it has full health.
     public bool CanBeHealed()
     {
@@ -136,5 +137,36 @@ public abstract class Entity : MonoBehaviour
                 Guns[i].GetComponent<Gun>().ResetAmmo();
             }
         }
+    }
+
+    // Variables to slow down the gun switching.
+    private float lastSwitched;
+    private const float switchWait = 0.05f;
+
+    /// <returns>True if the gun currently active is the one requested</returns>
+    protected bool TrySwitchGuns(int toDeactivate, int toActivate)
+    {
+        if (Time.time > lastSwitched + switchWait)
+        {
+            if (toDeactivate != toActivate)
+            {
+                lastSwitched = Time.time;
+                currentGun = toActivate;
+                DeactivateGun(toDeactivate);
+                ActivateGun(toActivate);
+            }
+
+            return true;
+        }
+
+        return toDeactivate == toActivate;
+    }
+
+    protected virtual void ActivateGun(int index)
+    {
+    }
+
+    protected virtual void DeactivateGun(int index)
+    {
     }
 }

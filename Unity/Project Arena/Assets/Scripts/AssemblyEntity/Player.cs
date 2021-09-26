@@ -67,10 +67,6 @@ public class Player : Entity, ILoggable
         KeyCode.Alpha9,
     };
 
-    // Variables to slow down the gun switchig.
-    private float lastSwitched = 0f;
-    private float switchWait = 0.05f;
-
     private void Awake()
     {
         Guns = gameObject.GetComponentsInChildren<Gun>().ToList();
@@ -141,8 +137,11 @@ public class Player : Entity, ILoggable
                     var t = transform;
                     var position = t.position;
                     PositionInfoGameEvent.Instance.Raise(
-                        new PositionInfo {x = position.x, z = position.z,
-                            dir = t.eulerAngles.y, entityID = entityID});
+                        new PositionInfo
+                        {
+                            x = position.x, z = position.z,
+                            dir = t.eulerAngles.y, entityID = entityID
+                        });
                     lastPositionLog = Time.time;
                 }
             }
@@ -152,7 +151,7 @@ public class Player : Entity, ILoggable
             }
         }
     }
-    
+
     // Returns the next or the previous active gun.
     private int GetActiveGun(int currentGun, bool next)
     {
@@ -295,43 +294,29 @@ public class Player : Entity, ILoggable
     // Switches weapon if possible.
     private void UpdateGun()
     {
-        if (Time.time > lastSwitched + switchWait)
+        if (Input.GetAxisRaw("Mouse ScrollWheel") > 0)
         {
-            if (Input.GetAxisRaw("Mouse ScrollWheel") > 0)
+            TrySwitchGuns(currentGun, GetActiveGun(currentGun, true));
+        }
+        else if (Input.GetAxisRaw("Mouse ScrollWheel") < 0)
+        {
+            TrySwitchGuns(currentGun, GetActiveGun(currentGun, false));
+        }
+        else
+        {
+            for (int i = 0; i < Guns.Count; i++)
             {
-                SwitchGuns(currentGun, GetActiveGun(currentGun, true));
-            }
-            else if (Input.GetAxisRaw("Mouse ScrollWheel") < 0)
-            {
-                SwitchGuns(currentGun, GetActiveGun(currentGun, false));
-            }
-            else
-            {
-                for (int i = 0; i < Guns.Count; i++)
+                if (i != currentGun && ActiveGuns[i] && Input.GetKeyDown(keyCodes[i]))
                 {
-                    if (i != currentGun && ActiveGuns[i] && Input.GetKeyDown(keyCodes[i]))
-                    {
-                        SwitchGuns(currentGun, i);
-                    }
+                    if (TrySwitchGuns(currentGun, i))
+                        break;
                 }
             }
         }
     }
 
-    // Deactivates a gun and actiates another.
-    private void SwitchGuns(int toDeactivate, int toActivate)
-    {
-        lastSwitched = Time.time;
-
-        if (toDeactivate != toActivate)
-        {
-            DeactivateGun(toDeactivate);
-            ActivateGun(toActivate);
-        }
-    }
-
     // Activates a gun.
-    private void ActivateGun(int toActivate)
+    protected override void ActivateGun(int toActivate)
     {
         Guns[toActivate].GetComponent<Gun>().Wield();
         currentGun = toActivate;
@@ -339,7 +324,7 @@ public class Player : Entity, ILoggable
     }
 
     // Deactivates a gun.
-    private void DeactivateGun(int toDeactivate)
+    protected override void DeactivateGun(int toDeactivate)
     {
         Guns[toDeactivate].GetComponent<Gun>().Stow();
     }

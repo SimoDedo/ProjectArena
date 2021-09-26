@@ -105,7 +105,6 @@ public class AIEntity : Entity, ILoggable
 
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id)
     {
-        ActiveGuns = ag.ToList();
         gameManagerScript = gms;
 
         totalHealth = th;
@@ -118,7 +117,7 @@ public class AIEntity : Entity, ILoggable
             var gun = Guns[i].GetComponent<Gun>();
             gun.SetupGun(gms, this, null, i + 1);
         }
-
+        ActiveGuns = ag.ToList();
         ActivateLowestGun();
 
         pickupKnowledgeBase.DetectPickups();
@@ -218,16 +217,20 @@ public class AIEntity : Entity, ILoggable
 
     private void ActivateLowestGun()
     {
-        Guns[0].GetComponent<Gun>().Wield();
+        Guns.First(it=>it.isActiveAndEnabled).Wield();
     }
 
-    public Gun EquipGun(int index)
+    public bool EquipGun(int index)
     {
         if (index < 0 || index > Guns.Count)
-            return null;
+            return false;
         if (!ActiveGuns[index])
-            return null;
-        currentGun = index;
+            return false;
+        return TrySwitchGuns(currentGun, index);
+    }
+
+    public Gun GetCurrentGun()
+    {
         return Guns[currentGun];
     }
 
@@ -350,15 +353,24 @@ public class AIEntity : Entity, ILoggable
         return enemy;
     }
 
-    public int GetBestGunIndex()
+    public List<Gun> GetGuns()
     {
-        // TODO Choose with fuzzy logic or anything...
-        return 0;
+        return Guns;
     }
 
     [SerializeField] [Range(0f, 1f)] private float aimingSkill = 0.5f;
     public float GetAimingSkill()
     {
         return aimingSkill;
+    }
+
+    protected override void ActivateGun(int index)
+    {
+        Guns[index].Wield();
+    }
+
+    protected override void DeactivateGun(int index)
+    {
+        Guns[index].Stow();
     }
 }

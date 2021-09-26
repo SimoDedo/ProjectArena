@@ -32,6 +32,11 @@ public class RaycastGun : Gun {
         sparks.transform.localPosition = Vector3.zero;
     }
 
+    public override float GetProjectileSpeed()
+    {
+        return float.PositiveInfinity;
+    }
+
     public override void Shoot() {
         StartCoroutine(ShowMuzzleFlash());
 
