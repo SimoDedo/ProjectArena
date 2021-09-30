@@ -49,9 +49,13 @@ public class PositionTracker : MonoBehaviour
             : new Tuple<Vector3, float>(afterPosition, timeToSearch);
 
         // Step 3: interpolate the two
+        Vector3 interpolatedPos;
+        if (timeToSearch == afterTime)
+            interpolatedPos = afterPosition;
+        else
+            interpolatedPos = Vector3.Lerp(beforePosition, afterPosition,
+                (timeToSearch - beforeTime) / (afterTime - beforeTime));
 
-        var interpolatedPos = Vector3.Lerp(beforePosition, afterPosition,
-            (timeToSearch - beforeTime) / (afterTime - beforeTime));
 
         // Select all element before beforeTime
         // Find index of beforeTime
@@ -74,11 +78,11 @@ public class PositionTracker : MonoBehaviour
 
         var actualVelocity =
             (positions[positions.Count - 1].Item1 - positions[positions.Count - 2].Item1) /
-                (positions[positions.Count - 1].Item2 - positions[positions.Count - 2].Item2);
+            (positions[positions.Count - 1].Item2 - positions[positions.Count - 2].Item2);
 
         Debug.Log("Difference between actual velocity and estimated velocity is "
-         + (actualVelocity - smoothedVelocity).magnitude + "!");
-        
+                  + (actualVelocity - smoothedVelocity).magnitude + "!");
+
         return new Tuple<Vector3, Vector3>(interpolatedPos, smoothedVelocity);
     }
 

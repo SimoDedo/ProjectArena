@@ -13,14 +13,11 @@ namespace AI.State
         }
 
         private AIEntity entity;
-        private NavMeshAgent agent;
         private ExternalBehaviorTree externalBT;
         private BehaviorTree behaviorTree;
-        private TargetKnowledgeBase targetKnowledgeBase;
 
         public void Enter()
         {
-            agent = entity.GetComponent<NavMeshAgent>();
             externalBT = Resources.Load<ExternalBehaviorTree>("Behaviors/Fight");
             behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
             behaviorTree.StartWhenEnabled = false;
@@ -40,11 +37,11 @@ namespace AI.State
                     entity.SetState(new LookForHealth(entity));
                     return;
                 }
-                
-                entity.SetState(new Wander(entity));
 
-                // TODO how to know if target is dead?
-                // if (targetKnowledgeBase)
+                if (entity.GetEnemy().isAlive)
+                    entity.SetState(new SearchForLostEnemy(entity));
+                else
+                    entity.SetState(new Wander(entity));
                 return;
             }
 

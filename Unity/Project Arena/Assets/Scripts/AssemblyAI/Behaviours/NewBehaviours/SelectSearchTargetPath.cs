@@ -15,7 +15,7 @@ namespace AI.Behaviours.NewBehaviours
         private NavMeshAgent agent;
         private AIEntity entity;
         private AISightSensor sensor;
-        private GameObject enemy;
+        private Entity enemy;
         [SerializeField] private SharedSelectedPathInfo selectedPath;
         private bool canUsePremonition;
         private float premonitionSkill;
@@ -28,7 +28,7 @@ namespace AI.Behaviours.NewBehaviours
             sensor = GetComponent<AISightSensor>();
             agent = GetComponent<NavMeshAgent>();
             enemy = entity.GetEnemy();
-            premonitionSkill = entity.GetPremonition();
+            premonitionSkill = entity.GetPredictionSkill();
             startingPoint = transform.position;
             maxRange = sensor.GetObstacleDistanceInDirection(startingPoint,
                 enemy.transform.position - startingPoint, Physics.IgnoreRaycastLayer);

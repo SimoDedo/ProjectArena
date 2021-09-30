@@ -34,7 +34,7 @@ namespace AI.State
             else if (entity.ShouldLookForHealth())
                 entity.SetState(new LookForHealth(entity));
             else if (entity.HasTakenDamage())
-                entity.SetState(new Search(entity));
+                entity.SetState(new SearchForLostEnemy(entity));
             else
                 BehaviorManager.instance.Tick(behaviorTree);
         }

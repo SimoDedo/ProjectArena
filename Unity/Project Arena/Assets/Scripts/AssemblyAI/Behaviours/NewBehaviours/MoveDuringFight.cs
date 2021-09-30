@@ -13,7 +13,7 @@ namespace AI.NewBehaviours
     public class MoveDuringFight : Action
     {
         private NavigationSystem agent;
-        private GameObject target;
+        private Entity target;
         [SerializeField] private SharedFloat movementAmount;
 
         private bool strifeRight = Random.value < 0.5;

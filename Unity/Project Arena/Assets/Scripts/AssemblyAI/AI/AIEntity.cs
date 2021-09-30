@@ -12,6 +12,7 @@ using JetBrains.Annotations;
 using ScriptableObjectArchitecture;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Serialization;
 using Utils;
 using Random = UnityEngine.Random;
 using Wander = AI.State.Wander;
@@ -193,7 +194,7 @@ public class AIEntity : Entity, ILoggable
         });
         Health = totalHealth;
         ResetAllAmmo();
-        ActivateLowestGun();
+        // ActivateLowestGun();
         SetInGame(true);
     }
 
@@ -217,7 +218,10 @@ public class AIEntity : Entity, ILoggable
 
     private void ActivateLowestGun()
     {
-        Guns.First(it=>it.isActiveAndEnabled).Wield();
+        var firstIndex = Guns.FindIndex(it=>it.isActiveAndEnabled);
+        Guns[firstIndex].Wield();
+        currentGun = firstIndex;
+        // EquipGun(firstIndex);
     }
 
     public bool EquipGun(int index)
@@ -266,24 +270,6 @@ public class AIEntity : Entity, ILoggable
         inGame = b;
     }
 
-
-    public void CanReload()
-    {
-        var gun = Guns[currentGun].GetComponent<Gun>();
-        gun.CanReload();
-    }
-
-    public void Reload()
-    {
-        var gun = Guns[currentGun].GetComponent<Gun>();
-        gun.Reload();
-    }
-
-    public void Shoot()
-    {
-        var gun = Guns[currentGun].GetComponent<Gun>();
-        gun.Shoot();
-    }
 
     public void SetupLogging()
     {
@@ -339,16 +325,16 @@ public class AIEntity : Entity, ILoggable
         return curiosity;
     }
 
-    [Range(0f, 1f)] [SerializeField] private float premonition = 0.5f;
+    [FormerlySerializedAs("premonition")] [Range(0f, 1f)] [SerializeField] private float predictionSkill = 0.5f;
 
-    public float GetPremonition()
+    public float GetPredictionSkill()
     {
-        return premonition;
+        return predictionSkill;
     }
 
-    [SerializeField] [NotNull] private GameObject enemy;
+    [SerializeField] [NotNull] private Entity enemy;
 
-    public GameObject GetEnemy()
+    public Entity GetEnemy()
     {
         return enemy;
     }

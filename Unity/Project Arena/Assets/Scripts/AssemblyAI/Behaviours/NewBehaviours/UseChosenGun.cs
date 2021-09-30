@@ -7,7 +7,6 @@ using Entities.AI.Layer1.Sensors;
 using Entities.AI.Layer2;
 using UnityEngine;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
-using Random = UnityEngine.Random;
 
 namespace AI.Behaviours.NewBehaviours.Variables
 {
@@ -18,7 +17,7 @@ namespace AI.Behaviours.NewBehaviours.Variables
         [SerializeField] private int maxLookAheadFrames = 5;
         [SerializeField] private float lookAheadTimeStep = 0.1f;
         private AIEntity entity;
-        private GameObject enemy;
+        private Entity enemy;
         private PositionTracker enemyPositionTracker;
         private AISightController sightController;
         private AISightSensor sightSensor;
@@ -26,9 +25,7 @@ namespace AI.Behaviours.NewBehaviours.Variables
         private Gun gun;
 
         private NormalDistribution distribution;
-        private float nextUpdateDelayTime;
         private float reflexDelay;
-        private const float UPDATE_DELAY = 0.1f;
 
         public override void OnAwake()
         {
@@ -51,17 +48,11 @@ namespace AI.Behaviours.NewBehaviours.Variables
             // TODO check this is called at the right time
             entity.EquipGun(chosenGunIndex.Value);
             gun = entity.GetCurrentGun();
-            nextUpdateDelayTime = Time.time;
+            reflexDelay = (float) distribution.Generate();
         }
 
         public override TaskStatus OnUpdate()
         {
-            if (Time.time > nextUpdateDelayTime)
-            {
-                nextUpdateDelayTime = Time.time + UPDATE_DELAY;
-                reflexDelay = (float) distribution.Generate();
-            }
-
             var (position, velocity) = enemyPositionTracker.GetPositionAndVelocityFromDelay(reflexDelay);
 
             if (!gun.CanShoot())
@@ -86,8 +77,8 @@ namespace AI.Behaviours.NewBehaviours.Variables
                 // Default value: point on ground underneath enemy
                 var record = float.PositiveInfinity;
 
-                navSystem.IsPointOnNavMesh(enemyStartPos, out var chosenPoint);
-                for (var i = 1; i <= maxLookAheadFrames; i++)
+                var chosenPoint = Vector3.zero;
+                for (var i = 0; i <= maxLookAheadFrames; i++)
                 {
                     var newPos = enemyStartPos + velocity * (i * lookAheadTimeStep);
                     // TODO NavMeshCheck
@@ -110,7 +101,8 @@ namespace AI.Behaviours.NewBehaviours.Variables
                     }
                 }
 
-                Debug.DrawLine(ourStartingPoint, chosenPoint);
+                // Only shoot if we found a nice position, otherwise keep the shot for another time
+                if (float.IsPositiveInfinity(record)) return TaskStatus.Running;
                 angle = sightController.LookAtPoint(chosenPoint);
             }
 
@@ -120,17 +112,5 @@ namespace AI.Behaviours.NewBehaviours.Variables
 
             return TaskStatus.Running;
         }
-    }
-}
-
-public static class RandomUtils
-{
-    public static float GetRandomNormal(float mean, float stdDev)
-    {
-        var u1 = 1.0f - Random.value;
-        var u2 = 1.0f - Random.value;
-        var randStdNormal = Mathf.Sqrt(-2.0f * Mathf.Log(u1)) *
-                            Mathf.Sin(2.0f * Mathf.PI * u2); //random normal(0,1)
-        return mean + stdDev * randStdNormal; //random normal(mean,stdDev^2)
     }
 }
