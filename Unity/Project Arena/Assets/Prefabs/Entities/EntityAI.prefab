@@ -580,10 +580,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   totalHealth: 0
   disabledLayer: 0
-  guns:
-  - {fileID: 1420662876468926}
-  activeGuns: 
-  health: 0
   speed: 16
   acceleration: 100
   angularSpeed: 10
@@ -593,11 +589,14 @@ MonoBehaviour:
   sensibility: 10
   inputPenalty: 1
   memoryWindow: 0.5
-  timeBeforeReaction: 0.1
+  reactionTime: 0.1
+  consecutiveTimeBeforeCanReact: 0.04
+  health: 0
   movementSkill: 0.5
-  curiosity: 0.5
+  curiosity: 0
   premonition: 0.5
   enemy: {fileID: 1128226087601874}
+  aimingSkill: 0.5
 --- !u!114 &5647456198230708602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -928,13 +927,14 @@ GameObject:
   - component: {fileID: 4656231824012272}
   - component: {fileID: 114040892126706168}
   - component: {fileID: 114128907697292602}
+  - component: {fileID: 5119721961864454988}
   m_Layer: 8
   m_Name: Rifle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4656231824012272
 Transform:
   m_ObjectHideFlags: 0
@@ -986,7 +986,6 @@ MonoBehaviour:
   maximumAmmo: 30
   reloadTime: 1
   cooldownTime: 0.5
-  gunType: 0
   muzzleFlashDuration: 0.1
   recoil: 0.05
   aimEnabled: 1
@@ -1004,6 +1003,20 @@ MonoBehaviour:
   ignoredLayers:
     serializedVersion: 2
     m_Bits: 516
+--- !u!114 &5119721961864454988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1215800273274650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d9a5f783f7e49a986c7dfe20318e22c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minRange: 60
+  maxRange: 100
 --- !u!1 &1243870793981426
 GameObject:
   m_ObjectHideFlags: 0
@@ -1451,13 +1464,14 @@ GameObject:
   - component: {fileID: 4482265910674310}
   - component: {fileID: 114187036404975674}
   - component: {fileID: 114718352753251754}
+  - component: {fileID: 8520857570892039768}
   m_Layer: 8
   m_Name: Rocket Launcher
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4482265910674310
 Transform:
   m_ObjectHideFlags: 0
@@ -1510,7 +1524,6 @@ MonoBehaviour:
   maximumAmmo: 16
   reloadTime: 1
   cooldownTime: 0.75
-  gunType: 1
   muzzleFlashDuration: 0.1
   recoil: 0.05
   aimEnabled: 0
@@ -1525,6 +1538,20 @@ MonoBehaviour:
     type: 3}
   projectileLifeTime: 10
   projectileSpeed: 50
+--- !u!114 &8520857570892039768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1349010876380572}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d9a5f783f7e49a986c7dfe20318e22c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minRange: 20
+  maxRange: 30
 --- !u!1 &1350091775535268
 GameObject:
   m_ObjectHideFlags: 0
@@ -1946,6 +1973,7 @@ GameObject:
   - component: {fileID: 4079534491022434}
   - component: {fileID: 114406827984555436}
   - component: {fileID: 114191837528411164}
+  - component: {fileID: 7394982974198650920}
   m_Layer: 8
   m_Name: AK47
   m_TagString: Untagged
@@ -2004,7 +2032,6 @@ MonoBehaviour:
   maximumAmmo: 120
   reloadTime: 1
   cooldownTime: 0.1
-  gunType: 0
   muzzleFlashDuration: 0.05
   recoil: 0.02
   aimEnabled: 0
@@ -2022,6 +2049,20 @@ MonoBehaviour:
   ignoredLayers:
     serializedVersion: 2
     m_Bits: 516
+--- !u!114 &7394982974198650920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1420662876468926}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d9a5f783f7e49a986c7dfe20318e22c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minRange: 30
+  maxRange: 60
 --- !u!1 &1421365929848674
 GameObject:
   m_ObjectHideFlags: 0
@@ -3389,13 +3430,14 @@ GameObject:
   - component: {fileID: 4759083324844800}
   - component: {fileID: 114215182200902864}
   - component: {fileID: 114286380553423094}
+  - component: {fileID: 39344177914041967}
   m_Layer: 8
   m_Name: Shotgun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4759083324844800
 Transform:
   m_ObjectHideFlags: 0
@@ -3447,7 +3489,6 @@ MonoBehaviour:
   maximumAmmo: 24
   reloadTime: 1
   cooldownTime: 0.75
-  gunType: 0
   muzzleFlashDuration: 0.1
   recoil: 0.05
   aimEnabled: 0
@@ -3465,6 +3506,20 @@ MonoBehaviour:
   ignoredLayers:
     serializedVersion: 2
     m_Bits: 516
+--- !u!114 &39344177914041967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1686794995014334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d9a5f783f7e49a986c7dfe20318e22c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minRange: 0
+  maxRange: 20
 --- !u!1 &1707763142875596
 GameObject:
   m_ObjectHideFlags: 0
@@ -4499,7 +4554,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1845458571358680}
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0.33, y: -0.13, z: 0.8}
+  m_LocalPosition: {x: 0.08, y: -0.06, z: 0.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4482265910674310}

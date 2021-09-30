@@ -17,7 +17,7 @@ namespace AI.KnowledgeBase
             public bool isVisibile;
         }
 
-        private GameObject target;
+        private Entity target;
         private AISightSensor sensor;
         private float memoryWindow;
 
@@ -39,7 +39,7 @@ namespace AI.KnowledgeBase
 
         private List<VisibilityData> results = new List<VisibilityData>();
 
-        public void SetParameters(AISightSensor sensor, GameObject target, float memoryWindow,
+        public void SetParameters(AISightSensor sensor, Entity target, float memoryWindow,
             float consecutiveTimeBeforeReaction, float reactionTime)
         {
             this.target = target;
@@ -130,6 +130,15 @@ namespace AI.KnowledgeBase
             }
 
             return false;
+        }
+
+        public float GetLastKnownPositionTime()
+        {
+            var searchTimeEnd = Time.time - reactionTime;
+            var result = results.FindLast(it => it.isVisibile && it.startTime < searchTimeEnd);
+            // We got here not because we lost track of target, but for other reasons (e.g. got damage),
+            // return current position of enemy
+            return result?.startTime ?? Time.time;
         }
     }
 }

@@ -21,30 +21,23 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     [SerializeField] protected int maximumAmmo;
     [SerializeField] protected float reloadTime = 1f;
     [SerializeField] protected float cooldownTime = 0.1f;
-    [FormerlySerializedAs("gunType")] [SerializeField] protected GunShootType gunShootType;
-    [SerializeField] protected GunType gunType;
+    // [SerializeField] protected GunType gunType;
 
-    public GunType GetGunType()
-    {
-        return gunType;
-    }
-    
-    protected enum GunShootType
-    {
-        Raycast,
-        Projectile
-    }
+    // public GunType GetGunType()
+    // {
+    //     return gunType;
+    // }
 
-    public enum GunType
-    {
-        Sniper_Rifle,
-        Assault_Rifle,
-        Shotgun,
-        Rocket_Launcher
-    }
+    // public enum GunType
+    // {
+    //     Sniper_Rifle,
+    //     Assault_Rifle,
+    //     Shotgun,
+    //     Rocket_Launcher
+    // }
     
-    
-        
+    public abstract float GetProjectileSpeed();
+
     [Header("Appearence")] [SerializeField] protected float muzzleFlashDuration = 0.05f;
     [SerializeField] protected float recoil = 0.05f;
 

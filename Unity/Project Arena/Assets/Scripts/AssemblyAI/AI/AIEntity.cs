@@ -12,6 +12,7 @@ using JetBrains.Annotations;
 using ScriptableObjectArchitecture;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Serialization;
 using Utils;
 using Random = UnityEngine.Random;
 using Wander = AI.State.Wander;
@@ -105,7 +106,6 @@ public class AIEntity : Entity, ILoggable
 
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id)
     {
-        ActiveGuns = ag.ToList();
         gameManagerScript = gms;
 
         totalHealth = th;
@@ -118,7 +118,7 @@ public class AIEntity : Entity, ILoggable
             var gun = Guns[i].GetComponent<Gun>();
             gun.SetupGun(gms, this, null, i + 1);
         }
-
+        ActiveGuns = ag.ToList();
         ActivateLowestGun();
 
         pickupKnowledgeBase.DetectPickups();
@@ -194,7 +194,7 @@ public class AIEntity : Entity, ILoggable
         });
         Health = totalHealth;
         ResetAllAmmo();
-        ActivateLowestGun();
+        // ActivateLowestGun();
         SetInGame(true);
     }
 
@@ -218,16 +218,23 @@ public class AIEntity : Entity, ILoggable
 
     private void ActivateLowestGun()
     {
-        Guns[0].GetComponent<Gun>().Wield();
+        var firstIndex = Guns.FindIndex(it=>it.isActiveAndEnabled);
+        Guns[firstIndex].Wield();
+        currentGun = firstIndex;
+        // EquipGun(firstIndex);
     }
 
-    public Gun EquipGun(int index)
+    public bool EquipGun(int index)
     {
         if (index < 0 || index > Guns.Count)
-            return null;
+            return false;
         if (!ActiveGuns[index])
-            return null;
-        currentGun = index;
+            return false;
+        return TrySwitchGuns(currentGun, index);
+    }
+
+    public Gun GetCurrentGun()
+    {
         return Guns[currentGun];
     }
 
@@ -263,24 +270,6 @@ public class AIEntity : Entity, ILoggable
         inGame = b;
     }
 
-
-    public void CanReload()
-    {
-        var gun = Guns[currentGun].GetComponent<Gun>();
-        gun.CanReload();
-    }
-
-    public void Reload()
-    {
-        var gun = Guns[currentGun].GetComponent<Gun>();
-        gun.Reload();
-    }
-
-    public void Shoot()
-    {
-        var gun = Guns[currentGun].GetComponent<Gun>();
-        gun.Shoot();
-    }
 
     public void SetupLogging()
     {
@@ -336,29 +325,38 @@ public class AIEntity : Entity, ILoggable
         return curiosity;
     }
 
-    [Range(0f, 1f)] [SerializeField] private float premonition = 0.5f;
+    [FormerlySerializedAs("premonition")] [Range(0f, 1f)] [SerializeField] private float predictionSkill = 0.5f;
 
-    public float GetPremonition()
+    public float GetPredictionSkill()
     {
-        return premonition;
+        return predictionSkill;
     }
 
-    [SerializeField] [NotNull] private GameObject enemy;
+    [SerializeField] [NotNull] private Entity enemy;
 
-    public GameObject GetEnemy()
+    public Entity GetEnemy()
     {
         return enemy;
     }
 
-    public int GetBestGunIndex()
+    public List<Gun> GetGuns()
     {
-        // TODO Choose with fuzzy logic or anything...
-        return 0;
+        return Guns;
     }
 
     [SerializeField] [Range(0f, 1f)] private float aimingSkill = 0.5f;
     public float GetAimingSkill()
     {
         return aimingSkill;
+    }
+
+    protected override void ActivateGun(int index)
+    {
+        Guns[index].Wield();
+    }
+
+    protected override void DeactivateGun(int index)
+    {
+        Guns[index].Stow();
     }
 }

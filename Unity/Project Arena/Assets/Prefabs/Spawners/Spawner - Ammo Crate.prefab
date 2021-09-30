@@ -1607,6 +1607,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35137d41d54555c4da3189b9bc089cd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  type: 0
   cooldown: 30
   pickable: {fileID: 1650310700060530}
   suppliedGuns: 01010101
@@ -1619,7 +1620,7 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1319583826136552}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 0.15, y: 0.2, z: 0.15}

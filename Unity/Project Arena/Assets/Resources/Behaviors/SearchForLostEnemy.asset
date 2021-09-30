@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b23f08d2ae4cba14087c1ed36193d82b, type: 3}
+  m_Name: SearchForLostEnemy
+  m_EditorClassIdentifier: 
+  mBehaviorSource:
+    behaviorName: Behavior
+    behaviorDescription: 
+    mTaskData:
+      types: []
+      parentIndex: 
+      startIndex: 
+      variableStartIndex: 
+      JSONSerialization: '{"EntryTask":{"Type":"BehaviorDesigner.Runtime.Tasks.EntryTask","NodeData":{"Offset":"(-2252.95654,-120.566628)"},"ID":0,"Name":"Entry","Instant":true},"RootTask":{"Type":"BehaviorDesigner.Runtime.Tasks.Sequence","NodeData":{"Offset":"(3.293457,120.995811)"},"ID":1,"Name":"Sequence","Instant":true,"AbortTypeabortType":"None","Children":[{"Type":"AssemblyAI.Behaviours.NewBehaviours.GetPathToLastKnownPosition","NodeData":{"Offset":"(-246.706543,183.808273)"},"ID":2,"Name":"Get
+        Path To Last Known Position","Instant":true,"SharedSelectedPathInfopathChosen":{"Type":"AI.Behaviours.NewBehaviours.Variables.SharedSelectedPathInfo","Name":"ChosenPath","IsShared":true,"IsDynamic":true}},{"Type":"AI.Behaviours.NewBehaviours.ApplyPathToAgent","NodeData":{"Offset":"(18.918457,183.808273)"},"ID":3,"Name":"Apply
+        Path To Agent","Instant":true,"SharedSelectedPathInfopathToApply":{"Type":"AI.Behaviours.NewBehaviours.Variables.SharedSelectedPathInfo","Name":"ChosenPath","IsShared":true,"IsDynamic":true}},{"Type":"BehaviorDesigner.Runtime.Tasks.Repeater","NodeData":{"Offset":"(206.418457,183.808273)"},"ID":4,"Name":"Repeater","Instant":true,"SharedIntcount":{"Type":"BehaviorDesigner.Runtime.SharedInt","Name":null,"Int32mValue":0},"SharedBoolrepeatForever":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":null,"BooleanmValue":true},"SharedBoolendOnFailure":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":null,"BooleanmValue":true},"Children":[{"Type":"BehaviorDesigner.Runtime.Tasks.Sequence","NodeData":{"Offset":"(-0.07753277,107.705887)"},"ID":5,"Name":"Sequence","Instant":true,"AbortTypeabortType":"None","Children":[{"Type":"BehaviorDesigner.Runtime.Tasks.Selector","NodeData":{"Offset":"(-175.75795,110.9091)"},"ID":6,"Name":"Selector","Instant":true,"AbortTypeabortType":"None","Children":[{"Type":"AssemblyAI.Behaviours.NewBehaviours.PredictTargetPosition","NodeData":{"Offset":"(-122.019043,121.005219)"},"ID":7,"Name":"Predict
+        Target Position","Instant":true,"SharedSelectedPathInfopathChosen":{"Type":"AI.Behaviours.NewBehaviours.Variables.SharedSelectedPathInfo","Name":"ChosenPath","IsShared":true,"IsDynamic":true}},{"Type":"AssemblyAI.Behaviours.NewBehaviours.NewSelectWanderDestination","NodeData":{"Offset":"(85.79346,115.228683)"},"ID":8,"Name":"New
+        Select Wander Destination","Instant":true,"SharedIntmaxRetries":{"Type":"BehaviorDesigner.Runtime.SharedInt","Name":null,"Int32mValue":2},"SharedFloatwanderRate":{"Type":"BehaviorDesigner.Runtime.SharedFloat","Name":null,"SinglemValue":1},"SharedFloatminWanderDistance":{"Type":"BehaviorDesigner.Runtime.SharedFloat","Name":null,"SinglemValue":20},"SharedFloatmaxWanderDistance":{"Type":"BehaviorDesigner.Runtime.SharedFloat","Name":null,"SinglemValue":20},"SharedSelectedPathInfopathChosen":{"Type":"AI.Behaviours.NewBehaviours.Variables.SharedSelectedPathInfo","Name":"ChosenPath","IsShared":true,"IsDynamic":true}}]},{"Type":"BehaviorDesigner.Runtime.Tasks.ParallelComplete","NodeData":{"Offset":"(189.393982,120)"},"ID":9,"Name":"Parallel
+        Complete","Instant":true,"AbortTypeabortType":"None","Children":[{"Type":"AI.Behaviours.NewBehaviours.ApplyPathToAgent","NodeData":{"Offset":"(-90.43757,119.906754)"},"ID":10,"Name":"Apply
+        Path To Agent","Instant":true,"SharedSelectedPathInfopathToApply":{"Type":"AI.Behaviours.NewBehaviours.Variables.SharedSelectedPathInfo","Name":"ChosenPath","IsShared":true,"IsDynamic":true}},{"Type":"AI.Behaviours.NewBehaviours.NewLookAround3","NodeData":{"Offset":"(66.75943,119.906723)"},"ID":11,"Name":"New
+        Look Around 3","Instant":true,"Booleanfocused":true}]}]}]}]}}'
+      fieldSerializationData:
+        typeName: []
+        fieldNameHash: 
+        startIndex: 
+        dataPosition: 
+        unityObjects: []
+        byteData: 
+        byteDataArray: 
+      Version: 1.6.8

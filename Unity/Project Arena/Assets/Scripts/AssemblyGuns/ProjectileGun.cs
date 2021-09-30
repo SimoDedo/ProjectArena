@@ -25,6 +25,11 @@ public class ProjectileGun : Gun {
         projectiles.transform.localPosition = Vector3.zero;
     }
 
+    public override float GetProjectileSpeed()
+    {
+        return projectileSpeed;
+    }
+
     public override void Shoot() {
         StartCoroutine(ShowMuzzleFlash());
 

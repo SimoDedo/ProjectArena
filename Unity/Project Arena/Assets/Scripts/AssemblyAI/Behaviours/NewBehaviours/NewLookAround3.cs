@@ -15,6 +15,7 @@ namespace AI.Behaviours.NewBehaviours
     [Serializable]
     public class NewLookAround3 : Action
     {
+        [SerializeField] private bool focused;
         private AIMovementController movementController;
         private AISightController sightController;
         private AIEntity.CuriosityLevel curiosity;
@@ -37,7 +38,7 @@ namespace AI.Behaviours.NewBehaviours
         {
             var realForward = movementController.GetVelocity().normalized;
             var angleX = 0f;
-            
+
             if (mustFindLookPoint || Physics.Raycast(transform.position, transform.forward, THRESHOLD))
             {
                 // TODO Agent is not moving, have it slowly look around?
@@ -55,7 +56,7 @@ namespace AI.Behaviours.NewBehaviours
 
                 foreach (var angleScore in angleScores)
                 {
-                    if (curiosity >= angleScore.minimumLevel)
+                    if (curiosity >= angleScore.minLevel && (!focused || angleScore.allowedIfFocused))
                     {
                         var direction = Quaternion.AngleAxis(angleScore.angle, up) * realForward;
                         var distance =
@@ -87,6 +88,7 @@ namespace AI.Behaviours.NewBehaviours
                         activationTreshold = newThreshold;
                     }
                 }
+
                 var newDirection = Quaternion.AngleAxis(angleX, transform.up) * realForward;
                 // In order to not look down, I should be looking at a point far in the horizon, hence the x100
                 lookPoint = transform.position + (newDirection * 100);
@@ -98,23 +100,32 @@ namespace AI.Behaviours.NewBehaviours
         }
 
         private const float THRESHOLD = 10f;
+
         private struct AngleScore
         {
             public int angle;
             public int score;
-            public AIEntity.CuriosityLevel minimumLevel;
+            public AIEntity.CuriosityLevel minLevel;
+            public bool allowedIfFocused;
         }
 
         private static readonly ReadOnlyCollection<AngleScore> angleScores = new ReadOnlyCollection<AngleScore>(new[]
         {
-            new AngleScore {angle = 0, score = 100, minimumLevel = AIEntity.CuriosityLevel.Low},
-            new AngleScore {angle = -45, score = 60, minimumLevel = AIEntity.CuriosityLevel.Medium},
-            new AngleScore {angle = +45, score = 60, minimumLevel = AIEntity.CuriosityLevel.Medium},
-            new AngleScore {angle = -90, score = 30, minimumLevel = AIEntity.CuriosityLevel.Medium},
-            new AngleScore {angle = +90, score = 30, minimumLevel = AIEntity.CuriosityLevel.Medium},
-            new AngleScore {angle = -135, score = 10, minimumLevel = AIEntity.CuriosityLevel.High},
-            new AngleScore {angle = +135, score = 10, minimumLevel = AIEntity.CuriosityLevel.High},
-            new AngleScore {angle = +180, score = 10, minimumLevel = AIEntity.CuriosityLevel.High},
+            new AngleScore {angle = 0, score = 100, minLevel = AIEntity.CuriosityLevel.Low, allowedIfFocused = true},
+            new AngleScore
+                {angle = -45, score = 60, minLevel = AIEntity.CuriosityLevel.Medium, allowedIfFocused = true},
+            new AngleScore
+                {angle = +45, score = 60, minLevel = AIEntity.CuriosityLevel.Medium, allowedIfFocused = true},
+            new AngleScore
+                {angle = -90, score = 30, minLevel = AIEntity.CuriosityLevel.Medium, allowedIfFocused = false},
+            new AngleScore
+                {angle = +90, score = 30, minLevel = AIEntity.CuriosityLevel.Medium, allowedIfFocused = false},
+            new AngleScore
+                {angle = -135, score = 10, minLevel = AIEntity.CuriosityLevel.High, allowedIfFocused = false},
+            new AngleScore
+                {angle = +135, score = 10, minLevel = AIEntity.CuriosityLevel.High, allowedIfFocused = false},
+            new AngleScore
+                {angle = +180, score = 10, minLevel = AIEntity.CuriosityLevel.High, allowedIfFocused = false},
         });
     }
 }

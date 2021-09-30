@@ -34,14 +34,13 @@ namespace AI.State
             }
 
             // TODO Ignore can see enemy if I'm close to destination
-            // if (entity.CanSeeEnemy())
-            // {
-            //     entity.SetState(new Fight(entity));
-            // }
-            // else
-            // {
+            if (entity.CanSeeEnemy())
+            {
+                entity.SetState(new Fight(entity));
+                return;
+            }
+
             BehaviorManager.instance.Tick(behaviorTree);
-            // }
         }
 
         public void Exit()

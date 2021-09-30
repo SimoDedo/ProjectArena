@@ -34,6 +34,10 @@ namespace Entities.AI.Layer2
             agent.angularSpeed = angularSpeed;
         }
 
+        public float GetSpeed()
+        {
+            return speed;
+        }
         public NavMeshPath CalculatePath(Vector3 destination)
         {
             var path = new NavMeshPath();

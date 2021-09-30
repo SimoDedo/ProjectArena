@@ -13,14 +13,14 @@ namespace AI.NewBehaviours
     public class MoveDuringFight : Action
     {
         private NavigationSystem agent;
-        private GameObject target;
+        private Entity target;
         [SerializeField] private SharedFloat movementAmount;
 
         private bool strifeRight = Random.value < 0.5;
         private int remainingStrifes = Random.Range(minStrifeLength, maxStrifeLength);
 
-        private const int minStrifeLength = 5;
-        private const int maxStrifeLength = 20;
+        private const int minStrifeLength = 10;
+        private const int maxStrifeLength = 30;
         private float skill;
 
         public override void OnStart()
@@ -29,7 +29,7 @@ namespace AI.NewBehaviours
             var aiEntity = GetComponent<AIEntity>();
             target = aiEntity.GetEnemy();
             skill = aiEntity.GetMovementSkill();
-            
+            agent.CancelPath();
         }
 
         public override void OnEnd()
@@ -58,7 +58,7 @@ namespace AI.NewBehaviours
             if (skill < 0.6)
             {
                 // TODO how to decide if moving forward or backward?
-                agent.SetDestination(currentPos + direction * movementAmount.Value);
+                agent.SetDestination(currentPos + direction  * agent.GetSpeed());
                 return;
             }
 
@@ -73,7 +73,7 @@ namespace AI.NewBehaviours
                 }
             }
 
-            var offset = strifeDir * (strifeRight ? movementAmount.Value : -movementAmount.Value);
+            var offset = strifeDir * (strifeRight ? agent.GetSpeed() : -agent.GetSpeed());
             Debug.DrawLine(currentPos, currentPos + offset, Color.magenta);
             agent.SetDestination(currentPos + offset);
         }

@@ -84,7 +84,8 @@ public class BotGameManager : GameManager
     protected override void UpdateGamePhase()
     {
         int passedTime = (int) (Time.time - startTime);
-        Debug.Log("Time passed: " + passedTime + " out of " + gameDuration);
+        if (Application.isBatchMode) 
+            Debug.Log("Time passed: " + passedTime + " out of " + gameDuration);
         if (gamePhase == -1)
         {
             // Disable the contenders movement and interactions, activate the ready UI, set the 

@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace AI.State
 {
-    public class Search : IState
+    public class SearchForLostEnemy : IState
     {
-        public Search(AIEntity entity)
+        public SearchForLostEnemy(AIEntity entity)
         {
             this.entity = entity;
         }
@@ -17,7 +17,7 @@ namespace AI.State
 
         public void Enter()
         {
-            externalBT = Resources.Load<ExternalBehaviorTree>("Behaviors/Search");
+            externalBT = Resources.Load<ExternalBehaviorTree>("Behaviors/SearchForLostEnemy");
             behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
             behaviorTree.StartWhenEnabled = false;
             behaviorTree.RestartWhenComplete = true;

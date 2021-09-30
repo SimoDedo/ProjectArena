@@ -11,7 +11,8 @@ namespace AI.KnowledgeBase
         private AISightSensor sightSensor;
 
         private readonly Dictionary<Pickable, float> estimatedActivationTime = new Dictionary<Pickable, float>();
-
+        private float lastUpdateTime;
+        
         public void SetupParameters(AISightSensor sightSensor)
         {
             this.sightSensor = sightSensor;
@@ -33,14 +34,20 @@ namespace AI.KnowledgeBase
             {
                 var position = pickable.gameObject.transform.position;
                 if (!sightSensor.CanSeePosition(position, Physics.AllLayers)) continue;
-                if (pickable.IsActive)
+                if (pickable.IsActive && estimatedActivationTime[pickable] > Time.time)
+                {
+                    lastUpdateTime = Time.time;
                     estimatedActivationTime[pickable] = Time.time;
+                }
                 // If we believed that the pickup was already active, then update the value to the average
                 // possible remaining time (aka cooldown / 2)
                 // Otherwise we already have an estimate on when the object will respawn, so do not make any new
                 // assumption
                 else if (estimatedActivationTime[pickable] < Time.time)
+                {
+                    lastUpdateTime = Time.time;
                     estimatedActivationTime[pickable] = Time.time + pickable.Cooldown / 2;
+                }
             }
         }
 
@@ -71,6 +78,12 @@ namespace AI.KnowledgeBase
         public void MarkConsumed(Pickable pickable)
         {
             estimatedActivationTime[pickable] = Time.time + pickable.Cooldown;
+            lastUpdateTime = Time.time;
+        }
+
+        public float GetLastUpdateTime()
+        {
+            return lastUpdateTime;
         }
     }
 }
