@@ -260,7 +260,8 @@ public class AIEntity : Entity, ILoggable
     public override void SetInGame(bool b)
     {
         if (b)
-            SetState(new Wander(this));
+            // SetState(new Wander(this));
+            SetState(new Debug_LookForHealth(this));
         else
             SetState(new Idle());
 
@@ -358,5 +359,18 @@ public class AIEntity : Entity, ILoggable
     protected override void DeactivateGun(int index)
     {
         Guns[index].Stow();
+    }
+
+    public int GetMaxHealth()
+    {
+        return totalHealth;
+    }
+
+    [SerializeField] [Range(0f, 1f)] private float healthScore;
+    [SerializeField] [Range(0f, 1f)] private float ammoScore;
+
+    public float GetHealthScore()
+    {
+        return healthScore;
     }
 }

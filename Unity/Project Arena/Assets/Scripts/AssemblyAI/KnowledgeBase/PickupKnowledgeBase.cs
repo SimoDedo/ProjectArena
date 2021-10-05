@@ -33,11 +33,17 @@ namespace AI.KnowledgeBase
             foreach (var pickable in keyList)
             {
                 var position = pickable.gameObject.transform.position;
-                if (!sightSensor.CanSeePosition(position, Physics.AllLayers)) continue;
-                if (pickable.IsActive && estimatedActivationTime[pickable] > Time.time)
+                // Let us give the bot a slightly unfair advantage: if they are close to the powerup, they
+                // know its status. This is because it would be very easy for a human to turn around and check, 
+                // but complex (to implement) in the AI of the bot.
+                if ((position - transform.position).sqrMagnitude > 4 && !sightSensor.CanSeeObject(pickable.transform, Physics.AllLayers)) continue;
+                if (pickable.IsActive)
                 {
-                    lastUpdateTime = Time.time;
-                    estimatedActivationTime[pickable] = Time.time;
+                    // if(estimatedActivationTime[pickable] > Time.time)
+                    // {
+                        lastUpdateTime = Time.time;
+                        estimatedActivationTime[pickable] = Time.time;
+                    // }  
                 }
                 // If we believed that the pickup was already active, then update the value to the average
                 // possible remaining time (aka cooldown / 2)
@@ -46,6 +52,8 @@ namespace AI.KnowledgeBase
                 else if (estimatedActivationTime[pickable] < Time.time)
                 {
                     lastUpdateTime = Time.time;
+                    // TODO IF I CAN SEE THE OBJECT BEING PICKED UP, COOLDOWN IS NOT HALVED
+                    //  HOW TO PROPERLY DETECT PICKUP IS ENEMY IS IN FRONT?
                     estimatedActivationTime[pickable] = Time.time + pickable.Cooldown / 2;
                 }
             }

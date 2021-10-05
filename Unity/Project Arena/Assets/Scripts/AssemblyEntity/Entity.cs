@@ -63,13 +63,13 @@ public abstract class Entity : MonoBehaviour
 
     // If the entity is enabled, tells if any of the weapons passed as 
     // parameters hasn't the maximum ammo.
-    public bool CanBeSupllied(bool[] suppliedGuns)
+    public bool CanBeSupplied(bool[] suppliedGuns)
     {
         if (inGame)
         {
             for (int i = 0; i < Math.Min(suppliedGuns.Length, Guns.Count); i++)
             {
-                if (suppliedGuns[i] && ActiveGuns[i] && !Guns[i].GetComponent<Gun>().IsFull())
+                if (suppliedGuns[i] && ActiveGuns[i] && !Guns[i].IsFull())
                 {
                     return true;
                 }
@@ -84,9 +84,9 @@ public abstract class Entity : MonoBehaviour
     {
         for (int i = 0; i < suppliedGuns.GetLength(0); i++)
         {
-            if (suppliedGuns[i] && ActiveGuns[i] && !Guns[i].GetComponent<Gun>().IsFull())
+            if (suppliedGuns[i] && ActiveGuns[i])
             {
-                Guns[i].GetComponent<Gun>().AddAmmo(ammoAmounts[i]);
+                Guns[i].AddAmmo(ammoAmounts[i]);
             }
         }
     }

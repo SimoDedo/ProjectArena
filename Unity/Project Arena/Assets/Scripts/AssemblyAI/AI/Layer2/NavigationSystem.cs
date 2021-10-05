@@ -45,6 +45,13 @@ namespace Entities.AI.Layer2
             return path;
         }
 
+        public NavMeshPath CalculatePath(Vector3 startPoint, Vector3 destination)
+        {
+            var path = new NavMeshPath();
+            NavMesh.CalculatePath(startPoint, destination, agent.areaMask, path);
+            return path;
+        }
+
         public NavMeshPath CalculatePath(Vector3 destination, int agentId)
         {
             var path = new NavMeshPath();
