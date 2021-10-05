@@ -13,7 +13,7 @@ public class AmmoPickable : Pickable {
     public int[] AmmoAmounts => ammoAmounts;
 
     protected override bool CanBePicked(GameObject entity) {
-        return entity.GetComponent<Entity>().CanBeSupllied(suppliedGuns);
+        return entity.GetComponent<Entity>().CanBeSupplied(suppliedGuns);
     }
 
     protected override void PickUp(GameObject entity) {

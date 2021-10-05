@@ -25,7 +25,7 @@ public abstract class Pickable : MonoBehaviour {
     {
         return type;
     }
-
+    
     // Use this for initialization
     protected void Start() {
         ActivatePickable();

@@ -1,25 +1,26 @@
 ﻿using System.Collections;
 using AssemblyLogging;
-using ScriptableObjectArchitecture;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 /// <summary>
 /// Gun is an abstract class used to implement any kind of ranged weapon.
 /// </summary>
-public abstract class Gun : MonoBehaviour, ILoggable {
-
+public abstract class Gun : MonoBehaviour, ILoggable
+{
     [Header("Objects")] [SerializeField] protected Camera headCamera;
     [SerializeField] protected GameObject muzzleFlash;
 
-    [Header("Gun parameters")] [SerializeField] protected int damage = 10;
+    [Header("Gun parameters")] [SerializeField]
+    protected int damage = 10;
+
     [SerializeField] protected float dispersion = 0f;
     [SerializeField] protected int projectilesPerShot = 1;
     [SerializeField] protected bool infinteAmmo = false;
     [SerializeField] protected int chargerSize;
     [SerializeField] protected int maximumAmmo;
     [SerializeField] protected float reloadTime = 1f;
+
     [SerializeField] protected float cooldownTime = 0.1f;
     // [SerializeField] protected GunType gunType;
 
@@ -35,10 +36,12 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     //     Shotgun,
     //     Rocket_Launcher
     // }
-    
+
     public abstract float GetProjectileSpeed();
 
-    [Header("Appearence")] [SerializeField] protected float muzzleFlashDuration = 0.05f;
+    [Header("Appearence")] [SerializeField]
+    protected float muzzleFlashDuration = 0.05f;
+
     [SerializeField] protected float recoil = 0.05f;
 
     [Header("Aim")] [SerializeField] protected bool aimEnabled = false;
@@ -48,9 +51,7 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     [SerializeField] protected Vector3 aimPosition;
     [SerializeField] protected Image aimOverlay;
 
-    [Header("UI")]
-    [SerializeField]
-    protected bool hasUI;
+    [Header("UI")] [SerializeField] protected bool hasUI;
 
     // Default ammo.
     protected int defaultAmmoInCharger;
@@ -78,6 +79,7 @@ public abstract class Gun : MonoBehaviour, ILoggable {
 
     // Is the gun being used?
     protected bool used;
+
     // Is the input enabled?
     // Gun identifier.
     protected int gunId;
@@ -87,18 +89,23 @@ public abstract class Gun : MonoBehaviour, ILoggable {
 
     public bool IsReloading => reloading;
 
-    protected void Awake() {
-        if (aimEnabled) {
+    protected void Awake()
+    {
+        if (aimEnabled)
+        {
             originalFOV = headCamera.fieldOfView;
         }
     }
 
-    protected void Update() {
-        if (used) {
-            if (reloading || coolingDown) {
+    protected void Update()
+    {
+        if (used)
+        {
+            if (reloading || coolingDown)
+            {
                 UpdateTimers();
             }
-            
+
             if (animatingAim)
             {
                 AnimateAim();
@@ -106,36 +113,45 @@ public abstract class Gun : MonoBehaviour, ILoggable {
         }
     }
 
-    protected void OnDisable() {
-        if (aimEnabled) {
+    protected void OnDisable()
+    {
+        if (aimEnabled)
+        {
             ResetAim();
         }
-        if (muzzleFlash.activeSelf) {
+
+        if (muzzleFlash.activeSelf)
+        {
             muzzleFlash.SetActive(false);
         }
     }
 
     // Allows accepting input and enables all the childrens.
-    public void Wield() {
+    public void Wield()
+    {
         SetChildrenEnabled(true);
         muzzleFlash.SetActive(false);
         used = true;
 
-        if (ammoInCharger == 0 && CanReload()) {
+        if (ammoInCharger == 0 && CanReload())
+        {
             Reload();
         }
     }
 
     // Stops reloading, stops aiming, disallows accepting input and disables all the childrens.
-    public void Stow() {
+    public void Stow()
+    {
         // When I switch guns I stop the reloading, but not the cooldown.
         reloading = false;
 
-        if (hasUI) {
+        if (hasUI)
+        {
             playerUIManagerScript.StopReloading();
         }
 
-        if (aimEnabled) {
+        if (aimEnabled)
+        {
             ResetAim();
         }
 
@@ -144,11 +160,15 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     }
 
     // Ends the reload or the cooldown phases if possible. 
-    private void UpdateTimers() {
-        if (reloading) {
-            if (Time.time > reloadStart + reloadTime) {
+    private void UpdateTimers()
+    {
+        if (reloading)
+        {
+            if (Time.time > reloadStart + reloadTime)
+            {
                 // Log if needed.
-                if (loggingGame) {
+                if (loggingGame)
+                {
                     ReloadInfoGameEvent.Instance.Raise(new ReloadInfo
                     {
                         ownerId = ownerEntityScript.GetID(),
@@ -157,25 +177,36 @@ public abstract class Gun : MonoBehaviour, ILoggable {
                         totalAmmo = totalAmmo
                     });
                 }
+
                 // Stop the reloading.
                 reloading = false;
                 // Update charger and total ammo count.
-                if (infinteAmmo) {
+                if (infinteAmmo)
+                {
                     ammoInCharger = chargerSize;
-                } else if (totalAmmo >= chargerSize - ammoInCharger) {
+                }
+                else if (totalAmmo >= chargerSize - ammoInCharger)
+                {
                     totalAmmo -= chargerSize - ammoInCharger;
                     ammoInCharger = chargerSize;
-                } else {
+                }
+                else
+                {
                     ammoInCharger = ammoInCharger + totalAmmo;
                     totalAmmo = 0;
                 }
+
                 // Set the ammo in the UI.
-                if (hasUI) {
+                if (hasUI)
+                {
                     gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
                 }
             }
-        } else if (coolingDown) {
-            if (Time.time > cooldownStart + cooldownTime) {
+        }
+        else if (coolingDown)
+        {
+            if (Time.time > cooldownStart + cooldownTime)
+            {
                 coolingDown = false;
             }
         }
@@ -183,7 +214,8 @@ public abstract class Gun : MonoBehaviour, ILoggable {
 
     // Called by player, sets references to the game manager, to the player script itself and to 
     // the player UI.
-    public void SetupGun(GameManager gms, Entity e, PlayerUIManager puims, int id) {
+    public void SetupGun(GameManager gms, Entity e, PlayerUIManager puims, int id)
+    {
         ownerEntityScript = e;
         playerUIManagerScript = puims;
 
@@ -194,14 +226,16 @@ public abstract class Gun : MonoBehaviour, ILoggable {
 
         gunId = id;
 
-        if (hasUI) {
+        if (hasUI)
+        {
             gunUIManagerScript = GetComponent<GunUIManager>();
             gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
         }
     }
 
     // Called by the opponent, sets references to the game manager and to the player script itself.
-    public void SetupGun(GameManager gms, Entity e) {
+    public void SetupGun(GameManager gms, Entity e)
+    {
         ownerEntityScript = e;
 
         playerUIManagerScript = null;
@@ -215,16 +249,19 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     }
 
     // I can reload when I have ammo left, my charger isn't full and I'm not reloading.
-    public bool CanReload() {
+    public bool CanReload()
+    {
         return (totalAmmo > 0 || infinteAmmo) && ammoInCharger < chargerSize && !reloading;
     }
 
     // I can shoot when I'm not reloading and I'm not in cooldown.
-    public bool CanShoot() {
+    public bool CanShoot()
+    {
         return !reloading && !coolingDown && ammoInCharger > 0;
     }
 
-    public bool CanAim() {
+    public bool CanAim()
+    {
         return aimEnabled;
     }
 
@@ -232,12 +269,14 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     public abstract void Shoot();
 
     // Aims.
-    public void Aim(bool aim) {
+    public void Aim(bool aim)
+    {
         aiming = aim;
         animatingAim = true;
         aimStart = Time.time;
 
-        if (!aim) {
+        if (!aim)
+        {
             EnableAimOverlay(false);
             ownerEntityScript.SlowEntity(1);
             headCamera.fieldOfView = originalFOV;
@@ -245,35 +284,45 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     }
 
     // Animates the aim.
-    protected void AnimateAim() {
-        if (aiming) {
+    protected void AnimateAim()
+    {
+        if (aiming)
+        {
             transform.localPosition = Vector3.Lerp(transform.localPosition, aimPosition,
                 (Time.time - aimStart) * 10f);
-        } else {
+        }
+        else
+        {
             transform.localPosition = Vector3.Lerp(transform.localPosition, Vector3.zero,
                 (Time.time - aimStart) * 10f);
         }
 
-        if (transform.localPosition == aimPosition && aiming) {
+        if (transform.localPosition == aimPosition && aiming)
+        {
             EnableAimOverlay(true);
             ownerEntityScript.SlowEntity(0.4f);
             headCamera.fieldOfView = originalFOV / zoom;
             animatingAim = false;
-        } else if (transform.localPosition == Vector3.zero && !aiming) {
+        }
+        else if (transform.localPosition == Vector3.zero && !aiming)
+        {
             animatingAim = false;
         }
     }
 
     // Enables or disables the aim overlay.
-    protected void EnableAimOverlay(bool enabled) {
-        if (overlayEnabled) {
+    protected void EnableAimOverlay(bool enabled)
+    {
+        if (overlayEnabled)
+        {
             weaponCamera.enabled = !enabled;
             aimOverlay.enabled = enabled;
         }
     }
 
     // Resets the aim.
-    protected void ResetAim() {
+    protected void ResetAim()
+    {
         EnableAimOverlay(false);
         headCamera.fieldOfView = originalFOV;
         transform.localPosition = Vector3.zero;
@@ -281,50 +330,62 @@ public abstract class Gun : MonoBehaviour, ILoggable {
     }
 
     // Reloads.
-    public void Reload() {
+    public void Reload()
+    {
         SetReload();
 
-        if (hasUI) {
+        if (hasUI)
+        {
             gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
             playerUIManagerScript.SetCooldown(reloadTime);
         }
     }
 
     // Starts the cooldown phase.
-    protected void SetCooldown() {
+    protected void SetCooldown()
+    {
         cooldownStart = Time.time;
         coolingDown = true;
     }
 
     // Starts the reload phase.
-    protected void SetReload() {
+    protected void SetReload()
+    {
         reloadStart = Time.time;
         reloading = true;
     }
 
     // Tells if the gun has the maximum number of ammo.
-    public bool IsFull() {
+    public bool IsFull()
+    {
         return totalAmmo == maximumAmmo || infinteAmmo;
     }
 
     // Adds ammo.
-    public void AddAmmo(int amount) {
-        if (totalAmmo + amount < maximumAmmo) {
+    public void AddAmmo(int amount)
+    {
+        if (totalAmmo + amount < maximumAmmo)
+        {
             totalAmmo += amount;
-        } else {
+        }
+        else
+        {
             totalAmmo = maximumAmmo;
         }
 
-        if (gameObject.activeSelf && hasUI) {
+        if (gameObject.activeSelf && hasUI)
+        {
             gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
-            if (used && ammoInCharger == 0 && CanReload()) {
+            if (used && ammoInCharger == 0 && CanReload())
+            {
                 Reload();
             }
         }
     }
 
     // Show muzzle flash.
-    protected IEnumerator ShowMuzzleFlash() {
+    protected IEnumerator ShowMuzzleFlash()
+    {
         // Move the gun downwards.
         transform.position = new Vector3(transform.position.x, transform.position.y + recoil,
             transform.position.z);
@@ -339,36 +400,47 @@ public abstract class Gun : MonoBehaviour, ILoggable {
             transform.position.z);
         muzzleFlash.SetActive(false);
         // Reload if needed.
-        if (ammoInCharger == 0 && CanReload()) {
+        if (ammoInCharger == 0 && CanReload())
+        {
             Reload();
         }
     }
 
     // Activates/deactivates the children objects, with the exception of muzzle flashed which must
     // always be deactivated.
-    private void SetChildrenEnabled(bool active) {
-        foreach (Transform child in transform) {
+    private void SetChildrenEnabled(bool active)
+    {
+        foreach (Transform child in transform)
+        {
             child.gameObject.SetActive(active);
         }
     }
 
     // Resets the ammo.
-    public void ResetAmmo() {
+    public void ResetAmmo()
+    {
         ammoInCharger = defaultAmmoInCharger;
         totalAmmo = defaultTotalAmmo;
 
-        if (hasUI) {
+        if (hasUI)
+        {
             gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
         }
     }
-    
+
     // Setups stuff for the loggingGame.
-    public void SetupLogging() {
+    public void SetupLogging()
+    {
         loggingGame = true;
     }
 
-    public int GetAmmo()
+    public int GetCurrentAmmo()
     {
         return totalAmmo;
+    }
+
+    public int GetMaxAmmo()
+    {
+        return maximumAmmo;
     }
 }

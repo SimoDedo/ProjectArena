@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Accord.Math.Geometry;
 using BehaviorDesigner.Runtime.Tasks;
 using Entities.AI.Controller;
 using Entities.AI.Layer1.Sensors;
@@ -19,28 +20,35 @@ namespace AI.Behaviours.NewBehaviours
         private AIMovementController movementController;
         private AISightController sightController;
         private AIEntity.CuriosityLevel curiosity;
-        private bool mustFindLookPoint;
         private Vector3 lookPoint;
+        private float nextUpdateTime;
+        private float maxAngle;
+        private List<AngleScore> myValidAngles = new List<AngleScore>();
 
         public override void OnAwake()
         {
             sightController = GetComponent<AISightController>();
             movementController = GetComponent<AIMovementController>();
             curiosity = GetComponent<AIEntity>().GetCuriosity();
-        }
+            nextUpdateTime = float.MinValue;
 
-        public override void OnStart()
-        {
-            mustFindLookPoint = true;
+            foreach (var angleScore in angleScores)
+            {
+                if (curiosity >= angleScore.minLevel && (!focused || angleScore.allowedIfFocused))
+                {
+                    maxAngle = Mathf.Max(maxAngle, Mathf.Abs(angleScore.angle));
+                    myValidAngles.Add(angleScore);
+                }
+            }
         }
 
         public override TaskStatus OnUpdate()
         {
-            var realForward = movementController.GetVelocity().normalized;
+            var realForward = GetMovementDirection();
             var angleX = 0f;
-
-            if (mustFindLookPoint || Physics.Raycast(transform.position, transform.forward, THRESHOLD))
+            if (MustUpdate())
             {
+                UpdateNextUpdateTime();
                 // TODO Agent is not moving, have it slowly look around?
                 // if (realForward == Vector3.zero)
                 // {
@@ -54,19 +62,16 @@ namespace AI.Behaviours.NewBehaviours
                 var scores = new List<float>();
                 var up = transform.up;
 
-                foreach (var angleScore in angleScores)
+                foreach (var angleScore in myValidAngles)
                 {
-                    if (curiosity >= angleScore.minLevel && (!focused || angleScore.allowedIfFocused))
-                    {
-                        var direction = Quaternion.AngleAxis(angleScore.angle, up) * realForward;
-                        var distance =
-                            Physics.Raycast(transform.position, direction, out var hit, float.PositiveInfinity)
-                                ? hit.distance
-                                : float.PositiveInfinity;
-                        distance = Mathf.Clamp(distance, 0, 50);
-                        scores.Add(distance * distance / 2500 * angleScore.score);
-                        angles.Add(angleScore.angle);
-                    }
+                    var direction = Quaternion.AngleAxis(angleScore.angle, up) * realForward;
+                    var distance =
+                        Physics.Raycast(transform.position, direction, out var hit, float.PositiveInfinity)
+                            ? hit.distance
+                            : float.PositiveInfinity;
+                    distance = Mathf.Clamp(distance, 0, 50);
+                    scores.Add(distance * distance / 2500 * angleScore.score);
+                    angles.Add(angleScore.angle);
                 }
 
                 var scoreSum = scores.Sum();
@@ -95,11 +100,33 @@ namespace AI.Behaviours.NewBehaviours
             }
 
             sightController.LookAtPoint(lookPoint, 0.3f);
-            mustFindLookPoint = false;
             return TaskStatus.Running;
         }
 
+        private Vector3 GetMovementDirection()
+        {
+            return movementController.GetVelocity().normalized;
+        }
+
+        private bool MustUpdate()
+        {
+            var position = transform.position;
+            var lookDirection = lookPoint - position;
+            var movementDirection = GetMovementDirection();
+
+            var angle = Mathf.Abs(Vector3.Angle(lookDirection, movementDirection));
+            return angle > maxAngle || nextUpdateTime < Time.time ||
+                   Physics.Raycast(position, transform.forward, THRESHOLD);
+        }
+
+        private void UpdateNextUpdateTime()
+        {
+            nextUpdateTime = Time.time + Random.Range(MIN_UPDATE_TIME, MAX_UPDATE_TIME);
+        }
+
         private const float THRESHOLD = 10f;
+        private const float MIN_UPDATE_TIME = 0.3f;
+        private const float MAX_UPDATE_TIME = 0.8f;
 
         private struct AngleScore
         {

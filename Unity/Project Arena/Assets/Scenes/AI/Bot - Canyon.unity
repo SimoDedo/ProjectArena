@@ -697,7 +697,7 @@ PrefabInstance:
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
       propertyPath: curiosity
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}

@@ -34,7 +34,7 @@ namespace AI.State
                 // TODO personality of AIEntity
                 if (entity.ShouldLookForHealth())
                 {
-                    entity.SetState(new LookForHealth(entity));
+                    entity.SetState(new LookForPickups(entity));
                     return;
                 }
 

@@ -61,7 +61,7 @@ public class AIEntity : Entity, ILoggable
     // Time of the last position log.
     private float lastPositionLog;
 
-    public int health;
+    [SerializeField] private int health;
     public override int Health { get => health; protected set => health = value; }
 
     private AIMovementController movementController;
@@ -233,6 +233,7 @@ public class AIEntity : Entity, ILoggable
         return TrySwitchGuns(currentGun, index);
     }
 
+    // TODO Do not allow direct usage of Gun, create interface or new GunHandlingComponent
     public Gun GetCurrentGun()
     {
         return Guns[currentGun];
@@ -358,5 +359,25 @@ public class AIEntity : Entity, ILoggable
     protected override void DeactivateGun(int index)
     {
         Guns[index].Stow();
+    }
+
+    public int GetMaxHealth()
+    {
+        return totalHealth;
+    }
+
+    [SerializeField] [Range(0f, 1f)] private float healthScore;
+    [SerializeField] [Range(0f, 1f)] private float ammoScore;
+
+    public float GetHealthScore()
+    {
+        return healthScore;
+    }
+
+    // If any ammo is less than 50% capacity
+    public bool ShouldLookForAmmo()
+    {
+        return Guns.Where(gun => gun.isActiveAndEnabled)
+            .Any(gun => gun.GetCurrentAmmo() < gun.GetMaxAmmo() / 2);
     }
 }

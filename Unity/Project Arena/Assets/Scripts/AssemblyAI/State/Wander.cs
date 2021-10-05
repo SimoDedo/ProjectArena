@@ -31,8 +31,8 @@ namespace AI.State
         {
             if (entity.CanSeeEnemy())
                 entity.SetState(new Fight(entity));
-            else if (entity.ShouldLookForHealth())
-                entity.SetState(new LookForHealth(entity));
+            else if (entity.ShouldLookForHealth() || entity.ShouldLookForAmmo())
+                entity.SetState(new LookForPickups(entity));
             else if (entity.HasTakenDamage())
                 entity.SetState(new SearchForLostEnemy(entity));
             else
