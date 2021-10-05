@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using Utils;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
+using Debug = System.Diagnostics.Debug;
 
 namespace AssemblyAI.Behaviours.NewBehaviours.Actions
 {
@@ -35,21 +36,6 @@ namespace AssemblyAI.Behaviours.NewBehaviours.Actions
             agentSpeed = navSystem.GetSpeed();
             isFirstTime = true;
         }
-        
-        public override void OnEnd()
-        {
-            base.OnEnd();
-        }
-
-        public override void OnBehaviorComplete()
-        {
-            base.OnBehaviorComplete();
-        }
-
-        public override void OnBehaviorRestart()
-        {
-            base.OnBehaviorRestart();
-        }
 
         public override TaskStatus OnUpdate()
         {
@@ -58,26 +44,20 @@ namespace AssemblyAI.Behaviours.NewBehaviours.Actions
                 return TaskStatus.Running;
 
             lastKBUpdateTime = kbUpdateTime;
-            
+
             // Plan: find pickable which has the best score, calculated from:
             // - Value that this item gives me;
             // - Distance required to reach it;
             // - Time required to reach it;
             // - Amount of pickups nearby the chosen one.
-            var healthPickables = knowledgeBase.GetPickupKnowledgeForType(Pickable.PickupType.MEDKIT);
+            var pickables = knowledgeBase.GetPickupKnowledge();
             var bestScore = float.MinValue;
             Pickable bestPickup = null;
             NavMeshPath pathToBestPickup = null;
             var bestPickupActivationTime = 0f;
-            foreach (var entry in healthPickables)
+            foreach (var entry in pickables)
             {
-                var pickup = entry.Key as MedkitPickable;
-                if (pickup == null)
-                {
-                    Debug.LogWarning("Pickup reported as medkit but it is not of the correct class!");
-                    continue;
-                }
-
+                var pickup = entry.Key;
                 var activationTime = entry.Value;
                 var pickupPosition = pickup.transform.position;
 
@@ -89,16 +69,33 @@ namespace AssemblyAI.Behaviours.NewBehaviours.Actions
                 // CAN BE NEGATIVE, not necessarily a good thing
                 var waitTime = activationTime - estimatedArrival;
 
-                var valueScore = ScoreMedkit(entity.health, entity.GetMaxHealth(), pickup.RestoredHealth);
-                var distanceScore = ScoreDistance(pathLength);
-                var timeScore = ScoreTime(waitTime);
-                var neighborhoodScore = ScoreNeighborhood(pickup, healthPickables);
+                var distanceScore = ScoreDistance(pathLength) * DISTANCE_MODIFIER;
+                var timeScore = ScoreTime(waitTime) * TIME_MODIFIER;
+                var neighborhoodScore = ScoreNeighborhood(pickup, pickables) * NEIGHBORHOOD_MODIFIER;
 
-                var pickupTotalScore =
-                    valueScore * VALUE_MODIFIER +
-                    distanceScore * DISTANCE_MODIFIER +
-                    timeScore * TIME_MODIFIER +
-                    neighborhoodScore * NEIGHBORHOOD_MODIFIER;
+                float valueScore;
+
+                switch (pickup.GetPickupType())
+                {
+                    case Pickable.PickupType.MEDKIT:
+                    {
+                        var medkit = pickup as MedkitPickable;
+                        Debug.Assert(medkit != null, nameof(medkit) + " != null");
+                        valueScore = ScoreMedkit(medkit) * VALUE_MODIFIER;
+                        break;
+                    }
+                    case Pickable.PickupType.AMMO:
+                    {
+                        var ammoCrate = pickup as AmmoPickable;
+                        Debug.Assert(ammoCrate != null, nameof(ammoCrate) + " != null");
+                        valueScore = ScoreAmmoCrate(ammoCrate) * VALUE_MODIFIER;
+                        break;
+                    }
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                var pickupTotalScore = valueScore + distanceScore + timeScore + neighborhoodScore;
 
                 if (pickupTotalScore > bestScore)
                 {
@@ -126,12 +123,40 @@ namespace AssemblyAI.Behaviours.NewBehaviours.Actions
             return TaskStatus.Running;
         }
 
-        private float ScoreMedkit(float currentHealth, float totalHealth, float pickupHealth)
+        private float ScoreAmmoCrate(AmmoPickable pickable)
+        {
+            const float AMMO_NECESSITY_WEIGHT = 0.8f;
+            var guns = entity.GetGuns();
+            var maxGunIndex = Mathf.Min(pickable.AmmoAmounts.Length, guns.Count);
+
+            var totalCrateScore = 0f;
+
+            for (var i = 0; i < maxGunIndex; i++)
+            {
+                var currentGun = guns[i];
+                var pickupAmmo = pickable.AmmoAmounts[i];
+                var maxAmmo = currentGun.GetMaxAmmo();
+                var currentAmmo = currentGun.GetCurrentAmmo();
+
+                var recoveredAmmo = Mathf.Min(pickupAmmo, maxAmmo - currentAmmo);
+                var ammoCrateValue = (1 - AMMO_NECESSITY_WEIGHT) * recoveredAmmo / maxAmmo;
+                var ammoCrateWant = AMMO_NECESSITY_WEIGHT * (maxAmmo - currentAmmo) / maxAmmo;
+
+                totalCrateScore += ammoCrateValue + ammoCrateWant;
+            }
+
+            return totalCrateScore;
+        }
+
+        private float ScoreMedkit(MedkitPickable pickable)
         {
             const float MEDKIT_NECESSITY_WEIGHT = 0.8f;
-            var recoveredHealth = Mathf.Min(pickupHealth, totalHealth - currentHealth);
-            var medkitHealValue = (1 - MEDKIT_NECESSITY_WEIGHT) * recoveredHealth / totalHealth;
-            var medkitWant = MEDKIT_NECESSITY_WEIGHT * (totalHealth - currentHealth) / totalHealth;
+            var pickupHealth = pickable.RestoredHealth;
+            var maxHealth = entity.GetMaxHealth();
+            var currentHealth = entity.Health;
+            var recoveredHealth = Mathf.Min(pickupHealth, maxHealth - currentHealth);
+            var medkitHealValue = (1 - MEDKIT_NECESSITY_WEIGHT) * recoveredHealth / maxHealth;
+            var medkitWant = MEDKIT_NECESSITY_WEIGHT * (maxHealth - currentHealth) / maxHealth;
             return medkitHealValue + medkitWant;
         }
 
@@ -193,6 +218,5 @@ namespace AssemblyAI.Behaviours.NewBehaviours.Actions
         private const float DISTANCE_MODIFIER = 1f;
         private const float TIME_MODIFIER = 3f;
         private const float NEIGHBORHOOD_MODIFIER = 1f;
-
     }
 }

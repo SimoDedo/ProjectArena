@@ -91,6 +91,17 @@ public abstract class Entity : MonoBehaviour
         }
     }
 
+    public int GetTotalAmmoForGun(int index)
+    {
+        return Guns[index].GetCurrentAmmo();
+    }
+
+    public int GetMaxAmmoForGun(int index)
+    {
+        return Guns[index].GetMaxAmmo();
+    }
+
+
     // Sets if the entity is in game, i.e. if it can move, shoot, interact
     // with object and be hitten.
     public abstract void SetInGame(bool b);

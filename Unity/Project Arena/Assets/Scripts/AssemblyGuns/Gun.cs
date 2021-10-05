@@ -434,8 +434,13 @@ public abstract class Gun : MonoBehaviour, ILoggable
         loggingGame = true;
     }
 
-    public int GetAmmo()
+    public int GetCurrentAmmo()
     {
         return totalAmmo;
+    }
+
+    public int GetMaxAmmo()
+    {
+        return maximumAmmo;
     }
 }

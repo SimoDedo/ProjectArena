@@ -32,7 +32,7 @@ namespace AI.State
             if (entity.CanSeeEnemy())
                 entity.SetState(new Fight(entity));
             else if (entity.ShouldLookForHealth())
-                entity.SetState(new LookForHealth(entity));
+                entity.SetState(new LookForPickups(entity));
             else if (entity.ReachedSearchTimeout(startTimeSearch))
                 entity.SetState(new Wander(entity));
             else

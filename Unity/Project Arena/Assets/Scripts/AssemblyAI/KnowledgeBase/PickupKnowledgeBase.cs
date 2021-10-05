@@ -82,6 +82,14 @@ namespace AI.KnowledgeBase
                 .Where(it => it.Key.GetPickupType() == type)
                 .ToDictionary(pair => pair.Key, pair => pair.Value);
         }
+        
+        public Dictionary<Pickable, float> GetPickupKnowledge()
+        {
+            // TODO Is this a copy or a reference of the dictionary?
+            return estimatedActivationTime
+                // .ToDictionary(pair => pair.Key, pair => pair.Value)
+                ;
+        }
 
         public void MarkConsumed(Pickable pickable)
         {

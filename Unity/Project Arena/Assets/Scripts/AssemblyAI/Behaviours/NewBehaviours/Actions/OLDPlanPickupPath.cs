@@ -40,7 +40,7 @@ namespace AssemblyAI.Behaviours.NewBehaviours.Actions
             var availablePickups = new List<bool>(pickups.Select(it => true));
 
             // TODO Ammo retrieval from entity
-            var (_, pickup) = Recurse(pickups, availablePickups, 1, entity.health, null, transform.position, Time.time);
+            var (_, pickup) = Recurse(pickups, availablePickups, 1, entity.Health, null, transform.position, Time.time);
 
             chosenPath.Value = navSystem.CalculatePath(pickup.transform.position);
             return TaskStatus.Success;
