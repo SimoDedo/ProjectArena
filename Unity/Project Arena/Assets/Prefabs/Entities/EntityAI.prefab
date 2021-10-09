@@ -594,9 +594,11 @@ MonoBehaviour:
   health: 0
   movementSkill: 0.5
   curiosity: 0
-  premonition: 0.5
-  enemy: {fileID: 1128226087601874}
+  predictionSkill: 0.5
+  enemy: {fileID: 0}
   aimingSkill: 0.5
+  healthScore: 0
+  ammoScore: 0
 --- !u!114 &5647456198230708602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2027,7 +2029,7 @@ MonoBehaviour:
   damage: 15
   dispersion: 0
   projectilesPerShot: 1
-  infinteAmmo: 1
+  infinteAmmo: 0
   chargerSize: 32
   maximumAmmo: 120
   reloadTime: 1
