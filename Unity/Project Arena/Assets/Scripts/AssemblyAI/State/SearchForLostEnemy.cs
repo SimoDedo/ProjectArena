@@ -1,7 +1,8 @@
+using System.Collections.Generic;
 using BehaviorDesigner.Runtime;
 using UnityEngine;
 
-namespace AI.State
+namespace AssemblyAI.State
 {
     public class SearchForLostEnemy : IState
     {
@@ -9,12 +10,22 @@ namespace AI.State
         {
             this.entity = entity;
         }
-
+    
         private AIEntity entity;
         private ExternalBehaviorTree externalBT;
         private BehaviorTree behaviorTree;
-        private float startTimeSearch;
+        private List<IState> outgoingStates = new List<IState>();
 
+        public float CalculateTransitionScore()
+        {
+            if (entity.GetEnemy().isAlive && !entity.CanSeeEnemy())
+            {
+                // TODO calculate based on health and ammo available? No, simply do not give max score!
+                //  Also add a penalty term the longer the search is going on
+                return 0.7f;
+            }
+            return 0f;
+        }
         public void Enter()
         {
             externalBT = Resources.Load<ExternalBehaviorTree>("Behaviors/SearchForLostEnemy");
@@ -24,21 +35,32 @@ namespace AI.State
             behaviorTree.ExternalBehavior = externalBT;
             behaviorTree.EnableBehavior();
             BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
-            startTimeSearch = Time.time;
+                
+            outgoingStates.Add(new Wander(entity));
+            outgoingStates.Add(new LookForPickups(entity));
+            outgoingStates.Add(new Fight(entity));
         }
-
+    
         public void Update()
         {
-            if (entity.CanSeeEnemy())
-                entity.SetState(new Fight(entity));
-            else if (entity.ShouldLookForHealth())
-                entity.SetState(new LookForPickups(entity));
-            else if (entity.ReachedSearchTimeout(startTimeSearch))
-                entity.SetState(new Wander(entity));
+            var bestScore = CalculateTransitionScore();
+            IState bestState = null;
+            foreach (var state in outgoingStates)
+            {
+                var score = state.CalculateTransitionScore();
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    bestState = state;
+                }
+            }
+
+            if (bestState != null)
+                entity.SetNewState(bestState);
             else
                 BehaviorManager.instance.Tick(behaviorTree);
         }
-
+    
         public void Exit()
         {
             Resources.UnloadAsset(externalBT);

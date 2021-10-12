@@ -4,28 +4,30 @@ using UnityEngine;
 
 namespace AssemblyAI.State
 {
-    public class Fight : IState
+    // TODO This for now is exactly like SearchForLostEnemy, but with different transition
+    public class SearchForDamageSource : IState
     {
-        public Fight(AIEntity entity)
+        public SearchForDamageSource(AIEntity entity)
         {
             this.entity = entity;
         }
-
-        public float CalculateTransitionScore()
-        {
-            // TODO maybe we see enemy, but we want to run away?
-            var canSee = entity.CanSeeEnemy();
-            return canSee ? 0.95f : 0.0f;
-        }
-
+    
         private AIEntity entity;
         private ExternalBehaviorTree externalBT;
         private BehaviorTree behaviorTree;
         private List<IState> outgoingStates = new List<IState>();
 
+        public float CalculateTransitionScore()
+        {
+            if (entity.GetEnemy().isAlive && entity.HasTakenDamageRecently())
+            {
+                return 0.7f;
+            }
+            return 0f;
+        }
         public void Enter()
         {
-            externalBT = Resources.Load<ExternalBehaviorTree>("Behaviors/Fight");
+            externalBT = Resources.Load<ExternalBehaviorTree>("Behaviors/SearchForLostEnemy");
             behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
             behaviorTree.StartWhenEnabled = false;
             behaviorTree.RestartWhenComplete = true;
@@ -34,8 +36,8 @@ namespace AssemblyAI.State
             BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
                 
             outgoingStates.Add(new Wander(entity));
-            outgoingStates.Add(new SearchForLostEnemy(entity));
             outgoingStates.Add(new LookForPickups(entity));
+            outgoingStates.Add(new Fight(entity));
         }
     
         public void Update()

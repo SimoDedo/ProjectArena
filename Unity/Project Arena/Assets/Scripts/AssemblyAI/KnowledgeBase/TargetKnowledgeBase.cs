@@ -27,25 +27,20 @@ namespace AI.KnowledgeBase
         private float reactionTime;
 
         /// <summary>
-        /// Consecutive time that the enemy must be seen or not seen before declaring that we can
-        /// detected it or have lost it.
+        /// Total time (in the memory window) that the enemy must be seen or not seen before declaring that
+        /// we can detect it or have lost it.
         /// </summary>
-        private float consecutiveTimeBeforeReaction;
-
-        /// <summary>
-        /// The time I have last detected or loss sight of the enemy
-        /// </summary>
-        private float lastEventTime;
-
+        private float nonConsecutiveTimeBeforeReaction;
+        
         private List<VisibilityData> results = new List<VisibilityData>();
 
         public void SetParameters(AISightSensor sensor, Entity target, float memoryWindow,
-            float consecutiveTimeBeforeReaction, float reactionTime)
+            float nonConsecutiveTimeBeforeReaction, float reactionTime)
         {
             this.target = target;
             this.sensor = sensor;
             this.memoryWindow = memoryWindow;
-            this.consecutiveTimeBeforeReaction = consecutiveTimeBeforeReaction;
+            this.nonConsecutiveTimeBeforeReaction = nonConsecutiveTimeBeforeReaction;
             this.reactionTime = reactionTime;
         }
 
@@ -86,49 +81,44 @@ namespace AI.KnowledgeBase
         }
 
 
-        public bool CanReactToTarget()
+        public bool HasSeenTarget()
         {
             //Force updating since the enemy might have changed position since this component last update
             // or update might not have been called yet
             Update();
 
-            return TestDetection(true);
+            return TestDetection();
         }
 
-        public bool HasLostTarget()
+        private bool TestDetection()
         {
-            //Force updating since the enemy might have changed position since this component last update
-            // or update might not have been called yet
-            Update();
-
-            return TestDetection(false);
-        }
-
-        private bool TestDetection(bool expectingVisible)
-        {
-            var beginWindow = lastEventTime;
+            var beginWindow = Time.time - memoryWindow;
             var endWindow = Time.time - reactionTime;
-            var totalTimeVisibleAsExpected = 0f;
+            var totalTimeVisible = 0f;
+            var totalTimeNotVisible = 0f;
 
-            foreach (var t in results)
+            for (var i = results.Count - 1; i >= 0; i--)
             {
+                var t = results[i];
                 if (t.endTime < beginWindow) continue;
                 if (t.startTime > endWindow) continue;
 
-                if (t.isVisibile == expectingVisible)
+                var windowLenght = Math.Min(t.endTime, endWindow) -
+                                   Math.Max(t.startTime, beginWindow);
+
+                if (t.isVisibile)
                 {
-                    totalTimeVisibleAsExpected += Math.Min(t.endTime, endWindow) -
-                                                  Math.Max(t.startTime, beginWindow);
+                    totalTimeVisible += windowLenght;
+                    if (totalTimeVisible > nonConsecutiveTimeBeforeReaction)
+                        return true;
+                }
+                else
+                {
+                    totalTimeNotVisible += windowLenght;
+                    if (totalTimeNotVisible > nonConsecutiveTimeBeforeReaction)
+                        return false;
                 }
             }
-
-            if (totalTimeVisibleAsExpected > consecutiveTimeBeforeReaction)
-            {
-                Debug.Log("Target was detected? " + expectingVisible);
-                lastEventTime = endWindow;
-                return true;
-            }
-
             return false;
         }
 

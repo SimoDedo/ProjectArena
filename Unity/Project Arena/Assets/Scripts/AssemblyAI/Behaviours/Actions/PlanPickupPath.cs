@@ -143,7 +143,7 @@ namespace AssemblyAI.Behaviours.NewBehaviours.Actions
                 totalCrateScore += ammoCrateValue + ammoCrateWant;
             }
 
-            return totalCrateScore;
+            return totalCrateScore / maxGunIndex;
         }
 
         private float ScoreMedkit(MedkitPickable pickable)

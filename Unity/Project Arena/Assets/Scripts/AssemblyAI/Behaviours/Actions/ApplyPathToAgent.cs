@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using AssemblyAI.Behaviours.Variables;
 using BehaviorDesigner.Runtime.Tasks;
 using Entities.AI.Layer2;
@@ -21,6 +22,7 @@ namespace AssemblyAI.Behaviours.Actions
 
         public override TaskStatus OnUpdate()
         {
+            Debug.DrawLine(transform.position, pathToApply.Value.corners.Last(), Color.magenta);
             return navSystem.HasArrivedToDestination() ? TaskStatus.Success : TaskStatus.Running;
         }
     }
