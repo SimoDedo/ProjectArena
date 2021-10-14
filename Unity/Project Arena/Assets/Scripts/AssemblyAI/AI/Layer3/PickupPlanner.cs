@@ -160,10 +160,12 @@ namespace AI.AI.Layer3
             var maxGunIndex = Mathf.Min(pickable.AmmoAmounts.Length, guns.Count);
 
             var totalCrateScore = 0f;
-
+            var totalActiveGuns = 0;
             for (var i = 0; i < maxGunIndex; i++)
             {
                 var currentGun = guns[i];
+                if (!currentGun.isActiveAndEnabled) continue;
+                totalActiveGuns++;
                 var pickupAmmo = pickable.AmmoAmounts[i];
                 var maxAmmo = currentGun.GetMaxAmmo();
                 var currentAmmo = currentGun.GetCurrentAmmo();
@@ -175,7 +177,7 @@ namespace AI.AI.Layer3
                 totalCrateScore += ammoCrateValue + ammoCrateWant;
             }
 
-            return totalCrateScore / maxGunIndex;
+            return totalCrateScore / totalActiveGuns;
         }
 
         private float ScoreMedkit(MedkitPickable pickable)

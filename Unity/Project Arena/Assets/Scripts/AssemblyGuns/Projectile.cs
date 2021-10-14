@@ -15,9 +15,12 @@ public abstract class Projectile : MonoBehaviour {
     protected float damage;
     protected int shooterID;
 
+    public int ShooterID => shooterID;
+    
     private void Update() {
         if (shot) {
-            transform.position += transform.forward * Time.deltaTime * projectileSpeed;
+            var t = transform;
+            t.position += t.forward * (Time.deltaTime * projectileSpeed);
 
             if (Time.time > shotTime + projectileLifeTime) {
                 Recover();

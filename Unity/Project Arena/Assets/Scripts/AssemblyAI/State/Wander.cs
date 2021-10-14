@@ -30,9 +30,9 @@ namespace AssemblyAI.State
             behaviorTree.EnableBehavior();
             BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
 
-            // outgoingStates.Add(new Fight(entity)); 
-            // outgoingStates.Add(new LookForPickups(entity)); 
-            // outgoingStates.Add(new SearchForDamageSource(entity)); 
+            outgoingStates.Add(new Fight(entity)); 
+            outgoingStates.Add(new LookForPickups(entity)); 
+            outgoingStates.Add(new SearchForDamageSource(entity)); 
         }
 
         public void Update()

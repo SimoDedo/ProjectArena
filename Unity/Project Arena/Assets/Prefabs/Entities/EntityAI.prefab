@@ -581,8 +581,8 @@ MonoBehaviour:
   totalHealth: 0
   disabledLayer: 0
   speed: 16
-  acceleration: 100
-  angularSpeed: 10
+  acceleration: 1000000
+  angularSpeed: 1000000
   head: {fileID: 1523818027142824}
   fov: 60
   maxRange: 100
@@ -592,13 +592,11 @@ MonoBehaviour:
   reactionTime: 0.1
   timeBeforeCanReact: 0.1
   health: 0
-  movementSkill: 0.5
+  movementSkill: 0
   curiosity: 0
   predictionSkill: 0.5
   enemy: {fileID: 0}
   aimingSkill: 0.5
-  healthScore: 0
-  ammoScore: 0
 --- !u!114 &5647456198230708602
 MonoBehaviour:
   m_ObjectHideFlags: 0

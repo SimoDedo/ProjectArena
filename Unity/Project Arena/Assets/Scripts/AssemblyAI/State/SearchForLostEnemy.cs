@@ -15,14 +15,16 @@ namespace AssemblyAI.State
         private ExternalBehaviorTree externalBT;
         private BehaviorTree behaviorTree;
         private List<IState> outgoingStates = new List<IState>();
+        private float startSearchTime = float.NaN;
 
         public float CalculateTransitionScore()
         {
             if (entity.GetEnemy().isAlive && !entity.CanSeeEnemy())
             {
-                // TODO calculate based on health and ammo available? No, simply do not give max score!
-                //  Also add a penalty term the longer the search is going on
-                return 0.7f;
+                if (float.IsNaN(startSearchTime))
+                    return 0.7f;
+                // Slowly decrease want to search. After 5 secs, it's zero
+                return 1f - (Time.time - startSearchTime) / 5f;
             }
             return 0f;
         }
@@ -35,7 +37,7 @@ namespace AssemblyAI.State
             behaviorTree.ExternalBehavior = externalBT;
             behaviorTree.EnableBehavior();
             BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
-                
+            startSearchTime = Time.time;
             outgoingStates.Add(new Wander(entity));
             outgoingStates.Add(new LookForPickups(entity));
             outgoingStates.Add(new Fight(entity));

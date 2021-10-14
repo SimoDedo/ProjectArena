@@ -69,7 +69,7 @@ public abstract class GameManager : CoreComponent, ILoggable
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         
-        LoadNextScene("Menu");
+        LoadNextScene("Exit");
     }
 
     // Loads the next scene

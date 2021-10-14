@@ -2,6 +2,7 @@ using System;
 using Accord.Statistics.Distributions.Univariate;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
+using BehaviorDesigner.Runtime.Tasks.Unity.Math;
 using Entities.AI.Controller;
 using Entities.AI.Layer1.Sensors;
 using Entities.AI.Layer2;
@@ -25,7 +26,10 @@ namespace AssemblyAI.Behaviours.Actions
         private Gun gun;
 
         private NormalDistribution distribution;
-        private float reflexDelay;
+        private float previousReflexDelay;
+        private float targetReflexDelay;
+        private float nextDelayRecalculation = float.MinValue;
+        private const float UPDATE_INTERVAL = 0.5f;
 
         public override void OnAwake()
         {
@@ -41,6 +45,7 @@ namespace AssemblyAI.Behaviours.Actions
             var mean = 0.4f - 0.6f * skill; // [-0.2, 0.4]
             var stdDev = 0.3f - 0.1f * skill; // [0.2, 0.3]
             distribution = new NormalDistribution(mean, stdDev);
+            targetReflexDelay = (float) distribution.Generate();
         }
 
         public override void OnStart()
@@ -48,24 +53,29 @@ namespace AssemblyAI.Behaviours.Actions
             // TODO check this is called at the right time
             entity.EquipGun(chosenGunIndex.Value);
             gun = entity.GetCurrentGun();
-            reflexDelay = (float) distribution.Generate();
         }
 
         public override TaskStatus OnUpdate()
         {
-            var (position, velocity) = enemyPositionTracker.GetPositionAndVelocityFromDelay(reflexDelay);
-
-            if (!gun.CanShoot())
+            if (nextDelayRecalculation <= Time.time)
             {
-                sightController.LookAtPoint(position);
-                return TaskStatus.Running;
+                previousReflexDelay = targetReflexDelay;
+                targetReflexDelay = (float) distribution.Generate();
+                nextDelayRecalculation = Time.time + UPDATE_INTERVAL;
             }
+            
+            var currentDelay = 
+                previousReflexDelay + (targetReflexDelay - previousReflexDelay) * 
+                (Time.time - (nextDelayRecalculation - UPDATE_INTERVAL)) / UPDATE_INTERVAL;
 
+            var (position, velocity) = enemyPositionTracker.GetPositionAndVelocityFromDelay(currentDelay);
+            
             float angle;
             var projectileSpeed = gun.GetProjectileSpeed();
             if (float.IsPositiveInfinity(projectileSpeed))
             {
                 angle = sightController.LookAtPoint(position);
+                sightController.LookAtPoint(position);
             }
             else
             {
@@ -106,7 +116,7 @@ namespace AssemblyAI.Behaviours.Actions
                 angle = sightController.LookAtPoint(chosenPoint);
             }
 
-            if (angle < 40)
+            if (angle < 10 && gun.CanShoot())
                 gun.Shoot();
 
 

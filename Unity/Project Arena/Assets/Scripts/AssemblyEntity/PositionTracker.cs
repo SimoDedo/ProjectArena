@@ -80,8 +80,8 @@ public class PositionTracker : MonoBehaviour
             (positions[positions.Count - 1].Item1 - positions[positions.Count - 2].Item1) /
             (positions[positions.Count - 1].Item2 - positions[positions.Count - 2].Item2);
 
-        Debug.Log("Difference between actual velocity and estimated velocity is "
-                  + (actualVelocity - smoothedVelocity).magnitude + "!");
+        // Debug.Log("Difference between actual velocity and estimated velocity is "
+        //           + (actualVelocity - smoothedVelocity).magnitude + "!");
 
         return new Tuple<Vector3, Vector3>(interpolatedPos, smoothedVelocity);
     }

@@ -22,7 +22,7 @@ namespace AssemblyAI.Behaviours.Actions
 
         public override TaskStatus OnUpdate()
         {
-            Debug.DrawLine(transform.position, pathToApply.Value.corners.Last(), Color.magenta);
+            // Debug.DrawLine(transform.position, pathToApply.Value.corners.Last(), Color.magenta);
             return navSystem.HasArrivedToDestination() ? TaskStatus.Success : TaskStatus.Running;
         }
     }

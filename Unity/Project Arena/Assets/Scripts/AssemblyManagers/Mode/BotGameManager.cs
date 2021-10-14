@@ -111,7 +111,7 @@ public class BotGameManager : GameManager
         }
         else if (gamePhase == 1 && passedTime >= readyDuration + gameDuration)
         {
-            Debug.Log("In fase score");
+            Debug.Log("Final score: " + playerKillCount+ ", " + opponentKillCount);
             // Disable the contenders movement and interactions, activate the score UI, set the 
             // winner and set the phase.
             firstAI.SetInGame(false);

@@ -295,6 +295,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1553194458}
   - component: {fileID: 1553194457}
+  - component: {fileID: 1553194459}
   m_Layer: 0
   m_Name: Logger
   m_TagString: Untagged
@@ -330,6 +331,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1553194459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1553194456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cb542b1da60dd019ef0c51bdd1a244, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1628934860
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -362,6 +375,10 @@ PrefabInstance:
       value: EntityAI2
       objectReference: {fileID: 0}
     - target: {fileID: 1128226087601874, guid: 87c5267e1886311258a6f48dac81a1ca, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1417367129215238, guid: 87c5267e1886311258a6f48dac81a1ca, type: 3}
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
@@ -409,6 +426,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114128907697292602, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: infinteAmmo
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114191837528411164, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: infinteAmmo
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114286380553423094, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: infinteAmmo
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114718352753251754, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: infinteAmmo
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 900814110758346002, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
       propertyPath: m_IsActive
@@ -432,7 +469,7 @@ PrefabInstance:
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
       propertyPath: aimingSkill
-      value: 0.336
+      value: 0.35
       objectReference: {fileID: 0}
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
@@ -442,12 +479,12 @@ PrefabInstance:
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
       propertyPath: movementSkill
-      value: 0.937
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
       propertyPath: predictionSkill
-      value: 0.745
+      value: 0.75
       objectReference: {fileID: 0}
     - target: {fileID: 6069983894062413340, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
@@ -643,7 +680,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1417367129215238, guid: 87c5267e1886311258a6f48dac81a1ca, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4921396627691554, guid: 87c5267e1886311258a6f48dac81a1ca, type: 3}
       propertyPath: m_RootOrder
@@ -691,8 +728,33 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 20788917190633434, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 20788917190633434, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
       propertyPath: field of view
       value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 114128907697292602, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: infinteAmmo
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114191837528411164, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: infinteAmmo
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114286380553423094, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: infinteAmmo
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114718352753251754, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: infinteAmmo
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
@@ -707,7 +769,7 @@ PrefabInstance:
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
       propertyPath: aimingSkill
-      value: 1
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
@@ -717,7 +779,7 @@ PrefabInstance:
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
       propertyPath: movementSkill
-      value: 0.373
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
@@ -858,6 +920,21 @@ PrefabInstance:
     - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
         type: 3}
       propertyPath: activeGunsPlayer.Array.data[3]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
+        type: 3}
+      propertyPath: activeGunsOpponent.Array.data[0]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
+        type: 3}
+      propertyPath: activeGunsOpponent.Array.data[1]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
+        type: 3}
+      propertyPath: activeGunsOpponent.Array.data[3]
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8593336210271020112, guid: 4069fbb7d0b30823582f7d0379d72dfb,

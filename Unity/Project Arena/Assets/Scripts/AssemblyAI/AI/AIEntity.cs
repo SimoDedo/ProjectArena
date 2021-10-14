@@ -283,9 +283,17 @@ public class AIEntity : Entity, ILoggable
         return (Time.time - lastDamageTime) < 0.2f;
     }
     
-    [Range(0f, 1f)] [SerializeField] private float movementSkill = 0.5f;
+    public enum FightingMovementSkill
+    {
+        StandStill = 0,
+        MoveStraight = 1,
+        CircleStrife = 2,
+        CircleStrifeChangeDirection = 3,
+    }
+    
+    [SerializeField] private FightingMovementSkill movementSkill = FightingMovementSkill.MoveStraight;
 
-    public float GetMovementSkill()
+    public FightingMovementSkill GetMovementSkill()
     {
         return movementSkill;
     }
@@ -342,20 +350,5 @@ public class AIEntity : Entity, ILoggable
     public int GetMaxHealth()
     {
         return totalHealth;
-    }
-
-    [SerializeField] [Range(0f, 1f)] private float healthScore;
-    [SerializeField] [Range(0f, 1f)] private float ammoScore;
-
-    public float GetHealthScore()
-    {
-        return healthScore;
-    }
-
-    // If any ammo is less than 50% capacity
-    public bool ShouldLookForAmmo()
-    {
-        return Guns.Where(gun => gun.isActiveAndEnabled)
-            .Any(gun => gun.GetCurrentAmmo() < gun.GetMaxAmmo() / 2);
     }
 }

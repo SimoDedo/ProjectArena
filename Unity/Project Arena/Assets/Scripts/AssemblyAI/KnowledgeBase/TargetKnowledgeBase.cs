@@ -46,7 +46,9 @@ namespace AI.KnowledgeBase
 
         private void Update()
         {
-            var result = sensor.CanSeeObject(target.transform, Physics.DefaultRaycastLayers);
+            var enemyTransform = target.transform;
+            var isTargetClose = (enemyTransform.position - transform.position).sqrMagnitude < 10;
+            var result = isTargetClose || sensor.CanSeeObject(enemyTransform, Physics.DefaultRaycastLayers);
             if (results.Count != 0)
             {
                 var last = results.Last();
@@ -75,7 +77,7 @@ namespace AI.KnowledgeBase
         {
             // Remove all data which is too old
             results = results.Where(it => it.endTime > Time.time - memoryWindow).ToList();
-            // "Forget" (aka clamp") measurements to the memory window interval
+            // "Forget" (aka clamp) measurements to the memory window interval
             var first = results.First();
             first.startTime = Mathf.Max(first.startTime, Time.time - memoryWindow);
         }

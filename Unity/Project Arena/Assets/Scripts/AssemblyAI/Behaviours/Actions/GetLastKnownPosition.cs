@@ -1,6 +1,8 @@
 using System;
+using Accord.Statistics;
 using AI.KnowledgeBase;
 using AssemblyAI.Behaviours.Variables;
+using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
 using Entities.AI.Layer2;
 using UnityEngine;
@@ -10,9 +12,9 @@ using Action = BehaviorDesigner.Runtime.Tasks.Action;
 namespace AssemblyAI.Behaviours.Actions
 {
     [Serializable]
-    public class GetPathToLastKnownPosition : Action
+    public class GetLastKnownPosition : Action
     {
-        [SerializeField] private SharedSelectedPathInfo pathChosen;
+        [SerializeField] private SharedVector3 lastKnownPosition;
         private AIEntity entity;
         private Entity enemy;
         private PositionTracker enemyTracker;
@@ -35,22 +37,15 @@ namespace AssemblyAI.Behaviours.Actions
 
             // Try to estimate the position of the enemy after it has gone out of sight
             var estimatedPosition = position + velocity * 0.1f;
-            var path = navSystem.CalculatePath(estimatedPosition);
-            if (path.status == NavMeshPathStatus.PathComplete)
+            if (navSystem.IsPointOnNavMesh(estimatedPosition, out var point))
             {
-                pathChosen.Value = path;
+                point.y += 4f;
+                lastKnownPosition.Value = point;
                 return TaskStatus.Success;
             }
-            // Path wasn't valid, perhaps estimated position was OOB, use position
-            path = navSystem.CalculatePath(position);
-            if (path.status == NavMeshPathStatus.PathComplete)
-            {
-                pathChosen.Value = path;
-                return TaskStatus.Success;
-            }
-            // This shouldn't happen, abort search! 
-            // TODO Cannot abort from tree, throw exception for now
-            throw new Exception("Couldn't search for lost enemy");
+            // Point wasn't valid, perhaps estimated position was OOB, use position
+            lastKnownPosition.Value = estimatedPosition;
+            return TaskStatus.Success;
         }
     }
 }
