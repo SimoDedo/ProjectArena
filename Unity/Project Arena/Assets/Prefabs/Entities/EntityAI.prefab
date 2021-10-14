@@ -584,13 +584,13 @@ MonoBehaviour:
   acceleration: 100
   angularSpeed: 10
   head: {fileID: 1523818027142824}
-  fov: 90
+  fov: 60
   maxRange: 100
   sensibility: 10
   inputPenalty: 1
   memoryWindow: 0.5
   reactionTime: 0.1
-  consecutiveTimeBeforeCanReact: 0.04
+  timeBeforeCanReact: 0.1
   health: 0
   movementSkill: 0.5
   curiosity: 0

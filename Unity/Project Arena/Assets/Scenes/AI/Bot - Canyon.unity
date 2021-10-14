@@ -689,6 +689,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 20788917190633434, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: field of view
+      value: 60
+      objectReference: {fileID: 0}
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
       propertyPath: enemy

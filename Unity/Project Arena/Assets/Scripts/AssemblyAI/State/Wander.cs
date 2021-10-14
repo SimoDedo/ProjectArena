@@ -1,23 +1,27 @@
+using System.Collections.Generic;
 using BehaviorDesigner.Runtime;
 using UnityEngine;
-using UnityEngine.AI;
 
-namespace AI.State
+namespace AssemblyAI.State
 {
     public class Wander : IState
     {
+        private AIEntity entity;
         public Wander(AIEntity entity)
         {
             this.entity = entity;
         }
 
-        private AIEntity entity;
+        public float CalculateTransitionScore()
+        {
+            return 0.2f;
+        }
+
         private ExternalBehaviorTree externalBT;
         private BehaviorTree behaviorTree;
-
+        private List<IState> outgoingStates = new List<IState>();
         public void Enter()
         {
-            entity.GetComponent<NavMeshAgent>();
             externalBT = Resources.Load<ExternalBehaviorTree>("Behaviors/Wander");
             behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
             behaviorTree.StartWhenEnabled = false;
@@ -25,16 +29,28 @@ namespace AI.State
             behaviorTree.ExternalBehavior = externalBT;
             behaviorTree.EnableBehavior();
             BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
+
+            // outgoingStates.Add(new Fight(entity)); 
+            // outgoingStates.Add(new LookForPickups(entity)); 
+            // outgoingStates.Add(new SearchForDamageSource(entity)); 
         }
 
         public void Update()
         {
-            if (entity.CanSeeEnemy())
-                entity.SetState(new Fight(entity));
-            else if (entity.ShouldLookForHealth() || entity.ShouldLookForAmmo())
-                entity.SetState(new LookForPickups(entity));
-            else if (entity.HasTakenDamage())
-                entity.SetState(new SearchForLostEnemy(entity));
+            var bestScore = CalculateTransitionScore();
+            IState bestState = null;
+            foreach (var state in outgoingStates)
+            {
+                var score = state.CalculateTransitionScore();
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    bestState = state;
+                }
+            }
+
+            if (bestState != null)
+                entity.SetNewState(bestState);
             else
                 BehaviorManager.instance.Tick(behaviorTree);
         }

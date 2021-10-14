@@ -1,21 +1,18 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using AI.AI.Layer3;
 using AI.KnowledgeBase;
-using AI.State;
+using AssemblyAI.State;
 using AssemblyLogging;
 using BehaviorDesigner.Runtime;
 using Entities.AI.Controller;
 using Entities.AI.Layer1.Sensors;
 using Entities.AI.Layer2;
 using JetBrains.Annotations;
-using ScriptableObjectArchitecture;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Serialization;
 using Utils;
-using Random = UnityEngine.Random;
-using Wander = AI.State.Wander;
 
 /// <summary>
 /// Class representing an entity which is played by a bot.
@@ -53,7 +50,7 @@ public class AIEntity : Entity, ILoggable
     private float memoryWindow = 0.5f;
 
     [SerializeField] private float reactionTime = 0.1f;
-    [SerializeField] private float consecutiveTimeBeforeCanReact = 0.04f;
+    [SerializeField] private float timeBeforeCanReact = 0.1f;
 
     // Do I have to log?
     private bool loggingGame;
@@ -70,6 +67,7 @@ public class AIEntity : Entity, ILoggable
     private TargetKnowledgeBase targetKnowledgeBase;
     private PickupKnowledgeBase pickupKnowledgeBase;
     private NavigationSystem navigationSystem;
+    private PickupPlanner pickupPlanner;
 
     private void Awake()
     {
@@ -81,27 +79,24 @@ public class AIEntity : Entity, ILoggable
         sightSensor = gameObject.AddComponent<AISightSensor>();
         sightSensor.SetParameters(head, maxRange, fov);
         targetKnowledgeBase = gameObject.AddComponent<TargetKnowledgeBase>();
-        targetKnowledgeBase.SetParameters(sightSensor, enemy, memoryWindow, consecutiveTimeBeforeCanReact,
+        targetKnowledgeBase.SetParameters(sightSensor, enemy, memoryWindow, timeBeforeCanReact,
             reactionTime);
         pickupKnowledgeBase = gameObject.AddComponent<PickupKnowledgeBase>();
         pickupKnowledgeBase.SetupParameters(sightSensor);
         navigationSystem = gameObject.AddComponent<NavigationSystem>();
         navigationSystem.SetParameters(movementController, speed, acceleration, angularSpeed);
-    }
 
+        pickupPlanner = gameObject.AddComponent<PickupPlanner>();
+        pickupPlanner.SetParameters(this, navigationSystem, pickupKnowledgeBase);
+    }
+    
     [NotNull] private IState currentState = new Idle();
 
-    public void SetState([NotNull] IState state)
+    public void SetNewState([NotNull] IState state)
     {
         currentState.Exit();
         currentState = state;
         currentState.Enter();
-    }
-
-    [NotNull]
-    public IState GetState()
-    {
-        return currentState;
     }
 
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id)
@@ -132,12 +127,13 @@ public class AIEntity : Entity, ILoggable
         });
     }
 
+    private float lastDamageTime = float.MinValue; 
     public override void TakeDamage(int damage, int killerID)
     {
         if (inGame)
         {
             Health -= damage;
-
+            lastDamageTime = Time.time;
             var position = transform.position;
             HitInfoGameEvent.Instance.Raise(new HitInfo
             {
@@ -261,9 +257,9 @@ public class AIEntity : Entity, ILoggable
     public override void SetInGame(bool b)
     {
         if (b)
-            SetState(new Wander(this));
+            SetNewState(new Wander(this));
         else
-            SetState(new Idle());
+            SetNewState(new Idle());
 
         GetComponent<NavMeshAgent>().enabled = b;
         GetComponent<CapsuleCollider>().enabled = b;
@@ -279,32 +275,14 @@ public class AIEntity : Entity, ILoggable
 
     public bool CanSeeEnemy()
     {
-        return GetComponent<TargetKnowledgeBase>().CanReactToTarget();
+        return targetKnowledgeBase.HasSeenTarget();
     }
-
-    public bool HasLostTarget()
+    
+    public bool HasTakenDamageRecently()
     {
-        // TODO instead of querying the kb, I should have a personality module determining if I lost the target or not
-        return GetComponent<TargetKnowledgeBase>().HasLostTarget();
+        return (Time.time - lastDamageTime) < 0.2f;
     }
-
-    public bool ShouldLookForHealth()
-    {
-        return Health < 50;
-    }
-
-    public bool HasTakenDamage()
-    {
-        // TODO
-        return false;
-    }
-
-    public bool ReachedSearchTimeout(float startSearchTime)
-    {
-        // TODO
-        return Time.time > startSearchTime + 5;
-    }
-
+    
     [Range(0f, 1f)] [SerializeField] private float movementSkill = 0.5f;
 
     public float GetMovementSkill()
