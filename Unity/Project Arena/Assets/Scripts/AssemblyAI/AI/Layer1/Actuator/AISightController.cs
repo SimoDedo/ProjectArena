@@ -30,8 +30,6 @@ namespace Entities.AI.Controller
             var headTransform = head.transform;
             var position = headTransform.position;
             var direction = (target - position).normalized;
-
-            Debug.DrawLine(position, target, Color.green, 0, false);
             
             var rotation = Quaternion.LookRotation(direction);
 
@@ -102,15 +100,6 @@ namespace Entities.AI.Controller
         public void SetInputPenalty(float inputPenalty)
         {
             this.inputPenalty = inputPenalty;
-        }
-
-        public Vector3 GetLookDirection()
-        {
-            return head.transform.forward;
-        }
-
-        private void LateUpdate()
-        {
         }
     }
 }
