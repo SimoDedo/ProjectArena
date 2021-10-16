@@ -13,7 +13,7 @@ namespace Entities.AI.Layer2
         private float acceleration;
         private float angularSpeed;
 
-        public void SetParameters(AIMovementController mover, float speed, float acceleration, float angularSpeed)
+        public void Prepare(AIMovementController mover, float speed, float acceleration, float angularSpeed)
         {
             this.mover = mover;
             this.speed = speed;
@@ -126,6 +126,11 @@ namespace Entities.AI.Layer2
             var path = new NavMeshPath();
             agent.CalculatePath(movementAmountValue, path);
             agent.SetPath(path);
+        }
+
+        public void SetEnabled(bool b)
+        {
+            agent.enabled = b;
         }
     }
 }

@@ -1,31 +1,31 @@
 using System;
 using System.Linq;
+using AssemblyEntity.Component;
 using UnityEngine;
 using Utils;
 
 /// <summary>
 /// Opponent is a simple implementation of Entity with no extra logic.
 /// </summary>
-public class Opponent : Entity {
+public class Opponent : Entity
+{
+
+    private GunManager gunManager;
+    
     private void Awake()
     {
-        Guns = gameObject.GetComponentsInChildren<Gun>().ToList();
+        gunManager = gameObject.AddComponent<GunManager>();
+        gunManager.Prepare();
     }
 
     // Sets up all the opponent parameters and does the same with all its guns.
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id) {
-        ActiveGuns = ag.ToList();
+        gunManager.SetupGuns(gms, this, null, ag);
         gameManagerScript = gms;
 
         totalHealth = th;
         Health = th;
         entityID = id;
-
-        for (int i = 0; i < ag.GetLength(0); i++) {
-            // Setup the gun.
-            Guns[i].SetupGun(gms, this);
-            // Activate if it is one among the active ones which has the lowest rank.
-        }
     }
     
     // Applies damage to the opponent and eventually manages its death.
@@ -50,6 +50,26 @@ public class Opponent : Entity {
             Health += medkit.RestoredHealth;
     }
 
+    public override bool CanBeSupplied(bool[] suppliedGuns)
+    {
+        return gunManager.CanBeSupplied(suppliedGuns);
+    }
+
+    public override void SupplyGuns(bool[] suppliedGuns, int[] ammoAmounts)
+    {
+        gunManager.SupplyGuns(suppliedGuns, ammoAmounts);
+    }
+
+    public override int GetTotalAmmoForGun(int index)
+    {
+        return gunManager.GetTotalAmmoForGun(index);
+    }
+
+    public override int GetMaxAmmoForGun(int index)
+    {
+        return gunManager.GetMaxAmmoForGun(index);
+    }
+
     // Kills the opponent.
     protected override void Die(int id) {
         gameManagerScript.AddScore(id, entityID);
@@ -61,7 +81,7 @@ public class Opponent : Entity {
     // Respawns the opponent.
     public override void Respawn() {
         Health = totalHealth;
-        ResetAllAmmo();
+        gunManager.ResetAmmo();
         SetInGame(true);
     }
 
@@ -71,7 +91,7 @@ public class Opponent : Entity {
         MeshVisibility.SetMeshVisible(transform, b);
         inGame = b;
     }
-
+    
     public override void SlowEntity(float penalty) { }
 
 }

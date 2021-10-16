@@ -9,7 +9,7 @@ namespace Entities.AI.Controller
         private float sensibility;
         private float inputPenalty;
 
-        public void SetParameters(GameObject head, float sensibility, float inputPenalty)
+        public void Prepare(GameObject head, float sensibility, float inputPenalty)
         {
             this.head = head;
             this.sensibility = sensibility;

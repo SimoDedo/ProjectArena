@@ -29,13 +29,7 @@ public class Target : Entity, ILoggable {
 
     // Do I have to log?
     private bool loggingGame = false;
-
-    private void Awake()
-    {
-        // TODO Check if can be removed
-        Guns = new List<Gun>();
-    }
-
+    
     public override void SetupEntity(int th, bool[] ag, GameManager gms,
         int id) {
         originalScale = target.transform.localScale;
@@ -152,6 +146,27 @@ public class Target : Entity, ILoggable {
     }
 
     public override void HealFromMedkit(MedkitPickable medkit) { }
+
+    // TODO new entity type which doesn't have ammo
+    public override bool CanBeSupplied(bool[] suppliedGuns)
+    {
+        return false;
+    }
+
+    public override void SupplyGuns(bool[] suppliedGuns, int[] ammoAmounts)
+    {
+        throw new InvalidOperationException();
+    }
+
+    public override int GetTotalAmmoForGun(int index)
+    {
+        throw new InvalidOperationException();
+    }
+
+    public override int GetMaxAmmoForGun(int index)
+    {
+        throw new InvalidOperationException();
+    }
 
     public override void Respawn() { }
 

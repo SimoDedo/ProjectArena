@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using AI.KnowledgeBase;
 using AssemblyAI.Behaviours.Variables;
+using AssemblyEntity.Component;
 using Entities.AI.Layer2;
 using UnityEngine;
 using UnityEngine.AI;
@@ -16,6 +17,7 @@ namespace AI.AI.Layer3
 
         private AIEntity entity;
         private NavMeshPath chosenPath;
+        private GunManager gunManager;
         private Pickable chosenPickup;
 
         private float entityLastHealth = 0f;
@@ -26,11 +28,12 @@ namespace AI.AI.Layer3
         private bool isFirstTime = true;
 
         // TODO No more entity, provide Guns instead
-        public void SetParameters(AIEntity entity, NavigationSystem navSystem, PickupKnowledgeBase knowledgeBase)
+        public void Prepare(AIEntity entity, NavigationSystem navSystem, PickupKnowledgeBase knowledgeBase, GunManager gunManager)
         {
             this.entity = entity;
             this.navSystem = navSystem;
             this.knowledgeBase = knowledgeBase;
+            this.gunManager = gunManager;
             agentSpeed = navSystem.GetSpeed();
         }
 
@@ -89,7 +92,7 @@ namespace AI.AI.Layer3
             isFirstTime = false;
             lastKBUpdateTime = knowledgeBase.GetLastUpdateTime();
             entityLastHealth = entity.Health;
-            var totalGuns = entity.GetGuns().Count;
+            var totalGuns = gunManager.NumberOfGuns;
             if (entityLastAmmo.Length != totalGuns)
                 entityLastAmmo = new int[totalGuns];
             for (var i=0; i<totalGuns; i++)
@@ -100,7 +103,7 @@ namespace AI.AI.Layer3
         {
             var currentHealth = entity.Health;
             if (currentHealth != entityLastHealth) return false;
-            var totalGuns = entity.GetGuns().Count;
+            var totalGuns = gunManager.NumberOfGuns;
             if (totalGuns != entityLastAmmo.Length) return false;
             for (var i=0; i<totalGuns; i++)
                 if (entity.GetTotalAmmoForGun(i) != entityLastAmmo[i]) return false;
@@ -156,19 +159,18 @@ namespace AI.AI.Layer3
         private float ScoreAmmoCrate(AmmoPickable pickable)
         {
             const float AMMO_NECESSITY_WEIGHT = 0.8f;
-            var guns = entity.GetGuns();
-            var maxGunIndex = Mathf.Min(pickable.AmmoAmounts.Length, guns.Count);
+            var guns = gunManager.NumberOfGuns;
+            var maxGunIndex = Mathf.Min(pickable.AmmoAmounts.Length, guns);
 
             var totalCrateScore = 0f;
             var totalActiveGuns = 0;
             for (var i = 0; i < maxGunIndex; i++)
             {
-                var currentGun = guns[i];
-                if (!currentGun.isActiveAndEnabled) continue;
+                if (!gunManager.IsGunActive(i)) continue;
                 totalActiveGuns++;
                 var pickupAmmo = pickable.AmmoAmounts[i];
-                var maxAmmo = currentGun.GetMaxAmmo();
-                var currentAmmo = currentGun.GetCurrentAmmo();
+                var maxAmmo = gunManager.GetMaxAmmoForGun(i);
+                var currentAmmo = gunManager.GetCurrentAmmoForGun(i);
 
                 var recoveredAmmo = Mathf.Min(pickupAmmo, maxAmmo - currentAmmo);
                 var ammoCrateValue = (1 - AMMO_NECESSITY_WEIGHT) * recoveredAmmo / maxAmmo;

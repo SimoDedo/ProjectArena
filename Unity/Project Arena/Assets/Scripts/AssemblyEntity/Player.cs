@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using AssemblyEntity.Component;
 using AssemblyLogging;
 using ScriptableObjectArchitecture;
 using UnityEngine;
@@ -17,10 +18,12 @@ public class Player : Entity, ILoggable
     [SerializeField] private float jumpSpeed = 8f;
     [SerializeField] private float gravity = 100f;
     [SerializeField] private Transform point;
-
+    private int CurrentGun => gunManager.CurrentGunIndex;
+    
     // Smoothing factor.
     [SerializeField] private float smoothing = 2.0f;
 
+    
     // Player controller.
     private CharacterController controller;
 
@@ -52,6 +55,7 @@ public class Player : Entity, ILoggable
     private float lastPositionLog = 0;
 
     private PlayerUIManager playerUIManagerScript;
+    private GunManager gunManager;
 
     // Codes of the numeric keys.
     private KeyCode[] keyCodes =
@@ -69,7 +73,8 @@ public class Player : Entity, ILoggable
 
     private void Awake()
     {
-        Guns = gameObject.GetComponentsInChildren<Gun>().ToList();
+        gunManager = gameObject.AddComponent<GunManager>();
+        gunManager.Prepare();
     }
 
     private void Start()
@@ -104,28 +109,27 @@ public class Player : Entity, ILoggable
 
             if (inGame)
             {
-                var actualGun = Guns[currentGun].GetComponent<Gun>();
-                if (actualGun.CanAim())
+                if (gunManager.CanCurrentGunAim())
                 {
                     if (Input.GetButtonDown("Fire2"))
                     {
-                        actualGun.Aim(true);
+                        gunManager.SetCurrentGunAim(true);
                     }
 
                     if (Input.GetButtonUp("Fire2"))
                     {
-                        actualGun.Aim(false);
+                        gunManager.SetCurrentGunAim(false);
                     }
                 }
 
-                if (Input.GetButton("Fire1") && actualGun.CanShoot())
+                if (Input.GetButton("Fire1") && gunManager.CanCurrentGunShoot())
                 {
-                    actualGun.Shoot();
+                    gunManager.ShootCurrentGun();
                 }
 
-                if (Input.GetButtonDown("Reload") && actualGun.CanReload())
+                if (Input.GetButtonDown("Reload") && gunManager.CanCurrentGunReload())
                 {
-                    actualGun.Reload();
+                    gunManager.ReloadCurrentGun();
                 }
 
                 UpdateCameraPosition();
@@ -155,21 +159,22 @@ public class Player : Entity, ILoggable
     // Returns the next or the previous active gun.
     private int GetActiveGun(int currentGun, bool next)
     {
+        var gunsCount = gunManager.NumberOfGuns;
         if (next)
         {
             // Try for the guns after it
-            for (int i = currentGun + 1; i < Guns.Count; i++)
+            for (var i = currentGun + 1; i < gunsCount; i++)
             {
-                if (ActiveGuns[i])
+                if (gunManager.IsGunActive(i))
                 {
                     return i;
                 }
             }
 
             // Try for the guns before it
-            for (int i = 0; i < currentGun; i++)
+            for (var i = 0; i < currentGun; i++)
             {
-                if (ActiveGuns[i])
+                if (gunManager.IsGunActive(i))
                 {
                     return i;
                 }
@@ -178,36 +183,34 @@ public class Player : Entity, ILoggable
             // There's no other gun, return itself.
             return currentGun;
         }
-        else
+
+        // Try for the guns before it
+        for (var i = currentGun - 1; i >= 0; i--)
         {
-            // Try for the guns before it
-            for (int i = currentGun - 1; i >= 0; i--)
+            if (gunManager.IsGunActive(i))
             {
-                if (ActiveGuns[i])
-                {
-                    return i;
-                }
+                return i;
             }
-
-            // Try for the guns after it
-            for (int i = Guns.Count - 1; i > currentGun; i--)
-            {
-                if (ActiveGuns[i])
-                {
-                    return i;
-                }
-            }
-
-            // There's no other gun, return itself.
-            return currentGun;
         }
+
+        // Try for the guns after it
+        for (var i = gunsCount - 1; i > currentGun; i--)
+        {
+            if (gunManager.IsGunActive(i))
+            {
+                return i;
+            }
+        }
+
+        // There's no other gun, return itself.
+        return currentGun;
     }
 
 
     // Sets up all the player parameter and does the same with all its guns.
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id)
     {
-        ActiveGuns = ag.ToList();
+        gunManager.SetupGuns(gms, this, playerUIManagerScript, ag);
         gameManagerScript = gms;
 
         totalHealth = th;
@@ -215,12 +218,6 @@ public class Player : Entity, ILoggable
         entityID = id;
 
         playerUIManagerScript.SetActiveGuns(ag);
-
-        for (int i = 0; i < ag.GetLength(0); i++)
-        {
-            // Setup the gun.
-            Guns[i].GetComponent<Gun>().SetupGun(gms, this, playerUIManagerScript, i + 1);
-        }
     }
 
     // Applies damage to the player and eventually manages its death.
@@ -258,6 +255,26 @@ public class Player : Entity, ILoggable
         playerUIManagerScript.SetHealth(Health, totalHealth);
     }
 
+    public override bool CanBeSupplied(bool[] suppliedGuns)
+    {
+        return gunManager.CanBeSupplied(suppliedGuns);
+    }
+
+    public override void SupplyGuns(bool[] suppliedGuns, int[] ammoAmounts)
+    {
+        gunManager.SupplyGuns(suppliedGuns, ammoAmounts);
+    }
+
+    public override int GetTotalAmmoForGun(int index)
+    {
+        return gunManager.GetTotalAmmoForGun(index);
+    }
+
+    public override int GetMaxAmmoForGun(int index)
+    {
+        return gunManager.GetMaxAmmoForGun(index);
+    }
+
     // Kills the player.
     protected override void Die(int id)
     {
@@ -271,7 +288,7 @@ public class Player : Entity, ILoggable
     public override void Respawn()
     {
         Health = totalHealth;
-        ResetAllAmmo();
+        gunManager.ResetAmmo();
         ActivateLowestGun();
         SetInGame(true);
 
@@ -281,14 +298,16 @@ public class Player : Entity, ILoggable
     // Activates the lowest ranked gun.
     private void ActivateLowestGun()
     {
-        for (int i = 0; i < ActiveGuns.Count; i++)
-        {
+        // var gunCount = gunManager.NumberOfGuns();
+        // for (int i = 0; i < gun; i++)
+        // {
             // Activate it if is one among the active ones which has the lowest rank.
-            if (i == GetActiveGun(-1, true))
-            {
-                ActivateGun(i);
-            }
-        }
+            // if (i == GetActiveGun(-1, true))
+            // {
+            //     ActivateGun(i);
+            // }
+        // }
+        ActivateGun(GetActiveGun(-1, true));
     }
 
     // Switches weapon if possible.
@@ -296,19 +315,20 @@ public class Player : Entity, ILoggable
     {
         if (Input.GetAxisRaw("Mouse ScrollWheel") > 0)
         {
-            TrySwitchGuns(currentGun, GetActiveGun(currentGun, true));
+            gunManager.TrySwitchGuns(CurrentGun, GetActiveGun(CurrentGun, true));
         }
         else if (Input.GetAxisRaw("Mouse ScrollWheel") < 0)
         {
-            TrySwitchGuns(currentGun, GetActiveGun(currentGun, false));
+            gunManager.TrySwitchGuns(CurrentGun, GetActiveGun(CurrentGun, false));
         }
         else
         {
-            for (int i = 0; i < Guns.Count; i++)
+            var gunsCount = gunManager.NumberOfGuns;
+            for (var i = 0; i < gunsCount; i++)
             {
-                if (i != currentGun && ActiveGuns[i] && Input.GetKeyDown(keyCodes[i]))
+                if (i != CurrentGun && gunManager.IsGunActive(i) && Input.GetKeyDown(keyCodes[i]))
                 {
-                    if (TrySwitchGuns(currentGun, i))
+                    if (gunManager.TrySwitchGuns(CurrentGun, i))
                         break;
                 }
             }
@@ -316,17 +336,17 @@ public class Player : Entity, ILoggable
     }
 
     // Activates a gun.
-    protected override void ActivateGun(int toActivate)
+    private void ActivateGun(int toActivate)
     {
-        Guns[toActivate].GetComponent<Gun>().Wield();
-        currentGun = toActivate;
+        gunManager.TryEquipGun(toActivate);
+        // Guns[toActivate].GetComponent<Gun>().Wield();
         SetUIColor();
     }
 
     // Deactivates a gun.
-    protected override void DeactivateGun(int toDeactivate)
+    private void UnequipCurrentGun()
     {
-        Guns[toDeactivate].GetComponent<Gun>().Stow();
+        gunManager.TryEquipGun(GunManager.NO_GUN);
     }
 
     // Updates the position.
@@ -424,12 +444,12 @@ public class Player : Entity, ILoggable
         if (b)
         {
             playerUIManagerScript.SetPlayerUIVisible(true);
-            ActivateGun(currentGun);
+            ActivateLowestGun();
         }
         else
         {
             playerUIManagerScript.SetPlayerUIVisible(false);
-            DeactivateGun(currentGun);
+            UnequipCurrentGun();
         }
 
         inGame = b;
@@ -438,8 +458,8 @@ public class Player : Entity, ILoggable
     // Sets the UI colors.
     private void SetUIColor()
     {
-        playerUIManagerScript.SetColorAll(playerUIManagerScript.GetGunColor(currentGun));
-        gameManagerScript.SetUIColor(playerUIManagerScript.GetGunColor(currentGun));
+        playerUIManagerScript.SetColorAll(playerUIManagerScript.GetGunColor(CurrentGun));
+        gameManagerScript.SetUIColor(playerUIManagerScript.GetGunColor(CurrentGun));
     }
 
     public override void SlowEntity(float penalty)
@@ -447,16 +467,19 @@ public class Player : Entity, ILoggable
         inputPenalty = penalty;
     }
 
+
+    private int previousGun = GunManager.NO_GUN;
     // Shows current guns
     public void ShowGun(bool b)
     {
         if (b)
         {
-            ActivateGun(currentGun);
+            ActivateGun(previousGun);
         }
         else
         {
-            DeactivateGun(currentGun);
+            previousGun = CurrentGun;
+            UnequipCurrentGun();
         }
     }
 
