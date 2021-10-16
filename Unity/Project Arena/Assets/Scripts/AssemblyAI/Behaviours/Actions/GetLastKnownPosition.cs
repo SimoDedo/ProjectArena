@@ -25,9 +25,10 @@ namespace AssemblyAI.Behaviours.Actions
         {
             entity = GetComponent<AIEntity>();
             enemy = entity.GetEnemy();
+            knowledgeBase = GetComponent<TargetKnowledgeBase>();
+            navSystem = GetComponent<NavigationSystem>();
+            
             enemyTracker = enemy.GetComponent<PositionTracker>();
-            knowledgeBase = enemy.GetComponent<TargetKnowledgeBase>();
-            navSystem = enemy.GetComponent<NavigationSystem>();
         }
 
         public override TaskStatus OnUpdate()

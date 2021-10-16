@@ -325,6 +325,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114940447452184972, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
         type: 3}
+      propertyPath: customObjects.Array.data[0].heightCorrection
+      value: -1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 114940447452184972, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
+        type: 3}
+      propertyPath: customObjects.Array.data[1].heightCorrection
+      value: -1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 114940447452184972, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
+        type: 3}
       propertyPath: customObjects.Array.data[5].heightCorrection
       value: -0.1
       objectReference: {fileID: 0}

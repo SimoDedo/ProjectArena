@@ -3,6 +3,7 @@ using System.Linq;
 using AI.AI.Layer3;
 using AI.KnowledgeBase;
 using AssemblyAI.State;
+using AssemblyEntity.Component;
 using AssemblyLogging;
 using BehaviorDesigner.Runtime;
 using Entities.AI.Controller;
@@ -68,26 +69,27 @@ public class AIEntity : Entity, ILoggable
     private PickupKnowledgeBase pickupKnowledgeBase;
     private NavigationSystem navigationSystem;
     private PickupPlanner pickupPlanner;
+    private GunManager gunManager;
 
     private void Awake()
     {
-        Guns = gameObject.GetComponentsInChildren<Gun>().ToList();
         movementController = gameObject.AddComponent<AIMovementController>();
-        movementController.SetParameters(speed);
+        movementController.Prepare(speed);
         sightController = gameObject.AddComponent<AISightController>();
-        sightController.SetParameters(head, sensibility, inputPenalty);
+        sightController.Prepare(head, sensibility, inputPenalty);
         sightSensor = gameObject.AddComponent<AISightSensor>();
-        sightSensor.SetParameters(head, maxRange, fov);
+        sightSensor.Prepare(head, maxRange, fov);
         targetKnowledgeBase = gameObject.AddComponent<TargetKnowledgeBase>();
-        targetKnowledgeBase.SetParameters(sightSensor, enemy, memoryWindow, timeBeforeCanReact,
+        targetKnowledgeBase.Prepare(sightSensor, enemy, memoryWindow, timeBeforeCanReact,
             reactionTime);
         pickupKnowledgeBase = gameObject.AddComponent<PickupKnowledgeBase>();
-        pickupKnowledgeBase.SetupParameters(sightSensor);
+        pickupKnowledgeBase.Prepare(sightSensor);
         navigationSystem = gameObject.AddComponent<NavigationSystem>();
-        navigationSystem.SetParameters(movementController, speed, acceleration, angularSpeed);
-
+        navigationSystem.Prepare(movementController, speed, acceleration, angularSpeed);
+        gunManager = gameObject.AddComponent<GunManager>();
+        gunManager.Prepare();
         pickupPlanner = gameObject.AddComponent<PickupPlanner>();
-        pickupPlanner.SetParameters(this, navigationSystem, pickupKnowledgeBase);
+        pickupPlanner.Prepare(this, navigationSystem, pickupKnowledgeBase, gunManager);
     }
     
     [NotNull] private IState currentState = new Idle();
@@ -107,15 +109,8 @@ public class AIEntity : Entity, ILoggable
         Health = th;
         entityID = id;
 
-        for (var i = 0; i < ag.Length; i++)
-        {
-            // Setup the gun.
-            var gun = Guns[i].GetComponent<Gun>();
-            gun.SetupGun(gms, this, null, i + 1);
-        }
-        ActiveGuns = ag.ToList();
-        ActivateLowestGun();
-
+        gunManager.SetupGuns(gms, this, null, ag);
+        gunManager.TryEquipGun(gunManager.FindLowestActiveGun());
         pickupKnowledgeBase.DetectPickups();
         var position = transform.position;
         SpawnInfoGameEvent.Instance.Raise(new SpawnInfo
@@ -189,7 +184,7 @@ public class AIEntity : Entity, ILoggable
             spawnEntity = gameObject.name
         });
         Health = totalHealth;
-        ResetAllAmmo();
+        gunManager.ResetAmmo();
         // ActivateLowestGun();
         SetInGame(true);
     }
@@ -212,28 +207,7 @@ public class AIEntity : Entity, ILoggable
         currentState.Update();
     }
 
-    private void ActivateLowestGun()
-    {
-        var firstIndex = Guns.FindIndex(it=>it.isActiveAndEnabled);
-        Guns[firstIndex].Wield();
-        currentGun = firstIndex;
-        // EquipGun(firstIndex);
-    }
-
-    public bool EquipGun(int index)
-    {
-        if (index < 0 || index > Guns.Count)
-            return false;
-        if (!ActiveGuns[index])
-            return false;
-        return TrySwitchGuns(currentGun, index);
-    }
-
-    // TODO Do not allow direct usage of Gun, create interface or new GunHandlingComponent
-    public Gun GetCurrentGun()
-    {
-        return Guns[currentGun];
-    }
+    
 
     public override void SlowEntity(float penalty)
     {
@@ -254,6 +228,26 @@ public class AIEntity : Entity, ILoggable
         GetComponent<PickupKnowledgeBase>().MarkConsumed(medkit);
     }
 
+    public override bool CanBeSupplied(bool[] suppliedGuns)
+    {
+        return gunManager.CanBeSupplied(suppliedGuns);
+    }
+
+    public override void SupplyGuns(bool[] suppliedGuns, int[] ammoAmounts)
+    {
+        gunManager.SupplyGuns(suppliedGuns, ammoAmounts);
+    }
+
+    public override int GetTotalAmmoForGun(int index)
+    {
+        return gunManager.GetTotalAmmoForGun(index);
+    }
+
+    public override int GetMaxAmmoForGun(int index)
+    {
+        return gunManager.GetMaxAmmoForGun(index);
+    }
+
     public override void SetInGame(bool b)
     {
         if (b)
@@ -261,7 +255,7 @@ public class AIEntity : Entity, ILoggable
         else
             SetNewState(new Idle());
 
-        GetComponent<NavMeshAgent>().enabled = b;
+        navigationSystem.SetEnabled(b);
         GetComponent<CapsuleCollider>().enabled = b;
         MeshVisibility.SetMeshVisible(transform, b);
         inGame = b;
@@ -280,7 +274,7 @@ public class AIEntity : Entity, ILoggable
     
     public bool HasTakenDamageRecently()
     {
-        return (Time.time - lastDamageTime) < 0.2f;
+        return Time.time - lastDamageTime < 0.2f;
     }
     
     public enum FightingMovementSkill
@@ -326,27 +320,14 @@ public class AIEntity : Entity, ILoggable
         return enemy;
     }
 
-    public List<Gun> GetGuns()
-    {
-        return Guns;
-    }
+    
 
     [SerializeField] [Range(0f, 1f)] private float aimingSkill = 0.5f;
     public float GetAimingSkill()
     {
         return aimingSkill;
     }
-
-    protected override void ActivateGun(int index)
-    {
-        Guns[index].Wield();
-    }
-
-    protected override void DeactivateGun(int index)
-    {
-        Guns[index].Stow();
-    }
-
+    
     public int GetMaxHealth()
     {
         return totalHealth;

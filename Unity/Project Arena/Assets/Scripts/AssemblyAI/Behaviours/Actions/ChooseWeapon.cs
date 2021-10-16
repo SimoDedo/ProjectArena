@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AI.Guns;
+using AssemblyEntity.Component;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
 using UnityEngine;
@@ -14,15 +15,15 @@ namespace AssemblyAI.Behaviours.Actions
     {
         private AIEntity entity;
         [SerializeField] private SharedInt chosenGunIndex;
-        private List<Gun> guns;
-        private List<GunScorer> gunScorers;
+        private GunManager gunManager;
+        private int gunsCount;
         private Transform enemyTransform;
         private Transform t;
         public override void OnAwake()
         {
             entity = gameObject.GetComponent<AIEntity>();
-            guns = entity.GetGuns();
-            gunScorers = guns.Select(it => it.gameObject.GetComponent<GunScorer>()).ToList();
+            gunManager = gameObject.GetComponent<GunManager>();
+            gunsCount = gunManager.NumberOfGuns;
             enemyTransform = entity.GetEnemy().transform;
             t = transform;
         }
@@ -32,11 +33,11 @@ namespace AssemblyAI.Behaviours.Actions
             var distance = (enemyTransform.position - t.position).magnitude;
             var chosenIndex = -1;
             var bestScore = float.MinValue;
-            for (var i = 0; i < guns.Count; i++)
+            for (var i = 0; i < gunsCount; i++)
             {
-                if (guns[i].isActiveAndEnabled)
+                if (gunManager.IsGunActive(i))
                 {
-                    var currentScore = gunScorers[i].GetGunScore(distance);
+                    var currentScore = gunManager.GetGunScore(i, distance);
                     if (currentScore > bestScore)
                     {
                         bestScore = currentScore;
@@ -48,7 +49,7 @@ namespace AssemblyAI.Behaviours.Actions
             if (chosenIndex == -1)
             {
                 // Find first active weapon
-                chosenIndex = guns.FindIndex(g => g.isActiveAndEnabled);
+                chosenIndex = gunManager.FindLowestActiveGun();
             }
 
             chosenGunIndex.Value = chosenIndex;

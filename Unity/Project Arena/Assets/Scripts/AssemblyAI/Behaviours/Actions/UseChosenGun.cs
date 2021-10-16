@@ -1,5 +1,6 @@
 using System;
 using Accord.Statistics.Distributions.Univariate;
+using AssemblyEntity.Component;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
 using BehaviorDesigner.Runtime.Tasks.Unity.Math;
@@ -18,12 +19,12 @@ namespace AssemblyAI.Behaviours.Actions
         [SerializeField] private int maxLookAheadFrames = 5;
         [SerializeField] private float lookAheadTimeStep = 0.1f;
         private AIEntity entity;
+        private GunManager gunManager;
         private Entity enemy;
         private PositionTracker enemyPositionTracker;
         private AISightController sightController;
         private AISightSensor sightSensor;
         private NavigationSystem navSystem;
-        private Gun gun;
 
         private NormalDistribution distribution;
         private float previousReflexDelay;
@@ -34,6 +35,7 @@ namespace AssemblyAI.Behaviours.Actions
         public override void OnAwake()
         {
             entity = GetComponent<AIEntity>();
+            gunManager = GetComponent<GunManager>();
             sightController = GetComponent<AISightController>();
             sightSensor = GetComponent<AISightSensor>();
             navSystem = GetComponent<NavigationSystem>();
@@ -50,9 +52,9 @@ namespace AssemblyAI.Behaviours.Actions
 
         public override void OnStart()
         {
-            // TODO check this is called at the right time
-            entity.EquipGun(chosenGunIndex.Value);
-            gun = entity.GetCurrentGun();
+            // TODO What if this fails?
+            gunManager.TryEquipGun(chosenGunIndex.Value);
+            
         }
 
         public override TaskStatus OnUpdate()
@@ -71,7 +73,7 @@ namespace AssemblyAI.Behaviours.Actions
             var (position, velocity) = enemyPositionTracker.GetPositionAndVelocityFromDelay(currentDelay);
             
             float angle;
-            var projectileSpeed = gun.GetProjectileSpeed();
+            var projectileSpeed = gunManager.GetCurrentGunProjectileSpeed();
             if (float.IsPositiveInfinity(projectileSpeed))
             {
                 angle = sightController.LookAtPoint(position);
@@ -116,8 +118,8 @@ namespace AssemblyAI.Behaviours.Actions
                 angle = sightController.LookAtPoint(chosenPoint);
             }
 
-            if (angle < 10 && gun.CanShoot())
-                gun.Shoot();
+            if (angle < 10 && gunManager.CanCurrentGunShoot())
+                gunManager.ShootCurrentGun();
 
 
             return TaskStatus.Running;

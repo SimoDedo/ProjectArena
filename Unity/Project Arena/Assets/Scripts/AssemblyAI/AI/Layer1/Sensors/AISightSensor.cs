@@ -9,7 +9,7 @@ namespace Entities.AI.Layer1.Sensors
         private float maxSightRange;
         private float fov;
 
-        public void SetParameters(GameObject head, float maxSightRange, float fov)
+        public void Prepare(GameObject head, float maxSightRange, float fov)
         {
             this.head = head;
             this.maxSightRange = maxSightRange;

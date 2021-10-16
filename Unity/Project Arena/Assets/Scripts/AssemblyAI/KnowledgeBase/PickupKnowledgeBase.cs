@@ -13,7 +13,7 @@ namespace AI.KnowledgeBase
         private readonly Dictionary<Pickable, float> estimatedActivationTime = new Dictionary<Pickable, float>();
         private float lastUpdateTime;
         
-        public void SetupParameters(AISightSensor sightSensor)
+        public void Prepare(AISightSensor sightSensor)
         {
             this.sightSensor = sightSensor;
         }

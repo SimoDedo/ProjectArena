@@ -13,22 +13,9 @@ public abstract class Entity : MonoBehaviour
 {
     [SerializeField] protected int totalHealth;
     [SerializeField] protected int disabledLayer;
-
-    protected virtual List<bool> ActiveGuns
-    {
-        get { return Guns.Select(it => it.gameObject.activeSelf).ToList(); }
-        set
-        {
-            for (var i = 0; i < Math.Min(Guns.Count, value.Count); i++)
-                Guns[i].gameObject.SetActive(value[i]);
-        }
-    }
-
-    protected virtual List<Gun> Guns { get; set; }
     public virtual int Health { get; protected set; }
 
     protected int entityID;
-    protected int currentGun = 0;
     protected bool inGame = false;
     protected int originalLayer;
 
@@ -63,47 +50,18 @@ public abstract class Entity : MonoBehaviour
 
     // If the entity is enabled, tells if any of the weapons passed as 
     // parameters hasn't the maximum ammo.
-    public bool CanBeSupplied(bool[] suppliedGuns)
-    {
-        if (inGame)
-        {
-            for (int i = 0; i < Math.Min(suppliedGuns.Length, Guns.Count); i++)
-            {
-                if (suppliedGuns[i] && ActiveGuns[i] && !Guns[i].IsFull())
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
+    public abstract bool CanBeSupplied(bool[] suppliedGuns);
 
     // Increases the ammo of the available guns.
-    public void SupplyGuns(bool[] suppliedGuns, int[] ammoAmounts)
-    {
-        for (int i = 0; i < suppliedGuns.GetLength(0); i++)
-        {
-            if (suppliedGuns[i] && ActiveGuns[i])
-            {
-                Guns[i].AddAmmo(ammoAmounts[i]);
-            }
-        }
-    }
+    public abstract void SupplyGuns(bool[] suppliedGuns, int[] ammoAmounts);
 
-    public int GetTotalAmmoForGun(int index)
-    {
-        return Guns[index].GetCurrentAmmo();
-    }
+    public abstract int GetTotalAmmoForGun(int index);
 
-    public int GetMaxAmmoForGun(int index)
-    {
-        return Guns[index].GetMaxAmmo();
-    }
-
+    public abstract int GetMaxAmmoForGun(int index);
+    
 
     // Sets if the entity is in game, i.e. if it can move, shoot, interact
-    // with object and be hitten.
+    // with object and be hit.
     public abstract void SetInGame(bool b);
 
     // Returns the ID of the entity.
@@ -136,48 +94,5 @@ public abstract class Entity : MonoBehaviour
             child.gameObject.layer = l;
             ChangeLayersRecursively(child, l);
         }
-    }
-
-    // Resets the ammo of all the weapons.
-    protected void ResetAllAmmo()
-    {
-        for (int i = 0; i < Guns.Count; i++)
-        {
-            if (ActiveGuns[i])
-            {
-                Guns[i].GetComponent<Gun>().ResetAmmo();
-            }
-        }
-    }
-
-    // Variables to slow down the gun switching.
-    private float lastSwitched;
-    private const float switchWait = 0.05f;
-
-    /// <returns>True if the gun currently active is the one requested</returns>
-    protected bool TrySwitchGuns(int toDeactivate, int toActivate)
-    {
-        if (Time.time > lastSwitched + switchWait)
-        {
-            if (toDeactivate != toActivate)
-            {
-                lastSwitched = Time.time;
-                currentGun = toActivate;
-                DeactivateGun(toDeactivate);
-                ActivateGun(toActivate);
-            }
-
-            return true;
-        }
-
-        return toDeactivate == toActivate;
-    }
-
-    protected virtual void ActivateGun(int index)
-    {
-    }
-
-    protected virtual void DeactivateGun(int index)
-    {
     }
 }

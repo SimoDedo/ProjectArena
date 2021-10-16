@@ -34,7 +34,7 @@ namespace AI.KnowledgeBase
         
         private List<VisibilityData> results = new List<VisibilityData>();
 
-        public void SetParameters(AISightSensor sensor, Entity target, float memoryWindow,
+        public void Prepare(AISightSensor sensor, Entity target, float memoryWindow,
             float nonConsecutiveTimeBeforeReaction, float reactionTime)
         {
             this.target = target;
@@ -47,7 +47,7 @@ namespace AI.KnowledgeBase
         private void Update()
         {
             var enemyTransform = target.transform;
-            var isTargetClose = (enemyTransform.position - transform.position).sqrMagnitude < 10;
+            var isTargetClose = target.isAlive && (enemyTransform.position - transform.position).sqrMagnitude < 10;
             var result = isTargetClose || sensor.CanSeeObject(enemyTransform, Physics.DefaultRaycastLayers);
             if (results.Count != 0)
             {

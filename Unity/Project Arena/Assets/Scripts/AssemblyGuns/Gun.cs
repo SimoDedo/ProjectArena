@@ -54,31 +54,31 @@ public abstract class Gun : MonoBehaviour, ILoggable
     [Header("UI")] [SerializeField] protected bool hasUI;
 
     // Default ammo.
-    protected int defaultAmmoInCharger;
-    protected int defaultTotalAmmo;
+    private int defaultAmmoInCharger;
+    private int defaultTotalAmmo;
 
     // Variables to manage ammo.
     protected int ammoInCharger;
     protected int totalAmmo;
 
     // Variables to manage cooldown and reload.
-    protected float cooldownStart;
-    protected float reloadStart;
-    protected bool coolingDown;
-    protected bool reloading;
+    private float cooldownStart;
+    private float reloadStart;
+    private bool coolingDown;
+    private bool reloading;
 
-    // Variables to meange the aim.
-    protected bool aiming;
-    protected bool animatingAim;
-    protected float aimStart;
-    protected float originalFOV;
+    // Variables to manage the aim.
+    private bool aiming;
+    private bool animatingAim;
+    private float aimStart;
+    private float originalFOV;
 
     protected GunUIManager gunUIManagerScript;
-    protected PlayerUIManager playerUIManagerScript;
+    private PlayerUIManager playerUIManagerScript;
     protected Entity ownerEntityScript;
 
     // Is the gun being used?
-    protected bool used;
+    private bool used;
 
     // Is the input enabled?
     // Gun identifier.
@@ -255,6 +255,7 @@ public abstract class Gun : MonoBehaviour, ILoggable
     }
 
     // I can shoot when I'm not reloading and I'm not in cooldown.
+    // FIXME is it ok if I report being able to shoot even if not equipped?
     public bool CanShoot()
     {
         return !reloading && !coolingDown && ammoInCharger > 0;

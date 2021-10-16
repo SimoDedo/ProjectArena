@@ -7,7 +7,7 @@ public class AIMovementController : MonoBehaviour
     private Transform t;
     private Vector3 previousPosition;
 
-    public void SetParameters(float speed)
+    public void Prepare(float speed)
     {
         this.speed = speed;
     }
