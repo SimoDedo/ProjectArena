@@ -6,12 +6,14 @@ namespace AssemblyAI.State
 {
     public class SearchForLostEnemy : IState
     {
-        public SearchForLostEnemy(AIEntity entity)
+        public SearchForLostEnemy(AIEntity entity, bool searchDueToDamage = false)
         {
             this.entity = entity;
+            this.searchDueToDamage = searchDueToDamage;
         }
     
         private AIEntity entity;
+        private bool searchDueToDamage;
         private ExternalBehaviorTree externalBT;
         private BehaviorTree behaviorTree;
         private List<IState> outgoingStates = new List<IState>();
@@ -37,6 +39,7 @@ namespace AssemblyAI.State
             behaviorTree.ExternalBehavior = externalBT;
             behaviorTree.EnableBehavior();
             BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
+            behaviorTree.SetVariableValue("SearchDueToDamage", searchDueToDamage);
             startSearchTime = Time.time;
             outgoingStates.Add(new Wander(entity));
             outgoingStates.Add(new LookForPickups(entity));

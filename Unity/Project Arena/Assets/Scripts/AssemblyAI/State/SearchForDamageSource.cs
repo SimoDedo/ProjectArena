@@ -7,13 +7,13 @@ namespace AssemblyAI.State
     // TODO This for now is exactly like SearchForLostEnemy, but with different transition
     public class SearchForDamageSource : IState
     {
+        private AIEntity entity;
+
         public SearchForDamageSource(AIEntity entity)
         {
             this.entity = entity;
         }
-    
-        private AIEntity entity;
-
+        
         public float CalculateTransitionScore()
         {
             if (entity.GetEnemy().isAlive && entity.HasTakenDamageRecently())
@@ -24,7 +24,7 @@ namespace AssemblyAI.State
         }
         public void Enter()
         {
-            entity.SetNewState(new SearchForLostEnemy(entity));
+            entity.SetNewState(new SearchForLostEnemy(entity, true));
         }
     
         public void Update()

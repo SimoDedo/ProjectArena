@@ -264,17 +264,7 @@ public class Player : Entity, ILoggable
     {
         gunManager.SupplyGuns(suppliedGuns, ammoAmounts);
     }
-
-    public override int GetTotalAmmoForGun(int index)
-    {
-        return gunManager.GetTotalAmmoForGun(index);
-    }
-
-    public override int GetMaxAmmoForGun(int index)
-    {
-        return gunManager.GetMaxAmmoForGun(index);
-    }
-
+    
     // Kills the player.
     protected override void Die(int id)
     {
@@ -292,7 +282,7 @@ public class Player : Entity, ILoggable
         ActivateLowestGun();
         SetInGame(true);
 
-        playerUIManagerScript.SetHealth(Health, totalHealth);
+        playerUIManagerScript?.SetHealth(Health, totalHealth);
     }
 
     // Activates the lowest ranked gun.

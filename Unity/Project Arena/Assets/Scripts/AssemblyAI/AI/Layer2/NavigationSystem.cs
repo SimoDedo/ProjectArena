@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
 using UnityEngine.AI;
-using Utils;
 
 namespace Entities.AI.Layer2
 {
@@ -13,12 +12,12 @@ namespace Entities.AI.Layer2
         private float acceleration;
         private float angularSpeed;
 
-        public void Prepare(AIMovementController mover, float speed, float acceleration, float angularSpeed)
+        public void Prepare(AIMovementController mover, float speed)
         {
             this.mover = mover;
             this.speed = speed;
-            this.acceleration = acceleration;
-            this.angularSpeed = angularSpeed;
+            acceleration = 1000000;
+            angularSpeed = 1000000;
         }
 
         private void Start()
@@ -108,12 +107,6 @@ namespace Entities.AI.Layer2
         public bool HasArrivedToDestination()
         {
             return agent.remainingDistance < 0.5f;
-        }
-
-        public float GetEstimatedPathDuration(NavMeshPath path)
-        {
-            var lenght = NavigationUtils.GetPathLenght(path);
-            return lenght / agent.speed;
         }
 
         public void CancelPath()

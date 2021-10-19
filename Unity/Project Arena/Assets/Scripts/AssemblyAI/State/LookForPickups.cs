@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using AI.AI.Layer3;
 using AssemblyAI.Behaviours.Variables;
 using BehaviorDesigner.Runtime;
+using BehaviorDesigner.Runtime.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
 using Object = UnityEngine.Object;
@@ -86,8 +87,12 @@ namespace AssemblyAI.State
                     
                     currentPickable = nextPickable;
                 }
-
+                
                 BehaviorManager.instance.Tick(behaviorTree);
+                if (behaviorTree.ExecutionStatus == TaskStatus.Failure)
+                {
+                    Debug.Log("What happened?");
+                }
             }
         }
 

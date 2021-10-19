@@ -59,17 +59,7 @@ public class Opponent : Entity
     {
         gunManager.SupplyGuns(suppliedGuns, ammoAmounts);
     }
-
-    public override int GetTotalAmmoForGun(int index)
-    {
-        return gunManager.GetTotalAmmoForGun(index);
-    }
-
-    public override int GetMaxAmmoForGun(int index)
-    {
-        return gunManager.GetMaxAmmoForGun(index);
-    }
-
+    
     // Kills the opponent.
     protected override void Die(int id) {
         gameManagerScript.AddScore(id, entityID);

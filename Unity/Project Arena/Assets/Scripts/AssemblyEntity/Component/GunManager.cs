@@ -9,6 +9,7 @@ namespace AssemblyEntity.Component
     public class GunManager : MonoBehaviour
     {
         private List<Gun> guns;
+        private List<GunScorer> gunScorers;
         private List<bool> ActiveGuns
         {
             get { return guns.Select(it => it.isActiveAndEnabled).ToList(); }
@@ -47,6 +48,7 @@ namespace AssemblyEntity.Component
         public void Prepare()
         {
             guns = gameObject.GetComponentsInChildren<Gun>().ToList();
+            gunScorers = guns.Select(it => it.GetComponent<GunScorer>()).ToList();
         }
 
 
@@ -109,12 +111,7 @@ namespace AssemblyEntity.Component
                 }
             }
         }
-
-        public int GetTotalAmmoForGun(int index)
-        {
-            return guns[index].GetCurrentAmmo();
-        }
-
+        
         public int GetMaxAmmoForGun(int index)
         {
             return guns[index].GetMaxAmmo();
@@ -123,6 +120,17 @@ namespace AssemblyEntity.Component
         {
             return guns[index].GetCurrentAmmo();
         }
+        
+        public int GetCurrentChargerSize(int index)
+        {
+            return guns[index].GetAmmoClipSize();
+        }
+        
+        public int GetCurrentAmmoInCharger(int index)
+        {
+            return guns[index].GetLoadedAmmo();
+        }
+        
 
         public void ResetAmmo()
         {
@@ -181,11 +189,11 @@ namespace AssemblyEntity.Component
 
         public void ReloadCurrentGun()
         {
-            guns[CurrentGunIndex].Shoot();
+            guns[CurrentGunIndex].Reload();
         }
         public float GetGunScore(int index, float distance)
         {
-            return guns[index].GetComponent<GunScorer>().GetGunScore(distance);
+            return gunScorers[index].GetGunScore(distance);
         }
 
         public float GetGunProjectileSpeed(int index)
@@ -198,6 +206,17 @@ namespace AssemblyEntity.Component
             return guns[CurrentGunIndex].GetProjectileSpeed();
         }
 
+        public bool IsCurrentGunReloading()
+        {
+            return guns[CurrentGunIndex].IsReloading;
+        }
+
+        public Tuple<float,float> GetCurrentAmmoOptimalRange()
+        {
+            return gunScorers[CurrentGunIndex].GetOptimalRange();
+        }
+        
         public const int NO_GUN = -1;
+
     }
 }

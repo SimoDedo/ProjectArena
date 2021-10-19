@@ -14,7 +14,7 @@ namespace AssemblyAI.State
 
         public float CalculateTransitionScore()
         {
-            return 0.2f;
+            return 0.1f;
         }
 
         private ExternalBehaviorTree externalBT;

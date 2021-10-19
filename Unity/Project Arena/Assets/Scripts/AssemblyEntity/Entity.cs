@@ -34,7 +34,7 @@ public abstract class Entity : MonoBehaviour
     public abstract void Respawn();
 
     // Returns whether the entity is in game or not
-    public bool isAlive => Health > 0;
+    public bool isAlive => isActiveAndEnabled && Health > 0;
 
     // Slows down the entity.
     public abstract void SlowEntity(float penalty);
@@ -54,12 +54,7 @@ public abstract class Entity : MonoBehaviour
 
     // Increases the ammo of the available guns.
     public abstract void SupplyGuns(bool[] suppliedGuns, int[] ammoAmounts);
-
-    public abstract int GetTotalAmmoForGun(int index);
-
-    public abstract int GetMaxAmmoForGun(int index);
     
-
     // Sets if the entity is in game, i.e. if it can move, shoot, interact
     // with object and be hit.
     public abstract void SetInGame(bool b);

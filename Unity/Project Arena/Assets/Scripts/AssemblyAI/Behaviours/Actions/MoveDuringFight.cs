@@ -1,4 +1,5 @@
 using System;
+using AssemblyEntity.Component;
 using BehaviorDesigner.Runtime.Tasks;
 using Entities.AI.Layer2;
 using UnityEngine;
@@ -12,6 +13,7 @@ namespace AssemblyAI.Behaviours.Actions
     {
         private AIEntity entity;
         private NavigationSystem agent;
+        private GunManager gunManager;
         private Entity target;
 
         private bool strifeRight = Random.value < 0.5;
@@ -27,6 +29,7 @@ namespace AssemblyAI.Behaviours.Actions
         {
             agent = GetComponent<NavigationSystem>();
             entity = GetComponent<AIEntity>();
+            gunManager = GetComponent<GunManager>();
             target = entity.GetEnemy();
             skill = entity.GetMovementSkill();
             agent.CancelPath();
@@ -134,32 +137,43 @@ namespace AssemblyAI.Behaviours.Actions
             var targetPos = target.transform.position;
             targetPos.y = currentPos.y;
             var unNormalizedDirection = targetPos - currentPos;
+            var distance = unNormalizedDirection.magnitude;
             var direction = unNormalizedDirection.normalized;
 
-            if (skill == AIEntity.FightingMovementSkill.MoveStraight)
-            {
-                // TODO how to decide if moving forward or backward?
-                if (unNormalizedDirection.sqrMagnitude > 25f)
-                    agent.SetDestination(currentPos + direction * 3f);
-                else
-                    agent.SetDestination(currentPos + -direction * 3f);
-                return;
-            }
+            var movementDirectionDueToGun = Vector3.zero; 
+            var movementDirectionDueToStrife = Vector3.zero; 
+            
+            // Get current gun optimal range
+            var (closeRange, farRange) = gunManager.GetCurrentAmmoOptimalRange();
+            if (distance < closeRange)
+                movementDirectionDueToGun = direction;
+            else if (distance > farRange)
+                movementDirectionDueToGun = -direction;
 
-            var strifeDir = Vector3.Cross(direction, transform.up);
-            if (skill == AIEntity.FightingMovementSkill.CircleStrifeChangeDirection)
+            if (skill >= AIEntity.FightingMovementSkill.CircleStrife)
             {
-                remainingStrifes--;
-                if (remainingStrifes < 0)
+                movementDirectionDueToStrife = Vector3.Cross(direction, transform.up);
+                if (skill == AIEntity.FightingMovementSkill.CircleStrifeChangeDirection)
                 {
-                    remainingStrifes = Random.Range(minStrifeLength, maxStrifeLength);
-                    strifeRight = !strifeRight;
+                    remainingStrifes--;
+                    if (remainingStrifes < 0)
+                    {
+                        remainingStrifes = Random.Range(minStrifeLength, maxStrifeLength);
+                        strifeRight = !strifeRight;
+                    }
                 }
+                if (!strifeRight)
+                    movementDirectionDueToStrife = -movementDirectionDueToStrife;
             }
-
-            var offset = strifeDir * (strifeRight ? 3f : -3f);
-            Debug.DrawLine(currentPos, currentPos + offset, Color.magenta);
-            agent.SetDestination(currentPos + offset);
+            
+            var totalMovement = movementDirectionDueToStrife + movementDirectionDueToGun * 3f;
+            var newPos = currentPos + totalMovement;
+            if (!Physics.Linecast(newPos, targetPos, out var hit, Physics.IgnoreRaycastLayer) ||
+                hit.collider.gameObject != target.gameObject)
+            {
+                Debug.DrawLine(currentPos, currentPos + totalMovement, Color.magenta);
+                agent.SetDestination(currentPos + totalMovement);
+            }
         }
     }
 }

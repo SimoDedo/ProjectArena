@@ -96,7 +96,7 @@ namespace AI.AI.Layer3
             if (entityLastAmmo.Length != totalGuns)
                 entityLastAmmo = new int[totalGuns];
             for (var i=0; i<totalGuns; i++)
-                entityLastAmmo[i] = entity.GetTotalAmmoForGun(i);
+                entityLastAmmo[i] = entity.GetCurrentAmmoForGun(i);
         }
 
         private bool CanUsePreviousResult()
@@ -106,7 +106,7 @@ namespace AI.AI.Layer3
             var totalGuns = gunManager.NumberOfGuns;
             if (totalGuns != entityLastAmmo.Length) return false;
             for (var i=0; i<totalGuns; i++)
-                if (entity.GetTotalAmmoForGun(i) != entityLastAmmo[i]) return false;
+                if (entity.GetCurrentAmmoForGun(i) != entityLastAmmo[i]) return false;
             return !isFirstTime && lastKBUpdateTime == knowledgeBase.GetLastUpdateTime();
         }
 

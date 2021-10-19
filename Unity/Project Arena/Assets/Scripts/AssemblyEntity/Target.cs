@@ -158,16 +158,6 @@ public class Target : Entity, ILoggable {
         throw new InvalidOperationException();
     }
 
-    public override int GetTotalAmmoForGun(int index)
-    {
-        throw new InvalidOperationException();
-    }
-
-    public override int GetMaxAmmoForGun(int index)
-    {
-        throw new InvalidOperationException();
-    }
-
     public override void Respawn() { }
 
     public override void SetInGame(bool b) { }

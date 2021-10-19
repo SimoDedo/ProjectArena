@@ -1,3 +1,5 @@
+using System;
+using BehaviorDesigner.Runtime.Tasks.Unity.Math;
 using UnityEngine;
 
 namespace AI.Guns
@@ -5,11 +7,6 @@ namespace AI.Guns
     public abstract class GunScorer : MonoBehaviour
     {
         public abstract float GetGunScore(float distance);
+        public abstract Tuple<float, float> GetOptimalRange();
     }
-
-    // TODO For now:
-    //   Shotgun: 0-20
-    //   Rocket: 20-30
-    //   Assault: 30-60
-    //   Rifle: 60-100
 }

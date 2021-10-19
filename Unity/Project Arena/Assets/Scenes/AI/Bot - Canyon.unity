@@ -463,8 +463,13 @@ PrefabInstance:
       objectReference: {fileID: 1812419189}
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
+      propertyPath: speed
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
       propertyPath: curiosity
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
@@ -478,6 +483,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
+      propertyPath: memoryWindow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
       propertyPath: movementSkill
       value: 3
       objectReference: {fileID: 0}
@@ -485,6 +495,11 @@ PrefabInstance:
         type: 3}
       propertyPath: predictionSkill
       value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: timeBeforeCanReact
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 6069983894062413340, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
@@ -763,6 +778,11 @@ PrefabInstance:
       objectReference: {fileID: 590510142}
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
+      propertyPath: speed
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
       propertyPath: curiosity
       value: 0
       objectReference: {fileID: 0}
@@ -778,8 +798,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
+      propertyPath: memoryWindow
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
       propertyPath: movementSkill
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: timeBeforeCanReact
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}

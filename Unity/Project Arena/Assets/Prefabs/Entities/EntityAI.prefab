@@ -542,6 +542,7 @@ GameObject:
   - component: {fileID: 5647456198230708602}
   - component: {fileID: 3810383247524921496}
   - component: {fileID: 1272100895109282999}
+  - component: {fileID: 257471483569046898}
   m_Layer: 8
   m_Name: EntityAI
   m_TagString: Player
@@ -581,17 +582,15 @@ MonoBehaviour:
   totalHealth: 0
   disabledLayer: 0
   speed: 16
-  acceleration: 1000000
-  angularSpeed: 1000000
   head: {fileID: 1523818027142824}
   fov: 60
   maxRange: 100
-  sensibility: 10
-  inputPenalty: 1
+  maxSpeed: 1000
+  maxAcceleration: 2000
   memoryWindow: 0.5
-  reactionTime: 0.1
   timeBeforeCanReact: 0.1
   health: 0
+  shouldDisplayUIIfAvailable: 1
   movementSkill: 0
   curiosity: 0
   predictionSkill: 0.5
@@ -639,6 +638,31 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &257471483569046898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1128226087601874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 630de61c621197d4a86984936fde87e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: {fileID: 0}
+  cooldown: {fileID: 0}
+  damage: {fileID: 0}
+  gunNumbers:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  gunColors:
+  - {r: 0.41176474, g: 0.27450982, b: 0.68235296, a: 1}
+  - {r: 0.92549026, g: 0.8588236, b: 0.2627451, a: 1}
+  - {r: 0.3254902, g: 0.6509804, b: 0.3372549, a: 1}
+  - {r: 0.45882356, g: 0.34117648, b: 0.3019608, a: 1}
 --- !u!1 &1136143575041094
 GameObject:
   m_ObjectHideFlags: 0
@@ -927,7 +951,7 @@ GameObject:
   - component: {fileID: 4656231824012272}
   - component: {fileID: 114040892126706168}
   - component: {fileID: 114128907697292602}
-  - component: {fileID: 5119721961864454988}
+  - component: {fileID: 3455471732554073194}
   m_Layer: 8
   m_Name: Rifle
   m_TagString: Untagged
@@ -994,7 +1018,7 @@ MonoBehaviour:
   weaponCamera: {fileID: 20151622254872766}
   aimPosition: {x: -0.35, y: 0.075, z: -0.4}
   aimOverlay: {fileID: 0}
-  hasUI: 0
+  displayUIIfAvailable: 1
   limitRange: 0
   range: 100
   sparkPrefab: {fileID: 1267919001785460, guid: 0bf9b404556a5e74b8b2438fd337397c,
@@ -1003,7 +1027,7 @@ MonoBehaviour:
   ignoredLayers:
     serializedVersion: 2
     m_Bits: 516
---- !u!114 &5119721961864454988
+--- !u!114 &3455471732554073194
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1012,11 +1036,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 1215800273274650}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d9a5f783f7e49a986c7dfe20318e22c, type: 3}
+  m_Script: {fileID: 11500000, guid: 8c8f11410b65469bb5e6162f2edb125b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minRange: 60
-  maxRange: 100
+  minRangeBest: 50
+  maxRangeBest: 100
+  controlPoints:
+  - distance: 25
+    score: 0.1
+  - distance: 50
+    score: 1
 --- !u!1 &1243870793981426
 GameObject:
   m_ObjectHideFlags: 0
@@ -1464,7 +1493,7 @@ GameObject:
   - component: {fileID: 4482265910674310}
   - component: {fileID: 114187036404975674}
   - component: {fileID: 114718352753251754}
-  - component: {fileID: 8520857570892039768}
+  - component: {fileID: 7444563172988504387}
   m_Layer: 8
   m_Name: Rocket Launcher
   m_TagString: Untagged
@@ -1532,13 +1561,13 @@ MonoBehaviour:
   weaponCamera: {fileID: 0}
   aimPosition: {x: 0, y: 0, z: 0}
   aimOverlay: {fileID: 0}
-  hasUI: 0
+  displayUIIfAvailable: 1
   projectilePosition: {fileID: 1845458571358680}
   projectilePrefab: {fileID: 1126430156955636, guid: 3e91b684c4b3fec4386397b9b1d4c745,
     type: 3}
   projectileLifeTime: 10
   projectileSpeed: 50
---- !u!114 &8520857570892039768
+--- !u!114 &7444563172988504387
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1547,11 +1576,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 1349010876380572}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d9a5f783f7e49a986c7dfe20318e22c, type: 3}
+  m_Script: {fileID: 11500000, guid: 8c8f11410b65469bb5e6162f2edb125b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minRange: 20
-  maxRange: 30
+  minRangeBest: 10
+  maxRangeBest: 20
+  controlPoints:
+  - distance: 0
+    score: 0
+  - distance: 10
+    score: 0
+  - distance: 10
+    score: 1
+  - distance: 20
+    score: 1
+  - distance: 40
+    score: 0.5
+  - distance: 50
+    score: 0.01
 --- !u!1 &1350091775535268
 GameObject:
   m_ObjectHideFlags: 0
@@ -1973,7 +2015,7 @@ GameObject:
   - component: {fileID: 4079534491022434}
   - component: {fileID: 114406827984555436}
   - component: {fileID: 114191837528411164}
-  - component: {fileID: 7394982974198650920}
+  - component: {fileID: 449096392693712555}
   m_Layer: 8
   m_Name: AK47
   m_TagString: Untagged
@@ -2040,7 +2082,7 @@ MonoBehaviour:
   weaponCamera: {fileID: 0}
   aimPosition: {x: 0, y: 0, z: 0}
   aimOverlay: {fileID: 0}
-  hasUI: 0
+  displayUIIfAvailable: 1
   limitRange: 0
   range: 100
   sparkPrefab: {fileID: 1898888085525940, guid: f32340268f5f82147a7b25d160d8f0ee,
@@ -2049,7 +2091,7 @@ MonoBehaviour:
   ignoredLayers:
     serializedVersion: 2
     m_Bits: 516
---- !u!114 &7394982974198650920
+--- !u!114 &449096392693712555
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2058,11 +2100,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 1420662876468926}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d9a5f783f7e49a986c7dfe20318e22c, type: 3}
+  m_Script: {fileID: 11500000, guid: 8c8f11410b65469bb5e6162f2edb125b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minRange: 30
-  maxRange: 60
+  minRangeBest: 20
+  maxRangeBest: 50
+  controlPoints:
+  - distance: 0
+    score: 0.25
+  - distance: 20
+    score: 1
+  - distance: 50
+    score: 1
+  - distance: 100
+    score: 0.25
 --- !u!1 &1421365929848674
 GameObject:
   m_ObjectHideFlags: 0
@@ -3430,7 +3481,7 @@ GameObject:
   - component: {fileID: 4759083324844800}
   - component: {fileID: 114215182200902864}
   - component: {fileID: 114286380553423094}
-  - component: {fileID: 39344177914041967}
+  - component: {fileID: 3844986804408395285}
   m_Layer: 8
   m_Name: Shotgun
   m_TagString: Untagged
@@ -3497,7 +3548,7 @@ MonoBehaviour:
   weaponCamera: {fileID: 0}
   aimPosition: {x: 0, y: 0, z: 0}
   aimOverlay: {fileID: 0}
-  hasUI: 0
+  displayUIIfAvailable: 1
   limitRange: 1
   range: 100
   sparkPrefab: {fileID: 1370238009886188, guid: 8e38765ee5c99e14588ef9c70a666350,
@@ -3506,7 +3557,7 @@ MonoBehaviour:
   ignoredLayers:
     serializedVersion: 2
     m_Bits: 516
---- !u!114 &39344177914041967
+--- !u!114 &3844986804408395285
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3515,11 +3566,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 1686794995014334}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d9a5f783f7e49a986c7dfe20318e22c, type: 3}
+  m_Script: {fileID: 11500000, guid: 8c8f11410b65469bb5e6162f2edb125b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minRange: 0
-  maxRange: 20
+  minRangeBest: 10
+  maxRangeBest: 25
+  controlPoints:
+  - distance: 25
+    score: 1
+  - distance: 40
+    score: 0.01
 --- !u!1 &1707763142875596
 GameObject:
   m_ObjectHideFlags: 0

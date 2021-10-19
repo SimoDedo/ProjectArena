@@ -6,14 +6,15 @@ namespace Entities.AI.Controller
     public class AISightController : MonoBehaviour
     {
         private GameObject head;
-        private float sensibility;
-        private float inputPenalty;
+        private float maxSpeed;
+        private float maxAcceleration;
+        private float inputPenalty = 1f;
 
-        public void Prepare(GameObject head, float sensibility, float inputPenalty)
+        public void Prepare(GameObject head, float maxSpeed, float maxAcceleration)
         {
             this.head = head;
-            this.sensibility = sensibility;
-            this.inputPenalty = inputPenalty;
+            this.maxSpeed = maxSpeed;
+            this.maxAcceleration = maxAcceleration;
         }
 
         /// <summary>
@@ -30,7 +31,7 @@ namespace Entities.AI.Controller
             var headTransform = head.transform;
             var position = headTransform.position;
             var direction = (target - position).normalized;
-            
+
             var rotation = Quaternion.LookRotation(direction);
 
             var angles = rotation.eulerAngles;
@@ -47,12 +48,11 @@ namespace Entities.AI.Controller
 
             currentBodySpeed = CalculateNewSpeed(angles.y, currentHeadAngles.y, currentBodySpeed);
             currentHeadSpeed = CalculateNewSpeed(angles.x, currentHeadAngles.x, currentHeadSpeed);
-            
-            Debug.Log(gameObject.name + " new speeds: " + currentBodySpeed + ", " + currentHeadSpeed);
-            
+
+            // Debug.Log(gameObject.name + " new speeds: " + currentBodySpeed + ", " + currentHeadSpeed);
+
             var maxAngleBody = Math.Abs(currentBodySpeed * Time.deltaTime);
             var maxAnglehead = Math.Abs(currentHeadSpeed * Time.deltaTime);
-            // var maxAngle = 2 * sensibility * inputPenalty * sensibilityAdjustement;
 
             var newHeadRotation = Quaternion.RotateTowards(currentHeadRotation, desiredHeadRotation, maxAnglehead);
             var newBodyRotation = Quaternion.RotateTowards(currentBodyRotation, desiredBodyRotation, maxAngleBody);
@@ -60,30 +60,31 @@ namespace Entities.AI.Controller
             headTransform.localRotation = newHeadRotation;
             transform.localRotation = newBodyRotation;
 
+            Debug.DrawRay(head.transform.position, headTransform.forward, Color.green);
+            Debug.DrawLine(head.transform.position, target, Color.blue);
             return Vector3.Angle(headTransform.forward, direction);
         }
 
-        private const float maxAcceleration = 2000f;
-        private const float maxSpeed = 1000f;
         private float currentBodySpeed;
         private float currentHeadSpeed;
 
         private float CalculateNewSpeed(float target, float actual, float previousSpeed)
         {
+            var clampedAcceleration = maxAcceleration * inputPenalty;
             var angleToPerform = target - actual;
-            var timeDeceleration = previousSpeed / maxAcceleration;
+            var timeDeceleration = previousSpeed / clampedAcceleration;
             var angleDuringDeceleration = previousSpeed * timeDeceleration +
-                                          1f / 2f * maxAcceleration * timeDeceleration * timeDeceleration;
+                                          1f / 2f * clampedAcceleration * timeDeceleration * timeDeceleration;
 
             if (Math.Abs(angleDuringDeceleration) < Math.Abs(angleToPerform))
             {
-                var newSpeed = previousSpeed + Mathf.Sign(angleToPerform) * maxAcceleration * Time.deltaTime;
+                var newSpeed = previousSpeed + Mathf.Sign(angleToPerform) * clampedAcceleration * Time.deltaTime;
                 if (Mathf.Abs(newSpeed) > maxSpeed)
                     newSpeed = maxSpeed * Mathf.Sign(newSpeed);
                 return newSpeed;
             }
 
-            return previousSpeed + Mathf.Sign(-previousSpeed) * maxAcceleration * Time.deltaTime;
+            return previousSpeed + Mathf.Sign(-previousSpeed) * clampedAcceleration * Time.deltaTime;
         }
 
         private static Vector3 ConvertTo180Based(Vector3 angles)

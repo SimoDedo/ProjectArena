@@ -52,7 +52,7 @@ public class ProjectileGun : Gun {
             });
         }
 
-        if (hasUI) {
+        if (canDisplayUI) {
             gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
         }
 

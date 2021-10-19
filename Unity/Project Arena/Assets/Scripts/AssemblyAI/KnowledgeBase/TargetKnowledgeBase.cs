@@ -20,12 +20,7 @@ namespace AI.KnowledgeBase
         private Entity target;
         private AISightSensor sensor;
         private float memoryWindow;
-
-        /// <summary>
-        /// Delay before reacting to detection or loss of target
-        /// </summary>
-        private float reactionTime;
-
+        
         /// <summary>
         /// Total time (in the memory window) that the enemy must be seen or not seen before declaring that
         /// we can detect it or have lost it.
@@ -35,13 +30,12 @@ namespace AI.KnowledgeBase
         private List<VisibilityData> results = new List<VisibilityData>();
 
         public void Prepare(AISightSensor sensor, Entity target, float memoryWindow,
-            float nonConsecutiveTimeBeforeReaction, float reactionTime)
+            float nonConsecutiveTimeBeforeReaction)
         {
             this.target = target;
             this.sensor = sensor;
             this.memoryWindow = memoryWindow;
             this.nonConsecutiveTimeBeforeReaction = nonConsecutiveTimeBeforeReaction;
-            this.reactionTime = reactionTime;
         }
 
         private void Update()
@@ -95,7 +89,7 @@ namespace AI.KnowledgeBase
         private bool TestDetection()
         {
             var beginWindow = Time.time - memoryWindow;
-            var endWindow = Time.time - reactionTime;
+            var endWindow = Time.time;
             var totalTimeVisible = 0f;
             var totalTimeNotVisible = 0f;
 
@@ -126,7 +120,7 @@ namespace AI.KnowledgeBase
 
         public float GetLastKnownPositionTime()
         {
-            var searchTimeEnd = Time.time - reactionTime;
+            var searchTimeEnd = Time.time;
             var result = results.FindLast(it => it.isVisibile && it.startTime < searchTimeEnd);
             // We got here not because we lost track of target, but for other reasons (e.g. got damage),
             // return current position of enemy

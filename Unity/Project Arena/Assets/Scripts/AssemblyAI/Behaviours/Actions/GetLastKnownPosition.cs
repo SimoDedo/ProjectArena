@@ -15,6 +15,7 @@ namespace AssemblyAI.Behaviours.Actions
     public class GetLastKnownPosition : Action
     {
         [SerializeField] private SharedVector3 lastKnownPosition;
+        [SerializeField] private SharedBool searchDueToDamage;
         private AIEntity entity;
         private Entity enemy;
         private PositionTracker enemyTracker;
@@ -27,25 +28,35 @@ namespace AssemblyAI.Behaviours.Actions
             enemy = entity.GetEnemy();
             knowledgeBase = GetComponent<TargetKnowledgeBase>();
             navSystem = GetComponent<NavigationSystem>();
-            
+
             enemyTracker = enemy.GetComponent<PositionTracker>();
         }
 
         public override TaskStatus OnUpdate()
         {
-            var delay = Time.time - knowledgeBase.GetLastKnownPositionTime();
-            var (position, velocity) = enemyTracker.GetPositionAndVelocityFromDelay(delay);
-
-            // Try to estimate the position of the enemy after it has gone out of sight
-            var estimatedPosition = position + velocity * 0.1f;
-            if (navSystem.IsPointOnNavMesh(estimatedPosition, out var point))
+            float delay;
+            Debug.Log("Entity " + gameObject.name + " will look because of damage? " + searchDueToDamage.Value);
+            if (!searchDueToDamage.Value)
             {
-                point.y += 4f;
-                lastKnownPosition.Value = point;
+                delay = Time.time - knowledgeBase.GetLastKnownPositionTime();
+                var (position, velocity) = enemyTracker.GetPositionAndVelocityFromDelay(delay);
+
+                // Try to estimate the position of the enemy after it has gone out of sight
+                var estimatedPosition = position + velocity * 0.1f;
+                if (navSystem.IsPointOnNavMesh(estimatedPosition, out var point))
+                {
+                    lastKnownPosition.Value = estimatedPosition;
+                    return TaskStatus.Success;
+                }
+
+                // Point wasn't valid, perhaps estimated position was OOB, use position
+                lastKnownPosition.Value = estimatedPosition;
                 return TaskStatus.Success;
             }
-            // Point wasn't valid, perhaps estimated position was OOB, use position
-            lastKnownPosition.Value = estimatedPosition;
+
+            delay = 0.2f;
+            var (enemyPos, _) = enemyTracker.GetPositionAndVelocityFromDelay(delay);
+            lastKnownPosition.Value = enemyPos;
             return TaskStatus.Success;
         }
     }

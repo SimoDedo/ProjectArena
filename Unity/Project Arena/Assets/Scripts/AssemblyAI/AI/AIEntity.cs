@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using AI.AI.Layer3;
 using AI.KnowledgeBase;
 using AssemblyAI.State;
@@ -11,7 +9,6 @@ using Entities.AI.Layer1.Sensors;
 using Entities.AI.Layer2;
 using JetBrains.Annotations;
 using UnityEngine;
-using UnityEngine.AI;
 using UnityEngine.Serialization;
 using Utils;
 
@@ -36,21 +33,18 @@ public class AIEntity : Entity, ILoggable
     [Header("Movement parameters")] [SerializeField]
     private float speed = 16;
 
-    [SerializeField] private float acceleration = 10;
-    [SerializeField] private float angularSpeed = 10;
-
     [Header("Sight parameters")] [SerializeField]
     private GameObject head;
 
-    [SerializeField] private float fov = 90f;
+    [SerializeField] private float fov = 60f;
     [SerializeField] private float maxRange = 100f;
-    [SerializeField] private float sensibility = 5f;
-    [SerializeField] private float inputPenalty = 1f;
+    [SerializeField] private float maxSpeed = 1000f;
+    [SerializeField] private float maxAcceleration = 2000f;
 
     [Header("Target reaction parameter")] [SerializeField]
     private float memoryWindow = 0.5f;
 
-    [SerializeField] private float reactionTime = 0.1f;
+    // TODO Better name
     [SerializeField] private float timeBeforeCanReact = 0.1f;
 
     // Do I have to log?
@@ -60,7 +54,12 @@ public class AIEntity : Entity, ILoggable
     private float lastPositionLog;
 
     [SerializeField] private int health;
-    public override int Health { get => health; protected set => health = value; }
+
+    public override int Health
+    {
+        get => health;
+        protected set => health = value;
+    }
 
     private AIMovementController movementController;
     private AISightSensor sightSensor;
@@ -70,28 +69,29 @@ public class AIEntity : Entity, ILoggable
     private NavigationSystem navigationSystem;
     private PickupPlanner pickupPlanner;
     private GunManager gunManager;
-
+    
+    [SerializeField] private bool shouldDisplayUIIfAvailable = true;
+    
     private void Awake()
     {
         movementController = gameObject.AddComponent<AIMovementController>();
         movementController.Prepare(speed);
         sightController = gameObject.AddComponent<AISightController>();
-        sightController.Prepare(head, sensibility, inputPenalty);
+        sightController.Prepare(head, maxSpeed, maxAcceleration);
         sightSensor = gameObject.AddComponent<AISightSensor>();
         sightSensor.Prepare(head, maxRange, fov);
         targetKnowledgeBase = gameObject.AddComponent<TargetKnowledgeBase>();
-        targetKnowledgeBase.Prepare(sightSensor, enemy, memoryWindow, timeBeforeCanReact,
-            reactionTime);
+        targetKnowledgeBase.Prepare(sightSensor, enemy, memoryWindow, timeBeforeCanReact);
         pickupKnowledgeBase = gameObject.AddComponent<PickupKnowledgeBase>();
         pickupKnowledgeBase.Prepare(sightSensor);
         navigationSystem = gameObject.AddComponent<NavigationSystem>();
-        navigationSystem.Prepare(movementController, speed, acceleration, angularSpeed);
+        navigationSystem.Prepare(movementController, speed);
         gunManager = gameObject.AddComponent<GunManager>();
         gunManager.Prepare();
         pickupPlanner = gameObject.AddComponent<PickupPlanner>();
         pickupPlanner.Prepare(this, navigationSystem, pickupKnowledgeBase, gunManager);
     }
-    
+
     [NotNull] private IState currentState = new Idle();
 
     public void SetNewState([NotNull] IState state)
@@ -122,11 +122,13 @@ public class AIEntity : Entity, ILoggable
         });
     }
 
-    private float lastDamageTime = float.MinValue; 
+    private float lastDamageTime = float.MinValue;
+
     public override void TakeDamage(int damage, int killerID)
     {
         if (inGame)
         {
+            Debug.Log("Entity " + gameObject.name + " has taken damage!");
             Health -= damage;
             lastDamageTime = Time.time;
             var position = transform.position;
@@ -207,7 +209,6 @@ public class AIEntity : Entity, ILoggable
         currentState.Update();
     }
 
-    
 
     public override void SlowEntity(float penalty)
     {
@@ -238,12 +239,12 @@ public class AIEntity : Entity, ILoggable
         gunManager.SupplyGuns(suppliedGuns, ammoAmounts);
     }
 
-    public override int GetTotalAmmoForGun(int index)
+    public int GetCurrentAmmoForGun(int index)
     {
-        return gunManager.GetTotalAmmoForGun(index);
+        return gunManager.GetCurrentAmmoForGun(index);
     }
 
-    public override int GetMaxAmmoForGun(int index)
+    public int GetMaxAmmoForGun(int index)
     {
         return gunManager.GetMaxAmmoForGun(index);
     }
@@ -260,8 +261,7 @@ public class AIEntity : Entity, ILoggable
         MeshVisibility.SetMeshVisible(transform, b);
         inGame = b;
     }
-
-
+    
     public void SetupLogging()
     {
         loggingGame = true;
@@ -271,12 +271,12 @@ public class AIEntity : Entity, ILoggable
     {
         return targetKnowledgeBase.HasSeenTarget();
     }
-    
+
     public bool HasTakenDamageRecently()
     {
         return Time.time - lastDamageTime < 0.2f;
     }
-    
+
     public enum FightingMovementSkill
     {
         StandStill = 0,
@@ -284,7 +284,7 @@ public class AIEntity : Entity, ILoggable
         CircleStrife = 2,
         CircleStrifeChangeDirection = 3,
     }
-    
+
     [SerializeField] private FightingMovementSkill movementSkill = FightingMovementSkill.MoveStraight;
 
     public FightingMovementSkill GetMovementSkill()
@@ -299,14 +299,15 @@ public class AIEntity : Entity, ILoggable
         Low,
         Medium,
         High,
-    } 
+    }
 
     public CuriosityLevel GetCuriosity()
     {
         return curiosity;
     }
 
-    [FormerlySerializedAs("premonition")] [Range(0f, 1f)] [SerializeField] private float predictionSkill = 0.5f;
+    [FormerlySerializedAs("premonition")] [Range(0f, 1f)] [SerializeField]
+    private float predictionSkill = 0.5f;
 
     public float GetPredictionSkill()
     {
@@ -320,14 +321,14 @@ public class AIEntity : Entity, ILoggable
         return enemy;
     }
 
-    
 
     [SerializeField] [Range(0f, 1f)] private float aimingSkill = 0.5f;
+
     public float GetAimingSkill()
     {
         return aimingSkill;
     }
-    
+
     public int GetMaxHealth()
     {
         return totalHealth;

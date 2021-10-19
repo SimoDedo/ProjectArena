@@ -51,7 +51,10 @@ public abstract class Gun : MonoBehaviour, ILoggable
     [SerializeField] protected Vector3 aimPosition;
     [SerializeField] protected Image aimOverlay;
 
-    [Header("UI")] [SerializeField] protected bool hasUI;
+    [Header("UI")] 
+    [SerializeField] protected bool displayUIIfAvailable = true;
+
+    protected bool canDisplayUI;
 
     // Default ammo.
     private int defaultAmmoInCharger;
@@ -145,7 +148,7 @@ public abstract class Gun : MonoBehaviour, ILoggable
         // When I switch guns I stop the reloading, but not the cooldown.
         reloading = false;
 
-        if (hasUI)
+        if (canDisplayUI)
         {
             playerUIManagerScript.StopReloading();
         }
@@ -192,12 +195,12 @@ public abstract class Gun : MonoBehaviour, ILoggable
                 }
                 else
                 {
-                    ammoInCharger = ammoInCharger + totalAmmo;
+                    ammoInCharger += totalAmmo;
                     totalAmmo = 0;
                 }
 
                 // Set the ammo in the UI.
-                if (hasUI)
+                if (canDisplayUI)
                 {
                     gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
                 }
@@ -226,7 +229,8 @@ public abstract class Gun : MonoBehaviour, ILoggable
 
         gunId = id;
 
-        if (hasUI)
+        canDisplayUI = displayUIIfAvailable && playerUIManagerScript != null; 
+        if (canDisplayUI)
         {
             gunUIManagerScript = GetComponent<GunUIManager>();
             gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
@@ -239,7 +243,7 @@ public abstract class Gun : MonoBehaviour, ILoggable
         ownerEntityScript = e;
 
         playerUIManagerScript = null;
-        hasUI = false;
+        canDisplayUI = false;
 
         ammoInCharger = chargerSize;
         totalAmmo = maximumAmmo / 2 - chargerSize;
@@ -335,7 +339,7 @@ public abstract class Gun : MonoBehaviour, ILoggable
     {
         SetReload();
 
-        if (hasUI)
+        if (canDisplayUI)
         {
             gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
             playerUIManagerScript.SetCooldown(reloadTime);
@@ -374,7 +378,7 @@ public abstract class Gun : MonoBehaviour, ILoggable
             totalAmmo = maximumAmmo;
         }
 
-        if (gameObject.activeSelf && hasUI)
+        if (gameObject.activeSelf && canDisplayUI)
         {
             gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
             if (used && ammoInCharger == 0 && CanReload())
@@ -423,7 +427,7 @@ public abstract class Gun : MonoBehaviour, ILoggable
         ammoInCharger = defaultAmmoInCharger;
         totalAmmo = defaultTotalAmmo;
 
-        if (hasUI)
+        if (canDisplayUI)
         {
             gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
         }
@@ -443,5 +447,15 @@ public abstract class Gun : MonoBehaviour, ILoggable
     public int GetMaxAmmo()
     {
         return maximumAmmo;
+    }
+
+    public int GetAmmoClipSize()
+    {
+        return chargerSize;
+    }
+    
+    public int GetLoadedAmmo()
+    {
+        return ammoInCharger;
     }
 }
