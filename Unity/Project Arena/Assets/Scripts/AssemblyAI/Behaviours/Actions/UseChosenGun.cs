@@ -77,7 +77,8 @@ namespace AssemblyAI.Behaviours.Actions
             if (float.IsPositiveInfinity(projectileSpeed))
             {
                 angle = sightController.LookAtPoint(position);
-                sightController.LookAtPoint(position);
+                if (angle < 10 && gunManager.CanCurrentGunShoot())
+                    gunManager.ShootCurrentGun();
             }
             else
             {
@@ -116,10 +117,10 @@ namespace AssemblyAI.Behaviours.Actions
                 // Only shoot if we found a nice position, otherwise keep the shot for another time
                 if (float.IsPositiveInfinity(record)) return TaskStatus.Running;
                 angle = sightController.LookAtPoint(chosenPoint);
+                if (angle < 40 && gunManager.CanCurrentGunShoot())
+                    gunManager.ShootCurrentGun();
             }
 
-            if (angle < 10 && gunManager.CanCurrentGunShoot())
-                gunManager.ShootCurrentGun();
 
 
             return TaskStatus.Running;

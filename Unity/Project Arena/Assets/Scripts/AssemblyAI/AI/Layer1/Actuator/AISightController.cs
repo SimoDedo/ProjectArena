@@ -22,16 +22,22 @@ namespace Entities.AI.Controller
         /// The rotation is subjected to the limitation given by the sensibility of the camera, so it might
         /// not be possible to immediately look at the target
         /// </summary>
-        /// <param name="target">The point to look
-        /// <param name="sensibilityAdjustement">The speed change to use when moving
+        /// <param name="target">The point to look</param>
+        /// <param name="sensibilityAdjustment">The speed change to use when moving</param>ù
+        /// <param name="forceLookStraightWhenClose"></param>
         /// <returns>The angle between the new look direction and the target</returns>
-        /// </param>
-        public float LookAtPoint(Vector3 target, float sensibilityAdjustement = 1f)
+        /// 
+        public float LookAtPoint(Vector3 target, float sensibilityAdjustment = 1f, bool forceLookStraightWhenClose = true)
         {
             var headTransform = head.transform;
             var position = headTransform.position;
-            var direction = (target - position).normalized;
 
+            var distance = (target - position).magnitude;
+
+            if (distance < 10 && forceLookStraightWhenClose)
+                target.y = position.y;
+
+            var direction = (target - position).normalized;
             var rotation = Quaternion.LookRotation(direction);
 
             var angles = rotation.eulerAngles;
@@ -52,16 +58,16 @@ namespace Entities.AI.Controller
             // Debug.Log(gameObject.name + " new speeds: " + currentBodySpeed + ", " + currentHeadSpeed);
 
             var maxAngleBody = Math.Abs(currentBodySpeed * Time.deltaTime);
-            var maxAnglehead = Math.Abs(currentHeadSpeed * Time.deltaTime);
+            var maxAngleHead = Math.Abs(currentHeadSpeed * Time.deltaTime);
 
-            var newHeadRotation = Quaternion.RotateTowards(currentHeadRotation, desiredHeadRotation, maxAnglehead);
+            var newHeadRotation = Quaternion.RotateTowards(currentHeadRotation, desiredHeadRotation, maxAngleHead);
             var newBodyRotation = Quaternion.RotateTowards(currentBodyRotation, desiredBodyRotation, maxAngleBody);
 
             headTransform.localRotation = newHeadRotation;
             transform.localRotation = newBodyRotation;
 
-            Debug.DrawRay(head.transform.position, headTransform.forward, Color.green);
-            Debug.DrawLine(head.transform.position, target, Color.blue);
+            // Debug.DrawRay(head.transform.position, headTransform.forward, Color.green);
+            // Debug.DrawLine(head.transform.position, target, Color.blue);
             return Vector3.Angle(headTransform.forward, direction);
         }
 

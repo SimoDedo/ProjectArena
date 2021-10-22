@@ -146,9 +146,9 @@ namespace AssemblyAI.Behaviours.Actions
             // Get current gun optimal range
             var (closeRange, farRange) = gunManager.GetCurrentGunOptimalRange();
             if (distance < closeRange)
-                movementDirectionDueToGun = direction;
-            else if (distance > farRange)
                 movementDirectionDueToGun = -direction;
+            else if (distance > farRange)
+                movementDirectionDueToGun = direction;
 
             if (skill >= FightingMovementSkill.CircleStrife)
             {
