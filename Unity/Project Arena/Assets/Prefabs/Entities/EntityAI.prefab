@@ -542,7 +542,6 @@ GameObject:
   - component: {fileID: 5647456198230708602}
   - component: {fileID: 3810383247524921496}
   - component: {fileID: 1272100895109282999}
-  - component: {fileID: 257471483569046898}
   m_Layer: 8
   m_Name: EntityAI
   m_TagString: Player
@@ -581,21 +580,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   totalHealth: 0
   disabledLayer: 0
-  speed: 16
   head: {fileID: 1523818027142824}
-  fov: 60
-  maxRange: 100
-  maxSpeed: 1000
-  maxAcceleration: 2000
-  memoryWindow: 0.5
-  timeBeforeCanReact: 0.1
+  botParams:
+    speed: 0
+    movementSkill: 0
+    fov: 0
+    maxCameraSpeed: 0
+    maxCameraAcceleration: 0
+    maxRange: 0
+    memoryWindow: 0
+    timeBeforeCanReact: 0
+    curiosity: 0
+    predictionSkill: 0
+    aimingSkill: 0
   health: 0
-  shouldDisplayUIIfAvailable: 1
-  movementSkill: 0
-  curiosity: 0
-  predictionSkill: 0.5
   enemy: {fileID: 0}
-  aimingSkill: 0.5
 --- !u!114 &5647456198230708602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -638,31 +637,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &257471483569046898
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1128226087601874}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 630de61c621197d4a86984936fde87e7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  health: {fileID: 0}
-  cooldown: {fileID: 0}
-  damage: {fileID: 0}
-  gunNumbers:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  gunColors:
-  - {r: 0.41176474, g: 0.27450982, b: 0.68235296, a: 1}
-  - {r: 0.92549026, g: 0.8588236, b: 0.2627451, a: 1}
-  - {r: 0.3254902, g: 0.6509804, b: 0.3372549, a: 1}
-  - {r: 0.45882356, g: 0.34117648, b: 0.3019608, a: 1}
 --- !u!1 &1136143575041094
 GameObject:
   m_ObjectHideFlags: 0

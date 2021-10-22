@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
+using System.IO;
 using Accord.Statistics.Kernels;
 using AI;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// BotGameManager is an implementation of GameManager. The bot game mode consists in a deathmatch
@@ -20,15 +23,19 @@ public class BotGameManager : GameManager
     [SerializeField] private int totalHealthOpponent = 100;
     [SerializeField] private bool[] activeGunsPlayer;
     [SerializeField] private bool[] activeGunsOpponent;
-    [SerializeField] AIMapTesting mapTesting;
+
+    [FormerlySerializedAs("mapTesting")] [SerializeField]
+    AIMapTestingLogger mapTestingLogger;
 
     [Header("Duel variables")] [SerializeField]
     protected DuelGameUIManager duelGameUIManagerScript;
 
     private AIEntity firstAI;
+    [SerializeField] private string firstBotParamsFile = "bot1.json";
     private AIEntity secondAI;
+    [SerializeField] private string secondBotParamsFile = "bot2.json";
 
-    private int playerKillCount = 0;
+    [SerializeField] private int playerKillCount = 0;
     private int opponentKillCount = 0;
 
     private int playerID = 1;
@@ -44,7 +51,7 @@ public class BotGameManager : GameManager
         secondAI = opponent.GetComponent<AIEntity>();
 
         duelGameUIManagerScript.Fade(0.7f, 1f, true, 0.5f);
-        mapTesting.StartLogging();
+        mapTestingLogger.StartLogging();
     }
 
     private void Update()
@@ -65,13 +72,27 @@ public class BotGameManager : GameManager
                 Spawn(opponent);
 
                 // Setup the contenders.
+                var args = Environment.GetCommandLineArgs();
+                foreach (var arg in args)
+                {
+                    if (arg.StartsWith("-bot1file="))
+                        firstBotParamsFile = arg.Substring(10);
+                    if (arg.StartsWith("-bot2file="))
+                        secondBotParamsFile = arg.Substring(10);
+                }
+
+                var firstBot = LoadBotCharacteristics(firstBotParamsFile);
+                firstAI.SetCharacteristics(firstBot);
                 firstAI.SetupEntity(totalHealthPlayer, activeGunsPlayer, this, playerID);
                 firstAI.SetupLogging();
-                secondAI.SetupEntity(totalHealthOpponent,
-                    activeGunsOpponent, this, opponentID);
+
+                var secondBot = LoadBotCharacteristics(secondBotParamsFile);
+                secondAI.SetCharacteristics(secondBot);
+                secondAI.SetupEntity(totalHealthOpponent, activeGunsOpponent, this, opponentID);
                 secondAI.SetupLogging();
                 startTime = Time.time;
             }
+
             SetReady(true);
         }
         else if (IsReady() && !generateOnly)
@@ -80,11 +101,45 @@ public class BotGameManager : GameManager
         }
     }
 
+    private static BotCharacteristics LoadBotCharacteristics(string botFilename)
+    {
+        var importPath = Application.persistentDataPath + "/Import";
+        if (!Directory.Exists(importPath))
+        {
+            Directory.CreateDirectory(importPath);
+        }
+
+        var filePath = importPath + "/" + botFilename;
+        try
+        {
+            using var reader = new StreamReader(filePath);
+            var botParams = reader.ReadToEnd();
+            return JsonUtility.FromJson<BotCharacteristics>(botParams);
+        }
+        catch (Exception)
+        {
+            var rtn = BotCharacteristics.Default;
+            try
+            {
+                var json = JsonUtility.ToJson(rtn, true);
+                using var writer = new StreamWriter(filePath);
+                writer.Write(json);
+                writer.Close();
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
+            return rtn;
+        }
+    }
+
     // Updates the phase of the game.
     protected override void UpdateGamePhase()
     {
         int passedTime = (int) (Time.time - startTime);
-        if (Application.isBatchMode) 
+        if (Application.isBatchMode)
             Debug.Log("Time passed: " + passedTime + " out of " + gameDuration);
         if (gamePhase == -1)
         {
@@ -111,7 +166,7 @@ public class BotGameManager : GameManager
         }
         else if (gamePhase == 1 && passedTime >= readyDuration + gameDuration)
         {
-            Debug.Log("Final score: " + playerKillCount+ ", " + opponentKillCount);
+            Debug.Log("Final score: " + playerKillCount + ", " + opponentKillCount);
             // Disable the contenders movement and interactions, activate the score UI, set the 
             // winner and set the phase.
             firstAI.SetInGame(false);
@@ -123,7 +178,7 @@ public class BotGameManager : GameManager
         }
         else if (gamePhase == 2 && passedTime >= readyDuration + gameDuration + scoreDuration)
         {
-            mapTesting.StopLogging();
+            mapTestingLogger.StopLogging();
             Quit();
             gamePhase = 3;
         }

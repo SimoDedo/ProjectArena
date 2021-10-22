@@ -21,8 +21,8 @@ namespace AssemblyAI.Behaviours.Actions
             var worstPercentage = 1f;
             for (var i = 0; i < gunCount; i++)
             {
-                var ammoInCharger = gunManager.GetCurrentAmmoInCharger(i);
-                var chargerSize = gunManager.GetCurrentChargerSize(i);
+                var ammoInCharger = gunManager.GetAmmoInChargerForGun(i);
+                var chargerSize = gunManager.GetChargerSizeForGun(i);
                 var percentage = ammoInCharger / (float) chargerSize;
                 if (percentage < worstPercentage)
                 {
