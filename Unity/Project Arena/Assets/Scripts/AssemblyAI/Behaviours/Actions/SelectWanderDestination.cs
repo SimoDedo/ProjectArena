@@ -14,7 +14,7 @@ namespace AssemblyAI.Behaviours.Actions
     [Serializable]
     public class SelectWanderDestination : Action
     {
-        [SerializeField] private SharedInt maxRetries = 2;
+        [SerializeField] private SharedInt maxRetries = 10;
         [SerializeField] private SharedFloat wanderRate = 1;
         [SerializeField] private SharedFloat minWanderDistance = 20;
         [SerializeField] private SharedFloat maxWanderDistance = 20;

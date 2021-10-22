@@ -84,8 +84,8 @@ namespace AssemblyEntity.Component
                 // Setup the gun.
                 var gun = guns[i];
                 gun.SetupGun(gms, parent, pms, i + 1);
-                ActiveGuns[i] = ag[i];
             }
+            ActiveGuns = ag.ToList();
         }
 
         public bool CanBeSupplied(bool[] suppliedGuns)
@@ -121,12 +121,12 @@ namespace AssemblyEntity.Component
             return guns[index].GetCurrentAmmo();
         }
         
-        public int GetCurrentChargerSize(int index)
+        public int GetChargerSizeForGun(int index)
         {
             return guns[index].GetAmmoClipSize();
         }
         
-        public int GetCurrentAmmoInCharger(int index)
+        public int GetAmmoInChargerForGun(int index)
         {
             return guns[index].GetLoadedAmmo();
         }
@@ -211,7 +211,7 @@ namespace AssemblyEntity.Component
             return guns[CurrentGunIndex].IsReloading;
         }
 
-        public Tuple<float,float> GetCurrentAmmoOptimalRange()
+        public Tuple<float,float> GetCurrentGunOptimalRange()
         {
             return gunScorers[CurrentGunIndex].GetOptimalRange();
         }

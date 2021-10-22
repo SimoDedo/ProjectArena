@@ -1,3 +1,4 @@
+using System;
 using AI.AI.Layer3;
 using AI.KnowledgeBase;
 using AssemblyAI.State;
@@ -9,7 +10,6 @@ using Entities.AI.Layer1.Sensors;
 using Entities.AI.Layer2;
 using JetBrains.Annotations;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Utils;
 
 /// <summary>
@@ -28,25 +28,69 @@ using Utils;
 // Premonition: How likely the player is at correctly guessing a lost target position
 
 // Aside from reflexes, all the other properties fall in [0-1] range
+
+[Serializable]
+public struct BotCharacteristics
+{
+    [Header("Movement parameters")]
+    [SerializeField] public float speed;
+    [SerializeField] public FightingMovementSkill movementSkill;
+
+    [Header("Sight parameters")]
+    [SerializeField] public float fov;
+    [SerializeField] public float maxCameraSpeed;
+    [SerializeField] public float maxCameraAcceleration;
+
+    [Header("Target reaction parameter")]
+    [SerializeField] public float maxRange;
+    [SerializeField] public float memoryWindow;
+    [SerializeField] public float timeBeforeCanReact;
+    
+    [Header("Others")]
+    [SerializeField]
+    public CuriosityLevel curiosity;
+    [SerializeField] [Range(0f,1f)] public float predictionSkill;
+    [SerializeField] [Range(0f,1f)] public float aimingSkill;
+
+    public static BotCharacteristics Default =>
+        new BotCharacteristics
+        {
+            aimingSkill = 0.5f,
+            curiosity = CuriosityLevel.Medium,
+            fov = 60,
+            maxCameraAcceleration = 2000f,
+            maxCameraSpeed = 2000f,
+            maxRange = 100f,
+            memoryWindow = 0.5f,
+            timeBeforeCanReact = 0.2f,
+            movementSkill = FightingMovementSkill.CircleStrife,
+            predictionSkill = 0.5f,
+            speed = 16
+        };
+}
+
+public enum FightingMovementSkill
+{
+    StandStill,
+    MoveStraight,
+    CircleStrife,
+    CircleStrifeChangeDirection,
+}
+public enum CuriosityLevel
+{
+    Low,
+    Medium,
+    High,
+}
+
+
 public class AIEntity : Entity, ILoggable
 {
-    [Header("Movement parameters")] [SerializeField]
-    private float speed = 16;
-
-    [Header("Sight parameters")] [SerializeField]
+    [SerializeField]
     private GameObject head;
 
-    [SerializeField] private float fov = 60f;
-    [SerializeField] private float maxRange = 100f;
-    [SerializeField] private float maxSpeed = 1000f;
-    [SerializeField] private float maxAcceleration = 2000f;
-
-    [Header("Target reaction parameter")] [SerializeField]
-    private float memoryWindow = 0.5f;
-
-    // TODO Better name
-    [SerializeField] private float timeBeforeCanReact = 0.1f;
-
+    [SerializeField] private BotCharacteristics botParams = BotCharacteristics.Default;
+    
     // Do I have to log?
     private bool loggingGame;
 
@@ -70,22 +114,20 @@ public class AIEntity : Entity, ILoggable
     private PickupPlanner pickupPlanner;
     private GunManager gunManager;
     
-    [SerializeField] private bool shouldDisplayUIIfAvailable = true;
-    
-    private void Awake()
+    private void PrepareComponents()
     {
         movementController = gameObject.AddComponent<AIMovementController>();
-        movementController.Prepare(speed);
+        movementController.Prepare(botParams.speed);
         sightController = gameObject.AddComponent<AISightController>();
-        sightController.Prepare(head, maxSpeed, maxAcceleration);
+        sightController.Prepare(head, botParams.maxCameraSpeed, botParams.maxCameraAcceleration);
         sightSensor = gameObject.AddComponent<AISightSensor>();
-        sightSensor.Prepare(head, maxRange, fov);
+        sightSensor.Prepare(head, botParams.maxRange, botParams.fov);
         targetKnowledgeBase = gameObject.AddComponent<TargetKnowledgeBase>();
-        targetKnowledgeBase.Prepare(sightSensor, enemy, memoryWindow, timeBeforeCanReact);
+        targetKnowledgeBase.Prepare(sightSensor, enemy, botParams.memoryWindow, botParams.timeBeforeCanReact);
         pickupKnowledgeBase = gameObject.AddComponent<PickupKnowledgeBase>();
         pickupKnowledgeBase.Prepare(sightSensor);
         navigationSystem = gameObject.AddComponent<NavigationSystem>();
-        navigationSystem.Prepare(movementController, speed);
+        navigationSystem.Prepare(movementController, botParams.speed);
         gunManager = gameObject.AddComponent<GunManager>();
         gunManager.Prepare();
         pickupPlanner = gameObject.AddComponent<PickupPlanner>();
@@ -103,6 +145,8 @@ public class AIEntity : Entity, ILoggable
 
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id)
     {
+        PrepareComponents();
+        
         gameManagerScript = gms;
 
         totalHealth = th;
@@ -206,7 +250,10 @@ public class AIEntity : Entity, ILoggable
             lastPositionLog = Time.time;
         }
 
-        currentState.Update();
+        if (inGame) // TODO Check if necessary
+        {
+            currentState.Update();
+        }
     }
 
 
@@ -276,42 +323,19 @@ public class AIEntity : Entity, ILoggable
     {
         return Time.time - lastDamageTime < 0.2f;
     }
-
-    public enum FightingMovementSkill
-    {
-        StandStill = 0,
-        MoveStraight = 1,
-        CircleStrife = 2,
-        CircleStrifeChangeDirection = 3,
-    }
-
-    [SerializeField] private FightingMovementSkill movementSkill = FightingMovementSkill.MoveStraight;
-
     public FightingMovementSkill GetMovementSkill()
     {
-        return movementSkill;
-    }
-
-    [SerializeField] private CuriosityLevel curiosity = CuriosityLevel.Medium;
-
-    public enum CuriosityLevel
-    {
-        Low,
-        Medium,
-        High,
+        return botParams.movementSkill;
     }
 
     public CuriosityLevel GetCuriosity()
     {
-        return curiosity;
+        return botParams.curiosity;
     }
-
-    [FormerlySerializedAs("premonition")] [Range(0f, 1f)] [SerializeField]
-    private float predictionSkill = 0.5f;
-
+    
     public float GetPredictionSkill()
     {
-        return predictionSkill;
+        return botParams.predictionSkill;
     }
 
     [SerializeField] [NotNull] private Entity enemy;
@@ -320,17 +344,20 @@ public class AIEntity : Entity, ILoggable
     {
         return enemy;
     }
-
-
-    [SerializeField] [Range(0f, 1f)] private float aimingSkill = 0.5f;
-
+    
     public float GetAimingSkill()
     {
-        return aimingSkill;
+        return botParams.aimingSkill;
     }
 
     public int GetMaxHealth()
     {
         return totalHealth;
+    }
+
+    // Won't work if bot was already set up.
+    public void SetCharacteristics(BotCharacteristics botParams)
+    {
+        this.botParams = botParams;
     }
 }

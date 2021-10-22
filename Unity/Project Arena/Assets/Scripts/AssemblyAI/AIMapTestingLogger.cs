@@ -22,7 +22,7 @@ namespace AI
     /// from the server. When sending data to the server this information is stored in the comment field 
     /// of each entry as the sum of the retrieved completion and the completion progress stored locally.
     /// </summary>
-    public class AIMapTesting : MonoBehaviour, ILoggable
+    public class AIMapTestingLogger : MonoBehaviour, ILoggable
     {
         // Directory for this esperiment files.
         private string experimentDirectory;
