@@ -19,7 +19,7 @@ namespace AI.Behaviours.NewBehaviours
         [SerializeField] private bool focused;
         private AIMovementController movementController;
         private AISightController sightController;
-        private AIEntity.CuriosityLevel curiosity;
+        private CuriosityLevel curiosity;
         private Vector3 lookPoint;
         private float nextUpdateTime;
         private float maxAngle;
@@ -135,27 +135,27 @@ namespace AI.Behaviours.NewBehaviours
         {
             public int angle;
             public int score;
-            public AIEntity.CuriosityLevel minLevel;
+            public CuriosityLevel minLevel;
             public bool allowedIfFocused;
         }
 
         private static readonly ReadOnlyCollection<AngleScore> angleScores = new ReadOnlyCollection<AngleScore>(new[]
         {
-            new AngleScore {angle = 0, score = 100, minLevel = AIEntity.CuriosityLevel.Low, allowedIfFocused = true},
+            new AngleScore {angle = 0, score = 100, minLevel = CuriosityLevel.Low, allowedIfFocused = true},
             new AngleScore
-                {angle = -45, score = 60, minLevel = AIEntity.CuriosityLevel.Medium, allowedIfFocused = true},
+                {angle = -45, score = 60, minLevel = CuriosityLevel.Medium, allowedIfFocused = true},
             new AngleScore
-                {angle = +45, score = 60, minLevel = AIEntity.CuriosityLevel.Medium, allowedIfFocused = true},
+                {angle = +45, score = 60, minLevel = CuriosityLevel.Medium, allowedIfFocused = true},
             new AngleScore
-                {angle = -90, score = 30, minLevel = AIEntity.CuriosityLevel.Medium, allowedIfFocused = false},
+                {angle = -90, score = 30, minLevel = CuriosityLevel.Medium, allowedIfFocused = false},
             new AngleScore
-                {angle = +90, score = 30, minLevel = AIEntity.CuriosityLevel.Medium, allowedIfFocused = false},
+                {angle = +90, score = 30, minLevel = CuriosityLevel.Medium, allowedIfFocused = false},
             new AngleScore
-                {angle = -135, score = 10, minLevel = AIEntity.CuriosityLevel.High, allowedIfFocused = false},
+                {angle = -135, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false},
             new AngleScore
-                {angle = +135, score = 10, minLevel = AIEntity.CuriosityLevel.High, allowedIfFocused = false},
+                {angle = +135, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false},
             new AngleScore
-                {angle = +180, score = 10, minLevel = AIEntity.CuriosityLevel.High, allowedIfFocused = false}
+                {angle = +180, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false}
         });
     }
 }

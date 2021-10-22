@@ -21,7 +21,7 @@ namespace AssemblyAI.Behaviours.Actions
 
         private const int minStrifeLength = 10;
         private const int maxStrifeLength = 30;
-        private AIEntity.FightingMovementSkill skill;
+        private FightingMovementSkill skill;
         private Collider[] rocketTestCollider = new Collider[4];
         private const float ROCKET_DETECTION_RADIUS = 40f;
 
@@ -43,7 +43,7 @@ namespace AssemblyAI.Behaviours.Actions
         public override TaskStatus OnUpdate()
         {
             // Is able enough to dodge rockets?
-            if (skill >= AIEntity.FightingMovementSkill.CircleStrife)
+            if (skill >= FightingMovementSkill.CircleStrife)
             {
                 var rocketToDodge = FindRocketToDodge();
                 if (rocketToDodge != null)
@@ -83,7 +83,7 @@ namespace AssemblyAI.Behaviours.Actions
         private Projectile FindRocketToDodge()
         {
             Projectile projectileToDodge = null;
-            if (skill >= AIEntity.FightingMovementSkill.CircleStrife)
+            if (skill >= FightingMovementSkill.CircleStrife)
             {
                 // Detect rocket presence
                 var position = transform.position;
@@ -131,7 +131,7 @@ namespace AssemblyAI.Behaviours.Actions
         private void TrySelectDestination()
         {
             // Don't move at all during shooting
-            if (skill == AIEntity.FightingMovementSkill.StandStill) return;
+            if (skill == FightingMovementSkill.StandStill) return;
 
             var currentPos = transform.position;
             var targetPos = target.transform.position;
@@ -144,16 +144,16 @@ namespace AssemblyAI.Behaviours.Actions
             var movementDirectionDueToStrife = Vector3.zero; 
             
             // Get current gun optimal range
-            var (closeRange, farRange) = gunManager.GetCurrentAmmoOptimalRange();
+            var (closeRange, farRange) = gunManager.GetCurrentGunOptimalRange();
             if (distance < closeRange)
                 movementDirectionDueToGun = direction;
             else if (distance > farRange)
                 movementDirectionDueToGun = -direction;
 
-            if (skill >= AIEntity.FightingMovementSkill.CircleStrife)
+            if (skill >= FightingMovementSkill.CircleStrife)
             {
                 movementDirectionDueToStrife = Vector3.Cross(direction, transform.up);
-                if (skill == AIEntity.FightingMovementSkill.CircleStrifeChangeDirection)
+                if (skill == FightingMovementSkill.CircleStrifeChangeDirection)
                 {
                     remainingStrifes--;
                     if (remainingStrifes < 0)
