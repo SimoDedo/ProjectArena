@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using UnityEngine;
 using MapManipulation;
 using ScriptableObjectArchitecture;
@@ -244,17 +245,17 @@ public abstract class MapGenerator : CoreComponent {
     
     public string GetMapAsText()
     {
-        var textMap = "";
+        var textMap = new StringBuilder();
         for (var x = 0; x < width; x++) {
             for (var y = 0; y < height; y++) {
-                textMap += map[x, y];
+                textMap.Append(map[x, y]);
             }
             if (x < width - 1) {
-                textMap += "\n";
+                textMap.Append("\n");
             }
         }
 
-        return textMap;
+        return textMap.ToString();
     }
     
     // Returns the map in AB notation.

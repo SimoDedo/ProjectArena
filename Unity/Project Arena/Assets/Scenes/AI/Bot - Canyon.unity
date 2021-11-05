@@ -285,6 +285,83 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc7c640dcd514e94c964113eee79d48d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &777917572
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 777917574}
+  - component: {fileID: 777917573}
+  m_Layer: 0
+  m_Name: GraphMapGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &777917573
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 777917572}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a07ca82466374339984c93a96aba9817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useRandomSeed: 0
+  seed: rgreaev42
+  width: 500
+  height: 500
+  objectToObjectDistance: 5
+  objectToWallDistance: 2
+  borderSize: 5
+  roomChar: 114
+  wallChar: 119
+  mapObjects:
+  - objectChar: 115
+    numObjPerMap: 5
+    placeAnywhere: 0
+    positioningMethod: 0
+  - objectChar: 97
+    numObjPerMap: 4
+    placeAnywhere: 0
+    positioningMethod: 0
+  - objectChar: 104
+    numObjPerMap: 4
+    placeAnywhere: 0
+    positioningMethod: 0
+  - objectChar: 100
+    numObjPerMap: 100
+    placeAnywhere: 0
+    positioningMethod: 0
+  createTextFile: 0
+  textFilePath: 
+  minRoomWidth: 1
+  maxRoomWidth: 20
+  minRoomHeight: 1
+  maxRoomHeight: 20
+  minGridSeparation: 5
+  maxGridSeparation: 15
+--- !u!4 &777917574
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 777917572}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 38.5, y: -27.95, z: 39.600002}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1553194456
 GameObject:
   m_ObjectHideFlags: 0
@@ -554,97 +631,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 87c5267e1886311258a6f48dac81a1ca, type: 3}
---- !u!1001 &1791699632
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4941001127723736, guid: d7fdd8a3b1e48ad4aaec099b06b133d7, type: 3}
-      propertyPath: m_RootOrder
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 4941001127723736, guid: d7fdd8a3b1e48ad4aaec099b06b133d7, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4941001127723736, guid: d7fdd8a3b1e48ad4aaec099b06b133d7, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4941001127723736, guid: d7fdd8a3b1e48ad4aaec099b06b133d7, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4941001127723736, guid: d7fdd8a3b1e48ad4aaec099b06b133d7, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4941001127723736, guid: d7fdd8a3b1e48ad4aaec099b06b133d7, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4941001127723736, guid: d7fdd8a3b1e48ad4aaec099b06b133d7, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4941001127723736, guid: d7fdd8a3b1e48ad4aaec099b06b133d7, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114553068300837960, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
-        type: 3}
-      propertyPath: textFilePath
-      value: /home/jimbo/Documents/dev/Unity/Projects/ProjectArena-New/ProjectArena/Unity/Project
-        Arena/Assets/Maps/Experiment 1/ai_strafing.txt
-      objectReference: {fileID: 0}
-    - target: {fileID: 114553068300837960, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
-        type: 3}
-      propertyPath: loadMapFromFile
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114810593565605670, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
-        type: 3}
-      propertyPath: isSkyVisibile
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114940447452184972, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
-        type: 3}
-      propertyPath: customObjects.Array.data[0].prefab
-      value: 
-      objectReference: {fileID: 4758734857810169564, guid: 52dc053e14f5e0b7596a6dfc2a5592c4,
-        type: 3}
-    - target: {fileID: 114940447452184972, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
-        type: 3}
-      propertyPath: customObjects.Array.data[1].prefab
-      value: 
-      objectReference: {fileID: 4444291794755708082, guid: 5110074c3fb145a18b7e7187d8d1a520,
-        type: 3}
-    - target: {fileID: 114940447452184972, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
-        type: 3}
-      propertyPath: customObjects.Array.data[0].heightCorrection
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114940447452184972, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
-        type: 3}
-      propertyPath: customObjects.Array.data[1].heightCorrection
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: d7fdd8a3b1e48ad4aaec099b06b133d7, type: 3}
---- !u!114 &1791699634 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 114553068300837960, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
-    type: 3}
-  m_PrefabInstance: {fileID: 1791699632}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15fe1a4d11fa05c4bb6fedd5c97f660b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1812419185 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1128226087601874, guid: 87c5267e1886311258a6f48dac81a1ca,
@@ -885,6 +871,286 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 87c5267e1886311258a6f48dac81a1ca, type: 3}
+--- !u!1 &1061464544299812
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4526347940827838}
+  - component: {fileID: 114911934861621558}
+  m_Layer: 0
+  m_Name: Cellular Map Generator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &1196365291933476
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4940999428581480}
+  m_Layer: 0
+  m_Name: Cellular Map
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &1461830577091552
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4273161134851952}
+  - component: {fileID: 114553069018779384}
+  m_Layer: 0
+  m_Name: SL Map Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &1845882366269052
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4338200530977490}
+  - component: {fileID: 114940446810925884}
+  m_Layer: 0
+  m_Name: Object Displacer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &1946891055617548
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4880583689238518}
+  - component: {fileID: 114810592109712790}
+  m_Layer: 0
+  m_Name: Mesh Map Assembler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4273161134851952
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1461830577091552}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 11.424643, y: 124.662315, z: -29.069704}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4940999428581480}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4338200530977490
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845882366269052}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4940999428581480}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4526347940827838
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1061464544299812}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4940999428581480}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4880583689238518
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1946891055617548}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4940999428581480}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4940999428581480
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1196365291933476}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 4273161134851952}
+  - {fileID: 4526347940827838}
+  - {fileID: 4880583689238518}
+  - {fileID: 4338200530977490}
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114553069018779384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1461830577091552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15fe1a4d11fa05c4bb6fedd5c97f660b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mapGeneratorScript: {fileID: 777917573}
+  mapAssemblerScript: {fileID: 114810592109712790}
+  objectDisplacerScript: {fileID: 114940446810925884}
+  loadMapFromFile: 0
+  textFilePath: /home/jimbo/Documents/dev/Unity/Projects/ProjectArena-New/ProjectArena/Unity/Project
+    Arena/Assets/Maps/Experiment 1/ai_strafing.txt
+  spawnPointCategory: Spawn Points
+--- !u!114 &114810592109712790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1946891055617548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e733af4eeeb7a0c4787a8541a2f72994, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wallHeight: 30
+  squareSize: 1.1
+  isSkyVisibile: 1
+  topMaterial: {fileID: 2100000, guid: c0613303af609ef4e9a058dbd6a9e117, type: 2}
+  wallMaterial: {fileID: 2100000, guid: fb414c8d4e64f1d47926c89b9dd84470, type: 2}
+  floorMaterial: {fileID: 2100000, guid: c0613303af609ef4e9a058dbd6a9e117, type: 2}
+--- !u!114 &114911934861621558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1061464544299812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b1aaa116c7cc594db0321e8f4f03d05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useRandomSeed: 1
+  seed: 
+  width: 120
+  height: 120
+  objectToObjectDistance: 10
+  objectToWallDistance: 3
+  borderSize: 5
+  roomChar: 114
+  wallChar: 119
+  mapObjects:
+  - objectChar: 115
+    numObjPerMap: 5
+    placeAnywhere: 0
+    positioningMethod: 0
+  - objectChar: 97
+    numObjPerMap: 4
+    placeAnywhere: 0
+    positioningMethod: 0
+  - objectChar: 104
+    numObjPerMap: 4
+    placeAnywhere: 0
+    positioningMethod: 0
+  - objectChar: 100
+    numObjPerMap: 100
+    placeAnywhere: 0
+    positioningMethod: 0
+  createTextFile: 0
+  textFilePath: C:\Users\Marco\Documents\Thesis\Generated Maps
+  ramdomFillPercent: 45
+  smoothingIterations: 2
+  neighbourTileLimitHigh: 4
+  neighbourTileLimitLow: 4
+  wallThresholdSize: 40
+  roomThresholdSize: 100
+  passageWidth: 10
+--- !u!114 &114940446810925884
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845882366269052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f379b89017c26bb429a805fc84a8b785, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  negativeHeight: 1
+  heightCorrection: 0
+  sizeCorrection: 1
+  customObjects:
+  - objectChar: 104
+    category: Pickable
+    prefab: {fileID: 4758734857810169564, guid: 52dc053e14f5e0b7596a6dfc2a5592c4,
+      type: 3}
+    heightCorrection: 0
+  - objectChar: 97
+    category: Pickable
+    prefab: {fileID: 4444291794755708082, guid: 5110074c3fb145a18b7e7187d8d1a520,
+      type: 3}
+    heightCorrection: 0
+  - objectChar: 115
+    category: Spawn Points
+    prefab: {fileID: 1611774674004552, guid: 36044f2c24d969c4382c559446fc5991, type: 3}
+    heightCorrection: 0.9
+  - objectChar: 100
+    category: Decorations
+    prefab: {fileID: 1430335293414702, guid: 6a35ddc474b8b0a43a22ea9037e48a00, type: 3}
+    heightCorrection: -0.2
+  - objectChar: 100
+    category: Decorations
+    prefab: {fileID: 1097561034709022, guid: bed298a547b7a51428934daba5e2d3fa, type: 3}
+    heightCorrection: -0.2
 --- !u!1001 &2548120643255209890
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -921,7 +1187,7 @@ PrefabInstance:
         type: 3}
       propertyPath: mapManagerScript
       value: 
-      objectReference: {fileID: 1791699634}
+      objectReference: {fileID: 114553069018779384}
     - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
         type: 3}
       propertyPath: mapTestingLogger
