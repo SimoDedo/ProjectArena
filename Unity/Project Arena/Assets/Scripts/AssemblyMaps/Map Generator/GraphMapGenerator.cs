@@ -15,13 +15,13 @@ namespace AssemblyMaps.Map_Generator
         [SerializeField] private int maxRoomHeight = 20;
         [SerializeField] private int minGridSeparation = 5;
         [SerializeField] private int maxGridSeparation = 15;
-        [SerializeField] private int corridorThickness = 3;
+        [SerializeField] private int maxCorridorThickness = 3;
 
         // TODO Add probabilities for corridor spawn, room sizes, ...
         private void Start()
         {
             SetReady(true);
-            Assert.IsTrue(corridorThickness > 0);
+            Assert.IsTrue(maxCorridorThickness > 0);
         }
 
         public override char[,] GenerateMap()
@@ -59,26 +59,6 @@ namespace AssemblyMaps.Map_Generator
             for (var column = 0; column < maxNumberOfColumns - 1; column++)
                 gridHorizontalSeparations[column] = pseudoRandomGen.Next(minGridSeparation, maxGridSeparation);
 
-            // Initialize array containing whether there are vertical corridors between rooms or not. 
-            // Value (i,j) indicates whether corridor connecting (i,j) and (i,j+1) is present or not
-            var hasVerticalCorridor = new bool[maxNumberOfRows - 1][];
-            for (var row = 0; row < maxNumberOfRows - 1; row++)
-            {
-                hasVerticalCorridor[row] = new bool[maxNumberOfColumns];
-                for (var column = 0; column < maxNumberOfColumns; column++)
-                    hasVerticalCorridor[row][column] = pseudoRandomGen.Next(0, 2) == 0;
-            }
-
-            // Initialize array containing whether there are horizontal corridors between rooms or not. 
-            // Value (i,j) indicates whether corridor connecting (i,j) and (i+1,j) is present or not
-            var hasHorizontalCorridor = new bool[maxNumberOfRows][];
-            for (var row = 0; row < maxNumberOfRows; row++)
-            {
-                hasHorizontalCorridor[row] = new bool[maxNumberOfColumns - 1];
-                for (var column = 0; column < maxNumberOfColumns - 1; column++)
-                    hasHorizontalCorridor[row][column] = pseudoRandomGen.Next(0, 2) == 0;
-            }
-
             // Calculate max height of each row
             var maxRowHeight = new int[maxNumberOfRows];
             for (var row = 0; row < maxNumberOfRows; row++)
@@ -93,6 +73,26 @@ namespace AssemblyMaps.Map_Generator
             {
                 for (var column = 0; column < maxNumberOfColumns; column++)
                     maxColumnWidth[column] = Mathf.Max(maxColumnWidth[column], roomsWidth[row][column]);
+            }
+
+            // Initialize array containing the width of the corridor connecting cell (i,j) with (i+1,j).
+            // A value of 0 indicates that there is no corridor
+            var verticalCorridorsWidths = new int[maxNumberOfRows - 1][];
+            for (var row = 0; row < maxNumberOfRows - 1; row++)
+            {
+                verticalCorridorsWidths[row] = new int[maxNumberOfColumns];
+                for (var column = 0; column < maxNumberOfColumns; column++)
+                    verticalCorridorsWidths[row][column] = pseudoRandomGen.Next(0, Mathf.Min(maxColumnWidth[column], maxCorridorThickness)+1);
+            }
+            
+            // Initialize array containing the height of the corridor connecting cell (i,j) with (i,j+1).
+            // A value of 0 indicates that there is no corridor
+            var horizontalCorridorsHeights = new int[maxNumberOfRows][];
+            for (var row = 0; row < maxNumberOfRows; row++)
+            {
+                horizontalCorridorsHeights[row] = new int[maxNumberOfColumns - 1];
+                for (var column = 0; column < maxNumberOfColumns - 1; column++)
+                    horizontalCorridorsHeights[row][column] = pseudoRandomGen.Next(0, Mathf.Min(maxRowHeight[row], maxCorridorThickness)+1);
             }
 
             // Calculate starting row index in the char[,] map of each row
@@ -124,7 +124,7 @@ namespace AssemblyMaps.Map_Generator
                     if (roomConnectedComponentNum[row][column] == 0)
                     {
                         var connectedRooms = VisitCell(currentConnectedNumber, row, column, roomConnectedComponentNum,
-                            hasHorizontalCorridor, hasVerticalCorridor);
+                            horizontalCorridorsHeights, verticalCorridorsWidths);
                         if (connectedRooms > bestConnectedComponentSize)
                         {
                             bestConnectedComponent = currentConnectedNumber;
@@ -154,10 +154,10 @@ namespace AssemblyMaps.Map_Generator
             {
                 for (var column = 0; column < maxNumberOfColumns; column++)
                 {
-                    if (hasVerticalCorridor[row][column] &&
+                    if (verticalCorridorsWidths[row][column] > 0 &&
                         roomConnectedComponentNum[row][column] == bestConnectedComponent)
                     {
-                        FillVerticalCorridor(rowStartingIndexes[row], rowStartingIndexes[row + 1],
+                        FillVerticalCorridor(verticalCorridorsWidths[row][column], rowStartingIndexes[row], rowStartingIndexes[row + 1],
                             columnStartingIndex[column],
                             maxColumnWidth[column], maxRowHeight[row], maxRowHeight[row + 1]);
                     }
@@ -169,10 +169,10 @@ namespace AssemblyMaps.Map_Generator
             {
                 for (var column = 0; column < maxNumberOfColumns - 1; column++)
                 {
-                    if (hasHorizontalCorridor[row][column] &&
+                    if (horizontalCorridorsHeights[row][column] > 0 &&
                         roomConnectedComponentNum[row][column] == bestConnectedComponent)
                     {
-                        FillHorizontalCorridor(rowStartingIndexes[row],
+                        FillHorizontalCorridor(horizontalCorridorsHeights[row][column], rowStartingIndexes[row],
                             columnStartingIndex[column], columnStartingIndex[column + 1],
                             maxColumnWidth[column], maxColumnWidth[column + 1], maxRowHeight[row]);
                     }
@@ -193,14 +193,14 @@ namespace AssemblyMaps.Map_Generator
             return map;
         }
 
-        private void FillVerticalCorridor(int currentRowStartingIndex, int nextRowStartingIndex,
+        private void FillVerticalCorridor(int corridorThickness, int currentRowStartingIndex, int nextRowStartingIndex,
             int currentColumnStartingIndex, int currentColumnMaxWidth, int currentRowMaxHeight, int nextRowMaxHeight)
         {
             var corridorStaringRow = currentRowStartingIndex + currentRowMaxHeight / 2;
             var corridorEndingRow = nextRowStartingIndex + nextRowMaxHeight / 2;
 
             int corridorStartingColumn;
-            var corridorWidth = Mathf.Min(corridorThickness, currentColumnMaxWidth);
+            var corridorWidth = corridorThickness;
             if (corridorWidth <= currentColumnMaxWidth / 2)
                 corridorStartingColumn = currentColumnStartingIndex + (currentColumnMaxWidth / 2) - corridorWidth;
             else
@@ -217,7 +217,7 @@ namespace AssemblyMaps.Map_Generator
             }
         }
 
-        private void FillHorizontalCorridor(int currentRowStartingIndex, int currentColumnStartingIndex,
+        private void FillHorizontalCorridor(int corridorThickness, int currentRowStartingIndex, int currentColumnStartingIndex,
             int nextColumnStartingIndex, int currentColumnMaxWidth, int nextColumnMaxWidth, int currentRowMaxHeight)
         {
             var corridorStartingColumn = currentColumnStartingIndex + currentColumnMaxWidth / 2;
@@ -226,7 +226,7 @@ namespace AssemblyMaps.Map_Generator
             // var corridorEndingRow = corridorStartingRow + Math.Min(currentRowMaxHeight, );
 
             int corridorStartingRow;
-            var corridorHeight = Mathf.Min(corridorThickness, currentRowMaxHeight);
+            var corridorHeight = corridorThickness;
             if (corridorHeight <= currentRowMaxHeight / 2)
                 corridorStartingRow = currentRowStartingIndex + (currentRowMaxHeight / 2) - corridorHeight;
             else
@@ -287,7 +287,7 @@ namespace AssemblyMaps.Map_Generator
 
         // Returns the number of rooms found while exploring
         private int VisitCell(int connectedNumber, int row, int column, int[][] roomConnectedComponentNum,
-            bool[][] hasHorizontalCorridor, bool[][] hasVerticalCorridor)
+            int[][] hasHorizontalCorridor, int[][] hasVerticalCorridor)
         {
             if (roomConnectedComponentNum[row][column] != 0) return 0;
             roomConnectedComponentNum[row][column] = connectedNumber;
@@ -295,17 +295,17 @@ namespace AssemblyMaps.Map_Generator
             var maxColumns = roomConnectedComponentNum[0].Length;
 
             var connectedComponents = 1; // I'm connected to myself
-            if (row > 0 && hasVerticalCorridor[row - 1][column])
+            if (row > 0 && hasVerticalCorridor[row - 1][column] > 0)
                 connectedComponents += VisitCell(connectedNumber, row - 1, column, roomConnectedComponentNum,
                     hasHorizontalCorridor, hasVerticalCorridor);
-            if (row < maxRows - 1 && hasVerticalCorridor[row][column])
+            if (row < maxRows - 1 && hasVerticalCorridor[row][column] > 0)
                 connectedComponents += VisitCell(connectedNumber, row + 1, column, roomConnectedComponentNum,
                     hasHorizontalCorridor, hasVerticalCorridor);
 
-            if (column > 0 && hasHorizontalCorridor[row][column - 1])
+            if (column > 0 && hasHorizontalCorridor[row][column - 1] > 0)
                 connectedComponents += VisitCell(connectedNumber, row, column - 1, roomConnectedComponentNum,
                     hasHorizontalCorridor, hasVerticalCorridor);
-            if (column < maxColumns - 1 && hasHorizontalCorridor[row][column])
+            if (column < maxColumns - 1 && hasHorizontalCorridor[row][column] > 0)
                 connectedComponents += VisitCell(connectedNumber, row, column + 1, roomConnectedComponentNum,
                     hasHorizontalCorridor, hasVerticalCorridor);
             return connectedComponents;
