@@ -1,6 +1,4 @@
-﻿using Accord.Math;
-using AssemblyLogging;
-using ScriptableObjectArchitecture;
+﻿using AssemblyLogging;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;

@@ -1,10 +1,7 @@
-﻿using JsonObjects.Logging.Survey;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using AssemblyLogging;
-using ScriptableObjectArchitecture;
+using JsonObjects.Logging.Survey;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 /// <summary>
 /// This class manages the UI of the survey. A survey is a sequence of screens that starts with an

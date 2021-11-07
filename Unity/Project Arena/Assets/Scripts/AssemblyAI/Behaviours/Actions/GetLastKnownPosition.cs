@@ -1,12 +1,9 @@
 using System;
-using Accord.Statistics;
 using AI.KnowledgeBase;
-using AssemblyAI.Behaviours.Variables;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
 using Entities.AI.Layer2;
 using UnityEngine;
-using UnityEngine.AI;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
 
 namespace AssemblyAI.Behaviours.Actions

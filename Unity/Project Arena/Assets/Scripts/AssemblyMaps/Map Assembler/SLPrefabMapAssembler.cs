@@ -1,5 +1,5 @@
-﻿using MapManipulation;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using MapManipulation;
 using UnityEngine;
 
 /// <summary>

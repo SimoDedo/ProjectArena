@@ -1,6 +1,6 @@
-﻿using JsonObjects.Logging.Survey;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using JsonObjects.Logging.Survey;
 using UnityEngine;
 using UnityEngine.UI;
 

@@ -1,6 +1,6 @@
-﻿using MapManipulation;
-using System;
+﻿using System;
 using System.IO;
+using MapManipulation;
 
 /// <summary>
 /// SLMapManager is an implementation of MapManager used to manage single-level maps.

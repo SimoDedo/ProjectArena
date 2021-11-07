@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
 using MapManipulation;
-using ScriptableObjectArchitecture;
-using MapInfo = MapManipulation.MapInfo;
+using UnityEngine;
 
 /// <summary>
 /// MapGenerator is an abstract class used to implement any kind of map generator. A map consist in

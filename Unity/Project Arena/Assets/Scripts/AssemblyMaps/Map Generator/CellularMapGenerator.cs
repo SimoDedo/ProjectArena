@@ -1,8 +1,7 @@
-﻿using MapManipulation;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using AssemblyLogging;
-using ScriptableObjectArchitecture;
+using MapManipulation;
 using UnityEngine;
 using MapInfo = MapManipulation.MapInfo;
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using AssemblyLogging;
-using ScriptableObjectArchitecture;
 using UnityEngine;
 
 /// <summary>

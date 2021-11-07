@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Accord.Statistics.Kernels;
 using UnityEngine;
 
 // TODO the circularQueue is dependent on the FPS of the game. Bad refresh rate will cause the positions

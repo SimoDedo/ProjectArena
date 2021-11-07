@@ -1,8 +1,5 @@
-﻿using System;
-using System.Linq;
-using AssemblyEntity.Component;
+﻿using AssemblyEntity.Component;
 using AssemblyLogging;
-using ScriptableObjectArchitecture;
 using UnityEngine;
 
 /// <summary>

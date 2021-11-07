@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using BehaviorDesigner.Runtime;
-using UnityEngine;
-
 namespace AssemblyAI.State
 {
     // TODO This for now is exactly like SearchForLostEnemy, but with different transition

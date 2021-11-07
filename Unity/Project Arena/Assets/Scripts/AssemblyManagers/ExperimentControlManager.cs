@@ -1,15 +1,15 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using JsonObjects.Logging;
 using JsonObjects.Logging.Game;
 using JsonObjects.Logging.Statistics;
 using JsonObjects.Logging.Survey;
 using MapManipulation;
 using Polimi.GameCollective.Connectivity;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEngine;
 
 // TODO This file was broken. I have tried to fix it, but I don't know if I did that correctly
