@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using AI.KnowledgeBase;
 using BehaviorDesigner.Runtime;
 using UnityEngine;
 
@@ -9,16 +10,18 @@ namespace AssemblyAI.State
         public Fight(AIEntity entity)
         {
             this.entity = entity;
+            targetKB = entity.GetComponent<TargetKnowledgeBase>();
         }
 
         public float CalculateTransitionScore()
         {
             // TODO maybe we see enemy, but we want to run away?
-            var canSee = entity.CanSeeEnemy();
+            var canSee = targetKB.HasSeenTarget();
             return canSee ? 0.95f : 0.0f;
         }
 
         private AIEntity entity;
+        private TargetKnowledgeBase targetKB;
         private ExternalBehaviorTree externalBT;
         private BehaviorTree behaviorTree;
         private List<IState> outgoingStates = new List<IState>();
