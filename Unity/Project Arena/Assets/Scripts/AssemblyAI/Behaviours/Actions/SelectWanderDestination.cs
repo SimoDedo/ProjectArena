@@ -31,7 +31,7 @@ namespace AssemblyAI.Behaviours.Actions
         {
             return TrySetTarget() ? TaskStatus.Success : TaskStatus.Running;
         }
-
+        
         private bool TrySetTarget()
         {
             var direction = transform.forward; //Or use velocity

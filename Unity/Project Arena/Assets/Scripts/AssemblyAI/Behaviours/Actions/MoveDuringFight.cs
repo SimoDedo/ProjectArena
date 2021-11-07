@@ -12,7 +12,7 @@ namespace AssemblyAI.Behaviours.Actions
     public class MoveDuringFight : Action
     {
         private AIEntity entity;
-        private NavigationSystem agent;
+        private NavigationSystem navSystem;
         private GunManager gunManager;
         private Entity target;
 
@@ -27,17 +27,17 @@ namespace AssemblyAI.Behaviours.Actions
 
         public override void OnStart()
         {
-            agent = GetComponent<NavigationSystem>();
+            navSystem = GetComponent<NavigationSystem>();
             entity = GetComponent<AIEntity>();
             gunManager = GetComponent<GunManager>();
             target = entity.GetEnemy();
             skill = entity.GetMovementSkill();
-            agent.CancelPath();
+            navSystem.CancelPath();
         }
 
         public override void OnEnd()
         {
-            agent.CancelPath();
+            navSystem.CancelPath();
         }
 
         public override TaskStatus OnUpdate()
@@ -53,7 +53,7 @@ namespace AssemblyAI.Behaviours.Actions
                 }
             }
 
-            if (agent.HasPath() && !agent.HasArrivedToDestination())
+            if (navSystem.HasPath() && !navSystem.HasArrivedToDestination())
                 return TaskStatus.Running;
             TrySelectDestination();
             return TaskStatus.Running;
@@ -76,8 +76,8 @@ namespace AssemblyAI.Behaviours.Actions
             var avoidDirection = Vector3.Cross(up, myDirection).normalized;
             if (angle > 0f)
                 avoidDirection = -avoidDirection;
-            agent.SetDestination(transform.position + avoidDirection * agent.GetSpeed());
-            Debug.DrawLine(transform.position, transform.position + avoidDirection * agent.GetSpeed(), Color.magenta);
+            navSystem.SetDestination(transform.position + avoidDirection * navSystem.GetSpeed());
+            Debug.DrawLine(transform.position, transform.position + avoidDirection * navSystem.GetSpeed(), Color.magenta);
         }
 
         private Projectile FindRocketToDodge()
@@ -168,11 +168,10 @@ namespace AssemblyAI.Behaviours.Actions
             
             var totalMovement = movementDirectionDueToStrife + movementDirectionDueToGun * 3f;
             var newPos = currentPos + totalMovement;
-            if (!Physics.Linecast(newPos, targetPos, out var hit, Physics.IgnoreRaycastLayer) ||
-                hit.collider.gameObject != target.gameObject)
+            if (!Physics.Linecast(newPos, targetPos, out var hit) ||
+                hit.collider.gameObject == target.gameObject)
             {
-                Debug.DrawLine(currentPos, currentPos + totalMovement, Color.magenta);
-                agent.SetDestination(currentPos + totalMovement);
+                navSystem.SetDestination(newPos);
             }
         }
     }

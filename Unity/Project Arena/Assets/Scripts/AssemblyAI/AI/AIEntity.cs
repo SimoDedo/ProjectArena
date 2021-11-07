@@ -314,11 +314,6 @@ public class AIEntity : Entity, ILoggable
         loggingGame = true;
     }
 
-    public bool CanSeeEnemy()
-    {
-        return targetKnowledgeBase.HasSeenTarget();
-    }
-
     public bool HasTakenDamageRecently()
     {
         return Time.time - lastDamageTime < 0.2f;
