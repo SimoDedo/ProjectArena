@@ -1,11 +1,10 @@
-﻿using ABObjects;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using ABObjects;
 using AssemblyLogging;
-using UnityEngine;
 using MapManipulation;
-using ScriptableObjectArchitecture;
+using UnityEngine;
 using MapInfo = MapManipulation.MapInfo;
 
 /// <summary>

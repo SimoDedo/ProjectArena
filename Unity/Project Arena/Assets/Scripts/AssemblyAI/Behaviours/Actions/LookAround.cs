@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Accord.Math;
 using BehaviorDesigner.Runtime.Tasks;
 using Entities.AI.Controller;
 using UnityEngine;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
 using Random = UnityEngine.Random;
-using Vector3 = UnityEngine.Vector3;
 
 // Current version is this one!
 namespace AI.Behaviours.NewBehaviours

@@ -1,16 +1,15 @@
-﻿using ExperimentObjects;
-using JsonObjects.Logging;
-using JsonObjects.Logging.Game;
-using JsonObjects.Logging.Statistics;
-using JsonObjects.Logging.Survey;
-using Polimi.GameCollective.Connectivity;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AssemblyLogging;
-using ScriptableObjectArchitecture;
+using ExperimentObjects;
+using JsonObjects.Logging;
+using JsonObjects.Logging.Game;
+using JsonObjects.Logging.Statistics;
+using JsonObjects.Logging.Survey;
+using Polimi.GameCollective.Connectivity;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using AI.KnowledgeBase;
-using AssemblyAI.Behaviours.Variables;
 using AssemblyEntity.Component;
 using Entities.AI.Layer2;
 using UnityEngine;

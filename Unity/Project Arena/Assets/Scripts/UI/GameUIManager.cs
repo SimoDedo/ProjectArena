@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>
 /// GameUIManager is an abstract class used to implement any kind of game UI manager. A game UI

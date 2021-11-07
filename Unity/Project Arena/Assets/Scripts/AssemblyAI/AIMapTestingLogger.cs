@@ -6,7 +6,6 @@ using ExperimentObjects;
 using JsonObjects.Logging;
 using JsonObjects.Logging.Game;
 using JsonObjects.Logging.Statistics;
-using ScriptableObjectArchitecture;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
-using Accord.Math.Optimization;
-using BehaviorDesigner.Runtime.Tasks;
 using Entities.AI.Layer1.Sensors;
 using UnityEngine;
 

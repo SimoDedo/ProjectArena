@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
 /// DemoGameManager is an implementation of GameManager. It simply generates a new map every generationInterval seconds.
