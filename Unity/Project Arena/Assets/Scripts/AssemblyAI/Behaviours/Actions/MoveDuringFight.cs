@@ -54,7 +54,11 @@ namespace AssemblyAI.Behaviours.Actions
             }
 
             if (navSystem.HasPath() && !navSystem.HasArrivedToDestination())
+            {
+                navSystem.MoveAlongPath();
                 return TaskStatus.Running;
+            }
+
             TrySelectDestination();
             return TaskStatus.Running;
         }
@@ -77,7 +81,7 @@ namespace AssemblyAI.Behaviours.Actions
             if (angle > 0f)
                 avoidDirection = -avoidDirection;
             navSystem.SetDestination(transform.position + avoidDirection * navSystem.GetSpeed());
-            Debug.DrawLine(transform.position, transform.position + avoidDirection * navSystem.GetSpeed(), Color.magenta);
+            navSystem.MoveAlongPath();
         }
 
         private Projectile FindRocketToDodge()
@@ -170,8 +174,9 @@ namespace AssemblyAI.Behaviours.Actions
             var newPos = currentPos + totalMovement;
             if (!Physics.Linecast(newPos, targetPos, out var hit) ||
                 hit.collider.gameObject == target.gameObject)
-            {
+            { 
                 navSystem.SetDestination(newPos);
+                navSystem.MoveAlongPath();
             }
         }
     }

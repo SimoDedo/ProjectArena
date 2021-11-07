@@ -99,7 +99,7 @@ namespace Entities.AI.Layer2
             return agent.hasPath;
         }
 
-        private void Update()
+        public void MoveAlongPath()
         {
             mover.MoveToPosition(agent.nextPosition);
         }
