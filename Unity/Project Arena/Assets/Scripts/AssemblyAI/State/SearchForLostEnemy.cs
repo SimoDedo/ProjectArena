@@ -46,7 +46,7 @@ namespace AssemblyAI.State
             startSearchTime = Time.time;
             outgoingStates.Add(new Wander(entity));
             outgoingStates.Add(new LookForPickups(entity));
-            outgoingStates.Add(new Fight(entity));
+            outgoingStates.Add(new ResumeFight(entity));
         }
     
         public void Update()

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
+using Accord.Math.Optimization;
 using BehaviorDesigner.Runtime.Tasks;
 using Entities.AI.Layer1.Sensors;
 using UnityEngine;
@@ -20,13 +21,13 @@ namespace AI.KnowledgeBase
         private Entity target;
         private AISightSensor sensor;
         private float memoryWindow;
-        
+
         /// <summary>
         /// Total time (in the memory window) that the enemy must be seen or not seen before declaring that
         /// we can detect it or have lost it.
         /// </summary>
         private float nonConsecutiveTimeBeforeReaction;
-        
+
         private List<VisibilityData> results = new List<VisibilityData>();
 
         public void Prepare(AISightSensor sensor, Entity target, float memoryWindow,
@@ -64,6 +65,7 @@ namespace AI.KnowledgeBase
                     endTime = Time.time
                 });
             }
+
             CompactList();
         }
 
@@ -77,17 +79,20 @@ namespace AI.KnowledgeBase
         }
 
 
-        public bool HasSeenTarget()
+        public bool HasSeenTarget(bool fastReact = false)
         {
             //Force updating since the enemy might have changed position since this component last update
             // or update might not have been called yet
             Update();
 
-            return TestDetection();
+            return TestDetection(fastReact);
         }
 
-        private bool TestDetection()
+        private bool TestDetection(bool fasterReactionTime)
         {
+            var reactionTime = fasterReactionTime
+                ? nonConsecutiveTimeBeforeReaction * 0.3
+                : nonConsecutiveTimeBeforeReaction;
             var beginWindow = Time.time - memoryWindow;
             var endWindow = Time.time;
             var totalTimeVisible = 0f;
@@ -105,16 +110,17 @@ namespace AI.KnowledgeBase
                 if (t.isVisibile)
                 {
                     totalTimeVisible += windowLenght;
-                    if (totalTimeVisible > nonConsecutiveTimeBeforeReaction)
+                    if (totalTimeVisible > reactionTime)
                         return true;
                 }
                 else
                 {
                     totalTimeNotVisible += windowLenght;
-                    if (totalTimeNotVisible > nonConsecutiveTimeBeforeReaction)
+                    if (totalTimeNotVisible > reactionTime)
                         return false;
                 }
             }
+
             return false;
         }
 
