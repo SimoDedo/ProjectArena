@@ -20,6 +20,11 @@ namespace AssemblyAI.Behaviours.Actions
             navSystem.SetPath(pathToApply.Value);
         }
 
+        public override void OnEnd()
+        {
+            navSystem.CancelPath();
+        }
+
         public override TaskStatus OnUpdate()
         {
             // Debug.DrawLine(transform.position, pathToApply.Value.corners.Last(), Color.magenta);

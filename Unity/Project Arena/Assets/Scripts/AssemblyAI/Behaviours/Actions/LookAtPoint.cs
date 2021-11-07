@@ -17,6 +17,7 @@ public class LookAtPoint : Action
         sightController = GetComponent<AISightController>();
     }
 
+    
     public override TaskStatus OnUpdate()
     {
         sightController.LookAtPoint(lookPoint.Value);
