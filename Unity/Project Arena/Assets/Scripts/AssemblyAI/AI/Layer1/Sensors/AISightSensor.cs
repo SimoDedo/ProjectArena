@@ -30,7 +30,7 @@ namespace Entities.AI.Layer1.Sensors
             return true;
         }
 
-        public bool CanSeePosition(Vector3 position, int ignoreLayers = Physics.IgnoreRaycastLayer)
+        public bool CanSeePosition(Vector3 position, int ignoreLayers = Physics.DefaultRaycastLayers)
         {
             var visibility = VisibilityUtils.CanSeePosition(head.transform, position, ignoreLayers);
             if (!visibility.isVisible) return false;
