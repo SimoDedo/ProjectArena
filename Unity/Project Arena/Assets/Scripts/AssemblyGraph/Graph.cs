@@ -11,6 +11,10 @@ namespace AssemblyGraph
     {
         public readonly struct Node
         {
+            public readonly int id;
+            private readonly List<Edge> connectedEdges;
+            private readonly Dictionary<string, object> properties;
+
             public Node(int id, Dictionary<string, object> properties)
             {
                 this.id = id;
@@ -23,16 +27,13 @@ namespace AssemblyGraph
                 connectedEdges.Add(edge);
             }
 
-            
+
             public object this[string key]
             {
-                get => properties[key];
+                get => properties.TryGetValue(key, out var rtn) ? rtn : null;
                 set => properties[key] = value;
             }
 
-            public readonly int id;
-            internal readonly List<Edge> connectedEdges;
-            private readonly Dictionary<string, object> properties;
             public Edge[] edges => connectedEdges.ToArray();
         }
 
@@ -102,6 +103,16 @@ namespace AssemblyGraph
         public Node GetNode(int id)
         {
             return nodes[id];
+        }
+
+        public Node[] GetNodes()
+        {
+            return nodes.Select(it => it.Value).ToArray();
+        }
+
+        public int[] GetNodesIDs()
+        {
+            return nodes.Select(it => it.Key).ToArray();
         }
 
         public bool HasEdge(int node1ID, int node2ID)

@@ -265,6 +265,7 @@ def addEverything(map, rooms, spawnPoint, medkit, ammo):
                      for x in range(len(visibilityMatrix))]
 
     for i in range(spawnPoint[1]):
+        print("Placing spawnpoint " + str(i));
         bestTile = getBestTile(roomGraph, diameter, diagonal, spawnPoint, [spawnPoint[0]], 
                                placedObjects, degreeFit, visibilityFit, [1, 0.25, -2], [1, 0.5, 0.5])
         addResource(bestTile[0], bestTile[1], spawnPoint[0], roomGraph, map)
@@ -309,6 +310,7 @@ def addEverything(map, rooms, spawnPoint, medkit, ammo):
         placedObjects.append([bestTile[0], bestTile[1], ammo[0]])
 
     print("Done.")
+    print(placedObjects, flush=True)
  
 # Adds spawn points in safe locations.
 def addSpawnPointsSafe(map, rooms, spawnPoint):
@@ -432,7 +434,7 @@ def addSpawnPointsUniformly(map, rooms, spawnPoint):
         if (len(placedObjects) > 0):
             bestRoom = getMostIsolatedNode(roomGraph, spawnPoint[0])
         else:
-            bestRoom = roomGraph.node[random.choice(list(roomGraph.nodes))]
+            bestRoom = roomGraph.nodes[random.choice(list(roomGraph.nodes))]
 
         print("Done.")
         
@@ -470,7 +472,7 @@ def addSpawnPointsRandom(map, rooms, spawnPoint):
     print("Placing the spawn points... ", end='', flush=True)
 
     for i in range(spawnPoint[1]):
-        room = roomGraph.node[random.choice(list(roomGraph.nodes()))]
+        room = roomGraph.nodes[random.choice(list(roomGraph.nodes()))]
         tile = [random.randint(room["originX"], room["endX"]), random.randint(room["originY"], room["endY"])]
         addResource(tile[0], tile[1], spawnPoint[0], roomGraph, map)
 
@@ -575,7 +577,7 @@ def resourceDistance(graph, diameter, node, resources):
 def resourceRedundancy(graph, node, resource):
     redundancy = 0
     for neighbor in graph[node]:
-        if "resource" in graph.node[neighbor] and graph.node[neighbor]["resource"] is resource[0]:
+        if "resource" in graph.nodes[neighbor] and graph.nodes[neighbor]["resource"] is resource[0]:
             redundancy = redundancy + 1 / resource[1]
     return redundancy
 
@@ -605,7 +607,7 @@ def getBestTile(graph, diameter, diagonal, object, objects, placedObjects, degre
     candidateRooms = [(node, roomFit(graph, diameter, node, degreeFit[node], object, objects, 
                       roomWeigths)) for node, data in graph.nodes(data = True) if 
                       (not "resource" in data and node in degreeFit)]
-    bestRoom = graph.node[max(candidateRooms, key = lambda x: x[1])[0]]
+    bestRoom = graph.nodes[max(candidateRooms, key = lambda x: x[1])[0]]
     candidateTiles = [(x, y, tileFit(x, y, visibilityFit[x][y], bestRoom["originX"], bestRoom["originY"], 
                       bestRoom["endX"], bestRoom["endY"], placedObjects, diagonal, tileWeigths)) 
                       for x in range(bestRoom["originX"], bestRoom["endX"]) 
@@ -618,7 +620,7 @@ def getMostIsolatedNode(graph, resource):
     nodes = [(node1, min([nx.shortest_path_length(graph, node1, node2) 
              for node2, data2 in graph.nodes(data = True) if ("resource" in data2 and data2["resource"] == resource)]))
              for node1, data1 in graph.nodes(data = True) if ("resource" not in data1)]
-    return graph.node[max(nodes, key = lambda x: x[1])[0]]
+    return graph.nodes[max(nodes, key = lambda x: x[1])[0]]
 
 ### GRAPH FUNCTIONS ###########################################################
 
@@ -1268,7 +1270,7 @@ def populateMenu():
 
         option = input("Option: ")
     
-        while option != "1" and option != "2" and option != "3" and option != "4" and option != "0":
+        while option != "1" and option != "2" and option != "3" and option != "4" and option != "5"  and option != "0":
             option = input("Invalid choice. Option: ")
     
         if option == "1":
@@ -1285,7 +1287,7 @@ def populateMenu():
             addSpawnPointsRandom(map, rooms, ["s", 5])
             exportMap(outputDir + "/" + mapName + "_SR.map.txt")  
         elif option == "5":
-            addEverything(map, rooms, ["s", 5], ["h", 4], ["a", 4])
+            addEverything(map, rooms, ["s", 100], ["h", 4], ["a", 4])
             exportMap(outputDir + "/" + mapName + "_ES.map.txt")  
         elif option == "0":
             return
