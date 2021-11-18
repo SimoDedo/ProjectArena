@@ -29,7 +29,7 @@ namespace AssemblyGraph
         private const char WALL_CHAR = 'w';
         private const char FLOOR_CHAR = 'r';
 
-        public static Graph GenerateTileGraph(char[,] map)
+        public static NewGraph GenerateTileGraph(char[,] map)
         {
             var tileGraph = GenerateTileGraphNodesFromMap(map, out var rows, out var columns);
             for (var column = 0; column < columns; column++)
@@ -78,11 +78,11 @@ namespace AssemblyGraph
             return tileGraph;
         }
 
-        private static Graph GenerateTileGraphNodesFromMap(char[,] map, out int rows, out int columns)
+        private static NewGraph GenerateTileGraphNodesFromMap(char[,] map, out int rows, out int columns)
         {
             rows = map.GetLength(0);
             columns = map.GetLength(1);
-            var tileGraph = new Graph();
+            var tileGraph = new NewGraph();
             for (var column = 0; column < columns; column++)
             {
                 for (var row = 0; row < rows; row++)
@@ -100,7 +100,7 @@ namespace AssemblyGraph
             return tileGraph;
         }
 
-        private static Graph GenerateVisibilityGraph(char[,] map)
+        private static NewGraph GenerateVisibilityGraph(char[,] map)
         {
             var visibilityGraph = GenerateTileGraphNodesFromMap(map, out var rows, out var columns);
             var visibilities = new int[rows, columns];
@@ -128,7 +128,7 @@ namespace AssemblyGraph
                         }
                     }
 
-                    var visibility = visibilityGraph.GetEdgesFromNode(nodeAID).Length;
+                    var visibility = visibilityGraph.GetNodeDegree(nodeAID);
                     visibilities[row1, col1] = visibility;
                     if (visibility > maxVisibility)
                         maxVisibility = visibility;
@@ -145,7 +145,7 @@ namespace AssemblyGraph
                     if (map[row, col] == WALL_CHAR) continue;
                     var visibility = (visibilities[row, col] - minVisibility) / visibilityInterval;
                     var node =
-                        visibilityGraph.GetNode(GetTileIndexFromCoordinates(row, col, rows, columns));
+                        visibilityGraph.GetNodeProperties(GetTileIndexFromCoordinates(row, col, rows, columns));
                     node[VISIBILITY] = visibility;
                 }
             }
@@ -204,9 +204,9 @@ namespace AssemblyGraph
             return visibilityMatrix;
         }
 
-        public static Graph GenerateRoomsCorridorsGraph(Area[] areas)
+        public static NewGraph GenerateRoomsCorridorsGraph(Area[] areas)
         {
-            var roomsCorridorsGraph = new Graph();
+            var roomsCorridorsGraph = new NewGraph();
             // ID of each area is simply it's index in the for loop
             for (var index = 0; index < areas.Length; index++)
             {
@@ -248,7 +248,7 @@ namespace AssemblyGraph
             return roomsCorridorsGraph;
         }
 
-        public static Graph GenerateRoomsCorridorsObjectsGraph(Area[] areas, char[,] map, char[] excludedChars)
+        public static NewGraph GenerateRoomsCorridorsObjectsGraph(Area[] areas, char[,] map, char[] excludedChars)
         {
             if (map.GetLength(1) > MAX_MAP_WIDTH)
             {
@@ -296,58 +296,10 @@ namespace AssemblyGraph
             return graph;
         }
 
-        public static TimeSpan Time(Action action)
-        {
-            var stopwatch = Stopwatch.StartNew();
-            action();
-            stopwatch.Stop();
-            return stopwatch.Elapsed;
-        }
-        
         // Dijkstra, assume edge weights are positive
-        public static float CalculateShortestPathLength(Graph input, int nodeA, int nodeB)
+        public static float CalculateShortestPathLength(NewGraph input, int nodeA, int nodeB)
         {
-            var totalTimeEnqueue = new TimeSpan();
-            var totalTimeDequeue = new TimeSpan();
-            var totalTimeGetEdges = new TimeSpan();
-            var visitedNodes = new HashSet<int>();
-            var nodeQueue = new SimplePriorityQueue<int, float>();
-
-            // TODO Use fast priority queue
-            
-            totalTimeEnqueue += Time( () => nodeQueue.Enqueue(nodeA, 0) );
-            
-            while (nodeQueue.Count != 0)
-            {
-                var currentNode = nodeQueue.First;
-                var pathLength = nodeQueue.GetPriority(currentNode);
-                totalTimeDequeue += Time(() =>nodeQueue.Dequeue());
-                if (currentNode == nodeB)
-                {
-                    // Reached destination!
-                    Debug.LogWarning("Total time: " + totalTimeEnqueue.Milliseconds + ", " + totalTimeDequeue.Milliseconds + ", " +
-                                     totalTimeGetEdges.Milliseconds);
-                    return pathLength;
-                }
-
-                visitedNodes.Add(currentNode);
-                var sw = new Stopwatch();
-                sw.Start();
-                var outgoingEdges = input.GetEdgesFromNode(currentNode);
-                sw.Stop();
-                totalTimeGetEdges += sw.Elapsed;
-                foreach (var e in outgoingEdges)
-                {
-                    var nextNode = e.node1 == currentNode ? e.node2 : e.node1;
-                    var totalLength = pathLength + e.weight;
-                    totalTimeEnqueue += Time(()=>nodeQueue.Enqueue(nextNode, totalLength));
-                }
-            }
-
-            Debug.LogWarning("Total time: " + totalTimeEnqueue.Milliseconds + ", " + totalTimeDequeue.Milliseconds + ", " +
-                      totalTimeGetEdges.Milliseconds);
-            // If we arrived here, nodeB couldn't be reached from nodeA.
-            return float.PositiveInfinity;
+            return input.CalculateShortestPathLenght(nodeA, nodeB);
         }
 
         private static int GetTileIndexFromCoordinates(int row, int column, int numRows, int numColumns)
@@ -447,7 +399,7 @@ namespace AssemblyGraph
 
             var objectsPlacedPos = new List<Vector2Int>();
             const char spawnPointsChar = 's';
-            const int numSpawnPointsToPlace = 2;
+            const int numSpawnPointsToPlace = 100;
             var objectTypesConsidered = new List<char> {spawnPointsChar};
 
             var spawnPointsRoomWeights = new[] {1f, 0.25f, -2f};
@@ -484,7 +436,7 @@ namespace AssemblyGraph
             
             Debug.Log("Finished placing medkits");
             const char ammoCrateChar = 'a';
-            const int numAmmoCratesToPlace = 0;
+            const int numAmmoCratesToPlace = 2;
             var ammoCrateRoomWeights = new[] {1f, 0.25f, 0f};
             var ammoCrateTileWeights = new[] {1f, 0.25f, 0.5f};
             var ammoCrateNormDegreeFitness1 = ComputeNormalizedDegreeFitness(normalizedDegrees, 0.2f, 0.4f);
@@ -530,7 +482,7 @@ namespace AssemblyGraph
             }
         }
 
-        private static void TryAddResource(Vector2Int bestTile, char spawnPointsChar, Graph roomGraph, char[,] map,
+        private static void TryAddResource(Vector2Int bestTile, char spawnPointsChar, NewGraph roomGraph, char[,] map,
             List<Vector2Int> objectsPlacedPos)
         {
             if (bestTile.x == -1 || bestTile.y == -1) return; // Invalid tile, do not do anything
@@ -544,9 +496,10 @@ namespace AssemblyGraph
                 new Tuple<string, object>(RESOURCE, spawnPointsChar)
             );
 
-            var nodes = roomGraph.GetNodes();
-            foreach (var node in nodes)
+            var nodesIDs = roomGraph.GetNodeIDs();
+            foreach (var nodeID in nodesIDs)
             {
+                var node = roomGraph.GetNodeProperties(nodeID);
                 var temp = node[LEFT_COLUMN];
                 if (temp == null) continue; // this is not a room
                 var leftColumn = (int) temp;
@@ -559,7 +512,7 @@ namespace AssemblyGraph
                     var centerColumn = (leftColumn + rightColumn) / 2f;
                     var centerRow = (topRow + bottomRow) / 2f;
                     var distance = EuclideanDistance(centerColumn, centerRow, bestTile.x, bestTile.y);
-                    roomGraph.AddEdge(objectNodeID, node.id, distance);
+                    roomGraph.AddEdge(objectNodeID, nodeID, distance);
                 }
             }
 
@@ -568,7 +521,7 @@ namespace AssemblyGraph
 
         }
 
-        private static Vector2Int GetBestTile(Graph roomGraph, float diameter, float diagonal, char spawnPointsChar,
+        private static Vector2Int GetBestTile(NewGraph roomGraph, float diameter, float diagonal, char spawnPointsChar,
             int numSpawnPoints, List<char> objectTypesConsidered, List<Vector2Int> objectsPlaced,
             Dictionary<int, float> normDegreeFitness, float[,] visibilityFit, float[] roomWeights,
             float[] tileWeights)
@@ -579,7 +532,7 @@ namespace AssemblyGraph
             foreach (var roomID in roomsToConsider)
             {
                 // Do not consider nodes which represent resources
-                if (roomGraph.GetNode(roomID)[RESOURCE] != null) continue;
+                if (roomGraph.GetNodeProperties(roomID)[RESOURCE] != null) continue;
                 var roomScore = RoomFit(roomGraph, diameter, roomID, normDegreeFitness[roomID], spawnPointsChar,
                     numSpawnPoints, objectTypesConsidered, roomWeights);
                 if (roomScore > bestScore)
@@ -589,12 +542,12 @@ namespace AssemblyGraph
                 }
             }
 
-            var bestNode = roomGraph.GetNode(bestNodeID);
+            var bestNodeProperties = roomGraph.GetNodeProperties(bestNodeID);
 
-            var leftColumn = (int) bestNode[LEFT_COLUMN];
-            var topRow = (int) bestNode[TOP_ROW];
-            var rightColumn = (int) bestNode[RIGHT_COLUMN];
-            var bottomRow = (int) bestNode[BOTTOM_ROW];
+            var leftColumn = (int) bestNodeProperties[LEFT_COLUMN];
+            var topRow = (int) bestNodeProperties[TOP_ROW];
+            var rightColumn = (int) bestNodeProperties[RIGHT_COLUMN];
+            var bottomRow = (int) bestNodeProperties[BOTTOM_ROW];
 
             var bestTileScore = float.MinValue;
             var bestTile = new Vector2Int(-1,-1);
@@ -644,7 +597,7 @@ namespace AssemblyGraph
             return distance / normalizingFactor;
         }
 
-        private static float RoomFit(Graph roomGraph, float diameter, int roomID, float degreeFit,
+        private static float RoomFit(NewGraph roomGraph, float diameter, int roomID, float degreeFit,
             char spawnPointsChar, int numSpawnPoints,
             List<char> objectTypesConsidered, float[] roomWeights)
         {
@@ -653,15 +606,13 @@ namespace AssemblyGraph
                 ResourceRedundancy(roomGraph, roomID, spawnPointsChar, numSpawnPoints);
         }
 
-        private static float ResourceRedundancy(Graph roomGraph, int roomID, char spawnPointsChar, int numSpawnPoints)
+        private static float ResourceRedundancy(NewGraph roomGraph, int roomID, char spawnPointsChar, int numSpawnPoints)
         {
-            var edges = roomGraph.GetEdgesFromNode(roomID);
+            var adjacentNodes = roomGraph.GetAdjacentNodes(roomID);
             var redundancy = 0f;
-            foreach (var edge in edges)
+            foreach (var otherNodeID in adjacentNodes)
             {
-                var otherNodeID = edge.node1 == roomID ? edge.node2 : edge.node1;
-                var otherNode = roomGraph.GetNode(otherNodeID);
-                var resource = otherNode[RESOURCE];
+                var resource = roomGraph.GetNodeProperties(otherNodeID)[RESOURCE];
                 if (resource != null && (char) resource == spawnPointsChar)
                     redundancy++;
             }
@@ -669,24 +620,18 @@ namespace AssemblyGraph
             return redundancy / numSpawnPoints;
         }
 
-        private static float ResourceDistance(Graph roomGraph, float diameter, int roomID,
+        private static float ResourceDistance(NewGraph roomGraph, float diameter, int roomID,
             List<char> objectTypesConsidered)
         {
-            var nodes = roomGraph.GetNodes();
-            var sw = new Stopwatch();
-            sw.Start();
+            var nodesIDs = roomGraph.GetNodeIDs();
             var minDistance =
-                (from node in nodes
-                    let resource = node[RESOURCE]
+                (from nodeID in nodesIDs
+                    let resource = roomGraph.GetNodeProperties(nodeID)[RESOURCE]
                     where resource != null && objectTypesConsidered.Contains((char) resource)
-                    select MapAnalyzer.CalculateShortestPathLength(roomGraph, roomID, node.id)).Prepend(diameter).Min();
+                    select CalculateShortestPathLength(roomGraph, roomID, nodeID)).Prepend(diameter).Min();
 
-            sw.Stop();
-            Debug.Log("Calculate shortest path took " + sw.ElapsedMilliseconds);
             return minDistance / diameter;
-            
         }
-        
 
         private static Dictionary<int, float> ComputeNormalizedDegreeFitness(Dictionary<int, float> normDegrees,
             float min, float max)
@@ -706,7 +651,7 @@ namespace AssemblyGraph
                 degree => 1f - (degree.Value - minFitness) / variation);
         }
 
-        private static float ComputeDiameter(Area[] areas, Graph areaGraph)
+        private static float ComputeDiameter(Area[] areas, NewGraph areaGraph)
         {
             var diameter = float.MaxValue;
             for (var i1 = 0; i1 < areas.Length; i1++)
@@ -724,15 +669,15 @@ namespace AssemblyGraph
             return diameter;
         }
 
-        private static Dictionary<int, float> ComputeNormalizedDegree(Graph roomGraph, bool discardDeadEnds = false)
+        private static Dictionary<int, float> ComputeNormalizedDegree(NewGraph roomGraph, bool discardDeadEnds = false)
         {
-            var ids = roomGraph.GetNodesIDs();
+            var ids = roomGraph.GetNodeIDs();
             var minDegree = float.MaxValue;
             var maxDegree = float.MinValue;
             var rtn = new Dictionary<int, float>();
             foreach (var id in ids)
             {
-                var degree = roomGraph.GetEdgesFromNode(id).Length;
+                var degree = roomGraph.GetNodeDegree(id);
                 if (degree < minDegree)
                     minDegree = degree;
                 if (degree > maxDegree)
@@ -742,7 +687,7 @@ namespace AssemblyGraph
             var degreeVariation = maxDegree - minDegree;
             foreach (var id in ids)
             {
-                var degree = roomGraph.GetEdgesFromNode(id).Length;
+                var degree = roomGraph.GetNodeDegree(id);
                 if (!discardDeadEnds || degree != 1)
                     rtn.Add(id, (degree - minDegree) / degreeVariation);
             }

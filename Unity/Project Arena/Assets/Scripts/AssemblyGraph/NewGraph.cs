@@ -80,6 +80,16 @@ namespace AssemblyGraph
         {
             return graph.AdjacentVertices(nodeID).ToArray();
         }
+        
+        public int GetNodeDegree(int nodeID)
+        {
+            return graph.AdjacentDegree(nodeID);
+        }
+
+        public NodeProperties GetNodeProperties(int nodeID)
+        {
+            return nodeProperties[nodeID];
+        }
 
         private static double GetEdgeWeightFunc(TaggedUndirectedEdge<int,float> edge)
         {
@@ -90,7 +100,7 @@ namespace AssemblyGraph
         {
             var a = new UndirectedDijkstraShortestPathAlgorithm<int, TaggedUndirectedEdge<int, float>>(graph, GetEdgeWeightFunc);
             a.Compute(source);
-            return (float) a.GetDistance(target);
+            return a.TryGetDistance(target, out var rtn) ? (float) rtn : float.MaxValue;
         }
     }
 }
