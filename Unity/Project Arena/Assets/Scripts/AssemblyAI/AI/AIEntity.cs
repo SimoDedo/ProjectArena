@@ -2,6 +2,7 @@ using System;
 using AI.AI.Layer3;
 using AI.KnowledgeBase;
 using AssemblyAI.State;
+using AssemblyAI.StateMachine;
 using AssemblyEntity.Component;
 using AssemblyLogging;
 using BehaviorDesigner.Runtime;
@@ -132,17 +133,11 @@ public class AIEntity : Entity, ILoggable
         gunManager.Prepare();
         pickupPlanner = gameObject.AddComponent<PickupPlanner>();
         pickupPlanner.Prepare(this, navigationSystem, pickupKnowledgeBase, gunManager);
+        stateMachine = new EntityStateMachine(this);
     }
 
-    [NotNull] private IState currentState = new Idle();
-
-    public void SetNewState([NotNull] IState state)
-    {
-        currentState.Exit();
-        currentState = state;
-        currentState.Enter();
-    }
-
+    private IStateMachine stateMachine;
+    
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id)
     {
         PrepareComponents();
@@ -252,7 +247,7 @@ public class AIEntity : Entity, ILoggable
 
         if (inGame) // TODO Check if necessary
         {
-            currentState.Update();
+            stateMachine.Update();
         }
     }
 
@@ -298,11 +293,7 @@ public class AIEntity : Entity, ILoggable
 
     public override void SetInGame(bool b)
     {
-        if (b)
-            SetNewState(new Wander(this));
-        else
-            SetNewState(new Idle());
-
+        stateMachine.SetIsIdle(!b);
         navigationSystem.SetEnabled(b);
         GetComponent<CapsuleCollider>().enabled = b;
         MeshVisibility.SetMeshVisible(transform, b);
