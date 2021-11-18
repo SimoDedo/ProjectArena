@@ -204,11 +204,18 @@ namespace AssemblyAI.Behaviours.Actions
                         navSystem.MoveAlongPath();
                     }                
                 }
+                else
+                {
+                    strifeRight = !strifeRight;
+                }
             }
             else
             {
                 // We cannot see the enemy from where we are, try to find a position from where it is visible.
                 // How? For now, random selection (even if this breaks the movement capabilities of the bot)
+
+                // Also reset strife
+                strifeRight = Random.value > 0.5f;
                 const int maxAttempts = 10;
                 for (var i = 0; i < maxAttempts; i++)
                 {

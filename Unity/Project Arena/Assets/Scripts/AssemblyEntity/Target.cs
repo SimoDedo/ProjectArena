@@ -34,7 +34,8 @@ public class Target : Entity, ILoggable {
         gameManagerScript = gms;
         Health = totalHealth;
 
-        originalLayer = transform.gameObject.layer;
+        originalLayer = gameObject.layer;
+        var disabledLayer = LayerMask.NameToLayer("Ignore Raycast");
         ChangeLayersRecursively(transform, disabledLayer);
 
         meshList = gameObject.GetComponentsInChildren<MeshRenderer>();

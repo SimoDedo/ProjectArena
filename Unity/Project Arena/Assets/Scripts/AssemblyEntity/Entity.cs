@@ -8,7 +8,6 @@
 public abstract class Entity : MonoBehaviour
 {
     [SerializeField] protected int totalHealth;
-    [SerializeField] protected int disabledLayer;
     public virtual int Health { get; protected set; }
 
     protected int entityID;
@@ -67,8 +66,9 @@ public abstract class Entity : MonoBehaviour
         if (mustIgnore)
         {
             originalLayer = gameObject.layer;
-            gameObject.layer = disabledLayer;
-            ChangeLayersRecursively(transform, disabledLayer);
+            var ignoreLayer = LayerMask.NameToLayer("Ignore Raycast");
+            gameObject.layer = ignoreLayer;
+            ChangeLayersRecursively(transform, ignoreLayer);
         }
         else
         {

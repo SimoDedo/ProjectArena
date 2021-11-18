@@ -36,7 +36,7 @@ namespace Utils
             var direction = position - user.position;
             rtn.angle = Vector3.Angle(user.forward, direction);
 
-            if (Physics.Linecast(user.position, direction, out var hit, ignoreLayers))
+            if (Physics.Linecast(user.position, position, out var hit, ignoreLayers))
             {
                 rtn.isVisible = false;
                 rtn.distance = hit.distance;
