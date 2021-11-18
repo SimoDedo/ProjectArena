@@ -28,7 +28,11 @@ namespace AssemblyAI.Behaviours.Actions
         public override TaskStatus OnUpdate()
         {
             Debug.DrawLine(transform.position, destination.Value, Color.green);
-            return navSystem.HasArrivedToDestination() ? TaskStatus.Success : TaskStatus.Running;
+
+            if (navSystem.HasArrivedToDestination())
+                return TaskStatus.Success;
+            navSystem.MoveAlongPath();
+            return TaskStatus.Running;
         }
     }
 }

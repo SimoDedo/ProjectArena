@@ -3,6 +3,7 @@ using AssemblyEntity.Component;
 using BehaviorDesigner.Runtime.Tasks;
 using Entities.AI.Layer2;
 using UnityEngine;
+using UnityEngine.AI;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
 using Random = UnityEngine.Random;
 
@@ -54,8 +55,15 @@ namespace AssemblyAI.Behaviours.Actions
             }
 
             if (navSystem.HasPath() && !navSystem.HasArrivedToDestination())
+            {
+                navSystem.MoveAlongPath();
                 return TaskStatus.Running;
+            }
+
+            // We won't interfere raycasts and linecasts with our own presence
+            entity.SetIgnoreRaycast(true);
             TrySelectDestination();
+            entity.SetIgnoreRaycast(false);
             return TaskStatus.Running;
         }
 
@@ -77,7 +85,7 @@ namespace AssemblyAI.Behaviours.Actions
             if (angle > 0f)
                 avoidDirection = -avoidDirection;
             navSystem.SetDestination(transform.position + avoidDirection * navSystem.GetSpeed());
-            Debug.DrawLine(transform.position, transform.position + avoidDirection * navSystem.GetSpeed(), Color.magenta);
+            navSystem.MoveAlongPath();
         }
 
         private Projectile FindRocketToDodge()
@@ -135,43 +143,95 @@ namespace AssemblyAI.Behaviours.Actions
 
             var currentPos = transform.position;
             var targetPos = target.transform.position;
+
+            bool canSeeEnemyFromStartingPoint;
+
+            // Check if we can see enemy from where we are
+            canSeeEnemyFromStartingPoint = !Physics.Linecast(currentPos, targetPos, out var canSeeEnemyHit) ||
+                                           canSeeEnemyHit.collider.gameObject == target.gameObject;
+
+            // We do not care if enemy is above or beyond us, the move straight/strife movement should be
+            // parallel to the floor.
             targetPos.y = currentPos.y;
+
             var unNormalizedDirection = targetPos - currentPos;
             var distance = unNormalizedDirection.magnitude;
             var direction = unNormalizedDirection.normalized;
 
-            var movementDirectionDueToGun = Vector3.zero; 
-            var movementDirectionDueToStrife = Vector3.zero; 
-            
-            // Get current gun optimal range
-            var (closeRange, farRange) = gunManager.GetCurrentGunOptimalRange();
-            if (distance < closeRange)
-                movementDirectionDueToGun = -direction;
-            else if (distance > farRange)
-                movementDirectionDueToGun = direction;
-
-            if (skill >= FightingMovementSkill.CircleStrife)
+            // If we can see the enemy from the starting point, we should play as usual
+            if (canSeeEnemyFromStartingPoint)
             {
-                movementDirectionDueToStrife = Vector3.Cross(direction, transform.up);
-                if (skill == FightingMovementSkill.CircleStrifeChangeDirection)
+                var movementDirectionDueToGun = Vector3.zero;
+                var movementDirectionDueToStrife = Vector3.zero;
+
+                // Get current gun optimal range
+                var (closeRange, farRange) = gunManager.GetCurrentGunOptimalRange();
+                if (distance < closeRange)
+                    movementDirectionDueToGun = -direction;
+                else if (distance > farRange)
+                    movementDirectionDueToGun = direction;
+
+                if (skill >= FightingMovementSkill.CircleStrife)
                 {
-                    remainingStrifes--;
-                    if (remainingStrifes < 0)
+                    movementDirectionDueToStrife = Vector3.Cross(direction, transform.up);
+                    if (skill == FightingMovementSkill.CircleStrifeChangeDirection)
                     {
-                        remainingStrifes = Random.Range(minStrifeLength, maxStrifeLength);
+                        remainingStrifes--;
+                        if (remainingStrifes < 0)
+                        {
+                            remainingStrifes = Random.Range(minStrifeLength, maxStrifeLength);
+                            strifeRight = !strifeRight;
+                        }
+                    }
+
+                    if (!strifeRight)
+                        movementDirectionDueToStrife = -movementDirectionDueToStrife;
+                }
+
+                var totalMovement = movementDirectionDueToStrife + movementDirectionDueToGun * 3f;
+                var newPos = currentPos + totalMovement;
+                Debug.DrawLine(newPos, targetPos, Color.blue);
+                
+                if (!Physics.Linecast(newPos, targetPos, out var hit) ||
+                    hit.collider.gameObject == target.gameObject)
+                {
+                    var path = navSystem.CalculatePath(newPos);
+                    if (path.status != NavMeshPathStatus.PathComplete)
                         strifeRight = !strifeRight;
+                    else
+                    {
+                        navSystem.SetPath(path);
+                        navSystem.MoveAlongPath();
+                    }                
+                }
+            }
+            else
+            {
+                // We cannot see the enemy from where we are, try to find a position from where it is visible.
+                // How? For now, random selection (even if this breaks the movement capabilities of the bot)
+                const int maxAttempts = 10;
+                for (var i = 0; i < maxAttempts; i++)
+                {
+                    var randomDir = Random.insideUnitCircle;
+                    var newPos = currentPos;
+                    newPos.x = randomDir.x;
+                    newPos.z = randomDir.y;
+
+                    if (navSystem.IsPointOnNavMesh(newPos, out var finalPos))
+                    {
+                        if (!Physics.Linecast(finalPos, targetPos, out var finalPosVisibility)
+                            || finalPosVisibility.collider.gameObject == target.gameObject)
+                        {
+                            // Can see enemy from here, found new position!
+                            navSystem.SetDestination(finalPos);
+                            navSystem.MoveAlongPath();
+                            return;
+                        }
                     }
                 }
-                if (!strifeRight)
-                    movementDirectionDueToStrife = -movementDirectionDueToStrife;
-            }
-            
-            var totalMovement = movementDirectionDueToStrife + movementDirectionDueToGun * 3f;
-            var newPos = currentPos + totalMovement;
-            if (!Physics.Linecast(newPos, targetPos, out var hit) ||
-                hit.collider.gameObject == target.gameObject)
-            {
-                navSystem.SetDestination(newPos);
+
+                // I couldn't find the enemy from any place. Let's just not move? Otherwise, let's move towards the
+                // enemy
             }
         }
     }

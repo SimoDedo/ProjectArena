@@ -74,6 +74,7 @@ namespace Entities.AI.Layer2
                 agentTypeID = agentId,
                 areaMask = NavMesh.AllAreas
             };
+            
             if (NavMesh.SamplePosition(point, out var hit, float.MaxValue, filter))
             {
                 validPoint = hit.position;
@@ -98,7 +99,7 @@ namespace Entities.AI.Layer2
             return agent.hasPath;
         }
 
-        private void Update()
+        public void MoveAlongPath()
         {
             mover.MoveToPosition(agent.nextPosition);
         }
