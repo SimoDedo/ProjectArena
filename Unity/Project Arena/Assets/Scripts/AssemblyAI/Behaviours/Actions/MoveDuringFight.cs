@@ -3,6 +3,7 @@ using AssemblyEntity.Component;
 using BehaviorDesigner.Runtime.Tasks;
 using Entities.AI.Layer2;
 using UnityEngine;
+using UnityEngine.AI;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
 using Random = UnityEngine.Random;
 
@@ -59,7 +60,10 @@ namespace AssemblyAI.Behaviours.Actions
                 return TaskStatus.Running;
             }
 
+            // We won't interfere raycasts and linecasts with our own presence
+            entity.SetIgnoreRaycast(true);
             TrySelectDestination();
+            entity.SetIgnoreRaycast(false);
             return TaskStatus.Running;
         }
 
@@ -186,11 +190,19 @@ namespace AssemblyAI.Behaviours.Actions
 
                 var totalMovement = movementDirectionDueToStrife + movementDirectionDueToGun * 3f;
                 var newPos = currentPos + totalMovement;
+                Debug.DrawLine(newPos, targetPos, Color.blue);
+                
                 if (!Physics.Linecast(newPos, targetPos, out var hit) ||
                     hit.collider.gameObject == target.gameObject)
                 {
-                    navSystem.SetDestination(newPos);
-                    navSystem.MoveAlongPath();
+                    var path = navSystem.CalculatePath(newPos);
+                    if (path.status != NavMeshPathStatus.PathComplete)
+                        strifeRight = !strifeRight;
+                    else
+                    {
+                        navSystem.SetPath(path);
+                        navSystem.MoveAlongPath();
+                    }                
                 }
             }
             else

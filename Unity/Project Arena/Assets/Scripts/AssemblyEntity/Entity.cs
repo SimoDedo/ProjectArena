@@ -66,7 +66,7 @@ public abstract class Entity : MonoBehaviour
     }
 
     // Sets if the entity must be ignored by raycast.
-    protected void SetIgnoreRaycast(bool mustIgnore)
+    public void SetIgnoreRaycast(bool mustIgnore)
     {
         if (mustIgnore)
         {
