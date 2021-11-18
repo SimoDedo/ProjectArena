@@ -1,28 +1,31 @@
 using System.Collections.Generic;
 using AI.KnowledgeBase;
+using AssemblyAI.StateMachine;
+using AssemblyAI.StateMachine.Transition;
 using BehaviorDesigner.Runtime;
 using UnityEngine;
 
 namespace AssemblyAI.State
 {
-    public class SearchForLostEnemy : IState
+    public class SearchEnemy : IState
     {
-        public SearchForLostEnemy(AIEntity entity, bool searchDueToDamage = false)
-        {
-            this.entity = entity;
-            targetKB = entity.GetComponent<TargetKnowledgeBase>();
-            this.searchDueToDamage = searchDueToDamage;
-        }
-    
         private AIEntity entity;
         private TargetKnowledgeBase targetKB;
         private bool searchDueToDamage;
         private ExternalBehaviorTree externalBT;
         private BehaviorTree behaviorTree;
-        private List<IState> outgoingStates = new List<IState>();
         private float startSearchTime = float.NaN;
+        public ITransition[] OutgoingTransitions { get; private set; }
 
-        public float CalculateTransitionScore()
+
+        public SearchEnemy(AIEntity entity, bool searchDueToDamage = false)
+        {
+            this.entity = entity;
+            targetKB = entity.GetComponent<TargetKnowledgeBase>();
+            this.searchDueToDamage = searchDueToDamage;
+        }
+
+        public float LostEnemyTransitionScore()
         {
             if (entity.GetEnemy().isAlive && !targetKB.HasSeenTarget())
             {
@@ -31,11 +34,23 @@ namespace AssemblyAI.State
                 // Slowly decrease want to search. After 5 secs, it's zero
                 return 1f - (Time.time - startSearchTime) / 5f;
             }
+
             return 0f;
         }
+
+        public float DamagedTransitionScore()
+        {
+            if (entity.GetEnemy().isAlive && entity.HasTakenDamageRecently())
+            {
+                return 0.7f;
+            }
+
+            return 0f;
+        }
+
         public void Enter()
         {
-            externalBT = Resources.Load<ExternalBehaviorTree>("Behaviors/SearchForLostEnemy");
+            externalBT = Resources.Load<ExternalBehaviorTree>("Behaviors/SearchEnemy");
             behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
             behaviorTree.StartWhenEnabled = false;
             behaviorTree.RestartWhenComplete = true;
@@ -44,31 +59,21 @@ namespace AssemblyAI.State
             BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
             behaviorTree.SetVariableValue("SearchDueToDamage", searchDueToDamage);
             startSearchTime = Time.time;
-            outgoingStates.Add(new Wander(entity));
-            outgoingStates.Add(new LookForPickups(entity));
-            outgoingStates.Add(new ResumeFight(entity));
+            
+            OutgoingTransitions = new ITransition[]
+            {
+                new ToSearchTransition(this), // Self-loop
+                new ToWanderTransition(entity),
+                new ToPickupTransition(entity),
+                new ResumeFightTransition(entity),
+            };
         }
-    
+
         public void Update()
         {
-            var bestScore = CalculateTransitionScore();
-            IState bestState = null;
-            foreach (var state in outgoingStates)
-            {
-                var score = state.CalculateTransitionScore();
-                if (score > bestScore)
-                {
-                    bestScore = score;
-                    bestState = state;
-                }
-            }
-
-            if (bestState != null)
-                entity.SetNewState(bestState);
-            else
-                BehaviorManager.instance.Tick(behaviorTree);
+            BehaviorManager.instance.Tick(behaviorTree);
         }
-    
+
         public void Exit()
         {
             Resources.UnloadAsset(externalBT);
