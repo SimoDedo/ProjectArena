@@ -321,6 +321,11 @@ public class CellularMapGenerator : MapGenerator {
         throw new NotImplementedException();
     }
 
+    public override Area[] ConvertMapToAreas()
+    {
+        throw new NotImplementedException();
+    }
+
     // Stores all information about a room.
     private class Room : IComparable<Room> {
         public List<Coord> tiles;

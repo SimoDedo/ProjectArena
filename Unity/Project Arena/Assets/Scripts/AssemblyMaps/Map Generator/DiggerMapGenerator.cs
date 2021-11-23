@@ -322,4 +322,8 @@ public class DiggerMapGenerator : MapGenerator {
         return genome;
     }
 
+    public override Area[] ConvertMapToAreas()
+    {
+        throw new NotImplementedException();
+    }
 }

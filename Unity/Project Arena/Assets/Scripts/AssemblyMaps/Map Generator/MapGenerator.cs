@@ -258,7 +258,11 @@ public abstract class MapGenerator : CoreComponent {
     }
     
     // Returns the map in AB notation.
+    // TODO extract this to a new subclass, instead of having it as a virtual method implemented by nobody
     public abstract string ConvertMapToAB(bool exportObjects = true);
+
+    // TODO extract this to a new subclass, instead of having it as a virtual method implemented by nobody
+    public abstract Area[] ConvertMapToAreas();
 
     // Returns a new void map and saves its size.
     protected char[,] GetVoidMap() {

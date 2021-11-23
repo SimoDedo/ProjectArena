@@ -341,5 +341,10 @@ namespace AssemblyMaps.Map_Generator
         {
             throw new NotImplementedException();
         }
+
+        public override Area[] ConvertMapToAreas()
+        {
+            return areas.ToArray();
+        }
     }
 }
