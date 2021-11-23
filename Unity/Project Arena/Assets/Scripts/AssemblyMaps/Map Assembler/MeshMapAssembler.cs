@@ -513,7 +513,7 @@ public class MeshMapAssembler : MapAssembler {
         }
     }
 
-    // A Node is placed between two Control Nodes and belongs to a single Control Node.
+    // A NodeProperties is placed between two Control Nodes and belongs to a single Control NodeProperties.
     public class Node {
         public Vector3 position;
         public int vertexIndex = -1;
@@ -523,7 +523,7 @@ public class MeshMapAssembler : MapAssembler {
         }
     }
 
-    // An active Control Node is a wall.
+    // An active Control NodeProperties is a wall.
     public class ControlNode : Node {
         public bool active;
         public Node above, right;
