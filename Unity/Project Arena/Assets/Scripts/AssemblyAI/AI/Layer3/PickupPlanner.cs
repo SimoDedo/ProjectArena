@@ -15,18 +15,10 @@ namespace AI.AI.Layer3
         private NavigationSystem navSystem;
 
         private AIEntity entity;
-        private NavMeshPath chosenPath;
         private GunManager gunManager;
         private Pickable chosenPickup;
-
-        private float entityLastHealth = 0f;
-        private int[] entityLastAmmo = new int[0];
-
         private float agentSpeed;
-        private float lastKBUpdateTime;
-        private bool isFirstTime = true;
 
-        // TODO No more entity, provide Guns instead
         public void Prepare(AIEntity entity, NavigationSystem navSystem, PickupKnowledgeBase knowledgeBase, GunManager gunManager)
         {
             this.entity = entity;
@@ -34,15 +26,6 @@ namespace AI.AI.Layer3
             this.knowledgeBase = knowledgeBase;
             this.gunManager = gunManager;
             agentSpeed = navSystem.GetSpeed();
-        }
-
-        private float CalculateCurrentPickupScore()
-        {
-            if (chosenPickup == null)
-                return 0f;
-            var kb = knowledgeBase.GetPickupKnowledge();
-            var (value, time) = ScorePickup(kb, chosenPickup, out _);
-            return Mathf.Min(1f, value / time / 10);
         }
 
         public Pickable ScorePickups(out NavMeshPath path, out float bestPickupScore, out float activationTime)
@@ -77,36 +60,13 @@ namespace AI.AI.Layer3
                     bestPickupVelocity = velocity;
                     bestPickupTime = time;
                     bestPickup = entry.Key;
-                    chosenPath = path = pickupPath;
+                    path = pickupPath;
                 }
             }
 
             chosenPickup = bestPickup;
             activationTime = chosenPickup == null ? float.MinValue : pickables[chosenPickup];
             return bestPickup;
-        }
-
-        private void UpdateComputationSkipValues()
-        {
-            isFirstTime = false;
-            lastKBUpdateTime = knowledgeBase.GetLastUpdateTime();
-            entityLastHealth = entity.Health;
-            var totalGuns = gunManager.NumberOfGuns;
-            if (entityLastAmmo.Length != totalGuns)
-                entityLastAmmo = new int[totalGuns];
-            for (var i=0; i<totalGuns; i++)
-                entityLastAmmo[i] = entity.GetCurrentAmmoForGun(i);
-        }
-
-        private bool CanUsePreviousResult()
-        {
-            var currentHealth = entity.Health;
-            if (currentHealth != entityLastHealth) return false;
-            var totalGuns = gunManager.NumberOfGuns;
-            if (totalGuns != entityLastAmmo.Length) return false;
-            for (var i=0; i<totalGuns; i++)
-                if (entity.GetCurrentAmmoForGun(i) != entityLastAmmo[i]) return false;
-            return !isFirstTime && lastKBUpdateTime == knowledgeBase.GetLastUpdateTime();
         }
 
         private Tuple<float, float> ScorePickup(Dictionary<Pickable, float> pickables, Pickable pickup, out NavMeshPath path)

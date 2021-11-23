@@ -280,17 +280,7 @@ public class AIEntity : Entity, ILoggable
     {
         gunManager.SupplyGuns(suppliedGuns, ammoAmounts);
     }
-
-    public int GetCurrentAmmoForGun(int index)
-    {
-        return gunManager.GetCurrentAmmoForGun(index);
-    }
-
-    public int GetMaxAmmoForGun(int index)
-    {
-        return gunManager.GetMaxAmmoForGun(index);
-    }
-
+    
     public override void SetInGame(bool b)
     {
         stateMachine.SetIsIdle(!b);
