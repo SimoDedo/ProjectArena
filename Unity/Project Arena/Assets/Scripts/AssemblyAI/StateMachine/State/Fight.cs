@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using AI.KnowledgeBase;
 using AssemblyAI.StateMachine;
 using AssemblyAI.StateMachine.Transition;
+using AssemblyEntity.Component;
 using BehaviorDesigner.Runtime;
 using UnityEngine;
 
@@ -11,6 +12,7 @@ namespace AssemblyAI.State
     {
         private AIEntity entity;
         private TargetKnowledgeBase targetKB;
+        private GunManager gunManager;
         private ExternalBehaviorTree externalBT;
         private BehaviorTree behaviorTree;
         public ITransition[] OutgoingTransitions { get; private set; }
@@ -19,10 +21,13 @@ namespace AssemblyAI.State
         {
             this.entity = entity;
             targetKB = entity.GetComponent<TargetKnowledgeBase>();
+            gunManager = entity.GetComponent<GunManager>();
         }
         
         public float FightTransitionScore(bool isResumingFight = false)
         {
+            if (!gunManager.HasAmmo())
+                return 0;
             // TODO maybe we see enemy, but we want to run away?
             var canSee = targetKB.HasSeenTarget(isResumingFight);
             return canSee ? 0.95f : 0.0f;
