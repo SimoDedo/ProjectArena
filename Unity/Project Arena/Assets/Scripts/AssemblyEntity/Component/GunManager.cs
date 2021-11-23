@@ -218,5 +218,9 @@ namespace AssemblyEntity.Component
         
         public const int NO_GUN = -1;
 
+        public bool HasAmmo()
+        {
+            return guns.Any(it => it.GetCurrentAmmo() != 0);
+        }
     }
 }
