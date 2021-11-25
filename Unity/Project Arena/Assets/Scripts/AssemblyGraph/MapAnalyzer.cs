@@ -26,8 +26,9 @@ namespace AssemblyGraph
         private const string IS_CORRIDOR = "isCorridor";
         private const char WALL_CHAR = 'w';
         private const char FLOOR_CHAR = 'r';
+        private const float TOLERANCE = 0.001f;
 
-        public static NewGraph GenerateTileGraph(char[,] map)
+        public static DirectedGraph GenerateTileGraph(char[,] map)
         {
             var tileGraph = GenerateTileGraphNodesFromMap(map, out var rows, out var columns);
             for (var column = 0; column < columns; column++)
@@ -37,7 +38,7 @@ namespace AssemblyGraph
                     if (map[row, column] == WALL_CHAR) continue;
                     if (row + 1 < rows && map[row + 1, column] != WALL_CHAR)
                     {
-                        tileGraph.AddEdge(
+                        tileGraph.AddEdges(
                             GetTileIndexFromCoordinates(row, column, rows, columns),
                             GetTileIndexFromCoordinates(row + 1, column, rows, columns)
                         );
@@ -45,7 +46,7 @@ namespace AssemblyGraph
 
                     if (column + 1 < columns && map[row, column + 1] != WALL_CHAR)
                     {
-                        tileGraph.AddEdge(
+                        tileGraph.AddEdges(
                             GetTileIndexFromCoordinates(row, column, rows, columns),
                             GetTileIndexFromCoordinates(row, column + 1, rows, columns)
                         );
@@ -54,7 +55,7 @@ namespace AssemblyGraph
                     if (row + 1 < rows && column + 1 < columns && map[row, column + 1] != WALL_CHAR &&
                         map[row + 1, column] != WALL_CHAR && map[row + 1, column + 1] != WALL_CHAR)
                     {
-                        tileGraph.AddEdge(
+                        tileGraph.AddEdges(
                             GetTileIndexFromCoordinates(row, column, rows, columns),
                             GetTileIndexFromCoordinates(row + 1, column + 1, rows, columns),
                             SQRT2
@@ -64,7 +65,7 @@ namespace AssemblyGraph
                     if (row - 1 > 0 && column + 1 < columns && map[row, column + 1] != WALL_CHAR &&
                         map[row - 1, column] != WALL_CHAR && map[row - 1, column + 1] != WALL_CHAR)
                     {
-                        tileGraph.AddEdge(
+                        tileGraph.AddEdges(
                             GetTileIndexFromCoordinates(row, column, rows, columns),
                             GetTileIndexFromCoordinates(row - 1, column + 1, rows, columns),
                             SQRT2
@@ -76,11 +77,11 @@ namespace AssemblyGraph
             return tileGraph;
         }
 
-        private static NewGraph GenerateTileGraphNodesFromMap(char[,] map, out int rows, out int columns)
+        private static DirectedGraph GenerateTileGraphNodesFromMap(char[,] map, out int rows, out int columns)
         {
             rows = map.GetLength(0);
             columns = map.GetLength(1);
-            var tileGraph = new NewGraph();
+            var tileGraph = new DirectedGraph();
             for (var column = 0; column < columns; column++)
             {
                 for (var row = 0; row < rows; row++)
@@ -98,7 +99,7 @@ namespace AssemblyGraph
             return tileGraph;
         }
 
-        private static NewGraph GenerateVisibilityGraph(char[,] map)
+        private static DirectedGraph GenerateVisibilityGraph(char[,] map)
         {
             var visibilityGraph = GenerateTileGraphNodesFromMap(map, out var rows, out var columns);
             var visibilities = new int[rows, columns];
@@ -118,10 +119,10 @@ namespace AssemblyGraph
                             if (map[row2, col2] == WALL_CHAR) continue;
                             if (row1 == row2 && col1 == col2) continue;
                             // The two cells are not walls. We need to check every cell in between
-                            if (isTileVisible(row1, col1, row2, col2, map))
+                            if (IsTileVisible(row1, col1, row2, col2, map))
                             {
                                 var nodeBID = GetTileIndexFromCoordinates(row2, col2, rows, columns);
-                                visibilityGraph.AddEdge(nodeAID, nodeBID, EuclideanDistance(row1, col1, row2, col2));
+                                visibilityGraph.AddEdges(nodeAID, nodeBID, EuclideanDistance(row1, col1, row2, col2));
                             }
                         }
                     }
@@ -130,8 +131,7 @@ namespace AssemblyGraph
                     visibilities[row1, col1] = visibility;
                     if (visibility > maxVisibility)
                         maxVisibility = visibility;
-                    else if (visibility < minVisibility)
-                        minVisibility = visibility;
+                    else if (visibility < minVisibility) minVisibility = visibility;
                 }
             }
 
@@ -172,23 +172,19 @@ namespace AssemblyGraph
                             if (map[row2, col2] == WALL_CHAR) continue;
                             if (row1 == row2 && col1 == col2) continue;
                             // The two cells are not walls. We need to check every cell in between
-                            if (isTileVisible(row1, col1, row2, col2, map))
-                                visibilityMatrix[row1, col1]++;
+                            if (IsTileVisible(row1, col1, row2, col2, map)) visibilityMatrix[row1, col1]++;
                         }
                     }
 
                     var visibility = visibilityMatrix[row1, col1];
                     visibilityMatrix[row1, col1] = visibility;
-                    if (visibility > maxVisibility)
-                        maxVisibility = visibility;
-                    if (visibility < minVisibility)
-                        minVisibility = visibility;
+                    if (visibility > maxVisibility) maxVisibility = visibility;
+                    if (visibility < minVisibility) minVisibility = visibility;
                 }
             }
 
             var visibilityInterval = maxVisibility - minVisibility;
-            if (visibilityInterval == 0)
-                visibilityInterval = maxVisibility; // Everything will be normalized to 1
+            if (visibilityInterval == 0) visibilityInterval = maxVisibility; // Everything will be normalized to 1
 
             for (var row = 0; row < rows; row++)
             {
@@ -202,9 +198,9 @@ namespace AssemblyGraph
             return visibilityMatrix;
         }
 
-        public static NewGraph GenerateRoomsCorridorsGraph(Area[] areas)
+        public static DirectedGraph GenerateRoomsCorridorsGraph(Area[] areas)
         {
-            var roomsCorridorsGraph = new NewGraph();
+            var roomsCorridorsGraph = new DirectedGraph();
             // ID of each area is simply it's index in the for loop
             for (var index = 0; index < areas.Length; index++)
             {
@@ -227,9 +223,9 @@ namespace AssemblyGraph
                 {
                     var area2 = areas[index2];
                     var overlapColumn = Math.Min(area1.rightColumn, area2.rightColumn) -
-                                   Math.Max(area1.leftColumn, area2.leftColumn);
+                        Math.Max(area1.leftColumn, area2.leftColumn);
                     var overlapRow = Math.Min(area1.bottomRow, area2.bottomRow) -
-                                   Math.Max(area1.topRow, area2.topRow);
+                        Math.Max(area1.topRow, area2.topRow);
 
                     if (overlapColumn >= 0 && overlapRow >= 0)
                     {
@@ -237,7 +233,7 @@ namespace AssemblyGraph
                         var centerColumn2 = (area2.leftColumn + area2.rightColumn) / 2f;
                         var centerRow2 = (area2.topRow + area2.bottomRow) / 2f;
                         var distance = EuclideanDistance(centerColumn1, centerRow1, centerColumn2, centerRow2);
-                        roomsCorridorsGraph.AddEdge(GetRoomIndexFromIndex(index1), GetRoomIndexFromIndex(index2),
+                        roomsCorridorsGraph.AddEdges(GetRoomIndexFromIndex(index1), GetRoomIndexFromIndex(index2),
                             distance);
                     }
                 }
@@ -246,7 +242,7 @@ namespace AssemblyGraph
             return roomsCorridorsGraph;
         }
 
-        public static NewGraph GenerateRoomsCorridorsObjectsGraph(Area[] areas, char[,] map, char[] excludedChars)
+        public static DirectedGraph GenerateRoomsCorridorsObjectsGraph(Area[] areas, char[,] map, char[] excludedChars)
         {
             if (map.GetLength(1) > MAX_MAP_WIDTH)
             {
@@ -284,7 +280,7 @@ namespace AssemblyGraph
                                 var centerColumn = (area.leftColumn + area.rightColumn) / 2f;
                                 var centerRow = (area.topRow + area.bottomRow) / 2f;
                                 var distance = EuclideanDistance(centerColumn, centerRow, col, row);
-                                graph.AddEdge(GetRoomIndexFromIndex(roomIndex), objectNodeId, distance);
+                                graph.AddEdges(GetRoomIndexFromIndex(roomIndex), objectNodeId, distance);
                             }
                         }
                     }
@@ -294,8 +290,137 @@ namespace AssemblyGraph
             return graph;
         }
 
+        // TODO Convert to struct
+        public class MapProperties
+        {
+            public int degreeMax;
+            public int degreeMin;
+            public float degreeAvg;
+
+            public float cCentralityMin;
+            public float cCentralityMax;
+            public float cCentralityAvg;
+
+            public float bCentralityMin;
+            public float bCentralityMax;
+            public float bCentralityAvg;
+
+            public float radius;
+            public float centerSetSize; 
+            public float diameter;
+            public float peripherySetSize; 
+            public float avgEccentricity;
+
+            public float density;
+        }
+
+        public static MapProperties CalculateGraphProperties(Area[] areas, char[,] map)
+        {
+            // TODO CHECK correctness
+            var rtn = new MapProperties();
+            var roomGraph = GenerateRoomsCorridorsGraph(areas);
+            var nodes = roomGraph.GetNodeIDs();
+
+            // TODO should I include corridors in the analysis? 
+            // Degree centrality min, max, avg
+            var degreeMax = int.MinValue;
+            var degreeMin = int.MaxValue;
+            var avgDegree = 0f;
+            foreach (var node in nodes)
+            {
+                var degree = roomGraph.GetNodeDegree(node);
+                if (degree > degreeMax) degreeMax = degree;
+                if (degree < degreeMin) degreeMin = degree;
+                avgDegree += degree;
+            }
+
+            avgDegree /= nodes.Length;
+            rtn.degreeMin = degreeMin;
+            rtn.degreeMax = degreeMax;
+            rtn.degreeAvg = avgDegree;
+
+            // Closeness centrality min, max, avg; eccentricity min, max and avg and betweenness
+            var betweenness = nodes.ToDictionary(node => node, node => 0f);
+            var minCCentrality = float.MaxValue;
+            var maxCCentrality = float.MinValue;
+            var avgCCentrality = 0f;
+
+            var radius = float.MaxValue;
+            var centerSetSize = 0;
+            var diameter = float.MinValue;
+            var peripherySetSize = 0;
+            var avgEccentricity = 0f;
+
+            foreach (var node1 in nodes)
+            {
+                var totalPathLength = 0f;
+                var eccentricityNode = float.MinValue;
+                foreach (var node2 in nodes)
+                {
+                    if (node1 != node2)
+                    {
+                        var pathLenght = roomGraph.CalculateShortestPathLenghtAndBetweeness(node1, node2, betweenness);
+                        totalPathLength += pathLenght;
+                        if (pathLenght > eccentricityNode) eccentricityNode = pathLenght;
+                    }
+                }
+
+                if (eccentricityNode < radius)
+                {
+                    radius = eccentricityNode;
+                    centerSetSize = 1;
+                } else if (Math.Abs(eccentricityNode - radius) < TOLERANCE)
+                {
+                    centerSetSize++;
+                }
+
+                if (eccentricityNode > diameter)
+                {
+                    diameter = eccentricityNode;
+                    peripherySetSize = 1;
+                } else if (Math.Abs(eccentricityNode - diameter) < TOLERANCE)
+                {
+                    peripherySetSize++;
+                }
+
+                avgEccentricity += eccentricityNode;
+
+                if (totalPathLength < minCCentrality) minCCentrality = totalPathLength;
+                if (totalPathLength > maxCCentrality) maxCCentrality = totalPathLength;
+                avgCCentrality += totalPathLength;
+            }
+
+            avgCCentrality /= nodes.Length;
+            avgEccentricity /= nodes.Length;
+
+            rtn.cCentralityMin = minCCentrality;
+            rtn.cCentralityMax = maxCCentrality;
+            rtn.cCentralityAvg = avgCCentrality;
+
+            rtn.bCentralityMin = betweenness.Min(it => it.Value);
+            rtn.bCentralityMax = betweenness.Max(it => it.Value);
+            rtn.bCentralityAvg = betweenness.Average(it => it.Value);
+
+            rtn.radius = radius;
+            rtn.centerSetSize = centerSetSize;
+            rtn.diameter = diameter;
+            rtn.peripherySetSize = peripherySetSize;
+            rtn.avgEccentricity = avgEccentricity;
+
+
+            // Density
+            var edgesCompleteGraph = nodes.Length * (nodes.Length - 1) / 2f;
+            var totalEdges = nodes.Aggregate(0f, (current, node) =>
+                current + roomGraph.GetNodeDegree(node));
+            var density = totalEdges / edgesCompleteGraph;
+
+            rtn.density = density;
+
+            return rtn;
+        }
+
         // Dijkstra, assume edge weights are positive
-        public static float CalculateShortestPathLength(NewGraph input, int nodeA, int nodeB)
+        private static float CalculateShortestPathLength(DirectedGraph input, int nodeA, int nodeB)
         {
             return input.CalculateShortestPathLenght(nodeA, nodeB);
         }
@@ -311,7 +436,7 @@ namespace AssemblyGraph
         }
 
         // Tells if a tile is visible from another tile.
-        private static bool isTileVisible(int y1, int x1, int y2, int x2, char[,] map)
+        private static bool IsTileVisible(int y1, int x1, int y2, int x2, char[,] map)
         {
             var dx = x2 - x1;
             var dy = y2 - y1;
@@ -322,8 +447,7 @@ namespace AssemblyGraph
                 var max = Mathf.Max(y1, y2);
                 for (var i = min; i <= max; i++)
                 {
-                    if (map[i, x1] == WALL_CHAR)
-                        return false;
+                    if (map[i, x1] == WALL_CHAR) return false;
                 }
 
                 return true;
@@ -335,8 +459,7 @@ namespace AssemblyGraph
                 var max = Mathf.Max(x1, x2);
                 for (var i = min; i <= max; i++)
                 {
-                    if (map[y1, i] == WALL_CHAR)
-                        return false;
+                    if (map[y1, i] == WALL_CHAR) return false;
                 }
 
                 return true;
@@ -356,8 +479,7 @@ namespace AssemblyGraph
                     var ceil = (int) Mathf.Min(map.GetLength(1), Mathf.Ceil(loc));
                     if (map[i, floor] == WALL_CHAR && map[i, ceil] == WALL_CHAR) return false;
                 }
-            }
-            else
+            } else
             {
                 // If we travel more horizontally then vertically
                 var min = Mathf.Min(x1, x2);
@@ -409,11 +531,12 @@ namespace AssemblyGraph
                 var bestTile = GetBestTile(roomGraph, diameter, diagonal, spawnPointsChar, numSpawnPointsToPlace,
                     objectTypesConsidered,
                     objectsPlacedPos,
-                    spawnPointNormDegreeFitness, spawnPointsVisibilityFit, spawnPointsRoomWeights, spawnPointsTileWeights);
+                    spawnPointNormDegreeFitness, spawnPointsVisibilityFit, spawnPointsRoomWeights,
+                    spawnPointsTileWeights);
 
                 TryAddResource(bestTile, spawnPointsChar, roomGraph, map, objectsPlacedPos);
             }
-            
+
             Debug.Log("Finished placing spawn points");
             const char medkitsChar = 'h';
             const int numMedkitsToPlace = 2;
@@ -431,7 +554,7 @@ namespace AssemblyGraph
 
                 TryAddResource(bestTile, medkitsChar, roomGraph, map, objectsPlacedPos);
             }
-            
+
             Debug.Log("Finished placing medkits");
             const char ammoCrateChar = 'a';
             const int numAmmoCratesToPlace = 2;
@@ -450,10 +573,10 @@ namespace AssemblyGraph
 
                 TryAddResource(bestTile, ammoCrateChar, roomGraph, map, objectsPlacedPos);
             }
-            
+
             Debug.Log("Finished placing ammo 1");
 
-            for (var i = numAmmoCratesToPlace/2; i < numAmmoCratesToPlace; i++)
+            for (var i = numAmmoCratesToPlace / 2; i < numAmmoCratesToPlace; i++)
             {
                 var bestTile = GetBestTile(roomGraph, diameter, diagonal, ammoCrateChar, numAmmoCratesToPlace,
                     objectTypesConsidered,
@@ -480,8 +603,13 @@ namespace AssemblyGraph
             }
         }
 
-        private static void TryAddResource(Vector2Int bestTile, char spawnPointsChar, NewGraph roomGraph, char[,] map,
-            List<Vector2Int> objectsPlacedPos)
+        private static void TryAddResource(
+            Vector2Int bestTile,
+            char spawnPointsChar,
+            DirectedGraph roomGraph,
+            char[,] map,
+            List<Vector2Int> objectsPlacedPos
+        )
         {
             if (bestTile.x == -1 || bestTile.y == -1) return; // Invalid tile, do not do anything
             var rows = map.GetLength(0);
@@ -505,24 +633,33 @@ namespace AssemblyGraph
                 var rightColumn = (int) node[RIGHT_COLUMN];
                 var bottomRow = (int) node[BOTTOM_ROW];
 
-                if (bestTile.x >= leftColumn && bestTile.x < rightColumn && bestTile.y >= topRow && bestTile.y < bottomRow)
+                if (bestTile.x >= leftColumn && bestTile.x < rightColumn && bestTile.y >= topRow &&
+                    bestTile.y < bottomRow)
                 {
                     var centerColumn = (leftColumn + rightColumn) / 2f;
                     var centerRow = (topRow + bottomRow) / 2f;
                     var distance = EuclideanDistance(centerColumn, centerRow, bestTile.x, bestTile.y);
-                    roomGraph.AddEdge(objectNodeID, nodeID, distance);
+                    roomGraph.AddEdges(objectNodeID, nodeID, distance);
                 }
             }
 
             map[bestTile.y, bestTile.x] = spawnPointsChar;
             objectsPlacedPos.Add(bestTile);
-
         }
 
-        private static Vector2Int GetBestTile(NewGraph roomGraph, float diameter, float diagonal, char spawnPointsChar,
-            int numSpawnPoints, List<char> objectTypesConsidered, List<Vector2Int> objectsPlaced,
-            Dictionary<int, float> normDegreeFitness, float[,] visibilityFit, float[] roomWeights,
-            float[] tileWeights)
+        private static Vector2Int GetBestTile(
+            DirectedGraph roomGraph,
+            float diameter,
+            float diagonal,
+            char spawnPointsChar,
+            int numSpawnPoints,
+            List<char> objectTypesConsidered,
+            List<Vector2Int> objectsPlaced,
+            Dictionary<int, float> normDegreeFitness,
+            float[,] visibilityFit,
+            float[] roomWeights,
+            float[] tileWeights
+        )
         {
             var roomsToConsider = normDegreeFitness.Keys;
             var bestScore = float.MinValue;
@@ -548,7 +685,7 @@ namespace AssemblyGraph
             var bottomRow = (int) bestNodeProperties[BOTTOM_ROW];
 
             var bestTileScore = float.MinValue;
-            var bestTile = new Vector2Int(-1,-1);
+            var bestTile = new Vector2Int(-1, -1);
             var currentTile = new Vector2Int();
             for (var col = leftColumn; col < rightColumn; col++)
             {
@@ -556,9 +693,11 @@ namespace AssemblyGraph
                 for (var row = topRow; row < bottomRow; row++)
                 {
                     currentTile.y = row;
-                    if (objectsPlaced.Contains(currentTile)) continue; // Avoid placing object where there is one already
-                    
-                    var tileFit = TileFit(col, row, visibilityFit[row, col], leftColumn, topRow, rightColumn, bottomRow, objectsPlaced,
+                    if (objectsPlaced.Contains(currentTile))
+                        continue; // Avoid placing object where there is one already
+
+                    var tileFit = TileFit(col, row, visibilityFit[row, col], leftColumn, topRow, rightColumn, bottomRow,
+                        objectsPlaced,
                         diagonal, tileWeights);
                     if (tileFit > bestTileScore)
                     {
@@ -572,12 +711,22 @@ namespace AssemblyGraph
             return bestTile;
         }
 
-        private static float TileFit(int row, int col, float visibilityFit, int originX, int originY, int endX, int endY,
-            List<Vector2Int> objectsPlaced, float diagonal, float[] tileWeights)
+        private static float TileFit(
+            int row,
+            int col,
+            float visibilityFit,
+            int originX,
+            int originY,
+            int endX,
+            int endY,
+            List<Vector2Int> objectsPlaced,
+            float diagonal,
+            float[] tileWeights
+        )
         {
             return tileWeights[0] * visibilityFit +
-                   tileWeights[1] * WallDistance(originX, originY, endX, endY, row, col) +
-                   tileWeights[2] * ObjectDistance(row, col, objectsPlaced, diagonal);
+                tileWeights[1] * WallDistance(originX, originY, endX, endY, row, col) +
+                tileWeights[2] * ObjectDistance(row, col, objectsPlaced, diagonal);
         }
 
         private static float ObjectDistance(int x, int y, List<Vector2Int> objectsPlaced, float diagonal)
@@ -590,36 +739,52 @@ namespace AssemblyGraph
 
         private static float WallDistance(int leftColumn, int topRow, int rightColumn, int bottomRow, int col, int row)
         {
-            var distance = Mathf.Min(col - leftColumn, rightColumn - 1 - col) + Mathf.Min(row - topRow, bottomRow - 1 - row) + 1f;
+            var distance = Mathf.Min(col - leftColumn, rightColumn - 1 - col) +
+                Mathf.Min(row - topRow, bottomRow - 1 - row) + 1f;
             var normalizingFactor = (rightColumn - leftColumn + bottomRow - topRow) / 2f;
             return distance / normalizingFactor;
         }
 
-        private static float RoomFit(NewGraph roomGraph, float diameter, int roomID, float degreeFit,
-            char spawnPointsChar, int numSpawnPoints,
-            List<char> objectTypesConsidered, float[] roomWeights)
+        private static float RoomFit(
+            DirectedGraph roomGraph,
+            float diameter,
+            int roomID,
+            float degreeFit,
+            char spawnPointsChar,
+            int numSpawnPoints,
+            List<char> objectTypesConsidered,
+            float[] roomWeights
+        )
         {
             return roomWeights[0] * degreeFit + roomWeights[1] *
                 ResourceDistance(roomGraph, diameter, roomID, objectTypesConsidered) + roomWeights[2] *
                 ResourceRedundancy(roomGraph, roomID, spawnPointsChar, numSpawnPoints);
         }
 
-        private static float ResourceRedundancy(NewGraph roomGraph, int roomID, char spawnPointsChar, int numSpawnPoints)
+        private static float ResourceRedundancy(
+            DirectedGraph roomGraph,
+            int roomID,
+            char spawnPointsChar,
+            int numSpawnPoints
+        )
         {
             var adjacentNodes = roomGraph.GetAdjacentNodes(roomID);
             var redundancy = 0f;
             foreach (var otherNodeID in adjacentNodes)
             {
                 var resource = roomGraph.GetNodeProperties(otherNodeID)[RESOURCE];
-                if (resource != null && (char) resource == spawnPointsChar)
-                    redundancy++;
+                if (resource != null && (char) resource == spawnPointsChar) redundancy++;
             }
 
             return redundancy / numSpawnPoints;
         }
 
-        private static float ResourceDistance(NewGraph roomGraph, float diameter, int roomID,
-            List<char> objectTypesConsidered)
+        private static float ResourceDistance(
+            DirectedGraph roomGraph,
+            float diameter,
+            int roomID,
+            List<char> objectTypesConsidered
+        )
         {
             var nodesIDs = roomGraph.GetNodeIDs();
             var minDistance =
@@ -631,17 +796,18 @@ namespace AssemblyGraph
             return minDistance / diameter;
         }
 
-        private static Dictionary<int, float> ComputeNormalizedDegreeFitness(Dictionary<int, float> normDegrees,
-            float min, float max)
+        private static Dictionary<int, float> ComputeNormalizedDegreeFitness(
+            Dictionary<int, float> normDegrees,
+            float min,
+            float max
+        )
         {
             var minFitness = float.MaxValue;
             var maxFitness = float.MinValue;
             foreach (var distance in normDegrees.Select(degree => IntervalDistance(min, max, degree.Value)))
             {
-                if (distance < minFitness)
-                    minFitness = distance;
-                if (distance > maxFitness)
-                    maxFitness = distance;
+                if (distance < minFitness) minFitness = distance;
+                if (distance > maxFitness) maxFitness = distance;
             }
 
             var variation = maxFitness - minFitness;
@@ -649,9 +815,9 @@ namespace AssemblyGraph
                 degree => 1f - (degree.Value - minFitness) / variation);
         }
 
-        private static float ComputeDiameter(Area[] areas, NewGraph areaGraph)
+        private static float ComputeDiameter(Area[] areas, DirectedGraph areaGraph)
         {
-            var diameter = float.MaxValue;
+            var diameter = float.MinValue;
             for (var i1 = 0; i1 < areas.Length; i1++)
             {
                 for (var i2 = i1 + 1; i2 < areas.Length; i2++)
@@ -659,15 +825,14 @@ namespace AssemblyGraph
                     var distance = MapAnalyzer.CalculateShortestPathLength(areaGraph,
                         MapAnalyzer.GetRoomIndexFromIndex(i1),
                         MapAnalyzer.GetRoomIndexFromIndex(i2));
-                    if (distance < diameter)
-                        diameter = distance;
+                    if (distance > diameter) diameter = distance;
                 }
             }
 
             return diameter;
         }
 
-        private static Dictionary<int, float> ComputeNormalizedDegree(NewGraph roomGraph, bool discardDeadEnds = false)
+        private static Dictionary<int, float> ComputeNormalizedDegree(DirectedGraph roomGraph, bool discardDeadEnds = false)
         {
             var ids = roomGraph.GetNodeIDs();
             var minDegree = float.MaxValue;
@@ -676,18 +841,15 @@ namespace AssemblyGraph
             foreach (var id in ids)
             {
                 var degree = roomGraph.GetNodeDegree(id);
-                if (degree < minDegree)
-                    minDegree = degree;
-                if (degree > maxDegree)
-                    maxDegree = degree;
+                if (degree < minDegree) minDegree = degree;
+                if (degree > maxDegree) maxDegree = degree;
             }
 
             var degreeVariation = maxDegree - minDegree;
             foreach (var id in ids)
             {
                 var degree = roomGraph.GetNodeDegree(id);
-                if (!discardDeadEnds || degree != 1)
-                    rtn.Add(id, (degree - minDegree) / degreeVariation);
+                if (!discardDeadEnds || degree != 1) rtn.Add(id, (degree - minDegree) / degreeVariation);
             }
 
             return rtn;
@@ -695,8 +857,7 @@ namespace AssemblyGraph
 
         private static float IntervalDistance(float min, float max, float value)
         {
-            if (value >= min && value <= max)
-                return 0;
+            if (value >= min && value <= max) return 0;
             return value < min ? Mathf.Abs(min - value) : Mathf.Abs(value - max);
         }
     }
