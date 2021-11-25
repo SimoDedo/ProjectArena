@@ -103,20 +103,40 @@ namespace AssemblyGraph
             return a.TryGetDistance(target, out var rtn) ? (float) rtn : float.MaxValue;
         }
 
-        public float CalculateShortestPathLenghtAndBetweeness(int source, int target, Dictionary<int, float> betweeness)
+        public float CalculateShortestPathLenghtAndBetweeness(
+            int source,
+            int target,
+            Dictionary<int, float> betweeness,
+            int kPaths = 1
+        )
         {
-            // TODO using ranked algorithms to find possible different shortest paths algorithms. By default
-            //  the algorithms tries 3 different paths, and I filter out those that are not the shortest.
-            //  If, in some map, there are more than 3 shortest paths, I do not consider them, so the
+            // TODO using ranked algorithms to find possible different shortest paths algorithms.
+            //  The algorithms tries k different paths, and I filter out those that are not the shortest.
+            //  If, in some map, there are more than k shortest paths, I do not consider them, so the
             //  betweeness centrality calculated will be wrong.
-            var alg = new HoffmanPavleyRankedShortestPathAlgorithm<int, TaggedEdge<int, float>>(graph,
-                GetEdgeWeightFunc);
 
-            alg.Compute(source, target);
+            if (kPaths == 1)
+            {
+                var dijkstra = graph.ShortestPathsDijkstra(GetEdgeWeightFunc, source);
+                if (dijkstra(target, out var path))
+                {
+                    var pathAsList = path.ToList();
+                    var pathLength = pathAsList.Sum(it => it.Tag);
+                    for (var i = 0; i < pathAsList.Count - 1; i++) betweeness[pathAsList[i].Target]++;
+                    return pathLength;
+                }
+
+                return float.MaxValue;
+            }
+
+            var hoffPav = new HoffmanPavleyRankedShortestPathAlgorithm<int, TaggedEdge<int, float>>(graph,
+                GetEdgeWeightFunc) {ShortestPathCount = kPaths};
+
+            hoffPav.Compute(source, target);
 
             var minDistance = float.MaxValue;
             var foundValue = false;
-            foreach (var algPath in alg.ComputedShortestPaths)
+            foreach (var algPath in hoffPav.ComputedShortestPaths)
             {
                 var pathList = algPath.ToList();
                 var sum = pathList.Sum(it => it.Tag);
@@ -134,14 +154,21 @@ namespace AssemblyGraph
                 }
 
                 // DO not consider final vertex in path
-                pathList.RemoveAt(pathList.Count-1);
-                pathList.ForEach(it=>
-                {
-                    betweeness[it.Target] = betweeness[it.Target] + 1f / pathList.Count;
-                });
-
+                pathList.RemoveAt(pathList.Count - 1);
+                pathList.ForEach(it => { betweeness[it.Target] = betweeness[it.Target] + 1f / pathList.Count; });
             }
+
             return minDistance;
+        }
+
+        public IEnumerable<Tuple<int, float>> GetOutEdges(int node)
+        {
+            return graph.OutEdges(node).Select(it => new Tuple<int, float>(it.Target, it.Tag));
+        }
+
+        public bool RemoveNode(int it)
+        {
+            return graph.RemoveVertex(it);
         }
     }
 }

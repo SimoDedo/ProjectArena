@@ -242,6 +242,38 @@ namespace AssemblyGraph
             return roomsCorridorsGraph;
         }
 
+        public static DirectedGraph GenerateRoomsGraph(Area[] areas)
+        {
+            var roomsCorridorsGraph = GenerateRoomsCorridorsGraph(areas);
+            // Now, find all the areas which are corridors, find all the vertices connected to them, connect them and
+            // remove the vertex
+
+            var nodes = roomsCorridorsGraph.GetNodeIDs();
+            var nodesToRemove = new List<int>();
+            foreach (var node in nodes)
+            {
+                var isCorridor = roomsCorridorsGraph.GetNodeProperties(node)[IS_CORRIDOR];
+                if (isCorridor != null && (bool) isCorridor)
+                {
+                    var outEdges = roomsCorridorsGraph.GetOutEdges(node).ToList();
+
+                    for (var i = 0; i < outEdges.Count; i++)
+                    {
+                        var (nodeA, lengthA) = outEdges[i];
+                        for (var j = i+1; j < outEdges.Count; j++)
+                        {
+                            var (nodeB, lengthB) = outEdges[j];
+                            roomsCorridorsGraph.AddEdges(nodeA, nodeB, lengthA + lengthB);
+                        }
+                    }
+                    nodesToRemove.Add(node);
+                }
+            }
+
+            nodesToRemove.ForEach(it=>roomsCorridorsGraph.RemoveNode(it));
+            return roomsCorridorsGraph;
+        }
+
         public static DirectedGraph GenerateRoomsCorridorsObjectsGraph(Area[] areas, char[,] map, char[] excludedChars)
         {
             if (map.GetLength(1) > MAX_MAP_WIDTH)
@@ -291,6 +323,7 @@ namespace AssemblyGraph
         }
 
         // TODO Convert to struct
+        [Serializable]
         public class MapProperties
         {
             public int degreeMax;
@@ -306,19 +339,20 @@ namespace AssemblyGraph
             public float bCentralityAvg;
 
             public float radius;
-            public float centerSetSize; 
+            public float centerSetSize;
             public float diameter;
-            public float peripherySetSize; 
+            public float peripherySetSize;
             public float avgEccentricity;
 
             public float density;
         }
 
-        public static MapProperties CalculateGraphProperties(Area[] areas, char[,] map)
+        public static MapProperties CalculateGraphProperties(Area[] areas)
         {
             // TODO CHECK correctness
             var rtn = new MapProperties();
-            var roomGraph = GenerateRoomsCorridorsGraph(areas);
+            var roomGraph = GenerateRoomsGraph(areas);
+            // var roomGraph = GenerateRoomsCorridorsGraph(areas);
             var nodes = roomGraph.GetNodeIDs();
 
             // TODO should I include corridors in the analysis? 
@@ -832,7 +866,10 @@ namespace AssemblyGraph
             return diameter;
         }
 
-        private static Dictionary<int, float> ComputeNormalizedDegree(DirectedGraph roomGraph, bool discardDeadEnds = false)
+        private static Dictionary<int, float> ComputeNormalizedDegree(
+            DirectedGraph roomGraph,
+            bool discardDeadEnds = false
+        )
         {
             var ids = roomGraph.GetNodeIDs();
             var minDegree = float.MaxValue;

@@ -31,7 +31,7 @@ namespace AssemblyGraph
 
             var charMap = MapUtils.TranslateAreaMap(areas);
 
-            MapAnalyzer.CalculateGraphProperties(areas, charMap);
+            MapAnalyzer.CalculateGraphProperties(areas);
 
             var finalMap = MapUtils.GetStringFromCharMap(charMap);
         }

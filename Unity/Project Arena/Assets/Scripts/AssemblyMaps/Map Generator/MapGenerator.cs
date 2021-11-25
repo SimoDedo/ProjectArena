@@ -241,8 +241,8 @@ public abstract class MapGenerator : CoreComponent {
             }
         }
     }
-    
-    public string GetMapAsText()
+
+    protected string GetMapAsText()
     {
         var textMap = new StringBuilder();
         for (var x = 0; x < width; x++) {
