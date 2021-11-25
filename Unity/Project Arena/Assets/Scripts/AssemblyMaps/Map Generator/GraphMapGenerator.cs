@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using AssemblyLogging;
 using MapManipulation;
 using UnityEngine;
@@ -15,7 +16,10 @@ namespace AssemblyMaps.Map_Generator
         [SerializeField] private int maxRoomHeight = 20;
         [SerializeField] private int minGridSeparation = 5;
         [SerializeField] private int maxGridSeparation = 15;
+        [SerializeField] private int minCorridorThickness = 3;
         [SerializeField] private int maxCorridorThickness = 3;
+
+        private readonly List<Area> areas = new List<Area>();
 
         // TODO Add probabilities for corridor spawn, room sizes, ...
         private void Start()
@@ -26,28 +30,35 @@ namespace AssemblyMaps.Map_Generator
 
         public override char[,] GenerateMap()
         {
+            var roomsDictionary = new Dictionary<int, int>();
+            areas.Clear();
             map = GetVoidMap();
             MapEdit.FillMap(map, wallChar);
             InitializePseudoRandomGenerator();
 
             var maxNumberOfColumns = width / ((maxRoomWidth + maxGridSeparation));
             var maxNumberOfRows = height / ((maxRoomHeight + maxGridSeparation));
-            // Initialize array containing width of every room
+            // Initialize arrays containing widths and heights of every room
             var roomsWidth = new int[maxNumberOfRows][];
+            var roomsHeight = new int[maxNumberOfRows][];
+
             for (var row = 0; row < maxNumberOfRows; row++)
             {
                 roomsWidth[row] = new int[maxNumberOfColumns];
-                for (var column = 0; column < maxNumberOfColumns; column++)
-                    roomsWidth[row][column] = pseudoRandomGen.Next(minRoomWidth, maxRoomWidth);
-            }
-
-            // Initialize array containing height of every room
-            var roomsHeight = new int[maxNumberOfRows][];
-            for (var row = 0; row < maxNumberOfRows; row++)
-            {
                 roomsHeight[row] = new int[maxNumberOfColumns];
                 for (var column = 0; column < maxNumberOfColumns; column++)
-                    roomsHeight[row][column] = pseudoRandomGen.Next(minRoomHeight, maxRoomHeight);
+                {
+                    if (pseudoRandomGen.NextDouble() < 0.5)
+                    {
+                        roomsWidth[row][column] = pseudoRandomGen.Next(minRoomWidth, maxRoomWidth);
+                        roomsHeight[row][column] = pseudoRandomGen.Next(minRoomHeight, maxRoomHeight);
+                        // placedRoomWidth = true;
+                    } else
+                    {
+                        roomsWidth[row][column] = minCorridorThickness;
+                        roomsHeight[row][column] = minCorridorThickness;
+                    }
+                }
             }
 
             // Initialize array containing separation height between cells rows
@@ -82,9 +93,20 @@ namespace AssemblyMaps.Map_Generator
             {
                 verticalCorridorsWidths[row] = new int[maxNumberOfColumns];
                 for (var column = 0; column < maxNumberOfColumns; column++)
-                    verticalCorridorsWidths[row][column] = pseudoRandomGen.Next(0, Mathf.Min(maxColumnWidth[column], maxCorridorThickness)+1);
+                {
+                    if (pseudoRandomGen.NextDouble() < 0.5)
+                    {
+                        verticalCorridorsWidths[row][column] = Mathf.Min(
+                            pseudoRandomGen.Next(minCorridorThickness, maxCorridorThickness),
+                            maxColumnWidth[column]
+                        );
+                    } else
+                    {
+                        verticalCorridorsWidths[row][column] = 0;
+                    }
+                }
             }
-            
+
             // Initialize array containing the height of the corridor connecting cell (i,j) with (i,j+1).
             // A value of 0 indicates that there is no corridor
             var horizontalCorridorsHeights = new int[maxNumberOfRows][];
@@ -92,20 +114,31 @@ namespace AssemblyMaps.Map_Generator
             {
                 horizontalCorridorsHeights[row] = new int[maxNumberOfColumns - 1];
                 for (var column = 0; column < maxNumberOfColumns - 1; column++)
-                    horizontalCorridorsHeights[row][column] = pseudoRandomGen.Next(0, Mathf.Min(maxRowHeight[row], maxCorridorThickness)+1);
+                {
+                    if (pseudoRandomGen.NextDouble() < 0.5)
+                    {
+                        horizontalCorridorsHeights[row][column] = Mathf.Min(
+                            pseudoRandomGen.Next(minCorridorThickness, maxCorridorThickness),
+                            maxColumnWidth[column]
+                        );
+                    } else
+                    {
+                        horizontalCorridorsHeights[row][column] = 0;
+                    }
+                }
             }
 
             // Calculate starting row index in the char[,] map of each row
             var rowStartingIndexes = new int[maxNumberOfRows];
             for (var row = 1; row < maxNumberOfRows; row++)
                 rowStartingIndexes[row] = rowStartingIndexes[row - 1] + maxRowHeight[row - 1] +
-                                          gridVerticalSeparations[row - 1];
+                    gridVerticalSeparations[row - 1];
 
             // Calculate starting column index in the char[,] map of each column
             var columnStartingIndex = new int[maxNumberOfColumns];
             for (var column = 1; column < maxNumberOfColumns; column++)
                 columnStartingIndex[column] = columnStartingIndex[column - 1] + maxColumnWidth[column - 1] +
-                                              gridHorizontalSeparations[column - 1];
+                    gridHorizontalSeparations[column - 1];
 
             // Graph visit initialization, every room has not been visited
             var roomConnectedComponentNum = new int[maxNumberOfRows][];
@@ -123,6 +156,7 @@ namespace AssemblyMaps.Map_Generator
                 {
                     if (roomConnectedComponentNum[row][column] == 0)
                     {
+                        if (roomsHeight[row][column] == 0 || roomsWidth[row][column] == 0) continue;
                         var connectedRooms = VisitCell(currentConnectedNumber, row, column, roomConnectedComponentNum,
                             horizontalCorridorsHeights, verticalCorridorsWidths);
                         if (connectedRooms > bestConnectedComponentSize)
@@ -143,8 +177,10 @@ namespace AssemblyMaps.Map_Generator
                 {
                     if (roomConnectedComponentNum[row][column] == bestConnectedComponent)
                     {
-                        FillRoom(rowStartingIndexes[row], columnStartingIndex[column], maxColumnWidth[column],
-                            maxRowHeight[row], roomsWidth[row][column], roomsHeight[row][column]);
+                        roomsDictionary.Add(row * maxNumberOfColumns + column, areas.Count);
+                        areas.Add(CreateRoom(rowStartingIndexes[row], columnStartingIndex[column],
+                            maxColumnWidth[column],
+                            maxRowHeight[row], roomsWidth[row][column], roomsHeight[row][column]));
                     }
                 }
             }
@@ -157,9 +193,11 @@ namespace AssemblyMaps.Map_Generator
                     if (verticalCorridorsWidths[row][column] > 0 &&
                         roomConnectedComponentNum[row][column] == bestConnectedComponent)
                     {
-                        FillVerticalCorridor(verticalCorridorsWidths[row][column], rowStartingIndexes[row], rowStartingIndexes[row + 1],
+                        areas.Add(CreateVerticalCorridor(verticalCorridorsWidths[row][column],
+                            areas[roomsDictionary[row * maxNumberOfColumns + column]],
+                            areas[roomsDictionary[(row + 1) * maxNumberOfColumns + column]],
                             columnStartingIndex[column],
-                            maxColumnWidth[column], maxRowHeight[row], maxRowHeight[row + 1]);
+                            maxColumnWidth[column]));
                     }
                 }
             }
@@ -172,13 +210,16 @@ namespace AssemblyMaps.Map_Generator
                     if (horizontalCorridorsHeights[row][column] > 0 &&
                         roomConnectedComponentNum[row][column] == bestConnectedComponent)
                     {
-                        FillHorizontalCorridor(horizontalCorridorsHeights[row][column], rowStartingIndexes[row],
-                            columnStartingIndex[column], columnStartingIndex[column + 1],
-                            maxColumnWidth[column], maxColumnWidth[column + 1], maxRowHeight[row]);
+                        areas.Add(CreateHorizontalCorridor(horizontalCorridorsHeights[row][column],
+                            rowStartingIndexes[row],
+                            areas[roomsDictionary[row * maxNumberOfColumns + column]],
+                            areas[roomsDictionary[row * maxNumberOfColumns + column + 1]],
+                            maxRowHeight[row]));
                     }
                 }
             }
 
+            FillMap(areas);
             // ProcessMap();
             PopulateMap();
 
@@ -188,16 +229,37 @@ namespace AssemblyMaps.Map_Generator
 
             var textMap = GetMapAsText();
             SaveMapTextGameEvent.Instance.Raise(textMap);
-            if (createTextFile)
-                SaveMapAsText(textMap);
+            if (createTextFile) SaveMapAsText(textMap);
             return map;
         }
 
-        private void FillVerticalCorridor(int corridorThickness, int currentRowStartingIndex, int nextRowStartingIndex,
-            int currentColumnStartingIndex, int currentColumnMaxWidth, int currentRowMaxHeight, int nextRowMaxHeight)
+        private void FillMap(List<Area> areas)
         {
-            var corridorStaringRow = currentRowStartingIndex + currentRowMaxHeight / 2;
-            var corridorEndingRow = nextRowStartingIndex + nextRowMaxHeight / 2;
+            foreach (var area in areas)
+            {
+                for (var row = area.topRow; row < area.bottomRow; row++)
+                {
+                    for (var col = area.leftColumn; col < area.rightColumn; col++)
+                    {
+                        if (area.isCorridor)
+                            map[row, col] = 'R';
+                        else
+                            map[row, col] = 'r';
+                    }
+                }
+            }
+        }
+
+        private static Area CreateVerticalCorridor(
+            int corridorThickness,
+            Area topRoom,
+            Area bottomRoom,
+            int currentColumnStartingIndex,
+            int currentColumnMaxWidth
+        )
+        {
+            var corridorStartingRow = topRoom.bottomRow;
+            var corridorEndingRow = bottomRoom.topRow;
 
             int corridorStartingColumn;
             var corridorWidth = corridorThickness;
@@ -206,24 +268,21 @@ namespace AssemblyMaps.Map_Generator
             else
                 corridorStartingColumn = currentColumnStartingIndex;
 
-            var corridorEndingColumns = corridorStartingColumn + corridorWidth;
+            var corridorEndingColumn = corridorStartingColumn + corridorWidth;
 
-            for (var row = corridorStaringRow; row <= corridorEndingRow; row++)
-            {
-                for (var column = corridorStartingColumn; column < corridorEndingColumns; column++)
-                {
-                    map[row, column] = roomChar;
-                }
-            }
+            return new Area(corridorStartingColumn, corridorStartingRow, corridorEndingColumn, corridorEndingRow, true);
         }
 
-        private void FillHorizontalCorridor(int corridorThickness, int currentRowStartingIndex, int currentColumnStartingIndex,
-            int nextColumnStartingIndex, int currentColumnMaxWidth, int nextColumnMaxWidth, int currentRowMaxHeight)
+        private Area CreateHorizontalCorridor(
+            int corridorThickness,
+            int currentRowStartingIndex,
+            Area leftRoom,
+            Area rightRoom,
+            int currentRowMaxHeight
+        )
         {
-            var corridorStartingColumn = currentColumnStartingIndex + currentColumnMaxWidth / 2;
-            var corridorEndingColumn = nextColumnStartingIndex + nextColumnMaxWidth / 2;
-            // var corridorStartingRow = currentRowStartingIndex + currentRowMaxHeight / 2;
-            // var corridorEndingRow = corridorStartingRow + Math.Min(currentRowMaxHeight, );
+            var corridorStartingColumn = leftRoom.rightColumn;
+            var corridorEndingColumn = rightRoom.leftColumn;
 
             int corridorStartingRow;
             var corridorHeight = corridorThickness;
@@ -234,17 +293,17 @@ namespace AssemblyMaps.Map_Generator
 
             var corridorEndingRow = corridorStartingRow + corridorHeight;
 
-            for (var row = corridorStartingRow; row < corridorEndingRow; row++)
-            {
-                for (var column = corridorStartingColumn; column <= corridorEndingColumn; column++)
-                {
-                    map[row, column] = roomChar;
-                }
-            }
+            return new Area(corridorStartingColumn, corridorStartingRow, corridorEndingColumn, corridorEndingRow, true);
         }
 
-        private void FillRoom(int rowStartingIndex, int columnStartingIndex, int columnWidth, int rowHeight,
-            int roomWidth, int roomHeight)
+        private Area CreateRoom(
+            int rowStartingIndex,
+            int columnStartingIndex,
+            int columnWidth,
+            int rowHeight,
+            int roomWidth,
+            int roomHeight
+        )
         {
             int selectedStartingColumn;
             int selectedStartingRow;
@@ -254,8 +313,7 @@ namespace AssemblyMaps.Map_Generator
                 selectedStartingColumn =
                     columnStartingIndex + (columnWidth / 2) - roomWidth +
                     pseudoRandomGen.Next(0, possibleStartingColumns);
-            }
-            else
+            } else
             {
                 var possibleStartingColumns = columnWidth - roomWidth;
                 selectedStartingColumn = columnStartingIndex + pseudoRandomGen.Next(0, possibleStartingColumns);
@@ -267,27 +325,27 @@ namespace AssemblyMaps.Map_Generator
                 selectedStartingRow =
                     rowStartingIndex + (rowHeight / 2) - roomHeight +
                     pseudoRandomGen.Next(0, possibleStartingRows);
-            }
-            else
+            } else
             {
                 var possibleStartingRows = rowHeight - roomHeight;
                 selectedStartingRow = rowStartingIndex + pseudoRandomGen.Next(0, possibleStartingRows);
             }
 
-            for (var i = 0; i < roomWidth; i++)
-            {
-                for (var j = 0; j < roomHeight; j++)
-                {
-                    map[selectedStartingRow + j, selectedStartingColumn + i] = roomChar;
-                }
-            }
+            var endingRow = selectedStartingRow + roomHeight;
+            var endingCol = selectedStartingColumn + roomWidth;
 
-            Debug.Log("Finished filling room");
+            return new Area(selectedStartingColumn, selectedStartingRow, endingCol, endingRow);
         }
 
         // Returns the number of rooms found while exploring
-        private int VisitCell(int connectedNumber, int row, int column, int[][] roomConnectedComponentNum,
-            int[][] hasHorizontalCorridor, int[][] hasVerticalCorridor)
+        private int VisitCell(
+            int connectedNumber,
+            int row,
+            int column,
+            int[][] roomConnectedComponentNum,
+            int[][] hasHorizontalCorridor,
+            int[][] hasVerticalCorridor
+        )
         {
             if (roomConnectedComponentNum[row][column] != 0) return 0;
             roomConnectedComponentNum[row][column] = connectedNumber;
@@ -314,6 +372,11 @@ namespace AssemblyMaps.Map_Generator
         public override string ConvertMapToAB(bool exportObjects = true)
         {
             throw new NotImplementedException();
+        }
+
+        public override Area[] ConvertMapToAreas()
+        {
+            return areas.ToArray();
         }
     }
 }

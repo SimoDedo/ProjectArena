@@ -438,6 +438,11 @@ public class DivisiveMapGenerator : MapGenerator {
         return genome;
     }
 
+    public override Area[] ConvertMapToAreas()
+    {
+        throw new NotImplementedException();
+    }
+
     // Stores all information about a room.
     private class Room : IComparable<Room> {
         public int originX;

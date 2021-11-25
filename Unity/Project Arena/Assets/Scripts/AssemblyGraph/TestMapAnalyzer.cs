@@ -22,16 +22,16 @@ namespace AssemblyGraph
                 new Area(8, 12, 11, 14),
                 new Area(8, 9, 9, 10),
                 
-                new Area(2, 2, 7, 3, true),
-                new Area(2, 2, 3, 10, true),
-                new Area(4, 9, 9, 10, true),
-                new Area(8, 9, 9, 12, true),
+                new Area(4, 2, 6, 3, true),
+                new Area(2, 5, 3, 7, true),
+                new Area(6, 9, 8, 10, true),
+                new Area(8, 10, 9, 12, true),
                 
             };
 
             var charMap = MapUtils.TranslateAreaMap(areas);
 
-            MapAnalyzer.AddEverything(areas, charMap);
+            MapAnalyzer.CalculateGraphProperties(areas);
 
             var finalMap = MapUtils.GetStringFromCharMap(charMap);
         }
@@ -99,7 +99,10 @@ namespace AssemblyGraph
                 {
                     for (var col = area.leftColumn; col < area.rightColumn; col++)
                     {
-                        rtn[row - minCoords.y, col - minCoords.x] = 'r';
+                        if (area.isCorridor)
+                            rtn[row - minCoords.y, col - minCoords.x] = 'R';
+                        else
+                            rtn[row - minCoords.y, col - minCoords.x] = 'r';
                     }
                 }
             }

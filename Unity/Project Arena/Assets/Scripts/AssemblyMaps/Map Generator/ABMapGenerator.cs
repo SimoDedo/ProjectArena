@@ -341,4 +341,8 @@ public class ABMapGenerator : MapGenerator {
         throw new NotImplementedException();
     }
 
+    public override Area[] ConvertMapToAreas()
+    {
+        throw new NotImplementedException();
+    }
 }
