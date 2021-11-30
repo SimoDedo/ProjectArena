@@ -21,6 +21,7 @@ public class ProjectileGun : Gun {
     {
         t = transform;
         projectiles = new GameObject("Projectiles - " + gameObject.name);
+        projectiles.transform.parent = t;
         projectiles.transform.localPosition = Vector3.zero;
     }
 

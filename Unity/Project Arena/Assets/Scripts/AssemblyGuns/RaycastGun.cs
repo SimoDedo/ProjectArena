@@ -27,7 +27,9 @@ public class RaycastGun : Gun {
 
         ignoredLayers = ~ignoredLayers;
 
-        sparks = new GameObject("Sparks - " + transform.gameObject.name);
+        var transform1 = transform;
+        sparks = new GameObject("Sparks - " + transform1.gameObject.name);
+        sparks.transform.parent = transform1;
         sparks.transform.localPosition = Vector3.zero;
     }
 

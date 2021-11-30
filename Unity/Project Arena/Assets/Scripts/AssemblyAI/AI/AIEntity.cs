@@ -161,6 +161,11 @@ public class AIEntity : Entity, ILoggable
         });
     }
 
+    public void SetEnemy(Entity enemy)
+    {
+        this.enemy = enemy;
+    }
+
     private float lastDamageTime = float.MinValue;
 
     public override void TakeDamage(int damage, int killerID)

@@ -6,9 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/AI/Bot - Canyon.unity
-    guid: 2c51a78227dad1ac4bcc336b9a3504db
-  - enabled: 1
-    path: Assets/Scenes/Exit.unity
-    guid: 345ca98268d9580d0a053f9e3f9a36e2
+    path: Assets/Scenes/Graph testing/FinalMapTester.unity
+    guid: 95bfb270c799104158be33379f6aa73b
   m_configObjects: {}

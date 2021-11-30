@@ -34,6 +34,11 @@ public class SpawnPointManager : CoreComponent {
         }
     }
 
+    public void Reset()
+    {
+        spawnPoints.Clear();
+    }
+
     // Updates the last used field of all the spawn points that have already been used.
     public void UpdateLastUsed() {
         foreach (SpawnPoint s in spawnPoints)

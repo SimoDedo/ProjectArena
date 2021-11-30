@@ -38,6 +38,12 @@ public abstract class MapManager : CoreComponent {
         ExtractParametersFromManager();
     }
 
+    public void SetTextFile(string mapPath)
+    {
+        loadMapFromFile = true;
+        textFilePath = mapPath;
+    }
+
     private void Update() {
         if (!IsReady() && mapAssemblerScript.IsReady() && mapGeneratorScript.IsReady() &&
              objectDisplacerScript.IsReady()) {
@@ -105,6 +111,7 @@ public abstract class MapManager : CoreComponent {
         mapGeneratorScript.ResetMapSize();
         mapAssemblerScript.ClearMap();
         objectDisplacerScript.DestroyAllCustomObjects();
+        SetReady(false);
     }
 
     public bool GetFlip() {
