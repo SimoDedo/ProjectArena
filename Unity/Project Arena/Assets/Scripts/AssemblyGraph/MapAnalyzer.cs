@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Accord.Math;
+using QuikGraph;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -10,9 +11,10 @@ using Debug = UnityEngine.Debug;
 // greater than MAX_MAP_WIDTH, otherwise I'll get clashes between room indexes and tile indexes
 namespace AssemblyGraph
 {
+    // ReSharper disable class InconsistentNaming
     public static class MapAnalyzer
     {
-        private static readonly float SQRT2 = Mathf.Sqrt(2);
+        private static readonly float Sqrt2 = Mathf.Sqrt(2);
         private const int MAX_MAP_WIDTH = 10000;
         private const string RESOURCE = "resource";
         private const string ROW = "col";
@@ -24,6 +26,7 @@ namespace AssemblyGraph
         private const string BOTTOM_ROW = "bottomRow";
         private const string VISIBILITY = "visibility";
         private const string IS_CORRIDOR = "isCorridor";
+        private const string IS_DUMMY = "isDummy";
         private const char WALL_CHAR = 'w';
         private const char FLOOR_CHAR = 'r';
         private const float TOLERANCE = 0.001f;
@@ -58,7 +61,7 @@ namespace AssemblyGraph
                         tileGraph.AddEdges(
                             GetTileIndexFromCoordinates(row, column, rows, columns),
                             GetTileIndexFromCoordinates(row + 1, column + 1, rows, columns),
-                            SQRT2
+                            Sqrt2
                         );
                     }
 
@@ -68,7 +71,7 @@ namespace AssemblyGraph
                         tileGraph.AddEdges(
                             GetTileIndexFromCoordinates(row, column, rows, columns),
                             GetTileIndexFromCoordinates(row - 1, column + 1, rows, columns),
-                            SQRT2
+                            Sqrt2
                         );
                     }
                 }
@@ -210,7 +213,8 @@ namespace AssemblyGraph
                     new Tuple<string, object>(TOP_ROW, current.topRow),
                     new Tuple<string, object>(RIGHT_COLUMN, current.rightColumn),
                     new Tuple<string, object>(BOTTOM_ROW, current.bottomRow),
-                    new Tuple<string, object>(IS_CORRIDOR, current.isCorridor)
+                    new Tuple<string, object>(IS_CORRIDOR, current.isCorridor),
+                    new Tuple<string, object>(IS_DUMMY, current.isDummyRoom)
                 );
             }
 
@@ -230,6 +234,9 @@ namespace AssemblyGraph
                     if (overlapColumn >= 0 && overlapRow >= 0)
                     {
                         if (overlapColumn == 0 && overlapRow == 0) continue;
+                        if (!(area1.isCorridor ^ area2.isCorridor))
+                            // In the map, two corridors touch. Ignore this, or duplicated edges will be generated
+                            continue;
                         var centerColumn2 = (area2.leftColumn + area2.rightColumn) / 2f;
                         var centerRow2 = (area2.topRow + area2.bottomRow) / 2f;
                         var distance = EuclideanDistance(centerColumn1, centerRow1, centerColumn2, centerRow2);
@@ -260,17 +267,43 @@ namespace AssemblyGraph
                     for (var i = 0; i < outEdges.Count; i++)
                     {
                         var (nodeA, lengthA) = outEdges[i];
-                        for (var j = i+1; j < outEdges.Count; j++)
+                        for (var j = i + 1; j < outEdges.Count; j++)
                         {
                             var (nodeB, lengthB) = outEdges[j];
                             roomsCorridorsGraph.AddEdges(nodeA, nodeB, lengthA + lengthB);
                         }
                     }
+
                     nodesToRemove.Add(node);
                 }
             }
 
-            nodesToRemove.ForEach(it=>roomsCorridorsGraph.RemoveNode(it));
+            var discardDummies = areas.Any(it => !it.isCorridor && !it.isDummyRoom);
+            if (discardDummies)
+            {
+                foreach (var node in nodes)
+                {
+                    var isDummy = roomsCorridorsGraph.GetNodeProperties(node)[IS_DUMMY];
+                    if (isDummy != null && (bool) isDummy)
+                    {
+                        var outEdges = roomsCorridorsGraph.GetOutEdges(node).ToList();
+
+                        for (var i = 0; i < outEdges.Count; i++)
+                        {
+                            var (nodeA, lengthA) = outEdges[i];
+                            for (var j = i + 1; j < outEdges.Count; j++)
+                            {
+                                var (nodeB, lengthB) = outEdges[j];
+                                roomsCorridorsGraph.AddEdges(nodeA, nodeB, lengthA + lengthB);
+                            }
+                        }
+
+                        nodesToRemove.Add(node);
+                    }
+                }
+            }
+
+            nodesToRemove.ForEach(it => roomsCorridorsGraph.RemoveNode(it));
             return roomsCorridorsGraph;
         }
 
@@ -349,7 +382,6 @@ namespace AssemblyGraph
 
         public static MapProperties CalculateGraphProperties(Area[] areas)
         {
-            // TODO CHECK correctness
             var rtn = new MapProperties();
             var roomGraph = GenerateRoomsGraph(areas);
             // var roomGraph = GenerateRoomsCorridorsGraph(areas);
@@ -464,7 +496,7 @@ namespace AssemblyGraph
             return row * numColumns + column;
         }
 
-        public static int GetRoomIndexFromIndex(int roomNum)
+        private static int GetRoomIndexFromIndex(int roomNum)
         {
             return roomNum + MAX_MAP_WIDTH;
         }
@@ -553,7 +585,7 @@ namespace AssemblyGraph
 
             var objectsPlacedPos = new List<Vector2Int>();
             const char spawnPointsChar = 's';
-            const int numSpawnPointsToPlace = 100;
+            const int numSpawnPointsToPlace = 5;
             var objectTypesConsidered = new List<char> {spawnPointsChar};
 
             var spawnPointsRoomWeights = new[] {1f, 0.25f, -2f};
@@ -711,6 +743,7 @@ namespace AssemblyGraph
                 }
             }
 
+            if (bestNodeID == -1) Debug.Log("!?");
             var bestNodeProperties = roomGraph.GetNodeProperties(bestNodeID);
 
             var leftColumn = (int) bestNodeProperties[LEFT_COLUMN];
@@ -845,6 +878,9 @@ namespace AssemblyGraph
             }
 
             var variation = maxFitness - minFitness;
+            if (variation == 0) // TODO BETTER NORMALIZATION IN THIS CASE
+                return normDegrees.ToDictionary(degree => degree.Key,
+                    degree => 1f);
             return normDegrees.ToDictionary(degree => degree.Key,
                 degree => 1f - (degree.Value - minFitness) / variation);
         }
@@ -856,9 +892,9 @@ namespace AssemblyGraph
             {
                 for (var i2 = i1 + 1; i2 < areas.Length; i2++)
                 {
-                    var distance = MapAnalyzer.CalculateShortestPathLength(areaGraph,
-                        MapAnalyzer.GetRoomIndexFromIndex(i1),
-                        MapAnalyzer.GetRoomIndexFromIndex(i2));
+                    var distance = CalculateShortestPathLength(areaGraph,
+                        GetRoomIndexFromIndex(i1),
+                        GetRoomIndexFromIndex(i2));
                     if (distance > diameter) diameter = distance;
                 }
             }
@@ -885,8 +921,14 @@ namespace AssemblyGraph
             var degreeVariation = maxDegree - minDegree;
             foreach (var id in ids)
             {
-                var degree = roomGraph.GetNodeDegree(id);
-                if (!discardDeadEnds || degree != 1) rtn.Add(id, (degree - minDegree) / degreeVariation);
+                if (degreeVariation == 0)
+                {
+                    rtn.Add(id, 1f);
+                } else
+                {
+                    var degree = roomGraph.GetNodeDegree(id);
+                    if (!discardDeadEnds || degree != 1) rtn.Add(id, (degree - minDegree) / degreeVariation);
+                }
             }
 
             return rtn;
@@ -907,13 +949,22 @@ public class Area
     public readonly int rightColumn;
     public readonly int bottomRow;
     public readonly bool isCorridor;
+    public readonly bool isDummyRoom;
 
-    public Area(int leftColumn, int topRow, int rightColumn, int bottomRow, bool isCorridor = false)
+    public Area(
+        int leftColumn,
+        int topRow,
+        int rightColumn,
+        int bottomRow,
+        bool isCorridor = false,
+        bool isDummyRoom = false
+    )
     {
         this.leftColumn = leftColumn;
         this.topRow = topRow;
         this.rightColumn = rightColumn;
         this.bottomRow = bottomRow;
         this.isCorridor = isCorridor;
+        this.isDummyRoom = isDummyRoom;
     }
 }
