@@ -21,7 +21,7 @@ namespace AssemblyAI.Behaviours.Actions
         public override void OnAwake()
         {
             entity = GetComponent<AIEntity>();
-            navSystem = entity.GetComponent<NavigationSystem>();
+            navSystem = entity.NavigationSystem;
             enemy = entity.GetEnemy();
             predictionSkill = entity.GetPredictionSkill();
         }

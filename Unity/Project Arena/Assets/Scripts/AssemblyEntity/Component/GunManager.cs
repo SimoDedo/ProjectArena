@@ -6,10 +6,12 @@ using UnityEngine;
 
 namespace AssemblyEntity.Component
 {
-    public class GunManager : MonoBehaviour
+    // TODO Do not allow direct usage of Gun, create interface or new GunHandlingComponent
+    public class GunManager
     {
         private List<Gun> guns;
         private List<GunScorer> gunScorers;
+
         private List<bool> ActiveGuns
         {
             get { return guns.Select(it => it.isActiveAndEnabled).ToList(); }
@@ -23,34 +25,37 @@ namespace AssemblyEntity.Component
                 }
             }
         }
-        
+
         public int CurrentGunIndex { get; private set; } = NO_GUN;
         public int NumberOfGuns => guns.Count;
+
+        private readonly Entity me;
+
+        public GunManager(Entity entity)
+        {
+            me = entity;
+        }
+
+        public void Prepare(GameManager gms, Entity parent, PlayerUIManager pms, bool[] ag)
+        {
+            guns = me.GetComponentsInChildren<Gun>().ToList();
+            gunScorers = guns.Select(it => it.GetComponent<GunScorer>()).ToList();
+            SetupGuns(gms, parent, pms, ag);
+        }
 
         public int FindLowestActiveGun()
         {
             return ActiveGuns.FindIndex(it => it);
         }
-        
+
         // TODO RENAMING
         public bool TryEquipGun(int index)
         {
-            if (index == NO_GUN)
-                return TrySwitchGuns(CurrentGunIndex, index);
-            
-            if (index < 0 || index > guns.Count)
-                return false;
+            if (index == NO_GUN) return TrySwitchGuns(CurrentGunIndex, index);
+
+            if (index < 0 || index > guns.Count) return false;
             return ActiveGuns[index] && TrySwitchGuns(CurrentGunIndex, index);
         }
-
-        // TODO Do not allow direct usage of Gun, create interface or new GunHandlingComponent
-
-        public void Prepare()
-        {
-            guns = gameObject.GetComponentsInChildren<Gun>().ToList();
-            gunScorers = guns.Select(it => it.GetComponent<GunScorer>()).ToList();
-        }
-
 
         // Variables to slow down the gun switching.
         private float lastSwitched = float.MinValue;
@@ -65,10 +70,8 @@ namespace AssemblyEntity.Component
                 {
                     lastSwitched = Time.time;
                     CurrentGunIndex = toActivate;
-                    if (toDeactivate != NO_GUN)
-                        guns[toDeactivate].Stow();
-                    if (toActivate != NO_GUN)
-                        guns[toActivate].Wield();
+                    if (toDeactivate != NO_GUN) guns[toDeactivate].Stow();
+                    if (toActivate != NO_GUN) guns[toActivate].Wield();
                 }
 
                 return true;
@@ -77,7 +80,7 @@ namespace AssemblyEntity.Component
             return toDeactivate == toActivate;
         }
 
-        public void SetupGuns(GameManager gms, Entity parent, PlayerUIManager pms, bool[] ag)
+        private void SetupGuns(GameManager gms, Entity parent, PlayerUIManager pms, bool[] ag)
         {
             for (var i = 0; i < ag.Length; i++)
             {
@@ -85,6 +88,7 @@ namespace AssemblyEntity.Component
                 var gun = guns[i];
                 gun.SetupGun(gms, parent, pms, i + 1);
             }
+
             ActiveGuns = ag.ToList();
         }
 
@@ -111,26 +115,27 @@ namespace AssemblyEntity.Component
                 }
             }
         }
-        
+
         public int GetMaxAmmoForGun(int index)
         {
             return guns[index].GetMaxAmmo();
         }
+
         public int GetCurrentAmmoForGun(int index)
         {
             return guns[index].GetCurrentAmmo();
         }
-        
+
         public int GetChargerSizeForGun(int index)
         {
             return guns[index].GetAmmoClipSize();
         }
-        
+
         public int GetAmmoInChargerForGun(int index)
         {
             return guns[index].GetLoadedAmmo();
         }
-        
+
 
         public void ResetAmmo()
         {
@@ -142,7 +147,7 @@ namespace AssemblyEntity.Component
                 }
             }
         }
-        
+
         public bool IsGunActive(int index)
         {
             return ActiveGuns[index];
@@ -152,7 +157,7 @@ namespace AssemblyEntity.Component
         {
             return guns[index].CanAim();
         }
-        
+
         public bool CanCurrentGunAim()
         {
             return guns[CurrentGunIndex].CanAim();
@@ -172,6 +177,7 @@ namespace AssemblyEntity.Component
         {
             return guns[CurrentGunIndex].CanShoot();
         }
+
         public void ShootCurrentGun()
         {
             guns[CurrentGunIndex].Shoot();
@@ -191,6 +197,7 @@ namespace AssemblyEntity.Component
         {
             guns[CurrentGunIndex].Reload();
         }
+
         public float GetGunScore(int index, float distance)
         {
             return gunScorers[index].GetGunScore(distance);
@@ -200,7 +207,7 @@ namespace AssemblyEntity.Component
         {
             return guns[index].GetProjectileSpeed();
         }
-        
+
         public float GetCurrentGunProjectileSpeed()
         {
             return guns[CurrentGunIndex].GetProjectileSpeed();
@@ -211,11 +218,11 @@ namespace AssemblyEntity.Component
             return guns[CurrentGunIndex].IsReloading;
         }
 
-        public Tuple<float,float> GetCurrentGunOptimalRange()
+        public Tuple<float, float> GetCurrentGunOptimalRange()
         {
             return gunScorers[CurrentGunIndex].GetOptimalRange();
         }
-        
+
         public const int NO_GUN = -1;
 
         public bool HasAmmo()

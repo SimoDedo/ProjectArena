@@ -1,21 +1,32 @@
 using System;
 using UnityEngine;
 
-namespace Entities.AI.Controller
+namespace AssemblyAI.AI.Layer1.Actuator
 {
-    public class AISightController : MonoBehaviour
+    public class AISightController
     {
-        private GameObject head;
-        private float maxSpeed;
-        private float maxAcceleration;
+        private readonly Transform bodyTransform;
+        private readonly GameObject head;
+        private readonly float maxSpeed;
+        private readonly float maxAcceleration;
         private float inputPenalty = 1f;
+        private float currentBodySpeed;
+        private float currentHeadSpeed;
 
-        public void Prepare(GameObject head, float maxSpeed, float maxAcceleration)
+        public AISightController(
+            AIEntity entity,
+            GameObject head,
+            float maxSpeed,
+            float maxAcceleration
+        )
         {
+            bodyTransform = entity.transform;
             this.head = head;
             this.maxSpeed = maxSpeed;
             this.maxAcceleration = maxAcceleration;
         }
+
+        public void Prepare() { /* Nothing to do */ }
 
         /// <summary>
         /// This functions rotates head and body of the entity in order to look at the provided target.
@@ -27,15 +38,18 @@ namespace Entities.AI.Controller
         /// <param name="forceLookStraightWhenClose"></param>
         /// <returns>The angle between the new look direction and the target</returns>
         /// 
-        public float LookAtPoint(Vector3 target, float sensibilityAdjustment = 1f, bool forceLookStraightWhenClose = true)
+        public float LookAtPoint(
+            Vector3 target,
+            float sensibilityAdjustment = 1f,
+            bool forceLookStraightWhenClose = true
+        )
         {
             var headTransform = head.transform;
             var position = headTransform.position;
 
             var distance = (target - position).magnitude;
 
-            if (distance < 10 && forceLookStraightWhenClose)
-                target.y = position.y;
+            if (distance < 10 && forceLookStraightWhenClose) target.y = position.y;
 
             var direction = (target - position).normalized;
             var rotation = Quaternion.LookRotation(direction);
@@ -47,7 +61,7 @@ namespace Entities.AI.Controller
             var desiredBodyRotation = Quaternion.Euler(0, angles.y, 0);
 
             var currentHeadRotation = headTransform.localRotation;
-            var currentBodyRotation = transform.localRotation;
+            var currentBodyRotation = bodyTransform.localRotation;
 
             var currentHeadAngles = head.transform.rotation.eulerAngles;
             currentHeadAngles = ConvertTo180Based(currentHeadAngles);
@@ -64,29 +78,25 @@ namespace Entities.AI.Controller
             var newBodyRotation = Quaternion.RotateTowards(currentBodyRotation, desiredBodyRotation, maxAngleBody);
 
             headTransform.localRotation = newHeadRotation;
-            transform.localRotation = newBodyRotation;
+            bodyTransform.localRotation = newBodyRotation;
 
             // Debug.DrawRay(head.transform.position, headTransform.forward, Color.green);
             // Debug.DrawLine(head.transform.position, target, Color.blue);
             return Vector3.Angle(headTransform.forward, direction);
         }
-
-        private float currentBodySpeed;
-        private float currentHeadSpeed;
-
+        
         private float CalculateNewSpeed(float target, float actual, float previousSpeed)
         {
             var clampedAcceleration = maxAcceleration * inputPenalty;
             var angleToPerform = target - actual;
             var timeDeceleration = previousSpeed / clampedAcceleration;
             var angleDuringDeceleration = previousSpeed * timeDeceleration +
-                                          1f / 2f * clampedAcceleration * timeDeceleration * timeDeceleration;
+                1f / 2f * clampedAcceleration * timeDeceleration * timeDeceleration;
 
             if (Math.Abs(angleDuringDeceleration) < Math.Abs(angleToPerform))
             {
                 var newSpeed = previousSpeed + Mathf.Sign(angleToPerform) * clampedAcceleration * Time.deltaTime;
-                if (Mathf.Abs(newSpeed) > maxSpeed)
-                    newSpeed = maxSpeed * Mathf.Sign(newSpeed);
+                if (Mathf.Abs(newSpeed) > maxSpeed) newSpeed = maxSpeed * Mathf.Sign(newSpeed);
                 return newSpeed;
             }
 
@@ -95,12 +105,9 @@ namespace Entities.AI.Controller
 
         private static Vector3 ConvertTo180Based(Vector3 angles)
         {
-            if (angles.x > 180f)
-                angles.x -= 360f;
-            if (angles.y > 180f)
-                angles.y -= 360f;
-            if (angles.z > 180f)
-                angles.z -= 360f;
+            if (angles.x > 180f) angles.x -= 360f;
+            if (angles.y > 180f) angles.y -= 360f;
+            if (angles.z > 180f) angles.z -= 360f;
             return angles;
         }
 

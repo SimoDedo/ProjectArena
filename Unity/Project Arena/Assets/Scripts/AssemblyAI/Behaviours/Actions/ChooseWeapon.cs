@@ -19,7 +19,7 @@ namespace AssemblyAI.Behaviours.Actions
         public override void OnAwake()
         {
             entity = gameObject.GetComponent<AIEntity>();
-            gunManager = gameObject.GetComponent<GunManager>();
+            gunManager = entity.GunManager;
             gunsCount = gunManager.NumberOfGuns;
             enemyTransform = entity.GetEnemy().transform;
             t = transform;

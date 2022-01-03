@@ -1,13 +1,12 @@
 using System;
-using AI.AI.Layer3;
 using AI.KnowledgeBase;
-using AssemblyAI.State;
+using AssemblyAI.AI.Layer1.Actuator;
+using AssemblyAI.AI.Layer1.Sensors;
+using AssemblyAI.AI.Layer3;
 using AssemblyAI.StateMachine;
 using AssemblyEntity.Component;
 using AssemblyLogging;
 using BehaviorDesigner.Runtime;
-using Entities.AI.Controller;
-using Entities.AI.Layer1.Sensors;
 using Entities.AI.Layer2;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -29,29 +28,29 @@ using Utils;
 // Premonition: How likely the player is at correctly guessing a lost target position
 
 // Aside from reflexes, all the other properties fall in [0-1] range
-
 [Serializable]
 public struct BotCharacteristics
 {
-    [Header("Movement parameters")]
-    [SerializeField] public float speed;
+    [Header("Movement parameters")] [SerializeField]
+    public float speed;
+
     [SerializeField] public FightingMovementSkill movementSkill;
 
-    [Header("Sight parameters")]
-    [SerializeField] public float fov;
+    [Header("Sight parameters")] [SerializeField]
+    public float fov;
+
     [SerializeField] public float maxCameraSpeed;
     [SerializeField] public float maxCameraAcceleration;
 
-    [Header("Target reaction parameter")]
-    [SerializeField] public float maxRange;
+    [Header("Target reaction parameter")] [SerializeField]
+    public float maxRange;
+
     [SerializeField] public float memoryWindow;
     [SerializeField] public float timeBeforeCanReact;
-    
-    [Header("Others")]
-    [SerializeField]
-    public CuriosityLevel curiosity;
-    [SerializeField] [Range(0f,1f)] public float predictionSkill;
-    [SerializeField] [Range(0f,1f)] public float aimingSkill;
+
+    [Header("Others")] [SerializeField] public CuriosityLevel curiosity;
+    [SerializeField] [Range(0f, 1f)] public float predictionSkill;
+    [SerializeField] [Range(0f, 1f)] public float aimingSkill;
 
     public static BotCharacteristics Default =>
         new BotCharacteristics
@@ -77,6 +76,7 @@ public enum FightingMovementSkill
     CircleStrife,
     CircleStrifeChangeDirection,
 }
+
 public enum CuriosityLevel
 {
     Low,
@@ -87,11 +87,10 @@ public enum CuriosityLevel
 
 public class AIEntity : Entity, ILoggable
 {
-    [SerializeField]
-    private GameObject head;
+    [SerializeField] private GameObject head;
 
     [SerializeField] private BotCharacteristics botParams = BotCharacteristics.Default;
-    
+
     // Do I have to log?
     private bool loggingGame;
 
@@ -106,59 +105,61 @@ public class AIEntity : Entity, ILoggable
         protected set => health = value;
     }
 
-    private AIMovementController movementController;
-    private AISightSensor sightSensor;
-    private AISightController sightController;
-    private TargetKnowledgeBase targetKnowledgeBase;
-    private PickupKnowledgeBase pickupKnowledgeBase;
-    private NavigationSystem navigationSystem;
-    private PickupPlanner pickupPlanner;
-    private GunManager gunManager;
-    
-    private void PrepareComponents()
-    {
-        movementController = gameObject.AddComponent<AIMovementController>();
-        movementController.Prepare(botParams.speed);
-        sightController = gameObject.AddComponent<AISightController>();
-        sightController.Prepare(head, botParams.maxCameraSpeed, botParams.maxCameraAcceleration);
-        sightSensor = gameObject.AddComponent<AISightSensor>();
-        sightSensor.Prepare(head, botParams.maxRange, botParams.fov);
-        targetKnowledgeBase = gameObject.AddComponent<TargetKnowledgeBase>();
-        targetKnowledgeBase.Prepare(sightSensor, enemy, botParams.memoryWindow, botParams.timeBeforeCanReact);
-        pickupKnowledgeBase = gameObject.AddComponent<PickupKnowledgeBase>();
-        pickupKnowledgeBase.Prepare(sightSensor);
-        navigationSystem = gameObject.AddComponent<NavigationSystem>();
-        navigationSystem.Prepare(movementController, botParams.speed);
-        gunManager = gameObject.AddComponent<GunManager>();
-        gunManager.Prepare();
-        pickupPlanner = gameObject.AddComponent<PickupPlanner>();
-        pickupPlanner.Prepare(this, navigationSystem, pickupKnowledgeBase, gunManager);
-        stateMachine = new EntityStateMachine(this);
-    }
+    public TargetKnowledgeBase TargetKb { get; private set; }
+
+    public AIMovementController MovementController { get; private set; }
+    public AISightSensor SightSensor { get; private set; }
+
+    public AISightController SightController { get; private set; }
+
+    public PickupKnowledgeBase PickupKnowledgeBase { get; private set; }
+
+    public PickupPlanner PickupPlanner { get; private set; }
+
+    public NavigationSystem NavigationSystem { get; private set; }
+
+    public GunManager GunManager { get; private set; }
 
     private IStateMachine stateMachine;
+
+    private void PrepareComponents(GameManager gms, bool[] ag)
+    {
+        MovementController = new AIMovementController(this, botParams.speed);
+        SightController = new AISightController(this, head, botParams.maxCameraSpeed, botParams.maxCameraAcceleration);
+        SightSensor = new AISightSensor(head, botParams.maxRange, botParams.fov);
+        TargetKb = new TargetKnowledgeBase(this, enemy, botParams.memoryWindow, botParams.timeBeforeCanReact);
+        PickupKnowledgeBase = new PickupKnowledgeBase(this);
+        NavigationSystem = new NavigationSystem(this, botParams.speed);
+        GunManager = new GunManager(this);
+        PickupPlanner = new PickupPlanner(this);
+        stateMachine = new EntityStateMachine(this);
+
+        GunManager.Prepare(gms, this, null, ag);
+        TargetKb.Prepare();
+        PickupKnowledgeBase.Prepare();
+        SightController.Prepare();
+        SightSensor.Prepare();
+        MovementController.Prepare();
+        PickupPlanner.Prepare();
+        NavigationSystem.Prepare();
+    }
     
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id)
     {
-        PrepareComponents();
-        
+        PrepareComponents(gms, ag);
         gameManagerScript = gms;
 
         totalHealth = th;
         Health = th;
         entityID = id;
 
-        gunManager.SetupGuns(gms, this, null, ag);
-        gunManager.TryEquipGun(gunManager.FindLowestActiveGun());
-        pickupKnowledgeBase.DetectPickups();
+
+        GunManager.TryEquipGun(GunManager.FindLowestActiveGun());
+
         var position = transform.position;
-        SpawnInfoGameEvent.Instance.Raise(new SpawnInfo
-        {
-            x = position.x,
-            z = position.z,
-            entityId = entityID,
-            spawnEntity = gameObject.name
-        });
+        SpawnInfoGameEvent.Instance.Raise(
+            new SpawnInfo {x = position.x, z = position.z, entityId = entityID, spawnEntity = gameObject.name}
+        );
     }
 
     private float lastDamageTime = float.MinValue;
@@ -171,16 +172,18 @@ public class AIEntity : Entity, ILoggable
             Health -= damage;
             lastDamageTime = Time.time;
             var position = transform.position;
-            HitInfoGameEvent.Instance.Raise(new HitInfo
-            {
-                damage = damage,
-                hitEntityID = entityID,
-                hitEntity = gameObject.name,
-                hitterEntityID = killerID,
-                hitterEntity = "Player " + killerID,
-                x = position.x,
-                z = position.z
-            });
+            HitInfoGameEvent.Instance.Raise(
+                new HitInfo
+                {
+                    damage = damage,
+                    hitEntityID = entityID,
+                    hitEntity = gameObject.name,
+                    hitterEntityID = killerID,
+                    hitterEntity = "Player " + killerID,
+                    x = position.x,
+                    z = position.z
+                }
+            );
 
             // If the health goes under 0, kill the entity and start the respawn process.
             if (Health <= 0f)
@@ -189,25 +192,23 @@ public class AIEntity : Entity, ILoggable
                 // Kill the entity.
                 Die(killerID);
             }
-            else
-            {
-                GetComponent<BehaviorTree>().SendEvent("Damaged");
-            }
         }
     }
 
     protected override void Die(int id)
     {
         var position = transform.position;
-        KillInfoGameEvent.Instance.Raise(new KillInfo
-        {
-            killedEntity = gameObject.name,
-            killedEntityID = entityID,
-            killerEntity = "Player" + id,
-            killerEntityID = id,
-            x = position.x,
-            z = position.z
-        });
+        KillInfoGameEvent.Instance.Raise(
+            new KillInfo
+            {
+                killedEntity = gameObject.name,
+                killedEntityID = entityID,
+                killerEntity = "Player" + id,
+                killerEntityID = id,
+                x = position.x,
+                z = position.z
+            }
+        );
         gameManagerScript.AddScore(id, entityID);
         SetInGame(false);
         // Start the respawn process.
@@ -217,15 +218,11 @@ public class AIEntity : Entity, ILoggable
     public override void Respawn()
     {
         var position = transform.position;
-        SpawnInfoGameEvent.Instance.Raise(new SpawnInfo
-        {
-            x = position.x,
-            z = position.z,
-            entityId = entityID,
-            spawnEntity = gameObject.name
-        });
+        SpawnInfoGameEvent.Instance.Raise(
+            new SpawnInfo {x = position.x, z = position.z, entityId = entityID, spawnEntity = gameObject.name}
+        );
         Health = totalHealth;
-        gunManager.ResetAmmo();
+        GunManager.ResetAmmo();
         // ActivateLowestGun();
         SetInGame(true);
     }
@@ -237,24 +234,26 @@ public class AIEntity : Entity, ILoggable
             var t = transform;
             var position = t.position;
             PositionInfoGameEvent.Instance.Raise(
-                new PositionInfo
-                {
-                    x = position.x, z = position.z,
-                    dir = t.eulerAngles.y, entityID = entityID
-                });
+                new PositionInfo {x = position.x, z = position.z, dir = t.eulerAngles.y, entityID = entityID}
+            );
             lastPositionLog = Time.time;
         }
 
-        if (inGame) // TODO Check if necessary
+        if (inGame)
         {
+            TargetKb.Update();
+            PickupKnowledgeBase.Update();
+            
             stateMachine.Update();
+            
+            // TODO 
         }
     }
 
 
     public override void SlowEntity(float penalty)
     {
-        sightController.SetInputPenalty(penalty);
+        SightController.SetInputPenalty(penalty);
     }
 
     public override void HealFromMedkit(MedkitPickable medkit)
@@ -268,28 +267,28 @@ public class AIEntity : Entity, ILoggable
             Health += medkit.RestoredHealth;
         }
 
-        GetComponent<PickupKnowledgeBase>().MarkConsumed(medkit);
+        PickupKnowledgeBase.MarkConsumed(medkit);
     }
 
     public override bool CanBeSupplied(bool[] suppliedGuns)
     {
-        return gunManager.CanBeSupplied(suppliedGuns);
+        return GunManager.CanBeSupplied(suppliedGuns);
     }
 
     public override void SupplyGuns(bool[] suppliedGuns, int[] ammoAmounts)
     {
-        gunManager.SupplyGuns(suppliedGuns, ammoAmounts);
+        GunManager.SupplyGuns(suppliedGuns, ammoAmounts);
     }
-    
+
     public override void SetInGame(bool b)
     {
         stateMachine.SetIsIdle(!b);
-        navigationSystem.SetEnabled(b);
+        NavigationSystem.SetEnabled(b);
         GetComponent<CapsuleCollider>().enabled = b;
         MeshVisibility.SetMeshVisible(transform, b);
         inGame = b;
     }
-    
+
     public void SetupLogging()
     {
         loggingGame = true;
@@ -299,6 +298,7 @@ public class AIEntity : Entity, ILoggable
     {
         return Time.time - lastDamageTime < 0.2f;
     }
+
     public FightingMovementSkill GetMovementSkill()
     {
         return botParams.movementSkill;
@@ -308,7 +308,7 @@ public class AIEntity : Entity, ILoggable
     {
         return botParams.curiosity;
     }
-    
+
     public float GetPredictionSkill()
     {
         return botParams.predictionSkill;
@@ -320,7 +320,7 @@ public class AIEntity : Entity, ILoggable
     {
         return enemy;
     }
-    
+
     public float GetAimingSkill()
     {
         return botParams.aimingSkill;

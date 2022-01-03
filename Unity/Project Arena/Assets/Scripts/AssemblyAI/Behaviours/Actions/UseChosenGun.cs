@@ -1,10 +1,10 @@
 using System;
 using Accord.Statistics.Distributions.Univariate;
+using AssemblyAI.AI.Layer1.Actuator;
+using AssemblyAI.AI.Layer1.Sensors;
 using AssemblyEntity.Component;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
-using Entities.AI.Controller;
-using Entities.AI.Layer1.Sensors;
 using Entities.AI.Layer2;
 using UnityEngine;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
@@ -34,10 +34,10 @@ namespace AssemblyAI.Behaviours.Actions
         public override void OnAwake()
         {
             entity = GetComponent<AIEntity>();
-            gunManager = GetComponent<GunManager>();
-            sightController = GetComponent<AISightController>();
-            sightSensor = GetComponent<AISightSensor>();
-            navSystem = GetComponent<NavigationSystem>();
+            gunManager = entity.GunManager;
+            sightController = entity.SightController;
+            sightSensor = entity.SightSensor;
+            navSystem = entity.NavigationSystem;
             enemy = entity.GetEnemy();
             enemyPositionTracker = enemy.GetComponent<PositionTracker>();
 

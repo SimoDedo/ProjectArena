@@ -1,14 +1,13 @@
-using AssemblyAI.StateMachine;
 using AssemblyAI.StateMachine.Transition;
 using BehaviorDesigner.Runtime;
 using UnityEngine;
 
-namespace AssemblyAI.State
+namespace AssemblyAI.StateMachine.State
 {
     public class Wander : IState
     {
-        private AIEntity entity;
-        private ExternalBehaviorTree externalBT;
+        private readonly AIEntity entity;
+        private ExternalBehaviorTree externalBt;
         private BehaviorTree behaviorTree;
         public ITransition[] OutgoingTransitions { get; private set; }
 
@@ -24,11 +23,11 @@ namespace AssemblyAI.State
 
         public void Enter()
         {
-            externalBT = Resources.Load<ExternalBehaviorTree>("Behaviors/Wander");
+            externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/Wander");
             behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
             behaviorTree.StartWhenEnabled = false;
             behaviorTree.RestartWhenComplete = true;
-            behaviorTree.ExternalBehavior = externalBT;
+            behaviorTree.ExternalBehavior = externalBt;
             behaviorTree.EnableBehavior();
             BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
             
@@ -48,7 +47,7 @@ namespace AssemblyAI.State
 
         public void Exit()
         {
-            Resources.UnloadAsset(externalBT);
+            Resources.UnloadAsset(externalBt);
             Object.Destroy(behaviorTree);
         }
     }

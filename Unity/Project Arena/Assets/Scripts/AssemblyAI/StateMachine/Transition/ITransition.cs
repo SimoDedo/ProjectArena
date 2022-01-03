@@ -1,3 +1,5 @@
+using AssemblyAI.StateMachine.State;
+
 namespace AssemblyAI.StateMachine
 {
     public interface ITransition

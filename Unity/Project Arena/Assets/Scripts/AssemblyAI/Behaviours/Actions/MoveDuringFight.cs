@@ -28,9 +28,9 @@ namespace AssemblyAI.Behaviours.Actions
 
         public override void OnStart()
         {
-            navSystem = GetComponent<NavigationSystem>();
             entity = GetComponent<AIEntity>();
-            gunManager = GetComponent<GunManager>();
+            navSystem = entity.NavigationSystem;
+            gunManager = entity.GunManager;
             target = entity.GetEnemy();
             skill = entity.GetMovementSkill();
             navSystem.CancelPath();
@@ -84,7 +84,7 @@ namespace AssemblyAI.Behaviours.Actions
             var avoidDirection = Vector3.Cross(up, myDirection).normalized;
             if (angle > 0f)
                 avoidDirection = -avoidDirection;
-            navSystem.SetDestination(transform.position + avoidDirection * navSystem.GetSpeed());
+            navSystem.SetDestination(transform.position + avoidDirection * navSystem.Speed);
             navSystem.MoveAlongPath();
         }
 

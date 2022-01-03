@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using AssemblyAI.AI.Layer1.Actuator;
 using BehaviorDesigner.Runtime.Tasks;
-using Entities.AI.Controller;
 using UnityEngine;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
 using Random = UnityEngine.Random;
@@ -25,9 +25,12 @@ namespace AI.Behaviours.NewBehaviours
 
         public override void OnAwake()
         {
-            sightController = GetComponent<AISightController>();
-            movementController = GetComponent<AIMovementController>();
-            curiosity = GetComponent<AIEntity>().GetCuriosity();
+            var entity = GetComponent<AIEntity>();
+            sightController = entity.SightController;
+
+            movementController = entity.MovementController;
+            curiosity = entity.GetCuriosity();
+            
             nextUpdateTime = float.MinValue;
 
             foreach (var angleScore in angleScores)

@@ -1,18 +1,16 @@
-using System.Collections.Generic;
 using AI.KnowledgeBase;
-using AssemblyAI.StateMachine;
 using AssemblyAI.StateMachine.Transition;
 using BehaviorDesigner.Runtime;
 using UnityEngine;
 
-namespace AssemblyAI.State
+namespace AssemblyAI.StateMachine.State
 {
     public class SearchEnemy : IState
     {
-        private AIEntity entity;
-        private TargetKnowledgeBase targetKB;
-        private bool searchDueToDamage;
-        private ExternalBehaviorTree externalBT;
+        private readonly AIEntity entity;
+        private readonly TargetKnowledgeBase targetKb;
+        private readonly bool searchDueToDamage;
+        private ExternalBehaviorTree externalBt;
         private BehaviorTree behaviorTree;
         private float startSearchTime = float.NaN;
         public ITransition[] OutgoingTransitions { get; private set; }
@@ -21,13 +19,13 @@ namespace AssemblyAI.State
         public SearchEnemy(AIEntity entity, bool searchDueToDamage = false)
         {
             this.entity = entity;
-            targetKB = entity.GetComponent<TargetKnowledgeBase>();
+            targetKb = entity.TargetKb;
             this.searchDueToDamage = searchDueToDamage;
         }
 
         public float LostEnemyTransitionScore()
         {
-            if (entity.GetEnemy().isAlive && !targetKB.HasSeenTarget())
+            if (entity.GetEnemy().isAlive && !targetKb.HasSeenTarget())
             {
                 if (float.IsNaN(startSearchTime))
                     return 0.7f;
@@ -50,11 +48,11 @@ namespace AssemblyAI.State
 
         public void Enter()
         {
-            externalBT = Resources.Load<ExternalBehaviorTree>("Behaviors/SearchEnemy");
+            externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/SearchEnemy");
             behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
             behaviorTree.StartWhenEnabled = false;
             behaviorTree.RestartWhenComplete = true;
-            behaviorTree.ExternalBehavior = externalBT;
+            behaviorTree.ExternalBehavior = externalBt;
             behaviorTree.EnableBehavior();
             BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
             behaviorTree.SetVariableValue("SearchDueToDamage", searchDueToDamage);
@@ -76,7 +74,7 @@ namespace AssemblyAI.State
 
         public void Exit()
         {
-            Resources.UnloadAsset(externalBT);
+            Resources.UnloadAsset(externalBt);
             Object.Destroy(behaviorTree);
         }
     }

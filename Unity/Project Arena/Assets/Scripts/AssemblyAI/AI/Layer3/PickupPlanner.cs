@@ -7,25 +7,28 @@ using UnityEngine;
 using UnityEngine.AI;
 using Utils;
 
-namespace AI.AI.Layer3
+namespace AssemblyAI.AI.Layer3
 {
-    public class PickupPlanner : MonoBehaviour
+    public class PickupPlanner
     {
+        private readonly AIEntity me;
         private PickupKnowledgeBase knowledgeBase;
         private NavigationSystem navSystem;
-
-        private AIEntity entity;
         private GunManager gunManager;
         private Pickable chosenPickup;
         private float agentSpeed;
 
-        public void Prepare(AIEntity entity, NavigationSystem navSystem, PickupKnowledgeBase knowledgeBase, GunManager gunManager)
+        public PickupPlanner(AIEntity entity)
         {
-            this.entity = entity;
-            this.navSystem = navSystem;
-            this.knowledgeBase = knowledgeBase;
-            this.gunManager = gunManager;
-            agentSpeed = navSystem.GetSpeed();
+            me = entity;
+        }
+
+        public void Prepare()
+        {
+            navSystem = me.NavigationSystem;
+            knowledgeBase = me.PickupKnowledgeBase;
+            gunManager = me.GunManager;
+            agentSpeed = navSystem.Speed;
         }
 
         public Pickable ScorePickups(out NavMeshPath path, out float bestPickupScore, out float activationTime)
@@ -143,25 +146,25 @@ namespace AI.AI.Layer3
 
         private float ScoreMedkit(MedkitPickable pickable)
         {
-            const float MEDKIT_NECESSITY_WEIGHT = 0.8f;
+            const float medkitNecessityWeight = 0.8f;
             var pickupHealth = pickable.RestoredHealth;
-            var maxHealth = entity.GetMaxHealth();
-            var currentHealth = entity.Health;
+            var maxHealth = me.GetMaxHealth();
+            var currentHealth = me.Health;
             var recoveredHealth = Mathf.Min(pickupHealth, maxHealth - currentHealth);
-            var medkitHealValue = (1 - MEDKIT_NECESSITY_WEIGHT) * recoveredHealth / maxHealth;
-            var medkitWant = MEDKIT_NECESSITY_WEIGHT * (maxHealth - currentHealth) / maxHealth;
+            var medkitHealValue = (1 - medkitNecessityWeight) * recoveredHealth / maxHealth;
+            var medkitWant = medkitNecessityWeight * (maxHealth - currentHealth) / maxHealth;
             return medkitHealValue + medkitWant;
         }
 
         private static float ScoreNeighborhood(Pickable pickup, Dictionary<Pickable, float> pickables)
         {
-            const float MAX_NEIGHBORHOOD_SCORE = 1f;
-            const float NEIGHBOR_SCORE = 0.2f;
-            const float MAX_NEIGHBORHOOD_DISTANCE = 20f;
+            const float maxNeighborhoodScore = 1f;
+            const float neighborScore = 0.2f;
+            const float maxNeighborhoodDistance = 20f;
             // For the sake of speed, we do not check the actual lenght of the path, but the distance
             // as the crow flies
             var pickupPos = pickup.transform.position;
-            const float maxSquaredDistance = MAX_NEIGHBORHOOD_DISTANCE * MAX_NEIGHBORHOOD_DISTANCE;
+            const float maxSquaredDistance = maxNeighborhoodDistance * maxNeighborhoodDistance;
             var neighborsCount = 0;
             foreach (var entry in pickables.Keys)
             {
@@ -171,7 +174,7 @@ namespace AI.AI.Layer3
                     neighborsCount++;
             }
 
-            return Mathf.Min(MAX_NEIGHBORHOOD_SCORE, neighborsCount * NEIGHBOR_SCORE);
+            return Mathf.Min(maxNeighborhoodScore, neighborsCount * neighborScore);
         }
 
 

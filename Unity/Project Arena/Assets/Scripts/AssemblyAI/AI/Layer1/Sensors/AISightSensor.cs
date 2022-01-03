@@ -1,20 +1,22 @@
 using UnityEngine;
 using Utils;
 
-namespace Entities.AI.Layer1.Sensors
+namespace AssemblyAI.AI.Layer1.Sensors
 {
-    public class AISightSensor : MonoBehaviour
+    public class AISightSensor
     {
-        private GameObject head;
-        private float maxSightRange;
-        private float fov;
-
-        public void Prepare(GameObject head, float maxSightRange, float fov)
+        private readonly GameObject head;
+        private readonly float maxSightRange;
+        private readonly float fov;
+        
+        public AISightSensor(GameObject head, float maxSightRange, float fov)
         {
             this.head = head;
             this.maxSightRange = maxSightRange;
             this.fov = fov;
         }
+        
+        public void Prepare() { /* Nothing to do */ }
 
         public float GetAngleFromLookDirection(Vector3 direction)
         {

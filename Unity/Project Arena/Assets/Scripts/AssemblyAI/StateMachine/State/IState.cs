@@ -1,4 +1,4 @@
-namespace AssemblyAI.StateMachine
+namespace AssemblyAI.StateMachine.State
 {
     public interface IState
     {

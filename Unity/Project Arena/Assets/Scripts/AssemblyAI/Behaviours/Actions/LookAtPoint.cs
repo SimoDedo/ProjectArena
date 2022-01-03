@@ -1,7 +1,7 @@
 using System;
+using AssemblyAI.AI.Layer1.Actuator;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
-using Entities.AI.Controller;
 using UnityEngine;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
 
@@ -14,7 +14,7 @@ public class LookAtPoint : Action
 
     public override void OnAwake()
     {
-        sightController = GetComponent<AISightController>();
+        sightController = GetComponent<AIEntity>().SightController;
     }
 
     

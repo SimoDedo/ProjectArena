@@ -24,7 +24,7 @@ namespace AssemblyAI.Behaviours.Actions
 
         public override void OnAwake()
         {
-            navSystem = GetComponent<NavigationSystem>();
+            navSystem = GetComponent<AIEntity>().NavigationSystem;
         }
 
         public override TaskStatus OnUpdate()

@@ -70,8 +70,7 @@ public class Player : Entity, ILoggable
 
     private void Awake()
     {
-        gunManager = gameObject.AddComponent<GunManager>();
-        gunManager.Prepare();
+        gunManager = new GunManager(this);
     }
 
     private void Start()
@@ -207,7 +206,7 @@ public class Player : Entity, ILoggable
     // Sets up all the player parameter and does the same with all its guns.
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id)
     {
-        gunManager.SetupGuns(gms, this, playerUIManagerScript, ag);
+        gunManager.Prepare(gms, this, playerUIManagerScript, ag);
         gameManagerScript = gms;
 
         totalHealth = th;

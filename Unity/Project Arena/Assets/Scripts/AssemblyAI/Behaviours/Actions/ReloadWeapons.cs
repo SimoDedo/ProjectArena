@@ -11,7 +11,7 @@ namespace AssemblyAI.Behaviours.Actions
 
         public override void OnAwake()
         {
-            gunManager = GetComponent<GunManager>();
+            gunManager = GetComponent<AIEntity>().GunManager;
         }
 
         public override void OnStart()

@@ -1,4 +1,4 @@
-using AssemblyAI.State;
+using AssemblyAI.StateMachine.State;
 
 namespace AssemblyAI.StateMachine.Transition
 {

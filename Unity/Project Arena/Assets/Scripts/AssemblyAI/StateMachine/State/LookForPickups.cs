@@ -1,21 +1,19 @@
-using System.Collections.Generic;
-using AI.AI.Layer3;
+using AssemblyAI.AI.Layer3;
 using AssemblyAI.Behaviours.Variables;
-using AssemblyAI.StateMachine;
 using AssemblyAI.StateMachine.Transition;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace AssemblyAI.State
+namespace AssemblyAI.StateMachine.State
 {
     public class LookForPickups : IState
     {
-        private AIEntity entity;
-        private ExternalBehaviorTree externalBT;
+        private readonly AIEntity entity;
+        private ExternalBehaviorTree externalBt;
         private BehaviorTree behaviorTree;
-        private PickupPlanner pickupPlanner;
+        private readonly PickupPlanner pickupPlanner;
         private Pickable currentPickable;
         private Pickable nextPickable;
         private float nextPickableActivationTime;
@@ -25,7 +23,7 @@ namespace AssemblyAI.State
         public LookForPickups(AIEntity entity)
         {
             this.entity = entity;
-            pickupPlanner = entity.GetComponent<PickupPlanner>();
+            pickupPlanner = entity.PickupPlanner;
         }
 
         public float CalculateTransitionScore()
@@ -39,11 +37,11 @@ namespace AssemblyAI.State
 
         public void Enter()
         {
-            externalBT = Resources.Load<ExternalBehaviorTree>("Behaviors/PlanPickups");
+            externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/PlanPickups");
             behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
             behaviorTree.StartWhenEnabled = false;
             behaviorTree.ResetValuesOnRestart = true;
-            behaviorTree.ExternalBehavior = externalBT;
+            behaviorTree.ExternalBehavior = externalBt;
             behaviorTree.EnableBehavior();
             BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
             
@@ -85,7 +83,7 @@ namespace AssemblyAI.State
 
         public void Exit()
         {
-            Resources.UnloadAsset(externalBT);
+            Resources.UnloadAsset(externalBt);
             Object.Destroy(behaviorTree);
         }
     }

@@ -23,8 +23,8 @@ namespace AssemblyAI.Behaviours.Actions
         {
             entity = GetComponent<AIEntity>();
             enemy = entity.GetEnemy();
-            knowledgeBase = GetComponent<TargetKnowledgeBase>();
-            navSystem = GetComponent<NavigationSystem>();
+            knowledgeBase = entity.TargetKb;
+            navSystem = entity.NavigationSystem;
 
             enemyTracker = enemy.GetComponent<PositionTracker>();
         }

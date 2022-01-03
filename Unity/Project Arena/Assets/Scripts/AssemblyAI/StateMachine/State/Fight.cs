@@ -1,27 +1,25 @@
-using System.Collections.Generic;
 using AI.KnowledgeBase;
-using AssemblyAI.StateMachine;
 using AssemblyAI.StateMachine.Transition;
 using AssemblyEntity.Component;
 using BehaviorDesigner.Runtime;
 using UnityEngine;
 
-namespace AssemblyAI.State
+namespace AssemblyAI.StateMachine.State
 {
     public class Fight : IState
     {
-        private AIEntity entity;
-        private TargetKnowledgeBase targetKB;
-        private GunManager gunManager;
-        private ExternalBehaviorTree externalBT;
+        private readonly AIEntity entity;
+        private readonly TargetKnowledgeBase targetKb;
+        private readonly GunManager gunManager;
+        private ExternalBehaviorTree externalBt;
         private BehaviorTree behaviorTree;
         public ITransition[] OutgoingTransitions { get; private set; }
 
         public Fight(AIEntity entity)
         {
             this.entity = entity;
-            targetKB = entity.GetComponent<TargetKnowledgeBase>();
-            gunManager = entity.GetComponent<GunManager>();
+            targetKb = entity.TargetKb;
+            gunManager = entity.GunManager;
         }
         
         public float FightTransitionScore(bool isResumingFight = false)
@@ -29,18 +27,18 @@ namespace AssemblyAI.State
             if (!gunManager.HasAmmo())
                 return 0;
             // TODO maybe we see enemy, but we want to run away?
-            var canSee = targetKB.HasSeenTarget(isResumingFight);
+            var canSee = targetKb.HasSeenTarget(isResumingFight);
             return canSee ? 0.95f : 0.0f;
         }
 
 
         public void Enter()
         {
-            externalBT = Resources.Load<ExternalBehaviorTree>("Behaviors/Fight");
+            externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/Fight");
             behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
             behaviorTree.StartWhenEnabled = false;
             behaviorTree.RestartWhenComplete = true;
-            behaviorTree.ExternalBehavior = externalBT;
+            behaviorTree.ExternalBehavior = externalBt;
             behaviorTree.EnableBehavior();
             BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
             
@@ -60,7 +58,7 @@ namespace AssemblyAI.State
     
         public void Exit()
         {
-            Resources.UnloadAsset(externalBT);
+            Resources.UnloadAsset(externalBt);
             Object.Destroy(behaviorTree);
         }
     }

@@ -1,41 +1,41 @@
+using AssemblyAI.AI.Layer1.Actuator;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace Entities.AI.Layer2
 {
-    public class NavigationSystem : MonoBehaviour
+    public class NavigationSystem
     {
+        private readonly AIEntity me;
+        public float Acceleration { get; }
+        public float AngularSpeed { get; }
+        public float Speed { get; }
+
         private NavMeshAgent agent;
         private AIMovementController mover;
-        private float speed;
-        private float acceleration;
-        private float angularSpeed;
 
-        public void Prepare(AIMovementController mover, float speed)
+        public NavigationSystem(AIEntity me, float speed)
         {
-            this.mover = mover;
-            this.speed = speed;
-            acceleration = 1000000;
-            angularSpeed = 1000000;
+            Speed = speed;
+            this.me = me;
+            Acceleration = 1000000;
+            AngularSpeed = 1000000;
         }
 
-        private void Start()
+        public void Prepare()
         {
-            agent = gameObject.AddComponent<NavMeshAgent>();
+            mover = me.MovementController;
+            agent = me.gameObject.AddComponent<NavMeshAgent>();
             agent.radius = 0.2f;
             agent.baseOffset = 1f;
             agent.autoBraking = false;
             agent.updatePosition = false;
             agent.updateRotation = false;
-            agent.speed = speed;
-            agent.acceleration = acceleration;
-            agent.angularSpeed = angularSpeed;
+            agent.speed = Speed;
+            agent.acceleration = Acceleration;
+            agent.angularSpeed = AngularSpeed;
         }
 
-        public float GetSpeed()
-        {
-            return speed;
-        }
         public NavMeshPath CalculatePath(Vector3 destination)
         {
             var path = new NavMeshPath();
@@ -53,11 +53,7 @@ namespace Entities.AI.Layer2
         public NavMeshPath CalculatePath(Vector3 destination, int agentId)
         {
             var path = new NavMeshPath();
-            var filter = new NavMeshQueryFilter
-            {
-                agentTypeID = agentId,
-                areaMask = NavMesh.AllAreas
-            };
+            var filter = new NavMeshQueryFilter {agentTypeID = agentId, areaMask = NavMesh.AllAreas};
             if (NavMesh.SamplePosition(destination, out var hit, float.MaxValue, filter))
             {
                 agent.CalculatePath(hit.position, path);
@@ -69,21 +65,18 @@ namespace Entities.AI.Layer2
 
         public bool IsPointOnNavMesh(Vector3 point, int agentId, out Vector3 validPoint)
         {
-            var filter = new NavMeshQueryFilter
-            {
-                agentTypeID = agentId,
-                areaMask = NavMesh.AllAreas
-            };
-            
+            var filter = new NavMeshQueryFilter {agentTypeID = agentId, areaMask = NavMesh.AllAreas};
+
             if (NavMesh.SamplePosition(point, out var hit, float.MaxValue, filter))
             {
                 validPoint = hit.position;
                 return true;
             }
+
             validPoint = point;
             return false;
         }
-        
+
         public bool IsPointOnNavMesh(Vector3 point, out Vector3 validPoint)
         {
             return IsPointOnNavMesh(point, agent.agentTypeID, out validPoint);

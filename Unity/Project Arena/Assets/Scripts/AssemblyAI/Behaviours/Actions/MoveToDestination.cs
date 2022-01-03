@@ -15,7 +15,7 @@ namespace AssemblyAI.Behaviours.Actions
 
         public override void OnStart()
         {
-            navSystem = GetComponent<NavigationSystem>();
+            navSystem = GetComponent<AIEntity>().NavigationSystem;
             var path = navSystem.CalculatePath(destination.Value);
             navSystem.SetPath(path);
         }
