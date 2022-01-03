@@ -1,5 +1,6 @@
 using AssemblyAI.StateMachine;
 using AssemblyAI.StateMachine.Transition;
+using AssemblyLogging;
 using BehaviorDesigner.Runtime;
 using UnityEngine;
 
@@ -31,14 +32,20 @@ namespace AssemblyAI.State
             behaviorTree.ExternalBehavior = externalBT;
             behaviorTree.EnableBehavior();
             BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
-            
+
             OutgoingTransitions = new ITransition[]
             {
-                new ToWanderTransition(this), // Self-loop
-                new OnEnemyInSightTransition(entity),
-                new ToPickupTransition(entity),
-                new OnDamagedTransition(entity)
+                new WanderSelfLoop(this), new OnEnemyInSightTransition(entity, EnterFightAction),
+                new ToPickupTransition(entity), new OnDamagedTransition(entity)
             };
+        }
+
+        private void EnterFightAction()
+        {
+            var position = entity.transform.position;
+            FightEnterGameEvent.Instance.Raise(
+                new EnterFightInfo {x = position.x, z = position.z, entityId = entity.GetID()}
+            );
         }
 
         public void Update()

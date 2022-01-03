@@ -13,11 +13,7 @@ namespace AssemblyLogging
         public int totalAmmo;
     }
 
-    public class BaseShotInfoGameEvent : GameEventBase<ShotInfo>
-    {
-    }
+    public class BaseShotInfoGameEvent : GameEventBase<ShotInfo> { }
 
-    public sealed class ShotInfoGameEvent : ScriptableObjectSingleton<BaseShotInfoGameEvent>
-    {
-    }
+    public sealed class ShotInfoGameEvent : ScriptableObjectSingleton<BaseShotInfoGameEvent> { }
 }

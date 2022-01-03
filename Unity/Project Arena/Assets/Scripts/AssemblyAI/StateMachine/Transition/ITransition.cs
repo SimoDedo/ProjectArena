@@ -4,5 +4,6 @@ namespace AssemblyAI.StateMachine
     {
         float GetScore();
         IState GetNextState();
+        void OnActivate();
     }
 }

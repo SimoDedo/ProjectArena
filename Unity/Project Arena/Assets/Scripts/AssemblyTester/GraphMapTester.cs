@@ -50,7 +50,16 @@ namespace AssemblyTester
             SpawnInfoGameEvent.Instance.AddListener(analyzer.LogSpawn);
             KillInfoGameEvent.Instance.AddListener(analyzer.LogKill);
             HitInfoGameEvent.Instance.AddListener(analyzer.LogHit);
+            
+            EnemyInSightGameEvent.Instance.AddListener(analyzer.LogEnemyInSight);
+            EnemyOutOfSightGameEvent.Instance.AddListener(analyzer.LogEnemyOutOfSight);
 
+            FightEnterGameEvent.Instance.AddListener(analyzer.LogEnterFight);
+            FightExitGameEvent.Instance.AddListener(analyzer.LogExitFight);
+
+            SearchStartGameEvent.Instance.AddListener(analyzer.LogStartSearch);
+            SearchStopGameEvent.Instance.AddListener(analyzer.LogStopSearch);
+            
             StartNewExperimentGameEvent.Instance.AddListener(NewExperimentStarted);
             ExperimentEndedGameEvent.Instance.AddListener(ExperimentEnded);
 

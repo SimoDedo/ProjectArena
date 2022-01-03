@@ -1,13 +1,17 @@
+using System;
 using AssemblyAI.State;
+using AssemblyLogging;
 
 namespace AssemblyAI.StateMachine.Transition
 {
     public class ResumeFightTransition : ITransition
     {
         private readonly Fight fight;
-
-        public ResumeFightTransition(AIEntity entity)
+        private readonly Action action;
+        
+        public ResumeFightTransition(AIEntity entity, Action action)
         {
+            this.action = action;
             fight = new Fight(entity);
         }
 
@@ -19,6 +23,11 @@ namespace AssemblyAI.StateMachine.Transition
         public IState GetNextState()
         {
             return fight;
+        }
+
+        public void OnActivate()
+        {
+            action?.Invoke();
         }
     }
 }

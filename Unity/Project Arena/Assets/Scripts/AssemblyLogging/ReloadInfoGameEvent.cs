@@ -11,11 +11,7 @@ namespace AssemblyLogging
         public int totalAmmo;
     }
 
-    public class BaseReloadInfoGameEvent : GameEventBase<ReloadInfo>
-    {
-    }
+    public class BaseReloadInfoGameEvent : GameEventBase<ReloadInfo> { }
 
-    public sealed class ReloadInfoGameEvent : ScriptableObjectSingleton<BaseReloadInfoGameEvent>
-    {
-    }
+    public sealed class ReloadInfoGameEvent : ScriptableObjectSingleton<BaseReloadInfoGameEvent> { }
 }

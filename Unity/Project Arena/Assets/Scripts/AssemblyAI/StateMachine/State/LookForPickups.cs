@@ -3,6 +3,7 @@ using AI.AI.Layer3;
 using AssemblyAI.Behaviours.Variables;
 using AssemblyAI.StateMachine;
 using AssemblyAI.StateMachine.Transition;
+using AssemblyLogging;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
 using UnityEngine;
@@ -46,14 +47,22 @@ namespace AssemblyAI.State
             behaviorTree.ExternalBehavior = externalBT;
             behaviorTree.EnableBehavior();
             BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
-            
+
             OutgoingTransitions = new ITransition[]
             {
-                new ToPickupTransition(this), // Self-loop
-                new OnEnemyInSightTransition(entity),
-                new ToWanderTransition(entity),
+                new PickupSelfLoop(this), // Self-loop
+                new OnEnemyInSightTransition(entity, EnterFightAction),
+                new ToWanderTransition(entity, EnterFightAction),
                 new OnDamagedTransition(entity),
             };
+        }
+
+        private void EnterFightAction()
+        {
+            var position = entity.transform.position;
+            FightEnterGameEvent.Instance.Raise(
+                new EnterFightInfo {x = position.x, z = position.z, entityId = entity.GetID()}
+            );
         }
 
         public void Update()
@@ -66,8 +75,7 @@ namespace AssemblyAI.State
 
                 var pickupInfo = new SelectedPickupInfo
                 {
-                    pickup = nextPickable,
-                    estimatedActivationTime = nextPickableActivationTime
+                    pickup = nextPickable, estimatedActivationTime = nextPickableActivationTime
                 };
                 behaviorTree.SetVariableValue("ChosenPickup", pickupInfo);
                 behaviorTree.SetVariableValue("ChosenPickupPosition", nextPickable.transform.position);

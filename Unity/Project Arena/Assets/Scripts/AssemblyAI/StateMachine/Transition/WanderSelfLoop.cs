@@ -1,17 +1,14 @@
-using System;
 using AssemblyAI.State;
 
 namespace AssemblyAI.StateMachine.Transition
 {
-    public class ToWanderTransition : ITransition
+    public class WanderSelfLoop: ITransition
     {
         private readonly Wander wander;
-        private readonly Action action;
 
-        public ToWanderTransition(AIEntity entity, Action action = null)
+        public WanderSelfLoop(Wander wander)
         {
-            this.action = action;
-            wander = new Wander(entity);
+            this.wander = wander;
         }
 
         public float GetScore()
@@ -24,9 +21,6 @@ namespace AssemblyAI.StateMachine.Transition
             return wander;
         }
 
-        public void OnActivate()
-        {
-            action?.Invoke();
-        }
+        public void OnActivate() { }
     }
 }

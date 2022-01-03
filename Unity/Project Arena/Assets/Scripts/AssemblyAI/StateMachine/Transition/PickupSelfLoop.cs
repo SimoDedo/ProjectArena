@@ -3,15 +3,13 @@ using AssemblyAI.State;
 
 namespace AssemblyAI.StateMachine.Transition
 {
-    public class ToPickupTransition : ITransition
+    public class PickupSelfLoop : ITransition
     {
         private readonly LookForPickups lookForPickups;
-        private readonly Action action;
 
-        public ToPickupTransition(AIEntity entity, Action action = null)
+        public PickupSelfLoop(LookForPickups pickups)
         {
-            this.action = action;
-            lookForPickups = new LookForPickups(entity);
+            lookForPickups = pickups;
         }
         public float GetScore()
         {
@@ -24,8 +22,6 @@ namespace AssemblyAI.StateMachine.Transition
         }
 
         public void OnActivate()
-        {
-            action?.Invoke();
-        }
+        { }
     }
 }

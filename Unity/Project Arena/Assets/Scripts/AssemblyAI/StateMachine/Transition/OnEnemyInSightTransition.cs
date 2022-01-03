@@ -1,19 +1,21 @@
+using System;
 using AssemblyAI.State;
+using AssemblyLogging;
 
 namespace AssemblyAI.StateMachine.Transition
 {
+    // Used for
+    // Wander -> Fight
+    // Pickup -> Fight
     public class OnEnemyInSightTransition : ITransition
     {
         private readonly Fight fight;
-
-        public OnEnemyInSightTransition(AIEntity entity)
-        {
-            fight = new Fight(entity);
-        }
+        private Action action;
         
-        public OnEnemyInSightTransition(Fight fight)
+        public OnEnemyInSightTransition(AIEntity entity, Action action = null)
         {
-            this.fight = fight;
+            this.action = action;
+            fight = new Fight(entity);
         }
 
         public float GetScore()
@@ -24,6 +26,11 @@ namespace AssemblyAI.StateMachine.Transition
         public IState GetNextState()
         {
             return fight;
+        }
+
+        public void OnActivate()
+        {
+            action?.Invoke();
         }
     }
 }

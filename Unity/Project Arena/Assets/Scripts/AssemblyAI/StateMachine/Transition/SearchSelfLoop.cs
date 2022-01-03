@@ -2,24 +2,25 @@ using AssemblyAI.State;
 
 namespace AssemblyAI.StateMachine.Transition
 {
-    public class OnDamagedTransition : ITransition
+    public class SearchSelfLoop : ITransition
     {
-        private SearchEnemy search;
-        public OnDamagedTransition(AIEntity entity)
+        private readonly SearchEnemy search;
+
+        public SearchSelfLoop(SearchEnemy search)
         {
-            search = new SearchEnemy(entity, true);
+            this.search = search;
         }
 
         public float GetScore()
         {
-            return search.DamagedTransitionScore();
+            return search.LostEnemyTransitionScore();
         }
 
         public IState GetNextState()
         {
             return search;
         }
-        
+
         public void OnActivate() { }
     }
 }

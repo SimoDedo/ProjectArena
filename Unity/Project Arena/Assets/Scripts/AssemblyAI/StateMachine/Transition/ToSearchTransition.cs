@@ -1,3 +1,4 @@
+using System;
 using AssemblyAI.State;
 
 namespace AssemblyAI.StateMachine.Transition
@@ -5,14 +6,12 @@ namespace AssemblyAI.StateMachine.Transition
     public class ToSearchTransition : ITransition
     {
         private readonly SearchEnemy search;
-        public ToSearchTransition(AIEntity entity)
-        {
-            search = new SearchEnemy(entity);
-        }
+        private readonly Action action;
 
-        public ToSearchTransition(SearchEnemy search)
+        public ToSearchTransition(AIEntity entity, Action action = null)
         {
-            this.search = search;
+            this.action = action;
+            search = new SearchEnemy(entity);
         }
 
         public float GetScore()
@@ -23,6 +22,11 @@ namespace AssemblyAI.StateMachine.Transition
         public IState GetNextState()
         {
             return search;
+        }
+
+        public void OnActivate()
+        {
+            action?.Invoke();
         }
     }
 }

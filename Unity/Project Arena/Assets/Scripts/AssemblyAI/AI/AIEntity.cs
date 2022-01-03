@@ -124,7 +124,7 @@ public class AIEntity : Entity, ILoggable
         sightSensor = gameObject.AddComponent<AISightSensor>();
         sightSensor.Prepare(head, botParams.maxRange, botParams.fov);
         targetKnowledgeBase = gameObject.AddComponent<TargetKnowledgeBase>();
-        targetKnowledgeBase.Prepare(sightSensor, enemy, botParams.memoryWindow, botParams.timeBeforeCanReact);
+        targetKnowledgeBase.Prepare(sightSensor, enemy, botParams.memoryWindow, botParams.timeBeforeCanReact, entityID);
         pickupKnowledgeBase = gameObject.AddComponent<PickupKnowledgeBase>();
         pickupKnowledgeBase.Prepare(sightSensor);
         navigationSystem = gameObject.AddComponent<NavigationSystem>();
@@ -140,14 +140,14 @@ public class AIEntity : Entity, ILoggable
     
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id)
     {
-        PrepareComponents();
-        
         gameManagerScript = gms;
 
         totalHealth = th;
         Health = th;
         entityID = id;
 
+        PrepareComponents();
+        
         gunManager.SetupGuns(gms, this, null, ag);
         gunManager.TryEquipGun(gunManager.FindLowestActiveGun());
         pickupKnowledgeBase.DetectPickups();
@@ -193,10 +193,6 @@ public class AIEntity : Entity, ILoggable
                 Health = 0;
                 // Kill the entity.
                 Die(killerID);
-            }
-            else
-            {
-                GetComponent<BehaviorTree>().SendEvent("Damaged");
             }
         }
     }
@@ -292,6 +288,7 @@ public class AIEntity : Entity, ILoggable
         navigationSystem.SetEnabled(b);
         GetComponent<CapsuleCollider>().enabled = b;
         MeshVisibility.SetMeshVisible(transform, b);
+        targetKnowledgeBase.SetActive(b);
         inGame = b;
     }
     

@@ -3,6 +3,7 @@ using AI.KnowledgeBase;
 using AssemblyAI.StateMachine;
 using AssemblyAI.StateMachine.Transition;
 using AssemblyEntity.Component;
+using AssemblyLogging;
 using BehaviorDesigner.Runtime;
 using UnityEngine;
 
@@ -23,11 +24,10 @@ namespace AssemblyAI.State
             targetKB = entity.GetComponent<TargetKnowledgeBase>();
             gunManager = entity.GetComponent<GunManager>();
         }
-        
+
         public float FightTransitionScore(bool isResumingFight = false)
         {
-            if (!gunManager.HasAmmo())
-                return 0;
+            if (!gunManager.HasAmmo()) return 0;
             // TODO maybe we see enemy, but we want to run away?
             var canSee = targetKB.HasSeenTarget(isResumingFight);
             return canSee ? 0.95f : 0.0f;
@@ -43,21 +43,34 @@ namespace AssemblyAI.State
             behaviorTree.ExternalBehavior = externalBT;
             behaviorTree.EnableBehavior();
             BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
-            
+
             OutgoingTransitions = new ITransition[]
             {
-                new OnEnemyInSightTransition(this), // Self-loop 
-                new ToWanderTransition(entity),
-                new ToSearchTransition(entity),
-                new ToPickupTransition(entity), 
+                new FightSelfLoop(this), // Self-loop 
+                new ToWanderTransition(entity, ExitFightAction), 
+                new ToSearchTransition(entity, StartSearchAction),
+                new ToPickupTransition(entity, ExitFightAction)
             };
         }
-    
+
+        private void StartSearchAction()
+        {
+            SearchStartGameEvent.Instance.Raise(entity.GetID());
+        }
+
+        private void ExitFightAction()
+        {
+            var position = entity.transform.position;
+            FightExitGameEvent.Instance.Raise(
+                new ExitFightInfo {x = position.x, z = position.z, entityId = entity.GetID()}
+            );
+        }
+
         public void Update()
         {
             BehaviorManager.instance.Tick(behaviorTree);
         }
-    
+
         public void Exit()
         {
             Resources.UnloadAsset(externalBT);
