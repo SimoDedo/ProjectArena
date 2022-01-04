@@ -8,6 +8,8 @@
 public abstract class Entity : MonoBehaviour
 {
     [SerializeField] protected int totalHealth;
+
+    // TODO Move to subclasses, no reason for this to be public
     public virtual int Health { get; protected set; }
 
     protected int entityID;

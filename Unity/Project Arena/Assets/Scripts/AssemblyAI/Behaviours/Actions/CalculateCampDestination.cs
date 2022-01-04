@@ -1,8 +1,8 @@
 using System;
+using AssemblyAI.AI.Layer2;
 using AssemblyAI.Behaviours.Variables;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
-using Entities.AI.Layer2;
 using Others;
 using UnityEngine;
 using UnityEngine.AI;
@@ -47,7 +47,7 @@ namespace AssemblyAI.Behaviours.Actions
                     var randomRadius = Random.value * (maxRadius - minRadius) + minRadius;
                     var newPoint = newDirection * randomRadius + campLocation.Value;
                     if (Physics.Linecast(campLocation.Value, newPoint)) continue;
-                    if (!navSystem.IsPointOnNavMesh(newPoint, NavMeshUtils.GetAgentIDFromName("Wanderer"),
+                    if (!NavigationSystem.IsPointOnNavMesh(newPoint, NavMeshUtils.GetAgentIDFromName("Wanderer"),
                         out var finalPoint)) continue;
 
                     var path = navSystem.CalculatePath(finalPoint);

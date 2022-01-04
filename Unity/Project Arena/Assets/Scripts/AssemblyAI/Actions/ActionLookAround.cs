@@ -1,41 +1,37 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using AssemblyAI.AI.Layer1.Actuator;
-using BehaviorDesigner.Runtime.Tasks;
 using UnityEngine;
-using Action = BehaviorDesigner.Runtime.Tasks.Action;
-using Random = UnityEngine.Random;
 
-// Current version is this one!
-namespace AssemblyAI.Behaviours.Actions
+namespace AssemblyAI.Actions
 {
-    [Serializable]
-    public class LookAround : Action
+    public class ActionLookAround
     {
-        [SerializeField] private bool focused;
-        private AIMovementController movementController;
-        private AISightController sightController;
-        private CuriosityLevel curiosity;
+        private readonly AIEntity entity;
+        private readonly Transform transform;
+        private readonly AISightController sightController;
+        private readonly AIMovementController movementController;
         private Vector3 lookPoint;
         private float nextUpdateTime;
-        private float maxAngle;
-        private List<AngleScore> myValidAngles = new List<AngleScore>();
+        private readonly float maxAngle;
+        private readonly List<AngleScore> myValidAngles = new List<AngleScore>();
 
-        public override void OnAwake()
+        public ActionLookAround(AIEntity entity)
         {
-            var entity = GetComponent<AIEntity>();
+            this.entity = entity;
+            transform = entity.transform;
             sightController = entity.SightController;
 
             movementController = entity.MovementController;
-            curiosity = entity.GetCuriosity();
-            
+            var curiosity = entity.GetCuriosity();
+
             nextUpdateTime = float.MinValue;
 
             foreach (var angleScore in AngleScores)
             {
-                if (curiosity >= angleScore.minLevel && (!focused || angleScore.allowedIfFocused))
+                if (curiosity >= angleScore.minLevel &&
+                    (!entity.BotState.lookAroundIsFocused || angleScore.allowedIfFocused))
                 {
                     maxAngle = Mathf.Max(maxAngle, Mathf.Abs(angleScore.angle));
                     myValidAngles.Add(angleScore);
@@ -43,22 +39,16 @@ namespace AssemblyAI.Behaviours.Actions
             }
         }
 
-        public override TaskStatus OnUpdate()
+        public void Perform()
         {
             var realForward = GetMovementDirection();
             // For some reason we spawn moving up, causing weird issues with look direction
-            if (realForward == Vector3.up)
-                realForward = transform.forward;
+            if (realForward == Vector3.up) realForward = entity.transform.forward;
             var angleX = 0f;
             if (MustUpdate())
             {
                 UpdateNextUpdateTime();
                 // TODO Agent is not moving, have it slowly look around?
-                // if (realForward == Vector3.zero)
-                // {
-                //     realForward = sightSensor.GetLookDirection();
-                //     angleX = 1;
-                // }
 
                 // Score formula: max(0, 10 + distanceScore * 40 + forwardScore * 30)
 
@@ -104,7 +94,6 @@ namespace AssemblyAI.Behaviours.Actions
             }
 
             sightController.LookAtPoint(lookPoint, 0.3f);
-            return TaskStatus.Running;
         }
 
         private Vector3 GetMovementDirection()
@@ -120,7 +109,7 @@ namespace AssemblyAI.Behaviours.Actions
 
             var angle = Mathf.Abs(Vector3.Angle(lookDirection, movementDirection));
             return angle > maxAngle || nextUpdateTime < Time.time ||
-                   Physics.Raycast(position, transform.forward, THRESHOLD);
+                Physics.Raycast(position, transform.forward, THRESHOLD);
         }
 
         private void UpdateNextUpdateTime()
@@ -132,6 +121,7 @@ namespace AssemblyAI.Behaviours.Actions
         private const float MIN_UPDATE_TIME = 0.3f;
         private const float MAX_UPDATE_TIME = 0.8f;
 
+
         private struct AngleScore
         {
             public int angle;
@@ -140,23 +130,32 @@ namespace AssemblyAI.Behaviours.Actions
             public bool allowedIfFocused;
         }
 
-        private static readonly ReadOnlyCollection<AngleScore> AngleScores = new ReadOnlyCollection<AngleScore>(new[]
-        {
-            new AngleScore {angle = 0, score = 100, minLevel = CuriosityLevel.Low, allowedIfFocused = true},
-            new AngleScore
-                {angle = -45, score = 60, minLevel = CuriosityLevel.Medium, allowedIfFocused = true},
-            new AngleScore
-                {angle = +45, score = 60, minLevel = CuriosityLevel.Medium, allowedIfFocused = true},
-            new AngleScore
-                {angle = -90, score = 30, minLevel = CuriosityLevel.Medium, allowedIfFocused = false},
-            new AngleScore
-                {angle = +90, score = 30, minLevel = CuriosityLevel.Medium, allowedIfFocused = false},
-            new AngleScore
-                {angle = -135, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false},
-            new AngleScore
-                {angle = +135, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false},
-            new AngleScore
-                {angle = +180, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false}
-        });
+        private static readonly ReadOnlyCollection<AngleScore> AngleScores = new ReadOnlyCollection<AngleScore>(
+            new[]
+            {
+                new AngleScore {angle = 0, score = 100, minLevel = CuriosityLevel.Low, allowedIfFocused = true},
+                new AngleScore {angle = -45, score = 60, minLevel = CuriosityLevel.Medium, allowedIfFocused = true},
+                new AngleScore {angle = +45, score = 60, minLevel = CuriosityLevel.Medium, allowedIfFocused = true},
+                new AngleScore
+                {
+                    angle = -90, score = 30, minLevel = CuriosityLevel.Medium, allowedIfFocused = false
+                },
+                new AngleScore
+                {
+                    angle = +90, score = 30, minLevel = CuriosityLevel.Medium, allowedIfFocused = false
+                },
+                new AngleScore {angle = -135, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false},
+                new AngleScore {angle = +135, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false},
+                new AngleScore {angle = +180, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false}
+            }
+        );
+    }
+}
+
+namespace BotSpace
+{
+    public partial class BotState
+    {
+        public bool lookAroundIsFocused = false;
     }
 }

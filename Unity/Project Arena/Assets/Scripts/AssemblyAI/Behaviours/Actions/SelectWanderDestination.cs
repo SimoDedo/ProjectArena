@@ -1,8 +1,8 @@
 using System;
+using AssemblyAI.AI.Layer2;
 using AssemblyAI.Behaviours.Variables;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
-using Entities.AI.Layer2;
 using Others;
 using UnityEngine;
 using UnityEngine.AI;
@@ -42,7 +42,7 @@ namespace AssemblyAI.Behaviours.Actions
                 direction += Random.insideUnitSphere * wanderRate.Value;
                 var destination = transform.position + direction.normalized *
                     Random.Range(minWanderDistance.Value, maxWanderDistance.Value);
-                validDestination = navSystem.IsPointOnNavMesh(destination, NavMeshUtils.GetAgentIDFromName("Wanderer"),
+                validDestination = NavigationSystem.IsPointOnNavMesh(destination, NavMeshUtils.GetAgentIDFromName("Wanderer"),
                     out destination);
                 if (validDestination)
                 {

@@ -1,8 +1,8 @@
 using System;
 using AI.KnowledgeBase;
+using AssemblyAI.AI.Layer2;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
-using Entities.AI.Layer2;
 using UnityEngine;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
 

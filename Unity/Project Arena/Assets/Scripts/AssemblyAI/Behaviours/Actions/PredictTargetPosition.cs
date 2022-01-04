@@ -1,7 +1,7 @@
 using System;
+using AssemblyAI.AI.Layer2;
 using AssemblyAI.Behaviours.Variables;
 using BehaviorDesigner.Runtime.Tasks;
-using Entities.AI.Layer2;
 using UnityEngine;
 using UnityEngine.AI;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;

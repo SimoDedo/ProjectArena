@@ -77,7 +77,7 @@ namespace AssemblyAI.StateMachine.State
             BehaviorManager.instance.Tick(behaviorTree);
             if (behaviorTree.ExecutionStatus == TaskStatus.Failure)
             {
-                Debug.Log("What happened?");
+                Debug.LogError("What happened?");
             }
         }
 

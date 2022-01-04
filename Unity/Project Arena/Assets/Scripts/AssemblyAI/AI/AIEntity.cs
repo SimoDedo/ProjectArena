@@ -1,13 +1,16 @@
 using System;
+using System.Collections.Generic;
+using AI.Actions;
 using AI.KnowledgeBase;
 using AssemblyAI.AI.Layer1.Actuator;
 using AssemblyAI.AI.Layer1.Sensors;
+using AssemblyAI.AI.Layer2;
 using AssemblyAI.AI.Layer3;
 using AssemblyAI.StateMachine;
 using AssemblyEntity.Component;
 using AssemblyLogging;
 using BehaviorDesigner.Runtime;
-using Entities.AI.Layer2;
+using BotSpace;
 using JetBrains.Annotations;
 using UnityEngine;
 using Utils;
@@ -97,13 +100,21 @@ public class AIEntity : Entity, ILoggable
     // Time of the last position log.
     private float lastPositionLog;
 
-    [SerializeField] private int health;
+    [SerializeField] private BotState botState;
+
+    public BotState BotState
+    {
+        get => botState;
+        private set => botState = value;
+    }
 
     public override int Health
     {
-        get => health;
-        protected set => health = value;
+        get => BotState.Health;
+        protected set => BotState.Health = value;
     }
+    
+    public int MaxHealth => totalHealth;
 
     public TargetKnowledgeBase TargetKb { get; private set; }
 
@@ -133,6 +144,7 @@ public class AIEntity : Entity, ILoggable
         GunManager = new GunManager(this);
         PickupPlanner = new PickupPlanner(this);
         stateMachine = new EntityStateMachine(this);
+        BotState = new BotState();
 
         GunManager.Prepare(gms, this, null, ag);
         TargetKb.Prepare();
@@ -143,7 +155,7 @@ public class AIEntity : Entity, ILoggable
         PickupPlanner.Prepare();
         NavigationSystem.Prepare();
     }
-    
+
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id)
     {
         PrepareComponents(gms, ag);
@@ -197,6 +209,7 @@ public class AIEntity : Entity, ILoggable
 
     protected override void Die(int id)
     {
+        // TODO Reset the various states
         var position = transform.position;
         KillInfoGameEvent.Instance.Raise(
             new KillInfo
@@ -243,9 +256,21 @@ public class AIEntity : Entity, ILoggable
         {
             TargetKb.Update();
             PickupKnowledgeBase.Update();
-            
             stateMachine.Update();
-            
+
+            // Weapon select (if no enemy, choose weapon to reload)
+            ActionSelectWeapon.Perform(this);
+            // Weapon reload if needed
+            ActionWeaponReload.Perform(this);
+            // Aim according to needs (aim enemy vs look around)
+            ActionAimView.Perform(this);
+            // Weapon shoot
+            // ??? Done in ActionAimView?
+            // Bot dodge rockets?
+            ActionDodgeRockets.Perform(this);
+
+            // Bot move
+            NavigationSystem.MoveAlongPath();
             // TODO 
         }
     }
@@ -299,10 +324,7 @@ public class AIEntity : Entity, ILoggable
         return Time.time - lastDamageTime < 0.2f;
     }
 
-    public FightingMovementSkill GetMovementSkill()
-    {
-        return botParams.movementSkill;
-    }
+    public FightingMovementSkill MovementSkill => botParams.movementSkill;
 
     public CuriosityLevel GetCuriosity()
     {
@@ -326,14 +348,25 @@ public class AIEntity : Entity, ILoggable
         return botParams.aimingSkill;
     }
 
-    public int GetMaxHealth()
-    {
-        return totalHealth;
-    }
 
     // Won't work if bot was already set up.
     public void SetCharacteristics(BotCharacteristics botParams)
     {
         this.botParams = botParams;
+    }
+}
+
+namespace BotSpace
+{
+    // TODO Define BotState contents (health, ammo, current target, timeouts for stuff, ...)
+    [Serializable]
+    public partial class BotState
+    {
+        [SerializeField] private int health;
+        public int Health
+        {
+            get => health;
+            set => health = value;
+        }
     }
 }

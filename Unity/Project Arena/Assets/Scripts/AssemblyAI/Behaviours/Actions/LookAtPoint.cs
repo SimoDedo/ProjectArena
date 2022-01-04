@@ -14,6 +14,7 @@ public class LookAtPoint : Action
 
     public override void OnAwake()
     {
+        // TODO this must be set up!
         sightController = GetComponent<AIEntity>().SightController;
     }
 

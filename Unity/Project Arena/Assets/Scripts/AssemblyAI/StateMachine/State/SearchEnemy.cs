@@ -7,14 +7,14 @@ namespace AssemblyAI.StateMachine.State
 {
     public class SearchEnemy : IState
     {
+        private const float NO_TIME = -1;
         private readonly AIEntity entity;
         private readonly TargetKnowledgeBase targetKb;
         private readonly bool searchDueToDamage;
         private ExternalBehaviorTree externalBt;
         private BehaviorTree behaviorTree;
-        private float startSearchTime = float.NaN;
+        private float startSearchTime = NO_TIME;
         public ITransition[] OutgoingTransitions { get; private set; }
-
 
         public SearchEnemy(AIEntity entity, bool searchDueToDamage = false)
         {
@@ -27,7 +27,8 @@ namespace AssemblyAI.StateMachine.State
         {
             if (entity.GetEnemy().isAlive && !targetKb.HasSeenTarget())
             {
-                if (float.IsNaN(startSearchTime))
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                if (startSearchTime == NO_TIME)
                     return 0.7f;
                 // Slowly decrease want to search. After 5 secs, it's zero
                 return 1f - (Time.time - startSearchTime) / 5f;

@@ -1,7 +1,8 @@
 using System;
+using System.Linq;
+using AssemblyAI.AI.Layer2;
 using AssemblyEntity.Component;
 using BehaviorDesigner.Runtime.Tasks;
-using Entities.AI.Layer2;
 using UnityEngine;
 using UnityEngine.AI;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
@@ -18,13 +19,12 @@ namespace AssemblyAI.Behaviours.Actions
         private Entity target;
 
         private bool strifeRight = Random.value < 0.5;
-        private int remainingStrifes = Random.Range(minStrifeLength, maxStrifeLength);
+        private int remainingStrifes = Random.Range(MIN_STRIFE_LENGTH, MAX_STRIFE_LENGTH);
 
-        private const int minStrifeLength = 10;
-        private const int maxStrifeLength = 30;
+        private const int MIN_STRIFE_LENGTH = 10;
+        private const int MAX_STRIFE_LENGTH = 30;
+        private Vector3 destination;
         private FightingMovementSkill skill;
-        private Collider[] rocketTestCollider = new Collider[4];
-        private const float ROCKET_DETECTION_RADIUS = 40f;
 
         public override void OnStart()
         {
@@ -32,8 +32,9 @@ namespace AssemblyAI.Behaviours.Actions
             navSystem = entity.NavigationSystem;
             gunManager = entity.GunManager;
             target = entity.GetEnemy();
-            skill = entity.GetMovementSkill();
+            skill = entity.MovementSkill;
             navSystem.CancelPath();
+            destination = Vector3.positiveInfinity;
         }
 
         public override void OnEnd()
@@ -43,20 +44,10 @@ namespace AssemblyAI.Behaviours.Actions
 
         public override TaskStatus OnUpdate()
         {
-            // Is able enough to dodge rockets?
-            if (skill >= FightingMovementSkill.CircleStrife)
+            if (destination != Vector3.positiveInfinity && navSystem.HasArrivedToDestination(destination))
             {
-                var rocketToDodge = FindRocketToDodge();
-                if (rocketToDodge != null)
-                {
-                    DodgeRocket(rocketToDodge);
-                    return TaskStatus.Running;
-                }
-            }
-
-            if (navSystem.HasPath() && !navSystem.HasArrivedToDestination())
-            {
-                navSystem.MoveAlongPath();
+                // Call every frame, just in case someone overwrote our destination choice (e.g. to avoid rocket)
+                navSystem.SetDestination(destination);
                 return TaskStatus.Running;
             }
 
@@ -65,75 +56,6 @@ namespace AssemblyAI.Behaviours.Actions
             TrySelectDestination();
             entity.SetIgnoreRaycast(false);
             return TaskStatus.Running;
-        }
-
-        private void DodgeRocket(Projectile rocketToDodge)
-        {
-            // This rocket is not mine... How do I dodge it?
-            // Calculate it's trajectory and try to get away from it
-
-            var projectileTransform = rocketToDodge.transform;
-            var projectilePosition = projectileTransform.position;
-            var projectileDirection = projectileTransform.forward;
-
-            var myDirection = transform.position - projectilePosition;
-            var up = transform.up;
-            var angle = Vector3.SignedAngle(myDirection, projectileDirection, up);
-
-            // Try to strife in direction that increases this angle
-            var avoidDirection = Vector3.Cross(up, myDirection).normalized;
-            if (angle > 0f)
-                avoidDirection = -avoidDirection;
-            navSystem.SetDestination(transform.position + avoidDirection * navSystem.Speed);
-            navSystem.MoveAlongPath();
-        }
-
-        private Projectile FindRocketToDodge()
-        {
-            Projectile projectileToDodge = null;
-            if (skill >= FightingMovementSkill.CircleStrife)
-            {
-                // Detect rocket presence
-                var position = transform.position;
-                var projectileColliders = Physics.OverlapSphereNonAlloc(position, ROCKET_DETECTION_RADIUS,
-                    rocketTestCollider,
-                    1 << LayerMask.NameToLayer("Projectile"));
-
-                var closestRocket = float.MaxValue;
-
-                if (projectileColliders != 0)
-                {
-                    // Check if any projectile doesn't belong to me
-                    for (var i = 0; i < projectileColliders; i++)
-                    {
-                        var projectile = rocketTestCollider[i].GetComponent<Projectile>();
-                        if (projectile == null) continue;
-                        if (projectile.ShooterID != entity.GetID())
-                        {
-                            // This rocket is not mine... How do I dodge it?
-                            // Calculate it's trajectory and try to get away from it
-
-                            var projectileTransform = projectile.transform;
-                            var projectilePosition = projectileTransform.position;
-                            var distance = (position - projectilePosition).sqrMagnitude;
-                            if (distance < closestRocket)
-                            {
-                                // calculate angle, ignore projectiles that are going in the opposite direction
-                                var projectileDirection = projectileTransform.forward;
-                                var myDirection = position - projectilePosition;
-
-                                if (Vector3.Angle(myDirection, projectileDirection) < 45)
-                                {
-                                    closestRocket = distance;
-                                    projectileToDodge = projectile;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            return projectileToDodge;
         }
 
         private void TrySelectDestination()
@@ -148,7 +70,7 @@ namespace AssemblyAI.Behaviours.Actions
 
             // Check if we can see enemy from where we are
             canSeeEnemyFromStartingPoint = !Physics.Linecast(currentPos, targetPos, out var canSeeEnemyHit) ||
-                                           canSeeEnemyHit.collider.gameObject == target.gameObject;
+                canSeeEnemyHit.collider.gameObject == target.gameObject;
 
             // We do not care if enemy is above or beyond us, the move straight/strife movement should be
             // parallel to the floor.
@@ -168,8 +90,7 @@ namespace AssemblyAI.Behaviours.Actions
                 var (closeRange, farRange) = gunManager.GetCurrentGunOptimalRange();
                 if (distance < closeRange)
                     movementDirectionDueToGun = -direction;
-                else if (distance > farRange)
-                    movementDirectionDueToGun = direction;
+                else if (distance > farRange) movementDirectionDueToGun = direction;
 
                 if (skill >= FightingMovementSkill.CircleStrife)
                 {
@@ -179,19 +100,18 @@ namespace AssemblyAI.Behaviours.Actions
                         remainingStrifes--;
                         if (remainingStrifes < 0)
                         {
-                            remainingStrifes = Random.Range(minStrifeLength, maxStrifeLength);
+                            remainingStrifes = Random.Range(MIN_STRIFE_LENGTH, MAX_STRIFE_LENGTH);
                             strifeRight = !strifeRight;
                         }
                     }
 
-                    if (!strifeRight)
-                        movementDirectionDueToStrife = -movementDirectionDueToStrife;
+                    if (!strifeRight) movementDirectionDueToStrife = -movementDirectionDueToStrife;
                 }
 
                 var totalMovement = movementDirectionDueToStrife + movementDirectionDueToGun * 3f;
                 var newPos = currentPos + totalMovement;
                 Debug.DrawLine(newPos, targetPos, Color.blue);
-                
+
                 if (!Physics.Linecast(newPos, targetPos, out var hit) ||
                     hit.collider.gameObject == target.gameObject)
                 {
@@ -200,9 +120,9 @@ namespace AssemblyAI.Behaviours.Actions
                         strifeRight = !strifeRight;
                     else
                     {
-                        navSystem.SetPath(path);
-                        navSystem.MoveAlongPath();
-                    }                
+                        destination = path.corners.Last();
+                        navSystem.SetPathToDestination(path);
+                    }
                 }
                 else
                 {
@@ -230,8 +150,8 @@ namespace AssemblyAI.Behaviours.Actions
                             || finalPosVisibility.collider.gameObject == target.gameObject)
                         {
                             // Can see enemy from here, found new position!
+                            destination = finalPos;
                             navSystem.SetDestination(finalPos);
-                            navSystem.MoveAlongPath();
                             return;
                         }
                     }

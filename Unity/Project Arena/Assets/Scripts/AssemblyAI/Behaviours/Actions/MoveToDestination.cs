@@ -1,7 +1,7 @@
 using System;
+using AssemblyAI.AI.Layer2;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
-using Entities.AI.Layer2;
 using UnityEngine;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
 
@@ -16,8 +16,6 @@ namespace AssemblyAI.Behaviours.Actions
         public override void OnStart()
         {
             navSystem = GetComponent<AIEntity>().NavigationSystem;
-            var path = navSystem.CalculatePath(destination.Value);
-            navSystem.SetPath(path);
         }
 
         public override void OnEnd()
@@ -28,10 +26,10 @@ namespace AssemblyAI.Behaviours.Actions
         public override TaskStatus OnUpdate()
         {
             Debug.DrawLine(transform.position, destination.Value, Color.green);
-
-            if (navSystem.HasArrivedToDestination())
+            if (navSystem.HasArrivedToDestination(destination.Value))
                 return TaskStatus.Success;
-            navSystem.MoveAlongPath();
+
+            navSystem.SetDestination(destination.Value);
             return TaskStatus.Running;
         }
     }

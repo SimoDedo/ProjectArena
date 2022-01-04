@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using AI.KnowledgeBase;
+using AssemblyAI.AI.Layer2;
 using AssemblyEntity.Component;
-using Entities.AI.Layer2;
 using UnityEngine;
 using UnityEngine.AI;
 using Utils;
@@ -148,7 +148,7 @@ namespace AssemblyAI.AI.Layer3
         {
             const float medkitNecessityWeight = 0.8f;
             var pickupHealth = pickable.RestoredHealth;
-            var maxHealth = me.GetMaxHealth();
+            var maxHealth = me.MaxHealth;
             var currentHealth = me.Health;
             var recoveredHealth = Mathf.Min(pickupHealth, maxHealth - currentHealth);
             var medkitHealValue = (1 - medkitNecessityWeight) * recoveredHealth / maxHealth;

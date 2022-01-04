@@ -428,8 +428,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114128907697292602, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
+      propertyPath: damage
+      value: 75
+      objectReference: {fileID: 0}
+    - target: {fileID: 114128907697292602, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
       propertyPath: infinteAmmo
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114128907697292602, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: cooldownTime
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 114191837528411164, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
@@ -673,8 +683,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114128907697292602, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
+      propertyPath: damage
+      value: 75
+      objectReference: {fileID: 0}
+    - target: {fileID: 114128907697292602, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
       propertyPath: infinteAmmo
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114128907697292602, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: cooldownTime
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 114191837528411164, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
@@ -880,8 +900,49 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 459336622430151955, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
         type: 3}
+      propertyPath: width
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 459336622430151955, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
+        type: 3}
+      propertyPath: height
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 459336622430151955, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
+        type: 3}
+      propertyPath: maxRoomWidth
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 459336622430151955, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
+        type: 3}
+      propertyPath: minRoomWidth
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 459336622430151955, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
+        type: 3}
+      propertyPath: maxRoomHeight
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 459336622430151955, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
+        type: 3}
+      propertyPath: minRoomHeight
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 459336622430151955, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
+        type: 3}
       propertyPath: maxCorridorThickness
       value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 561011864743673710, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
+        type: 3}
+      propertyPath: textFilePath
+      value: /home/jimbo/Documents/dev/Unity/Projects/ProjectArena-New/ProjectArena/Unity/Project
+        Arena/Assets/Maps/Experiment 1/ai_pickups.txt
+      objectReference: {fileID: 0}
+    - target: {fileID: 561011864743673710, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
+        type: 3}
+      propertyPath: loadMapFromFile
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b0fb2683cafdfe0ec88bf193abc9cb18, type: 3}
@@ -955,17 +1016,17 @@ PrefabInstance:
     - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
         type: 3}
       propertyPath: activeGunsPlayer.Array.data[0]
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
         type: 3}
       propertyPath: activeGunsPlayer.Array.data[1]
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
         type: 3}
       propertyPath: activeGunsPlayer.Array.data[2]
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
         type: 3}
@@ -975,17 +1036,17 @@ PrefabInstance:
     - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
         type: 3}
       propertyPath: activeGunsOpponent.Array.data[0]
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
         type: 3}
       propertyPath: activeGunsOpponent.Array.data[1]
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
         type: 3}
       propertyPath: activeGunsOpponent.Array.data[2]
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
         type: 3}

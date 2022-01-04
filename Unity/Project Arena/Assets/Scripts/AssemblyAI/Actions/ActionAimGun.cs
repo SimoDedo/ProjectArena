@@ -4,36 +4,33 @@ using AssemblyAI.AI.Layer1.Actuator;
 using AssemblyAI.AI.Layer1.Sensors;
 using AssemblyAI.AI.Layer2;
 using AssemblyEntity.Component;
-using BehaviorDesigner.Runtime;
-using BehaviorDesigner.Runtime.Tasks;
 using UnityEngine;
-using Action = BehaviorDesigner.Runtime.Tasks.Action;
 
-namespace AssemblyAI.Behaviours.Actions
+namespace AssemblyAI.Actions
 {
-    [Serializable]
-    public class UseChosenGun : Action
+    public class ActionAimGun
     {
-        [SerializeField] private SharedInt chosenGunIndex;
-        [SerializeField] private int maxLookAheadFrames = 5;
-        [SerializeField] private float lookAheadTimeStep = 0.1f;
-        private AIEntity entity;
-        private GunManager gunManager;
-        private Entity enemy;
-        private PositionTracker enemyPositionTracker;
-        private AISightController sightController;
-        private AISightSensor sightSensor;
-        private NavigationSystem navSystem;
+        private const int MAX_LOOK_AHEAD_FRAMES = 5;
+        private const float LOOK_AHEAD_TIME_STEP = 0.1f;
+        private readonly Transform transform;
+        private readonly GunManager gunManager;
+        private readonly Entity enemy;
+        private readonly PositionTracker enemyPositionTracker;
+        private readonly AISightController sightController;
+        private readonly AISightSensor sightSensor;
+        private readonly NavigationSystem navSystem;
 
-        private NormalDistribution distribution;
+        private readonly NormalDistribution distribution;
         private float previousReflexDelay;
         private float targetReflexDelay;
         private float nextDelayRecalculation = float.MinValue;
         private const float UPDATE_INTERVAL = 0.5f;
 
-        public override void OnAwake()
+        private int previousGunIndex;
+
+        public ActionAimGun(AIEntity entity)
         {
-            entity = GetComponent<AIEntity>();
+            transform = entity.transform;
             gunManager = entity.GunManager;
             sightController = entity.SightController;
             sightSensor = entity.SightSensor;
@@ -41,43 +38,41 @@ namespace AssemblyAI.Behaviours.Actions
             enemy = entity.GetEnemy();
             enemyPositionTracker = enemy.GetComponent<PositionTracker>();
 
-            // TODO Find better values
             var skill = entity.GetAimingSkill();
+
+            // TODO Find better values
             var mean = 0.4f - 0.6f * skill; // [-0.2, 0.4]
             var stdDev = 0.3f - 0.1f * skill; // [0.2, 0.3]
+
             distribution = new NormalDistribution(mean, stdDev);
             targetReflexDelay = (float) distribution.Generate();
+
+            previousGunIndex = gunManager.CurrentGunIndex;
         }
 
-        public override void OnStart()
+        public void Perform()
         {
-            // TODO What if this fails?
-            gunManager.TryEquipGun(chosenGunIndex.Value);
-            
-        }
-
-        public override TaskStatus OnUpdate()
-        {
-            if (nextDelayRecalculation <= Time.time)
+            if (previousGunIndex != gunManager.CurrentGunIndex || nextDelayRecalculation <= Time.time)
             {
                 previousReflexDelay = targetReflexDelay;
                 targetReflexDelay = (float) distribution.Generate();
                 nextDelayRecalculation = Time.time + UPDATE_INTERVAL;
             }
-            
-            var currentDelay = 
-                previousReflexDelay + (targetReflexDelay - previousReflexDelay) * 
+
+            previousGunIndex = gunManager.CurrentGunIndex;
+
+            var currentDelay =
+                previousReflexDelay + (targetReflexDelay - previousReflexDelay) *
                 (Time.time - (nextDelayRecalculation - UPDATE_INTERVAL)) / UPDATE_INTERVAL;
 
             var (position, velocity) = enemyPositionTracker.GetPositionAndVelocityFromDelay(currentDelay);
-            
+
             float angle;
             var projectileSpeed = gunManager.GetCurrentGunProjectileSpeed();
             if (float.IsPositiveInfinity(projectileSpeed))
             {
                 angle = sightController.LookAtPoint(position);
-                if (angle < 10 && gunManager.CanCurrentGunShoot())
-                    gunManager.ShootCurrentGun();
+                if (angle < 10 && gunManager.CanCurrentGunShoot()) gunManager.ShootCurrentGun();
             }
             else
             {
@@ -90,16 +85,16 @@ namespace AssemblyAI.Behaviours.Actions
                 var record = float.PositiveInfinity;
 
                 var chosenPoint = Vector3.zero;
-                for (var i = 0; i <= maxLookAheadFrames; i++)
+                for (var i = 0; i <= MAX_LOOK_AHEAD_FRAMES; i++)
                 {
-                    var newPos = enemyStartPos + velocity * (i * lookAheadTimeStep);
+                    var newPos = enemyStartPos + velocity * (i * LOOK_AHEAD_TIME_STEP);
                     // TODO NavMeshCheck
                     if (navSystem.IsPointOnNavMesh(newPos, out var hit))
                     {
                         newPos = hit;
                         if (!sightSensor.CanSeePosition(newPos)) continue;
                         var distance = (ourStartingPoint - newPos).magnitude;
-                        var rocketTravelDistance = i * lookAheadTimeStep * projectileSpeed;
+                        var rocketTravelDistance = i * LOOK_AHEAD_TIME_STEP * projectileSpeed;
                         // if (rocketTravelDistance > distance) // Perfect, found our solution!
                         // {
                         //     chosenPoint = newPos;
@@ -114,15 +109,10 @@ namespace AssemblyAI.Behaviours.Actions
                 }
 
                 // Only shoot if we found a nice position, otherwise keep the shot for another time
-                if (float.IsPositiveInfinity(record)) return TaskStatus.Running;
+                if (float.IsPositiveInfinity(record)) return;
                 angle = sightController.LookAtPoint(chosenPoint);
-                if (angle < 40 && gunManager.CanCurrentGunShoot())
-                    gunManager.ShootCurrentGun();
+                if (angle < 40 && gunManager.CanCurrentGunShoot()) gunManager.ShootCurrentGun();
             }
-
-
-
-            return TaskStatus.Running;
         }
     }
 }
