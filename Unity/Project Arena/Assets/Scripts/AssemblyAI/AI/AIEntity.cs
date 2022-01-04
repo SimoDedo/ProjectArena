@@ -49,6 +49,7 @@ public struct BotCharacteristics
     public float maxRange;
 
     [SerializeField] public float memoryWindow;
+    [SerializeField] public float detectionWindow;
     [SerializeField] public float timeBeforeCanReact;
 
     [Header("Others")] [SerializeField] public CuriosityLevel curiosity;
@@ -64,7 +65,8 @@ public struct BotCharacteristics
             maxCameraAcceleration = 2000f,
             maxCameraSpeed = 2000f,
             maxRange = 100f,
-            memoryWindow = 0.5f,
+            memoryWindow = 4f,
+            detectionWindow = 2f,
             timeBeforeCanReact = 0.2f,
             movementSkill = FightingMovementSkill.CircleStrife,
             predictionSkill = 0.5f,
@@ -138,7 +140,7 @@ public class AIEntity : Entity, ILoggable
         MovementController = new AIMovementController(this, botParams.speed);
         SightController = new AISightController(this, head, botParams.maxCameraSpeed, botParams.maxCameraAcceleration);
         SightSensor = new AISightSensor(head, botParams.maxRange, botParams.fov);
-        TargetKb = new TargetKnowledgeBase(this, enemy, botParams.memoryWindow, botParams.timeBeforeCanReact);
+        TargetKb = new TargetKnowledgeBase(this, enemy, botParams.memoryWindow, botParams.detectionWindow, botParams.timeBeforeCanReact);
         PickupKnowledgeBase = new PickupKnowledgeBase(this);
         NavigationSystem = new NavigationSystem(this, botParams.speed);
         GunManager = new GunManager(this);
@@ -196,6 +198,12 @@ public class AIEntity : Entity, ILoggable
                     z = position.z
                 }
             );
+            if (killerID != entityID)
+            {
+                // We just got damaged and it was not self-inflicted, we might need to search the enemy with more
+                // care.
+                TargetKb.ApplyFocus();
+            }
 
             // If the health goes under 0, kill the entity and start the respawn process.
             if (Health <= 0f)

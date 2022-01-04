@@ -64,7 +64,7 @@ namespace AssemblyAI.StateMachine.State
                 new ToSearchTransition(this), // Self-loop
                 new ToWanderTransition(entity),
                 new ToPickupTransition(entity),
-                new ResumeFightTransition(entity),
+                new OnEnemyInSightTransition(entity)
             };
         }
 
