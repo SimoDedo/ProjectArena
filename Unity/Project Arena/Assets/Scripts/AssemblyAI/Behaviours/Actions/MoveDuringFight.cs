@@ -19,10 +19,11 @@ namespace AssemblyAI.Behaviours.Actions
         private Entity target;
 
         private bool strifeRight = Random.value < 0.5;
-        private int remainingStrifes = Random.Range(MIN_STRIFE_LENGTH, MAX_STRIFE_LENGTH);
+        private int remainingStrafes = Random.Range(MIN_STRAFE_LENGTH, MAX_STRAFE_LENGTH);
 
-        private const int MIN_STRIFE_LENGTH = 10;
-        private const int MAX_STRIFE_LENGTH = 30;
+        private const int MIN_STRAFE_LENGTH = 10;
+        private const int MAX_STRAFE_LENGTH = 30;
+        private static readonly Vector3 NoDestination = new Vector3(10000, 10000, 10000);
         private Vector3 destination;
         private FightingMovementSkill skill;
 
@@ -34,7 +35,7 @@ namespace AssemblyAI.Behaviours.Actions
             target = entity.GetEnemy();
             skill = entity.MovementSkill;
             navSystem.CancelPath();
-            destination = Vector3.positiveInfinity;
+            destination = NoDestination;
         }
 
         public override void OnEnd()
@@ -44,7 +45,7 @@ namespace AssemblyAI.Behaviours.Actions
 
         public override TaskStatus OnUpdate()
         {
-            if (destination != Vector3.positiveInfinity && navSystem.HasArrivedToDestination(destination))
+            if (destination != NoDestination && !navSystem.HasArrivedToDestination(destination))
             {
                 // Call every frame, just in case someone overwrote our destination choice (e.g. to avoid rocket)
                 navSystem.SetDestination(destination);
@@ -60,8 +61,12 @@ namespace AssemblyAI.Behaviours.Actions
 
         private void TrySelectDestination()
         {
-            // Don't move at all during shooting
-            if (skill == FightingMovementSkill.StandStill) return;
+            if (skill == FightingMovementSkill.StandStill)
+            {
+                // Don't move at all if skill is so low.
+                navSystem.CancelPath();
+                return;
+            }
 
             var currentPos = transform.position;
             var targetPos = target.transform.position;
@@ -72,7 +77,7 @@ namespace AssemblyAI.Behaviours.Actions
             canSeeEnemyFromStartingPoint = !Physics.Linecast(currentPos, targetPos, out var canSeeEnemyHit) ||
                 canSeeEnemyHit.collider.gameObject == target.gameObject;
 
-            // We do not care if enemy is above or beyond us, the move straight/strife movement should be
+            // We do not care if enemy is above or below us, the move straight/strife movement should be
             // parallel to the floor.
             targetPos.y = currentPos.y;
 
@@ -83,7 +88,7 @@ namespace AssemblyAI.Behaviours.Actions
             // If we can see the enemy from the starting point, we should play as usual
             if (canSeeEnemyFromStartingPoint)
             {
-                var movementDirectionDueToGun = Vector3.zero;
+                Vector3 movementDirectionDueToGun;
                 var movementDirectionDueToStrife = Vector3.zero;
 
                 // Get current gun optimal range
@@ -91,21 +96,32 @@ namespace AssemblyAI.Behaviours.Actions
                 if (distance < closeRange)
                     movementDirectionDueToGun = -direction;
                 else if (distance > farRange) movementDirectionDueToGun = direction;
+                else
+                {
+                    // Randomly move through the optimal range of the gun, but not too much
+                    movementDirectionDueToGun = direction * (Random.value > 0.5f ? -0.3f : 0.3f);
+                }
 
                 if (skill >= FightingMovementSkill.CircleStrife)
                 {
-                    movementDirectionDueToStrife = Vector3.Cross(direction, transform.up);
-                    if (skill == FightingMovementSkill.CircleStrifeChangeDirection)
+                    var enemyLookDirection = target.transform.forward;
+                    var lookAngleRelativeToDirection = Vector3.SignedAngle(enemyLookDirection, direction, Vector3.up);
+                    if (Mathf.Abs(lookAngleRelativeToDirection) > 90)
                     {
-                        remainingStrifes--;
-                        if (remainingStrifes < 0)
+                        // Only strife if enemy is looking
+                        movementDirectionDueToStrife = Vector3.Cross(direction, transform.up);
+                        if (skill == FightingMovementSkill.CircleStrifeChangeDirection)
                         {
-                            remainingStrifes = Random.Range(MIN_STRIFE_LENGTH, MAX_STRIFE_LENGTH);
-                            strifeRight = !strifeRight;
+                            remainingStrafes--;
+                            if (remainingStrafes < 0)
+                            {
+                                remainingStrafes = Random.Range(MIN_STRAFE_LENGTH, MAX_STRAFE_LENGTH);
+                                strifeRight = !strifeRight;
+                            }
                         }
-                    }
 
-                    if (!strifeRight) movementDirectionDueToStrife = -movementDirectionDueToStrife;
+                        if (!strifeRight) movementDirectionDueToStrife = -movementDirectionDueToStrife;
+                    }
                 }
 
                 var totalMovement = movementDirectionDueToStrife + movementDirectionDueToGun * 3f;
@@ -141,24 +157,27 @@ namespace AssemblyAI.Behaviours.Actions
                 {
                     var randomDir = Random.insideUnitCircle;
                     var newPos = currentPos;
-                    newPos.x = randomDir.x;
-                    newPos.z = randomDir.y;
+                    newPos.x += randomDir.x;
+                    newPos.z += randomDir.y;
 
-                    if (navSystem.IsPointOnNavMesh(newPos, out var finalPos))
+                    if (!Physics.Linecast(newPos, targetPos, out var finalPosVisibility)
+                        || finalPosVisibility.collider.gameObject == target.gameObject)
                     {
-                        if (!Physics.Linecast(finalPos, targetPos, out var finalPosVisibility)
-                            || finalPosVisibility.collider.gameObject == target.gameObject)
+                        // Can see enemy from here, found new position!
+                        destination = newPos;
+                        if (navSystem.SetDestination(newPos))
                         {
-                            // Can see enemy from here, found new position!
-                            destination = finalPos;
-                            navSystem.SetDestination(finalPos);
+                            // Destination is valid!                                
                             return;
                         }
                     }
                 }
 
-                // I couldn't find the enemy from any place. Let's just not move? Otherwise, let's move towards the
-                // enemy
+                // I couldn't see the enemy from any place. This bot is stupid and will rush towards the enemy, thinking
+                // that it might be fleeing...
+                navSystem.SetDestination(targetPos);
+                //... however it should do this only in this frame, not until it has reached the enemy.
+                destination = NoDestination;
             }
         }
     }

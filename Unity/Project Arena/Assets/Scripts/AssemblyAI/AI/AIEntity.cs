@@ -267,9 +267,9 @@ public class AIEntity : Entity, ILoggable
             stateMachine.Update();
 
             // Weapon select (if no enemy, choose weapon to reload)
-            ActionSelectWeapon.Perform(this);
+            // ActionSelectWeapon.Perform(this);
             // Weapon reload if needed
-            ActionWeaponReload.Perform(this);
+            // ActionWeaponReload.Perform(this);
             // Aim according to needs (aim enemy vs look around)
             ActionAimView.Perform(this);
             // Weapon shoot

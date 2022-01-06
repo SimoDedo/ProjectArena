@@ -3,6 +3,8 @@ using AssemblyLogging;
 using UnityEngine;
 using UnityEngine.UI;
 
+// TODO add type (blast vs non-blast)
+
 /// <summary>
 /// Gun is an abstract class used to implement any kind of ranged weapon.
 /// </summary>
@@ -22,6 +24,8 @@ public abstract class Gun : MonoBehaviour, ILoggable
     [SerializeField] protected float reloadTime = 1f;
 
     [SerializeField] protected float cooldownTime = 0.1f;
+
+    [SerializeField] private bool isBlastWeapon;
     // [SerializeField] protected GunType gunType;
 
     // public GunType GetGunType()
@@ -388,6 +392,8 @@ public abstract class Gun : MonoBehaviour, ILoggable
         }
     }
 
+    public bool IsBlastWeapon => isBlastWeapon;
+
     // Show muzzle flash.
     protected IEnumerator ShowMuzzleFlash()
     {
@@ -458,4 +464,6 @@ public abstract class Gun : MonoBehaviour, ILoggable
     {
         return ammoInCharger;
     }
+
+    public abstract float MaxRange { get; } 
 }

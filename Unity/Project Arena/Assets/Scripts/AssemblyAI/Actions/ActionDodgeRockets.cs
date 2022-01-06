@@ -24,48 +24,59 @@ namespace AI.Actions
         private static Projectile FindRocketToDodge(AIEntity entity)
         {
             var skill = entity.MovementSkill;
-            var transform = entity.transform;
 
             Projectile projectileToDodge = null;
-            if (skill >= FightingMovementSkill.CircleStrife)
+            if (skill < FightingMovementSkill.CircleStrife)
             {
-                // Detect rocket presence
-                var position = transform.position;
-                var projectileColliders = Physics.OverlapSphereNonAlloc(
-                    position,
-                    ROCKET_DETECTION_RADIUS,
-                    RocketTestCollider,
-                    1 << LayerMask.NameToLayer("Projectile")
-                );
+                // Too dumb to avoid rockets
+                return null;
+            }
+            var sightSensor = entity.SightSensor;
+            var transform = entity.transform;
 
-                var closestRocket = float.MaxValue;
+            // Detect rocket presence
+            var position = transform.position;
+            var projectileColliders = Physics.OverlapSphereNonAlloc(
+                position,
+                ROCKET_DETECTION_RADIUS,
+                RocketTestCollider,
+                1 << LayerMask.NameToLayer("Projectile")
+            );
 
-                if (projectileColliders != 0)
+            var closestRocket = float.MaxValue;
+
+            if (projectileColliders != 0)
+            {
+                // Check if any projectile doesn't belong to me
+                for (var i = 0; i < projectileColliders; i++)
                 {
-                    // Check if any projectile doesn't belong to me
-                    for (var i = 0; i < projectileColliders; i++)
+                    var projectile = RocketTestCollider[i].GetComponent<Projectile>();
+                    if (projectile == null) continue;
+                    if (projectile.ShooterID != entity.GetID())
                     {
-                        var projectile = RocketTestCollider[i].GetComponent<Projectile>();
-                        if (projectile == null) continue;
-                        if (projectile.ShooterID != entity.GetID())
+                        // This rocket is not mine... How do I dodge it?
+                        // Calculate it's trajectory and try to get away from it
+
+                        var projectileTransform = projectile.transform;
+                        var projectilePosition = projectileTransform.position;
+                        var distance = (position - projectilePosition).sqrMagnitude;
+
+                        if (!sightSensor.CanSeeObject(projectileTransform, Physics.DefaultRaycastLayers))
                         {
-                            // This rocket is not mine... How do I dodge it?
-                            // Calculate it's trajectory and try to get away from it
+                            // Cannot react to rockets I do not see!
+                            continue;
+                        }
+                        
+                        if (distance < closestRocket)
+                        {
+                            // calculate angle, ignore projectiles that are going in the opposite direction
+                            var projectileDirection = projectileTransform.forward;
+                            var myDirection = position - projectilePosition;
 
-                            var projectileTransform = projectile.transform;
-                            var projectilePosition = projectileTransform.position;
-                            var distance = (position - projectilePosition).sqrMagnitude;
-                            if (distance < closestRocket)
+                            if (Vector3.Angle(myDirection, projectileDirection) < 45)
                             {
-                                // calculate angle, ignore projectiles that are going in the opposite direction
-                                var projectileDirection = projectileTransform.forward;
-                                var myDirection = position - projectilePosition;
-
-                                if (Vector3.Angle(myDirection, projectileDirection) < 45)
-                                {
-                                    closestRocket = distance;
-                                    projectileToDodge = projectile;
-                                }
+                                closestRocket = distance;
+                                projectileToDodge = projectile;
                             }
                         }
                     }
@@ -94,7 +105,14 @@ namespace AI.Actions
             // Try to strife in direction that increases this angle
             var avoidDirection = Vector3.Cross(up, myDirection).normalized;
             if (angle > 0f) avoidDirection = -avoidDirection;
-            navSystem.SetDestination(transform.position + avoidDirection * navSystem.Speed);
+            Debug.DrawLine(
+                transform.position,
+                transform.position + avoidDirection * navSystem.Speed,
+                Color.cyan,
+                0f,
+                true
+            );
+            navSystem.SetDestination(transform.position + avoidDirection);
         }
     }
 }

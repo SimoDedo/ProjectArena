@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AI.Guns;
+using UnityEditor;
 using UnityEngine;
 
 namespace AssemblyEntity.Component
 {
     // TODO Do not allow direct usage of Gun, create interface or new GunHandlingComponent
+    // TODO expose view of GunView instead of all the methods to query stuff 
     public class GunManager
     {
         private List<Gun> guns;
@@ -198,9 +200,9 @@ namespace AssemblyEntity.Component
             guns[CurrentGunIndex].Reload();
         }
 
-        public float GetGunScore(int index, float distance)
+        public float GetGunScore(int index, float distance, bool fakeEmptyCharger = false)
         {
-            return gunScorers[index].GetGunScore(distance);
+            return gunScorers[index].GetGunScore(distance, fakeEmptyCharger);
         }
 
         public float GetGunProjectileSpeed(int index)
@@ -208,10 +210,16 @@ namespace AssemblyEntity.Component
             return guns[index].GetProjectileSpeed();
         }
 
+        public bool IsGunBlastWeapon(int index)
+        {
+            return guns[index].IsBlastWeapon;
+        }
+
         public float GetCurrentGunProjectileSpeed()
         {
             return guns[CurrentGunIndex].GetProjectileSpeed();
         }
+
 
         public bool IsCurrentGunReloading()
         {
@@ -228,6 +236,11 @@ namespace AssemblyEntity.Component
         public bool HasAmmo()
         {
             return guns.Any(it => it.GetCurrentAmmo() != 0);
+        }
+
+        public float GetGunMaxRange(int index)
+        {
+            return guns[index].MaxRange;
         }
     }
 }

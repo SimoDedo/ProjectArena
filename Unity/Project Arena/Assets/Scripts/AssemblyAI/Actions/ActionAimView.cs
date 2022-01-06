@@ -9,7 +9,7 @@ namespace AI.Actions
             var hasTarget = entity.TargetKb.HasSeenTarget();
             if (hasTarget)
             {
-                AimWeapon(entity);
+                // AimWeapon(entity);
             }
             // TODO Missing has specific look at target
             else

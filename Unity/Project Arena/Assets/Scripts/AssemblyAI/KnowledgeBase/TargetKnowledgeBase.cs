@@ -93,6 +93,7 @@ namespace AI.KnowledgeBase
         {
             this.target = target;
             this.memoryWindow = memoryWindow;
+            this.detectionWindow = detectionWindow;
             this.nonConsecutiveTimeBeforeReaction = nonConsecutiveTimeBeforeReaction;
             this.me = me;
         }
@@ -127,12 +128,15 @@ namespace AI.KnowledgeBase
             }
 
             ForgetOldData();
+            
+            Debug.LogWarning("Entity " + me.name + " has spotted: " + HasSeenTarget() + " , has lost: " + HasLostTarget());
+            
         }
 
         public void ApplyFocus(float timeout = FOCUSED_DEFAULT_TIMEOUT)
         {
             isFocused = true;
-            focusedExpirationTime = Time.time + focusedExpirationTime;
+            focusedExpirationTime = Time.time + timeout;
         }
 
         public void RemoveFocus()
@@ -142,6 +146,7 @@ namespace AI.KnowledgeBase
 
         public bool HasSeenTarget()
         {
+            if (!target.isAlive) return false;
             return TestDetection(
                 Time.time - detectionWindow,
                 Time.time,
@@ -151,6 +156,7 @@ namespace AI.KnowledgeBase
 
         public bool HasLostTarget()
         {
+            if (!target.isAlive) return false;
             if (HasSeenTarget())
             {
                 return false;
@@ -163,13 +169,20 @@ namespace AI.KnowledgeBase
             );
         }
 
-        public float GetLastKnownPositionTime()
+        public float GetLastSightedTime()
         {
             var searchTimeEnd = Time.time;
             var result = results.FindLast(it => it.isVisible && it.startTime < searchTimeEnd);
-            // We got here not because we lost track of target, but for other reasons (e.g. got damage),
-            // return current position of enemy
-            return result?.startTime ?? Time.time;
+            if (result == null)
+            {
+                // We don't really know the position of the target, but maybe we got damaged and we want
+                // magically get to know the latest position of the enemy.
+                // To avoid outright cheating, when I get damaged I can give an estimate on 
+                // the enemy position based on its real position (e.g. a circle around that)
+                return float.NaN;
+            }
+
+            return result.endTime;
         }
 
         private void ForgetOldData()

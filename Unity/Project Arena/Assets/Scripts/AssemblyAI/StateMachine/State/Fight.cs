@@ -27,7 +27,7 @@ namespace AssemblyAI.StateMachine.State
         {
             if (!gunManager.HasAmmo()) return 0;
             // TODO maybe we see enemy, but we want to run away?
-            var canSee = targetKb.HasSeenTarget();
+            var canSee = targetKb.HasSeenTarget() && entity.GetEnemy().isAlive;
             var inverseHealthPercentage = 1f - (float) entity.Health / entity.MaxHealth;
             return canSee ? 0.8f - inverseHealthPercentage * LOW_HEALTH_PENALTY : 0.0f;
         }
@@ -35,9 +35,7 @@ namespace AssemblyAI.StateMachine.State
 
         public void Enter()
         {
-            // TODO remove behaviour tree here, since it's rather simple
-            
-            externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/Fight");
+            externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/NewFight");
             behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
             behaviorTree.StartWhenEnabled = false;
             behaviorTree.RestartWhenComplete = true;

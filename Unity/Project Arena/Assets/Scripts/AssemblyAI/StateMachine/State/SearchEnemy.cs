@@ -25,7 +25,7 @@ namespace AssemblyAI.StateMachine.State
 
         public float LostEnemyTransitionScore()
         {
-            if (entity.GetEnemy().isAlive && !targetKb.HasSeenTarget())
+            if (entity.GetEnemy().isAlive && targetKb.HasLostTarget())
             {
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (startSearchTime == NO_TIME)

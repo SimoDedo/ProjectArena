@@ -115,5 +115,15 @@ namespace AssemblyAI.AI.Layer1.Actuator
         {
             this.inputPenalty = inputPenalty;
         }
+
+        public Vector3 GetHeadPosition()
+        {
+            return head.transform.position;
+        }
+
+        public Vector3 GetHeadForward()
+        {
+            return head.transform.forward;
+        }
     }
 }

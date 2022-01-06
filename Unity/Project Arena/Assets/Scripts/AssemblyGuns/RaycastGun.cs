@@ -9,7 +9,7 @@ using UnityEngine;
 /// </summary>
 public class RaycastGun : Gun {
 
-    [Header("Raycast parameters")] [SerializeField] private bool limitRange = false;
+    [Header("Raycast parameters")] [SerializeField] private bool limitRange;
     [SerializeField] private float range = 100f;
     [SerializeField] private GameObject sparkPrefab;
     [SerializeField] private float sparkDuration = 0.01f;
@@ -84,6 +84,8 @@ public class RaycastGun : Gun {
 
         SetCooldown();
     }
+
+    public override float MaxRange => range;
 
     // Show a spark at the hit point flash.
     private IEnumerator ShowSpark(RaycastHit hit) {

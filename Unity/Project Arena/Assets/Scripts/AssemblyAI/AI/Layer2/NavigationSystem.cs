@@ -1,5 +1,7 @@
 using System.Linq;
 using AssemblyAI.AI.Layer1.Actuator;
+using BehaviorDesigner.Runtime.Tasks;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -7,7 +9,7 @@ namespace AssemblyAI.AI.Layer2
 {
     public class NavigationSystem
     {
-        private static readonly Vector3 NoDestination = Vector3.negativeInfinity;
+        private static readonly Vector3 NoDestination = new Vector3(1000, 1000, 1000);
         private readonly AIEntity me;
         private readonly Transform transform;
         private float Acceleration { get; }
@@ -25,7 +27,7 @@ namespace AssemblyAI.AI.Layer2
         private Vector3 latestDestination = NoDestination;
 
         private NavMeshPath latestDestinationPath;
-        
+
         private NavMeshAgent agent;
         private AIMovementController mover;
 
@@ -34,7 +36,7 @@ namespace AssemblyAI.AI.Layer2
             Speed = speed;
             this.me = me;
             transform = me.transform;
-            Acceleration = 1000000;
+            Acceleration = 100;
             AngularSpeed = 1000000;
         }
 
@@ -90,7 +92,7 @@ namespace AssemblyAI.AI.Layer2
         {
             return IsPointOnNavMesh(point, agent.agentTypeID, out validPoint);
         }
-        
+
         public void MoveAlongPath()
         {
             if (latestDestination != currentDestination)
@@ -99,9 +101,12 @@ namespace AssemblyAI.AI.Layer2
                 var path = latestDestinationPath ?? CalculatePath(currentDestination);
                 agent.SetPath(path);
             }
+
+            Debug.DrawLine(transform.position, agent.destination, Color.green, 0, false);
+            Debug.DrawLine(transform.position, agent.nextPosition, Color.red, 0.4f);
             mover.MoveToPosition(agent.nextPosition);
         }
-        
+
         public void CancelPath()
         {
             agent.ResetPath();
@@ -123,13 +128,20 @@ namespace AssemblyAI.AI.Layer2
         /// Use this to set a destination to the navigation system.
         /// If this method is called multiple times during a frame, only the last call counts to
         /// determine the destination of the agent path.
+        /// <returns>True if the destination can be reached, false otherwise</returns>
         /// </summary>
-        public void SetDestination(Vector3 destination)
+        [MustUseReturnValue("Check that the destination provided can be reached!")]
+        public bool SetDestination(Vector3 destination)
         {
+            if (destination == latestDestination) return latestDestinationPath.status == NavMeshPathStatus.PathComplete;
+
+            var path = CalculatePath(destination);
+            if (path.status != NavMeshPathStatus.PathComplete) return false;
             latestDestination = destination;
-            latestDestinationPath = null;
+            latestDestinationPath = path;
+            return true;
         }
-        
+
         public void SetEnabled(bool b)
         {
             agent.enabled = b;
@@ -137,8 +149,9 @@ namespace AssemblyAI.AI.Layer2
 
         public bool HasArrivedToDestination(Vector3 pathDestination)
         {
-            IsPointOnNavMesh(transform.position, out var floor);
-            return (pathDestination - floor).magnitude < 0.5f;
+            IsPointOnNavMesh(transform.position, out var floor1);
+            IsPointOnNavMesh(pathDestination, out var floor2);
+            return (floor1 - floor2).magnitude < 0.5f;
         }
     }
 }

@@ -28,7 +28,11 @@ namespace AssemblyAI.Behaviours.Actions
 
         public override TaskStatus OnUpdate()
         {
-            if (navSystem.HasArrivedToDestination(pathDestination)) return TaskStatus.Success;
+            if (navSystem.HasArrivedToDestination(pathDestination))
+            {
+                navSystem.CancelPath();
+                return TaskStatus.Success;
+            }
             navSystem.SetDestination(pathDestination);
             return TaskStatus.Running;
         }

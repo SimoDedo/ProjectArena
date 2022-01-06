@@ -75,9 +75,9 @@ public class PositionTracker : MonoBehaviour
             smoothedVelocity += integral * velocity;
         }
 
-        var actualVelocity =
-            (positions[positions.Count - 1].Item1 - positions[positions.Count - 2].Item1) /
-            (positions[positions.Count - 1].Item2 - positions[positions.Count - 2].Item2);
+        // var actualVelocity =
+        //     (positions[positions.Count - 1].Item1 - positions[positions.Count - 2].Item1) /
+        //     (positions[positions.Count - 1].Item2 - positions[positions.Count - 2].Item2);
 
         // Debug.Log("Difference between actual velocity and estimated velocity is "
         //           + (actualVelocity - smoothedVelocity).magnitude + "!");

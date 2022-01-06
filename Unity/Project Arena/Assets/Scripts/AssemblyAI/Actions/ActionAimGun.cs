@@ -72,7 +72,15 @@ namespace AssemblyAI.Actions
             if (float.IsPositiveInfinity(projectileSpeed))
             {
                 angle = sightController.LookAtPoint(position);
-                if (angle < 10 && gunManager.CanCurrentGunShoot()) gunManager.ShootCurrentGun();
+                if (angle < 10 && gunManager.CanCurrentGunShoot())
+                {
+                    if (!Physics.Linecast(sightController.GetHeadPosition(), position, out var hitInfo) ||
+                        hitInfo.collider.gameObject == enemy.gameObject)
+                    {
+                        // I can directly see that point or I found an obstacle, but it's the enemy itself, so shoot!
+                        gunManager.ShootCurrentGun();
+                    }
+                }
             }
             else
             {

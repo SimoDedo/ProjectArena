@@ -5,6 +5,9 @@ using BehaviorDesigner.Runtime.Tasks;
 using UnityEngine;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
 
+// TODO If enemy cannot be seen, then choose blast weapon
+// TODO Also equip the weapon if possible
+
 namespace AssemblyAI.Behaviours.Actions
 {
     [Serializable]

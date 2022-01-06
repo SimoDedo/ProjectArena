@@ -35,7 +35,7 @@ namespace AssemblyAI.Behaviours.Actions
             Debug.Log("Entity " + gameObject.name + " will look because of damage? " + searchDueToDamage.Value);
             if (!searchDueToDamage.Value)
             {
-                delay = Time.time - knowledgeBase.GetLastKnownPositionTime();
+                delay = Time.time - knowledgeBase.GetLastSightedTime();
                 var (position, velocity) = enemyTracker.GetPositionAndVelocityFromDelay(delay);
 
                 // Try to estimate the position of the enemy after it has gone out of sight
