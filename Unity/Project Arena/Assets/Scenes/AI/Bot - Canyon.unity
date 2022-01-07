@@ -449,7 +449,7 @@ PrefabInstance:
     - target: {fileID: 114191837528411164, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
       propertyPath: infinteAmmo
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114286380553423094, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}

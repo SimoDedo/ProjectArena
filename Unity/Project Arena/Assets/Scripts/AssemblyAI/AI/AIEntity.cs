@@ -271,7 +271,7 @@ public class AIEntity : Entity, ILoggable
             // Weapon reload if needed
             // ActionWeaponReload.Perform(this);
             // Aim according to needs (aim enemy vs look around)
-            ActionAimView.Perform(this);
+            // ActionAimView.Perform(this);
             // Weapon shoot
             // ??? Done in ActionAimView?
             // Bot dodge rockets?

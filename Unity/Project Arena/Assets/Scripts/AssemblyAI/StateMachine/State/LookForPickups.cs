@@ -37,7 +37,7 @@ namespace AssemblyAI.StateMachine.State
 
         public void Enter()
         {
-            externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/PlanPickups");
+            externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/NewPickup");
             behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
             behaviorTree.StartWhenEnabled = false;
             behaviorTree.ResetValuesOnRestart = true;

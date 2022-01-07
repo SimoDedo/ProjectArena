@@ -28,27 +28,19 @@ MonoBehaviour:
         (e.g. enemy moves?). TODO! Find another cover"},"ID":3,"Name":"Sequence","Instant":true,"AbortTypeabortType":"Both","Children":[{"Type":"AssemblyAI.Behaviours.Conditions.ShouldGoToCover","NodeData":{"Offset":"(-113.225952,157.0968)","Comment":"I
         should start searching for a corner if my current weapon is soon to be running
         out of ammo but it''s still the best weapon to use given the score"},"ID":4,"Name":"Should
-        Go To Cover","Instant":true,"SharedBoolisGoingToCover":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":null,"BooleanmValue":false}},{"Type":"BehaviorDesigner.Runtime.Tasks.Repeater","NodeData":{"Offset":"(82.95703,158.448273)"},"ID":5,"Name":"Repeater","Instant":true,"SharedIntcount":{"Type":"BehaviorDesigner.Runtime.SharedInt","Name":null,"Int32mValue":0},"SharedBoolrepeatForever":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":null,"BooleanmValue":true},"SharedBoolendOnFailure":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":null,"BooleanmValue":false},"Children":[{"Type":"BehaviorDesigner.Runtime.Tasks.Sequence","NodeData":{"Offset":"(-0.3761902,110.114777)"},"ID":6,"Name":"Sequence","Instant":true,"AbortTypeabortType":"None","Children":[{"Type":"AssemblyAI.Behaviours.Actions.SelectCover","NodeData":{"Offset":"(-110,106.666534)"},"ID":7,"Name":"Select
+        Go To Cover","Instant":true,"SharedBoolisGoingToCover":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":"IsGoingForCover","IsShared":true,"BooleanmValue":false}},{"Type":"BehaviorDesigner.Runtime.Tasks.Repeater","NodeData":{"Offset":"(82.95703,158.448273)"},"ID":5,"Name":"Repeater","Instant":true,"SharedIntcount":{"Type":"BehaviorDesigner.Runtime.SharedInt","Name":null,"Int32mValue":0},"SharedBoolrepeatForever":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":null,"BooleanmValue":true},"SharedBoolendOnFailure":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":null,"BooleanmValue":false},"Children":[{"Type":"BehaviorDesigner.Runtime.Tasks.Sequence","NodeData":{"Offset":"(-0.3761902,110.114777)"},"ID":6,"Name":"Sequence","Instant":true,"AbortTypeabortType":"None","Children":[{"Type":"AssemblyAI.Behaviours.Actions.SelectCover","NodeData":{"Offset":"(-110,106.666534)"},"ID":7,"Name":"Select
         Cover","Instant":true,"SingleminCoverDistance":0,"SinglemaxCoverDistance":15,"Int32maxCoverSearchAttempts":30,"SharedSelectedPathInfopathInfo":{"Type":"AssemblyAI.Behaviours.Variables.SharedSelectedPathInfo","Name":"CoverPath","IsShared":true,"NavMeshPathmValue":{}}},{"Type":"BehaviorDesigner.Runtime.Tasks.Sequence","NodeData":{"Offset":"(130,116.666656)"},"ID":8,"Name":"Sequence","Instant":true,"AbortTypeabortType":"Self","Children":[{"Type":"AssemblyAI.Behaviours.Conditions.IsCoverStillValid","NodeData":{"Offset":"(-100,140)"},"ID":9,"Name":"Is
         Cover Still Valid","Instant":true,"SharedSelectedPathInfopathInfo":{"Type":"AssemblyAI.Behaviours.Variables.SharedSelectedPathInfo","Name":"CoverPath","IsShared":true,"NavMeshPathmValue":{}}},{"Type":"AssemblyAI.Behaviours.Actions.ApplyPathToAgent","NodeData":{"Offset":"(77.43591,140)"},"ID":10,"Name":"Apply
         Path To Agent","Instant":true,"SharedSelectedPathInfopathToApply":{"Type":"AssemblyAI.Behaviours.Variables.SharedSelectedPathInfo","Name":"CoverPath","IsShared":true,"NavMeshPathmValue":{}}}]}]}]}]},{"Type":"AssemblyAI.Behaviours.Actions.MoveDuringFight","NodeData":{"Offset":"(110,200)"},"ID":11,"Name":"Move
-        During Fight","Instant":true}]},{"Type":"BehaviorDesigner.Runtime.Tasks.Parallel","NodeData":{"Offset":"(220,170)","Comment":"Weapon
-        selection and usage branch.\nShould be extracted to external tree (weapon
-        usage branch).\n"},"ID":12,"Name":"Parallel","Instant":true,"AbortTypeabortType":"None","Children":[{"Type":"AssemblyAI.Behaviours.Actions.NewChooseWeapon","NodeData":{"Offset":"(-260,160)","Comment":"Select
-        the best weapon due to the situation and the score. \nIf I cannot see the
-        enemy, prefer blast weapons, so that I can hit it even if behind corners.\nOtherwise,
-        prefer based on the normal scoring"},"ID":13,"Name":"New Choose Weapon","Instant":true},{"Type":"AssemblyAI.Behaviours.Actions.UseChosenGun","NodeData":{"Offset":"(130,160)","Comment":"Shoot
-        at the enemy last known position (which is the enemy position if we see it,
-        it''s the enemy last position before going being corner otherwise)"},"ID":14,"Name":"Use
-        Chosen Gun","Instant":true,"Int32maxLookAheadFrames":5,"SinglelookAheadTimeStep":0.1,"SharedBoolisGoingForCover":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":null,"BooleanmValue":false}}]}]},"DetachedTasks":[{"Type":"BehaviorDesigner.Runtime.Tasks.Log","NodeData":{"Offset":"(-745.559753,401.889343)","Comment":"Add:
-        if I cannot see the enemy because I have chosen to move to cover, then reload
-        the weapon"},"ID":15,"Name":"Log","Instant":true,"SharedStringtext":{"Type":"BehaviorDesigner.Runtime.SharedString","Name":null,"StringmValue":""},"SharedBoollogError":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":null,"BooleanmValue":false},"SharedBoollogTime":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":null,"BooleanmValue":false}}],"Variables":[{"Type":"AssemblyAI.Behaviours.Variables.SharedSelectedPathInfo","Name":"CoverPath","IsShared":true,"NavMeshPathmValue":{}}]}'
+        During Fight","Instant":true}]},{"Type":"BehaviorDesigner.Runtime.Tasks.BehaviorTreeReference","NodeData":{"Offset":"(142.819046,173.672974)"},"ID":12,"Name":"Behavior
+        Tree Reference","Instant":true,"ExternalBehavior[]externalBehaviors":[0],"SharedNamedVariable[]variables":[{"Type":"BehaviorDesigner.Runtime.SharedNamedVariable","Name":null,"NamedVariablemValue":{"Stringname":"IsGoingForCover","Stringtype":"SharedBool","SharedVariablevalue":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":"IsGoingForCover","IsShared":true,"BooleanmValue":false}}}],"Booleancollapsed":false}]},"Variables":[{"Type":"AssemblyAI.Behaviours.Variables.SharedSelectedPathInfo","Name":"CoverPath","IsShared":true,"NavMeshPathmValue":{}},{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":"IsGoingForCover","IsShared":true,"BooleanmValue":false}]}'
       fieldSerializationData:
         typeName: []
         fieldNameHash: 
         startIndex: 
         dataPosition: 
-        unityObjects: []
+        unityObjects:
+        - {fileID: 11400000, guid: cf1ac1aa34bc9a390a39cd6ecaeb3dec, type: 2}
         byteData: 
         byteDataArray: 
       Version: 1.6.8

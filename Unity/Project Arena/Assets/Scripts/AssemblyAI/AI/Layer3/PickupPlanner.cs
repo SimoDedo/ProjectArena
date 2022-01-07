@@ -55,12 +55,13 @@ namespace AssemblyAI.AI.Layer3
 
             foreach (var entry in pickables)
             {
+                // TODO Find nice way to estimate score
                 var (value, time) = ScorePickup(pickables, entry.Key, out var pickupPath);
                 if (value == 0) continue;
-                var velocity = value / time;
+                var velocity = Mathf.Pow(value / time, 2f);
                 if (velocity > bestPickupVelocity || Math.Abs(velocity - bestPickupVelocity) < 0.05 && time < bestPickupTime)
                 {
-                    bestPickupScore = Mathf.Min(1f, value / time / 10);
+                    bestPickupScore = Mathf.Min(1f, value / time / 5);
                     bestPickupVelocity = velocity;
                     bestPickupTime = time;
                     bestPickup = entry.Key;

@@ -128,9 +128,6 @@ namespace AI.KnowledgeBase
             }
 
             ForgetOldData();
-            
-            Debug.LogWarning("Entity " + me.name + " has spotted: " + HasSeenTarget() + " , has lost: " + HasLostTarget());
-            
         }
 
         public void ApplyFocus(float timeout = FOCUSED_DEFAULT_TIMEOUT)
