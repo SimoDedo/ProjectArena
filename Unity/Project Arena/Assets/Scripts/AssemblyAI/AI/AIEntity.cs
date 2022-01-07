@@ -235,6 +235,10 @@ public class AIEntity : Entity, ILoggable
             }
         );
         gameManagerScript.AddScore(id, entityID);
+        
+        TargetKb.Reset();
+        DamageSensor.Reset();
+
         SetInGame(false);
         // Start the respawn process.
         gameManagerScript.ManageEntityDeath(gameObject, this);

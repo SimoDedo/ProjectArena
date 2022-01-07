@@ -130,6 +130,11 @@ namespace AI.KnowledgeBase
             ForgetOldData();
         }
 
+        public void Reset()
+        {
+            results.Clear();
+        }
+
         public void ApplyFocus(float timeout = FOCUSED_DEFAULT_TIMEOUT)
         {
             isFocused = true;

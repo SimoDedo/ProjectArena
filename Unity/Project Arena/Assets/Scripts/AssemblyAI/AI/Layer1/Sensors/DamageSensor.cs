@@ -15,6 +15,11 @@ namespace AssemblyAI.AI.Layer1.Sensors
             LastTimeDamaged = Time.time;
         }
 
+        public void Reset()
+        {
+            LastTimeDamaged = float.MinValue;
+        }
+        
         private float LastTimeDamaged { get; set; } = float.MinValue;
 
         public bool WasDamagedRecently => LastTimeDamaged + recentDamageTimeout >= Time.time;

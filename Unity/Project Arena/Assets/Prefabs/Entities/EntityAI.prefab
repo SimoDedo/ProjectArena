@@ -593,6 +593,7 @@ MonoBehaviour:
     curiosity: 0
     predictionSkill: 0
     aimingSkill: 0
+    recentDamageTimeout: 0
   botState:
     health: 0
     lookAroundIsFocused: 0
