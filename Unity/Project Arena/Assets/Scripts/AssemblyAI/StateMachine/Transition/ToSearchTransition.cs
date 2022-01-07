@@ -5,19 +5,21 @@ namespace AssemblyAI.StateMachine.Transition
     public class ToSearchTransition : ITransition
     {
         private readonly SearchEnemy search;
+        private readonly bool searchDueToDamage;
         public ToSearchTransition(AIEntity entity)
         {
             search = new SearchEnemy(entity);
         }
 
-        public ToSearchTransition(SearchEnemy search)
+        public ToSearchTransition(SearchEnemy search, bool searchDueToDamage)
         {
             this.search = search;
+            this.searchDueToDamage = searchDueToDamage;
         }
 
         public float GetScore()
         {
-            return search.LostEnemyTransitionScore();
+            return searchDueToDamage ? search.DamagedTransitionScore() : search.LostEnemyTransitionScore();
         }
 
         public IState GetNextState()

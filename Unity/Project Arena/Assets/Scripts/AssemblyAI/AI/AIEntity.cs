@@ -56,6 +56,9 @@ public struct BotCharacteristics
     [SerializeField] [Range(0f, 1f)] public float predictionSkill;
     [SerializeField] [Range(0f, 1f)] public float aimingSkill;
 
+    // For how long the entity remains wary after receiving damage
+    [SerializeField] public float recentDamageTimeout;
+
     public static BotCharacteristics Default =>
         new BotCharacteristics
         {
@@ -70,7 +73,8 @@ public struct BotCharacteristics
             timeBeforeCanReact = 0.2f,
             movementSkill = FightingMovementSkill.CircleStrife,
             predictionSkill = 0.5f,
-            speed = 16
+            speed = 16,
+            recentDamageTimeout = 0.5f,
         };
 }
 
@@ -120,6 +124,8 @@ public class AIEntity : Entity, ILoggable
 
     public TargetKnowledgeBase TargetKb { get; private set; }
 
+    public DamageSensor DamageSensor { get; private set; }
+
     public AIMovementController MovementController { get; private set; }
     public AISightSensor SightSensor { get; private set; }
 
@@ -141,6 +147,7 @@ public class AIEntity : Entity, ILoggable
         SightController = new AISightController(this, head, botParams.maxCameraSpeed, botParams.maxCameraAcceleration);
         SightSensor = new AISightSensor(head, botParams.maxRange, botParams.fov);
         TargetKb = new TargetKnowledgeBase(this, enemy, botParams.memoryWindow, botParams.detectionWindow, botParams.timeBeforeCanReact);
+        DamageSensor = new DamageSensor(botParams.recentDamageTimeout);
         PickupKnowledgeBase = new PickupKnowledgeBase(this);
         NavigationSystem = new NavigationSystem(this, botParams.speed);
         GunManager = new GunManager(this);
@@ -175,16 +182,12 @@ public class AIEntity : Entity, ILoggable
             new SpawnInfo {x = position.x, z = position.z, entityId = entityID, spawnEntity = gameObject.name}
         );
     }
-
-    private float lastDamageTime = float.MinValue;
-
     public override void TakeDamage(int damage, int killerID)
     {
         if (inGame)
         {
             Debug.Log("Entity " + gameObject.name + " has taken damage!");
             Health -= damage;
-            lastDamageTime = Time.time;
             var position = transform.position;
             HitInfoGameEvent.Instance.Raise(
                 new HitInfo
@@ -203,6 +206,7 @@ public class AIEntity : Entity, ILoggable
                 // We just got damaged and it was not self-inflicted, we might need to search the enemy with more
                 // care.
                 TargetKb.ApplyFocus();
+                DamageSensor.GotDamaged();
             }
 
             // If the health goes under 0, kill the entity and start the respawn process.
@@ -326,12 +330,7 @@ public class AIEntity : Entity, ILoggable
     {
         loggingGame = true;
     }
-
-    public bool HasTakenDamageRecently()
-    {
-        return Time.time - lastDamageTime < 0.2f;
-    }
-
+    
     public FightingMovementSkill MovementSkill => botParams.movementSkill;
 
     public CuriosityLevel GetCuriosity()

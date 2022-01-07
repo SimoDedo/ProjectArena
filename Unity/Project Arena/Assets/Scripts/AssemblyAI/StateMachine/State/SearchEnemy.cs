@@ -1,4 +1,5 @@
 using AI.KnowledgeBase;
+using AssemblyAI.AI.Layer1.Sensors;
 using AssemblyAI.StateMachine.Transition;
 using BehaviorDesigner.Runtime;
 using UnityEngine;
@@ -10,6 +11,7 @@ namespace AssemblyAI.StateMachine.State
         private const float NO_TIME = -1;
         private readonly AIEntity entity;
         private readonly TargetKnowledgeBase targetKb;
+        private readonly DamageSensor damageSensor;
         private readonly bool searchDueToDamage;
         private ExternalBehaviorTree externalBt;
         private BehaviorTree behaviorTree;
@@ -20,6 +22,7 @@ namespace AssemblyAI.StateMachine.State
         {
             this.entity = entity;
             targetKb = entity.TargetKb;
+            damageSensor = entity.DamageSensor;
             this.searchDueToDamage = searchDueToDamage;
         }
 
@@ -39,7 +42,7 @@ namespace AssemblyAI.StateMachine.State
 
         public float DamagedTransitionScore()
         {
-            if (entity.GetEnemy().isAlive && entity.HasTakenDamageRecently())
+            if (entity.GetEnemy().isAlive && damageSensor.WasDamagedRecently)
             {
                 return 0.7f;
             }
@@ -61,7 +64,8 @@ namespace AssemblyAI.StateMachine.State
             
             OutgoingTransitions = new ITransition[]
             {
-                new ToSearchTransition(this), // Self-loop
+                new ToSearchTransition(this, true), // Self-loop
+                new ToSearchTransition(this, false), // Self-loop
                 new ToWanderTransition(entity),
                 new ToPickupTransition(entity),
                 new OnEnemyInSightTransition(entity)
