@@ -1,4 +1,6 @@
+using Others;
 using UnityEngine;
+using Utils;
 
 namespace AI.Actions
 {
@@ -86,6 +88,7 @@ namespace AI.Actions
             return projectileToDodge;
         }
 
+        // TODO Improve missile dodging logic?
         private static void CalculateDodgePosition(AIEntity entity, Projectile rocketToDodge)
         {
             var transform = entity.transform;
@@ -105,14 +108,21 @@ namespace AI.Actions
             // Try to strife in direction that increases this angle
             var avoidDirection = Vector3.Cross(up, myDirection).normalized;
             if (angle > 0f) avoidDirection = -avoidDirection;
-            Debug.DrawLine(
-                transform.position,
-                transform.position + avoidDirection * navSystem.Speed,
-                Color.cyan,
-                0f,
-                true
-            );
-            navSystem.SetDestination(transform.position + avoidDirection);
+            // Debug.DrawLine(
+            //     transform.position,
+            //     transform.position + avoidDirection * navSystem.Speed,
+            //     Color.cyan,
+            //     0f,
+            //     true
+            // );
+            var path = navSystem.CalculatePath(transform.position + avoidDirection);
+            if (path.IsComplete())
+            {
+                navSystem.SetPathToDestination(path);
+            }
+
+            // path.status
+            // navSystem.SetDestination(transform.position + avoidDirection);
         }
     }
 }

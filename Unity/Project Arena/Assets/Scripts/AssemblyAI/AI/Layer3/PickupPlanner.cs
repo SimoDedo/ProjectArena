@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AI.KnowledgeBase;
 using AssemblyAI.AI.Layer2;
 using AssemblyEntity.Component;
+using Others;
 using UnityEngine;
 using UnityEngine.AI;
 using Utils;

@@ -3,6 +3,7 @@ using System.Linq;
 using AssemblyAI.AI.Layer2;
 using AssemblyEntity.Component;
 using BehaviorDesigner.Runtime.Tasks;
+using Others;
 using UnityEngine;
 using UnityEngine.AI;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
@@ -164,10 +165,12 @@ namespace AssemblyAI.Behaviours.Actions
                         || finalPosVisibility.collider.gameObject == target.gameObject)
                     {
                         // Can see enemy from here, found new position!
-                        destination = newPos;
-                        if (navSystem.SetDestination(newPos))
+
+                        var path = navSystem.CalculatePath(newPos);
+                        if (path.IsComplete())
                         {
-                            // Destination is valid!                                
+                            destination = newPos;
+                            navSystem.SetPathToDestination(path);
                             return;
                         }
                     }

@@ -1,7 +1,9 @@
+using System;
 using System.Linq;
 using AssemblyAI.AI.Layer1.Actuator;
 using BehaviorDesigner.Runtime.Tasks;
 using JetBrains.Annotations;
+using Others;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -128,18 +130,19 @@ namespace AssemblyAI.AI.Layer2
         /// Use this to set a destination to the navigation system.
         /// If this method is called multiple times during a frame, only the last call counts to
         /// determine the destination of the agent path.
-        /// <returns>True if the destination can be reached, false otherwise</returns>
+        /// If the destination is not reachable, this method throws an exception!
         /// </summary>
-        [MustUseReturnValue("Check that the destination provided can be reached!")]
-        public bool SetDestination(Vector3 destination)
+        public void SetDestination(Vector3 destination)
         {
-            if (destination == latestDestination) return latestDestinationPath.status == NavMeshPathStatus.PathComplete;
-
+            if (destination == latestDestination) return;
+            
             var path = CalculatePath(destination);
-            if (path.status != NavMeshPathStatus.PathComplete) return false;
+            if (!path.IsComplete())
+            {
+                throw new ArgumentException("Destination is not reachable!");
+            }
             latestDestination = destination;
             latestDestinationPath = path;
-            return true;
         }
 
         public void SetEnabled(bool b)
