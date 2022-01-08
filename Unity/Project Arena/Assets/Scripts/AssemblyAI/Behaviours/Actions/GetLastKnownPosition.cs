@@ -1,8 +1,10 @@
 using System;
 using AI.KnowledgeBase;
 using AssemblyAI.AI.Layer2;
+using AssemblyAI.Behaviours.Variables;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
+using Others;
 using UnityEngine;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
 using Random = UnityEngine.Random;
@@ -12,15 +14,13 @@ namespace AssemblyAI.Behaviours.Actions
     [Serializable]
     public class GetLastKnownPosition : Action
     {
-        [SerializeField] private SharedVector3 lastKnownPosition;
+        [SerializeField] private SharedSelectedPathInfo lastKnownPositionPath;
         [SerializeField] private SharedBool searchDueToDamage;
         private AIEntity entity;
         private Entity enemy;
         private PositionTracker enemyTracker;
         private TargetKnowledgeBase knowledgeBase;
         private NavigationSystem navSystem;
-
-        private const float RANDOM_DISPLACEMENT_SIZE = 10f;
 
         public override void OnAwake()
         {
@@ -45,14 +45,18 @@ namespace AssemblyAI.Behaviours.Actions
 
             // Try to estimate the position of the enemy after it has gone out of sight
             var estimatedPosition = position + velocity * 0.1f;
-            if (navSystem.IsPointOnNavMesh(estimatedPosition, out var point))
+
+            var pathToEstimatedPos = navSystem.CalculatePath(estimatedPosition);
+            if (pathToEstimatedPos.IsComplete())
             {
-                lastKnownPosition.Value = estimatedPosition;
+                lastKnownPositionPath.Value = pathToEstimatedPos;
                 return TaskStatus.Success;
+                
             }
 
             // Point wasn't valid, perhaps estimated position was OOB, use position
-            lastKnownPosition.Value = estimatedPosition;
+            var pathToPosition = navSystem.CalculatePath(position);
+            lastKnownPositionPath.Value = pathToPosition;
             return TaskStatus.Success;
         }
 
@@ -79,10 +83,17 @@ namespace AssemblyAI.Behaviours.Actions
                 chosenPos.x += circle.x;
                 chosenPos.z += circle.y;
 
-                lastKnownPosition.Value = chosenPos;
+                var path = navSystem.CalculatePath(chosenPos);
+                if (path.IsComplete())
+                {
+                    lastKnownPositionPath.Value = path;
+                    return TaskStatus.Success;
+                }
+                // The position chosen is not valid... choose the point we have hit?
+                var path2 = navSystem.CalculatePath(hit.point);
+                lastKnownPositionPath.Value = path2;
                 return TaskStatus.Success;
             }
-
             // How come we haven't spotted anything in the enemy direction? Not even the enemy? Impossible!
             throw new ApplicationException("We couldn't spot the enemy even when raycasting towards it!");
         }

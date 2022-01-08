@@ -156,5 +156,11 @@ namespace AssemblyAI.AI.Layer2
             IsPointOnNavMesh(pathDestination, out var floor2);
             return (floor1 - floor2).magnitude < 0.5f;
         }
+
+        public float EstimatePathDuration(NavMeshPath path)
+        {
+            // Be a little pessimistic on arrival time.
+            return path.Length() / Speed * 1.1f;
+        }
     }
 }

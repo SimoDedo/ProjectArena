@@ -851,42 +851,12 @@ PrefabInstance:
     - target: {fileID: 459336622430151955, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
         type: 3}
       propertyPath: seed
-      value: 5feef
+      value: Step
       objectReference: {fileID: 0}
     - target: {fileID: 459336622430151955, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
         type: 3}
-      propertyPath: width
-      value: 300
-      objectReference: {fileID: 0}
-    - target: {fileID: 459336622430151955, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
-        type: 3}
-      propertyPath: height
-      value: 300
-      objectReference: {fileID: 0}
-    - target: {fileID: 459336622430151955, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
-        type: 3}
-      propertyPath: maxRoomWidth
-      value: 45
-      objectReference: {fileID: 0}
-    - target: {fileID: 459336622430151955, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
-        type: 3}
-      propertyPath: minRoomWidth
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 459336622430151955, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
-        type: 3}
-      propertyPath: maxRoomHeight
-      value: 45
-      objectReference: {fileID: 0}
-    - target: {fileID: 459336622430151955, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
-        type: 3}
-      propertyPath: minRoomHeight
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 459336622430151955, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
-        type: 3}
-      propertyPath: maxCorridorThickness
-      value: 15
+      propertyPath: useRandomSeed
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 561011864743673710, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
         type: 3}
