@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using AI.KnowledgeBase;
+using AssemblyAI.AI.Layer1.Actuator;
+using AssemblyAI.AI.Layer1.Sensors;
 using AssemblyAI.AI.Layer2;
 using AssemblyEntity.Component;
 using UnityEngine;
@@ -14,6 +16,7 @@ namespace AssemblyAI.AI.Layer3
         private PickupKnowledgeBase knowledgeBase;
         private NavigationSystem navSystem;
         private GunManager gunManager;
+        private AISightSensor sightSensor;
         private Pickable chosenPickup;
 
         private static readonly AnimationCurve TimeValueCurve = new AnimationCurve(
@@ -35,6 +38,7 @@ namespace AssemblyAI.AI.Layer3
             navSystem = me.NavigationSystem;
             knowledgeBase = me.PickupKnowledgeBase;
             gunManager = me.GunManager;
+            sightSensor = me.SightSensor;
         }
 
         public Pickable ScorePickups(out NavMeshPath path, out float bestPickupScore, out float activationTime)
@@ -94,7 +98,16 @@ namespace AssemblyAI.AI.Layer3
             else
             {
                 totalTime = pathTime;
-                timeUncertainty = estimatedArrival - activationTime;
+                if (sightSensor.CanSeeObject(pickup.transform, Physics.AllLayers)) // Use all layers since the crates are in ignore layer
+                {
+                    // I can see the object for now, so there is no uncertainty, the object is there!
+                    timeUncertainty = 0;
+                }
+                else
+                {
+                    // In this amount of time the pickup can be potentially be taken by someone before me
+                    timeUncertainty = estimatedArrival - activationTime;
+                }
             }
             
             var timeMultiplier = ScoreTimeToCollect(totalTime);
