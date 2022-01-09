@@ -274,15 +274,7 @@ public class AIEntity : Entity, ILoggable
             PickupKnowledgeBase.Update();
             stateMachine.Update();
 
-            // Weapon select (if no enemy, choose weapon to reload)
-            // ActionSelectWeapon.Perform(this);
-            // Weapon reload if needed
-            // ActionWeaponReload.Perform(this);
-            // Aim according to needs (aim enemy vs look around)
-            // ActionAimView.Perform(this);
-            // Weapon shoot
-            // ??? Done in ActionAimView?
-            // Bot dodge rockets?
+            // Bot dodge rockets
             ActionDodgeRockets.Perform(this);
 
             // Bot move
