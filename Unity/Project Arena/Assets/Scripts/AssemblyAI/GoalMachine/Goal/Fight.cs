@@ -24,7 +24,6 @@ namespace AssemblyAI.GoalMachine.Goal
             behaviorTree.StartWhenEnabled = false;
             behaviorTree.RestartWhenComplete = true;
             behaviorTree.ExternalBehavior = externalBt;
-            behaviorTree.EnableBehavior();
         }
 
         public float GetScore()
@@ -40,6 +39,7 @@ namespace AssemblyAI.GoalMachine.Goal
         public void Enter()
         {
             behaviorTree.EnableBehavior();
+            BehaviorManager.instance.RestartBehavior(behaviorTree);
         }
 
         public void Update()

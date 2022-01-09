@@ -9,7 +9,6 @@ using AssemblyAI.AI.Layer3;
 using AssemblyAI.GoalMachine;
 using AssemblyEntity.Component;
 using AssemblyLogging;
-using BehaviorDesigner.Runtime;
 using BotSpace;
 using JetBrains.Annotations;
 using UnityEngine;

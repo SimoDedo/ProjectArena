@@ -1,4 +1,5 @@
 using AssemblyAI.GoalMachine.Goal;
+using BehaviorDesigner.Runtime;
 
 namespace AssemblyAI.GoalMachine
 {
@@ -11,6 +12,8 @@ namespace AssemblyAI.GoalMachine
 
         public EntityGoalMachine(AIEntity entity)
         {
+            Behavior.CreateBehaviorManager();
+            BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
             goals = new IGoal[]
             {
                 new Wander(entity), new Fight(entity), new SearchEnemy(entity), new LookForPickups(entity)

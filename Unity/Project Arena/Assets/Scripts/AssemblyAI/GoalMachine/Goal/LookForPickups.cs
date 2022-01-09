@@ -2,7 +2,6 @@ using AssemblyAI.AI.Layer3;
 using AssemblyAI.Behaviours.Variables;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
-using Others;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -10,7 +9,6 @@ namespace AssemblyAI.GoalMachine.Goal
 {
     public class LookForPickups : IGoal
     {
-        private readonly AIEntity entity;
         private readonly ExternalBehaviorTree externalBt;
         private readonly BehaviorTree behaviorTree;
         private readonly PickupPlanner pickupPlanner;
@@ -21,14 +19,12 @@ namespace AssemblyAI.GoalMachine.Goal
 
         public LookForPickups(AIEntity entity)
         {
-            this.entity = entity;
             pickupPlanner = entity.PickupPlanner;
             externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/NewPickup");
             behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
             behaviorTree.StartWhenEnabled = false;
             behaviorTree.ResetValuesOnRestart = true;
             behaviorTree.ExternalBehavior = externalBt;
-            BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
         }
 
         public float GetScore()
@@ -43,6 +39,7 @@ namespace AssemblyAI.GoalMachine.Goal
         public void Enter()
         {
             behaviorTree.EnableBehavior();
+            BehaviorManager.instance.RestartBehavior(behaviorTree);
             currentPickable = null;
         }
 
@@ -76,7 +73,6 @@ namespace AssemblyAI.GoalMachine.Goal
 
         public void Exit()
         {
-            Object.Destroy(behaviorTree);
             behaviorTree.DisableBehavior();
         }
     }

@@ -25,8 +25,6 @@ namespace AssemblyAI.GoalMachine.Goal
             behaviorTree.StartWhenEnabled = false;
             behaviorTree.RestartWhenComplete = true;
             behaviorTree.ExternalBehavior = externalBt;
-            behaviorTree.EnableBehavior();
-            BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
 
         }
 
@@ -49,6 +47,7 @@ namespace AssemblyAI.GoalMachine.Goal
         public void Enter()
         {
             behaviorTree.EnableBehavior();
+            BehaviorManager.instance.RestartBehavior(behaviorTree);
             startSearchTime = Time.time;
         }
 
