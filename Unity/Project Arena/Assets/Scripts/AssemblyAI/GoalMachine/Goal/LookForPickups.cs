@@ -1,32 +1,37 @@
 using AssemblyAI.AI.Layer3;
 using AssemblyAI.Behaviours.Variables;
-using AssemblyAI.StateMachine.Transition;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
+using Others;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace AssemblyAI.StateMachine.State
+namespace AssemblyAI.GoalMachine.Goal
 {
-    public class LookForPickups : IState
+    public class LookForPickups : IGoal
     {
         private readonly AIEntity entity;
-        private ExternalBehaviorTree externalBt;
-        private BehaviorTree behaviorTree;
+        private readonly ExternalBehaviorTree externalBt;
+        private readonly BehaviorTree behaviorTree;
         private readonly PickupPlanner pickupPlanner;
         private Pickable currentPickable;
         private Pickable nextPickable;
         private float nextPickableActivationTime;
         private NavMeshPath newPath;
-        public ITransition[] OutgoingTransitions { get; private set; }
 
         public LookForPickups(AIEntity entity)
         {
             this.entity = entity;
             pickupPlanner = entity.PickupPlanner;
+            externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/NewPickup");
+            behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
+            behaviorTree.StartWhenEnabled = false;
+            behaviorTree.ResetValuesOnRestart = true;
+            behaviorTree.ExternalBehavior = externalBt;
+            BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
         }
 
-        public float CalculateTransitionScore()
+        public float GetScore()
         {
             nextPickable = pickupPlanner.ScorePickups(out var path, out var score, out var activationTime);
             newPath = path;
@@ -37,21 +42,8 @@ namespace AssemblyAI.StateMachine.State
 
         public void Enter()
         {
-            externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/NewPickup");
-            behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
-            behaviorTree.StartWhenEnabled = false;
-            behaviorTree.ResetValuesOnRestart = true;
-            behaviorTree.ExternalBehavior = externalBt;
             behaviorTree.EnableBehavior();
-            BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
-            
-            OutgoingTransitions = new ITransition[]
-            {
-                new ToPickupTransition(this), // Self-loop
-                new OnEnemyInSightTransition(entity),
-                new ToWanderTransition(entity),
-                new OnDamagedTransition(entity),
-            };
+            currentPickable = null;
         }
 
         public void Update()
@@ -73,8 +65,9 @@ namespace AssemblyAI.StateMachine.State
 
                 currentPickable = nextPickable;
             }
-
+            
             BehaviorManager.instance.Tick(behaviorTree);
+            
             if (behaviorTree.ExecutionStatus == TaskStatus.Failure)
             {
                 Debug.LogError("What happened?");
@@ -83,8 +76,8 @@ namespace AssemblyAI.StateMachine.State
 
         public void Exit()
         {
-            Resources.UnloadAsset(externalBt);
             Object.Destroy(behaviorTree);
+            behaviorTree.DisableBehavior();
         }
     }
 }

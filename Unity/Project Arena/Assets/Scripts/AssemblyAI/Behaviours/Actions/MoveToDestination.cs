@@ -25,7 +25,6 @@ namespace AssemblyAI.Behaviours.Actions
 
         public override TaskStatus OnUpdate()
         {
-            Debug.DrawLine(transform.position, destination.Value, Color.green);
             if (navSystem.HasArrivedToDestination(destination.Value))
                 return TaskStatus.Success;
 

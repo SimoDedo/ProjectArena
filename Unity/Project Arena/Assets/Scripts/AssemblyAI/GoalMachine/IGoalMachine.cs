@@ -1,6 +1,6 @@
-namespace AssemblyAI.StateMachine
+namespace AssemblyAI.GoalMachine
 {
-    public interface IStateMachine
+    public interface IGoalMachine
     {
         void Update();
         void SetIsIdle(bool idle = true);

@@ -6,7 +6,7 @@ using AssemblyAI.AI.Layer1.Actuator;
 using AssemblyAI.AI.Layer1.Sensors;
 using AssemblyAI.AI.Layer2;
 using AssemblyAI.AI.Layer3;
-using AssemblyAI.StateMachine;
+using AssemblyAI.GoalMachine;
 using AssemblyEntity.Component;
 using AssemblyLogging;
 using BehaviorDesigner.Runtime;
@@ -139,7 +139,7 @@ public class AIEntity : Entity, ILoggable
 
     public GunManager GunManager { get; private set; }
 
-    private IStateMachine stateMachine;
+    private IGoalMachine goalMachine;
 
     private void PrepareComponents(GameManager gms, bool[] ag)
     {
@@ -152,7 +152,7 @@ public class AIEntity : Entity, ILoggable
         NavigationSystem = new NavigationSystem(this, botParams.speed);
         GunManager = new GunManager(this);
         PickupPlanner = new PickupPlanner(this);
-        stateMachine = new EntityStateMachine(this);
+        goalMachine = new EntityGoalMachine(this);
         BotState = new BotState();
 
         GunManager.Prepare(gms, this, null, ag);
@@ -186,7 +186,6 @@ public class AIEntity : Entity, ILoggable
     {
         if (inGame)
         {
-            Debug.Log("Entity " + gameObject.name + " has taken damage!");
             Health -= damage;
             var position = transform.position;
             HitInfoGameEvent.Instance.Raise(
@@ -272,7 +271,7 @@ public class AIEntity : Entity, ILoggable
         {
             TargetKb.Update();
             PickupKnowledgeBase.Update();
-            stateMachine.Update();
+            goalMachine.Update();
 
             // Bot dodge rockets
             ActionDodgeRockets.Perform(this);
@@ -315,7 +314,7 @@ public class AIEntity : Entity, ILoggable
 
     public override void SetInGame(bool b)
     {
-        stateMachine.SetIsIdle(!b);
+        goalMachine.SetIsIdle(!b);
         NavigationSystem.SetEnabled(b);
         GetComponent<CapsuleCollider>().enabled = b;
         MeshVisibility.SetMeshVisible(transform, b);

@@ -1,0 +1,41 @@
+using BehaviorDesigner.Runtime;
+using UnityEngine;
+
+namespace AssemblyAI.GoalMachine.Goal
+{
+    public class Wander : IGoal
+    {
+        private readonly ExternalBehaviorTree externalBt;
+        private readonly BehaviorTree behaviorTree;
+        
+        public Wander(AIEntity entity)
+        {
+            externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/Wander");
+            behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
+            behaviorTree.StartWhenEnabled = false;
+            behaviorTree.RestartWhenComplete = true;
+            behaviorTree.ExternalBehavior = externalBt;
+            BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
+        }
+
+        public float GetScore()
+        {
+            return 0.1f;
+        }
+
+        public void Enter()
+        {
+            behaviorTree.EnableBehavior();
+        }
+
+        public void Update()
+        {
+            BehaviorManager.instance.Tick(behaviorTree);
+        }
+
+        public void Exit()
+        {
+            behaviorTree.DisableBehavior();
+        }
+    }
+}

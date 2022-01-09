@@ -43,13 +43,11 @@ namespace AssemblyAI.Behaviours.Actions
             var result = false;
             if (nextUnrestrictedTravelTime < Time.time)
             {
-                Debug.Log("Will now select long path!");
                 result = SelectLongWanderDestination();
             }
 
             if (result)
             {
-                Debug.Log("Long path valid destination found!");
                 // We got a valid destination! Apply cooldown
                 nextUnrestrictedTravelTime = Time.time + navSystem.EstimatePathDuration(pathChosen.Value) +
                     UNRESTRICTED_TRAVEL_COOLDOWN;
@@ -72,9 +70,7 @@ namespace AssemblyAI.Behaviours.Actions
                 var chosenDestination = currentPos;
                 chosenDestination.x += displacement.x;
                 chosenDestination.z += displacement.y;
-
-                Debug.DrawLine(transform.position, chosenDestination, Color.blue, 3f, false);
-
+                
                 var path = navSystem.CalculatePath(chosenDestination);
                 if (path.IsComplete())
                 {
@@ -111,17 +107,13 @@ namespace AssemblyAI.Behaviours.Actions
                     var penultimatePoint = corners.Length < 2 ? transform.position : corners[corners.Length - 2];
 
                     var forwardDirectionAtArrival = (onGroundDestination - penultimatePoint).normalized;
-
-                    Debug.DrawLine(penultimatePoint, onGroundDestination, Color.blue, 2f, false);
-
+                    
                     for (var i = -4; i <= 4; i++)
                     {
                         var angle = i * 90f / 4;
 
                         var currentLookDirection = Quaternion.AngleAxis(angle, Vector3.up) * forwardDirectionAtArrival;
-
-                        Debug.DrawRay(onGroundDestination, currentLookDirection * LOOK_AHEAD, Color.blue, 2f, false);
-
+                        
                         if (!Physics.Raycast(onGroundDestination, currentLookDirection, LOOK_AHEAD))
                         {
                             validPointsFound++;

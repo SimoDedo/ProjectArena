@@ -108,13 +108,13 @@ namespace AI.Actions
             // Try to strife in direction that increases this angle
             var avoidDirection = Vector3.Cross(up, myDirection).normalized;
             if (angle > 0f) avoidDirection = -avoidDirection;
-            // Debug.DrawLine(
-            //     transform.position,
-            //     transform.position + avoidDirection * navSystem.Speed,
-            //     Color.cyan,
-            //     0f,
-            //     true
-            // );
+            Debug.DrawLine(
+                transform.position,
+                transform.position + avoidDirection * navSystem.Speed,
+                Color.cyan,
+                0f,
+                true
+            );
             var path = navSystem.CalculatePath(transform.position + avoidDirection);
             if (path.IsComplete())
             {

@@ -127,7 +127,6 @@ namespace AssemblyAI.Behaviours.Actions
 
                 var totalMovement = movementDirectionDueToStrife + movementDirectionDueToGun * 3f;
                 var newPos = currentPos + totalMovement;
-                Debug.DrawLine(newPos, targetPos, Color.blue);
 
                 if (!Physics.Linecast(newPos, targetPos, out var hit) ||
                     hit.collider.gameObject == target.gameObject)

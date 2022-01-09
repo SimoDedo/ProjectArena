@@ -426,6 +426,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114718352753251754, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: infinteAmmo
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 900814110758346002, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
       propertyPath: m_IsActive
@@ -666,6 +671,11 @@ PrefabInstance:
       propertyPath: infinteAmmo
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114718352753251754, guid: 87c5267e1886311258a6f48dac81a1ca,
+        type: 3}
+      propertyPath: infinteAmmo
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3597659384659854098, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
       propertyPath: enemy
@@ -862,12 +872,12 @@ PrefabInstance:
         type: 3}
       propertyPath: textFilePath
       value: /home/jimbo/Documents/dev/Unity/Projects/ProjectArena-New/ProjectArena/Unity/Project
-        Arena/Assets/Maps/Experiment 1/ai_fight.txt
+        Arena/Assets/Maps/Experiment 1/ai_rockets.txt
       objectReference: {fileID: 0}
     - target: {fileID: 561011864743673710, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
         type: 3}
       propertyPath: loadMapFromFile
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b0fb2683cafdfe0ec88bf193abc9cb18, type: 3}
@@ -941,12 +951,12 @@ PrefabInstance:
     - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
         type: 3}
       propertyPath: activeGunsPlayer.Array.data[0]
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
         type: 3}
       propertyPath: activeGunsPlayer.Array.data[1]
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
         type: 3}
@@ -956,17 +966,17 @@ PrefabInstance:
     - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
         type: 3}
       propertyPath: activeGunsPlayer.Array.data[3]
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
         type: 3}
       propertyPath: activeGunsOpponent.Array.data[0]
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
         type: 3}
       propertyPath: activeGunsOpponent.Array.data[1]
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
         type: 3}
@@ -976,7 +986,7 @@ PrefabInstance:
     - target: {fileID: 5412675617600987587, guid: 4069fbb7d0b30823582f7d0379d72dfb,
         type: 3}
       propertyPath: activeGunsOpponent.Array.data[3]
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8593336210271020112, guid: 4069fbb7d0b30823582f7d0379d72dfb,
         type: 3}

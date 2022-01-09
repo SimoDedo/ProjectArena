@@ -77,8 +77,8 @@ public class DuelGameManager : GameManager {
     // Updates the phase of the game.
     protected override void UpdateGamePhase() {
         int passedTime = (int)(Time.time - startTime);
-
-        Debug.Log("Passed time: " + passedTime);
+        
+        // Debug.Log("Passed time: " + passedTime);
         
         if (gamePhase == -1) {
             // Disable the contenders movement and interactions, activate the ready UI, set the 

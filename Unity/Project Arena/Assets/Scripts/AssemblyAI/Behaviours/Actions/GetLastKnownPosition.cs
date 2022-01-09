@@ -1,8 +1,8 @@
 using System;
 using AI.KnowledgeBase;
+using AssemblyAI.AI.Layer1.Sensors;
 using AssemblyAI.AI.Layer2;
 using AssemblyAI.Behaviours.Variables;
-using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
 using Others;
 using UnityEngine;
@@ -15,12 +15,12 @@ namespace AssemblyAI.Behaviours.Actions
     public class GetLastKnownPosition : Action
     {
         [SerializeField] private SharedSelectedPathInfo lastKnownPositionPath;
-        [SerializeField] private SharedBool searchDueToDamage;
         private AIEntity entity;
         private Entity enemy;
         private PositionTracker enemyTracker;
         private TargetKnowledgeBase knowledgeBase;
         private NavigationSystem navSystem;
+        private DamageSensor damageSensor;
 
         public override void OnAwake()
         {
@@ -28,14 +28,25 @@ namespace AssemblyAI.Behaviours.Actions
             enemy = entity.GetEnemy();
             knowledgeBase = entity.TargetKb;
             navSystem = entity.NavigationSystem;
-
+            damageSensor = entity.DamageSensor;
             enemyTracker = enemy.GetComponent<PositionTracker>();
         }
 
         public override TaskStatus OnUpdate()
         {
-            Debug.Log("Entity " + gameObject.name + " will look because of damage? " + searchDueToDamage.Value);
-            return !searchDueToDamage.Value ? EstimateEnemyPositionFromKnowledge() : EstimateEnemyPositionFromDamage();
+            var damageTime = damageSensor.WasDamagedRecently
+                ? (damageSensor.LastTimeDamaged)
+                : float.MinValue;
+
+            var lossTime = knowledgeBase.GetLastSightedTime();
+
+            if (damageTime > lossTime)
+            {
+                // The most recent event was getting damaged, so use this knowledge to guess its position
+                return EstimateEnemyPositionFromDamage();
+            }
+            // The most recent event was losing the enemy, so use this knowledge to guess its position
+            return EstimateEnemyPositionFromKnowledge();
         }
 
         private TaskStatus EstimateEnemyPositionFromKnowledge()
@@ -66,11 +77,12 @@ namespace AssemblyAI.Behaviours.Actions
             // we got damaged. Draw a line between my pos in the direction of the enemy and pick any point
             // in such line (maybe in the second half of the line, otherwise we seek too close). Draw a circle
             // around that point and pick one point inside of it. That's the enemy estimated position.
-            var (enemyPos, _) = enemyTracker.GetPositionAndVelocityFromDelay(0);
+
+            var delay = damageSensor.LastTimeDamaged - Time.time;
+            var (enemyPos, _) = enemyTracker.GetPositionAndVelocityFromDelay(delay);
 
             var myPosition = transform.position;
             var direction = enemyPos - myPosition;
-            Debug.DrawRay(myPosition, direction);
             if (Physics.Raycast(myPosition, direction, out var hit, direction.magnitude * 2f))
             {
                 var chosenDistance = (0.5f + Random.value * 0.5f) * hit.distance;

@@ -181,7 +181,7 @@ namespace AI.KnowledgeBase
                 // magically get to know the latest position of the enemy.
                 // To avoid outright cheating, when I get damaged I can give an estimate on 
                 // the enemy position based on its real position (e.g. a circle around that)
-                return float.NaN;
+                return float.MinValue;
             }
 
             return result.endTime;

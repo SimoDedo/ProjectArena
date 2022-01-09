@@ -1,29 +1,33 @@
 using AI.KnowledgeBase;
-using AssemblyAI.StateMachine.Transition;
 using AssemblyEntity.Component;
 using BehaviorDesigner.Runtime;
 using UnityEngine;
 
-namespace AssemblyAI.StateMachine.State
+namespace AssemblyAI.GoalMachine.Goal
 {
-    public class Fight : IState
+    public class Fight : IGoal
     {
         private const float LOW_HEALTH_PENALTY = 0.6f;
         private readonly AIEntity entity;
         private readonly TargetKnowledgeBase targetKb;
         private readonly GunManager gunManager;
-        private ExternalBehaviorTree externalBt;
-        private BehaviorTree behaviorTree;
-        public ITransition[] OutgoingTransitions { get; private set; }
+        private readonly ExternalBehaviorTree externalBt;
+        private readonly BehaviorTree behaviorTree;
 
         public Fight(AIEntity entity)
         {
             this.entity = entity;
             targetKb = entity.TargetKb;
             gunManager = entity.GunManager;
+            externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/NewFight");
+            behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
+            behaviorTree.StartWhenEnabled = false;
+            behaviorTree.RestartWhenComplete = true;
+            behaviorTree.ExternalBehavior = externalBt;
+            behaviorTree.EnableBehavior();
         }
 
-        public float FightTransitionScore()
+        public float GetScore()
         {
             if (!gunManager.HasAmmo()) return 0;
             // TODO maybe we see enemy, but we want to run away?
@@ -35,21 +39,7 @@ namespace AssemblyAI.StateMachine.State
 
         public void Enter()
         {
-            externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/NewFight");
-            behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
-            behaviorTree.StartWhenEnabled = false;
-            behaviorTree.RestartWhenComplete = true;
-            behaviorTree.ExternalBehavior = externalBt;
             behaviorTree.EnableBehavior();
-            BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
-
-            OutgoingTransitions = new ITransition[]
-            {
-                new OnEnemyInSightTransition(this), // Self-loop 
-                new ToWanderTransition(entity), 
-                new ToSearchTransition(entity), 
-                new ToPickupTransition(entity),
-            };
         }
 
         public void Update()
@@ -65,8 +55,9 @@ namespace AssemblyAI.StateMachine.State
                 // him again. 
                 targetKb.ApplyFocus();
             }
-            Resources.UnloadAsset(externalBt);
-            Object.Destroy(behaviorTree);
+            behaviorTree.DisableBehavior();
+            // Resources.UnloadAsset(externalBt);
+            // Object.Destroy(behaviorTree);
         }
     }
 }

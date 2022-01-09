@@ -80,7 +80,6 @@ namespace AssemblyAI.Behaviours.Actions
                 // We don't know the exact position of the enemy currentDelay ago, so just consider
                 // its last know position (with velocity zero, so that we won't correct the shooting position)
                 (position, velocity) = enemyPositionTracker.GetPositionAndVelocityFromDelay(lastSightedDelay);
-                Debug.DrawLine(sightController.GetHeadPosition(), position, Color.black, 0, false);
             }
             else
             {
@@ -139,14 +138,11 @@ namespace AssemblyAI.Behaviours.Actions
 
                 // Only shoot if we found a nice position, otherwise keep the shot for another time
                 if (float.IsPositiveInfinity(record)) return TaskStatus.Running;
-
-                Debug.DrawLine(sightController.GetHeadPosition(), chosenPoint, Color.yellow, 0.2f, false);
-
+                
                 angle = sightController.LookAtPoint(chosenPoint);
                 if (angle < 40 && gunManager.CanCurrentGunShoot() &&
                     ShouldShootWeapon(sightController.GetHeadPosition(), chosenPoint))
                 {
-                    Debug.DrawRay(sightController.GetHeadPosition(), 100 * sightController.GetHeadForward(), Color.blue, 0.6f, false);
                     gunManager.ShootCurrentGun();
                 }
             }

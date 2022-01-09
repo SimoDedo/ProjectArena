@@ -21,9 +21,7 @@ namespace AssemblyAI.Behaviours.Conditions
 
         public override TaskStatus OnUpdate()
         {
-            Debug.DrawLine(transform.position, finalPos, Color.magenta);
-            Debug.DrawLine(enemy.transform.position, finalPos, Color.magenta);
-            if (!Physics.Linecast(finalPos, enemy.transform.position, out var hit) ||
+             if (!Physics.Linecast(finalPos, enemy.transform.position, out var hit) ||
                 hit.collider.gameObject == enemy.gameObject)
             {
                 // We can see the enemy from that position, no good! 
