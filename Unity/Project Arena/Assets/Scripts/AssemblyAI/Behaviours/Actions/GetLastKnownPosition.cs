@@ -53,7 +53,7 @@ namespace AssemblyAI.Behaviours.Actions
         {
             var delay = Time.time - knowledgeBase.GetLastSightedTime();
             var (position, velocity) = enemyTracker.GetPositionAndVelocityFromDelay(delay);
-
+            
             // Try to estimate the position of the enemy after it has gone out of sight
             var estimatedPosition = position + velocity * 0.1f;
 
