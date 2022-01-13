@@ -2,7 +2,7 @@ using ScriptableObjectArchitecture;
 
 namespace AssemblyLogging
 {
-    public sealed class ExperimentEndedGameEvent : ScriptableObjectSingleton<BaseFinishedExperimentGameEvent>
-    {
-    }
+    public class BaseFinishedExperimentGameEvent : GameEventBase { }
+
+    public sealed class ExperimentEndedGameEvent : ScriptableObjectSingleton<BaseFinishedExperimentGameEvent> { }
 }

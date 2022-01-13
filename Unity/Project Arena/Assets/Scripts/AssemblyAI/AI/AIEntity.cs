@@ -316,6 +316,7 @@ public class AIEntity : Entity, ILoggable
         NavigationSystem.SetEnabled(b);
         GetComponent<CapsuleCollider>().enabled = b;
         MeshVisibility.SetMeshVisible(transform, b);
+        TargetKb.SetActive(b);
         inGame = b;
     }
 

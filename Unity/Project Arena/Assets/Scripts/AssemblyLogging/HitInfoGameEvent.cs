@@ -13,11 +13,7 @@ namespace AssemblyLogging
         public int damage;
     }
 
-    public class BaseHitInfoGameEvent : GameEventBase<HitInfo>
-    {
-    }
+    public class BaseHitInfoGameEvent : GameEventBase<HitInfo> { }
 
-    public sealed class HitInfoGameEvent : ScriptableObjectSingleton<BaseHitInfoGameEvent>
-    {
-    }
+    public sealed class HitInfoGameEvent : ScriptableObjectSingleton<BaseHitInfoGameEvent> { }
 }

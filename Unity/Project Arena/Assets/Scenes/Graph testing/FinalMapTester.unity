@@ -609,12 +609,12 @@ MonoBehaviour:
     category: Pickable
     prefab: {fileID: 4758734857810169564, guid: 52dc053e14f5e0b7596a6dfc2a5592c4,
       type: 3}
-    heightCorrection: -0.25
+    heightCorrection: 0
   - objectChar: 97
     category: Pickable
     prefab: {fileID: 4444291794755708082, guid: 5110074c3fb145a18b7e7187d8d1a520,
       type: 3}
-    heightCorrection: -0.25
+    heightCorrection: 0
   - objectChar: 115
     category: Spawn Points
     prefab: {fileID: 1611774674004552, guid: 36044f2c24d969c4382c559446fc5991, type: 3}

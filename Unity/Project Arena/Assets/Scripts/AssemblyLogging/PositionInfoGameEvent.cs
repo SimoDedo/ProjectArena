@@ -10,11 +10,7 @@ namespace AssemblyLogging
         public int entityID;
     }
 
-    public class BasePositionInfoGameEvent : GameEventBase<PositionInfo>
-    {
-    }
+    public class BasePositionInfoGameEvent : GameEventBase<PositionInfo> { }
 
-    public sealed class PositionInfoGameEvent : ScriptableObjectSingleton<BasePositionInfoGameEvent>
-    {
-    }
+    public sealed class PositionInfoGameEvent : ScriptableObjectSingleton<BasePositionInfoGameEvent> { }
 }
