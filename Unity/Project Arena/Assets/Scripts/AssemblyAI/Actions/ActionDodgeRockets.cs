@@ -1,8 +1,7 @@
 using Others;
 using UnityEngine;
-using Utils;
 
-namespace AI.Actions
+namespace AssemblyAI.Actions
 {
     public static class ActionDodgeRockets
     {

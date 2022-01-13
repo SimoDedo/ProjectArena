@@ -1,7 +1,6 @@
 using System;
-using System.Collections.Generic;
-using AI.Actions;
 using AI.KnowledgeBase;
+using AssemblyAI.Actions;
 using AssemblyAI.AI.Layer1.Actuator;
 using AssemblyAI.AI.Layer1.Sensors;
 using AssemblyAI.AI.Layer2;
@@ -342,6 +341,11 @@ public class AIEntity : Entity, ILoggable
     public Entity GetEnemy()
     {
         return enemy;
+    }
+
+    public void SetEnemy(Entity enemy)
+    {
+        this.enemy = enemy;
     }
 
     public float GetAimingSkill()
