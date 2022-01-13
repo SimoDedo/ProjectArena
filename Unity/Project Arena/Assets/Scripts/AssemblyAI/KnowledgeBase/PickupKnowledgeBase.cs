@@ -1,32 +1,39 @@
 using System.Collections.Generic;
 using System.Linq;
-using Entities.AI.Layer1.Sensors;
+using AssemblyAI.AI.Layer1.Sensors;
 using UnityEngine;
 
 namespace AI.KnowledgeBase
 {
-    public class PickupKnowledgeBase : MonoBehaviour
+    public class PickupKnowledgeBase
     {
+        private readonly AIEntity me;
         private AISightSensor sightSensor;
 
         private readonly Dictionary<Pickable, float> estimatedActivationTime = new Dictionary<Pickable, float>();
         private float lastUpdateTime;
         
-        public void Prepare(AISightSensor sightSensor)
+        public PickupKnowledgeBase(AIEntity me)
         {
-            this.sightSensor = sightSensor;
+            this.me = me;
         }
 
-        public void DetectPickups()
+        public void Prepare()
         {
-            var spawners = FindObjectsOfType<Pickable>();
+            sightSensor = me.SightSensor;
+            DetectPickups();
+        }
+
+        private void DetectPickups()
+        {
+            var spawners = Object.FindObjectsOfType<Pickable>();
             foreach (var spawner in spawners)
             {
                 estimatedActivationTime.Add(spawner, Time.time);
             }
         }
 
-        private void Update()
+        public void Update()
         {
             var keyList = new List<Pickable>(estimatedActivationTime.Keys);
             foreach (var pickable in keyList)
@@ -35,7 +42,7 @@ namespace AI.KnowledgeBase
                 // Let us give the bot a slightly unfair advantage: if they are close to the powerup, they
                 // know its status. This is because it would be very easy for a human to turn around and check, 
                 // but complex (to implement) in the AI of the bot.
-                if ((position - transform.position).sqrMagnitude > 4 && !sightSensor.CanSeeObject(pickable.transform, Physics.AllLayers)) continue;
+                if ((position - me.transform.position).sqrMagnitude > 4 && !sightSensor.CanSeeObject(pickable.transform, Physics.AllLayers)) continue;
                 if (pickable.IsActive)
                 {
                     // if(estimatedActivationTime[pickable] > Time.time)

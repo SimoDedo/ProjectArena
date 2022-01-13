@@ -1,7 +1,9 @@
 using System;
+using System.Linq;
+using AssemblyAI.AI.Layer2;
 using AssemblyEntity.Component;
 using BehaviorDesigner.Runtime.Tasks;
-using Entities.AI.Layer2;
+using Others;
 using UnityEngine;
 using UnityEngine.AI;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
@@ -18,22 +20,23 @@ namespace AssemblyAI.Behaviours.Actions
         private Entity target;
 
         private bool strifeRight = Random.value < 0.5;
-        private int remainingStrifes = Random.Range(minStrifeLength, maxStrifeLength);
+        private int remainingStrafes = Random.Range(MIN_STRAFE_LENGTH, MAX_STRAFE_LENGTH);
 
-        private const int minStrifeLength = 10;
-        private const int maxStrifeLength = 30;
+        private const int MIN_STRAFE_LENGTH = 10;
+        private const int MAX_STRAFE_LENGTH = 30;
+        private static readonly Vector3 NoDestination = new Vector3(10000, 10000, 10000);
+        private Vector3 destination;
         private FightingMovementSkill skill;
-        private Collider[] rocketTestCollider = new Collider[4];
-        private const float ROCKET_DETECTION_RADIUS = 40f;
 
         public override void OnStart()
         {
-            navSystem = GetComponent<NavigationSystem>();
             entity = GetComponent<AIEntity>();
-            gunManager = GetComponent<GunManager>();
+            navSystem = entity.NavigationSystem;
+            gunManager = entity.GunManager;
             target = entity.GetEnemy();
-            skill = entity.GetMovementSkill();
+            skill = entity.MovementSkill;
             navSystem.CancelPath();
+            destination = NoDestination;
         }
 
         public override void OnEnd()
@@ -43,20 +46,10 @@ namespace AssemblyAI.Behaviours.Actions
 
         public override TaskStatus OnUpdate()
         {
-            // Is able enough to dodge rockets?
-            if (skill >= FightingMovementSkill.CircleStrife)
+            if (destination != NoDestination && !navSystem.HasArrivedToDestination(destination))
             {
-                var rocketToDodge = FindRocketToDodge();
-                if (rocketToDodge != null)
-                {
-                    DodgeRocket(rocketToDodge);
-                    return TaskStatus.Running;
-                }
-            }
-
-            if (navSystem.HasPath() && !navSystem.HasArrivedToDestination())
-            {
-                navSystem.MoveAlongPath();
+                // Call every frame, just in case someone overwrote our destination choice (e.g. to avoid rocket)
+                navSystem.SetDestination(destination);
                 return TaskStatus.Running;
             }
 
@@ -67,79 +60,14 @@ namespace AssemblyAI.Behaviours.Actions
             return TaskStatus.Running;
         }
 
-        private void DodgeRocket(Projectile rocketToDodge)
-        {
-            // This rocket is not mine... How do I dodge it?
-            // Calculate it's trajectory and try to get away from it
-
-            var projectileTransform = rocketToDodge.transform;
-            var projectilePosition = projectileTransform.position;
-            var projectileDirection = projectileTransform.forward;
-
-            var myDirection = transform.position - projectilePosition;
-            var up = transform.up;
-            var angle = Vector3.SignedAngle(myDirection, projectileDirection, up);
-
-            // Try to strife in direction that increases this angle
-            var avoidDirection = Vector3.Cross(up, myDirection).normalized;
-            if (angle > 0f)
-                avoidDirection = -avoidDirection;
-            navSystem.SetDestination(transform.position + avoidDirection * navSystem.GetSpeed());
-            navSystem.MoveAlongPath();
-        }
-
-        private Projectile FindRocketToDodge()
-        {
-            Projectile projectileToDodge = null;
-            if (skill >= FightingMovementSkill.CircleStrife)
-            {
-                // Detect rocket presence
-                var position = transform.position;
-                var projectileColliders = Physics.OverlapSphereNonAlloc(position, ROCKET_DETECTION_RADIUS,
-                    rocketTestCollider,
-                    1 << LayerMask.NameToLayer("Projectile"));
-
-                var closestRocket = float.MaxValue;
-
-                if (projectileColliders != 0)
-                {
-                    // Check if any projectile doesn't belong to me
-                    for (var i = 0; i < projectileColliders; i++)
-                    {
-                        var projectile = rocketTestCollider[i].GetComponent<Projectile>();
-                        if (projectile == null) continue;
-                        if (projectile.ShooterID != entity.GetID())
-                        {
-                            // This rocket is not mine... How do I dodge it?
-                            // Calculate it's trajectory and try to get away from it
-
-                            var projectileTransform = projectile.transform;
-                            var projectilePosition = projectileTransform.position;
-                            var distance = (position - projectilePosition).sqrMagnitude;
-                            if (distance < closestRocket)
-                            {
-                                // calculate angle, ignore projectiles that are going in the opposite direction
-                                var projectileDirection = projectileTransform.forward;
-                                var myDirection = position - projectilePosition;
-
-                                if (Vector3.Angle(myDirection, projectileDirection) < 45)
-                                {
-                                    closestRocket = distance;
-                                    projectileToDodge = projectile;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            return projectileToDodge;
-        }
-
         private void TrySelectDestination()
         {
-            // Don't move at all during shooting
-            if (skill == FightingMovementSkill.StandStill) return;
+            if (skill == FightingMovementSkill.StandStill)
+            {
+                // Don't move at all if skill is so low.
+                navSystem.CancelPath();
+                return;
+            }
 
             var currentPos = transform.position;
             var targetPos = target.transform.position;
@@ -148,9 +76,9 @@ namespace AssemblyAI.Behaviours.Actions
 
             // Check if we can see enemy from where we are
             canSeeEnemyFromStartingPoint = !Physics.Linecast(currentPos, targetPos, out var canSeeEnemyHit) ||
-                                           canSeeEnemyHit.collider.gameObject == target.gameObject;
+                canSeeEnemyHit.collider.gameObject == target.gameObject;
 
-            // We do not care if enemy is above or beyond us, the move straight/strife movement should be
+            // We do not care if enemy is above or below us, the move straight/strife movement should be
             // parallel to the floor.
             targetPos.y = currentPos.y;
 
@@ -161,37 +89,45 @@ namespace AssemblyAI.Behaviours.Actions
             // If we can see the enemy from the starting point, we should play as usual
             if (canSeeEnemyFromStartingPoint)
             {
-                var movementDirectionDueToGun = Vector3.zero;
+                Vector3 movementDirectionDueToGun;
                 var movementDirectionDueToStrife = Vector3.zero;
 
                 // Get current gun optimal range
                 var (closeRange, farRange) = gunManager.GetCurrentGunOptimalRange();
                 if (distance < closeRange)
                     movementDirectionDueToGun = -direction;
-                else if (distance > farRange)
-                    movementDirectionDueToGun = direction;
+                else if (distance > farRange) movementDirectionDueToGun = direction;
+                else
+                {
+                    // Randomly move through the optimal range of the gun, but not too much
+                    movementDirectionDueToGun = direction * (Random.value > 0.5f ? -0.3f : 0.3f);
+                }
 
                 if (skill >= FightingMovementSkill.CircleStrife)
                 {
-                    movementDirectionDueToStrife = Vector3.Cross(direction, transform.up);
-                    if (skill == FightingMovementSkill.CircleStrifeChangeDirection)
+                    var enemyLookDirection = target.transform.forward;
+                    var lookAngleRelativeToDirection = Vector3.SignedAngle(enemyLookDirection, direction, Vector3.up);
+                    if (Mathf.Abs(lookAngleRelativeToDirection) > 90)
                     {
-                        remainingStrifes--;
-                        if (remainingStrifes < 0)
+                        // Only strife if enemy is looking
+                        movementDirectionDueToStrife = Vector3.Cross(direction, transform.up);
+                        if (skill == FightingMovementSkill.CircleStrifeChangeDirection)
                         {
-                            remainingStrifes = Random.Range(minStrifeLength, maxStrifeLength);
-                            strifeRight = !strifeRight;
+                            remainingStrafes--;
+                            if (remainingStrafes < 0)
+                            {
+                                remainingStrafes = Random.Range(MIN_STRAFE_LENGTH, MAX_STRAFE_LENGTH);
+                                strifeRight = !strifeRight;
+                            }
                         }
-                    }
 
-                    if (!strifeRight)
-                        movementDirectionDueToStrife = -movementDirectionDueToStrife;
+                        if (!strifeRight) movementDirectionDueToStrife = -movementDirectionDueToStrife;
+                    }
                 }
 
                 var totalMovement = movementDirectionDueToStrife + movementDirectionDueToGun * 3f;
                 var newPos = currentPos + totalMovement;
-                Debug.DrawLine(newPos, targetPos, Color.blue);
-                
+
                 if (!Physics.Linecast(newPos, targetPos, out var hit) ||
                     hit.collider.gameObject == target.gameObject)
                 {
@@ -200,9 +136,9 @@ namespace AssemblyAI.Behaviours.Actions
                         strifeRight = !strifeRight;
                     else
                     {
-                        navSystem.SetPath(path);
-                        navSystem.MoveAlongPath();
-                    }                
+                        destination = path.corners.Last();
+                        navSystem.SetPathToDestination(path);
+                    }
                 }
                 else
                 {
@@ -221,24 +157,29 @@ namespace AssemblyAI.Behaviours.Actions
                 {
                     var randomDir = Random.insideUnitCircle;
                     var newPos = currentPos;
-                    newPos.x = randomDir.x;
-                    newPos.z = randomDir.y;
+                    newPos.x += randomDir.x;
+                    newPos.z += randomDir.y;
 
-                    if (navSystem.IsPointOnNavMesh(newPos, out var finalPos))
+                    if (!Physics.Linecast(newPos, targetPos, out var finalPosVisibility)
+                        || finalPosVisibility.collider.gameObject == target.gameObject)
                     {
-                        if (!Physics.Linecast(finalPos, targetPos, out var finalPosVisibility)
-                            || finalPosVisibility.collider.gameObject == target.gameObject)
+                        // Can see enemy from here, found new position!
+
+                        var path = navSystem.CalculatePath(newPos);
+                        if (path.IsComplete())
                         {
-                            // Can see enemy from here, found new position!
-                            navSystem.SetDestination(finalPos);
-                            navSystem.MoveAlongPath();
+                            destination = newPos;
+                            navSystem.SetPathToDestination(path);
                             return;
                         }
                     }
                 }
 
-                // I couldn't find the enemy from any place. Let's just not move? Otherwise, let's move towards the
-                // enemy
+                // I couldn't see the enemy from any place. This bot is stupid and will rush towards the enemy, thinking
+                // that it might be fleeing...
+                navSystem.SetDestination(targetPos);
+                //... however it should do this only in this frame, not until it has reached the enemy.
+                destination = NoDestination;
             }
         }
     }

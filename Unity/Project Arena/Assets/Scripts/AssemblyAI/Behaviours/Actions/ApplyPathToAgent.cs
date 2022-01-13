@@ -1,7 +1,8 @@
 using System;
+using System.Linq;
+using AssemblyAI.AI.Layer2;
 using AssemblyAI.Behaviours.Variables;
 using BehaviorDesigner.Runtime.Tasks;
-using Entities.AI.Layer2;
 using UnityEngine;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
 
@@ -11,12 +12,13 @@ namespace AssemblyAI.Behaviours.Actions
     public class ApplyPathToAgent : Action
     {
         [SerializeField] private SharedSelectedPathInfo pathToApply;
+        private Vector3 pathDestination;
         private NavigationSystem navSystem;
 
         public override void OnStart()
         {
-            navSystem = GetComponent<NavigationSystem>();
-            navSystem.SetPath(pathToApply.Value);
+            navSystem = GetComponent<AIEntity>().NavigationSystem;
+            pathDestination = pathToApply.Value.corners.Last();
         }
 
         public override void OnEnd()
@@ -26,10 +28,12 @@ namespace AssemblyAI.Behaviours.Actions
 
         public override TaskStatus OnUpdate()
         {
-            // Debug.DrawLine(transform.position, pathToApply.Value.corners.Last(), Color.magenta);
-            if(navSystem.HasArrivedToDestination())
+            if (navSystem.HasArrivedToDestination(pathDestination))
+            {
+                navSystem.CancelPath();
                 return TaskStatus.Success;
-            navSystem.MoveAlongPath();
+            }
+            navSystem.SetDestination(pathDestination);
             return TaskStatus.Running;
         }
     }

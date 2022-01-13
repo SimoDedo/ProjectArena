@@ -1,7 +1,8 @@
 using System;
-using BehaviorDesigner.Runtime;
+using System.Linq;
+using AssemblyAI.AI.Layer1.Actuator;
+using AssemblyAI.Behaviours.Variables;
 using BehaviorDesigner.Runtime.Tasks;
-using Entities.AI.Controller;
 using UnityEngine;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
 
@@ -10,17 +11,23 @@ public class LookAtPoint : Action
 {
     private AISightController sightController;
 
-    [SerializeField] private SharedVector3 lookPoint;
+    [SerializeField] private SharedSelectedPathInfo pathInfo;
+    private Vector3 lookPoint;
 
     public override void OnAwake()
     {
-        sightController = GetComponent<AISightController>();
+        sightController = GetComponent<AIEntity>().SightController;
     }
 
-    
+    public override void OnStart()
+    {
+        lookPoint = pathInfo.Value.corners.Last();
+    }
+
+
     public override TaskStatus OnUpdate()
     {
-        sightController.LookAtPoint(lookPoint.Value);
+        sightController.LookAtPoint(lookPoint);
         return TaskStatus.Running;
     }
 }

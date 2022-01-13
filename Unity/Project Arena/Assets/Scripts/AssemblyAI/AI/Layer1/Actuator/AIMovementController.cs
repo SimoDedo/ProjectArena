@@ -1,32 +1,36 @@
 using UnityEngine;
 
-public class AIMovementController : MonoBehaviour
+namespace AssemblyAI.AI.Layer1.Actuator
 {
-    private float speed;
-
-    private Transform t;
-    private Vector3 previousPosition;
-
-    public void Prepare(float speed)
+    public class AIMovementController
     {
-        this.speed = speed;
-    }
+        private float speed;
 
-    private void Awake()
-    {
-        t = transform;
-        previousPosition = t.position;
-    }
+        private readonly Transform transform;
+        private Vector3 previousPosition;
 
-    public void MoveToPosition(Vector3 position)
-    {
-        // TODO Control movement for this frame, prevent moving too fast
-        previousPosition = t.position;
-        t.position = position;
-    }
+        public AIMovementController(AIEntity entity, float speed)
+        {
+            transform = entity.transform;
+            this.speed = speed;
+        }
+    
+        public void Prepare()
+        {
+            previousPosition = transform.position;
+        }
 
-    public Vector3 GetVelocity()
-    {
-        return (t.position - previousPosition) / Time.deltaTime;
+
+        public void MoveToPosition(Vector3 position)
+        {
+            // TODO Control movement for this frame, prevent moving too fast
+            previousPosition = transform.position;
+            transform.position = position;
+        }
+
+        public Vector3 GetVelocity()
+        {
+            return (transform.position - previousPosition) / Time.deltaTime;
+        }
     }
 }

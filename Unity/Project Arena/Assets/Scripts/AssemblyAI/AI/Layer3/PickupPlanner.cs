@@ -1,63 +1,64 @@
 using System;
 using System.Collections.Generic;
 using AI.KnowledgeBase;
+using AssemblyAI.AI.Layer1.Actuator;
+using AssemblyAI.AI.Layer1.Sensors;
+using AssemblyAI.AI.Layer2;
 using AssemblyEntity.Component;
-using Entities.AI.Layer2;
 using UnityEngine;
 using UnityEngine.AI;
-using Utils;
 
-namespace AI.AI.Layer3
+namespace AssemblyAI.AI.Layer3
 {
-    public class PickupPlanner : MonoBehaviour
+    public class PickupPlanner
     {
+        private readonly AIEntity me;
         private PickupKnowledgeBase knowledgeBase;
         private NavigationSystem navSystem;
-
-        private AIEntity entity;
         private GunManager gunManager;
+        private AISightSensor sightSensor;
         private Pickable chosenPickup;
-        private float agentSpeed;
 
-        public void Prepare(AIEntity entity, NavigationSystem navSystem, PickupKnowledgeBase knowledgeBase, GunManager gunManager)
+        private static readonly AnimationCurve TimeValueCurve = new AnimationCurve(
+            new Keyframe(0, 2.5f),
+            new Keyframe(3f, 2f),
+            new Keyframe(10f, 1f),
+            new Keyframe(20f, 0.5f),
+            new Keyframe(100f, 0.3f)
+        );
+ 
+
+        public PickupPlanner(AIEntity entity)
         {
-            this.entity = entity;
-            this.navSystem = navSystem;
-            this.knowledgeBase = knowledgeBase;
-            this.gunManager = gunManager;
-            agentSpeed = navSystem.GetSpeed();
+            me = entity;
+        }
+
+        public void Prepare()
+        {
+            navSystem = me.NavigationSystem;
+            knowledgeBase = me.PickupKnowledgeBase;
+            gunManager = me.GunManager;
+            sightSensor = me.SightSensor;
         }
 
         public Pickable ScorePickups(out NavMeshPath path, out float bestPickupScore, out float activationTime)
         {
             var pickables = knowledgeBase.GetPickupKnowledge();
-            var bestPickupVelocity = float.MinValue;
-            var bestPickupTime = float.MinValue;
+            var bestPickupValue = float.MinValue;
+            var bestPickupTime = float.MaxValue;
             bestPickupScore = 0;
             path = null;
             Pickable bestPickup = null;
-
-            // FIXME: maybe we can avoid expensive computations, but... when can we be sure that avoiding
-            //   recalculation is possible?
-            // if (CanUsePreviousResult())
-            // {
-            //     bestPickupScore = CalculateCurrentPickupScore();
-            //     path = chosenPath;
-            //     activationTime = pickables[chosenPickup];
-            //     return chosenPickup;
-            // }
-            //
-            // UpdateComputationSkipValues();
-
+            
             foreach (var entry in pickables)
             {
-                var (value, time) = ScorePickup(pickables, entry.Key, out var pickupPath);
+                // TODO Find nice way to estimate score
+                var value = ScorePickup(pickables, entry.Key, out var time, out var pickupPath);
                 if (value == 0) continue;
-                var velocity = value / time;
-                if (velocity > bestPickupVelocity || Math.Abs(velocity - bestPickupVelocity) < 0.05 && time < bestPickupTime)
+                if (value > bestPickupValue || Mathf.Abs(value - bestPickupScore) < 0.05f && time < bestPickupTime)
                 {
-                    bestPickupScore = Mathf.Min(1f, value / time / 10);
-                    bestPickupVelocity = velocity;
+                    bestPickupScore = Mathf.Min(1f, value / time / 5);
+                    bestPickupValue = value;
                     bestPickupTime = time;
                     bestPickup = entry.Key;
                     path = pickupPath;
@@ -69,55 +70,82 @@ namespace AI.AI.Layer3
             return bestPickup;
         }
 
-        private Tuple<float, float> ScorePickup(Dictionary<Pickable, float> pickables, Pickable pickup, out NavMeshPath path)
+        private float ScorePickup(Dictionary<Pickable, float> pickables, Pickable pickup, out float totalTime, out NavMeshPath path)
         {
             var activationTime = pickables[pickup];
             var pickupPosition = pickup.transform.position;
 
-            // TODO don't recalculate path if this is current pickup (navSystem has latest path?)
+            var valueScore = ScorePickupByType(pickup);
+            if (valueScore == 0f)
+            {
+                // This pickup is not useful for us... 
+                path = new NavMeshPath();
+                totalTime = float.MaxValue;
+                return valueScore;
+            }
+            var neighborhoodScore = ScoreNeighborhood(pickup, pickables);
+
             path = navSystem.CalculatePath(pickupPosition);
-            var pathLength = path.Length();
-            var pathTime = pathLength / agentSpeed;
-
+            var pathTime = navSystem.EstimatePathDuration(path);
+            float timeUncertainty;
             var estimatedArrival = pathTime + Time.time;
-            // CAN BE NEGATIVE, not necessarily a good thing
-            var waitTime = activationTime - estimatedArrival;
 
-            var totalTime = pathTime + Mathf.Max(0f, waitTime);
+            if (estimatedArrival < activationTime)
+            {
+                totalTime = activationTime - Time.time;
+                timeUncertainty = 0;
+            }
+            else
+            {
+                totalTime = pathTime;
+                if (sightSensor.CanSeeObject(pickup.transform, Physics.AllLayers)) // Use all layers since the crates are in ignore layer
+                {
+                    // I can see the object for now, so there is no uncertainty, the object is there!
+                    timeUncertainty = 0;
+                }
+                else
+                {
+                    // In this amount of time the pickup can be potentially be taken by someone before me
+                    timeUncertainty = estimatedArrival - activationTime;
+                }
+            }
             
-            var distanceScore = ScoreDistance(pathLength) * DISTANCE_MODIFIER;
-            var timeScore = ScoreTime(waitTime) * TIME_MODIFIER;
-            var neighborhoodScore = ScoreNeighborhood(pickup, pickables) * NEIGHBORHOOD_MODIFIER;
+            var timeMultiplier = ScoreTimeToCollect(totalTime);
+            var uncertaintyMultiplier = ScoreUncertaintyTime(timeUncertainty);
 
+            var finalScore = (valueScore + neighborhoodScore) * timeMultiplier * uncertaintyMultiplier;
+            return finalScore;
+        }
+
+        private float ScorePickupByType(Pickable pickup)
+        {
             float valueScore;
-
             switch (pickup.GetPickupType())
             {
                 case Pickable.PickupType.MEDKIT:
                 {
                     var medkit = pickup as MedkitPickable;
                     Debug.Assert(medkit != null, nameof(medkit) + " != null");
-                    valueScore = ScoreMedkit(medkit) * VALUE_MODIFIER;
+                    valueScore = ScoreMedkit(medkit);
                     break;
                 }
                 case Pickable.PickupType.AMMO:
                 {
                     var ammoCrate = pickup as AmmoPickable;
                     Debug.Assert(ammoCrate != null, nameof(ammoCrate) + " != null");
-                    valueScore = ScoreAmmoCrate(ammoCrate) * VALUE_MODIFIER;
+                    valueScore = ScoreAmmoCrate(ammoCrate);
                     break;
                 }
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            
-            return new Tuple<float, float>(valueScore, totalTime);
-            //return valueScore + distanceScore + timeScore + neighborhoodScore;
+
+            return valueScore;
         }
 
         private float ScoreAmmoCrate(AmmoPickable pickable)
         {
-            const float AMMO_NECESSITY_WEIGHT = 0.8f;
+            const float ammoNecessityWeight = 0.8f;
             var guns = gunManager.NumberOfGuns;
             var maxGunIndex = Mathf.Min(pickable.AmmoAmounts.Length, guns);
 
@@ -132,8 +160,8 @@ namespace AI.AI.Layer3
                 var currentAmmo = gunManager.GetCurrentAmmoForGun(i);
 
                 var recoveredAmmo = Mathf.Min(pickupAmmo, maxAmmo - currentAmmo);
-                var ammoCrateValue = (1 - AMMO_NECESSITY_WEIGHT) * recoveredAmmo / maxAmmo;
-                var ammoCrateWant = AMMO_NECESSITY_WEIGHT * (maxAmmo - currentAmmo) / maxAmmo;
+                var ammoCrateValue = (1 - ammoNecessityWeight) * recoveredAmmo / maxAmmo;
+                var ammoCrateWant = ammoNecessityWeight * (maxAmmo - currentAmmo) / maxAmmo;
 
                 totalCrateScore += ammoCrateValue + ammoCrateWant;
             }
@@ -143,25 +171,26 @@ namespace AI.AI.Layer3
 
         private float ScoreMedkit(MedkitPickable pickable)
         {
-            const float MEDKIT_NECESSITY_WEIGHT = 0.8f;
+            const float medkitNecessityWeight = 0.8f;
             var pickupHealth = pickable.RestoredHealth;
-            var maxHealth = entity.GetMaxHealth();
-            var currentHealth = entity.Health;
+            var maxHealth = me.MaxHealth;
+            var currentHealth = me.Health;
             var recoveredHealth = Mathf.Min(pickupHealth, maxHealth - currentHealth);
-            var medkitHealValue = (1 - MEDKIT_NECESSITY_WEIGHT) * recoveredHealth / maxHealth;
-            var medkitWant = MEDKIT_NECESSITY_WEIGHT * (maxHealth - currentHealth) / maxHealth;
+            var medkitHealValue = (1 - medkitNecessityWeight) * recoveredHealth / maxHealth;
+            var medkitWant = medkitNecessityWeight * (maxHealth - currentHealth) / maxHealth;
             return medkitHealValue + medkitWant;
         }
 
         private static float ScoreNeighborhood(Pickable pickup, Dictionary<Pickable, float> pickables)
         {
-            const float MAX_NEIGHBORHOOD_SCORE = 1f;
-            const float NEIGHBOR_SCORE = 0.2f;
-            const float MAX_NEIGHBORHOOD_DISTANCE = 20f;
+            // TODO Maybe cache neighborhood info
+            const float maxNeighborhoodScore = 1f;
+            const float neighborScore = 0.2f;
+            const float maxNeighborhoodDistance = 20f;
             // For the sake of speed, we do not check the actual lenght of the path, but the distance
             // as the crow flies
             var pickupPos = pickup.transform.position;
-            const float maxSquaredDistance = MAX_NEIGHBORHOOD_DISTANCE * MAX_NEIGHBORHOOD_DISTANCE;
+            const float maxSquaredDistance = maxNeighborhoodDistance * maxNeighborhoodDistance;
             var neighborsCount = 0;
             foreach (var entry in pickables.Keys)
             {
@@ -171,45 +200,18 @@ namespace AI.AI.Layer3
                     neighborsCount++;
             }
 
-            return Mathf.Min(MAX_NEIGHBORHOOD_SCORE, neighborsCount * NEIGHBOR_SCORE);
+            return Mathf.Min(maxNeighborhoodScore, neighborsCount * neighborScore);
         }
 
 
-        private static float ScoreTime(float waitTime)
+        private static float ScoreTimeToCollect(float timeToCollect)
         {
-            const float VARIANCE = 10;
-            var rtn = NormalizedGaussian(waitTime, VARIANCE) - 1;
-            // The more backward in time my knowledge is, the more likely it is to be wrong. Let's therefore
-            // give a neutral score considering such uncertainty.
-            if (waitTime < 0)
-                rtn = (rtn + 1) / 2f;
-
-            return rtn;
+            return TimeValueCurve.Evaluate(timeToCollect);
         }
-
-        private static float ScoreDistance(float distance)
+        
+        private static float ScoreUncertaintyTime(float uncertaintyTime)
         {
-            const float MAX_DISTANCE = 100f;
-            // Score is 1 at distance 0 and -1 at distance MAX_DISTANCE
-
-            const float a = 2f / (MAX_DISTANCE * MAX_DISTANCE);
-            const float b = -2f * a * MAX_DISTANCE;
-            const float c = 1f;
-
-            if (distance > MAX_DISTANCE) return 0;
-            return a * distance * distance + b * distance + c;
+            return TimeValueCurve.Evaluate(uncertaintyTime);
         }
-
-
-        private static float NormalizedGaussian(float x, float sigmaSquared)
-        {
-            return Mathf.Exp(-x * x / (2f * sigmaSquared));
-        }
-
-        // TODO Tune parameters
-        private const float VALUE_MODIFIER = 5f;
-        private const float DISTANCE_MODIFIER = 1f;
-        private const float TIME_MODIFIER = 3f;
-        private const float NEIGHBORHOOD_MODIFIER = 1f;
     }
 }

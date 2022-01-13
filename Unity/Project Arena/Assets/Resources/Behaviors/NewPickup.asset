@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b23f08d2ae4cba14087c1ed36193d82b, type: 3}
+  m_Name: NewPickup
+  m_EditorClassIdentifier: 
+  mBehaviorSource:
+    behaviorName: NewPickup
+    behaviorDescription: 
+    mTaskData:
+      types: []
+      parentIndex: 
+      startIndex: 
+      variableStartIndex: 
+      JSONSerialization: '{"EntryTask":{"Type":"BehaviorDesigner.Runtime.Tasks.EntryTask","NodeData":{"Offset":"(714.0474,38.83206)"},"ID":0,"Name":"Entry","Instant":true},"RootTask":{"Type":"BehaviorDesigner.Runtime.Tasks.Parallel","NodeData":{"Offset":"(-4.28760147,105.051636)"},"ID":1,"Name":"Parallel","Instant":true,"AbortTypeabortType":"None","Children":[{"Type":"BehaviorDesigner.Runtime.Tasks.Selector","NodeData":{"Offset":"(-376.061829,125.696747)","Comment":"Camera
+        and weapon control branch"},"ID":2,"Name":"Selector","Instant":true,"AbortTypeabortType":"None","Children":[{"Type":"BehaviorDesigner.Runtime.Tasks.Sequence","NodeData":{"Offset":"(-520.646667,130.949982)","Comment":"Enemy
+        detected branch"},"ID":3,"Name":"Sequence","Instant":true,"AbortTypeabortType":"Both","Children":[{"Type":"AssemblyAI.Behaviours.Conditions.ShouldFight","NodeData":{"Offset":"(-100,162.820511)"},"ID":4,"Name":"Should
+        Fight","Instant":true},{"Type":"BehaviorDesigner.Runtime.Tasks.BehaviorTreeReference","NodeData":{"Offset":"(109.659149,158.494583)"},"ID":5,"Name":"Behavior
+        Tree Reference","Instant":true,"ExternalBehavior[]externalBehaviors":[0],"SharedNamedVariable[]variables":[],"Booleancollapsed":false}]},{"Type":"BehaviorDesigner.Runtime.Tasks.Sequence","NodeData":{"Offset":"(-125.952255,134.117279)","Comment":"Damaged
+        branch\n"},"ID":6,"Name":"Sequence","Instant":true,"AbortTypeabortType":"Both","Children":[{"Type":"AssemblyAI.Behaviours.Conditions.ShouldWatchOutForEnemy","NodeData":{"Offset":"(-85.60976,160)"},"ID":7,"Name":"Should
+        Watch Out For Enemy","Instant":true},{"Type":"AssemblyAI.Behaviours.Actions.LookAtDamageDirection","NodeData":{"Offset":"(104.848358,161.165649)"},"ID":8,"Name":"Look
+        At Damage Direction","Instant":true}]},{"Type":"BehaviorDesigner.Runtime.Tasks.Parallel","NodeData":{"Offset":"(288.419128,115.278908)","Comment":"Not
+        fighting branch"},"ID":9,"Name":"Parallel","Instant":true,"AbortTypeabortType":"None","Children":[{"Type":"AssemblyAI.Behaviours.Actions.LookAround","NodeData":{"Offset":"(-100,167.027008)","Comment":"No
+        enemy detected, just look around!"},"ID":10,"Name":"Look Around","Instant":true,"Booleanfocused":false},{"Type":"AssemblyAI.Behaviours.Actions.ReloadWeapons","NodeData":{"Offset":"(118.418945,183.6577)"},"ID":11,"Name":"Reload
+        Weapons","Instant":true}]}]},{"Type":"BehaviorDesigner.Runtime.Tasks.Sequence","NodeData":{"Offset":"(300,130.645142)","Comment":"Movement
+        branch"},"ID":12,"Name":"Sequence","Instant":true,"AbortTypeabortType":"None","Children":[{"Type":"AssemblyAI.Behaviours.Actions.ApplyPathToAgent","NodeData":{"Offset":"(-103.876236,166.7803)"},"ID":13,"Name":"Apply
+        Path To Agent","Instant":true,"SharedSelectedPathInfopathToApply":{"Type":"AssemblyAI.Behaviours.Variables.SharedSelectedPathInfo","Name":"ChosenPath","IsShared":true,"NavMeshPathmValue":{}}},{"Type":"BehaviorDesigner.Runtime.Tasks.ParallelComplete","NodeData":{"Offset":"(219.46344,182.909332)"},"ID":14,"Name":"Parallel
+        Complete","Instant":true,"AbortTypeabortType":"Self","Children":[{"Type":"AssemblyAI.Behaviours.Conditions.ShouldGoToPickup","NodeData":{"Offset":"(-104.900879,155.508972)"},"ID":15,"Name":"Should
+        Go To Pickup","Instant":true,"SharedSelectedPickupInfopickupInfo":{"Type":"AssemblyAI.Behaviours.Variables.SharedSelectedPickupInfo","Name":"ChosenPickup","IsShared":true,"SelectedPickupInfomValue":{"SingleestimatedActivationTime":0}}},{"Type":"BehaviorDesigner.Runtime.Tasks.Repeater","NodeData":{"Offset":"(75.93402,161.391327)"},"ID":16,"Name":"Repeater","Instant":true,"SharedIntcount":{"Type":"BehaviorDesigner.Runtime.SharedInt","Name":null,"Int32mValue":0},"SharedBoolrepeatForever":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":null,"BooleanmValue":true},"SharedBoolendOnFailure":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":null,"BooleanmValue":true},"Children":[{"Type":"BehaviorDesigner.Runtime.Tasks.Sequence","NodeData":{"Offset":"(-4.065979,115.357178)"},"ID":17,"Name":"Sequence","Instant":true,"AbortTypeabortType":"None","Children":[{"Type":"AssemblyAI.Behaviours.Actions.CalculateCampDestination","NodeData":{"Offset":"(-128.923645,123.592407)"},"ID":18,"Name":"Calculate
+        Camp Destination","Instant":true,"SingleminRadius":10,"SinglemaxRadius":20,"SinglemaxNumVertices":20,"SinglemaxRadiusAttempts":3,"SharedVector3campLocation":{"Type":"BehaviorDesigner.Runtime.SharedVector3","Name":"ChosenPickupPosition","IsShared":true,"Vector3mValue":"(0,0,0)"},"SharedSelectedPathInfopathChosen":{"Type":"AssemblyAI.Behaviours.Variables.SharedSelectedPathInfo","Name":"ChosenPath","IsShared":true,"NavMeshPathmValue":{}}},{"Type":"AssemblyAI.Behaviours.Actions.ApplyPathToAgent","NodeData":{"Offset":"(114.909363,123.592407)"},"ID":19,"Name":"Apply
+        Path To Agent","Instant":true,"SharedSelectedPathInfopathToApply":{"Type":"AssemblyAI.Behaviours.Variables.SharedSelectedPathInfo","Name":"ChosenPath","IsShared":true,"NavMeshPathmValue":{}}}]}]}]},{"Type":"AssemblyAI.Behaviours.Actions.MoveToDestination","NodeData":{"Offset":"(536.7309,140.4046)"},"ID":20,"Name":"Move
+        To Destination","Instant":true,"SharedVector3destination":{"Type":"BehaviorDesigner.Runtime.SharedVector3","Name":"ChosenPickupPosition","IsShared":true,"Vector3mValue":"(0,0,0)"}}]}]},"Variables":[{"Type":"AssemblyAI.Behaviours.Variables.SharedSelectedPathInfo","Name":"ChosenPath","IsShared":true,"NavMeshPathmValue":{}},{"Type":"AssemblyAI.Behaviours.Variables.SharedSelectedPickupInfo","Name":"ChosenPickup","IsShared":true,"SelectedPickupInfomValue":{"SingleestimatedActivationTime":0}},{"Type":"BehaviorDesigner.Runtime.SharedVector3","Name":"ChosenPickupPosition","IsShared":true,"Vector3mValue":"(0,0,0)"}]}'
+      fieldSerializationData:
+        typeName: []
+        fieldNameHash: 
+        startIndex: 
+        dataPosition: 
+        unityObjects:
+        - {fileID: 11400000, guid: cf1ac1aa34bc9a390a39cd6ecaeb3dec, type: 2}
+        byteData: 
+        byteDataArray: 
+      Version: 1.6.8

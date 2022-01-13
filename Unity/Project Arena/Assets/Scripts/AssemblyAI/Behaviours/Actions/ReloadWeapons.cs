@@ -1,5 +1,6 @@
 using AssemblyEntity.Component;
 using BehaviorDesigner.Runtime.Tasks;
+using UnityEngine;
 
 namespace AssemblyAI.Behaviours.Actions
 {
@@ -8,14 +9,44 @@ namespace AssemblyAI.Behaviours.Actions
     public class ReloadWeapons : Action
     {
         private GunManager gunManager;
+        private const float TIMEOUT = 1.5f;
+        private const float RELOAD_PROBABILITY = 0.8f;
+        private float nextWeaponChoiceTime = float.MinValue;
+        private bool shouldReload;
 
         public override void OnAwake()
         {
-            gunManager = GetComponent<GunManager>();
+            gunManager = GetComponent<AIEntity>().GunManager;
+        }
+        
+        public override TaskStatus OnUpdate()
+        {
+            if (nextWeaponChoiceTime < Time.time)
+            {
+                shouldReload = EquipGunToReload();
+                nextWeaponChoiceTime = Time.time + TIMEOUT;
+            }
+
+            if (shouldReload)
+            {
+                var currentGun = gunManager.CurrentGunIndex;
+                if (gunManager.CanGunReload(currentGun))
+                {
+                    gunManager.ReloadCurrentGun();
+                }
+            }
+
+            return TaskStatus.Running;
         }
 
-        public override void OnStart()
+        private bool EquipGunToReload()
         {
+            if (Random.value > RELOAD_PROBABILITY)
+            {
+                // Do not reload for this timeout
+                return false;
+            }
+            
             var gunCount = gunManager.NumberOfGuns;
             var mostUnchargedGun = GunManager.NO_GUN;
             var worstPercentage = 1f;
@@ -33,18 +64,11 @@ namespace AssemblyAI.Behaviours.Actions
 
             if (mostUnchargedGun != GunManager.NO_GUN)
             {
-                gunManager.TryEquipGun(mostUnchargedGun);
-                var currentGun = gunManager.CurrentGunIndex;
-                if (gunManager.CanGunReload(currentGun))
-                {
-                    gunManager.ReloadCurrentGun();
-                }
+                // Reload, but only if you manage to switch gun
+                return gunManager.TryEquipGun(mostUnchargedGun);
             }
-        }
 
-        public override TaskStatus OnUpdate()
-        {
-            return gunManager.IsCurrentGunReloading() ? TaskStatus.Running : TaskStatus.Success;
+            return false; // No weapon to reload
         }
     }
 }

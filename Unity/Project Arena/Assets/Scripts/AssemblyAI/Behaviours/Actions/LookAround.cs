@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using AssemblyAI.AI.Layer1.Actuator;
 using BehaviorDesigner.Runtime.Tasks;
-using Entities.AI.Controller;
 using UnityEngine;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
 using Random = UnityEngine.Random;
 
 // Current version is this one!
-namespace AI.Behaviours.NewBehaviours
+namespace AssemblyAI.Behaviours.Actions
 {
     [Serializable]
     public class LookAround : Action
@@ -25,12 +25,15 @@ namespace AI.Behaviours.NewBehaviours
 
         public override void OnAwake()
         {
-            sightController = GetComponent<AISightController>();
-            movementController = GetComponent<AIMovementController>();
-            curiosity = GetComponent<AIEntity>().GetCuriosity();
+            var entity = GetComponent<AIEntity>();
+            sightController = entity.SightController;
+
+            movementController = entity.MovementController;
+            curiosity = entity.GetCuriosity();
+            
             nextUpdateTime = float.MinValue;
 
-            foreach (var angleScore in angleScores)
+            foreach (var angleScore in AngleScores)
             {
                 if (curiosity >= angleScore.minLevel && (!focused || angleScore.allowedIfFocused))
                 {
@@ -137,7 +140,7 @@ namespace AI.Behaviours.NewBehaviours
             public bool allowedIfFocused;
         }
 
-        private static readonly ReadOnlyCollection<AngleScore> angleScores = new ReadOnlyCollection<AngleScore>(new[]
+        private static readonly ReadOnlyCollection<AngleScore> AngleScores = new ReadOnlyCollection<AngleScore>(new[]
         {
             new AngleScore {angle = 0, score = 100, minLevel = CuriosityLevel.Low, allowedIfFocused = true},
             new AngleScore

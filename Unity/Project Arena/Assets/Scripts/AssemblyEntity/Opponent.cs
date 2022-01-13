@@ -11,13 +11,12 @@ public class Opponent : Entity
     
     private void Awake()
     {
-        gunManager = gameObject.AddComponent<GunManager>();
-        gunManager.Prepare();
+        gunManager = new GunManager(this);
     }
 
     // Sets up all the opponent parameters and does the same with all its guns.
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id) {
-        gunManager.SetupGuns(gms, this, null, ag);
+        gunManager.Prepare(gms, this, null, ag);
         gameManagerScript = gms;
 
         totalHealth = th;

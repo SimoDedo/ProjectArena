@@ -5,6 +5,9 @@ using BehaviorDesigner.Runtime.Tasks;
 using UnityEngine;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
 
+// TODO If enemy cannot be seen, then choose blast weapon
+// TODO Also equip the weapon if possible
+
 namespace AssemblyAI.Behaviours.Actions
 {
     [Serializable]
@@ -19,7 +22,7 @@ namespace AssemblyAI.Behaviours.Actions
         public override void OnAwake()
         {
             entity = gameObject.GetComponent<AIEntity>();
-            gunManager = gameObject.GetComponent<GunManager>();
+            gunManager = entity.GunManager;
             gunsCount = gunManager.NumberOfGuns;
             enemyTransform = entity.GetEnemy().transform;
             t = transform;

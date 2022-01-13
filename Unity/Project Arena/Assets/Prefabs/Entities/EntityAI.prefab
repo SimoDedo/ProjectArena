@@ -579,7 +579,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   totalHealth: 0
-  disabledLayer: 0
   head: {fileID: 1523818027142824}
   botParams:
     speed: 0
@@ -589,11 +588,15 @@ MonoBehaviour:
     maxCameraAcceleration: 0
     maxRange: 0
     memoryWindow: 0
+    detectionWindow: 2
     timeBeforeCanReact: 0
     curiosity: 0
     predictionSkill: 0
     aimingSkill: 0
-  health: 0
+    recentDamageTimeout: 0
+  botState:
+    health: 0
+    lookAroundIsFocused: 0
   enemy: {fileID: 0}
 --- !u!114 &5647456198230708602
 MonoBehaviour:
@@ -984,6 +987,7 @@ MonoBehaviour:
   maximumAmmo: 30
   reloadTime: 1
   cooldownTime: 0.5
+  isBlastWeapon: 0
   muzzleFlashDuration: 0.1
   recoil: 0.05
   aimEnabled: 1
@@ -1527,6 +1531,7 @@ MonoBehaviour:
   maximumAmmo: 16
   reloadTime: 1
   cooldownTime: 0.75
+  isBlastWeapon: 1
   muzzleFlashDuration: 0.1
   recoil: 0.05
   aimEnabled: 0
@@ -2048,6 +2053,7 @@ MonoBehaviour:
   maximumAmmo: 120
   reloadTime: 1
   cooldownTime: 0.1
+  isBlastWeapon: 0
   muzzleFlashDuration: 0.05
   recoil: 0.02
   aimEnabled: 0
@@ -3514,6 +3520,7 @@ MonoBehaviour:
   maximumAmmo: 24
   reloadTime: 1
   cooldownTime: 0.75
+  isBlastWeapon: 0
   muzzleFlashDuration: 0.1
   recoil: 0.05
   aimEnabled: 0

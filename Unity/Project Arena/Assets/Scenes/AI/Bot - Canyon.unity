@@ -426,21 +426,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 114128907697292602, guid: 87c5267e1886311258a6f48dac81a1ca,
-        type: 3}
-      propertyPath: infinteAmmo
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114191837528411164, guid: 87c5267e1886311258a6f48dac81a1ca,
-        type: 3}
-      propertyPath: infinteAmmo
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114286380553423094, guid: 87c5267e1886311258a6f48dac81a1ca,
-        type: 3}
-      propertyPath: infinteAmmo
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 114718352753251754, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
       propertyPath: infinteAmmo
@@ -679,7 +664,7 @@ PrefabInstance:
     - target: {fileID: 114191837528411164, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
       propertyPath: infinteAmmo
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114286380553423094, guid: 87c5267e1886311258a6f48dac81a1ca,
         type: 3}
@@ -876,12 +861,23 @@ PrefabInstance:
     - target: {fileID: 459336622430151955, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
         type: 3}
       propertyPath: seed
-      value: 5feef
+      value: Step
       objectReference: {fileID: 0}
     - target: {fileID: 459336622430151955, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
         type: 3}
-      propertyPath: maxCorridorThickness
-      value: 15
+      propertyPath: useRandomSeed
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 561011864743673710, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
+        type: 3}
+      propertyPath: textFilePath
+      value: /home/jimbo/Documents/dev/Unity/Projects/ProjectArena-New/ProjectArena/Unity/Project
+        Arena/Assets/Maps/Experiment 1/ai_rockets.txt
+      objectReference: {fileID: 0}
+    - target: {fileID: 561011864743673710, guid: b0fb2683cafdfe0ec88bf193abc9cb18,
+        type: 3}
+      propertyPath: loadMapFromFile
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b0fb2683cafdfe0ec88bf193abc9cb18, type: 3}

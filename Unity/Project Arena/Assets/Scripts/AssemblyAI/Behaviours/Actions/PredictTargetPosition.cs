@@ -1,7 +1,7 @@
 using System;
+using AssemblyAI.AI.Layer2;
 using AssemblyAI.Behaviours.Variables;
 using BehaviorDesigner.Runtime.Tasks;
-using Entities.AI.Layer2;
 using UnityEngine;
 using UnityEngine.AI;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
@@ -21,7 +21,7 @@ namespace AssemblyAI.Behaviours.Actions
         public override void OnAwake()
         {
             entity = GetComponent<AIEntity>();
-            navSystem = entity.GetComponent<NavigationSystem>();
+            navSystem = entity.NavigationSystem;
             enemy = entity.GetEnemy();
             predictionSkill = entity.GetPredictionSkill();
         }

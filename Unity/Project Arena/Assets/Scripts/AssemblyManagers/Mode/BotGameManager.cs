@@ -34,7 +34,7 @@ public class BotGameManager : GameManager
     private AIEntity secondAI;
     [SerializeField] private string secondBotParamsFile = "bot2.json";
 
-    [SerializeField] private int playerKillCount = 0;
+    private int playerKillCount = 0;
     private int opponentKillCount = 0;
 
     private int playerID = 1;
@@ -137,9 +137,9 @@ public class BotGameManager : GameManager
     // Updates the phase of the game.
     protected override void UpdateGamePhase()
     {
-        int passedTime = (int) (Time.time - startTime);
-        if (Application.isBatchMode)
-            Debug.Log("Time passed: " + passedTime + " out of " + gameDuration);
+        var passedTime = (int) (Time.time - startTime);
+        // if (Application.isBatchMode)
+        //     Debug.Log("Time passed: " + passedTime + " out of " + gameDuration);
         if (gamePhase == -1)
         {
             // Disable the contenders movement and interactions, activate the ready UI, set the 

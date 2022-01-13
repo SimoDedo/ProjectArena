@@ -28,9 +28,11 @@ namespace AI.Guns
             rangeTuple = new Tuple<float, float>(minRangeBest, maxRangeBest);
         }
 
-        public override float GetGunScore(float distance)
+        public override float GetGunScore(float distance, bool fakeEmptyCharger = false)
         {
-            if (gun.GetCurrentAmmo() == 0)
+            var currentAmmo = gun.GetCurrentAmmo();
+            if (fakeEmptyCharger) {currentAmmo -= gun.GetLoadedAmmo();}
+            if (currentAmmo == 0)
                 return 0.0f;
 
             var score = 0.0f;
@@ -52,7 +54,7 @@ namespace AI.Guns
                 }
             }
 
-            if (gun.GetLoadedAmmo() == 0)
+            if (gun.GetLoadedAmmo() == 0 || fakeEmptyCharger)
                 score *= 0.7f;
 
             return score;

@@ -101,4 +101,5 @@ public class ProjectileGun : Gun {
         return Quaternion.Euler(eulerRotation);
     }
 
+    public override float MaxRange => projectileLifeTime * projectileSpeed;
 }
