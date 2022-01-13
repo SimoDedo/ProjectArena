@@ -1,210 +1,223 @@
+using System;
 using System.Collections.Generic;
 using AssemblyLogging;
 using AssemblyUtils;
 using UnityEngine;
-using Vector2 = System.Numerics.Vector2;
 
 namespace AssemblyTester
 {
     public class GameResultsAnalyzer
     {
-        // Current distance.
-        private readonly Dictionary<int, float> distancesBetweenKills = new Dictionary<int, float>();
+        public void Setup()
+        {
+            // PositionInfoGameEvent.Instance.AddListener(LogPosition);
+            // GameInfoGameEvent.Instance.AddListener(LogGameInfo);
+            // MapInfoGameEvent.Instance.AddListener(LogMapInfo);
+            // ReloadInfoGameEvent.Instance.AddListener(LogReload);
+            // ShotInfoGameEvent.Instance.AddListener(LogShot);
+            // KillInfoGameEvent.Instance.AddListener(LogKill);
+            // HitInfoGameEvent.Instance.AddListener(LogHit);
+            //
+            // EnemyInSightGameEvent.Instance.AddListener(LogEnemyInSight);
+            // EnemyOutOfSightGameEvent.Instance.AddListener(LogEnemyOutOfSight);
 
-        // Total distance.
-        private readonly Dictionary<int, float> totalDistances = new Dictionary<int, float>();
-
-        // Total shots.
-        private readonly Dictionary<int, int> shotCounts = new Dictionary<int, int>();
-
-        // Total hits.
-        private readonly Dictionary<int, int> hitsTaken = new Dictionary<int, int>();
-
-        // Total destroyed targets.
-        private readonly Dictionary<int, int> killCounts = new Dictionary<int, int>();
-
-        // Position of the players.
-        private readonly Dictionary<int, Vector2> lastPositions = new Dictionary<int, Vector2>();
-        private readonly Dictionary<int, Vector2> initialPositions = new Dictionary<int, Vector2>();
-
-        private readonly Dictionary<int, float> lastFightStartTime = new Dictionary<int, float>();
-
-        /// <summary>
-        /// Represents the last time when a fight ended or the last time the entity respawned.
-        /// </summary>
-        private readonly Dictionary<int, float> lastFightEndTime = new Dictionary<int, float>();
-
-        private readonly Dictionary<int, float> totalTimeInFight = new Dictionary<int, float>();
-        private readonly Dictionary<int, float> totalTimeToEngage = new Dictionary<int, float>();
-
-        // /// <summary>
-        // /// Last time when the enemy entered sight and the entity could react to that
-        // /// </summary>
-        // private readonly Dictionary<int, float> lastEnemyInSightTime = new Dictionary<int, float>();
-
-        /// <summary>
-        /// Last time when the enemy got out of sight and the entity could react to that
-        /// </summary>
-        private readonly Dictionary<int, float> lastEnemyOutOfSightTime = new Dictionary<int, float>();
-
-        private readonly Dictionary<int, float> totalTimeBetweenSights = new Dictionary<int, float>();
-
-        /// <summary>
-        /// The number of time an entity sees the enemy
-        /// </summary>
-        private readonly Dictionary<int, int> numberOfDetections = new Dictionary<int, int>();
-
-        /// <summary>
-        /// Last time when we started searching for an enemy lost during fight
-        /// </summary>
-        private readonly Dictionary<int, float> lastStartSearchTime = new Dictionary<int, float>();
-
-        // /// <summary>
-        // /// Last time when we stopped searching for an enemy lost during fight
-        // /// </summary>
-        // private readonly Dictionary<int, float> lastStopSearchTime = new Dictionary<int, float>();
-
-        /// <summary>
-        /// Total time we spent from the start of a search until we stopped searching
-        /// </summary>
-        private readonly Dictionary<int, float> totalTimeToSurrender = new Dictionary<int, float>();
+            SearchInfoGameEvent.Instance.AddListener(LogSearchInfo);
+            FightingStatusGameEvent.Instance.AddListener(LogFightStatus);
+            EnemyAwarenessStatusGameEvent.Instance.AddListener(LogAwareness);
+            SpawnInfoGameEvent.Instance.AddListener(LogSpawn);
+        }
         
-        // Logs info about the maps.
-        public void LogMapInfo(MapInfo info) { }
-
-        // Logs info about the maps.
-        public void LogGameInfo(GameInfo info) { }
-
-        // Logs reload.
-        public void LogReload(ReloadInfo info) { }
-
-        // Logs the shot.
-        public void LogShot(ShotInfo info) { }
-
-        // Logs the position (x and z respectively correspond to row and column in matrix notation).
-        public void LogPosition(PositionInfo info) { }
-
-        // Logs spawn.
-        public void LogSpawn(SpawnInfo info)
+        public void TearDown()
         {
-            lastFightEndTime[info.entityId] = Time.time;
+            // PositionInfoGameEvent.Instance.RemoveListener(LogPosition);
+            // GameInfoGameEvent.Instance.RemoveListener(LogGameInfo);
+            // MapInfoGameEvent.Instance.RemoveListener(LogMapInfo);
+            // ReloadInfoGameEvent.Instance.RemoveListener(LogReload);
+            // ShotInfoGameEvent.Instance.RemoveListener(LogShot);
+            // SpawnInfoGameEvent.Instance.RemoveListener(LogSpawn);
+            // KillInfoGameEvent.Instance.RemoveListener(LogKill);
+            // HitInfoGameEvent.Instance.RemoveListener(LogHit);
+            //
+            // EnemyInSightGameEvent.Instance.RemoveListener(LogEnemyInSight);
+            // EnemyOutOfSightGameEvent.Instance.RemoveListener(LogEnemyOutOfSight);
+            SearchInfoGameEvent.Instance.RemoveListener(LogSearchInfo);
+            FightingStatusGameEvent.Instance.RemoveListener(LogFightStatus);
+            EnemyAwarenessStatusGameEvent.Instance.RemoveListener(LogAwareness);
+            SpawnInfoGameEvent.Instance.RemoveListener(LogSpawn);
+
+        }
+        
+        private void LogSpawn(SpawnInfo receivedInfo)
+        {
+            HandleRespawn(receivedInfo.entityId);
+        }
+        
+        // TODO Handle death!
+        // In case of death:
+        // - I stop fights, if any (TimeInFight). Done by resetting the goal machine (if I was fighting, I exit)
+        // - I stop searches, if any (TimeToSurrender). Done by resetting the goal machine
+        // - I stop being aware of the enemy. (Done by the TargetKnowledgeBase.Reset())
+
+        // DONE!
+        private readonly Dictionary<int, float> timeToEngage = new Dictionary<int, float>();
+
+        // DONE!
+        private readonly Dictionary<int, float> timeInFight = new Dictionary<int, float>();
+
+        // DONE!
+        private readonly Dictionary<int, int> numberOfFights = new Dictionary<int, int>();
+
+        // DONE!
+        private readonly Dictionary<int, float> timeBetweenSights = new Dictionary<int, float>();
+
+        // DONE!
+        private readonly Dictionary<int, int> numberOfSights = new Dictionary<int, int>();
+
+        // DONE!
+        private readonly Dictionary<int, float> timeToSurrender = new Dictionary<int, float>();
+
+        // DONE!
+        private readonly Dictionary<int, int> numberOfRetreats = new Dictionary<int, int>();
+
+        
+        private readonly Dictionary<int, float> respawnTime = new Dictionary<int, float>();
+        private readonly Dictionary<int, float> startFightingTime = new Dictionary<int, float>();
+        private readonly Dictionary<int, float> endFightingTime = new Dictionary<int, float>();
+
+        private readonly Dictionary<int, float> endDetectEnemyTime = new Dictionary<int, float>();
+
+        private void HandleRespawn(int entityId)
+        {
+            // Time to engage stats
+            respawnTime[entityId] = Time.time;
+            // No other relevant stat
         }
 
-        // Logs a kill.
-        public void LogKill(KillInfo info)
+        private readonly Dictionary<int, EnemyAwarenessStatus> latestAwarenessStatus =
+            new Dictionary<int, EnemyAwarenessStatus>();
+
+        private void LogAwareness(EnemyAwarenessStatus receivedInfo)
         {
-            HandleEndOfFight(info.killedEntityID);
-            HandleEnemyOufOfSight(info.killedEntityID);
+            var hasValue = latestAwarenessStatus.TryGetValue(receivedInfo.observerID, out var storedInfo);
+            if (!hasValue || storedInfo.isEnemyDetected != receivedInfo.isEnemyDetected)
+            {
+                latestAwarenessStatus[receivedInfo.observerID] = receivedInfo;
+                if (receivedInfo.isEnemyDetected)
+                {
+                    ProcessAcquireEnemyDetection(receivedInfo.observerID);
+                }
+                else
+                {
+                    ProcessLostEnemyDetection(receivedInfo.observerID);
+                }
+            }
         }
 
-        // Logs a hit.
-        public void LogHit(HitInfo info) { }
+        private void ProcessLostEnemyDetection(int entityId)
+        {
+            endDetectEnemyTime[entityId] = Time.time;
+        }
 
 
-        // Logs statistics about the game.
-        public void LogGameStatistics() { }
+        private void ProcessAcquireEnemyDetection(int entityId)
+        {
+            UpdateTimeBetweenSights(entityId);
+        }
+
+        private void UpdateTimeBetweenSights(int entityId)
+        {
+            if (endDetectEnemyTime.TryGetValue(entityId, out var endTime))
+            {
+                timeBetweenSights.AddToKey(entityId, Time.time - endTime);
+            }
+
+            numberOfSights.AddToKey(entityId, 1);
+        }
+
+        private readonly Dictionary<int, Tuple<float, FightingStatus>> latestFightInfo =
+            new Dictionary<int, Tuple<float, FightingStatus>>();
+
+        private void LogFightStatus(FightingStatus receivedInfo)
+        {
+            var hasValue = latestFightInfo.TryGetValue(receivedInfo.entityId, out var storedInfo);
+            if (!hasValue || storedInfo.Item1 < Time.time &&
+                storedInfo.Item2.isActivelyFighting != receivedInfo.isActivelyFighting)
+            {
+                // There was a change in fighting status now!
+                if (receivedInfo.isActivelyFighting)
+                {
+                    ProcessEnteredFight(receivedInfo.entityId);
+                }
+                else
+                {
+                    ProcessExitedFight(receivedInfo.entityId);
+                }
+            }
+
+            latestFightInfo[receivedInfo.entityId] = new Tuple<float, FightingStatus>(Time.time, receivedInfo);
+        }
+
+        private void ProcessEnteredFight(int entityId)
+        {
+            startFightingTime[entityId] = Time.time;
+            numberOfFights.AddToKey(entityId, 1);
+            UpdateTimeToEngage(entityId);
+        }
+
+        private void UpdateTimeToEngage(int entityId)
+        {
+            respawnTime.TryGetValue(entityId, out var respawn);
+            endFightingTime.TryGetValue(entityId, out var endFight);
+            var startEngage = Mathf.Max(respawn, endFight);
+            timeToEngage.AddToKey(entityId, Time.time - startEngage);
+        }
+
+        private void ProcessExitedFight(int entityId)
+        {
+            endFightingTime[entityId] = Time.time;
+            // Time in fight stats
+            UpdateTimeInFight(entityId);
+        }
+
+        private void UpdateTimeInFight(int entityId)
+        {
+            var startFightTime = startFightingTime[entityId];
+            timeInFight.AddToKey(entityId,Time.time - startFightTime);
+        }
+
+        private readonly Dictionary<int, Tuple<float, SearchInfo>> latestSearchInfo =
+            new Dictionary<int, Tuple<float, SearchInfo>>();
+        
+        // This method should keep track of the previous search info reported by info.searcherID and update
+        // if required.
+        // If the new info has the same search start time, update the previous time used, otherwise close the 
+        // previous search (if any) and open a new one.
+        // When opening a new search, update the number of searches performed by the entity
+        private void LogSearchInfo(SearchInfo receivedInfo)
+        {
+            var hasValue = latestSearchInfo.TryGetValue(receivedInfo.searcherId, out var storedInfo);
+            if (!hasValue || storedInfo.Item2.timeLastSight < receivedInfo.timeLastSight)
+            {
+                timeToSurrender.TryGetValue(receivedInfo.searcherId, out var previousTime);
+                timeToSurrender[receivedInfo.searcherId] =
+                    previousTime + (Time.time - receivedInfo.timeLastSight);
+
+                numberOfRetreats.AddToKey(receivedInfo.searcherId, 1);
+            }
+            else
+            {
+                // The value refers to the same search, update previous!
+                timeToSurrender.TryGetValue(receivedInfo.searcherId, out var previousTime);
+                timeToSurrender[receivedInfo.searcherId] =
+                    previousTime + (Time.time - receivedInfo.timeLastSight) -
+                    (storedInfo.Item1 - storedInfo.Item2.timeLastSight);
+            }
+
+            latestSearchInfo[receivedInfo.searcherId] = new Tuple<float, SearchInfo>(Time.time, receivedInfo);
+        }
 
         public void CompileResults() { }
 
         public void Reset() { }
-
-        public void LogEnemyInSight(int entityID)
-        {
-            HandleEnemyInSight(entityID);
-        }
-
-        public void LogEnemyOutOfSight(int entityID)
-        {
-            HandleEnemyOufOfSight(entityID);
-        }
-
-        public void LogEnterFight(EnterFightInfo obj)
-        {
-            HandleStartOfFight(obj.entityId);
-        }
-
-        public void LogExitFight(ExitFightInfo obj)
-        {
-            HandleEndOfFight(obj.entityId);
-        }
-
-        public void LogStartSearch(int entityID)
-        {
-            HandleStartSearch(entityID);
-        }
-
-        public void LogStopSearch(int entityID)
-        {
-            HandleStopSearch(entityID);
-        }
-
-        private void HandleStartSearch(int entityID)
-        {
-            var startSearchTime = Time.time;
-            lastStartSearchTime[entityID] = startSearchTime;
-            // lastStopSearchTime.Remove(entityID);
-            // Nothing else?
-        }
-
-        private void HandleStopSearch(int entityID)
-        {
-            var stopSearchTime = Time.time;
-            // lastStopSearchTime[entityID] = stopSearchTime;
-            if (lastStartSearchTime.TryGetValue(entityID, out var startSearchTime))
-            {
-                var surrenderTime = stopSearchTime - startSearchTime;
-                totalTimeToSurrender.TryGetValue(entityID, out var previousTimeToSurrender);
-                totalTimeToSurrender[entityID] = previousTimeToSurrender + surrenderTime;
-            }
-
-            lastStartSearchTime.Remove(entityID);
-        }
-
-        private void HandleEnemyOufOfSight(int entityID)
-        {
-            numberOfDetections.AddToKey(entityID, 1);
-            lastEnemyOutOfSightTime[entityID] = Time.time;
-            // lastEnemyInSightTime.Remove(infoKilledEntityID);
-            // Nothing else?
-        }
-
-        private void HandleEnemyInSight(int entityID)
-        {
-            var foundTime = Time.time;
-            // lastEnemyInSightTime[entityID] = foundTime;
-            if (lastEnemyOutOfSightTime.TryGetValue(entityID, out var lastLostTime))
-            {
-                var timeBetweenSights = foundTime - lastLostTime;
-                totalTimeBetweenSights.AddToKey(entityID, timeBetweenSights);
-            }
-
-            lastEnemyOutOfSightTime.Remove(entityID);
-        }
-
-        private void HandleEndOfFight(int entityID)
-        {
-            var endFightTime = Time.time;
-            lastFightEndTime[entityID] = endFightTime;
-            if (lastFightStartTime.TryGetValue(entityID, out var startTime))
-            {
-                var timeInFight = endFightTime - startTime;
-                totalTimeInFight.AddToKey(entityID, timeInFight);
-            }
-
-            lastFightStartTime.Remove(entityID);
-        }
-
-        private void HandleStartOfFight(int entityID)
-        {
-            var startFightTime = Time.time;
-            lastFightStartTime[entityID] = startFightTime;
-            if (lastFightEndTime.TryGetValue(entityID, out var endTime))
-            {
-                var timeToEngage = startFightTime - endTime;
-                totalTimeToEngage.AddToKey(entityID, timeToEngage);
-            }
-
-            lastFightEndTime.Remove(entityID);
-        }
     }
 }

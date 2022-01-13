@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AssemblyAI.AI.Layer1.Sensors;
+using AssemblyLogging;
 using UnityEngine;
 
 namespace AI.KnowledgeBase
@@ -13,12 +14,6 @@ namespace AI.KnowledgeBase
     ///     memoryWindow seconds
     /// - Enemy lost: The enemy is not currently spotted, but it was X seconds ago.
     ///
-    /// It's possible to reduce the amount of time required to spot someone by "focusing".
-    /// Focusing lasts for Y seconds and it's particularly useful if we lost track of the enemy recently in
-    /// order to react faster to its presence.
-    ///
-    /// It's also possible to manually mark the enemy as found (if, for example, we take some damage and we want
-    /// to immediately know it's position)
     /// </summary>
     public class TargetKnowledgeBase
     {
@@ -66,19 +61,6 @@ namespace AI.KnowledgeBase
         private readonly float nonConsecutiveTimeBeforeReaction;
 
         /// <summary>
-        /// If true, the non consecutive time to spot an entity is reduced according to FOCUSED_MULTIPLIER.
-        /// </summary>
-        private bool isFocused;
-
-        /// <summary>
-        /// Amount of time after which the focused condition expires automatically
-        /// </summary>
-        private float focusedExpirationTime;
-
-        private const float FOCUSED_MULTIPLIER = 0.3f;
-        private const float FOCUSED_DEFAULT_TIMEOUT = 4f;
-
-        /// <summary>
         /// List of visibility data gathered so far, excluding data older than memoryWindow
         /// </summary>
         private List<VisibilityInInterval> results = new List<VisibilityInInterval>();
@@ -106,6 +88,7 @@ namespace AI.KnowledgeBase
         public void Update()
         {
             var targetTransform = target.transform;
+            // TODO Understand if this can be removed to avoid magically knowing enemy position when sneaking behind
             var isTargetClose = target.isAlive && (targetTransform.position - me.transform.position).sqrMagnitude < 10;
             var result = isTargetClose || sensor.CanSeeObject(targetTransform, Physics.DefaultRaycastLayers);
             if (results.Count != 0)
@@ -121,29 +104,24 @@ namespace AI.KnowledgeBase
             {
                 results.Add(new VisibilityInInterval {isVisible = result, startTime = Time.time, endTime = Time.time});
             }
-
-            if (isFocused && focusedExpirationTime < Time.time)
-            {
-                isFocused = false;
-            }
-
+            
             ForgetOldData();
+            
+            EnemyAwarenessStatusGameEvent.Instance.Raise(new EnemyAwarenessStatus
+            {
+                observerID = me.GetID(),
+                isEnemyDetected = HasSeenTarget()
+            });
         }
 
         public void Reset()
         {
             results.Clear();
-        }
-
-        public void ApplyFocus(float timeout = FOCUSED_DEFAULT_TIMEOUT)
-        {
-            isFocused = true;
-            focusedExpirationTime = Time.time + timeout;
-        }
-
-        public void RemoveFocus()
-        {
-            isFocused = false;
+            EnemyAwarenessStatusGameEvent.Instance.Raise(new EnemyAwarenessStatus
+            {
+                observerID = me.GetID(),
+                isEnemyDetected = false
+            });
         }
 
         public bool HasSeenTarget()
@@ -151,24 +129,14 @@ namespace AI.KnowledgeBase
             if (!target.isAlive) return false;
             return TestDetection(
                 Time.time - detectionWindow,
-                Time.time,
-                isFocused
+                Time.time
             );
         }
 
         public bool HasLostTarget()
         {
             if (!target.isAlive) return false;
-            if (HasSeenTarget())
-            {
-                return false;
-            }
-
-            return TestDetection(
-                Time.time - memoryWindow,
-                Time.time - detectionWindow,
-                false
-            );
+            return !HasSeenTarget() && TestDetection(Time.time - memoryWindow, Time.time - detectionWindow);
         }
 
         public float GetLastSightedTime()
@@ -197,15 +165,8 @@ namespace AI.KnowledgeBase
         }
 
 
-        private bool TestDetection(
-            float beginTime,
-            float endTime,
-            bool fasterReactionTime
-        )
+        private bool TestDetection(float beginTime, float endTime)
         {
-            var reactionTime = fasterReactionTime
-                ? nonConsecutiveTimeBeforeReaction * FOCUSED_MULTIPLIER
-                : nonConsecutiveTimeBeforeReaction;
             var totalTimeVisible = 0f;
 
             for (var i = results.Count - 1; i >= 0; i--)
@@ -220,7 +181,7 @@ namespace AI.KnowledgeBase
                 if (t.isVisible)
                 {
                     totalTimeVisible += windowLenght;
-                    if (totalTimeVisible > reactionTime) return true;
+                    if (totalTimeVisible > nonConsecutiveTimeBeforeReaction) return true;
                 }
             }
 

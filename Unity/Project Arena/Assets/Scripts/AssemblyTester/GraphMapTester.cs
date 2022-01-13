@@ -41,24 +41,7 @@ namespace AssemblyTester
             }
 
             analyzer = new GameResultsAnalyzer();
-
-            PositionInfoGameEvent.Instance.AddListener(analyzer.LogPosition);
-            GameInfoGameEvent.Instance.AddListener(analyzer.LogGameInfo);
-            MapInfoGameEvent.Instance.AddListener(analyzer.LogMapInfo);
-            ReloadInfoGameEvent.Instance.AddListener(analyzer.LogReload);
-            ShotInfoGameEvent.Instance.AddListener(analyzer.LogShot);
-            SpawnInfoGameEvent.Instance.AddListener(analyzer.LogSpawn);
-            KillInfoGameEvent.Instance.AddListener(analyzer.LogKill);
-            HitInfoGameEvent.Instance.AddListener(analyzer.LogHit);
-            
-            EnemyInSightGameEvent.Instance.AddListener(analyzer.LogEnemyInSight);
-            EnemyOutOfSightGameEvent.Instance.AddListener(analyzer.LogEnemyOutOfSight);
-
-            FightEnterGameEvent.Instance.AddListener(analyzer.LogEnterFight);
-            FightExitGameEvent.Instance.AddListener(analyzer.LogExitFight);
-
-            SearchStartGameEvent.Instance.AddListener(analyzer.LogStartSearch);
-            SearchStopGameEvent.Instance.AddListener(analyzer.LogStopSearch);
+            analyzer.Setup();
             
             StartNewExperimentGameEvent.Instance.AddListener(NewExperimentStarted);
             ExperimentEndedGameEvent.Instance.AddListener(ExperimentEnded);

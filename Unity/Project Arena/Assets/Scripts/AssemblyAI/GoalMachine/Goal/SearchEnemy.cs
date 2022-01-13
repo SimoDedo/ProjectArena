@@ -1,5 +1,6 @@
 using AI.KnowledgeBase;
 using AssemblyAI.AI.Layer1.Sensors;
+using AssemblyLogging;
 using BehaviorDesigner.Runtime;
 using UnityEngine;
 
@@ -53,6 +54,15 @@ namespace AssemblyAI.GoalMachine.Goal
 
         public void Update()
         {
+            if (targetKb.HasLostTarget())
+            {
+                // Log the fact that we are searching for the enemy at this frame
+                SearchInfoGameEvent.Instance.Raise(new SearchInfo
+                {
+                    searcherId = entity.GetID(),
+                    timeLastSight = targetKb.GetLastSightedTime()
+                });
+            } 
             BehaviorManager.instance.Tick(behaviorTree);
         }
 

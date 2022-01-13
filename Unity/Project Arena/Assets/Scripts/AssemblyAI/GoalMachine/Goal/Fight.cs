@@ -1,5 +1,6 @@
 using AI.KnowledgeBase;
 using AssemblyEntity.Component;
+using AssemblyLogging;
 using BehaviorDesigner.Runtime;
 using UnityEngine;
 
@@ -38,6 +39,9 @@ namespace AssemblyAI.GoalMachine.Goal
 
         public void Enter()
         {
+            FightingStatusGameEvent.Instance.Raise(
+                new FightingStatus {entityId = entity.GetID(), isActivelyFighting = true}
+            );
             behaviorTree.EnableBehavior();
             BehaviorManager.instance.RestartBehavior(behaviorTree);
         }
@@ -49,12 +53,6 @@ namespace AssemblyAI.GoalMachine.Goal
 
         public void Exit()
         {
-            if (entity.GetEnemy().isAlive)
-            {
-                // If I'm exiting this state but the enemy is still alive, I want to react faster than usual if I spot
-                // him again. 
-                targetKb.ApplyFocus();
-            }
             behaviorTree.DisableBehavior();
             // Resources.UnloadAsset(externalBt);
             // Object.Destroy(behaviorTree);
