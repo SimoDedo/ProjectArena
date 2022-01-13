@@ -20,8 +20,7 @@ public class ProjectileGun : Gun {
     private void Start()
     {
         t = transform;
-        projectiles = new GameObject("Projectiles - " + gameObject.name);
-        projectiles.transform.parent = t;
+        projectiles = new GameObject("Projectiles - " + gameObject.name); 
         projectiles.transform.localPosition = Vector3.zero;
     }
 
@@ -79,7 +78,7 @@ public class ProjectileGun : Gun {
             projectile = projectileList.Dequeue();
             projectile.SetActive(true);
         } else {
-            projectile = (GameObject)Instantiate(projectilePrefab);
+            projectile = Instantiate(projectilePrefab);
             projectile.transform.parent = projectiles.transform;
             projectile.name = projectilePrefab.name;
             projectile.GetComponent<Projectile>().SetupProjectile(projectileLifeTime,
