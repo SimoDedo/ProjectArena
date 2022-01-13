@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Accord.Statistics.Kernels;
 using AssemblyGraph;
+using Random = System.Random;
 
 namespace AssemblyMaps
 {
@@ -10,9 +12,11 @@ namespace AssemblyMaps
         public readonly int numRows; // DO NOT CHANGE during evolution
         public readonly int numColumns; // DO NOT CHANGE during evolution
 
-        public readonly int rowMaxHeight; // DO NOT CHANGE during evolution
-        public readonly int columnMaxWidth; // DO NOT CHANGE during evolution
+        public readonly int roomMaxSize; // DO NOT CHANGE during evolution
 
+        // Ratio: width / height
+        public readonly float minRatio; // DO NOT CHANGE during evolution
+        public readonly float maxRatio; // DO NOT CHANGE during evolution
         public readonly int corridorThickness; // DO NOT CHANGE during evolution
         public readonly int rowSeparationHeight; // DO NOT CHANGE during evolution
         public readonly int columnSeparationWidth; // DO NOT CHANGE during evolution
@@ -25,8 +29,9 @@ namespace AssemblyMaps
         public GraphGenomeV1(
             int numRows,
             int numColumns,
-            int rowMaxHeight,
-            int columnMaxWidth,
+            int roomMaxSize,
+            float minRatio,
+            float maxRatio,
             int corridorThickness,
             int rowSeparationHeight,
             int columnSeparationWidth,
@@ -37,79 +42,15 @@ namespace AssemblyMaps
         {
             this.numRows = numRows;
             this.numColumns = numColumns;
-            this.rowMaxHeight = rowMaxHeight;
-            this.columnMaxWidth = columnMaxWidth;
+            this.roomMaxSize = roomMaxSize;
             this.corridorThickness = corridorThickness;
             this.roomSizes = roomSizes;
             this.verticalConnections = verticalConnections;
             this.horizontalConnections = horizontalConnections;
+            this.minRatio = minRatio;
+            this.maxRatio = maxRatio;
             this.rowSeparationHeight = rowSeparationHeight;
             this.columnSeparationWidth = columnSeparationWidth;
-        }
-    }
-
-    public static class GenomeGenerator
-    {
-        public static GraphGenomeV1 Generate(
-            int numRows,
-            int numColumns,
-            int rowMaxHeight,
-            int columnMaxWidth,
-            int corridorThickness,
-            int rowSeparations,
-            int colSeparations,
-            Random random
-        )
-        {
-            var roomSizes = new AreaSize[numRows, numColumns];
-            var verticalConnections = new bool[numRows - 1, numColumns];
-            var horizontalConnections = new bool[numRows, numColumns - 1];
-            // Step 1: generate room sizes
-            for (var r = 0; r < numRows; r++)
-            {
-                for (var c = 0; c < numColumns; c++)
-                {
-                    if (random.NextDouble() < 0.3)
-                    {
-                        // Empty room
-                        roomSizes[r, c] = new AreaSize(0, 0);
-                    } else
-                    {
-                        var width = random.Next(corridorThickness, columnMaxWidth + 1);
-                        var height = random.Next(corridorThickness, rowMaxHeight + 1);
-                        roomSizes[r, c] = new AreaSize(width, height);
-                    }
-                }
-            }
-
-            // Step 2: generate vertical corridors
-            for (var r = 0; r < numRows - 1; r++)
-            {
-                for (var c = 0; c < numColumns; c++)
-                {
-                    if (random.NextDouble() > 0.3)
-                    {
-                        verticalConnections[r, c] = true;
-                    }
-                }
-            }
-
-            // Step 3: generate horizontal corridors
-            for (var r = 0; r < numRows; r++)
-            {
-                for (var c = 0; c < numColumns - 1; c++)
-                {
-                    if (random.NextDouble() > 0.3)
-                    {
-                        horizontalConnections[r, c] = true;
-                    }
-                }
-            }
-
-            return new GraphGenomeV1(numRows, numColumns, rowMaxHeight, columnMaxWidth, corridorThickness,
-                rowSeparations, colSeparations,
-                roomSizes,
-                verticalConnections, horizontalConnections);
         }
     }
 
@@ -149,49 +90,58 @@ namespace AssemblyMaps
             // Step 1: Consistency checks
             // FIXME: probably the first two consistency checks are not useful
             // Check that no row has only 0 sized rooms
-            for (var r = 0; r < genome.numRows; r++)
-            {
-                var okRow = false;
-                for (var c = 0; c < genome.numColumns; c++)
-                {
-                    okRow |= genome.roomSizes[r, c].height > 0;
-                }
+            // for (var r = 0; r < genome.numRows; r++)
+            // {
+            //     var okRow = false;
+            //     for (var c = 0; c < genome.numColumns; c++)
+            //     {
+            //         okRow |= genome.roomSizes[r, c].height > 0;
+            //     }
+            //
+            //     if (!okRow) throw new ApplicationException("Invalid genome: row has no room with height > 0");
+            // }
 
-                if (!okRow) throw new ApplicationException("Invalid genome: row has no room with height > 0");
+            //Check that at least one room exists
+            var foundValidRoom = false;
+            for (var r = 0; r < genome.numRows && !foundValidRoom; r++)
+            {
+                for (var c = 0; c < genome.numColumns && !foundValidRoom; c++)
+                    foundValidRoom |= !genome.roomSizes[r, c].IsZeroSized;
             }
 
+            if (!foundValidRoom) throw new ApplicationException("Invalid genome: no rooms!");
             // Check that no room has height greater than max
             for (var r = 0; r < genome.numRows; r++)
             {
                 for (var c = 0; c < genome.numColumns; c++)
                 {
-                    if (genome.roomSizes[r, c].height > genome.rowMaxHeight)
+                    if (genome.roomSizes[r, c].height > genome.roomMaxSize)
                         throw new ApplicationException(
-                            "Invalid genome: room height is greater than the max row height"
+                            "Invalid genome: room " + r + ", " + c + " height is greater than the max row height"
                         );
                 }
             }
 
-            // Check that no column has only 0 sized rooms
-            for (var c = 0; c < genome.numColumns; c++)
-            {
-                var okColumn = false;
-                for (var r = 0; r < genome.numRows; r++)
-                {
-                    okColumn |= genome.roomSizes[r, c].width > 0;
-                }
-
-                if (!okColumn) throw new ApplicationException("Invalid genome: column has no room with width > 0");
-            }
+            // // Check that no column has only 0 sized rooms
+            // for (var c = 0; c < genome.numColumns; c++)
+            // {
+            //     var okColumn = false;
+            //     for (var r = 0; r < genome.numRows; r++)
+            //     {
+            //         okColumn |= genome.roomSizes[r, c].width > 0;
+            //     }
+            //
+            //     if (!okColumn) throw new ApplicationException("Invalid genome: column has no room with width > 0");
+            // }
 
             // Check that no room has width greater than max
             for (var r = 0; r < genome.numRows; r++)
             {
                 for (var c = 0; c < genome.numColumns; c++)
                 {
-                    if (genome.roomSizes[r, c].width > genome.columnMaxWidth)
+                    if (genome.roomSizes[r, c].width > genome.roomMaxSize)
                         throw new ApplicationException(
-                            "Invalid genome: room width is greater than the max column width"
+                            "Invalid genome: room " + r + ", " + c + " width is greater than the max column width"
                         );
                 }
             }
@@ -202,7 +152,22 @@ namespace AssemblyMaps
                 for (var c = 0; c < genome.numColumns; c++)
                 {
                     if (genome.roomSizes[r, c].IsInvalid)
-                        throw new ApplicationException("Invalid genome: room has invalid dimensions!");
+                        throw new ApplicationException("Invalid genome: room " + r + ", " + c +
+                            " has invalid dimensions!");
+                }
+            }
+
+            // Check that ratio are respected
+            for (var r = 0; r < genome.numRows; r++)
+            {
+                for (var c = 0; c < genome.numColumns; c++)
+                {
+                    var size = genome.roomSizes[r, c];
+                    if (size.IsZeroSized) continue;
+                    var ratio = size.width / (float) size.height;
+                    if (ratio < genome.minRatio || ratio > genome.maxRatio)
+                        throw new ApplicationException("Invalid genome: room " + r + ", " + c +
+                            " has invalid dimensions!");
                 }
             }
 
@@ -391,6 +356,9 @@ namespace AssemblyMaps
             var endingRow = selectedStartingRow + roomHeight;
             var endingCol = selectedStartingColumn + roomWidth;
 
+            // If a room is small enough, do not consider it a room, but rather a corridor
+            if (roomWidth == genome.corridorThickness && roomHeight == genome.corridorThickness)
+                return new Area(selectedStartingColumn, selectedStartingRow, endingCol, endingRow, isDummyRoom: true);
             return new Area(selectedStartingColumn, selectedStartingRow, endingCol, endingRow);
         }
 
@@ -431,44 +399,6 @@ namespace AssemblyMaps
             if (column < genome.numColumns - 1 && genome.horizontalConnections[row, column])
                 connectedComponents += GenomeGraphVisit(ccNumber, row, column + 1, genome, ccRooms);
             return connectedComponents;
-        }
-    }
-
-    internal static class IENumerableExtension
-    {
-        public static IEnumerable<int> CumulativeSum(this IEnumerable<int> sequence)
-        {
-            using var iterator = sequence.GetEnumerator();
-            if (!iterator.MoveNext())
-            {
-                yield break;
-            }
-
-            yield return 0;
-            var previous = iterator.Current;
-            var sum = 0;
-            while (iterator.MoveNext())
-            {
-                sum += previous;
-                yield return sum;
-                previous = iterator.Current;
-            }
-        }
-
-        public static IEnumerable<int> SkipLast(this IEnumerable<int> source)
-        {
-            using var iterator = source.GetEnumerator();
-            if (!iterator.MoveNext())
-            {
-                yield break;
-            }
-
-            var previous = iterator.Current;
-            while (iterator.MoveNext())
-            {
-                yield return previous;
-                previous = iterator.Current;
-            }
         }
     }
 }

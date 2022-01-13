@@ -95,7 +95,7 @@ public class ObjectDisplacer : CoreComponent {
 
         foreach (Transform category in transform) {
             foreach (Transform child in category) {
-                GameObject.Destroy(child.gameObject);
+                Destroy(child.gameObject);
             }
         }
     }

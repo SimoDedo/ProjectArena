@@ -88,6 +88,10 @@ namespace AssemblyGraph
 
         public NodeProperties GetNodeProperties(int nodeID)
         {
+            if (!nodeProperties.ContainsKey(nodeID))
+            {
+                Debug.Log("!?");
+            }
             return nodeProperties[nodeID];
         }
 
