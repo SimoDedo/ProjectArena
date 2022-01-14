@@ -18,6 +18,8 @@ namespace AssemblyTester
         [SerializeField] private bool[] activeGunsBot2;
         [SerializeField] private MapManager mapManager;
         [SerializeField] private SpawnPointManager spawnPointManager;
+        [SerializeField] private int numExperiments = 1;
+        [SerializeField] private string experimentName = "experiment";
 
         // Size of a maps tile.
         private const float TILE_SIZE = 1;
@@ -25,7 +27,8 @@ namespace AssemblyTester
         private GraphTesterGameManager manager;
         private GameResultsAnalyzer analyzer;
 
-        private int experimentNumber = 0;
+        private int experimentNumber;
+
 
         private void Awake()
         {
@@ -38,6 +41,8 @@ namespace AssemblyTester
             {
                 if (arg.StartsWith("-bot1file=")) bot1ParamsPath = arg.Substring(10);
                 if (arg.StartsWith("-bot2file=")) bot2ParamsPath = arg.Substring(10);
+                if (arg.StartsWith("-numExperiments=")) numExperiments = int.Parse(arg.Substring(16));
+                if (arg.StartsWith("-experimentName=")) experimentName = arg.Substring(16);
             }
 
             analyzer = new GameResultsAnalyzer();
@@ -72,18 +77,47 @@ namespace AssemblyTester
         private void ExperimentEnded()
         {
             Debug.Log("Experiment num " + +experimentNumber + " ended!");
-            experimentNumber++;
 
             manager.StopGame();
             Destroy(manager);
+            
+            ExportResults(analyzer.CompileResults(), experimentName, experimentNumber);
 
-            mapManager.ResetMap();
-            spawnPointManager.Reset();
+            experimentNumber++;
 
-            analyzer.CompileResults();
             analyzer.Reset();
 
-            StartCoroutine(WaitAndStart());
+            if (experimentNumber >= numExperiments)
+            {
+                Application.Quit();
+            }
+            else
+            {
+                mapManager.ResetMap();
+                spawnPointManager.Reset();
+
+                StartCoroutine(WaitAndStart());
+            }
+        }
+
+        private static void ExportResults(string compileResults, string experimentName, int experimentNum)
+        {
+            var exportPath = Application.persistentDataPath + "/Export";
+            if (!Directory.Exists(exportPath))
+            {
+                Directory.CreateDirectory(exportPath);
+            }
+
+            var filePath = exportPath + "/" + experimentName + experimentNum + ".json";
+            try
+            {
+                using var writer = new StreamWriter(filePath);
+                writer.Write(compileResults);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Couldn't export results!, error " + e.Message);
+            }
         }
 
         private IEnumerator WaitAndStart()

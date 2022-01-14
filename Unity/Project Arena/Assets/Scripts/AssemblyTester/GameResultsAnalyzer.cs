@@ -285,22 +285,10 @@ namespace AssemblyTester
             latestSearchInfo[receivedInfo.searcherId] = new Tuple<float, SearchInfo>(Time.time, receivedInfo);
         }
 
-        public void CompileResults()
+        public string CompileResults()
         {
             // TODO Is everything done by the end of the game?
             // e.g. killstreaks are closed, searches are over, ...
-
-            // Just show the results?
-            Debug.Log("TimeToEngage: " + JsonConvert.SerializeObject(timeToEngage));
-            Debug.Log("TimeInFight: " + JsonConvert.SerializeObject(timeInFight));
-            Debug.Log("NumberOfFights: " + JsonConvert.SerializeObject(numberOfFights));
-            Debug.Log("TimeBetweenSights: " + JsonConvert.SerializeObject(timeBetweenSights));
-            Debug.Log("NumberOfSights: " + JsonConvert.SerializeObject(numberOfSights));
-            Debug.Log("TimeToSurrender: " + JsonConvert.SerializeObject(timeToSurrender));
-            Debug.Log("NumberOfRetreats: " + JsonConvert.SerializeObject(numberOfRetreats));
-            Debug.Log("NumberOfFrags: " + JsonConvert.SerializeObject(numberOfFrags));
-            Debug.Log("NumberOfShots: " + JsonConvert.SerializeObject(numberOfShots));
-            Debug.Log("NumberOfHits: " + JsonConvert.SerializeObject(numberOfHits));
 
             // Compile accuracy data
             var totalKeys = new HashSet<int>(numberOfShots.Keys);
@@ -321,9 +309,6 @@ namespace AssemblyTester
                 }
             }
 
-            Debug.Log("Accuracy: " + JsonConvert.SerializeObject(accuracy));
-
-            // Compile average kill streak data
             var killStreakAverage = new Dictionary<int, float>();
             foreach (var key in nonZeroKillStreaksCount.Keys)
             {
@@ -333,8 +318,23 @@ namespace AssemblyTester
                 killStreakAverage.Add(key, sum / (float) count);
             }
 
-            Debug.Log("KillStreakAvg: " + JsonConvert.SerializeObject(killStreakAverage));
-            Debug.Log("KillStreakMax: " + JsonConvert.SerializeObject(killStreakMax));
+            var data = new Dictionary<string, object>
+            {
+                {"timeInFight", timeInFight},
+                {"timeToEngage", timeToEngage},
+                {"numberOfFights", numberOfFights},
+                {"timeBetweenSights", timeBetweenSights},
+                {"timeToSurrender", timeToSurrender},
+                {"numberOfRetreats", numberOfRetreats},
+                {"numberOfFrags", numberOfFrags},
+                {"numberOfShots", numberOfShots},
+                {"numberOfHits", numberOfHits},
+                {"accuracy", accuracy},
+                {"killStreakAverage", killStreakAverage},
+                {"killStreakMax", killStreakMax}
+            };
+
+            return JsonConvert.SerializeObject(data);
         }
     }
 }
