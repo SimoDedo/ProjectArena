@@ -96,7 +96,8 @@ namespace AssemblyAI.Behaviours.Actions
                 var (closeRange, farRange) = gunManager.GetCurrentGunOptimalRange();
                 if (distance < closeRange)
                     movementDirectionDueToGun = -direction;
-                else if (distance > farRange) movementDirectionDueToGun = direction;
+                else if (distance > farRange)
+                    movementDirectionDueToGun = direction;
                 else
                 {
                     // Randomly move through the optimal range of the gun, but not too much
@@ -177,7 +178,16 @@ namespace AssemblyAI.Behaviours.Actions
 
                 // I couldn't see the enemy from any place. This bot is stupid and will rush towards the enemy, thinking
                 // that it might be fleeing...
-                navSystem.SetDestination(targetPos);
+                var enemyPath = navSystem.CalculatePath(targetPos);
+                if (!enemyPath.IsComplete())
+                {
+                    Debug.LogError(
+                        "Enemy is not reachable! My pos: (" + currentPos.x + " , " + currentPos.y + ", " +
+                        currentPos.z + "), enemyPos (" + targetPos.x + " , " + targetPos.y + ", " + targetPos.z + ")"
+                    );
+                }
+
+                navSystem.SetPathToDestination(enemyPath);
                 //... however it should do this only in this frame, not until it has reached the enemy.
                 destination = NoDestination;
             }

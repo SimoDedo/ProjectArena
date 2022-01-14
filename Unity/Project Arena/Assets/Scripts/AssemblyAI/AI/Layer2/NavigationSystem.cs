@@ -111,7 +111,11 @@ namespace AssemblyAI.AI.Layer2
 
         public void CancelPath()
         {
-            agent.ResetPath();
+            if (agent.isOnNavMesh)
+            {
+                agent.ResetPath();
+            }
+
             currentDestination = NoDestination;
         }
 
@@ -135,12 +139,13 @@ namespace AssemblyAI.AI.Layer2
         public void SetDestination(Vector3 destination)
         {
             if (destination == latestDestination) return;
-            
+
             var path = CalculatePath(destination);
             if (!path.IsComplete())
             {
                 throw new ArgumentException("Destination is not reachable!");
             }
+
             latestDestination = destination;
             latestDestinationPath = path;
         }

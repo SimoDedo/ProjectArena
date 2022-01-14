@@ -47,7 +47,7 @@ namespace AssemblyAI.Behaviours.Actions
         {
             var realForward = GetMovementDirection();
             // For some reason we spawn moving up, causing weird issues with look direction
-            if (realForward == Vector3.up)
+            if (realForward == Vector3.up || realForward == Vector3.zero)
                 realForward = transform.forward;
             var angleX = 0f;
             if (MustUpdate())

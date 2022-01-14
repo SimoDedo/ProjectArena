@@ -10,7 +10,6 @@ using UnityEngine;
 /// </summary>
 public class GraphTesterGameManager : GameManager
 {
-    // ReSharper disable once InconsistentNaming
     private const int TOTAL_HEALTH_BOT = 100;
     private bool[] activeGunsBot1;
     private bool[] activeGunsBot2;

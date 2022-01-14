@@ -102,13 +102,13 @@ namespace AssemblyTester
 
         private static void ExportResults(string compileResults, string experimentName, int experimentNum)
         {
-            var exportPath = Application.persistentDataPath + "/Export";
-            if (!Directory.Exists(exportPath))
+            var exportPath = Application.persistentDataPath + "/Export/" + experimentName;
+            if (!Directory.Exists(exportPath)) 
             {
                 Directory.CreateDirectory(exportPath);
             }
 
-            var filePath = exportPath + "/" + experimentName + experimentNum + ".json";
+            var filePath = exportPath + "/" + experimentNum + ".json";
             try
             {
                 using var writer = new StreamWriter(filePath);
