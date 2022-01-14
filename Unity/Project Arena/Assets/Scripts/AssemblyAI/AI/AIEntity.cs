@@ -137,6 +137,8 @@ public class AIEntity : Entity, ILoggable
 
     public GunManager GunManager { get; private set; }
 
+    public bool IsActivelyFighting { get; set; }
+
     private IGoalMachine goalMachine;
 
     private void PrepareComponents(GameManager gms, bool[] ag)
@@ -271,24 +273,30 @@ public class AIEntity : Entity, ILoggable
             lastPositionLog = Time.time;
         }
 
+        var previousFightStatus = IsActivelyFighting;
+        // Reset to false. Combat-driven behaviour will know when to set this to true
+        IsActivelyFighting = false;
+
         if (inGame)
         {
-            // Reset to false. If a fighting goal is triggered, it will update this
-            FightingStatusGameEvent.Instance.Raise(new FightingStatus
-            {
-                entityId = GetID(),
-                isActivelyFighting = false
-            });
             TargetKb.Update();
             PickupKnowledgeBase.Update();
             goalMachine.Update();
 
             // Bot dodge rockets
             ActionDodgeRockets.Perform(this);
-            
+
             // Bot move
             NavigationSystem.MoveAlongPath();
             // TODO 
+        }
+
+        if (previousFightStatus != IsActivelyFighting)
+        {
+            // Changed fighting status this turn!
+            FightingStatusGameEvent.Instance.Raise(
+                new FightingStatus {entityId = GetID(), isActivelyFighting = IsActivelyFighting}
+            );
         }
     }
 

@@ -27,11 +27,10 @@ namespace AssemblyAI.Behaviours.Conditions
 
             if (targetKb.HasSeenTarget())
             {
-                FightingStatusGameEvent.Instance.Raise(
-                    new FightingStatus {entityId = entity.GetID(), isActivelyFighting = true}
-                );
+                entity.IsActivelyFighting = true;
                 return TaskStatus.Success;
             }
+
             return TaskStatus.Failure;
         }
     }

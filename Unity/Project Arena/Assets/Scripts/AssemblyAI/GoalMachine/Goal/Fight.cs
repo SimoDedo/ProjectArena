@@ -39,20 +39,19 @@ namespace AssemblyAI.GoalMachine.Goal
 
         public void Enter()
         {
-            FightingStatusGameEvent.Instance.Raise(
-                new FightingStatus {entityId = entity.GetID(), isActivelyFighting = true}
-            );
             behaviorTree.EnableBehavior();
             BehaviorManager.instance.RestartBehavior(behaviorTree);
         }
 
         public void Update()
         {
+            entity.IsActivelyFighting = true;
             BehaviorManager.instance.Tick(behaviorTree);
         }
 
         public void Exit()
         {
+            entity.IsActivelyFighting = false;
             behaviorTree.DisableBehavior();
             // Resources.UnloadAsset(externalBt);
             // Object.Destroy(behaviorTree);

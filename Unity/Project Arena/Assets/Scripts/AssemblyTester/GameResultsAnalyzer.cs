@@ -1,63 +1,15 @@
 using System;
 using System.Collections.Generic;
+using Accord.Statistics.Kernels;
 using AssemblyLogging;
 using AssemblyUtils;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace AssemblyTester
 {
     public class GameResultsAnalyzer
     {
-        public void Setup()
-        {
-            // PositionInfoGameEvent.Instance.AddListener(LogPosition);
-            // GameInfoGameEvent.Instance.AddListener(LogGameInfo);
-            // MapInfoGameEvent.Instance.AddListener(LogMapInfo);
-            // ReloadInfoGameEvent.Instance.AddListener(LogReload);
-            // ShotInfoGameEvent.Instance.AddListener(LogShot);
-            // KillInfoGameEvent.Instance.AddListener(LogKill);
-            // HitInfoGameEvent.Instance.AddListener(LogHit);
-            //
-            // EnemyInSightGameEvent.Instance.AddListener(LogEnemyInSight);
-            // EnemyOutOfSightGameEvent.Instance.AddListener(LogEnemyOutOfSight);
-
-            SearchInfoGameEvent.Instance.AddListener(LogSearchInfo);
-            FightingStatusGameEvent.Instance.AddListener(LogFightStatus);
-            EnemyAwarenessStatusGameEvent.Instance.AddListener(LogAwareness);
-            SpawnInfoGameEvent.Instance.AddListener(LogSpawn);
-        }
-        
-        public void TearDown()
-        {
-            // PositionInfoGameEvent.Instance.RemoveListener(LogPosition);
-            // GameInfoGameEvent.Instance.RemoveListener(LogGameInfo);
-            // MapInfoGameEvent.Instance.RemoveListener(LogMapInfo);
-            // ReloadInfoGameEvent.Instance.RemoveListener(LogReload);
-            // ShotInfoGameEvent.Instance.RemoveListener(LogShot);
-            // SpawnInfoGameEvent.Instance.RemoveListener(LogSpawn);
-            // KillInfoGameEvent.Instance.RemoveListener(LogKill);
-            // HitInfoGameEvent.Instance.RemoveListener(LogHit);
-            //
-            // EnemyInSightGameEvent.Instance.RemoveListener(LogEnemyInSight);
-            // EnemyOutOfSightGameEvent.Instance.RemoveListener(LogEnemyOutOfSight);
-            SearchInfoGameEvent.Instance.RemoveListener(LogSearchInfo);
-            FightingStatusGameEvent.Instance.RemoveListener(LogFightStatus);
-            EnemyAwarenessStatusGameEvent.Instance.RemoveListener(LogAwareness);
-            SpawnInfoGameEvent.Instance.RemoveListener(LogSpawn);
-
-        }
-        
-        private void LogSpawn(SpawnInfo receivedInfo)
-        {
-            HandleRespawn(receivedInfo.entityId);
-        }
-        
-        // TODO Handle death!
-        // In case of death:
-        // - I stop fights, if any (TimeInFight). Done by resetting the goal machine (if I was fighting, I exit)
-        // - I stop searches, if any (TimeToSurrender). Done by resetting the goal machine
-        // - I stop being aware of the enemy. (Done by the TargetKnowledgeBase.Reset())
-
         // DONE!
         private readonly Dictionary<int, float> timeToEngage = new Dictionary<int, float>();
 
@@ -79,12 +31,39 @@ namespace AssemblyTester
         // DONE!
         private readonly Dictionary<int, int> numberOfRetreats = new Dictionary<int, int>();
 
-        
+
         private readonly Dictionary<int, float> respawnTime = new Dictionary<int, float>();
         private readonly Dictionary<int, float> startFightingTime = new Dictionary<int, float>();
         private readonly Dictionary<int, float> endFightingTime = new Dictionary<int, float>();
 
         private readonly Dictionary<int, float> endDetectEnemyTime = new Dictionary<int, float>();
+
+        private readonly Dictionary<int, EnemyAwarenessStatus> latestAwarenessStatus =
+            new Dictionary<int, EnemyAwarenessStatus>();
+
+        private readonly Dictionary<int, FightingStatus> latestFightInfo =
+            new Dictionary<int, FightingStatus>();
+
+        public void Setup()
+        {
+            SearchInfoGameEvent.Instance.AddListener(LogSearchInfo);
+            FightingStatusGameEvent.Instance.AddListener(LogFightStatus);
+            EnemyAwarenessStatusGameEvent.Instance.AddListener(LogAwareness);
+            SpawnInfoGameEvent.Instance.AddListener(LogSpawn);
+        }
+
+        public void TearDown()
+        {
+            SearchInfoGameEvent.Instance.RemoveListener(LogSearchInfo);
+            FightingStatusGameEvent.Instance.RemoveListener(LogFightStatus);
+            EnemyAwarenessStatusGameEvent.Instance.RemoveListener(LogAwareness);
+            SpawnInfoGameEvent.Instance.RemoveListener(LogSpawn);
+        }
+
+        private void LogSpawn(SpawnInfo receivedInfo)
+        {
+            HandleRespawn(receivedInfo.entityId);
+        }
 
         private void HandleRespawn(int entityId)
         {
@@ -92,9 +71,6 @@ namespace AssemblyTester
             respawnTime[entityId] = Time.time;
             // No other relevant stat
         }
-
-        private readonly Dictionary<int, EnemyAwarenessStatus> latestAwarenessStatus =
-            new Dictionary<int, EnemyAwarenessStatus>();
 
         private void LogAwareness(EnemyAwarenessStatus receivedInfo)
         {
@@ -134,14 +110,10 @@ namespace AssemblyTester
             numberOfSights.AddToKey(entityId, 1);
         }
 
-        private readonly Dictionary<int, Tuple<float, FightingStatus>> latestFightInfo =
-            new Dictionary<int, Tuple<float, FightingStatus>>();
-
         private void LogFightStatus(FightingStatus receivedInfo)
         {
             var hasValue = latestFightInfo.TryGetValue(receivedInfo.entityId, out var storedInfo);
-            if (!hasValue || storedInfo.Item1 < Time.time &&
-                storedInfo.Item2.isActivelyFighting != receivedInfo.isActivelyFighting)
+            if (hasValue && storedInfo.isActivelyFighting != receivedInfo.isActivelyFighting)
             {
                 // There was a change in fighting status now!
                 if (receivedInfo.isActivelyFighting)
@@ -154,7 +126,7 @@ namespace AssemblyTester
                 }
             }
 
-            latestFightInfo[receivedInfo.entityId] = new Tuple<float, FightingStatus>(Time.time, receivedInfo);
+            latestFightInfo[receivedInfo.entityId] = receivedInfo;
         }
 
         private void ProcessEnteredFight(int entityId)
@@ -181,13 +153,15 @@ namespace AssemblyTester
 
         private void UpdateTimeInFight(int entityId)
         {
-            var startFightTime = startFightingTime[entityId];
-            timeInFight.AddToKey(entityId,Time.time - startFightTime);
+            if (startFightingTime.TryGetValue(entityId, out var startFightTime))
+            {
+                timeInFight.AddToKey(entityId, Time.time - startFightTime);
+            }
         }
 
         private readonly Dictionary<int, Tuple<float, SearchInfo>> latestSearchInfo =
             new Dictionary<int, Tuple<float, SearchInfo>>();
-        
+
         // This method should keep track of the previous search info reported by info.searcherID and update
         // if required.
         // If the new info has the same search start time, update the previous time used, otherwise close the 
@@ -216,8 +190,39 @@ namespace AssemblyTester
             latestSearchInfo[receivedInfo.searcherId] = new Tuple<float, SearchInfo>(Time.time, receivedInfo);
         }
 
-        public void CompileResults() { }
+        public void CompileResults()
+        {
+            // Just show the results?
+            Debug.Log("TimeToEngage: " + JsonConvert.SerializeObject(timeToEngage));
+            Debug.Log("TimeInFight: " + JsonConvert.SerializeObject(timeInFight));
+            Debug.Log("NumberOfFights: " + JsonConvert.SerializeObject(numberOfFights));
+            Debug.Log("TimeBetweenSights: " + JsonConvert.SerializeObject(timeBetweenSights));
+            Debug.Log("NumberOfSights: " + JsonConvert.SerializeObject(numberOfSights));
+            Debug.Log("TimeToSurrender: " + JsonConvert.SerializeObject(timeToSurrender));
+            Debug.Log("NumberOfRetreats: " + JsonConvert.SerializeObject(numberOfRetreats));
+            // Debug.Log("Results: " + JsonConvert.SerializeObject(respawnTime));
+            // Debug.Log("Results: " + JsonConvert.SerializeObject(latestAwarenessStatus));
+            // Debug.Log("Results: " + JsonConvert.SerializeObject(startFightingTime));
+            // Debug.Log("Results: " + JsonConvert.SerializeObject(endFightingTime));
+            // Debug.Log("Results: " + JsonConvert.SerializeObject(endDetectEnemyTime));
+            // Debug.Log("Results: " + JsonConvert.SerializeObject(latestFightInfo));
+        }
 
-        public void Reset() { }
+        public void Reset()
+        {
+            timeToEngage.Clear();
+            timeInFight.Clear();
+            numberOfFights.Clear();
+            timeBetweenSights.Clear();
+            numberOfSights.Clear();
+            timeToSurrender.Clear();
+            numberOfRetreats.Clear();
+            respawnTime.Clear();
+            latestAwarenessStatus.Clear();
+            startFightingTime.Clear();
+            endFightingTime.Clear();
+            endDetectEnemyTime.Clear();
+            latestFightInfo.Clear();
+        }
     }
 }
