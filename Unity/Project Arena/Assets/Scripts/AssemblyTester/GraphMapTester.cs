@@ -31,8 +31,8 @@ namespace AssemblyTester
         {
             #if !UNITY_EDITOR
                 Time.captureFramerate = 30;
+                Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
             #endif
-            
             var args = Environment.GetCommandLineArgs();
             foreach (var arg in args)
             {
@@ -42,7 +42,7 @@ namespace AssemblyTester
 
             analyzer = new GameResultsAnalyzer();
             analyzer.Setup();
-            
+
             StartNewExperimentGameEvent.Instance.AddListener(NewExperimentStarted);
             ExperimentEndedGameEvent.Instance.AddListener(ExperimentEnded);
 
@@ -57,8 +57,16 @@ namespace AssemblyTester
             manager = gameObject.AddComponent<GraphTesterGameManager>();
             var bot1Params = LoadBotCharacteristics(bot1ParamsPath);
             var bot2Params = LoadBotCharacteristics(bot2ParamsPath);
-            manager.SetParameters(botPrefab, bot1Params, activeGunsBot1, bot2Params, activeGunsBot2, mapPath,
-                mapManager, spawnPointManager);
+            manager.SetParameters(
+                botPrefab,
+                bot1Params,
+                activeGunsBot1,
+                bot2Params,
+                activeGunsBot2,
+                mapPath,
+                mapManager,
+                spawnPointManager
+            );
         }
 
         private void ExperimentEnded()
@@ -84,6 +92,7 @@ namespace AssemblyTester
             mapManager.ManageMap(true);
             StartNewExperiment();
         }
+
         private void NewExperimentStarted()
         {
             Debug.Log("Experiment num " + experimentNumber + " started!");
@@ -103,7 +112,8 @@ namespace AssemblyTester
                 using var reader = new StreamReader(filePath);
                 var botParams = reader.ReadToEnd();
                 return JsonUtility.FromJson<BotCharacteristics>(botParams);
-            } catch (Exception)
+            }
+            catch (Exception)
             {
                 var rtn = BotCharacteristics.Default;
                 try
@@ -112,7 +122,8 @@ namespace AssemblyTester
                     using var writer = new StreamWriter(filePath);
                     writer.Write(json);
                     writer.Close();
-                } catch (Exception)
+                }
+                catch (Exception)
                 {
                     // Ignored, could not generate default file.
                 }

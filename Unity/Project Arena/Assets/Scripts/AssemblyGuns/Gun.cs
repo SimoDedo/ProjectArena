@@ -92,7 +92,7 @@ public abstract class Gun : MonoBehaviour, ILoggable
     protected int gunId;
 
     // Do I have to log?
-    protected bool loggingGame = false;
+    protected bool loggingGame = true;
 
     public bool IsReloading => reloading;
 
