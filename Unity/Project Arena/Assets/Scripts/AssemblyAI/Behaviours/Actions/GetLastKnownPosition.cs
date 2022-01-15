@@ -61,14 +61,27 @@ namespace AssemblyAI.Behaviours.Actions
             if (pathToEstimatedPos.IsComplete())
             {
                 lastKnownPositionPath.Value = pathToEstimatedPos;
+                if (lastKnownPositionPath.Value.corners.Length == 0)
+                {
+                    Debug.Log("NO");
+                }
                 return TaskStatus.Success;
                 
             }
 
             // Point wasn't valid, perhaps estimated position was OOB, use position
             var pathToPosition = navSystem.CalculatePath(position);
-            lastKnownPositionPath.Value = pathToPosition;
-            return TaskStatus.Success;
+            if (pathToPosition.IsComplete())
+            {
+                lastKnownPositionPath.Value = pathToPosition;
+                if (lastKnownPositionPath.Value.corners.Length == 0)
+                {
+                    Debug.Log("NO");
+                }
+                return TaskStatus.Success;
+            }
+
+            throw new ArgumentException("AAAA");
         }
 
         private TaskStatus EstimateEnemyPositionFromDamage()
@@ -99,14 +112,38 @@ namespace AssemblyAI.Behaviours.Actions
                 if (path.IsComplete())
                 {
                     lastKnownPositionPath.Value = path;
+                    if (lastKnownPositionPath.Value.corners.Length == 0)
+                    {
+                        Debug.Log("NO");
+                    }
+
                     return TaskStatus.Success;
                 }
                 // The position chosen is not valid... choose the point we have hit?
                 var path2 = navSystem.CalculatePath(hit.point);
-                lastKnownPositionPath.Value = path2;
-                return TaskStatus.Success;
+                if (path2.IsComplete())
+                {
+                    lastKnownPositionPath.Value = path2; 
+                    return TaskStatus.Success;
+                }
+                Debug.Log("WHY?");
+                // todo i'd like to understand why is the point unreachable here...
+                // ... choose enemy position...
+                var path3 = navSystem.CalculatePath(enemyPos);
+                if (path3.IsComplete())
+                {
+                    lastKnownPositionPath.Value = path3;
+                    return TaskStatus.Success;
+                }
+                // Give up on life
+                throw new ArgumentException("Cannot get valid path to enemy");
+            }
+            if (lastKnownPositionPath.Value.corners.Length == 0)
+            {
+                Debug.Log("NO");
             }
             // How come we haven't spotted anything in the enemy direction? Not even the enemy? Impossible!
+            Debug.Log("NO");
             throw new ApplicationException("We couldn't spot the enemy even when raycasting towards it!");
         }
     }

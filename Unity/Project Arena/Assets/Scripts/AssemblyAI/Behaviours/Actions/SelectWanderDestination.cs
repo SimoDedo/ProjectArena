@@ -57,8 +57,9 @@ namespace AssemblyAI.Behaviours.Actions
                 // We didn't got a result, apply short travel for now...
                 result = SelectShortWanderDestination();
             }
-
-            return result ? TaskStatus.Success : TaskStatus.Running;
+            
+            return result ? TaskStatus.Success : TaskStatus.Failure;
+            
         }
 
         private bool SelectLongWanderDestination()

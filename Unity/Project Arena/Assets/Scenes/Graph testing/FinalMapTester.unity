@@ -243,6 +243,8 @@ MonoBehaviour:
   activeGunsBot2: 01010101
   mapManager: {fileID: 8576320533562149655}
   spawnPointManager: {fileID: 1306383530137614300}
+  numExperiments: 100
+  experimentName: experiment
 --- !u!4 &1592271035
 Transform:
   m_ObjectHideFlags: 0

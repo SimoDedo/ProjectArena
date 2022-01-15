@@ -2,6 +2,7 @@ using System;
 using AssemblyAI.AI.Layer2;
 using AssemblyAI.Behaviours.Variables;
 using BehaviorDesigner.Runtime.Tasks;
+using Others;
 using UnityEngine;
 using UnityEngine.AI;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
@@ -37,9 +38,14 @@ namespace AssemblyAI.Behaviours.Actions
             }
 
             var path = navSystem.CalculatePath(enemy.transform.position);
-            if (path.status == NavMeshPathStatus.PathComplete)
+            if (path.IsComplete())
             {
                 pathChosen.Value = path;
+                if (pathChosen.Value.corners.Length == 0)
+                {
+                    Debug.Log("NO");
+                }
+
                 return TaskStatus.Success;
             }
 

@@ -18,6 +18,10 @@ namespace AssemblyAI.Behaviours.Actions
         public override void OnStart()
         {
             navSystem = GetComponent<AIEntity>().NavigationSystem;
+            if (pathToApply.Value.corners.Length == 0)
+            {
+                Debug.LogError("PROBLEM");
+            }
             pathDestination = pathToApply.Value.corners.Last();
         }
 
