@@ -28,10 +28,6 @@ namespace Others
         
         public static bool IsComplete(this NavMeshPath path)
         {
-            if (path.status == NavMeshPathStatus.PathComplete && path.corners.Length == 0)
-            {
-                Debug.LogError("What is this?");
-            }
             return path.status == NavMeshPathStatus.PathComplete;
         }
         

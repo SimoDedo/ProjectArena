@@ -89,7 +89,7 @@ namespace AI.KnowledgeBase
         {
             var targetTransform = target.transform;
             // TODO Understand if this can be removed to avoid magically knowing enemy position when sneaking behind
-            var isTargetClose = target.isAlive && (targetTransform.position - me.transform.position).sqrMagnitude < 10;
+            var isTargetClose = target.IsAlive && (targetTransform.position - me.transform.position).sqrMagnitude < 10;
             var result = isTargetClose || sensor.CanSeeObject(targetTransform, Physics.DefaultRaycastLayers);
             if (results.Count != 0)
             {
@@ -126,7 +126,7 @@ namespace AI.KnowledgeBase
 
         public bool HasSeenTarget()
         {
-            if (!target.isAlive) return false;
+            if (!target.IsAlive) return false;
             return TestDetection(
                 Time.time - detectionWindow,
                 Time.time
@@ -135,7 +135,7 @@ namespace AI.KnowledgeBase
 
         public bool HasLostTarget()
         {
-            if (!target.isAlive) return false;
+            if (!target.IsAlive) return false;
             return !HasSeenTarget() && TestDetection(Time.time - memoryWindow, Time.time - detectionWindow);
         }
 

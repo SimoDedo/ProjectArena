@@ -33,7 +33,7 @@ namespace AssemblyAI.GoalMachine.Goal
         {
             var searchDueToLoss = targetKb.HasLostTarget();
             var searchDueToDamage = !targetKb.HasSeenTarget() && damageSensor.WasDamagedRecently;
-            if (entity.GetEnemy().isAlive && (searchDueToLoss || searchDueToDamage))
+            if (entity.GetEnemy().IsAlive && (searchDueToLoss || searchDueToDamage))
             {
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (startSearchTime == NO_TIME)

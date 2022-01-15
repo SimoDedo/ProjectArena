@@ -52,36 +52,28 @@ namespace AssemblyAI.Behaviours.Actions
         private TaskStatus EstimateEnemyPositionFromKnowledge()
         {
             var delay = Time.time - knowledgeBase.GetLastSightedTime();
-            var (position, velocity) = enemyTracker.GetPositionAndVelocityFromDelay(delay);
+            var (delayedPosition, velocity) = enemyTracker.GetPositionAndVelocityFromDelay(delay);
             
             // Try to estimate the position of the enemy after it has gone out of sight
-            var estimatedPosition = position + velocity * 0.1f;
+            var estimatedPosition = delayedPosition + velocity * 0.1f;
 
             var pathToEstimatedPos = navSystem.CalculatePath(estimatedPosition);
             if (pathToEstimatedPos.IsComplete())
             {
                 lastKnownPositionPath.Value = pathToEstimatedPos;
-                if (lastKnownPositionPath.Value.corners.Length == 0)
-                {
-                    Debug.Log("NO");
-                }
                 return TaskStatus.Success;
                 
             }
 
             // Point wasn't valid, perhaps estimated position was OOB, use position
-            var pathToPosition = navSystem.CalculatePath(position);
-            if (pathToPosition.IsComplete())
+            var pathToDelayedPosition = navSystem.CalculatePath(delayedPosition);
+            if (pathToDelayedPosition.IsComplete())
             {
-                lastKnownPositionPath.Value = pathToPosition;
-                if (lastKnownPositionPath.Value.corners.Length == 0)
-                {
-                    Debug.Log("NO");
-                }
+                lastKnownPositionPath.Value = pathToDelayedPosition;
                 return TaskStatus.Success;
             }
-
-            throw new ArgumentException("AAAA");
+            
+            throw new ArgumentException("Impossible to reach the enemy, estimated position in not valid!");
         }
 
         private TaskStatus EstimateEnemyPositionFromDamage()
@@ -112,11 +104,6 @@ namespace AssemblyAI.Behaviours.Actions
                 if (path.IsComplete())
                 {
                     lastKnownPositionPath.Value = path;
-                    if (lastKnownPositionPath.Value.corners.Length == 0)
-                    {
-                        Debug.Log("NO");
-                    }
-
                     return TaskStatus.Success;
                 }
                 // The position chosen is not valid... choose the point we have hit?
@@ -126,7 +113,6 @@ namespace AssemblyAI.Behaviours.Actions
                     lastKnownPositionPath.Value = path2; 
                     return TaskStatus.Success;
                 }
-                Debug.Log("WHY?");
                 // todo i'd like to understand why is the point unreachable here...
                 // ... choose enemy position...
                 var path3 = navSystem.CalculatePath(enemyPos);
@@ -138,12 +124,7 @@ namespace AssemblyAI.Behaviours.Actions
                 // Give up on life
                 throw new ArgumentException("Cannot get valid path to enemy");
             }
-            if (lastKnownPositionPath.Value.corners.Length == 0)
-            {
-                Debug.Log("NO");
-            }
             // How come we haven't spotted anything in the enemy direction? Not even the enemy? Impossible!
-            Debug.Log("NO");
             throw new ApplicationException("We couldn't spot the enemy even when raycasting towards it!");
         }
     }

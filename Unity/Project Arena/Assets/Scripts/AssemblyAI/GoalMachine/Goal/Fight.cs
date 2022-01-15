@@ -31,7 +31,7 @@ namespace AssemblyAI.GoalMachine.Goal
         {
             if (!gunManager.HasAmmo()) return 0;
             // TODO maybe we see enemy, but we want to run away?
-            var canSee = targetKb.HasSeenTarget() && entity.GetEnemy().isAlive;
+            var canSee = targetKb.HasSeenTarget() && entity.GetEnemy().IsAlive;
             var inverseHealthPercentage = 1f - (float) entity.Health / entity.MaxHealth;
             return canSee ? 0.8f - inverseHealthPercentage * LOW_HEALTH_PENALTY : 0.0f;
         }
