@@ -31,7 +31,7 @@ public abstract class Entity : MonoBehaviour
     public abstract void Respawn();
 
     // Returns whether the entity is in game or not
-    public bool isAlive => isActiveAndEnabled && Health > 0;
+    public virtual bool IsAlive => isActiveAndEnabled && Health > 0;
 
     // Slows down the entity.
     public abstract void SlowEntity(float penalty);

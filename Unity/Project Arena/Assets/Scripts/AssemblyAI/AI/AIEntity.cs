@@ -140,6 +140,10 @@ public class AIEntity : Entity, ILoggable
     public bool IsActivelyFighting { get; set; }
 
     private IGoalMachine goalMachine;
+    private bool mustProcessDeath;
+    private int killerId;
+
+    public override bool IsAlive => isActiveAndEnabled && (Health > 0 || mustProcessDeath);
 
     private void PrepareComponents(GameManager gms, bool[] ag)
     {
@@ -213,13 +217,27 @@ public class AIEntity : Entity, ILoggable
                 DamageSensor.GotDamaged();
             }
 
-            // If the health goes under 0, kill the entity and start the respawn process.
-            if (Health <= 0f)
+            if (Health < 0)
             {
-                Health = 0;
-                // Kill the entity.
-                Die(killerID);
+                // Health = 0;
+                // TODO What if multiple entities kill the same one on the same frame?
+                // TODO What if I get killed but in my last frame I pickup a medkit?
+                if (!mustProcessDeath)
+                {
+                    mustProcessDeath = true;
+                    killerId = killerID;
+                }
             }
+        }
+    }
+
+    private void LateUpdate()
+    {
+        if (inGame && mustProcessDeath)
+        {
+            mustProcessDeath = false;
+            // Kill the entity.
+            Die(killerId);
         }
     }
 
@@ -308,6 +326,10 @@ public class AIEntity : Entity, ILoggable
 
     public override void HealFromMedkit(MedkitPickable medkit)
     {
+        if (mustProcessDeath)
+        {
+            Debug.LogWarning("An entity recovered health in the same turn it died!");
+        }
         if (Health + medkit.RestoredHealth > totalHealth)
         {
             Health = totalHealth;
