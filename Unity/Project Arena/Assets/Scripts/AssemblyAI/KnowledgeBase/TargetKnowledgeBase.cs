@@ -24,7 +24,7 @@ namespace AI.KnowledgeBase
         {
             public float startTime; // Inclusive
             public float endTime; // Exclusive
-            public bool isVisible;
+            public float visibilityScore;
         }
 
         /// <summary>
@@ -65,6 +65,13 @@ namespace AI.KnowledgeBase
         /// </summary>
         private List<VisibilityInInterval> results = new List<VisibilityInInterval>();
 
+        private static readonly AnimationCurve DistanceScore = new AnimationCurve(
+            new Keyframe(0f, 5f),
+            new Keyframe(10f, 3f),
+            new Keyframe(30f, 1.5f),
+            new Keyframe(50f, 1f)
+        );
+
         public TargetKnowledgeBase(
             AIEntity me,
             Entity target,
@@ -91,37 +98,28 @@ namespace AI.KnowledgeBase
             // TODO Understand if this can be removed to avoid magically knowing enemy position when sneaking behind
             var isTargetClose = target.IsAlive && (targetTransform.position - me.transform.position).sqrMagnitude < 10;
             var result = isTargetClose || sensor.CanSeeObject(targetTransform, Physics.DefaultRaycastLayers);
-            if (results.Count != 0)
+
+            var score = 0f;
+            if (result)
             {
-                var last = results.Last();
-                last.endTime = Time.time;
-                if (last.isVisible != result)
-                    results.Add(
-                        new VisibilityInInterval {isVisible = result, startTime = Time.time, endTime = Time.time}
-                    );
+                score = DistanceScore.Evaluate((me.transform.position - targetTransform.position).magnitude);
             }
-            else
-            {
-                results.Add(new VisibilityInInterval {isVisible = result, startTime = Time.time, endTime = Time.time});
-            }
-            
+
+            results.Add(new VisibilityInInterval {visibilityScore = score, startTime = Time.time - Time.deltaTime, endTime = Time.time});
+
             ForgetOldData();
-            
-            EnemyAwarenessStatusGameEvent.Instance.Raise(new EnemyAwarenessStatus
-            {
-                observerID = me.GetID(),
-                isEnemyDetected = HasSeenTarget()
-            });
+
+            EnemyAwarenessStatusGameEvent.Instance.Raise(
+                new EnemyAwarenessStatus {observerID = me.GetID(), isEnemyDetected = HasSeenTarget()}
+            );
         }
 
         public void Reset()
         {
             results.Clear();
-            EnemyAwarenessStatusGameEvent.Instance.Raise(new EnemyAwarenessStatus
-            {
-                observerID = me.GetID(),
-                isEnemyDetected = false
-            });
+            EnemyAwarenessStatusGameEvent.Instance.Raise(
+                new EnemyAwarenessStatus {observerID = me.GetID(), isEnemyDetected = false}
+            );
         }
 
         public bool HasSeenTarget()
@@ -142,7 +140,7 @@ namespace AI.KnowledgeBase
         public float GetLastSightedTime()
         {
             var searchTimeEnd = Time.time;
-            var result = results.FindLast(it => it.isVisible && it.startTime < searchTimeEnd);
+            var result = results.FindLast(it => it.visibilityScore != 0 && it.startTime < searchTimeEnd);
             if (result == null)
             {
                 // We don't really know the position of the target, but maybe we got damaged and we want
@@ -178,13 +176,9 @@ namespace AI.KnowledgeBase
                 var windowLenght = Math.Min(t.endTime, endTime) -
                     Math.Max(t.startTime, beginTime);
 
-                if (t.isVisible)
-                {
-                    totalTimeVisible += windowLenght;
-                    if (totalTimeVisible > nonConsecutiveTimeBeforeReaction) return true;
-                }
+                totalTimeVisible += windowLenght * t.visibilityScore;
+                if (totalTimeVisible > nonConsecutiveTimeBeforeReaction) return true;
             }
-
             return false;
         }
     }
