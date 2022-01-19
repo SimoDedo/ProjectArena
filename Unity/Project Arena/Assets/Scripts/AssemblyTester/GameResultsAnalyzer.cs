@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Accord.Statistics.Kernels;
 using AssemblyLogging;
 using AssemblyUtils;
-using Newtonsoft.Json;
 using UnityEngine;
 
 namespace AssemblyTester
@@ -285,7 +283,7 @@ namespace AssemblyTester
             latestSearchInfo[receivedInfo.searcherId] = new Tuple<float, SearchInfo>(Time.time, receivedInfo);
         }
 
-        public string CompileResults()
+        public Dictionary<string, object> CompileResults()
         {
             // TODO Is everything done by the end of the game?
             // e.g. killstreaks are closed, searches are over, ...
@@ -318,23 +316,33 @@ namespace AssemblyTester
                 killStreakAverage.Add(key, sum / (float) count);
             }
 
-            var data = new Dictionary<string, object>
+            return new Dictionary<string, object>
             {
-                {"timeInFight", timeInFight},
-                {"timeToEngage", timeToEngage},
-                {"numberOfFights", numberOfFights},
-                {"timeBetweenSights", timeBetweenSights},
-                {"timeToSurrender", timeToSurrender},
-                {"numberOfRetreats", numberOfRetreats},
-                {"numberOfFrags", numberOfFrags},
-                {"numberOfShots", numberOfShots},
-                {"numberOfHits", numberOfHits},
-                {"accuracy", accuracy},
-                {"killStreakAverage", killStreakAverage},
-                {"killStreakMax", killStreakMax}
+                {"timeInFight1", timeInFight.First().Value},
+                {"timeInFight2", timeInFight.Last().Value},
+                {"timeToEngage1", timeToEngage.First().Value},
+                {"timeToEngage2", timeToEngage.Last().Value},
+                {"numberOfFights1", numberOfFights.First().Value},
+                {"numberOfFights2", numberOfFights.Last().Value},
+                {"timeBetweenSights1", timeBetweenSights.First().Value},
+                {"timeBetweenSights2", timeBetweenSights.Last().Value},
+                {"timeToSurrender1", timeToSurrender.First().Value},
+                {"timeToSurrender2", timeToSurrender.Last().Value},
+                {"numberOfRetreats1", numberOfRetreats.First().Value},
+                {"numberOfRetreats2", numberOfRetreats.Last().Value},
+                {"numberOfFrags1", numberOfFrags.First().Value},
+                {"numberOfFrags2", numberOfFrags.Last().Value},
+                {"numberOfShots1", numberOfShots.First().Value},
+                {"numberOfShots2", numberOfShots.Last().Value},
+                {"numberOfHits1", numberOfHits.First().Value},
+                {"numberOfHits2", numberOfHits.Last().Value},
+                {"accuracy1", accuracy.First().Value},
+                {"accuracy2", accuracy.Last().Value},
+                {"killStreakAverage1", killStreakAverage.First().Value},
+                {"killStreakAverage2", killStreakAverage.Last().Value},
+                {"killStreakMax1", killStreakMax.First().Value},
+                {"killStreakMax2", killStreakMax.Last().Value}
             };
-
-            return JsonConvert.SerializeObject(data);
         }
     }
 }

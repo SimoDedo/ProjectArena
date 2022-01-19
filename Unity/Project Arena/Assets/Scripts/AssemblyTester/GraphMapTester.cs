@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using AssemblyLogging;
 using ExperimentObjects;
 using JsonObjects.Logging.Game;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace AssemblyTester
@@ -29,6 +31,7 @@ namespace AssemblyTester
 
         private int experimentNumber;
 
+        private readonly List<Dictionary<string, object>> results = new List<Dictionary<string, object>>();
 
         private void Awake()
         {
@@ -80,8 +83,8 @@ namespace AssemblyTester
 
             manager.StopGame();
             Destroy(manager);
-            
-            ExportResults(analyzer.CompileResults(), experimentName, experimentNumber);
+
+            results.Add(analyzer.CompileResults());
 
             experimentNumber++;
 
@@ -89,6 +92,7 @@ namespace AssemblyTester
 
             if (experimentNumber >= numExperiments)
             {
+                ExportResults(JsonConvert.SerializeObject(results), experimentName);
                 Application.Quit();
             }
             else
@@ -100,7 +104,7 @@ namespace AssemblyTester
             }
         }
 
-        private static void ExportResults(string compileResults, string experimentName, int experimentNum)
+        private static void ExportResults(string compileResults, string experimentName)
         {
             var exportPath = Application.persistentDataPath + "/Export/" + experimentName;
             if (!Directory.Exists(exportPath)) 
@@ -108,7 +112,7 @@ namespace AssemblyTester
                 Directory.CreateDirectory(exportPath);
             }
 
-            var filePath = exportPath + "/" + experimentNum + ".json";
+            var filePath = exportPath + "/" + "result.json";
             try
             {
                 using var writer = new StreamWriter(filePath);
