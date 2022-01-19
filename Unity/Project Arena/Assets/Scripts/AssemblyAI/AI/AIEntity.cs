@@ -117,7 +117,7 @@ public class AIEntity : Entity, ILoggable
         get => BotState.Health;
         protected set => BotState.Health = value;
     }
-    
+
     public int MaxHealth => totalHealth;
 
     public TargetKnowledgeBase TargetKb { get; private set; }
@@ -137,14 +137,26 @@ public class AIEntity : Entity, ILoggable
 
     public GunManager GunManager { get; private set; }
 
+    public bool IsActivelyFighting { get; set; }
+
     private IGoalMachine goalMachine;
+    private bool mustProcessDeath;
+    private int killerId;
+
+    public override bool IsAlive => isActiveAndEnabled && (Health > 0 || mustProcessDeath);
 
     private void PrepareComponents(GameManager gms, bool[] ag)
     {
         MovementController = new AIMovementController(this, botParams.speed);
         SightController = new AISightController(this, head, botParams.maxCameraSpeed, botParams.maxCameraAcceleration);
         SightSensor = new AISightSensor(head, botParams.maxRange, botParams.fov);
-        TargetKb = new TargetKnowledgeBase(this, enemy, botParams.memoryWindow, botParams.detectionWindow, botParams.timeBeforeCanReact);
+        TargetKb = new TargetKnowledgeBase(
+            this,
+            enemy,
+            botParams.memoryWindow,
+            botParams.detectionWindow,
+            botParams.timeBeforeCanReact
+        );
         DamageSensor = new DamageSensor(botParams.recentDamageTimeout);
         PickupKnowledgeBase = new PickupKnowledgeBase(this);
         NavigationSystem = new NavigationSystem(this, botParams.speed);
@@ -180,6 +192,7 @@ public class AIEntity : Entity, ILoggable
             new SpawnInfo {x = position.x, z = position.z, entityId = entityID, spawnEntity = gameObject.name}
         );
     }
+
     public override void TakeDamage(int damage, int killerID)
     {
         if (inGame)
@@ -200,19 +213,31 @@ public class AIEntity : Entity, ILoggable
             );
             if (killerID != entityID)
             {
-                // We just got damaged and it was not self-inflicted, we might need to search the enemy with more
-                // care.
-                TargetKb.ApplyFocus();
+                // We just got damaged and it was not self-inflicted, we might need to search the enemy.
                 DamageSensor.GotDamaged();
             }
 
-            // If the health goes under 0, kill the entity and start the respawn process.
-            if (Health <= 0f)
+            if (Health < 0)
             {
-                Health = 0;
-                // Kill the entity.
-                Die(killerID);
+                // Health = 0;
+                // TODO What if multiple entities kill the same one on the same frame?
+                // TODO What if I get killed but in my last frame I pickup a medkit?
+                if (!mustProcessDeath)
+                {
+                    mustProcessDeath = true;
+                    killerId = killerID;
+                }
             }
+        }
+    }
+
+    private void LateUpdate()
+    {
+        if (inGame && mustProcessDeath)
+        {
+            mustProcessDeath = false;
+            // Kill the entity.
+            Die(killerId);
         }
     }
 
@@ -232,9 +257,10 @@ public class AIEntity : Entity, ILoggable
             }
         );
         gameManagerScript.AddScore(id, entityID);
-        
+
         TargetKb.Reset();
         DamageSensor.Reset();
+        goalMachine.SetIsIdle();
 
         SetInGame(false);
         // Start the respawn process.
@@ -265,6 +291,10 @@ public class AIEntity : Entity, ILoggable
             lastPositionLog = Time.time;
         }
 
+        var previousFightStatus = IsActivelyFighting;
+        // Reset to false. Combat-driven behaviour will know when to set this to true
+        IsActivelyFighting = false;
+
         if (inGame)
         {
             TargetKb.Update();
@@ -278,6 +308,14 @@ public class AIEntity : Entity, ILoggable
             NavigationSystem.MoveAlongPath();
             // TODO 
         }
+
+        if (previousFightStatus != IsActivelyFighting)
+        {
+            // Changed fighting status this turn!
+            FightingStatusGameEvent.Instance.Raise(
+                new FightingStatus {entityId = GetID(), isActivelyFighting = IsActivelyFighting}
+            );
+        }
     }
 
 
@@ -288,6 +326,10 @@ public class AIEntity : Entity, ILoggable
 
     public override void HealFromMedkit(MedkitPickable medkit)
     {
+        if (mustProcessDeath)
+        {
+            Debug.LogWarning("An entity recovered health in the same turn it died!");
+        }
         if (Health + medkit.RestoredHealth > totalHealth)
         {
             Health = totalHealth;
@@ -323,7 +365,7 @@ public class AIEntity : Entity, ILoggable
     {
         loggingGame = true;
     }
-    
+
     public FightingMovementSkill MovementSkill => botParams.movementSkill;
 
     public CuriosityLevel GetCuriosity()
@@ -368,6 +410,7 @@ namespace BotSpace
     public partial class BotState
     {
         [SerializeField] private int health;
+
         public int Health
         {
             get => health;

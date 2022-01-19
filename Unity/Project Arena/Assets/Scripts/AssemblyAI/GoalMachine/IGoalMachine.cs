@@ -4,5 +4,6 @@ namespace AssemblyAI.GoalMachine
     {
         void Update();
         void SetIsIdle(bool idle = true);
+        void Reset();
     }
 }

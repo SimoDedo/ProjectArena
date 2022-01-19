@@ -1,4 +1,5 @@
 using AI.KnowledgeBase;
+using AssemblyLogging;
 using BehaviorDesigner.Runtime.Tasks;
 
 namespace AssemblyAI.Behaviours.Conditions
@@ -7,10 +8,11 @@ namespace AssemblyAI.Behaviours.Conditions
     {
         private FightingMovementSkill skill;
         private TargetKnowledgeBase targetKb;
-        
+        private AIEntity entity;
+
         public override void OnAwake()
         {
-            var entity = GetComponent<AIEntity>();
+            entity = GetComponent<AIEntity>();
             targetKb = entity.TargetKb;
             skill = entity.MovementSkill;
         }
@@ -22,7 +24,14 @@ namespace AssemblyAI.Behaviours.Conditions
                 // Never fight back if I don't have the required movement skill!
                 return TaskStatus.Failure;
             }
-            return targetKb.HasSeenTarget() ? TaskStatus.Success : TaskStatus.Failure;
+
+            if (targetKb.HasSeenTarget())
+            {
+                entity.IsActivelyFighting = true;
+                return TaskStatus.Success;
+            }
+
+            return TaskStatus.Failure;
         }
     }
 }

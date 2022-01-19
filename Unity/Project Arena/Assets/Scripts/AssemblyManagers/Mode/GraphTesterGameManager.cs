@@ -10,7 +10,6 @@ using UnityEngine;
 /// </summary>
 public class GraphTesterGameManager : GameManager
 {
-    // ReSharper disable once InconsistentNaming
     private const int TOTAL_HEALTH_BOT = 100;
     private bool[] activeGunsBot1;
     private bool[] activeGunsBot2;
@@ -108,7 +107,7 @@ public class GraphTesterGameManager : GameManager
     protected override void UpdateGamePhase()
     {
         var passedTime = (int) (Time.time - startTime);
-        if (Application.isBatchMode) Debug.Log("Time passed: " + passedTime + " out of " + gameDuration);
+        // if (Application.isBatchMode) Debug.Log("Time passed: " + passedTime + " out of " + gameDuration);
         switch (gamePhase)
         {
             case -1:

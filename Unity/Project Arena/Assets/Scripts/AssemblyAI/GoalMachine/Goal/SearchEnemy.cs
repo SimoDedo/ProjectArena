@@ -1,5 +1,6 @@
 using AI.KnowledgeBase;
 using AssemblyAI.AI.Layer1.Sensors;
+using AssemblyLogging;
 using BehaviorDesigner.Runtime;
 using UnityEngine;
 
@@ -32,7 +33,7 @@ namespace AssemblyAI.GoalMachine.Goal
         {
             var searchDueToLoss = targetKb.HasLostTarget();
             var searchDueToDamage = !targetKb.HasSeenTarget() && damageSensor.WasDamagedRecently;
-            if (entity.GetEnemy().isAlive && (searchDueToLoss || searchDueToDamage))
+            if (entity.GetEnemy().IsAlive && (searchDueToLoss || searchDueToDamage))
             {
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (startSearchTime == NO_TIME)
@@ -53,6 +54,15 @@ namespace AssemblyAI.GoalMachine.Goal
 
         public void Update()
         {
+            if (targetKb.HasLostTarget())
+            {
+                // Log the fact that we are searching for the enemy at this frame
+                SearchInfoGameEvent.Instance.Raise(new SearchInfo
+                {
+                    searcherId = entity.GetID(),
+                    timeLastSight = targetKb.GetLastSightedTime()
+                });
+            } 
             BehaviorManager.instance.Tick(behaviorTree);
         }
 

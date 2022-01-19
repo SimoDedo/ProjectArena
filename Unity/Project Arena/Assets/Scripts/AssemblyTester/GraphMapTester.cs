@@ -18,6 +18,8 @@ namespace AssemblyTester
         [SerializeField] private bool[] activeGunsBot2;
         [SerializeField] private MapManager mapManager;
         [SerializeField] private SpawnPointManager spawnPointManager;
+        [SerializeField] private int numExperiments = 1;
+        [SerializeField] private string experimentName = "experiment";
 
         // Size of a maps tile.
         private const float TILE_SIZE = 1;
@@ -25,41 +27,27 @@ namespace AssemblyTester
         private GraphTesterGameManager manager;
         private GameResultsAnalyzer analyzer;
 
-        private int experimentNumber = 0;
+        private int experimentNumber;
+
 
         private void Awake()
         {
             #if !UNITY_EDITOR
                 Time.captureFramerate = 30;
+                Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
             #endif
-            
             var args = Environment.GetCommandLineArgs();
             foreach (var arg in args)
             {
                 if (arg.StartsWith("-bot1file=")) bot1ParamsPath = arg.Substring(10);
                 if (arg.StartsWith("-bot2file=")) bot2ParamsPath = arg.Substring(10);
+                if (arg.StartsWith("-numExperiments=")) numExperiments = int.Parse(arg.Substring(16));
+                if (arg.StartsWith("-experimentName=")) experimentName = arg.Substring(16);
             }
 
             analyzer = new GameResultsAnalyzer();
+            analyzer.Setup();
 
-            PositionInfoGameEvent.Instance.AddListener(analyzer.LogPosition);
-            GameInfoGameEvent.Instance.AddListener(analyzer.LogGameInfo);
-            MapInfoGameEvent.Instance.AddListener(analyzer.LogMapInfo);
-            ReloadInfoGameEvent.Instance.AddListener(analyzer.LogReload);
-            ShotInfoGameEvent.Instance.AddListener(analyzer.LogShot);
-            SpawnInfoGameEvent.Instance.AddListener(analyzer.LogSpawn);
-            KillInfoGameEvent.Instance.AddListener(analyzer.LogKill);
-            HitInfoGameEvent.Instance.AddListener(analyzer.LogHit);
-            
-            EnemyInSightGameEvent.Instance.AddListener(analyzer.LogEnemyInSight);
-            EnemyOutOfSightGameEvent.Instance.AddListener(analyzer.LogEnemyOutOfSight);
-
-            FightEnterGameEvent.Instance.AddListener(analyzer.LogEnterFight);
-            FightExitGameEvent.Instance.AddListener(analyzer.LogExitFight);
-
-            SearchStartGameEvent.Instance.AddListener(analyzer.LogStartSearch);
-            SearchStopGameEvent.Instance.AddListener(analyzer.LogStopSearch);
-            
             StartNewExperimentGameEvent.Instance.AddListener(NewExperimentStarted);
             ExperimentEndedGameEvent.Instance.AddListener(ExperimentEnded);
 
@@ -74,25 +62,62 @@ namespace AssemblyTester
             manager = gameObject.AddComponent<GraphTesterGameManager>();
             var bot1Params = LoadBotCharacteristics(bot1ParamsPath);
             var bot2Params = LoadBotCharacteristics(bot2ParamsPath);
-            manager.SetParameters(botPrefab, bot1Params, activeGunsBot1, bot2Params, activeGunsBot2, mapPath,
-                mapManager, spawnPointManager);
+            manager.SetParameters(
+                botPrefab,
+                bot1Params,
+                activeGunsBot1,
+                bot2Params,
+                activeGunsBot2,
+                mapPath,
+                mapManager,
+                spawnPointManager
+            );
         }
 
         private void ExperimentEnded()
         {
             Debug.Log("Experiment num " + +experimentNumber + " ended!");
-            experimentNumber++;
 
             manager.StopGame();
             Destroy(manager);
+            
+            ExportResults(analyzer.CompileResults(), experimentName, experimentNumber);
 
-            mapManager.ResetMap();
-            spawnPointManager.Reset();
+            experimentNumber++;
 
-            analyzer.CompileResults();
             analyzer.Reset();
 
-            StartCoroutine(WaitAndStart());
+            if (experimentNumber >= numExperiments)
+            {
+                Application.Quit();
+            }
+            else
+            {
+                mapManager.ResetMap();
+                spawnPointManager.Reset();
+
+                StartCoroutine(WaitAndStart());
+            }
+        }
+
+        private static void ExportResults(string compileResults, string experimentName, int experimentNum)
+        {
+            var exportPath = Application.persistentDataPath + "/Export/" + experimentName;
+            if (!Directory.Exists(exportPath)) 
+            {
+                Directory.CreateDirectory(exportPath);
+            }
+
+            var filePath = exportPath + "/" + experimentNum + ".json";
+            try
+            {
+                using var writer = new StreamWriter(filePath);
+                writer.Write(compileResults);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Couldn't export results!, error " + e.Message);
+            }
         }
 
         private IEnumerator WaitAndStart()
@@ -101,6 +126,7 @@ namespace AssemblyTester
             mapManager.ManageMap(true);
             StartNewExperiment();
         }
+
         private void NewExperimentStarted()
         {
             Debug.Log("Experiment num " + experimentNumber + " started!");
@@ -120,7 +146,8 @@ namespace AssemblyTester
                 using var reader = new StreamReader(filePath);
                 var botParams = reader.ReadToEnd();
                 return JsonUtility.FromJson<BotCharacteristics>(botParams);
-            } catch (Exception)
+            }
+            catch (Exception)
             {
                 var rtn = BotCharacteristics.Default;
                 try
@@ -129,7 +156,8 @@ namespace AssemblyTester
                     using var writer = new StreamWriter(filePath);
                     writer.Write(json);
                     writer.Close();
-                } catch (Exception)
+                }
+                catch (Exception)
                 {
                     // Ignored, could not generate default file.
                 }

@@ -1573,6 +1573,7 @@ GameObject:
   - component: {fileID: 4557616418060572}
   - component: {fileID: 114455730111213496}
   - component: {fileID: 5211992987037661608}
+  - component: {fileID: 2831553794596013587}
   m_Layer: 2
   m_Name: Spawner - Ammo Crate
   m_TagString: Untagged
@@ -1625,6 +1626,22 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.15, y: 0.2, z: 0.15}
   m_Center: {x: 0, y: 0.05, z: 0}
+--- !u!114 &2831553794596013587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1319583826136552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 0
+  m_Area: 0
+  m_IgnoreFromBuild: 1
+  m_AffectedAgents: ffffffff
 --- !u!1 &1344566532368818
 GameObject:
   m_ObjectHideFlags: 0

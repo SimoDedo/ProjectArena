@@ -1,5 +1,6 @@
 using AI.KnowledgeBase;
 using AssemblyEntity.Component;
+using AssemblyLogging;
 using BehaviorDesigner.Runtime;
 using UnityEngine;
 
@@ -30,7 +31,7 @@ namespace AssemblyAI.GoalMachine.Goal
         {
             if (!gunManager.HasAmmo()) return 0;
             // TODO maybe we see enemy, but we want to run away?
-            var canSee = targetKb.HasSeenTarget() && entity.GetEnemy().isAlive;
+            var canSee = targetKb.HasSeenTarget() && entity.GetEnemy().IsAlive;
             var inverseHealthPercentage = 1f - (float) entity.Health / entity.MaxHealth;
             return canSee ? 0.8f - inverseHealthPercentage * LOW_HEALTH_PENALTY : 0.0f;
         }
@@ -44,17 +45,13 @@ namespace AssemblyAI.GoalMachine.Goal
 
         public void Update()
         {
+            entity.IsActivelyFighting = true;
             BehaviorManager.instance.Tick(behaviorTree);
         }
 
         public void Exit()
         {
-            if (entity.GetEnemy().isAlive)
-            {
-                // If I'm exiting this state but the enemy is still alive, I want to react faster than usual if I spot
-                // him again. 
-                targetKb.ApplyFocus();
-            }
+            entity.IsActivelyFighting = false;
             behaviorTree.DisableBehavior();
             // Resources.UnloadAsset(externalBt);
             // Object.Destroy(behaviorTree);

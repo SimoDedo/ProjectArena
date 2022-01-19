@@ -53,7 +53,7 @@ namespace AssemblyAI.Behaviours.Actions
                 );
                 var path = navSystem.CalculatePath(finalPos);
                 var pathLength = path.Length();
-                if (path.status != NavMeshPathStatus.PathComplete || pathLength > maxCoverDistance)
+                if (!path.IsComplete() || pathLength > maxCoverDistance)
                 {
                     // Path invalid or too long!
                     continue;

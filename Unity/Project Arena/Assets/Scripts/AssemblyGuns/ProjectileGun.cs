@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AssemblyLogging;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 /// <summary>
 /// ProjectileGun is an implementation of Gun. A projectile gun uses gameobjects with an attached 
@@ -99,6 +101,11 @@ public class ProjectileGun : Gun {
         eulerRotation.x += Random.Range(-dispersion / 2, dispersion / 2);
         eulerRotation.y += Random.Range(-dispersion / 2, dispersion / 2);
         return Quaternion.Euler(eulerRotation);
+    }
+
+    private void OnDestroy()
+    {
+        Destroy(projectiles);
     }
 
     public override float MaxRange => projectileLifeTime * projectileSpeed;

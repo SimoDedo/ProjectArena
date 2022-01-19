@@ -51,6 +51,13 @@ namespace AssemblyAI.GoalMachine
         {
             isIdle = idle;
         }
+
+        public void Reset()
+        {
+            CurrentGoal.Exit();
+            currentGoalIndex = 0;
+            CurrentGoal.Enter();
+        }
     }
     
     
