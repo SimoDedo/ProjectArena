@@ -114,11 +114,12 @@ namespace AssemblyAI.Behaviours.Actions
                 // Default value: point on ground underneath enemy
                 var record = float.PositiveInfinity;
                 var chosenPoint = Vector3.zero;
+                var isGunBlast = gunManager.IsGunBlastWeapon(gunManager.CurrentGunIndex);
                 for (var i = 0; i <= maxLookAheadFrames; i++)
                 {
                     var newPos = enemyStartPos + velocity * ((i-2) * lookAheadTimeStep);
 
-                    if (gunManager.IsGunBlastWeapon(gunManager.CurrentGunIndex))
+                    if (isGunBlast)
                     {
                         // The weapon is a blast weapon. Aim at the enemy's feet.
                         // TODO Check this raycast works
