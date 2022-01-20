@@ -103,9 +103,21 @@ namespace AI.KnowledgeBase
             if (result)
             {
                 score = DistanceScore.Evaluate((me.transform.position - targetTransform.position).magnitude);
+                results.Add(new VisibilityInInterval {visibilityScore = score, startTime = Time.time - Time.deltaTime, endTime = Time.time});
+            }
+            else
+            {
+                VisibilityInInterval last;
+                if (results.Count != 0 && (last = results.Last()).visibilityScore == 0)
+                {
+                    last.endTime = Time.time;
+                }
+                else
+                {
+                    results.Add(new VisibilityInInterval {visibilityScore = score, startTime = Time.time - Time.deltaTime, endTime = Time.time});
+                }               
             }
 
-            results.Add(new VisibilityInInterval {visibilityScore = score, startTime = Time.time - Time.deltaTime, endTime = Time.time});
 
             ForgetOldData();
 
@@ -156,8 +168,15 @@ namespace AI.KnowledgeBase
         private void ForgetOldData()
         {
             // Remove all data which is too old
-            results = results.Where(it => it.endTime > Time.time - memoryWindow).ToList();
-            // "Forget" (aka clamp) measurements to the memory window interval
+            var firstIndexToKeep = results.FindIndex(it => it.endTime > Time.time - memoryWindow);
+            if (firstIndexToKeep == -1)
+            {
+                // Nothing to keep
+                results.Clear();
+                return;
+            }
+            
+            results.RemoveRange(0, firstIndexToKeep);
             var first = results.First();
             first.startTime = Mathf.Max(first.startTime, Time.time - memoryWindow);
         }
