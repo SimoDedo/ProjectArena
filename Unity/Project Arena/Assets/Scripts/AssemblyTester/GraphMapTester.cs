@@ -22,6 +22,7 @@ namespace AssemblyTester
         [SerializeField] private SpawnPointManager spawnPointManager;
         [SerializeField] private int numExperiments = 1;
         [SerializeField] private string experimentName = "experiment";
+        private const int GAME_LENGTH = 600;
 
         // Size of a maps tile.
         private const float TILE_SIZE = 1;
@@ -73,7 +74,8 @@ namespace AssemblyTester
                 activeGunsBot2,
                 mapPath,
                 mapManager,
-                spawnPointManager
+                spawnPointManager,
+                GAME_LENGTH
             );
         }
 
@@ -84,7 +86,8 @@ namespace AssemblyTester
             manager.StopGame();
             Destroy(manager);
 
-            results.Add(analyzer.CompileResults());
+            // TODO provide correct length 
+            results.Add(analyzer.CompileResults(GAME_LENGTH));
 
             experimentNumber++;
 

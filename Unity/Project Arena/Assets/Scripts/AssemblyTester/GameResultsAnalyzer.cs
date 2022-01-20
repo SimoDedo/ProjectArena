@@ -283,7 +283,7 @@ namespace AssemblyTester
             latestSearchInfo[receivedInfo.searcherId] = new Tuple<float, SearchInfo>(Time.time, receivedInfo);
         }
 
-        public Dictionary<string, object> CompileResults()
+        public Dictionary<string, object> CompileResults(float gameLength)
         {
             // TODO Is everything done by the end of the game?
             // e.g. killstreaks are closed, searches are over, ...
@@ -316,6 +316,23 @@ namespace AssemblyTester
                 killStreakAverage.Add(key, sum / (float) count);
             }
 
+            var totalFrags = numberOfFrags.Sum(entry => entry.Value);
+            var entropy = numberOfFrags.Sum(entry => - entry.Value / (float) totalFrags * Mathf.Log(entry.Value / (float) totalFrags, 2));
+
+            var numberOfFightsSum = this.numberOfFights.Sum(entry => entry.Value);
+            var timeToEngageSum = timeToEngage.Sum(entry => entry.Value);
+            var pace = 2 * 1 / (1 + Math.Exp(-3 * numberOfFightsSum / timeToEngageSum)) - 1;
+
+            var timeInFightSum = timeInFight.Sum(entry => entry.Value);
+            var timeBetweenSightsSum = timeBetweenSights.Sum(entry => entry.Value);
+            var timeToSurrenderSum = timeToSurrender.Sum(entry => entry.Value);
+            var numberOfRetreatsSum = numberOfRetreats.Sum(entry => entry.Value);
+            var pursueTime = timeInFightSum / (2 * gameLength);
+            var fightTime = (timeInFightSum  - timeBetweenSightsSum - timeToSurrenderSum) / (2 * gameLength);
+
+            var sightLossRate = timeBetweenSightsSum / timeInFightSum;
+            var targetLossRate = numberOfRetreatsSum / numberOfFightsSum;
+            
             return new Dictionary<string, object>
             {
                 {"timeInFight1", timeInFight.First().Value},
@@ -341,7 +358,13 @@ namespace AssemblyTester
                 {"killStreakAverage1", killStreakAverage.First().Value},
                 {"killStreakAverage2", killStreakAverage.Last().Value},
                 {"killStreakMax1", killStreakMax.First().Value},
-                {"killStreakMax2", killStreakMax.Last().Value}
+                {"killStreakMax2", killStreakMax.Last().Value},
+                {"entropy", entropy},
+                {"pace", pace},
+                {"fightTime", fightTime},
+                {"pursueTime", pursueTime},
+                {"sightLossRate", sightLossRate},
+                {"targetLossRate", targetLossRate},
             };
         }
     }
