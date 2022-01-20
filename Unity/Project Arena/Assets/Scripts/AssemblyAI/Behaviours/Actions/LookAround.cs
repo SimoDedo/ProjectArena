@@ -70,9 +70,8 @@ namespace AssemblyAI.Behaviours.Actions
                 {
                     var direction = Quaternion.AngleAxis(angleScore.angle, up) * realForward;
                     var distance =
-                        Physics.Raycast(transform.position, direction, out var hit, float.PositiveInfinity)
-                            ? hit.distance
-                            : float.PositiveInfinity;
+                        Physics.Raycast(transform.position, direction, out var hit, 50)
+                            ? hit.distance : 50;
                     distance = Mathf.Clamp(distance, 0, 50);
                     scores.Add(distance * distance / 2500 * angleScore.score);
                     angles.Add(angleScore.angle);
