@@ -14,18 +14,9 @@ namespace AssemblyEntity.Component
         private List<Gun> guns;
         private List<GunScorer> gunScorers;
 
-        private List<bool> ActiveGuns
+        private void SetGunActive(int index, bool value)
         {
-            get { return guns.Select(it => it.isActiveAndEnabled).ToList(); }
-            set
-            {
-                if (value.Count != guns.Count)
-                    throw new Exception("Error, ActiveGuns value must have same lenght of gun!");
-                for (var i = 0; i < value.Count; i++)
-                {
-                    guns[i].enabled = value[i];
-                }
-            }
+            guns[index].enabled = value;
         }
 
         public int CurrentGunIndex { get; private set; } = NO_GUN;
@@ -47,7 +38,7 @@ namespace AssemblyEntity.Component
 
         public int FindLowestActiveGun()
         {
-            return ActiveGuns.FindIndex(it => it);
+            return guns.FindIndex(it => it.isActiveAndEnabled);
         }
 
         // TODO RENAMING
@@ -56,7 +47,7 @@ namespace AssemblyEntity.Component
             if (index == NO_GUN) return TrySwitchGuns(CurrentGunIndex, index);
 
             if (index < 0 || index > guns.Count) return false;
-            return ActiveGuns[index] && TrySwitchGuns(CurrentGunIndex, index);
+            return IsGunActive(index) && TrySwitchGuns(CurrentGunIndex, index);
         }
 
         // Variables to slow down the gun switching.
@@ -89,16 +80,15 @@ namespace AssemblyEntity.Component
                 // Setup the gun.
                 var gun = guns[i];
                 gun.SetupGun(gms, parent, pms, i + 1);
+                SetGunActive(i, ag[i]);
             }
-
-            ActiveGuns = ag.ToList();
         }
 
         public bool CanBeSupplied(bool[] suppliedGuns)
         {
             for (var i = 0; i < Math.Min(suppliedGuns.Length, guns.Count); i++)
             {
-                if (suppliedGuns[i] && ActiveGuns[i] && !guns[i].IsFull())
+                if (suppliedGuns[i] && IsGunActive(i) && !guns[i].IsFull())
                 {
                     return true;
                 }
@@ -111,7 +101,7 @@ namespace AssemblyEntity.Component
         {
             for (var i = 0; i < suppliedGuns.Length; i++)
             {
-                if (suppliedGuns[i] && ActiveGuns[i])
+                if (suppliedGuns[i] && IsGunActive(i))
                 {
                     guns[i].AddAmmo(ammoAmounts[i]);
                 }
@@ -143,7 +133,7 @@ namespace AssemblyEntity.Component
         {
             for (var i = 0; i < guns.Count; i++)
             {
-                if (ActiveGuns[i])
+                if (IsGunActive(i))
                 {
                     guns[i].ResetAmmo();
                 }
@@ -152,7 +142,7 @@ namespace AssemblyEntity.Component
 
         public bool IsGunActive(int index)
         {
-            return ActiveGuns[index];
+            return guns[index].isActiveAndEnabled;
         }
 
         public bool CanGunAim(int index)
