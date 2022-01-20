@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using AssemblyLogging;
-using ExperimentObjects;
 using JsonObjects.Logging.Game;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace AssemblyTester
@@ -20,6 +21,7 @@ namespace AssemblyTester
         [SerializeField] private SpawnPointManager spawnPointManager;
         [SerializeField] private int numExperiments = 1;
         [SerializeField] private string experimentName = "experiment";
+        private const int GAME_LENGTH = 600;
 
         // Size of a maps tile.
         private const float TILE_SIZE = 1;
@@ -29,6 +31,7 @@ namespace AssemblyTester
 
         private int experimentNumber;
 
+        private readonly List<Dictionary<string, object>> results = new List<Dictionary<string, object>>();
 
         private void Awake()
         {
@@ -70,7 +73,8 @@ namespace AssemblyTester
                 activeGunsBot2,
                 mapPath,
                 mapManager,
-                spawnPointManager
+                spawnPointManager,
+                GAME_LENGTH
             );
         }
 
@@ -80,8 +84,9 @@ namespace AssemblyTester
 
             manager.StopGame();
             Destroy(manager);
-            
-            ExportResults(analyzer.CompileResults(), experimentName, experimentNumber);
+
+            // TODO provide correct length 
+            results.Add(analyzer.CompileResults(GAME_LENGTH));
 
             experimentNumber++;
 
@@ -89,6 +94,7 @@ namespace AssemblyTester
 
             if (experimentNumber >= numExperiments)
             {
+                ExportResults(JsonConvert.SerializeObject(results), experimentName);
                 Application.Quit();
             }
             else
@@ -100,7 +106,7 @@ namespace AssemblyTester
             }
         }
 
-        private static void ExportResults(string compileResults, string experimentName, int experimentNum)
+        private static void ExportResults(string compileResults, string experimentName)
         {
             var exportPath = Application.persistentDataPath + "/Export/" + experimentName;
             if (!Directory.Exists(exportPath)) 
@@ -108,7 +114,7 @@ namespace AssemblyTester
                 Directory.CreateDirectory(exportPath);
             }
 
-            var filePath = exportPath + "/" + experimentNum + ".json";
+            var filePath = exportPath + "/" + "result.json";
             try
             {
                 using var writer = new StreamWriter(filePath);
@@ -164,56 +170,6 @@ namespace AssemblyTester
 
                 return rtn;
             }
-        }
-
-        // Logs the position (x and z respectively correspond to row and column in matrix notation).
-        private void LogPosition(PositionInfo info)
-        {
-            Debug.Log("Log position");
-            var coord = NormalizeFlipCoord(info.x, info.z);
-
-            // var jPosition = new JsonPosition(Time.time - logStart, info.entityID, coord.x, coord.z,
-            //     NormalizeAngle(info.dir));
-            // jGameLog.positionLogs.Add(jPosition);
-            //
-            // if (lastPositions.ContainsKey(info.entityID))
-            // {
-            //     var lastPosition = lastPositions[info.entityID];
-            //     var delta = EulerDistance(coord.x, coord.z, lastPosition.x, lastPosition.y);
-            //
-            //     if (totalDistances.ContainsKey(info.entityID))
-            //         totalDistances[info.entityID] += delta;
-            //     else
-            //         totalDistances[info.entityID] = delta;
-            //
-            //     if (distancesBetweenKills.ContainsKey(info.entityID))
-            //         distancesBetweenKills[info.entityID] += delta;
-            //     else
-            //         distancesBetweenKills[info.entityID] = delta;
-            // }
-            //
-            // lastPositions[info.entityID] = new Vector2(coord.x, coord.z);
-        }
-
-        // Normalizes the coordinates and flips them if needed.
-        private static Coord NormalizeFlipCoord(float x, float z)
-        {
-            x /= TILE_SIZE;
-            z /= TILE_SIZE;
-
-            return new Coord {x = x, z = z};
-        }
-
-        // If an angle is negative it makes it positive.
-        private static float NormalizeAngle(float angle)
-        {
-            return (angle < 0) ? (360 + angle % 360) : (angle % 360);
-        }
-
-        // Returns the euler distance.
-        private static float EulerDistance(float x1, float y1, float x2, float y2)
-        {
-            return Mathf.Sqrt(Mathf.Pow(x1 - x2, 2) + Mathf.Pow(y1 - y2, 2));
         }
     }
 }
