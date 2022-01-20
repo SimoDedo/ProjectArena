@@ -33,12 +33,16 @@ namespace AssemblyAI.Behaviours.Actions
             
             nextUpdateTime = float.MinValue;
 
-            foreach (var angleScore in AngleScores)
+            // Avoid recomputing and adding again all valid angles if already computed
+            if (myValidAngles.Count == 0)
             {
-                if (curiosity >= angleScore.minLevel && (!focused || angleScore.allowedIfFocused))
+                foreach (var angleScore in AngleScores)
                 {
-                    maxAngle = Mathf.Max(maxAngle, Mathf.Abs(angleScore.angle));
-                    myValidAngles.Add(angleScore);
+                    if (curiosity >= angleScore.minLevel && (!focused || angleScore.allowedIfFocused))
+                    {
+                        maxAngle = Mathf.Max(maxAngle, Mathf.Abs(angleScore.angle));
+                        myValidAngles.Add(angleScore);
+                    }
                 }
             }
         }
