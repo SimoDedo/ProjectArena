@@ -106,10 +106,10 @@ public class AIEntity : Entity, ILoggable
 
     [SerializeField] private BotState botState;
 
-    public BotState BotState
+    private BotState BotState
     {
         get => botState;
-        private set => botState = value;
+        set => botState = value;
     }
 
     public override int Health
@@ -137,7 +137,7 @@ public class AIEntity : Entity, ILoggable
 
     public GunManager GunManager { get; private set; }
 
-    public bool IsActivelyFighting { get; set; }
+    public bool IsFocusingOnEnemy { get; set; }
 
     private IGoalMachine goalMachine;
     private bool mustProcessDeath;
@@ -276,8 +276,36 @@ public class AIEntity : Entity, ILoggable
         Health = totalHealth;
         GunManager.ResetAmmo();
         // ActivateLowestGun();
+
+        if (!loggedFirstRespawn)
+        {
+            loggedFirstRespawn = true;
+            engageIntervalStartTime = Time.time;
+        }
+
         SetInGame(true);
     }
+
+    private float totalTimeToEngage;
+
+    private float totalTimeInFight;
+    private int numberOfFights;
+
+    private float totalTimeBetweenSights;
+
+    private float totalTimeToSurrender;
+    private int numberOfRetreats;
+
+    private bool enemyInSightPreviously;
+    private bool loggedFirstRespawn;
+    private float startFightEventTime;
+
+    /// <summary>
+    /// Time end last fight event or first respawn time
+    /// </summary>
+    private float engageIntervalStartTime;
+
+    private float previousDetectionTime;
 
     private void Update()
     {
@@ -291,9 +319,9 @@ public class AIEntity : Entity, ILoggable
             lastPositionLog = Time.time;
         }
 
-        var previousFightStatus = IsActivelyFighting;
+        var previousFightStatus = IsFocusingOnEnemy;
         // Reset to false. Combat-driven behaviour will know when to set this to true
-        IsActivelyFighting = false;
+        IsFocusingOnEnemy = false;
 
         if (inGame)
         {
@@ -306,15 +334,50 @@ public class AIEntity : Entity, ILoggable
 
             // Bot move
             NavigationSystem.MoveAlongPath();
-            // TODO 
         }
 
-        if (previousFightStatus != IsActivelyFighting)
+        if (loggedFirstRespawn)
         {
-            // Changed fighting status this turn!
-            FightingStatusGameEvent.Instance.Raise(
-                new FightingStatus {entityId = GetID(), isActivelyFighting = IsActivelyFighting}
-            );
+            if (previousFightStatus != IsFocusingOnEnemy)
+            {
+                // Changed fighting status this turn!
+                if (!IsFocusingOnEnemy)
+                {
+                    engageIntervalStartTime = Time.time;
+                    totalTimeInFight += Time.time - startFightEventTime;
+                    numberOfFights++;
+                    if (enemy.IsAlive)
+                    {
+                        totalTimeToSurrender += Time.time - Mathf.Max(startFightEventTime, TargetKb.LastTimeDetected);
+                        numberOfRetreats++;
+                    }
+                }
+                else
+                {
+                    totalTimeToEngage += Time.time - engageIntervalStartTime;
+                    startFightEventTime = Time.time;
+
+                    // First detection status of this fight!
+                    enemyInSightPreviously = TargetKb.HasSeenTarget();
+                    previousDetectionTime = TargetKb.LastTimeDetected;
+                }
+            }
+            else if (IsFocusingOnEnemy)
+            {
+                // We are in a fight event, so keep track of everything needed
+                var isEnemyInSightNow = TargetKb.HasSeenTarget();
+                if (isEnemyInSightNow && !enemyInSightPreviously)
+                {
+                    // Update time between sights, but only if enemy was lost in this event
+                    if (startFightEventTime <= previousDetectionTime)
+                    {
+                        totalTimeBetweenSights += Time.time - previousDetectionTime;
+                    }
+                }
+                
+                previousDetectionTime = TargetKb.LastTimeDetected;
+                enemyInSightPreviously = isEnemyInSightNow;
+            }
         }
     }
 
@@ -330,6 +393,7 @@ public class AIEntity : Entity, ILoggable
         {
             Debug.LogWarning("An entity recovered health in the same turn it died!");
         }
+
         if (Health + medkit.RestoredHealth > totalHealth)
         {
             Health = totalHealth;
@@ -352,13 +416,29 @@ public class AIEntity : Entity, ILoggable
         GunManager.SupplyGuns(suppliedGuns, ammoAmounts);
     }
 
-    public override void SetInGame(bool b)
+    public override void SetInGame(bool b, bool isGameEnded = false)
     {
         goalMachine.SetIsIdle(!b);
         NavigationSystem.SetEnabled(b);
         GetComponent<CapsuleCollider>().enabled = b;
         MeshVisibility.SetMeshVisible(transform, b);
         inGame = b;
+
+        if (isGameEnded)
+        {
+            // Send all logging info
+            EntityGameMetricsGameEvent.Instance.Raise(new GameMetrics
+            {
+                entityId = GetID(),
+                timeBetweenSights = totalTimeBetweenSights,
+                timeInFights = totalTimeInFight,
+                timeToSurrender = totalTimeToSurrender,
+                timeToEngage = totalTimeToEngage,
+                numberOfRetreats = numberOfRetreats,
+                numberOfFights = numberOfFights
+            });
+        }
+        
     }
 
     public void SetupLogging()

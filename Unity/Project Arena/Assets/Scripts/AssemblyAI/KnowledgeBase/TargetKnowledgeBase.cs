@@ -123,22 +123,15 @@ namespace AI.KnowledgeBase
 
             ForgetOldData();
 
-            var hasSeenTarget = HasSeenTarget();
-            if (hasSeenTarget)
+            if (HasSeenTarget())
             {
                 LastTimeDetected = Time.time;
             }
-            EnemyAwarenessStatusGameEvent.Instance.Raise(
-                new EnemyAwarenessStatus {observerID = me.GetID(), isEnemyDetected = hasSeenTarget}
-            );
         }
 
         public void Reset()
         {
             results.Clear();
-            EnemyAwarenessStatusGameEvent.Instance.Raise(
-                new EnemyAwarenessStatus {observerID = me.GetID(), isEnemyDetected = false}
-            );
         }
 
         public bool HasSeenTarget()

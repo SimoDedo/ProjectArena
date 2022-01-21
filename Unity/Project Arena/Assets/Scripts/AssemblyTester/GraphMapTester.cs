@@ -74,7 +74,8 @@ namespace AssemblyTester
                 mapPath,
                 mapManager,
                 spawnPointManager,
-                GAME_LENGTH
+                GAME_LENGTH,
+                respawnDuration: 1.5f
             );
         }
 

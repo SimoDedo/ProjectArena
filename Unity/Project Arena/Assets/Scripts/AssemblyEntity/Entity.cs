@@ -54,7 +54,7 @@ public abstract class Entity : MonoBehaviour
     
     // Sets if the entity is in game, i.e. if it can move, shoot, interact
     // with object and be hit.
-    public abstract void SetInGame(bool b);
+    public abstract void SetInGame(bool inGame, bool isGameEnded = false);
 
     // Returns the ID of the entity.
     public int GetID()

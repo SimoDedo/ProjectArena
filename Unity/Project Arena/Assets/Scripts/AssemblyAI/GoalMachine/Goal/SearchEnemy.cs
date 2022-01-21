@@ -55,21 +55,14 @@ namespace AssemblyAI.GoalMachine.Goal
 
         public void Update()
         {
-            if (targetKb.HasLostTarget())
-            {
-                // Log the fact that we are searching for the enemy at this frame
-                SearchInfoGameEvent.Instance.Raise(new SearchInfo
-                {
-                    searcherId = entity.GetID(),
-                    timeLastSight = targetKb.LastTimeDetected
-                });
-            } 
+            entity.IsFocusingOnEnemy = true;
             BehaviorManager.instance.Tick(behaviorTree);
         }
 
         public void Exit()
         {
             startSearchTime = NO_TIME;
+            entity.IsFocusingOnEnemy = false;
             behaviorTree.DisableBehavior();
         }
     }
