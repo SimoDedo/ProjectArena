@@ -65,6 +65,8 @@ namespace AI.KnowledgeBase
         /// </summary>
         private List<VisibilityInInterval> results = new List<VisibilityInInterval>();
 
+        public float LastTimeDetected { get; private set; } = float.MinValue;
+        
         private static readonly AnimationCurve DistanceScore = new AnimationCurve(
             new Keyframe(0f, 5f),
             new Keyframe(10f, 3f),
@@ -121,8 +123,13 @@ namespace AI.KnowledgeBase
 
             ForgetOldData();
 
+            var hasSeenTarget = HasSeenTarget();
+            if (hasSeenTarget)
+            {
+                LastTimeDetected = Time.time;
+            }
             EnemyAwarenessStatusGameEvent.Instance.Raise(
-                new EnemyAwarenessStatus {observerID = me.GetID(), isEnemyDetected = HasSeenTarget()}
+                new EnemyAwarenessStatus {observerID = me.GetID(), isEnemyDetected = hasSeenTarget}
             );
         }
 
@@ -148,23 +155,7 @@ namespace AI.KnowledgeBase
             if (!target.IsAlive) return false;
             return !HasSeenTarget() && TestDetection(Time.time - memoryWindow, Time.time - detectionWindow);
         }
-
-        public float GetLastSightedTime()
-        {
-            var searchTimeEnd = Time.time;
-            var result = results.FindLast(it => it.visibilityScore != 0 && it.startTime < searchTimeEnd);
-            if (result == null)
-            {
-                // We don't really know the position of the target, but maybe we got damaged and we want
-                // magically get to know the latest position of the enemy.
-                // To avoid outright cheating, when I get damaged I can give an estimate on 
-                // the enemy position based on its real position (e.g. a circle around that)
-                return float.MinValue;
-            }
-
-            return result.endTime;
-        }
-
+        
         private void ForgetOldData()
         {
             // Remove all data which is too old

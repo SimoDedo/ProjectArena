@@ -3,7 +3,6 @@ using Accord.Statistics.Distributions.Univariate;
 using AI.KnowledgeBase;
 using AssemblyAI.AI.Layer1.Actuator;
 using AssemblyAI.AI.Layer1.Sensors;
-using AssemblyAI.AI.Layer2;
 using AssemblyEntity.Component;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
@@ -52,7 +51,7 @@ namespace AssemblyAI.Behaviours.Actions
 
         public override TaskStatus OnUpdate()
         {
-            var lastSightedTime = targetKb.GetLastSightedTime();
+            var lastSightedTime = targetKb.LastTimeDetected;
             if (lastSightedTime != Time.time && isGoingForCover.Value && !gunManager.IsCurrentGunReloading())
             {
                 //We cannot see the enemy and we were looking for cover, reload now!

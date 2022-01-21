@@ -61,7 +61,7 @@ namespace AssemblyAI.GoalMachine.Goal
                 SearchInfoGameEvent.Instance.Raise(new SearchInfo
                 {
                     searcherId = entity.GetID(),
-                    timeLastSight = targetKb.GetLastSightedTime()
+                    timeLastSight = targetKb.LastTimeDetected
                 });
             } 
             BehaviorManager.instance.Tick(behaviorTree);
