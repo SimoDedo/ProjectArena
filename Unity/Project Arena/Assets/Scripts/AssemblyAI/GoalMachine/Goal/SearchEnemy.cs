@@ -49,6 +49,7 @@ namespace AssemblyAI.GoalMachine.Goal
         {
             behaviorTree.EnableBehavior();
             BehaviorManager.instance.RestartBehavior(behaviorTree);
+            // TODO searchStartTime should be replaced by last time enemy detected / last time took damage
             startSearchTime = Time.time;
         }
 

@@ -24,6 +24,7 @@ namespace AssemblyAI.Actions
 
         private static Projectile FindRocketToDodge(AIEntity entity)
         {
+            // TODO I should not react instantly to rockets...
             var skill = entity.MovementSkill;
 
             Projectile projectileToDodge = null;
