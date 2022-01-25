@@ -45,13 +45,13 @@ namespace AssemblyAI.GoalMachine.Goal
 
         public void Update()
         {
-            entity.IsActivelyFighting = true;
+            entity.IsFocusingOnEnemy = true;
             BehaviorManager.instance.Tick(behaviorTree);
         }
 
         public void Exit()
         {
-            entity.IsActivelyFighting = false;
+            entity.IsFocusingOnEnemy = false;
             behaviorTree.DisableBehavior();
             // Resources.UnloadAsset(externalBt);
             // Object.Destroy(behaviorTree);

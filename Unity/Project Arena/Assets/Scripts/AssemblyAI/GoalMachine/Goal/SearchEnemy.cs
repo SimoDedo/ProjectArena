@@ -49,26 +49,20 @@ namespace AssemblyAI.GoalMachine.Goal
         {
             behaviorTree.EnableBehavior();
             BehaviorManager.instance.RestartBehavior(behaviorTree);
+            // TODO searchStartTime should be replaced by last time enemy detected / last time took damage
             startSearchTime = Time.time;
         }
 
         public void Update()
         {
-            if (targetKb.HasLostTarget())
-            {
-                // Log the fact that we are searching for the enemy at this frame
-                SearchInfoGameEvent.Instance.Raise(new SearchInfo
-                {
-                    searcherId = entity.GetID(),
-                    timeLastSight = targetKb.GetLastSightedTime()
-                });
-            } 
+            entity.IsFocusingOnEnemy = true;
             BehaviorManager.instance.Tick(behaviorTree);
         }
 
         public void Exit()
         {
             startSearchTime = NO_TIME;
+            entity.IsFocusingOnEnemy = false;
             behaviorTree.DisableBehavior();
         }
     }

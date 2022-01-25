@@ -129,8 +129,8 @@ public class GraphTesterGameManager : GameManager
                 Debug.Log("Final score: " + playerKillCount + ", " + opponentKillCount);
                 // Disable the contenders movement and interactions, activate the score UI, set the 
                 // winner and set the phase.
-                ai1.SetInGame(false);
-                ai2.SetInGame(false);
+                ai1.SetInGame(false, true);
+                ai2.SetInGame(false, true);
                 gamePhase = 2;
                 break;
             case 2 when passedTime >= readyDuration + gameDuration + scoreDuration:

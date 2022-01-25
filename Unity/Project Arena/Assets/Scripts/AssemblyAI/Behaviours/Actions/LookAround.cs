@@ -33,12 +33,16 @@ namespace AssemblyAI.Behaviours.Actions
             
             nextUpdateTime = float.MinValue;
 
-            foreach (var angleScore in AngleScores)
+            // Avoid recomputing and adding again all valid angles if already computed
+            if (myValidAngles.Count == 0)
             {
-                if (curiosity >= angleScore.minLevel && (!focused || angleScore.allowedIfFocused))
+                foreach (var angleScore in AngleScores)
                 {
-                    maxAngle = Mathf.Max(maxAngle, Mathf.Abs(angleScore.angle));
-                    myValidAngles.Add(angleScore);
+                    if (curiosity >= angleScore.minLevel && (!focused || angleScore.allowedIfFocused))
+                    {
+                        maxAngle = Mathf.Max(maxAngle, Mathf.Abs(angleScore.angle));
+                        myValidAngles.Add(angleScore);
+                    }
                 }
             }
         }
@@ -70,9 +74,8 @@ namespace AssemblyAI.Behaviours.Actions
                 {
                     var direction = Quaternion.AngleAxis(angleScore.angle, up) * realForward;
                     var distance =
-                        Physics.Raycast(transform.position, direction, out var hit, float.PositiveInfinity)
-                            ? hit.distance
-                            : float.PositiveInfinity;
+                        Physics.Raycast(transform.position, direction, out var hit, 50)
+                            ? hit.distance : 50;
                     distance = Mathf.Clamp(distance, 0, 50);
                     scores.Add(distance * distance / 2500 * angleScore.score);
                     angles.Add(angleScore.angle);

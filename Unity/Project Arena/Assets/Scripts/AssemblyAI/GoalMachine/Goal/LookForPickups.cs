@@ -38,8 +38,7 @@ namespace AssemblyAI.GoalMachine.Goal
 
         public void Enter()
         {
-            behaviorTree.EnableBehavior();
-            BehaviorManager.instance.RestartBehavior(behaviorTree);
+            // Do not enable behavior, it will be done in Update!
             currentPickable = null;
         }
 

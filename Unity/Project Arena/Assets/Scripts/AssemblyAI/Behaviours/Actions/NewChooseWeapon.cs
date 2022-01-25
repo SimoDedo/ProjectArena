@@ -31,7 +31,7 @@ namespace AssemblyAI.Behaviours.Actions
 
             // Choose blast weapon if we cannot see the enemy right now
             // ReSharper disable once CompareOfFloatsByEqualityOperator
-            var mustChooseBlastWeapon = targetKb.GetLastSightedTime() != Time.time;
+            var mustChooseBlastWeapon = targetKb.LastTimeDetected != Time.time;
             
             var selectedGun = -1;
             var bestGunScore = 0f;

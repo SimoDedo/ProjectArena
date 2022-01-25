@@ -27,7 +27,7 @@ namespace AssemblyAI.Behaviours.Conditions
 
             if (targetKb.HasSeenTarget())
             {
-                entity.IsActivelyFighting = true;
+                entity.IsFocusingOnEnemy = true;
                 return TaskStatus.Success;
             }
 

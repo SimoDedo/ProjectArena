@@ -72,7 +72,7 @@ public class Opponent : Entity
     }
 
     // Sets if the opponent is in game.
-    public override void SetInGame(bool b) {
+    public override void SetInGame(bool b, bool isGameEnded = false) {
         SetIgnoreRaycast(!b);
         MeshVisibility.SetMeshVisible(transform, b);
         inGame = b;

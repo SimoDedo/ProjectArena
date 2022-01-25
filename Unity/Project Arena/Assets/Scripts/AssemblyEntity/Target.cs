@@ -159,7 +159,7 @@ public class Target : Entity, ILoggable {
 
     public override void Respawn() { }
 
-    public override void SetInGame(bool b) { }
+    public override void SetInGame(bool b, bool isGameEnded = false) { }
 
     public override void SlowEntity(float penalty) { }
 

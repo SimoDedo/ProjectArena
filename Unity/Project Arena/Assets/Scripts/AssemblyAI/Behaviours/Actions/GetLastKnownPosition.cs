@@ -38,7 +38,7 @@ namespace AssemblyAI.Behaviours.Actions
                 ? (damageSensor.LastTimeDamaged)
                 : float.MinValue;
 
-            var lossTime = knowledgeBase.GetLastSightedTime();
+            var lossTime = knowledgeBase.LastTimeDetected;
 
             if (damageTime > lossTime)
             {
@@ -51,7 +51,7 @@ namespace AssemblyAI.Behaviours.Actions
 
         private TaskStatus EstimateEnemyPositionFromKnowledge()
         {
-            var delay = Time.time - knowledgeBase.GetLastSightedTime();
+            var delay = Time.time - knowledgeBase.LastTimeDetected;
             var (delayedPosition, velocity) = enemyTracker.GetPositionAndVelocityFromDelay(delay);
             
             // Try to estimate the position of the enemy after it has gone out of sight

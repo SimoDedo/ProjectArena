@@ -425,7 +425,7 @@ public class Player : Entity, ILoggable
     }
 
     // Sets if the player is in game.
-    public override void SetInGame(bool b)
+    public override void SetInGame(bool b, bool isGameEnded = false)
     {
         if (b)
         {

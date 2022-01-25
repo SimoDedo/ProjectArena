@@ -65,6 +65,8 @@ namespace AI.KnowledgeBase
         /// </summary>
         private List<VisibilityInInterval> results = new List<VisibilityInInterval>();
 
+        public float LastTimeDetected { get; private set; } = float.MinValue;
+        
         private static readonly AnimationCurve DistanceScore = new AnimationCurve(
             new Keyframe(0f, 5f),
             new Keyframe(10f, 3f),
@@ -103,23 +105,33 @@ namespace AI.KnowledgeBase
             if (result)
             {
                 score = DistanceScore.Evaluate((me.transform.position - targetTransform.position).magnitude);
+                results.Add(new VisibilityInInterval {visibilityScore = score, startTime = Time.time - Time.deltaTime, endTime = Time.time});
+            }
+            else
+            {
+                VisibilityInInterval last;
+                if (results.Count != 0 && (last = results.Last()).visibilityScore == 0)
+                {
+                    last.endTime = Time.time;
+                }
+                else
+                {
+                    results.Add(new VisibilityInInterval {visibilityScore = score, startTime = Time.time - Time.deltaTime, endTime = Time.time});
+                }               
             }
 
-            results.Add(new VisibilityInInterval {visibilityScore = score, startTime = Time.time - Time.deltaTime, endTime = Time.time});
 
             ForgetOldData();
 
-            EnemyAwarenessStatusGameEvent.Instance.Raise(
-                new EnemyAwarenessStatus {observerID = me.GetID(), isEnemyDetected = HasSeenTarget()}
-            );
+            if (HasSeenTarget())
+            {
+                LastTimeDetected = Time.time;
+            }
         }
 
         public void Reset()
         {
             results.Clear();
-            EnemyAwarenessStatusGameEvent.Instance.Raise(
-                new EnemyAwarenessStatus {observerID = me.GetID(), isEnemyDetected = false}
-            );
         }
 
         public bool HasSeenTarget()
@@ -136,28 +148,19 @@ namespace AI.KnowledgeBase
             if (!target.IsAlive) return false;
             return !HasSeenTarget() && TestDetection(Time.time - memoryWindow, Time.time - detectionWindow);
         }
-
-        public float GetLastSightedTime()
-        {
-            var searchTimeEnd = Time.time;
-            var result = results.FindLast(it => it.visibilityScore != 0 && it.startTime < searchTimeEnd);
-            if (result == null)
-            {
-                // We don't really know the position of the target, but maybe we got damaged and we want
-                // magically get to know the latest position of the enemy.
-                // To avoid outright cheating, when I get damaged I can give an estimate on 
-                // the enemy position based on its real position (e.g. a circle around that)
-                return float.MinValue;
-            }
-
-            return result.endTime;
-        }
-
+        
         private void ForgetOldData()
         {
             // Remove all data which is too old
-            results = results.Where(it => it.endTime > Time.time - memoryWindow).ToList();
-            // "Forget" (aka clamp) measurements to the memory window interval
+            var firstIndexToKeep = results.FindIndex(it => it.endTime > Time.time - memoryWindow);
+            if (firstIndexToKeep == -1)
+            {
+                // Nothing to keep
+                results.Clear();
+                return;
+            }
+            
+            results.RemoveRange(0, firstIndexToKeep);
             var first = results.First();
             first.startTime = Mathf.Max(first.startTime, Time.time - memoryWindow);
         }
