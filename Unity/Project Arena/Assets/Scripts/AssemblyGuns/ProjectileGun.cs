@@ -109,4 +109,11 @@ public class ProjectileGun : Gun {
     }
 
     public override float MaxRange => projectileLifeTime * projectileSpeed;
+    
+    public override bool IsProjectileWeapon => false;
+
+    public override Vector3 GetProjectileSpawnerForwardDirection()
+    {
+        return projectilePosition.transform.forward;
+    }
 }

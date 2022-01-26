@@ -38,6 +38,11 @@ public class RaycastGun : Gun {
         return float.PositiveInfinity;
     }
 
+    public override Vector3 GetProjectileSpawnerForwardDirection()
+    {
+        throw new System.NotImplementedException();
+    }
+
     public override void Shoot() {
         StartCoroutine(ShowMuzzleFlash());
 
@@ -87,6 +92,7 @@ public class RaycastGun : Gun {
         SetCooldown();
     }
 
+    public override bool IsProjectileWeapon => false;
     public override float MaxRange => range;
 
     // Show a spark at the hit point flash.

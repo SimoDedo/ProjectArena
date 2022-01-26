@@ -42,6 +42,7 @@ public abstract class Gun : MonoBehaviour, ILoggable
     // }
 
     public abstract float GetProjectileSpeed();
+    public abstract Vector3 GetProjectileSpawnerForwardDirection();
 
     [Header("Appearence")] [SerializeField]
     protected float muzzleFlashDuration = 0.05f;
@@ -393,6 +394,11 @@ public abstract class Gun : MonoBehaviour, ILoggable
     }
 
     public bool IsBlastWeapon => isBlastWeapon;
+
+    public abstract bool IsProjectileWeapon
+    {
+        get;
+    }
 
     // Show muzzle flash.
     protected IEnumerator ShowMuzzleFlash()
