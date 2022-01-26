@@ -24,6 +24,9 @@ namespace AssemblyTester
         private string mapsPath;
         private string botsPath;
 
+        private const int BOT1_ID = 1;
+        private const int BOT2_ID = 2;
+
         // Size of a maps tile.
         private const float TILE_SIZE = 1;
 
@@ -69,7 +72,7 @@ namespace AssemblyTester
                 Directory.CreateDirectory(botsPath);
             }
 
-            analyzer = new GameResultsAnalyzer();
+            analyzer = new GameResultsAnalyzer(BOT1_ID, BOT2_ID);
             analyzer.Setup();
 
             StartNewExperimentGameEvent.Instance.AddListener(NewExperimentStarted);
@@ -83,6 +86,8 @@ namespace AssemblyTester
 
         private void StartNewExperiment()
         {
+            analyzer.Reset();
+
             manager = gameObject.AddComponent<GraphTesterGameManager>();
             var (bot1Params, activeGunsBot1) = LoadBotCharacteristics(botsPath, bot1ParamsFilenamePrefix);
             var (bot2Params, activeGunsBot2) = LoadBotCharacteristics(botsPath, bot2ParamsFilenamePrefix);
@@ -93,10 +98,11 @@ namespace AssemblyTester
                 throw new FileNotFoundException("Couldn't find map file " + mapPath);
             }
 
-            manager.SetParameters(
-                botPrefab,
+            manager.SetParameters(botPrefab,
+                BOT1_ID,
                 bot1Params,
                 activeGunsBot1,
+                BOT2_ID,
                 bot2Params,
                 activeGunsBot2,
                 mapPath,
@@ -118,9 +124,7 @@ namespace AssemblyTester
             results.Add(analyzer.CompileResults(GAME_LENGTH));
 
             experimentNumber++;
-
-            analyzer.Reset();
-
+            
             if (experimentNumber >= numExperiments)
             {
                 ExportResults(JsonConvert.SerializeObject(results), experimentName);

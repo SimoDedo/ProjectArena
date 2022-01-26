@@ -12,7 +12,9 @@ public class GraphTesterGameManager : GameManager
 {
     private const int TOTAL_HEALTH_BOT = 100;
     private bool[] activeGunsBot1;
+    private int bot1ID;
     private bool[] activeGunsBot2;
+    private int bot2ID;
 
     private GameObject bot1;
     private GameObject bot2;
@@ -24,10 +26,7 @@ public class GraphTesterGameManager : GameManager
 
     private int playerKillCount;
     private int opponentKillCount;
-
-    private const int BOT1_ID = 1;
-    private const int BOT2_ID = 2;
-
+    
     private void Awake()
     {
         if (generateOnly) throw new ArgumentException("Generate only is unsupported!");
@@ -35,8 +34,10 @@ public class GraphTesterGameManager : GameManager
 
     public void SetParameters(
         GameObject botPrefab,
+        int bot1ID,
         BotCharacteristics bot1Params,
         bool[] activeGunsBot1,
+        int bot2ID,
         BotCharacteristics bot2Params,
         bool[] activeGunsBot2,
         string mapPath,
@@ -57,10 +58,12 @@ public class GraphTesterGameManager : GameManager
         this.bot2Params = bot2Params;
 
         bot1 = Instantiate(botPrefab);
+        this.bot1ID = bot1ID;
         this.activeGunsBot1 = activeGunsBot1;
         ai1 = bot1.GetComponent<AIEntity>();
 
         bot2 = Instantiate(botPrefab);
+        this.bot2ID = bot2ID;
         this.activeGunsBot2 = activeGunsBot2;
         ai2 = bot2.GetComponent<AIEntity>();
 
@@ -87,12 +90,12 @@ public class GraphTesterGameManager : GameManager
 
             ai1.SetCharacteristics(bot1Params);
             ai1.SetEnemy(ai2);
-            ai1.SetupEntity(TOTAL_HEALTH_BOT, activeGunsBot1, this, BOT1_ID);
+            ai1.SetupEntity(TOTAL_HEALTH_BOT, activeGunsBot1, this, bot1ID);
             ai1.SetupLogging();
 
             ai2.SetCharacteristics(bot2Params);
             ai2.SetEnemy(ai1);
-            ai2.SetupEntity(TOTAL_HEALTH_BOT, activeGunsBot2, this, BOT2_ID);
+            ai2.SetupEntity(TOTAL_HEALTH_BOT, activeGunsBot2, this, bot2ID);
             ai2.SetupLogging();
             startTime = Time.time;
 
@@ -151,7 +154,7 @@ public class GraphTesterGameManager : GameManager
     {
         if (killerIdentifier == killedID)
         {
-            if (killerIdentifier == BOT1_ID)
+            if (killerIdentifier == bot1ID)
             {
                 playerKillCount--;
             } else
@@ -160,7 +163,7 @@ public class GraphTesterGameManager : GameManager
             }
         } else
         {
-            if (killerIdentifier == BOT1_ID)
+            if (killerIdentifier == bot1ID)
             {
                 playerKillCount++;
             } else

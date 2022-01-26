@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Accord.Statistics.Kernels;
 
 namespace AssemblyUtils
 {
@@ -15,6 +16,12 @@ namespace AssemblyUtils
         {
             dictionary.TryGetValue(key, out var current);
             dictionary[key] = current + toAdd;
+        }
+
+        public static TValue GetOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key)
+        {
+            dictionary.TryGetValue(key, out var rtn);
+            return rtn;
         }
     }
 }

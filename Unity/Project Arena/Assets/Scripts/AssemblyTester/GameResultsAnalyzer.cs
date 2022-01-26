@@ -30,6 +30,9 @@ namespace AssemblyTester
         // DONE!
         private readonly Dictionary<int, int> numberOfFrags = new Dictionary<int, int>();
 
+        // TODO!
+        private readonly Dictionary<int, int> numberOfSuicides = new Dictionary<int, int>();
+
         // DONE!
         private readonly Dictionary<int, int> numberOfShots = new Dictionary<int, int>();
 
@@ -41,6 +44,15 @@ namespace AssemblyTester
         private readonly Dictionary<int, int> currentKillStreak = new Dictionary<int, int>();
         private readonly Dictionary<int, int> killStreakMax = new Dictionary<int, int>();
 
+        private readonly int bot1ID;
+        private readonly int bot2ID;
+
+        public GameResultsAnalyzer(int bot1ID, int bot2ID)
+        {
+            this.bot1ID = bot1ID;
+            this.bot2ID = bot2ID;
+        }
+        
         public void Setup()
         {
             EntityGameMetricsGameEvent.Instance.AddListener(LogMetrics);
@@ -67,6 +79,7 @@ namespace AssemblyTester
             timeBetweenSights.Clear();
             
             numberOfFrags.Clear();
+            numberOfSuicides.Clear();
             numberOfShots.Clear();
             numberOfHits.Clear();
             killStreakMax.Clear();
@@ -97,6 +110,14 @@ namespace AssemblyTester
 
         private void LogKill(KillInfo receivedInfo)
         {
+            if (receivedInfo.killedEntityID == receivedInfo.killerEntityID)
+            {
+                // Suicide!
+                CloseKillStreak(receivedInfo.killedEntityID);
+                numberOfSuicides.AddToKey(receivedInfo.killedEntityID, 1);
+                return;
+            } 
+         
             numberOfFrags.AddToKey(receivedInfo.killerEntityID, 1);
             // TODO This is slightly wrong, what if I have a reciprocal kill? 
             // One of the entities would get the point now, and the other only after death.
@@ -175,7 +196,7 @@ namespace AssemblyTester
 
             var numberOfFightsSum = this.numberOfFights.Sum(entry => entry.Value);
             var timeToEngageSum = timeToEngage.Sum(entry => entry.Value);
-            var pace = 2 * 1 / (1 + Math.Exp(-3 * numberOfFightsSum / timeToEngageSum)) - 1;
+            var pace = 2 * 1 / (1 + Mathf.Exp(-3 * numberOfFightsSum / timeToEngageSum)) - 1;
 
             var timeInFightSum = timeInFight.Sum(entry => entry.Value);
             var timeBetweenSightsSum = timeBetweenSights.Sum(entry => entry.Value);
@@ -186,33 +207,35 @@ namespace AssemblyTester
 
             var sightLossRate = timeBetweenSightsSum / timeInFightSum;
             var targetLossRate = numberOfRetreatsSum / (float) numberOfFightsSum;
-
+            
             return new Dictionary<string, object>
             {
-                {"timeInFight1", timeInFight.First().Value},
-                {"timeInFight2", timeInFight.Last().Value},
-                {"timeToEngage1", timeToEngage.First().Value},
-                {"timeToEngage2", timeToEngage.Last().Value},
-                {"numberOfFights1", numberOfFights.First().Value},
-                {"numberOfFights2", numberOfFights.Last().Value},
-                {"timeBetweenSights1", timeBetweenSights.First().Value},
-                {"timeBetweenSights2", timeBetweenSights.Last().Value},
-                {"timeToSurrender1", timeToSurrender.First().Value},
-                {"timeToSurrender2", timeToSurrender.Last().Value},
-                {"numberOfRetreats1", numberOfRetreats.First().Value},
-                {"numberOfRetreats2", numberOfRetreats.Last().Value},
-                {"numberOfFrags1", numberOfFrags.First().Value},
-                {"numberOfFrags2", numberOfFrags.Last().Value},
-                {"numberOfShots1", numberOfShots.First().Value},
-                {"numberOfShots2", numberOfShots.Last().Value},
-                {"numberOfHits1", numberOfHits.First().Value},
-                {"numberOfHits2", numberOfHits.Last().Value},
-                {"accuracy1", accuracy.First().Value},
-                {"accuracy2", accuracy.Last().Value},
-                {"killStreakAverage1", killStreakAverage.First().Value},
-                {"killStreakAverage2", killStreakAverage.Last().Value},
-                {"killStreakMax1", killStreakMax.First().Value},
-                {"killStreakMax2", killStreakMax.Last().Value},
+                {"timeInFight1", timeInFight.GetOrDefault(bot1ID)},
+                {"timeInFight2", timeInFight.GetOrDefault(bot2ID)},
+                {"timeToEngage1", timeToEngage.GetOrDefault(bot1ID)},
+                {"timeToEngage2", timeToEngage.GetOrDefault(bot2ID)},
+                {"numberOfFights1", numberOfFights.GetOrDefault(bot1ID)},
+                {"numberOfFights2", numberOfFights.GetOrDefault(bot2ID)},
+                {"timeBetweenSights1", timeBetweenSights.GetOrDefault(bot1ID)},
+                {"timeBetweenSights2", timeBetweenSights.GetOrDefault(bot2ID)},
+                {"timeToSurrender1", timeToSurrender.GetOrDefault(bot1ID)},
+                {"timeToSurrender2", timeToSurrender.GetOrDefault(bot2ID)},
+                {"numberOfRetreats1", numberOfRetreats.GetOrDefault(bot1ID)},
+                {"numberOfRetreats2", numberOfRetreats.GetOrDefault(bot2ID)},
+                {"numberOfFrags1", numberOfFrags.GetOrDefault(bot1ID)},
+                {"numberOfFrags2", numberOfFrags.GetOrDefault(bot2ID)},
+                {"numberOfSuicides1", numberOfSuicides.GetOrDefault(bot1ID)},
+                {"numberOfSuicides2", numberOfSuicides.GetOrDefault(bot2ID)},
+                {"numberOfShots1", numberOfShots.GetOrDefault(bot1ID)},
+                {"numberOfShots2", numberOfShots.GetOrDefault(bot2ID)},
+                {"numberOfHits1", numberOfHits.GetOrDefault(bot1ID)},
+                {"numberOfHits2", numberOfHits.GetOrDefault(bot2ID)},
+                {"accuracy1", accuracy.GetOrDefault(bot1ID)},
+                {"accuracy2", accuracy.GetOrDefault(bot2ID)},
+                {"killStreakAverage1", killStreakAverage.GetOrDefault(bot1ID)},
+                {"killStreakAverage2", killStreakAverage.GetOrDefault(bot2ID)},
+                {"killStreakMax1", killStreakMax.GetOrDefault(bot1ID)},
+                {"killStreakMax2", killStreakMax.GetOrDefault(bot2ID)},
                 {"entropy", entropy},
                 {"pace", pace},
                 {"fightTime", fightTime},
