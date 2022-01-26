@@ -51,6 +51,7 @@ namespace AssemblyTester
 
         public void TearDown()
         {
+            EntityGameMetricsGameEvent.Instance.RemoveListener(LogMetrics);
             KillInfoGameEvent.Instance.RemoveListener(LogKill);
             ShotInfoGameEvent.Instance.RemoveListener(LogShot);
             HitInfoGameEvent.Instance.RemoveListener(LogHit);
@@ -58,6 +59,13 @@ namespace AssemblyTester
 
         public void Reset()
         {
+            timeToEngage.Clear();
+            numberOfFights.Clear();
+            timeInFight.Clear();
+            numberOfRetreats.Clear();
+            timeToSurrender.Clear();
+            timeBetweenSights.Clear();
+            
             numberOfFrags.Clear();
             numberOfShots.Clear();
             numberOfHits.Clear();
