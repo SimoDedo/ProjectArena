@@ -12,7 +12,7 @@ namespace AssemblyTester
     public class GraphMapTester : MonoBehaviour
     {
         [SerializeField] private GameObject botPrefab;
-        [SerializeField] private string mapPath;
+        [SerializeField] private string mapName;
         [SerializeField] private string bot1ParamsFilenamePrefix;
         [SerializeField] private string bot2ParamsFilenamePrefix;
         [SerializeField] private MapManager mapManager;
@@ -20,6 +20,9 @@ namespace AssemblyTester
         [SerializeField] private int numExperiments = 1;
         [SerializeField] private string experimentName = "experiment";
         private const int GAME_LENGTH = 600;
+        private string importPath;
+        private string mapsPath;
+        private string botsPath;
 
         // Size of a maps tile.
         private const float TILE_SIZE = 1;
@@ -44,6 +47,26 @@ namespace AssemblyTester
                 if (arg.StartsWith("-bot2file=")) bot2ParamsFilenamePrefix = arg.Substring(10);
                 if (arg.StartsWith("-numExperiments=")) numExperiments = int.Parse(arg.Substring(16));
                 if (arg.StartsWith("-experimentName=")) experimentName = arg.Substring(16);
+                if (arg.StartsWith("-mapName=")) mapName = arg.Substring(9);
+            }
+
+            importPath = Application.persistentDataPath + "/Import/";
+            mapsPath = importPath + "Maps/";
+            botsPath = importPath + "Bots/";
+
+            if (!Directory.Exists(importPath))
+            {
+                Directory.CreateDirectory(importPath);
+            }
+
+            if (!Directory.Exists(mapsPath))
+            {
+                Directory.CreateDirectory(mapsPath);
+            }
+
+            if (!Directory.Exists(botsPath))
+            {
+                Directory.CreateDirectory(botsPath);
             }
 
             analyzer = new GameResultsAnalyzer();
@@ -61,8 +84,15 @@ namespace AssemblyTester
         private void StartNewExperiment()
         {
             manager = gameObject.AddComponent<GraphTesterGameManager>();
-            var (bot1Params, activeGunsBot1) = LoadBotCharacteristics(bot1ParamsFilenamePrefix);
-            var (bot2Params, activeGunsBot2) = LoadBotCharacteristics(bot2ParamsFilenamePrefix);
+            var (bot1Params, activeGunsBot1) = LoadBotCharacteristics(botsPath, bot1ParamsFilenamePrefix);
+            var (bot2Params, activeGunsBot2) = LoadBotCharacteristics(botsPath, bot2ParamsFilenamePrefix);
+
+            var mapPath = mapsPath + mapName + ".txt";
+            if (!File.Exists(mapPath))
+            {
+                throw new FileNotFoundException("Couldn't find map file " + mapPath);
+            }
+
             manager.SetParameters(
                 botPrefab,
                 bot1Params,
@@ -137,15 +167,9 @@ namespace AssemblyTester
             Debug.Log("Experiment num " + experimentNumber + " started!");
         }
 
-        private static Tuple<BotCharacteristics, bool[]> LoadBotCharacteristics(string botFilename)
+        private static Tuple<BotCharacteristics, bool[]> LoadBotCharacteristics(string botsPath, string botFilename)
         {
-            var importPath = Application.persistentDataPath + "/Import";
-            if (!Directory.Exists(importPath))
-            {
-                Directory.CreateDirectory(importPath);
-            }
-
-            var paramsFile = importPath + "/" + botFilename + "params.json";
+            var paramsFile = botsPath + botFilename + "params.json";
             var botParams = BotCharacteristics.Default;
             try
             {
@@ -167,12 +191,12 @@ namespace AssemblyTester
                 }
             }
 
-            var gunsFile = importPath + "/" + botFilename + "guns.json";
+            var gunsFile = botsPath + botFilename + "guns.json";
             var guns = new[] {true, true, true, true};
             try
             {
                 using var reader = new StreamReader(gunsFile);
-                guns =  JsonConvert.DeserializeObject<bool[]>(reader.ReadToEnd());
+                guns = JsonConvert.DeserializeObject<bool[]>(reader.ReadToEnd());
             }
             catch (Exception)
             {
