@@ -13,10 +13,8 @@ namespace AssemblyTester
     {
         [SerializeField] private GameObject botPrefab;
         [SerializeField] private string mapPath;
-        [SerializeField] private string bot1ParamsPath;
-        [SerializeField] private string bot2ParamsPath;
-        [SerializeField] private bool[] activeGunsBot1;
-        [SerializeField] private bool[] activeGunsBot2;
+        [SerializeField] private string bot1ParamsFilenamePrefix;
+        [SerializeField] private string bot2ParamsFilenamePrefix;
         [SerializeField] private MapManager mapManager;
         [SerializeField] private SpawnPointManager spawnPointManager;
         [SerializeField] private int numExperiments = 1;
@@ -42,8 +40,8 @@ namespace AssemblyTester
             var args = Environment.GetCommandLineArgs();
             foreach (var arg in args)
             {
-                if (arg.StartsWith("-bot1file=")) bot1ParamsPath = arg.Substring(10);
-                if (arg.StartsWith("-bot2file=")) bot2ParamsPath = arg.Substring(10);
+                if (arg.StartsWith("-bot1file=")) bot1ParamsFilenamePrefix = arg.Substring(10);
+                if (arg.StartsWith("-bot2file=")) bot2ParamsFilenamePrefix = arg.Substring(10);
                 if (arg.StartsWith("-numExperiments=")) numExperiments = int.Parse(arg.Substring(16));
                 if (arg.StartsWith("-experimentName=")) experimentName = arg.Substring(16);
             }
@@ -63,8 +61,8 @@ namespace AssemblyTester
         private void StartNewExperiment()
         {
             manager = gameObject.AddComponent<GraphTesterGameManager>();
-            var bot1Params = LoadBotCharacteristics(bot1ParamsPath);
-            var bot2Params = LoadBotCharacteristics(bot2ParamsPath);
+            var (bot1Params, activeGunsBot1) = LoadBotCharacteristics(bot1ParamsFilenamePrefix);
+            var (bot2Params, activeGunsBot2) = LoadBotCharacteristics(bot2ParamsFilenamePrefix);
             manager.SetParameters(
                 botPrefab,
                 bot1Params,
@@ -110,7 +108,7 @@ namespace AssemblyTester
         private static void ExportResults(string compileResults, string experimentName)
         {
             var exportPath = Application.persistentDataPath + "/Export/" + experimentName;
-            if (!Directory.Exists(exportPath)) 
+            if (!Directory.Exists(exportPath))
             {
                 Directory.CreateDirectory(exportPath);
             }
@@ -139,7 +137,7 @@ namespace AssemblyTester
             Debug.Log("Experiment num " + experimentNumber + " started!");
         }
 
-        private static BotCharacteristics LoadBotCharacteristics(string botFilename)
+        private static Tuple<BotCharacteristics, bool[]> LoadBotCharacteristics(string botFilename)
         {
             var importPath = Application.persistentDataPath + "/Import";
             if (!Directory.Exists(importPath))
@@ -147,20 +145,19 @@ namespace AssemblyTester
                 Directory.CreateDirectory(importPath);
             }
 
-            var filePath = importPath + "/" + botFilename;
+            var paramsFile = importPath + "/" + botFilename + "params.json";
+            var botParams = BotCharacteristics.Default;
             try
             {
-                using var reader = new StreamReader(filePath);
-                var botParams = reader.ReadToEnd();
-                return JsonUtility.FromJson<BotCharacteristics>(botParams);
+                using var reader = new StreamReader(paramsFile);
+                botParams = JsonConvert.DeserializeObject<BotCharacteristics>(reader.ReadToEnd());
             }
             catch (Exception)
             {
-                var rtn = BotCharacteristics.Default;
                 try
                 {
-                    var json = JsonUtility.ToJson(rtn, true);
-                    using var writer = new StreamWriter(filePath);
+                    var json = JsonConvert.SerializeObject(botParams, Formatting.Indented);
+                    using var writer = new StreamWriter(paramsFile);
                     writer.Write(json);
                     writer.Close();
                 }
@@ -168,9 +165,31 @@ namespace AssemblyTester
                 {
                     // Ignored, could not generate default file.
                 }
-
-                return rtn;
             }
+
+            var gunsFile = importPath + "/" + botFilename + "guns.json";
+            var guns = new[] {true, true, true, true};
+            try
+            {
+                using var reader = new StreamReader(gunsFile);
+                guns =  JsonConvert.DeserializeObject<bool[]>(reader.ReadToEnd());
+            }
+            catch (Exception)
+            {
+                try
+                {
+                    var json = JsonConvert.SerializeObject(guns);
+                    using var writer = new StreamWriter(gunsFile);
+                    writer.Write(json);
+                    writer.Close();
+                }
+                catch (Exception)
+                {
+                    // Ignored, could not generate default file.
+                }
+            }
+
+            return new Tuple<BotCharacteristics, bool[]>(botParams, guns);
         }
     }
 }

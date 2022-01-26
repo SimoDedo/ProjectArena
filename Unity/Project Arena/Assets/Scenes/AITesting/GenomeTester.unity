@@ -237,10 +237,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   botPrefab: {fileID: 1128226087601874, guid: 87c5267e1886311258a6f48dac81a1ca, type: 3}
   mapPath: /home/jimbo/.config/unity3d/Polimi Games Collective/Project Arena/Export/Maps/map_5.txt
-  bot1ParamsPath: bot1.json
-  bot2ParamsPath: bot2.json
-  activeGunsBot1: 01010101
-  activeGunsBot2: 01010101
+  bot1ParamsFilenamePrefix: bot1
+  bot2ParamsFilenamePrefix: bot2
   mapManager: {fileID: 8576320533562149655}
   spawnPointManager: {fileID: 1306383530137614300}
   numExperiments: 100
