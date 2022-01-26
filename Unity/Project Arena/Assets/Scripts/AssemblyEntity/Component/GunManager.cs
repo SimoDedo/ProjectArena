@@ -205,6 +205,11 @@ namespace AssemblyEntity.Component
             return guns[index].IsBlastWeapon;
         }
 
+        public bool IsCurrentGunBlastWeapon()
+        {
+            return guns[CurrentGunIndex].IsBlastWeapon;
+        }
+
         public float GetCurrentGunProjectileSpeed()
         {
             return guns[CurrentGunIndex].GetProjectileSpeed();
@@ -225,7 +230,7 @@ namespace AssemblyEntity.Component
 
         public bool HasAmmo()
         {
-            return guns.Any(it => it.GetCurrentAmmo() != 0);
+            return guns.Any(it => it.isActiveAndEnabled && it.GetCurrentAmmo() != 0);
         }
 
         public float GetGunMaxRange(int index)
