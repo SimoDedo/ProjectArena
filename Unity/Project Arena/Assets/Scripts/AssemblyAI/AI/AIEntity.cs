@@ -325,7 +325,17 @@ public class AIEntity : Entity, ILoggable
 
         if (inGame)
         {
-            TargetKb.Update();
+            if (!enemy.IsAlive)
+            {
+                // Bug fix: forget enemy position, because if it dies and respawns before I lose track of the last
+                //   position occupied, I will shoot at that point as soon as the enemy respawns 
+                TargetKb.Reset();
+            }
+            else
+            {
+                TargetKb.Update();
+            }
+
             PickupKnowledgeBase.Update();
             goalMachine.Update();
 
