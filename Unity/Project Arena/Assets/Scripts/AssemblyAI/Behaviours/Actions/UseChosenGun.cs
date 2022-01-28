@@ -192,7 +192,7 @@ namespace AssemblyAI.Behaviours.Actions
             var headForward = sightController.GetHeadForward();
 
             var hitSomething = Physics.Raycast(startingPos, headForward, out var hit, weaponRange);
-            if (hitSomething && hit.distance <= distance * 0.9f)
+            if (hitSomething && hit.collider.gameObject != enemy.gameObject && hit.distance <= distance * 0.9f)
             {
                 // Looks like there is an obstacle between me and the point I wanted to shoot. Avoid shooting
                 return false;
