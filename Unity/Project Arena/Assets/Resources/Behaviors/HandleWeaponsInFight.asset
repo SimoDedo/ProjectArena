@@ -28,7 +28,7 @@ MonoBehaviour:
         prefer based on the normal scoring"},"ID":2,"Name":"New Choose Weapon","Instant":true},{"Type":"AssemblyAI.Behaviours.Actions.UseChosenGun","NodeData":{"Offset":"(130,160)","Comment":"Shoot
         at the enemy last known position (which is the enemy position if we see it,
         it''s the enemy last position before going being corner otherwise)"},"ID":3,"Name":"Use
-        Chosen Gun","Instant":true,"Int32maxLookAheadFrames":5,"SinglelookAheadTimeStep":0.1,"SharedBoolisGoingForCover":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":"IsGoingForCover","IsShared":true,"BooleanmValue":false}}]},"Variables":[{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":"IsGoingForCover","IsShared":true,"BooleanmValue":false}]}'
+        Chosen Gun","Instant":true,"Int32lookBackFrames":-3,"Int32lookAheadFrames":3,"SinglelookAheadTimeStep":0.3,"SharedBoolisGoingForCover":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":"IsGoingForCover","IsShared":true,"BooleanmValue":false}}]},"Variables":[{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":"IsGoingForCover","IsShared":true,"BooleanmValue":false}]}'
       fieldSerializationData:
         typeName: []
         fieldNameHash: 

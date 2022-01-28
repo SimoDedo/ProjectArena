@@ -85,14 +85,13 @@ namespace AssemblyAI.Behaviours.Actions
                 (enemyPosition, enemyVelocity) = enemyPositionTracker.GetPositionAndVelocityFromDelay(currentDelay);
             }
 
-            var projectileSpeed = gunManager.GetCurrentGunProjectileSpeed();
-            if (float.IsPositiveInfinity(projectileSpeed))
+            if (gunManager.IsCurrentGunProjectileWeapon())
             {
-                AimRaycastWeapon(enemyPosition, lastSightedTime);
+                AimProjectileWeapon(enemyPosition, enemyVelocity);
             }
             else
             {
-                AimProjectileWeapon(enemyPosition, enemyVelocity, projectileSpeed);
+                AimRaycastWeapon(enemyPosition, lastSightedTime);
             }
 
             return TaskStatus.Running;
@@ -102,8 +101,9 @@ namespace AssemblyAI.Behaviours.Actions
          * Tries to find the best position to aim at accounting for the weapon speed and the enemy estimated velocity.
          * In case the weapon is a blast weapon, positions at the 
          */
-        private void AimProjectileWeapon(Vector3 position, Vector3 velocity, float projectileSpeed)
+        private void AimProjectileWeapon(Vector3 position, Vector3 velocity)
         {
+            var projectileSpeed = gunManager.GetCurrentGunProjectileSpeed();
             var ourStartingPoint = sightController.GetHeadPosition();
             var enemyStartPos = position;
             var record = float.PositiveInfinity;
@@ -190,15 +190,22 @@ namespace AssemblyAI.Behaviours.Actions
                 return true;
             }
 
+            // TODO Avoid hardcoding radius of rocket and blast radius
+            const float rocketRadius = 0.3f;
+            const float blastRadius = 9f; // Slightly increase to prevent walking toward the explosion
+            
             // Check that we do not hurt ourselves by shooting this weapon
             var headForward = sightController.GetHeadForward();
             // Try to cast a ray from our position to position. If it's too short, we have an obstacle
             // in front of us...
             bool canShoot;
-            var hitSomething = Physics.Raycast(startingPos, headForward, out var hit, distance);
-            // TODO Retrieve gun blast radius
-            canShoot = !hitSomething || hit.distance > 6.5f;
-            Debug.Log("Going to shoot rocket because " + hitSomething + " or " + hit.distance + " > 6.5f");
+
+            var castDistance = Mathf.Max(2 * blastRadius, distance);
+            
+            var hitSomething = Physics.SphereCast(startingPos, rocketRadius, headForward, out var hit, castDistance);
+            // var rayCastHit = Physics.Raycast(startingPos, headForward, distance);
+            canShoot = !hitSomething || hit.distance > blastRadius;
+            // Debug.Log("Going to shoot rocket is " + canShoot + " because " + hitSomething + "(" + rayCastHit + ") or " + hit.distance + " > 6.5f");
             return canShoot;
         }
     }

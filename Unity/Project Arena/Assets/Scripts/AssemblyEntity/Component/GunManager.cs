@@ -209,6 +209,11 @@ namespace AssemblyEntity.Component
         {
             return guns[CurrentGunIndex].IsBlastWeapon;
         }
+        
+        public bool IsCurrentGunProjectileWeapon()
+        {
+            return guns[CurrentGunIndex].IsProjectileWeapon;
+        }
 
         public float GetCurrentGunProjectileSpeed()
         {
