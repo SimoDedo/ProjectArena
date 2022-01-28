@@ -58,11 +58,13 @@ public class GraphTesterGameManager : GameManager
         this.bot2Params = bot2Params;
 
         bot1 = Instantiate(botPrefab);
+        bot1.name = "AIEntity1";
         this.bot1ID = bot1ID;
         this.activeGunsBot1 = activeGunsBot1;
         ai1 = bot1.GetComponent<AIEntity>();
 
         bot2 = Instantiate(botPrefab);
+        bot2.name = "AIEntity2";
         this.bot2ID = bot2ID;
         this.activeGunsBot2 = activeGunsBot2;
         ai2 = bot2.GetComponent<AIEntity>();
