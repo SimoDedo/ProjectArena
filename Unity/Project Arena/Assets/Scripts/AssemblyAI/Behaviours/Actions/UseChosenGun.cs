@@ -178,31 +178,36 @@ namespace AssemblyAI.Behaviours.Actions
         {
             var startingPos = sightController.GetHeadPosition();
             var distance = (startingPos - position).magnitude;
-            if (gunManager.GetGunMaxRange(gunManager.CurrentGunIndex) < distance)
+            var weaponRange = gunManager.GetGunMaxRange(gunManager.CurrentGunIndex);
+            if (weaponRange < distance)
             {
                 // Outside of weapon range...
                 return false;
             }
 
-            if (!isBlastWeapon)
-            {
-                return true;
-            }
+            // TODO try to raycast from my position forward. If the distance I hit is not too smaller than the distance
+            // of the target, than you can shoot.
 
-            // TODO Avoid hardcoding radius of rocket and blast radius
-            const float rocketRadius = 0.3f;
-            const float blastRadius = 9f; // Slightly increase for security
-            
             // Check that we do not hurt ourselves by shooting this weapon
             var headForward = sightController.GetHeadForward();
+
+            var hitSomething = Physics.Raycast(startingPos, headForward, out var hit, weaponRange);
+            if (hitSomething && hit.distance <= distance * 0.9f)
+            {
+                // Looks like there is an obstacle between me and the point I wanted to shoot. Avoid shooting
+                return false;
+            }
+            if (!isBlastWeapon)
+            {
+                // No more checks needed now
+                return true;
+            }
 
             // Try to cast a ray from our position looking forward. If we hit something, check it's not too close to
             // hurt ourselves
 
-            var castDistance = Mathf.Max(2 * blastRadius, distance);
-            // Using sphere cast since projectiles have a size that might make them collide with a wall close to me
-            // in my look direction
-            var hitSomething = Physics.SphereCast(startingPos, rocketRadius, headForward, out var hit, castDistance);
+            // TODO Avoid hardcoding radius of rocket and blast radius
+            const float blastRadius = 9f; // Slightly increase for security
             var canShoot = !hitSomething || hit.distance > blastRadius;
             return canShoot;
         }
