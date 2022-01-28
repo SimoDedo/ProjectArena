@@ -18,15 +18,20 @@ public abstract class Projectile : MonoBehaviour {
     public int ShooterID => shooterID;
     
     private void Update() {
-        if (shot) {
-            var t = transform;
-            t.position += t.forward * (Time.deltaTime * projectileSpeed);
+        if (shot)
+        {
+            Step();
 
             if (Time.time > shotTime + projectileLifeTime) {
                 Recover();
             }
         }
     }
+
+    private void Step()
+    {
+        var t = transform;
+        t.position += t.forward * (Time.deltaTime * projectileSpeed);    }
 
     // Sets the projectile.
     public void SetupProjectile(float plt, float ps, ProjectileGun pg, float d, int s) {
@@ -41,11 +46,11 @@ public abstract class Projectile : MonoBehaviour {
     public void Fire(Vector3 position, Quaternion direction) {
         transform.position = position;
         transform.rotation = direction;
-
         shot = true;
         shotTime = Time.time;
         gameObject.SetActive(true);
         projectile.SetActive(true);
+        Step();
     }
 
     // Recovers the projectile.
