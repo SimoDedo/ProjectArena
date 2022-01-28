@@ -148,7 +148,6 @@ namespace AssemblyAI.Behaviours.Actions
             if (angle < 10 && gunManager.CanCurrentGunShoot() && ShouldShootWeapon(chosenPoint, isGunBlast))
             {
                 Debug.DrawRay(ourStartingPoint, sightController.GetHeadForward() * 100f, Color.blue, 2f);
-                Debug.Log("Shooting with angle " + angle);
                 gunManager.ShootCurrentGun();
             }
         }
@@ -192,20 +191,19 @@ namespace AssemblyAI.Behaviours.Actions
 
             // TODO Avoid hardcoding radius of rocket and blast radius
             const float rocketRadius = 0.3f;
-            const float blastRadius = 9f; // Slightly increase to prevent walking toward the explosion
+            const float blastRadius = 9f; // Slightly increase for security
             
             // Check that we do not hurt ourselves by shooting this weapon
             var headForward = sightController.GetHeadForward();
-            // Try to cast a ray from our position to position. If it's too short, we have an obstacle
-            // in front of us...
-            bool canShoot;
+
+            // Try to cast a ray from our position looking forward. If we hit something, check it's not too close to
+            // hurt ourselves
 
             var castDistance = Mathf.Max(2 * blastRadius, distance);
-            
+            // Using sphere cast since projectiles have a size that might make them collide with a wall close to me
+            // in my look direction
             var hitSomething = Physics.SphereCast(startingPos, rocketRadius, headForward, out var hit, castDistance);
-            // var rayCastHit = Physics.Raycast(startingPos, headForward, distance);
-            canShoot = !hitSomething || hit.distance > blastRadius;
-            // Debug.Log("Going to shoot rocket is " + canShoot + " because " + hitSomething + "(" + rayCastHit + ") or " + hit.distance + " > 6.5f");
+            var canShoot = !hitSomething || hit.distance > blastRadius;
             return canShoot;
         }
     }
