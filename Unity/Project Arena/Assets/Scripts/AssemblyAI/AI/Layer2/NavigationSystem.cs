@@ -106,6 +106,7 @@ namespace AssemblyAI.AI.Layer2
                 }
                 else
                 {
+                    // TODO Possible problem, we are trying to move in the space of the enemy?
                     Debug.LogError("Calculated invalid path for entity " + me.name);
                 }
             }
@@ -123,6 +124,7 @@ namespace AssemblyAI.AI.Layer2
             }
 
             currentDestination = NoDestination;
+            latestDestination = NoDestination;
             latestDestinationPath = null;
         }
 
