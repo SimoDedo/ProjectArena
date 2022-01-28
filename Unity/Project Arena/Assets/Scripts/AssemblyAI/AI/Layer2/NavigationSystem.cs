@@ -99,9 +99,15 @@ namespace AssemblyAI.AI.Layer2
         {
             if (latestDestination != currentDestination)
             {
-                currentDestination = latestDestination;
-                var path = latestDestinationPath ?? CalculatePath(currentDestination);
-                agent.SetPath(path);
+                var path = latestDestinationPath ?? CalculatePath(latestDestination);
+                if (agent.SetPath(path))
+                {
+                    currentDestination = latestDestination;
+                }
+                else
+                {
+                    Debug.LogError("Calculated invalid path for entity " + me.name);
+                }
             }
 
             Debug.DrawLine(transform.position, agent.destination, Color.green, 0, false);
@@ -117,6 +123,7 @@ namespace AssemblyAI.AI.Layer2
             }
 
             currentDestination = NoDestination;
+            latestDestinationPath = null;
         }
 
         /// <summary>
