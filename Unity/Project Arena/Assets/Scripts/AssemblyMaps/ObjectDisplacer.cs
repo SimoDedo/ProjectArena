@@ -63,18 +63,23 @@ public class ObjectDisplacer : CoreComponent {
     }
 
     // Displace the custom objects inside the map.
-    public void DisplaceObjects(char[,] map, float squareSize, float height) {
-        for (int x = 0; x < map.GetLength(0); x++) {
-            for (int y = 0; y < map.GetLength(1); y++) {
-                if (charObjectsDictionary.ContainsKey(map[x, y])) {
-                    CustomObject currentObject = charObjectsDictionary[map[x, y]].GetObject();
+    public void DisplaceObjects(char[,] map, float squareSize, float height)
+    {
+        var rows = map.GetLength(0);
+        var columns = map.GetLength(1);
+        for (var r = 0; r < rows; r++) {
+            for (var c = 0; c < columns; c++) {
+                if (charObjectsDictionary.ContainsKey(map[r, c])) {
+                    var currentObject = charObjectsDictionary[map[r, c]].GetObject();
 
-                    GameObject childObject = (GameObject)Instantiate(currentObject.prefab);
+                    var childObject = Instantiate(currentObject.prefab);
                     childObject.name = currentObject.prefab.name;
                     childObject.transform.parent = transform.Find(currentObject.category);
-                    childObject.transform.localPosition = new Vector3(squareSize * x,
-                        heightDirCorrection * (heightCorrection + height +
-                        currentObject.heightCorrection), squareSize * y);
+                    childObject.transform.localPosition = new Vector3(
+                        squareSize * c,
+                        heightDirCorrection * (heightCorrection + height + currentObject.heightCorrection), 
+                        (rows - r - 1) * squareSize
+                        );
                     childObject.transform.localScale *= sizeCorrection;
 
                     if (categoryObjectsDictionary.ContainsKey(currentObject.category)) {
