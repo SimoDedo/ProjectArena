@@ -97,11 +97,14 @@ public class MeshMapAssembler : MapAssembler
         vertices = new List<Vector3>();
         triangles = new List<int>();
 
-        for (int x = 0; x < squareGrid.squares.GetLength(0); x++)
+        var gridRows = squareGrid.squares.GetLength(0);
+        var gridColumns = squareGrid.squares.GetLength(1);
+        
+        for (var r = 0; r < gridRows; r++)
         {
-            for (int y = 0; y < squareGrid.squares.GetLength(1); y++)
+            for (var c = 0; c < gridColumns; c++)
             {
-                TriangulateSquare(squareGrid.squares[x, y]);
+                TriangulateSquare(squareGrid.squares[r, c]);
             }
         }
 
@@ -133,7 +136,7 @@ public class MeshMapAssembler : MapAssembler
     ) { }
 
     // Creates the top mesh.
-    private void CreateTopMesh(int sizeX, int sizeY)
+    private void CreateTopMesh(int rows, int columns)
     {
         if (isSkyVisibile)
         {
@@ -142,7 +145,7 @@ public class MeshMapAssembler : MapAssembler
             topMeshFilter.mesh = topMesh;
         } else
         {
-            Mesh topMesh = CreateRectangularMesh(sizeX, sizeY, squareSize, 0, isSkyVisibile);
+            Mesh topMesh = CreateRectangularMesh(rows, columns, squareSize, 0, isSkyVisibile);
             topMeshFilter.mesh = topMesh;
             topCollider.sharedMesh = topMesh;
         }
@@ -193,9 +196,9 @@ public class MeshMapAssembler : MapAssembler
     }
 
     // Creates the floor mesh.
-    private void CreateFloorMesh(int sizeX, int sizeY)
+    private void CreateFloorMesh(int rows, int columns)
     {
-        Mesh floorMesh = CreateRectangularMesh(sizeX, sizeY, squareSize, wallHeight, true);
+        var floorMesh = CreateRectangularMesh(rows, columns, squareSize, wallHeight, true);
 
         floorMeshFilter.mesh = floorMesh;
         floorCollider.sharedMesh = floorMesh;
@@ -203,33 +206,28 @@ public class MeshMapAssembler : MapAssembler
 
     // Creates a rectangular mesh.
     private Mesh CreateRectangularMesh(
-        int sizeX,
-        int sizeY,
+        int rectangleHeight,
+        int rectangleWidth,
         float squareSize,
         float height,
         bool facingUpwards
     )
     {
-        Mesh mesh = new Mesh();
+        var mesh = new Mesh();
 
-        Vector3[] vertices = new Vector3[4];
+        var vertices = new Vector3[4];
 
-        vertices[0] = new Vector3(-squareSize / 2, -height, -squareSize / 2);
-        vertices[1] = new Vector3(-squareSize / 2, -height,
-            sizeY * squareSize + squareSize / 2);
-        vertices[2] = new Vector3(sizeX * squareSize + squareSize / 2, -height,
-            -squareSize / 2);
-        vertices[3] = new Vector3(sizeX * squareSize + squareSize / 2, -height,
-            sizeY * squareSize + squareSize / 2);
+        var leftX = -squareSize / 2;
+        var topZ = rectangleHeight * squareSize + squareSize / 2;
+        var rightX = rectangleWidth * squareSize + squareSize / 2;
+        var bottomZ = -squareSize / 2;
 
-        int[] triangles;
-        if (facingUpwards)
-        {
-            triangles = new int[] {0, 1, 2, 2, 1, 3};
-        } else
-        {
-            triangles = new int[] {3, 1, 2, 2, 1, 0};
-        }
+        vertices[0] = new Vector3(leftX, -height, topZ); //Top Left
+        vertices[1] = new Vector3(rightX, -height, topZ); //Top Right
+        vertices[2] = new Vector3(rightX, -height, bottomZ); //Bottom Right
+        vertices[3] = new Vector3(leftX, -height, bottomZ); //Bottom Left
+
+        var triangles = !facingUpwards ? new[] {0, 3, 2, 2, 1, 0} : new[] {0, 2, 3, 1, 2, 0};
 
         mesh.vertices = vertices;
         mesh.triangles = triangles;
@@ -510,30 +508,30 @@ public class MeshMapAssembler : MapAssembler
 
         public SquareGrid(char[,] map, char charWall, float squareSize)
         {
-            int nodeCountX = map.GetLength(0);
-            int nodeCountY = map.GetLength(1);
+            var rows = map.GetLength(0);
+            var columns = map.GetLength(1);
 
             // We create a grid of Control Nodes.
-            ControlNode[,] controlNodes = new ControlNode[nodeCountX, nodeCountY];
+            var controlNodes = new ControlNode[rows, columns];
 
-            for (int x = 0; x < nodeCountX; x++)
+            for (var r = 0; r < rows; r++)
             {
-                for (int y = 0; y < nodeCountY; y++)
+                for (var c = 0; c < columns; c++)
                 {
-                    Vector3 pos = new Vector3(x * squareSize, 0, y * squareSize);
-                    controlNodes[x, y] = new ControlNode(pos, map[x, y] == charWall, squareSize);
+                    var pos = new Vector3(c * squareSize, 0, (rows - r - 1) * squareSize);
+                    controlNodes[r, c] = new ControlNode(pos, map[r, c] == charWall, squareSize);
                 }
             }
 
             // We create a grid of Squares out of the Control Nodes.
-            squares = new Square[nodeCountX - 1, nodeCountY - 1];
+            squares = new Square[rows - 1, columns - 1];
 
-            for (int x = 0; x < nodeCountX - 1; x++)
+            for (int x = 0; x < rows - 1; x++)
             {
-                for (int y = 0; y < nodeCountY - 1; y++)
+                for (int y = 0; y < columns - 1; y++)
                 {
-                    squares[x, y] = new Square(controlNodes[x, y + 1], controlNodes[x + 1, y + 1],
-                        controlNodes[x + 1, y], controlNodes[x, y]);
+                    squares[x, y] = new Square(controlNodes[x, y], controlNodes[x, y + 1],
+                        controlNodes[x + 1, y + 1], controlNodes[x + 1, y]);
                 }
             }
         }
