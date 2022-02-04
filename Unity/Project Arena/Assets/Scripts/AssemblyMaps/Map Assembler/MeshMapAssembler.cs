@@ -217,10 +217,10 @@ public class MeshMapAssembler : MapAssembler
 
         var vertices = new Vector3[4];
 
-        var leftX = -squareSize / 2;
-        var topZ = rectangleHeight * squareSize + squareSize / 2;
-        var rightX = rectangleWidth * squareSize + squareSize / 2;
-        var bottomZ = -squareSize / 2;
+        const int leftX = 0;
+        var topZ = rectangleHeight * squareSize;
+        var rightX = rectangleWidth * squareSize;
+        const int bottomZ = 0;
 
         vertices[0] = new Vector3(leftX, -height, topZ); //Top Left
         vertices[1] = new Vector3(rightX, -height, topZ); //Top Right
@@ -236,6 +236,7 @@ public class MeshMapAssembler : MapAssembler
         return mesh;
     }
 
+    // TODO Create a square wall. 
     // Depending on the configuration of a Square I create the rigth mesh.
     private void TriangulateSquare(Square square)
     {
@@ -244,62 +245,62 @@ public class MeshMapAssembler : MapAssembler
             case 0:
                 break;
             // 1 point cases.
-            case 1:
+            case /*1*/ BOTTOM_LEFT_WALL:
                 MeshFromPoints(square.centreLeft, square.centreBottom, square.bottomLeft);
                 break;
-            case 2:
+            case /*2*/ BOTTOM_RIGHT_WALL:
                 MeshFromPoints(square.bottomRight, square.centreBottom, square.centreRight);
                 break;
-            case 4:
+            case /*4*/ TOP_RIGHT_WALL:
                 MeshFromPoints(square.topRight, square.centreRight, square.centreTop);
                 break;
-            case 8:
+            case /*8*/ TOP_LEFT_WALL:
                 MeshFromPoints(square.topLeft, square.centreTop, square.centreLeft);
                 break;
             // 2 points cases.
-            case 3:
+            case /*3*/ BOTTOM_LEFT_WALL | BOTTOM_RIGHT_WALL:
                 MeshFromPoints(square.centreRight, square.bottomRight, square.bottomLeft,
                     square.centreLeft);
                 break;
-            case 6:
+            case /*6*/ BOTTOM_RIGHT_WALL | TOP_RIGHT_WALL:
                 MeshFromPoints(square.centreTop, square.topRight, square.bottomRight,
                     square.centreBottom);
                 break;
-            case 9:
+            case /*9*/ TOP_LEFT_WALL | BOTTOM_LEFT_WALL:
                 MeshFromPoints(square.topLeft, square.centreTop, square.centreBottom,
                     square.bottomLeft);
                 break;
-            case 12:
+            case /*12*/ TOP_LEFT_WALL | TOP_RIGHT_WALL:
                 MeshFromPoints(square.topLeft, square.topRight, square.centreRight,
                     square.centreLeft);
                 break;
-            case 5:
+            case /*5*/ TOP_RIGHT_WALL | BOTTOM_LEFT_WALL:
                 MeshFromPoints(square.centreTop, square.topRight, square.centreRight,
                     square.centreBottom, square.bottomLeft, square.centreLeft);
                 break;
-            case 10:
+            case /*10*/ TOP_LEFT_WALL | BOTTOM_RIGHT_WALL:
                 MeshFromPoints(square.topLeft, square.centreTop, square.centreRight,
                     square.bottomRight, square.centreBottom, square.centreLeft);
                 break;
             // 3 points cases.
-            case 7:
+            case /*7*/ TOP_RIGHT_WALL | BOTTOM_LEFT_WALL | BOTTOM_RIGHT_WALL:
                 MeshFromPoints(square.centreTop, square.topRight, square.bottomRight,
                     square.bottomLeft, square.centreLeft);
                 break;
-            case 11:
+            case /*11*/ TOP_LEFT_WALL | BOTTOM_LEFT_WALL | BOTTOM_RIGHT_WALL:
                 MeshFromPoints(square.topLeft, square.centreTop, square.centreRight,
                     square.bottomRight, square.bottomLeft);
                 break;
-            case 13:
+            case /*13*/ TOP_LEFT_WALL | TOP_RIGHT_WALL | BOTTOM_LEFT_WALL:
                 MeshFromPoints(square.topLeft, square.topRight, square.centreRight,
                     square.centreBottom, square.bottomLeft);
                 break;
-            case 14:
+            case /*14*/ TOP_LEFT_WALL | TOP_RIGHT_WALL | BOTTOM_RIGHT_WALL:
                 MeshFromPoints(square.topLeft, square.topRight, square.bottomRight,
                     square.centreBottom, square.centreLeft);
                 break;
             // 4 point case.
-            case 15:
+            case /*15*/ TOP_LEFT_WALL | TOP_RIGHT_WALL | BOTTOM_LEFT_WALL | BOTTOM_RIGHT_WALL:
                 MeshFromPoints(square.topLeft, square.topRight, square.bottomRight,
                     square.bottomLeft);
                 // All sorrounding Nodes are walls, so none of this vertices can belong to an 
@@ -514,24 +515,26 @@ public class MeshMapAssembler : MapAssembler
             // We create a grid of Control Nodes.
             var controlNodes = new ControlNode[rows, columns];
 
+            var halfSquareSize = 0.5f;
             for (var r = 0; r < rows; r++)
             {
                 for (var c = 0; c < columns; c++)
                 {
-                    var pos = new Vector3(c * squareSize, 0, (rows - r - 1) * squareSize);
+                    var pos = new Vector3(halfSquareSize + c * squareSize, 0, halfSquareSize + (rows - r - 1) * squareSize);
                     controlNodes[r, c] = new ControlNode(pos, map[r, c] == charWall, squareSize);
+                    
                 }
             }
 
             // We create a grid of Squares out of the Control Nodes.
             squares = new Square[rows - 1, columns - 1];
 
-            for (int x = 0; x < rows - 1; x++)
+            for (var r = 0; r < rows - 1; r++)
             {
-                for (int y = 0; y < columns - 1; y++)
+                for (var c = 0; c < columns - 1; c++)
                 {
-                    squares[x, y] = new Square(controlNodes[x, y], controlNodes[x, y + 1],
-                        controlNodes[x + 1, y + 1], controlNodes[x + 1, y]);
+                    squares[r, c] = new Square(controlNodes[r, c], controlNodes[r, c + 1],
+                        controlNodes[r + 1, c + 1], controlNodes[r + 1, c]);
                 }
             }
         }
@@ -560,22 +563,22 @@ public class MeshMapAssembler : MapAssembler
 
             if (topLeft.active)
             {
-                configuration += 8;
+                configuration |= TOP_LEFT_WALL;
             }
 
             if (topRight.active)
             {
-                configuration += 4;
+                configuration |= TOP_RIGHT_WALL;
             }
 
             if (bottomRight.active)
             {
-                configuration += 2;
+                configuration |= BOTTOM_RIGHT_WALL;
             }
 
             if (bottomLeft.active)
             {
-                configuration += 1;
+                configuration |= BOTTOM_LEFT_WALL;
             }
         }
     }
@@ -598,7 +601,6 @@ public class MeshMapAssembler : MapAssembler
         public bool active;
         public Node above, right;
 
-        // "base" means that what follows will be set by the dafault constructor.
         public ControlNode(Vector3 p, bool a, float squareSize) : base(p)
         {
             active = a;
@@ -621,4 +623,9 @@ public class MeshMapAssembler : MapAssembler
             Destroy(navMesh);
         }
     }
+    
+    private const int TOP_LEFT_WALL = 8;
+    private const int TOP_RIGHT_WALL = 4;
+    private const int BOTTOM_RIGHT_WALL = 2;
+    private const int BOTTOM_LEFT_WALL = 1;
 }
