@@ -29,7 +29,7 @@ namespace AssemblyAI.Behaviours.Actions
             var path = navSystem.CalculatePath(destination);
             if (!path.IsComplete())
             {
-                Debug.LogError("Problem!");
+                return TaskStatus.Running;
             }
             pathChosen.Value = path;
             return TaskStatus.Success;
