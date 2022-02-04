@@ -92,7 +92,7 @@ public class MeshMapAssembler : MapAssembler
         checkedVertices.Clear();
         triangleDictionary.Clear();
 
-        squareGrid = new SquareGrid(map, wallChar, squareSize);
+        squareGrid = new SquareGrid(map, wallChar, squareSize, wallHeight);
 
         vertices = new List<Vector3>();
         triangles = new List<int>();
@@ -145,7 +145,7 @@ public class MeshMapAssembler : MapAssembler
             topMeshFilter.mesh = topMesh;
         } else
         {
-            Mesh topMesh = CreateRectangularMesh(rows, columns, squareSize, 0, isSkyVisibile);
+            Mesh topMesh = CreateRectangularMesh(rows, columns, squareSize, wallHeight, isSkyVisibile);
             topMeshFilter.mesh = topMesh;
             topCollider.sharedMesh = topMesh;
         }
@@ -171,7 +171,7 @@ public class MeshMapAssembler : MapAssembler
                 // Rigth vertex of the wall panel.
                 wallVertices.Add(vertices[outline[i + 1]]);
                 // Bottom left vertex of the wall panel.
-                wallVertices.Add(vertices[outline[i]] - Vector3.up * wallHeight);
+                wallVertices.Add(vertices[outline[i]] - Vector3.up * wallHeight );
                 // Bottom rigth vertex of the wall panel.
                 wallVertices.Add(vertices[outline[i + 1]] - Vector3.up * wallHeight);
 
@@ -198,7 +198,7 @@ public class MeshMapAssembler : MapAssembler
     // Creates the floor mesh.
     private void CreateFloorMesh(int rows, int columns)
     {
-        var floorMesh = CreateRectangularMesh(rows, columns, squareSize, wallHeight, true);
+        var floorMesh = CreateRectangularMesh(rows, columns, squareSize, 0, true);
 
         floorMeshFilter.mesh = floorMesh;
         floorCollider.sharedMesh = floorMesh;
@@ -222,10 +222,10 @@ public class MeshMapAssembler : MapAssembler
         var rightX = rectangleWidth * squareSize;
         const int bottomZ = 0;
 
-        vertices[0] = new Vector3(leftX, -height, topZ); //Top Left
-        vertices[1] = new Vector3(rightX, -height, topZ); //Top Right
-        vertices[2] = new Vector3(rightX, -height, bottomZ); //Bottom Right
-        vertices[3] = new Vector3(leftX, -height, bottomZ); //Bottom Left
+        vertices[0] = new Vector3(leftX, height, topZ); //Top Left
+        vertices[1] = new Vector3(rightX, height, topZ); //Top Right
+        vertices[2] = new Vector3(rightX, height, bottomZ); //Bottom Right
+        vertices[3] = new Vector3(leftX, height, bottomZ); //Bottom Left
 
         var triangles = !facingUpwards ? new[] {0, 3, 2, 2, 1, 0} : new[] {0, 2, 3, 1, 2, 0};
 
@@ -507,7 +507,7 @@ public class MeshMapAssembler : MapAssembler
     {
         public Square[,] squares;
 
-        public SquareGrid(char[,] map, char charWall, float squareSize)
+        public SquareGrid(char[,] map, char charWall, float squareSize, float wallHeight)
         {
             var rows = map.GetLength(0);
             var columns = map.GetLength(1);
@@ -520,7 +520,7 @@ public class MeshMapAssembler : MapAssembler
             {
                 for (var c = 0; c < columns; c++)
                 {
-                    var pos = new Vector3(halfSquareSize + c * squareSize, 0, halfSquareSize + (rows - r - 1) * squareSize);
+                    var pos = new Vector3(halfSquareSize + c * squareSize, wallHeight, halfSquareSize + (rows - r - 1) * squareSize);
                     controlNodes[r, c] = new ControlNode(pos, map[r, c] == charWall, squareSize);
                     
                 }

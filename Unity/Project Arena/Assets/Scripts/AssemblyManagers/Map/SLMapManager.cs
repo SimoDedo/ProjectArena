@@ -32,7 +32,7 @@ public class SLMapManager : MapManager {
                 mapGeneratorScript.GetRoomChar());
             // Displace the objects.
             objectDisplacerScript.DisplaceObjects(map, mapAssemblerScript.GetSquareSize(),
-                mapAssemblerScript.GetWallHeight());
+                0);
         }
     }
 

@@ -566,8 +566,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   wallHeight: 30
-  squareSize: 1.1
-  isSkyVisibile: 0
+  squareSize: 1
+  isSkyVisibile: 1
   topMaterial: {fileID: 2100000, guid: c0613303af609ef4e9a058dbd6a9e117, type: 2}
   wallMaterial: {fileID: 2100000, guid: fb414c8d4e64f1d47926c89b9dd84470, type: 2}
   floorMaterial: {fileID: 2100000, guid: c0613303af609ef4e9a058dbd6a9e117, type: 2}
@@ -601,7 +601,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f379b89017c26bb429a805fc84a8b785, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  negativeHeight: 1
   heightCorrection: 0
   sizeCorrection: 1
   customObjects:
