@@ -4,6 +4,8 @@ using UnityEngine;
 
 /// <summary>
 /// SLPrefabMapAssembler is an implementation of PrefabMapAssembler for single-level maps.
+///
+/// WARNING: This implementation is currently broken!
 /// </summary>
 public class SLPrefabMapAssembler : PrefabMapAssembler {
 
