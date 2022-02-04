@@ -118,4 +118,8 @@ public abstract class MapManager : CoreComponent {
         return flip;
     }
 
+    public abstract char[,] GetMap();
+    public abstract Area[] GetAreas();
+    
+    public float MapScale => mapAssemblerScript.GetSquareSize();
 }

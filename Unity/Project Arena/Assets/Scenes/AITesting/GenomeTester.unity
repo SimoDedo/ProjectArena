@@ -140,7 +140,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!81 &380802321
 AudioListener:
   m_ObjectHideFlags: 0
@@ -175,8 +175,8 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 60
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -199,8 +199,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 380802320}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 65.29671, y: 140.57845, z: 52.3658}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -236,7 +236,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   botPrefab: {fileID: 1128226087601874, guid: 87c5267e1886311258a6f48dac81a1ca, type: 3}
-  mapName: map_5
+  mapName: 
   bot1ParamsFilenamePrefix: bot1
   bot2ParamsFilenamePrefix: bot2
   mapManager: {fileID: 8576320533562149655}
@@ -350,6 +350,81 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &1930846492
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1930846493}
+  - component: {fileID: 1930846494}
+  m_Layer: 0
+  m_Name: Graph Map Generator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1930846493
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1930846492}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 8539461162227559815}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1930846494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1930846492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a07ca82466374339984c93a96aba9817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useRandomSeed: 0
+  seed: sacsca
+  width: 120
+  height: 120
+  objectToObjectDistance: 5
+  objectToWallDistance: 2
+  borderSize: 5
+  roomChar: 114
+  wallChar: 119
+  mapObjects:
+  - objectChar: 115
+    numObjPerMap: 5
+    placeAnywhere: 0
+    positioningMethod: 0
+  - objectChar: 97
+    numObjPerMap: 4
+    placeAnywhere: 0
+    positioningMethod: 0
+  - objectChar: 104
+    numObjPerMap: 4
+    placeAnywhere: 0
+    positioningMethod: 0
+  createTextFile: 0
+  textFilePath: 
+  minRoomWidth: 15
+  maxRoomWidth: 20
+  minRoomHeight: 15
+  maxRoomHeight: 20
+  minGridSeparation: 5
+  maxGridSeparation: 15
+  minCorridorThickness: 3
+  maxCorridorThickness: 3
 --- !u!114 &1306383530137614300
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -392,7 +467,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 8539461162227559815}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &8533093681911868732
 Transform:
@@ -424,7 +499,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8539461162227559815
 Transform:
   m_ObjectHideFlags: 0
@@ -438,6 +513,7 @@ Transform:
   m_Children:
   - {fileID: 8546953669186486943}
   - {fileID: 8533093681911868732}
+  - {fileID: 1930846493}
   - {fileID: 8539556771910398489}
   - {fileID: 8546889728833275709}
   - {fileID: 1421710593931584306}
@@ -456,7 +532,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 8539461162227559815}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8544777448353338339
 GameObject:
@@ -537,7 +613,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 8539461162227559815}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &8546953669186486943
 Transform:
@@ -566,8 +642,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   wallHeight: 30
-  squareSize: 1.1
-  isSkyVisibile: 0
+  squareSize: 1
+  isSkyVisibile: 1
   topMaterial: {fileID: 2100000, guid: c0613303af609ef4e9a058dbd6a9e117, type: 2}
   wallMaterial: {fileID: 2100000, guid: fb414c8d4e64f1d47926c89b9dd84470, type: 2}
   floorMaterial: {fileID: 2100000, guid: c0613303af609ef4e9a058dbd6a9e117, type: 2}
@@ -583,10 +659,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15fe1a4d11fa05c4bb6fedd5c97f660b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapGeneratorScript: {fileID: 8638898065580295860}
+  mapGeneratorScript: {fileID: 1930846494}
   mapAssemblerScript: {fileID: 8576028925756510329}
   objectDisplacerScript: {fileID: 8578115688083402451}
-  loadMapFromFile: 1
+  loadMapFromFile: 0
   textFilePath: 
   spawnPointCategory: Spawn Points
 --- !u!114 &8578115688083402451
@@ -601,7 +677,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f379b89017c26bb429a805fc84a8b785, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  negativeHeight: 1
   heightCorrection: 0
   sizeCorrection: 1
   customObjects:
@@ -619,14 +694,6 @@ MonoBehaviour:
     category: Spawn Points
     prefab: {fileID: 1611774674004552, guid: 36044f2c24d969c4382c559446fc5991, type: 3}
     heightCorrection: 0.9
-  - objectChar: 100
-    category: Decorations
-    prefab: {fileID: 1430335293414702, guid: 6a35ddc474b8b0a43a22ea9037e48a00, type: 3}
-    heightCorrection: -0.2
-  - objectChar: 100
-    category: Decorations
-    prefab: {fileID: 1097561034709022, guid: bed298a547b7a51428934daba5e2d3fa, type: 3}
-    heightCorrection: -0.2
 --- !u!114 &8638898065580295860
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -639,8 +706,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b1aaa116c7cc594db0321e8f4f03d05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useRandomSeed: 1
-  seed: 
+  useRandomSeed: 0
+  seed: vvdszs
   width: 120
   height: 120
   objectToObjectDistance: 10

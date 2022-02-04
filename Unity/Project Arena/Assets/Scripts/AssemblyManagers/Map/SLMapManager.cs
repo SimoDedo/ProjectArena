@@ -32,7 +32,7 @@ public class SLMapManager : MapManager {
                 mapGeneratorScript.GetRoomChar());
             // Displace the objects.
             objectDisplacerScript.DisplaceObjects(map, mapAssemblerScript.GetSquareSize(),
-                mapAssemblerScript.GetWallHeight());
+                0);
         }
     }
 
@@ -54,6 +54,17 @@ public class SLMapManager : MapManager {
             ConvertToMatrix(seed.Split(new string[] { "\n", "\r\n" },
                 StringSplitOptions.RemoveEmptyEntries));
         }
+    }
+
+
+    public override char[,] GetMap()
+    {
+        return (char[,])map.Clone();
+    }
+
+    public override Area[] GetAreas()
+    {
+        return mapGeneratorScript.ConvertMapToAreas();
     }
 
     // Converts the map from a list of lines to a matrix.

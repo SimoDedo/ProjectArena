@@ -136,6 +136,8 @@ public class AIEntity : Entity, ILoggable
     public NavigationSystem NavigationSystem { get; private set; }
 
     public GunManager GunManager { get; private set; }
+    
+    public MapKnowledge MapKnowledge { get; private set; }
 
     public bool IsFocusingOnEnemy { get; set; }
 
@@ -150,6 +152,7 @@ public class AIEntity : Entity, ILoggable
         MovementController = new AIMovementController(this, botParams.speed);
         SightController = new AISightController(this, head, botParams.maxCameraSpeed, botParams.maxCameraAcceleration);
         SightSensor = new AISightSensor(head, botParams.maxRange, botParams.fov);
+        MapKnowledge = new MapKnowledge(this, gms);
         TargetKb = new TargetKnowledgeBase(
             this,
             enemy,
@@ -336,6 +339,7 @@ public class AIEntity : Entity, ILoggable
                 TargetKb.Update();
             }
 
+            MapKnowledge.Update();
             PickupKnowledgeBase.Update();
             goalMachine.Update();
 
