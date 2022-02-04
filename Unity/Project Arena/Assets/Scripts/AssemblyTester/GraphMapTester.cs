@@ -95,7 +95,8 @@ namespace AssemblyTester
             var mapPath = mapsPath + mapName + ".txt";
             if (!File.Exists(mapPath))
             {
-                throw new FileNotFoundException("Couldn't find map file " + mapPath);
+                Debug.LogWarning("File " + mapPath + " doesn't exist!");
+                mapPath = null;
             }
 
             manager.SetParameters(botPrefab,

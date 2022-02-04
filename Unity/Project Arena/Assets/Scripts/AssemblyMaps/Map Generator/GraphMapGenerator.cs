@@ -10,9 +10,9 @@ namespace AssemblyMaps.Map_Generator
 {
     public class GraphMapGenerator : MapGenerator
     {
-        [SerializeField] private int minRoomWidth = 1;
+        [SerializeField] private int minRoomWidth = 15;
         [SerializeField] private int maxRoomWidth = 20;
-        [SerializeField] private int minRoomHeight = 1;
+        [SerializeField] private int minRoomHeight = 15;
         [SerializeField] private int maxRoomHeight = 20;
         [SerializeField] private int minGridSeparation = 5;
         [SerializeField] private int maxGridSeparation = 15;
@@ -32,12 +32,20 @@ namespace AssemblyMaps.Map_Generator
         {
             var roomsDictionary = new Dictionary<int, int>();
             areas.Clear();
-            map = GetVoidMap();
+
+            var realWidth = width;
+            var realHeight = height;
+
+            width += borderSize * 2;
+            height += borderSize * 2;
+            
+            map = new char[width,height];
+            
             MapEdit.FillMap(map, wallChar);
             InitializePseudoRandomGenerator();
 
-            var maxNumberOfColumns = width / ((maxRoomWidth + maxGridSeparation));
-            var maxNumberOfRows = height / ((maxRoomHeight + maxGridSeparation));
+            var maxNumberOfColumns = realWidth / (maxRoomWidth + maxGridSeparation);
+            var maxNumberOfRows = realHeight / (maxRoomHeight + maxGridSeparation);
             // Initialize arrays containing widths and heights of every room
             var roomsWidth = new int[maxNumberOfRows][];
             var roomsHeight = new int[maxNumberOfRows][];
@@ -130,12 +138,14 @@ namespace AssemblyMaps.Map_Generator
 
             // Calculate starting row index in the char[,] map of each row
             var rowStartingIndexes = new int[maxNumberOfRows];
+            rowStartingIndexes[0] = borderSize;
             for (var row = 1; row < maxNumberOfRows; row++)
                 rowStartingIndexes[row] = rowStartingIndexes[row - 1] + maxRowHeight[row - 1] +
                     gridVerticalSeparations[row - 1];
 
             // Calculate starting column index in the char[,] map of each column
             var columnStartingIndex = new int[maxNumberOfColumns];
+            columnStartingIndex[0] = borderSize;
             for (var column = 1; column < maxNumberOfColumns; column++)
                 columnStartingIndex[column] = columnStartingIndex[column - 1] + maxColumnWidth[column - 1] +
                     gridHorizontalSeparations[column - 1];
@@ -222,11 +232,7 @@ namespace AssemblyMaps.Map_Generator
             FillMap(areas);
             // ProcessMap();
             PopulateMap();
-
-            map = MapEdit.AddBorders(map, borderSize, wallChar);
-            width = map.GetLength(0);
-            height = map.GetLength(1);
-
+            
             var textMap = GetMapAsText();
             SaveMapTextGameEvent.Instance.Raise(textMap);
             if (createTextFile) SaveMapAsText(textMap);
@@ -235,16 +241,14 @@ namespace AssemblyMaps.Map_Generator
 
         private void FillMap(List<Area> areas)
         {
+            // TODO Areas are flipped vertically. Understand why
             foreach (var area in areas)
             {
                 for (var row = area.topRow; row < area.bottomRow; row++)
                 {
                     for (var col = area.leftColumn; col < area.rightColumn; col++)
                     {
-                        if (area.isCorridor)
-                            map[row, col] = 'R';
-                        else
-                            map[row, col] = 'r';
+                        map[height - row - 1, col] = 'r';
                     }
                 }
             }

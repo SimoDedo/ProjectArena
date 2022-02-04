@@ -56,6 +56,17 @@ public class SLMapManager : MapManager {
         }
     }
 
+
+    public override char[,] GetMap()
+    {
+        return (char[,])map.Clone();
+    }
+
+    public override Area[] GetAreas()
+    {
+        return mapGeneratorScript.ConvertMapToAreas();
+    }
+
     // Converts the map from a list of lines to a matrix.
     private void ConvertToMatrix(string[] lines) {
         map = new char[lines.GetLength(0), lines[0].Length];

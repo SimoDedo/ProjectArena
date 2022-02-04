@@ -115,4 +115,19 @@ public abstract class GameManager : CoreComponent, ILoggable
     {
         return loggingGame;
     }
+    
+    public char[,] GetMap()
+    {
+        return mapManagerScript.GetMap();
+    }
+
+    public Area[] GetAreas()
+    {
+        return mapManagerScript.GetAreas();
+    }
+    
+    public float GetMapScale()
+    {
+        return mapManagerScript.MapScale;
+    }
 }

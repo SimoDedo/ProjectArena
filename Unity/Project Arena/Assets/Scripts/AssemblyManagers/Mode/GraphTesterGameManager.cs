@@ -71,7 +71,11 @@ public class GraphTesterGameManager : GameManager
 
         mapManagerScript = mapManager;
         spawnPointManagerScript = spawnPointManager;
-        mapManagerScript.SetTextFile(mapPath);
+
+        if (mapPath != null)
+        {
+            mapManagerScript.SetTextFile(mapPath);
+        }
     }
 
     private void Update()

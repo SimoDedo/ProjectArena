@@ -323,7 +323,7 @@ public class CellularMapGenerator : MapGenerator {
 
     public override Area[] ConvertMapToAreas()
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     // Stores all information about a room.

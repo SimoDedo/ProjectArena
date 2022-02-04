@@ -78,6 +78,16 @@ public class MLMapManager : MapManager {
         }
     }
 
+    public override char[,] GetMap()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override Area[] GetAreas()
+    {
+        throw new NotImplementedException();
+    }
+
     // Converts the map from a list of lines to a list of matrices.
     private void ConvertToMatrices(string[] lines) {
         int mapsCount = 1;
