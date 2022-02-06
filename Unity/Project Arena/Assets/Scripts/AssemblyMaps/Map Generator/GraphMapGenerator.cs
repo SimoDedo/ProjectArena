@@ -32,10 +32,11 @@ namespace AssemblyMaps.Map_Generator
         {
             var roomsDictionary = new Dictionary<int, int>();
             areas.Clear();
+            SaveMapSize();
 
             var realWidth = width;
             var realHeight = height;
-
+            
             width += borderSize * 2;
             height += borderSize * 2;
             
