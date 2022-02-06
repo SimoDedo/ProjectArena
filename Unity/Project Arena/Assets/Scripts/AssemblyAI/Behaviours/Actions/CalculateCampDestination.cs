@@ -47,8 +47,7 @@ namespace AssemblyAI.Behaviours.Actions
                     var randomRadius = Random.value * (maxRadius - minRadius) + minRadius;
                     var newPoint = newDirection * randomRadius + campLocation.Value;
                     if (Physics.Linecast(campLocation.Value, newPoint)) continue;
-                    if (!NavigationSystem.IsPointOnNavMesh(newPoint, NavMeshUtils.GetAgentIDFromName("Wanderer"),
-                        out var finalPoint)) continue;
+                    if (!NavigationSystem.IsPointOnNavMesh(newPoint, out var finalPoint)) continue;
 
                     var path = navSystem.CalculatePath(finalPoint);
                     if (path.status != NavMeshPathStatus.PathComplete) continue;

@@ -1,5 +1,6 @@
 using AssemblyAI.GoalMachine.Goal;
 using BehaviorDesigner.Runtime;
+using UnityEngine;
 
 namespace AssemblyAI.GoalMachine
 {
@@ -16,7 +17,8 @@ namespace AssemblyAI.GoalMachine
             BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
             goals = new IGoal[]
             {
-                new Wander(entity), new Fight(entity), new SearchEnemy(entity), new LookForPickups(entity)
+                new NoGoal(), new Wander(entity), new Fight(entity), new SearchEnemy(entity),
+                new LookForPickups(entity)
             };
             currentGoalIndex = 0;
             CurrentGoal.Enter();
@@ -27,7 +29,7 @@ namespace AssemblyAI.GoalMachine
             if (isIdle) return;
             var bestScore = float.MinValue;
             var bestIndex = currentGoalIndex;
-            for (var i=0; i<goals.Length; i++)
+            for (var i = 0; i < goals.Length; i++)
             {
                 var score = goals[i].GetScore();
                 if (score > bestScore)
@@ -59,6 +61,4 @@ namespace AssemblyAI.GoalMachine
             CurrentGoal.Enter();
         }
     }
-    
-    
 }

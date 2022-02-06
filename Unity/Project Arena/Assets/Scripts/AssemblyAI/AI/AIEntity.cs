@@ -264,6 +264,7 @@ public class AIEntity : Entity, ILoggable
         TargetKb.Reset();
         DamageSensor.Reset();
         goalMachine.SetIsIdle();
+        goalMachine.Reset();
 
         SetInGame(false);
         // Start the respawn process.
