@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b23f08d2ae4cba14087c1ed36193d82b, type: 3}
+  m_Name: DodgeRockets
+  m_EditorClassIdentifier: 
+  mBehaviorSource:
+    behaviorName: DodgeRockets
+    behaviorDescription: 
+    mTaskData:
+      types: []
+      parentIndex: 
+      startIndex: 
+      variableStartIndex: 
+      JSONSerialization: '{"EntryTask":{"Type":"BehaviorDesigner.Runtime.Tasks.EntryTask","NodeData":{"Offset":"(-1890.79065,143.006561)"},"ID":0,"Name":"Entry","Instant":true},"RootTask":{"Type":"BehaviorDesigner.Runtime.Tasks.Sequence","NodeData":{"Offset":"(3.88881874,103.888885)"},"ID":1,"Name":"Sequence","Instant":true,"AbortTypeabortType":"Both","Children":[{"Type":"AssemblyAI.Behaviours.Conditions.HasRocketToDodge","NodeData":{"Offset":"(-90,130)"},"ID":2,"Name":"Has
+        Rocket To Dodge","Instant":true,"SharedTransformrocketToDodge":{"Type":"BehaviorDesigner.Runtime.SharedTransform","Name":"RocketToDodge","IsShared":true,"IsDynamic":true}},{"Type":"AssemblyAI.Behaviours.Actions.DodgeRocket","NodeData":{"Offset":"(120,130)"},"ID":3,"Name":"Dodge
+        Rocket","Instant":true,"SharedTransformrocketToDodge":{"Type":"BehaviorDesigner.Runtime.SharedTransform","Name":"RocketToDodge","IsShared":true,"IsDynamic":true}}]},"Variables":[{"Type":"BehaviorDesigner.Runtime.SharedTransform","Name":"RocketToDodge","IsShared":true,"IsDynamic":true}]}'
+      fieldSerializationData:
+        typeName: []
+        fieldNameHash: 
+        startIndex: 
+        dataPosition: 
+        unityObjects: []
+        byteData: 
+        byteDataArray: 
+      Version: 1.6.8

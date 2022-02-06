@@ -342,10 +342,7 @@ public class AIEntity : Entity, ILoggable
             MapKnowledge.Update();
             PickupKnowledgeBase.Update();
             goalMachine.Update();
-
-            // Bot dodge rockets
-            ActionDodgeRockets.Perform(this);
-
+            
             // Bot move
             NavigationSystem.MoveAlongPath();
         }
