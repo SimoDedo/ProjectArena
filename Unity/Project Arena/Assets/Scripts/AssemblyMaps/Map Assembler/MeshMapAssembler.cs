@@ -616,7 +616,11 @@ public class MeshMapAssembler : MapAssembler
         floorMeshFilter.mesh.Clear();
         wallsCollider.sharedMesh.Clear();
         floorCollider.sharedMesh.Clear();
-        topCollider.sharedMesh.Clear();
+        if (!isSkyVisibile)
+        {
+            topCollider.sharedMesh.Clear();
+        }
+
         var navMeshes = navMeshObject.GetComponents<NavMeshSurface>();
         foreach (var navMesh in navMeshes)
         {
