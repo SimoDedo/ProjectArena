@@ -20,7 +20,7 @@ namespace AssemblyAI.AI.Layer3
             // me = entity;
             transform = entity.transform;
             areas = gms.GetAreas();
-            if (areas == null)
+            if (areas.Length == 0)
             {
                 Debug.Log("Cannot use map knowledge, no areas were defined...");
                 return;
@@ -74,7 +74,7 @@ namespace AssemblyAI.AI.Layer3
             
         }
 
-        public bool CanBeUsed => areas != null;
+        public bool CanBeUsed => areas.Length != 0;
 
         /**
          * Returns a possible destination to wander to based on:

@@ -85,7 +85,7 @@ public class MLMapManager : MapManager {
 
     public override Area[] GetAreas()
     {
-        throw new NotImplementedException();
+        return new Area[0];
     }
 
     // Converts the map from a list of lines to a list of matrices.

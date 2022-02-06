@@ -262,7 +262,10 @@ public abstract class MapGenerator : CoreComponent {
     public abstract string ConvertMapToAB(bool exportObjects = true);
 
     // TODO extract this to a new subclass, instead of having it as a virtual method implemented by nobody
-    public abstract Area[] ConvertMapToAreas();
+    public virtual Area[] ConvertMapToAreas()
+    {
+        return new Area[0];
+    }
 
     // Returns a new void map and saves its size.
     protected char[,] GetVoidMap() {

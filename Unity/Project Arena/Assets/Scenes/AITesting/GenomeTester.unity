@@ -693,7 +693,7 @@ MonoBehaviour:
   - objectChar: 115
     category: Spawn Points
     prefab: {fileID: 1611774674004552, guid: 36044f2c24d969c4382c559446fc5991, type: 3}
-    heightCorrection: 0.9
+    heightCorrection: 2
 --- !u!114 &8638898065580295860
 MonoBehaviour:
   m_ObjectHideFlags: 0
