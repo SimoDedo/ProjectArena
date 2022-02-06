@@ -113,19 +113,10 @@ public class MeshMapAssembler : MapAssembler
         CreateWallMesh();
 
         CreateFloorMesh(map.GetLength(0), map.GetLength(1));
-        var humanoidInt = NavMeshUtils.GetAgentIDFromName("Humanoid");
-        var wandererInt = NavMeshUtils.GetAgentIDFromName("Wanderer");
 
         var navMesh = navMeshObject.AddComponent<NavMeshSurface>();
         navMesh.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
-        navMesh.agentTypeID = humanoidInt;
         navMesh.BuildNavMesh();
-
-        // TODO REMOVE?
-        var navMesh2 = navMeshObject.gameObject.AddComponent<NavMeshSurface>();
-        navMesh2.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
-        navMesh2.agentTypeID = wandererInt;
-        navMesh2.BuildNavMesh();
     }
 
     public override void AssembleMap(

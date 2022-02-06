@@ -46,7 +46,10 @@ namespace AssemblyAI.AI.Layer2
         {
             mover = me.MovementController;
             agent = me.gameObject.AddComponent<NavMeshAgent>();
-            agent.radius = 0.2f;
+            var agentSettings = NavMesh.GetSettingsByIndex(0);
+            agent.radius = agentSettings.agentRadius;
+            agent.agentTypeID = agentSettings.agentTypeID;
+            agent.height = agentSettings.agentHeight;
             agent.baseOffset = 1f;
             agent.autoBraking = false;
             agent.updatePosition = false;
@@ -76,9 +79,9 @@ namespace AssemblyAI.AI.Layer2
         //     return path;
         // }
 
-        public static bool IsPointOnNavMesh(Vector3 point, int agentId, out Vector3 validPoint)
+        public static bool IsPointOnNavMesh(Vector3 point, out Vector3 validPoint)
         {
-            var filter = new NavMeshQueryFilter {agentTypeID = agentId, areaMask = NavMesh.AllAreas};
+            var filter = new NavMeshQueryFilter {areaMask = NavMesh.AllAreas};
 
             if (NavMesh.SamplePosition(point, out var hit, float.MaxValue, filter))
             {
@@ -88,11 +91,6 @@ namespace AssemblyAI.AI.Layer2
 
             validPoint = point;
             return false;
-        }
-
-        public bool IsPointOnNavMesh(Vector3 point, out Vector3 validPoint)
-        {
-            return IsPointOnNavMesh(point, agent.agentTypeID, out validPoint);
         }
 
         public void MoveAlongPath()
