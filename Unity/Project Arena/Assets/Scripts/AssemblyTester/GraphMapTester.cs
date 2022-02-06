@@ -163,7 +163,6 @@ namespace AssemblyTester
         private IEnumerator WaitAndStart()
         {
             yield return new WaitForSeconds(1);
-            mapManager.ManageMap(true);
             StartNewExperiment();
         }
 
