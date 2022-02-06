@@ -36,7 +36,7 @@ public abstract class GameManager : CoreComponent, ILoggable
     // Moves a gameobject to a free spawn point.
     public void Spawn(GameObject g)
     {
-        g.transform.position = spawnPointManagerScript.GetSpawnPosition() + Vector3.up * 3f;
+        g.transform.position = spawnPointManagerScript.GetSpawnPosition();
     }
 
     // Menages the death of an entity.
