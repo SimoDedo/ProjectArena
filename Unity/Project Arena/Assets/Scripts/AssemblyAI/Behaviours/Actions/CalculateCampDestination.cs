@@ -21,6 +21,9 @@ namespace AssemblyAI.Behaviours.Actions
         [SerializeField] private SharedVector3 campLocation;
         [SerializeField] private SharedSelectedPathInfo pathChosen;
 
+        private static readonly int LayerMask =
+            Physics.DefaultRaycastLayers ^ (1 << UnityEngine.LayerMask.NameToLayer("Entity"));
+
         private NavigationSystem navSystem;
 
         public override void OnAwake()
@@ -39,6 +42,7 @@ namespace AssemblyAI.Behaviours.Actions
             for (var attemptNum = 1; attemptNum <= maxNumVertices; attemptNum++)
             {
                 var direction = currentPos - campLocation.Value;
+                direction.y = 0;
                 var angle = attemptNum * 360 / maxNumVertices;
                 var newDirection = Quaternion.AngleAxis(angle, Vector3.up) * direction;
                 newDirection.Normalize();
@@ -46,10 +50,14 @@ namespace AssemblyAI.Behaviours.Actions
                 {
                     var randomRadius = Random.value * (maxRadius - minRadius) + minRadius;
                     var newPoint = newDirection * randomRadius + campLocation.Value;
-                    if (Physics.Linecast(campLocation.Value, newPoint)) continue;
-                    if (!NavigationSystem.IsPointOnNavMesh(newPoint, out var finalPoint)) continue;
+                    if (Physics.Linecast(campLocation.Value, newPoint, LayerMask))
+                    {
+                        // Chosen point is behind something, ignore!
+                        continue;
+                    }
+                    // if (!NavigationSystem.IsPointOnNavMesh(newPoint, out var finalPoint)) continue;
 
-                    var path = navSystem.CalculatePath(finalPoint);
+                    var path = navSystem.CalculatePath(newPoint);
                     if (path.status != NavMeshPathStatus.PathComplete) continue;
                     pathChosen.Value = path;
                     return true;

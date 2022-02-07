@@ -219,7 +219,7 @@ public class AIEntity : Entity, ILoggable
                 DamageSensor.GotDamaged();
             }
 
-            if (Health < 0)
+            if (Health <= 0)
             {
                 // Health = 0;
                 // TODO What if multiple entities kill the same one on the same frame?
