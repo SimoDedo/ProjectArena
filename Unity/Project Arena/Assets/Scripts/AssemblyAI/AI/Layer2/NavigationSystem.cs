@@ -1,8 +1,5 @@
 using System;
-using System.Linq;
 using AssemblyAI.AI.Layer1.Actuator;
-using BehaviorDesigner.Runtime.Tasks;
-using JetBrains.Annotations;
 using Others;
 using UnityEngine;
 using UnityEngine.AI;
@@ -11,27 +8,16 @@ namespace AssemblyAI.AI.Layer2
 {
     public class NavigationSystem
     {
-        private static readonly Vector3 NoDestination = new Vector3(1000, 1000, 1000);
         private readonly AIEntity me;
         private readonly Transform transform;
         private float Acceleration { get; }
         private float AngularSpeed { get; }
         public float Speed { get; }
-
-        /// <summary>
-        /// The destination that the agent was trying to reach at the beginning of the frame. 
-        /// </summary>
-        private Vector3 currentDestination = NoDestination;
-
-        /// <summary>
-        /// The latest destination set for the agent to follow. 
-        /// </summary>
-        private Vector3 latestDestination = NoDestination;
-
-        private NavMeshPath latestDestinationPath;
-
+        
         private NavMeshAgent agent;
         private AIMovementController mover;
+
+        private static readonly float AgentHeight = NavMesh.GetSettingsByIndex(0).agentHeight;
 
         public NavigationSystem(AIEntity me, float speed)
         {
@@ -66,51 +52,28 @@ namespace AssemblyAI.AI.Layer2
             return rtn;
         }
 
-        // public NavMeshPath CalculatePath(Vector3 destination, int agentId)
-        // {
-        //     var path = new NavMeshPath();
-        //     var filter = new NavMeshQueryFilter {agentTypeID = agentId, areaMask = NavMesh.AllAreas};
-        //     if (NavMesh.SamplePosition(destination, out var hit, float.MaxValue, filter))
-        //     {
-        //         agent.CalculatePath(hit.position, path);
-        //         return path;
-        //     }
-        //
-        //     return path;
-        // }
-
         public static bool IsPointOnNavMesh(Vector3 point, out Vector3 validPoint)
         {
-            var filter = new NavMeshQueryFilter {areaMask = NavMesh.AllAreas};
-
-            if (NavMesh.SamplePosition(point, out var hit, float.MaxValue, filter))
+            var filter = new NavMeshQueryFilter {areaMask = 1};
+            // TODO Should use agent height, but that's not statically accessible
+            if (NavMesh.SamplePosition(point, out var hit, AgentHeight * 2, filter))
             {
-                validPoint = hit.position;
-                return true;
+                point.y = hit.position.y;
+                if (point == hit.position)
+                {
+                    validPoint = hit.position;
+                    return true;
+                }
             }
-
             validPoint = point;
             return false;
-        }
+        } 
 
         public void MoveAlongPath()
         {
-            if (latestDestination != currentDestination)
-            {
-                var path = latestDestinationPath ?? CalculatePath(latestDestination);
-                if (agent.SetPath(path))
-                {
-                    currentDestination = latestDestination;
-                }
-                else
-                {
-                    // TODO Possible problem, we are trying to move in the space of the enemy?
-                    Debug.LogError("Calculated invalid path for entity " + me.name);
-                }
-            }
-
-            Debug.DrawLine(transform.position, agent.destination, Color.green, 0, false);
-            Debug.DrawLine(transform.position, agent.nextPosition, Color.red, 0.4f);
+            var position = transform.position;
+            Debug.DrawLine(position, agent.destination, Color.green, 0, false);
+            Debug.DrawLine(position, agent.nextPosition, Color.red, 0.4f);
             mover.MoveToPosition(agent.nextPosition);
         }
 
@@ -120,10 +83,6 @@ namespace AssemblyAI.AI.Layer2
             {
                 agent.ResetPath();
             }
-
-            currentDestination = NoDestination;
-            latestDestination = NoDestination;
-            latestDestinationPath = null;
         }
 
         /// <summary>
@@ -131,10 +90,9 @@ namespace AssemblyAI.AI.Layer2
         /// If this method is called multiple times during a frame, only the last call counts to
         /// determine the destination of the agent path.
         /// </summary>
-        public void SetPathToDestination(NavMeshPath path)
+        public void SetPath(NavMeshPath path)
         {
-            latestDestinationPath = path;
-            latestDestination = path.corners.Last();
+            agent.SetPath(path);
         }
 
         /// <summary>
@@ -145,16 +103,11 @@ namespace AssemblyAI.AI.Layer2
         /// </summary>
         public void SetDestination(Vector3 destination)
         {
-            if (destination == latestDestination) return;
-
             var path = CalculatePath(destination);
             if (!path.IsComplete())
             {
                 throw new ArgumentException("Destination is not reachable!");
             }
-
-            latestDestination = destination;
-            latestDestinationPath = path;
         }
 
         public void SetEnabled(bool b)
@@ -162,17 +115,20 @@ namespace AssemblyAI.AI.Layer2
             agent.enabled = b;
         }
 
-        public bool HasArrivedToDestination(Vector3 pathDestination)
+        public bool HasArrivedToDestination()
         {
-            IsPointOnNavMesh(transform.position, out var floor1);
-            IsPointOnNavMesh(pathDestination, out var floor2);
-            return (floor1 - floor2).magnitude < 0.5f;
+            return agent.remainingDistance < 0.5f;
         }
 
         public float EstimatePathDuration(NavMeshPath path)
         {
             // Be a little pessimistic on arrival time.
             return path.Length() / Speed * 1.1f;
+        }
+
+        public bool HasPath()
+        {
+            return agent.hasPath;
         }
     }
 }

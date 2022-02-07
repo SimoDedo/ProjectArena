@@ -16,6 +16,7 @@ namespace AssemblyAI.Behaviours.Actions
         public override void OnStart()
         {
             navSystem = GetComponent<AIEntity>().NavigationSystem;
+            navSystem.SetDestination(destination.Value);
         }
 
         public override void OnEnd()
@@ -25,10 +26,9 @@ namespace AssemblyAI.Behaviours.Actions
 
         public override TaskStatus OnUpdate()
         {
-            if (navSystem.HasArrivedToDestination(destination.Value))
+            if (navSystem.HasArrivedToDestination())
                 return TaskStatus.Success;
-
-            navSystem.SetDestination(destination.Value);
+            navSystem.MoveAlongPath();
             return TaskStatus.Running;
         }
     }

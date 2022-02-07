@@ -118,7 +118,7 @@ namespace AssemblyAI.Actions
             var path = navSystem.CalculatePath(transform.position + avoidDirection);
             if (path.IsComplete())
             {
-                navSystem.SetPathToDestination(path);
+                navSystem.SetPath(path);
             }
 
             // path.status
