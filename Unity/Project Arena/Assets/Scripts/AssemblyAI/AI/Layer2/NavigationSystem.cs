@@ -108,6 +108,8 @@ namespace AssemblyAI.AI.Layer2
             {
                 throw new ArgumentException("Destination is not reachable!");
             }
+
+            agent.SetPath(path);
         }
 
         public void SetEnabled(bool b)
