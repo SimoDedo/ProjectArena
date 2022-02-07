@@ -24,8 +24,6 @@ namespace AssemblyAI.Behaviours.Actions
 
         private const int MIN_STRAFE_LENGTH = 10;
         private const int MAX_STRAFE_LENGTH = 30;
-        private static readonly Vector3 NoDestination = new Vector3(10000, 10000, 10000);
-        private Vector3 destination;
         private FightingMovementSkill skill;
 
         public override void OnStart()
@@ -36,7 +34,6 @@ namespace AssemblyAI.Behaviours.Actions
             target = entity.GetEnemy();
             skill = entity.MovementSkill;
             navSystem.CancelPath();
-            destination = NoDestination;
         }
 
         public override void OnEnd()
@@ -46,10 +43,9 @@ namespace AssemblyAI.Behaviours.Actions
 
         public override TaskStatus OnUpdate()
         {
-            if (destination != NoDestination && !navSystem.HasArrivedToDestination(destination))
+            if (navSystem.HasPath() && !navSystem.HasArrivedToDestination())
             {
-                // Call every frame, just in case someone overwrote our destination choice (e.g. to avoid rocket)
-                navSystem.SetDestination(destination);
+                navSystem.MoveAlongPath();
                 return TaskStatus.Running;
             }
 
@@ -137,8 +133,7 @@ namespace AssemblyAI.Behaviours.Actions
                         strifeRight = !strifeRight;
                     else
                     {
-                        destination = path.corners.Last();
-                        navSystem.SetPathToDestination(path);
+                        navSystem.SetPath(path);
                     }
                 }
                 else
@@ -169,8 +164,7 @@ namespace AssemblyAI.Behaviours.Actions
                         var path = navSystem.CalculatePath(newPos);
                         if (path.IsComplete())
                         {
-                            destination = newPos;
-                            navSystem.SetPathToDestination(path);
+                            navSystem.SetPath(path);
                             return;
                         }
                     }
@@ -187,9 +181,7 @@ namespace AssemblyAI.Behaviours.Actions
                     );
                 }
 
-                navSystem.SetPathToDestination(enemyPath);
-                //... however it should do this only in this frame, not until it has reached the enemy.
-                destination = NoDestination;
+                navSystem.SetPath(enemyPath);
             }
         }
     }

@@ -29,6 +29,12 @@ namespace AssemblyAI.Behaviours.Actions
 
         public override TaskStatus OnUpdate()
         {
+            if (navSystem.HasPath() && !navSystem.HasArrivedToDestination())
+            {
+                navSystem.MoveAlongPath();
+                return TaskStatus.Running;
+            }
+            
             // This rocket is not mine... How do I dodge it?
             // Calculate it's trajectory and try to get away from it
 
@@ -54,7 +60,7 @@ namespace AssemblyAI.Behaviours.Actions
             var path = navSystem.CalculatePath(entityPosition + avoidDirection);
             if (path.IsComplete())
             {
-                navSystem.SetPathToDestination(path);
+                navSystem.SetPath(path);
             }
 
             return TaskStatus.Running;

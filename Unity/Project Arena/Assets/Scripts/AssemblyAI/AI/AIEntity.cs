@@ -1,6 +1,5 @@
 using System;
 using AI.KnowledgeBase;
-using AssemblyAI.Actions;
 using AssemblyAI.AI.Layer1.Actuator;
 using AssemblyAI.AI.Layer1.Sensors;
 using AssemblyAI.AI.Layer2;
@@ -136,7 +135,7 @@ public class AIEntity : Entity, ILoggable
     public NavigationSystem NavigationSystem { get; private set; }
 
     public GunManager GunManager { get; private set; }
-    
+
     public MapKnowledge MapKnowledge { get; private set; }
 
     public bool IsFocusingOnEnemy { get; set; }
@@ -343,9 +342,6 @@ public class AIEntity : Entity, ILoggable
             MapKnowledge.Update();
             PickupKnowledgeBase.Update();
             goalMachine.Update();
-            
-            // Bot move
-            NavigationSystem.MoveAlongPath();
         }
 
         if (loggedFirstRespawn)
@@ -386,7 +382,7 @@ public class AIEntity : Entity, ILoggable
                         totalTimeBetweenSights += Time.time - previousDetectionTime;
                     }
                 }
-                
+
                 previousDetectionTime = TargetKb.LastTimeDetected;
                 enemyInSightPreviously = isEnemyInSightNow;
             }
@@ -439,18 +435,19 @@ public class AIEntity : Entity, ILoggable
         if (isGameEnded)
         {
             // Send all logging info
-            EntityGameMetricsGameEvent.Instance.Raise(new GameMetrics
-            {
-                entityId = GetID(),
-                timeBetweenSights = totalTimeBetweenSights,
-                timeInFights = totalTimeInFight,
-                timeToSurrender = totalTimeToSurrender,
-                timeToEngage = totalTimeToEngage,
-                numberOfRetreats = numberOfRetreats,
-                numberOfFights = numberOfFights
-            });
+            EntityGameMetricsGameEvent.Instance.Raise(
+                new GameMetrics
+                {
+                    entityId = GetID(),
+                    timeBetweenSights = totalTimeBetweenSights,
+                    timeInFights = totalTimeInFight,
+                    timeToSurrender = totalTimeToSurrender,
+                    timeToEngage = totalTimeToEngage,
+                    numberOfRetreats = numberOfRetreats,
+                    numberOfFights = numberOfFights
+                }
+            );
         }
-        
     }
 
     public void SetupLogging()
