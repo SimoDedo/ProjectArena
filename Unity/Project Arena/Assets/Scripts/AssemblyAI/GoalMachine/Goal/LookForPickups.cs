@@ -1,3 +1,4 @@
+using AssemblyAI.AI.Layer2;
 using AssemblyAI.AI.Layer3;
 using AssemblyAI.Behaviours.Variables;
 using BehaviorDesigner.Runtime;
@@ -12,6 +13,7 @@ namespace AssemblyAI.GoalMachine.Goal
         private readonly ExternalBehaviorTree externalBt;
         private readonly BehaviorTree behaviorTree;
         private readonly PickupPlanner pickupPlanner;
+        private readonly NavigationSystem navSystem;
         private Pickable currentPickable;
         private Pickable nextPickable;
         private float nextPickableActivationTime;
@@ -20,6 +22,7 @@ namespace AssemblyAI.GoalMachine.Goal
         public LookForPickups(AIEntity entity)
         {
             pickupPlanner = entity.PickupPlanner;
+            navSystem = entity.NavigationSystem;
             externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/NewPickup");
             behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
             behaviorTree.StartWhenEnabled = false;
@@ -29,9 +32,10 @@ namespace AssemblyAI.GoalMachine.Goal
 
         public float GetScore()
         {
-            nextPickable = pickupPlanner.ScorePickups(out var path, out var score, out var activationTime);
-            newPath = path;
-            nextPickableActivationTime = activationTime;
+            var (pickup, score, estimatedActivationTime) = pickupPlanner.GetBestPickupInfo();
+            nextPickable = pickup;
+            nextPickableActivationTime = estimatedActivationTime;
+            newPath = navSystem.CalculatePath(nextPickable.transform.position);
             return score;
         }
 

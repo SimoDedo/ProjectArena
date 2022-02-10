@@ -12,12 +12,36 @@ namespace AssemblyAI.AI.Layer3
 {
     public class PickupPlanner
     {
+        public readonly struct ChosenPickupInfo
+        {
+            public readonly Pickable pickup;
+            public readonly float score;
+            public readonly float estimatedActivationTime;
+            
+            public ChosenPickupInfo(Pickable pickup, float score, float estimatedActivationTime)
+            {
+                this.pickup = pickup;
+                this.score = score;
+                this.estimatedActivationTime = estimatedActivationTime;
+            }
+
+            public void Deconstruct(out Pickable pickup, out float score, out float estimatedActivationTime)
+            {
+                pickup = this.pickup;
+                score = this.score;
+                estimatedActivationTime = this.estimatedActivationTime;
+            }    
+        }
+        
         private readonly AIEntity me;
         private PickupKnowledgeBase knowledgeBase;
         private NavigationSystem navSystem;
         private GunManager gunManager;
         private AISightSensor sightSensor;
-        private Pickable chosenPickup;
+        private ChosenPickupInfo chosenPickupInfo;
+        
+        private float nextUpdateTime;
+        private const float UPDATE_COOLDOWN = 0.5f;
 
         private static readonly AnimationCurve TimeValueCurve = new AnimationCurve(
             new Keyframe(0, 2.5f),
@@ -26,11 +50,12 @@ namespace AssemblyAI.AI.Layer3
             new Keyframe(20f, 0.5f),
             new Keyframe(100f, 0.3f)
         );
- 
 
         public PickupPlanner(AIEntity entity)
         {
             me = entity;
+            nextUpdateTime = float.MinValue;
+            chosenPickupInfo = new ChosenPickupInfo(null, 0, float.MaxValue);
         }
 
         public void Prepare()
@@ -41,36 +66,56 @@ namespace AssemblyAI.AI.Layer3
             sightSensor = me.SightSensor;
         }
 
-        public Pickable ScorePickups(out NavMeshPath path, out float bestPickupScore, out float activationTime)
+        public void Update()
+        {
+            if (Time.time < nextUpdateTime)
+            {
+                // Too soon to update? Should at least consider if there is a pickup very, very close and it's not the
+                // one we care atm
+                return;
+            }
+
+            nextUpdateTime = Time.time + UPDATE_COOLDOWN;
+            ScorePickups();
+        }
+
+        
+        
+        public ChosenPickupInfo GetBestPickupInfo()
+        {
+            return chosenPickupInfo;
+        }
+        
+        private void ScorePickups()
         {
             var pickables = knowledgeBase.GetPickupKnowledge();
             var bestPickupValue = float.MinValue;
-            var bestPickupTime = float.MaxValue;
-            bestPickupScore = 0;
-            path = null;
+            var bestPickupTimeToPick = float.MaxValue;
+            var bestPickupScore = 0f;
             Pickable bestPickup = null;
             
             foreach (var entry in pickables)
             {
                 // TODO Find nice way to estimate score
-                var value = ScorePickup(pickables, entry.Key, out var time, out var pickupPath);
-                if (value == 0) continue;
-                if (value > bestPickupValue || Mathf.Abs(value - bestPickupScore) < 0.05f && time < bestPickupTime)
+                var (score,time) = ScorePickup(pickables, entry.Key);
+                if (score == 0) continue;
+                if (score > bestPickupValue || Mathf.Abs(score - bestPickupScore) < 0.05f && time < bestPickupTimeToPick)
                 {
-                    bestPickupScore = Mathf.Min(1f, value / time / 5);
-                    bestPickupValue = value;
-                    bestPickupTime = time;
+                    bestPickupScore = Mathf.Min(1f, score / time / 5);
+                    bestPickupValue = score;
+                    bestPickupTimeToPick = time;
                     bestPickup = entry.Key;
-                    path = pickupPath;
                 }
             }
 
-            chosenPickup = bestPickup;
-            activationTime = chosenPickup == null ? float.MinValue : pickables[chosenPickup];
-            return bestPickup;
+            var activationTime = bestPickup == null ? float.MinValue : pickables[bestPickup];
+            chosenPickupInfo = new ChosenPickupInfo(bestPickup, bestPickupValue, activationTime);
         }
 
-        private float ScorePickup(Dictionary<Pickable, float> pickables, Pickable pickup, out float totalTime, out NavMeshPath path)
+        /**
+         * Returns tuple of score and estimated time required to pickup
+         */
+        private Tuple<float, float> ScorePickup(Dictionary<Pickable, float> pickables, Pickable pickup)
         {
             var activationTime = pickables[pickup];
             var pickupPosition = pickup.transform.position;
@@ -79,17 +124,16 @@ namespace AssemblyAI.AI.Layer3
             if (valueScore == 0f)
             {
                 // This pickup is not useful for us... 
-                path = new NavMeshPath();
-                totalTime = float.MaxValue;
-                return valueScore;
+                return new Tuple<float, float>(valueScore, float.MaxValue);
             }
             var neighborhoodScore = ScoreNeighborhood(pickup, pickables);
 
-            path = navSystem.CalculatePath(pickupPosition);
+            var path = navSystem.CalculatePath(pickupPosition);
             var pathTime = navSystem.EstimatePathDuration(path);
             float timeUncertainty;
             var estimatedArrival = pathTime + Time.time;
 
+            float totalTime;
             if (estimatedArrival < activationTime)
             {
                 totalTime = activationTime - Time.time;
@@ -114,7 +158,7 @@ namespace AssemblyAI.AI.Layer3
             var uncertaintyMultiplier = ScoreUncertaintyTime(timeUncertainty);
 
             var finalScore = (valueScore + neighborhoodScore) * timeMultiplier * uncertaintyMultiplier;
-            return finalScore;
+            return new Tuple<float, float>(finalScore, totalTime);
         }
 
         private float ScorePickupByType(Pickable pickup)
