@@ -337,14 +337,12 @@ public class AIEntity : Entity, ILoggable
             else
             {
                 TargetKb.Update();
-                MapKnowledge.Update();
-                PickupKnowledgeBase.Update();
-                // Important: Pickup planner must be updated after pickup knowledge base
-                PickupPlanner.Update();
-                goalMachine.Update();
-                
             }
-
+            MapKnowledge.Update();
+            PickupKnowledgeBase.Update();
+            // Important: Pickup planner must be updated after pickup knowledge base
+            PickupPlanner.Update();
+            goalMachine.Update();
         }
 
         if (loggedFirstRespawn)
