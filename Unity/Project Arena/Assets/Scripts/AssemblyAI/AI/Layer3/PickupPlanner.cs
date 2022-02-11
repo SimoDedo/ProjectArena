@@ -24,13 +24,23 @@ namespace AssemblyAI.AI.Layer3
         private const float UPDATE_COOLDOWN = 0.5f;
         private const float MAX_SQR_DISTANCE_TO_CALCULATE_PICKUP_SCORE_IMMEDIATELY = 4f;
 
-        private static readonly AnimationCurve TimeValueCurve = new AnimationCurve(
+        private static readonly AnimationCurve TimeToCollectValueCurve = new AnimationCurve(
             new Keyframe(0, 2.5f),
             new Keyframe(3f, 2f),
             new Keyframe(10f, 1f),
             new Keyframe(20f, 0.5f),
             new Keyframe(100f, 0.3f)
         );
+        
+                
+        private static readonly AnimationCurve TimeUncertaintyValueCurve = new AnimationCurve(
+            new Keyframe(0, 1.0f),
+            new Keyframe(3f, 0.8f),
+            new Keyframe(10f, 0.4f),
+            new Keyframe(20f, 0.2f),
+            new Keyframe(100f, 0.1666f)
+        );
+
 
         public PickupPlanner(AIEntity entity)
         {
@@ -166,6 +176,9 @@ namespace AssemblyAI.AI.Layer3
             var uncertaintyMultiplier = ScoreUncertaintyTime(timeUncertainty);
 
             var finalScore = (valueScore + neighborhoodScore) * timeMultiplier * uncertaintyMultiplier;
+            
+            Debug.LogError("Score is " + finalScore);
+            
             return new Tuple<float, float>(finalScore, totalTime);
         }
 
@@ -248,7 +261,17 @@ namespace AssemblyAI.AI.Layer3
             {
                 if (entry == pickup) continue;
                 var distanceSquared = (entry.transform.position - pickupPos).sqrMagnitude;
-                if (distanceSquared <= maxSquaredDistance) neighborsCount++;
+                if (distanceSquared <= maxSquaredDistance)
+                {
+                    neighborsCount++;
+                    Debug.DrawLine(entry.transform.position, pickupPos, Color.green, 0.3f, false);
+                    
+                    // TODO Calculate path?
+                }
+                // else
+                // {
+                //     Debug.DrawLine(entry.transform.position, pickupPos, Color.red, 0.3f, false);
+                // }
             }
 
             return Mathf.Min(maxNeighborhoodScore, neighborsCount * neighborScore);
@@ -257,12 +280,12 @@ namespace AssemblyAI.AI.Layer3
 
         private static float ScoreTimeToCollect(float timeToCollect)
         {
-            return TimeValueCurve.Evaluate(timeToCollect);
+            return TimeToCollectValueCurve.Evaluate(timeToCollect);
         }
 
         private static float ScoreUncertaintyTime(float uncertaintyTime)
         {
-            return TimeValueCurve.Evaluate(uncertaintyTime);
+            return TimeUncertaintyValueCurve.Evaluate(uncertaintyTime);
         }
     }
 }
