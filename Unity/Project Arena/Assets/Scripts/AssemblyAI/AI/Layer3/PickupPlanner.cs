@@ -214,9 +214,7 @@ namespace AssemblyAI.AI.Layer3
             var uncertaintyMultiplier = ScoreUncertaintyTime(timeUncertainty);
 
             var finalScore = (valueScore + neighborhoodScore) * timeMultiplier * uncertaintyMultiplier;
-
-            Debug.LogError("Score is " + finalScore);
-
+            
             return finalScore;
         }
 
