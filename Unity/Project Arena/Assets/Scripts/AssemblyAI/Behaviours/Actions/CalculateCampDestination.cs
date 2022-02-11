@@ -30,7 +30,6 @@ namespace AssemblyAI.Behaviours.Actions
         {
             navSystem = GetComponent<AIEntity>().NavigationSystem;
             startVertex = Random.Range(0, maxNumVertices);
-            Debug.Log(gameObject.name + " selected start vertex as " + startVertex);
         }
 
         public override TaskStatus OnUpdate()
