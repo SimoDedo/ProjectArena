@@ -4,6 +4,7 @@ using AI.KnowledgeBase;
 using AssemblyAI.AI.Layer1.Sensors;
 using AssemblyAI.AI.Layer2;
 using AssemblyEntity.Component;
+using Others;
 using UnityEngine;
 
 namespace AssemblyAI.AI.Layer3
@@ -15,7 +16,7 @@ namespace AssemblyAI.AI.Layer3
         private NavigationSystem navSystem;
         private GunManager gunManager;
         private AISightSensor sightSensor;
-        
+
         private Pickable chosenPickup;
         private float chosenPickupScore = float.MinValue;
         private float chosenPickupEstimatedActivationTime = float.MaxValue;
@@ -23,16 +24,19 @@ namespace AssemblyAI.AI.Layer3
         private float nextUpdateTime;
         private const float UPDATE_COOLDOWN = 0.5f;
         private const float MAX_SQR_DISTANCE_TO_CALCULATE_PICKUP_SCORE_IMMEDIATELY = 4f;
+        private const float MAX_DISTANCE_TO_BE_NEIGHBORS = 20f;
+
+        private readonly Dictionary<Pickable, float> neighborsScore = new Dictionary<Pickable, float>();
 
         private static readonly AnimationCurve TimeToCollectValueCurve = new AnimationCurve(
-            new Keyframe(0, 2.5f),
-            new Keyframe(3f, 2f),
-            new Keyframe(10f, 1f),
-            new Keyframe(20f, 0.5f),
-            new Keyframe(100f, 0.3f)
+            new Keyframe(0, 1.0f),
+            new Keyframe(3f, 0.8f),
+            new Keyframe(10f, 0.4f),
+            new Keyframe(20f, 0.2f),
+            new Keyframe(100f, 0.1666f)
         );
-        
-                
+
+
         private static readonly AnimationCurve TimeUncertaintyValueCurve = new AnimationCurve(
             new Keyframe(0, 1.0f),
             new Keyframe(3f, 0.8f),
@@ -54,6 +58,33 @@ namespace AssemblyAI.AI.Layer3
             knowledgeBase = me.PickupKnowledgeBase;
             gunManager = me.GunManager;
             sightSensor = me.SightSensor;
+
+            // Calculate neighborhood score
+            var pickups = knowledgeBase.GetPickups();
+
+            foreach (var pickup1 in pickups)
+            {
+                var pickup1Position = pickup1.transform.position;
+                var neighbors = 0;
+                foreach (var pickup2 in pickups)
+                {
+                    if (pickup1 == pickup2)
+                    {
+                        continue;
+                    }
+
+                    var pickup2Position = pickup2.transform.position;
+                    var path = navSystem.CalculatePath(pickup1Position, pickup2Position);
+
+                    if (path.Length() < MAX_DISTANCE_TO_BE_NEIGHBORS)
+                    {
+                        Debug.DrawLine(pickup1Position, pickup2Position, Color.yellow, 2f, false);
+                        neighbors++;
+                    }
+                }
+
+                neighborsScore[pickup1] = Math.Min(1.0f, neighbors / 5f);
+            }
         }
 
         public void Update()
@@ -88,11 +119,10 @@ namespace AssemblyAI.AI.Layer3
         {
             return chosenPickup;
         }
-        
+
         private void ScorePickups(bool considerOnlyClosePickups)
         {
-            var pickables = knowledgeBase.GetPickupKnowledge();
-            var bestPickupTimeToPick = float.MaxValue;
+            var pickables = knowledgeBase.GetPickupsEstimatedActivationTimes();
             var bestPickupScore = float.MinValue;
             Pickable bestPickup = null;
 
@@ -107,13 +137,11 @@ namespace AssemblyAI.AI.Layer3
                 }
 
                 // TODO Find nice way to estimate score
-                var (score, time) = ScorePickup(pickables, entry.Key);
+                var score = ScorePickup(pickables, entry.Key);
                 if (score == 0) continue;
-                if (score > bestPickupScore ||
-                    Mathf.Abs(score - bestPickupScore) < 0.05f && time < bestPickupTimeToPick)
+                if (score > bestPickupScore)
                 {
                     bestPickupScore = score;
-                    bestPickupTimeToPick = time;
                     bestPickup = entry.Key;
                 }
             }
@@ -128,10 +156,7 @@ namespace AssemblyAI.AI.Layer3
             chosenPickupScore = bestPickupScore;
         }
 
-        /**
-         * Returns tuple of score and estimated time required to pickup
-         */
-        private Tuple<float, float> ScorePickup(Dictionary<Pickable, float> pickables, Pickable pickup)
+        private float ScorePickup(Dictionary<Pickable, float> pickables, Pickable pickup)
         {
             var activationTime = pickables[pickup];
             var pickupPosition = pickup.transform.position;
@@ -139,11 +164,10 @@ namespace AssemblyAI.AI.Layer3
             var valueScore = ScorePickupByType(pickup);
             if (valueScore == 0f)
             {
-                // This pickup is not useful for us... 
-                return new Tuple<float, float>(valueScore, float.MaxValue);
+                return valueScore;
             }
 
-            var neighborhoodScore = ScoreNeighborhood(pickup, pickables);
+            var neighborhoodScore = neighborsScore[pickup];
 
             var path = navSystem.CalculatePath(pickupPosition);
             var pathTime = navSystem.EstimatePathDuration(path);
@@ -159,8 +183,8 @@ namespace AssemblyAI.AI.Layer3
             else
             {
                 totalTime = pathTime;
-                if (sightSensor.CanSeeObject(pickup.transform, Physics.AllLayers)
-                ) // Use all layers since the crates are in ignore layer
+                // Use all layers since the crates are in ignore layer
+                if (sightSensor.CanSeeObject(pickup.transform, Physics.AllLayers))
                 {
                     // I can see the object for now, so there is no uncertainty, the object is there!
                     timeUncertainty = 0;
@@ -176,10 +200,10 @@ namespace AssemblyAI.AI.Layer3
             var uncertaintyMultiplier = ScoreUncertaintyTime(timeUncertainty);
 
             var finalScore = (valueScore + neighborhoodScore) * timeMultiplier * uncertaintyMultiplier;
-            
+
             Debug.LogError("Score is " + finalScore);
-            
-            return new Tuple<float, float>(finalScore, totalTime);
+
+            return finalScore;
         }
 
         private float ScorePickupByType(Pickable pickup)
@@ -244,37 +268,6 @@ namespace AssemblyAI.AI.Layer3
             var medkitHealValue = (1 - medkitNecessityWeight) * recoveredHealth / maxHealth;
             var medkitWant = medkitNecessityWeight * (maxHealth - currentHealth) / maxHealth;
             return medkitHealValue + medkitWant;
-        }
-
-        private static float ScoreNeighborhood(Pickable pickup, Dictionary<Pickable, float> pickables)
-        {
-            // TODO Maybe cache neighborhood info
-            const float maxNeighborhoodScore = 1f;
-            const float neighborScore = 0.2f;
-            const float maxNeighborhoodDistance = 20f;
-            // For the sake of speed, we do not check the actual lenght of the path, but the distance
-            // as the crow flies
-            var pickupPos = pickup.transform.position;
-            const float maxSquaredDistance = maxNeighborhoodDistance * maxNeighborhoodDistance;
-            var neighborsCount = 0;
-            foreach (var entry in pickables.Keys)
-            {
-                if (entry == pickup) continue;
-                var distanceSquared = (entry.transform.position - pickupPos).sqrMagnitude;
-                if (distanceSquared <= maxSquaredDistance)
-                {
-                    neighborsCount++;
-                    Debug.DrawLine(entry.transform.position, pickupPos, Color.green, 0.3f, false);
-                    
-                    // TODO Calculate path?
-                }
-                // else
-                // {
-                //     Debug.DrawLine(entry.transform.position, pickupPos, Color.red, 0.3f, false);
-                // }
-            }
-
-            return Mathf.Min(maxNeighborhoodScore, neighborsCount * neighborScore);
         }
 
 

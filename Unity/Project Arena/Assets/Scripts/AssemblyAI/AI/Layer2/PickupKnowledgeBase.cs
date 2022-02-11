@@ -11,17 +11,16 @@ namespace AI.KnowledgeBase
         private AISightSensor sightSensor;
 
         private readonly Dictionary<Pickable, float> estimatedActivationTime = new Dictionary<Pickable, float>();
-        private float lastUpdateTime;
-        
+
         public PickupKnowledgeBase(AIEntity me)
         {
             this.me = me;
+            DetectPickups();
         }
 
         public void Prepare()
         {
             sightSensor = me.SightSensor;
-            DetectPickups();
         }
 
         private void DetectPickups()
@@ -47,8 +46,7 @@ namespace AI.KnowledgeBase
                 {
                     // if(estimatedActivationTime[pickable] > Time.time)
                     // {
-                        lastUpdateTime = Time.time;
-                        estimatedActivationTime[pickable] = Time.time;
+                    estimatedActivationTime[pickable] = Time.time;
                     // }  
                 }
                 // If we believed that the pickup was already active, then update the value to the average
@@ -57,7 +55,6 @@ namespace AI.KnowledgeBase
                 // assumption
                 else if (estimatedActivationTime[pickable] < Time.time)
                 {
-                    lastUpdateTime = Time.time;
                     // TODO IF I CAN SEE THE OBJECT BEING PICKED UP, COOLDOWN IS NOT HALVED
                     //  HOW TO PROPERLY DETECT PICKUP IS ENEMY IS IN FRONT?
                     estimatedActivationTime[pickable] = Time.time + pickable.Cooldown / 2;
@@ -65,31 +62,12 @@ namespace AI.KnowledgeBase
             }
         }
 
-        public bool IsProbablyActive(GameObject obj)
+        public List<Pickable> GetPickups()
         {
-            var pickable = obj.GetComponent<Pickable>();
-            if (pickable == null) return false;
-            return estimatedActivationTime[pickable] <= Time.time;
-        }
-
-        public List<GameObject> GetProbablyActive(Pickable.PickupType type)
-        {
-            var probablyActive =
-                from data in estimatedActivationTime
-                where data.Value < Time.time
-                where data.Key.GetPickupType() == type
-                select data.Key.gameObject;
-            return probablyActive.ToList();
-        }
-
-        public Dictionary<Pickable, float> GetPickupKnowledgeForType(Pickable.PickupType type)
-        {
-            return estimatedActivationTime
-                .Where(it => it.Key.GetPickupType() == type)
-                .ToDictionary(pair => pair.Key, pair => pair.Value);
+            return estimatedActivationTime.Keys.ToList();
         }
         
-        public Dictionary<Pickable, float> GetPickupKnowledge()
+        public Dictionary<Pickable, float> GetPickupsEstimatedActivationTimes()
         {
             // TODO Is this a copy or a reference of the dictionary?
             return estimatedActivationTime
@@ -100,12 +78,6 @@ namespace AI.KnowledgeBase
         public void MarkConsumed(Pickable pickable)
         {
             estimatedActivationTime[pickable] = Time.time + pickable.Cooldown;
-            lastUpdateTime = Time.time;
-        }
-
-        public float GetLastUpdateTime()
-        {
-            return lastUpdateTime;
         }
     }
 }
