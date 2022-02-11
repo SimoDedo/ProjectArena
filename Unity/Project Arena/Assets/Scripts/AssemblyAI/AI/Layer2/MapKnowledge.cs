@@ -38,7 +38,7 @@ namespace AssemblyAI.AI.Layer3
                 return;
             }
 
-            PrintAreas();
+            // PrintAreas();
             
             // Check in which areas I am in. Mark them as visited (immediately? no timeout?)
             var currentPosition = ConvertToAreasCoordinate(transform.position);
@@ -48,6 +48,9 @@ namespace AssemblyAI.AI.Layer3
                 {
                     // TODO Maybe use our own counter?
                     areaScores[i] = Time.frameCount;
+                    
+                    PrintArea(areas[i], Color.magenta);
+                    
                 }
             }
         }
@@ -56,21 +59,21 @@ namespace AssemblyAI.AI.Layer3
         {
             foreach (var area in areas)
             {
-                PrintArea(area);
+                PrintArea(area, Color.green);
             }
         }
 
-        private void PrintArea(Area area)
+        private void PrintArea(Area area, Color color)
         {
             var topLeft = ConvertToActualMapCoordinate(new Vector3(area.leftColumn, 0, area.topRow));
             var bottomLeft = ConvertToActualMapCoordinate(new Vector3(area.leftColumn, 0, area.bottomRow));
             var topRight = ConvertToActualMapCoordinate(new Vector3(area.rightColumn, 0, area.topRow));
             var bottomRight = ConvertToActualMapCoordinate(new Vector3(area.rightColumn, 0, area.bottomRow));
                 
-            Debug.DrawLine(topLeft, bottomLeft, Color.green, 2, false);
-            Debug.DrawLine( bottomLeft, bottomRight, Color.green, 2, false);
-            Debug.DrawLine(bottomRight, topRight, Color.green, 2, false);
-            Debug.DrawLine(topRight, topLeft, Color.green, 2, false);
+            Debug.DrawLine(topLeft, bottomLeft, color, 2, false);
+            Debug.DrawLine( bottomLeft, bottomRight, color, 2, false);
+            Debug.DrawLine(bottomRight, topRight, color, 2, false);
+            Debug.DrawLine(topRight, topLeft, color, 2, false);
             
         }
 
@@ -110,8 +113,7 @@ namespace AssemblyAI.AI.Layer3
 
             var selectedArea = areas[leastKnownArea];
             
-            PrintArea(selectedArea);
-            
+            PrintArea(selectedArea, Color.blue);
 
             var columnDelta = selectedArea.rightColumn - selectedArea.leftColumn;
             var rowDelta = selectedArea.topRow - selectedArea.bottomRow;

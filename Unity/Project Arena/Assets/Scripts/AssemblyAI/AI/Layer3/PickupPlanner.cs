@@ -23,8 +23,8 @@ namespace AssemblyAI.AI.Layer3
 
         private float nextUpdateTime;
         private const float UPDATE_COOLDOWN = 0.5f;
-        private const float MAX_SQR_DISTANCE_TO_CALCULATE_PICKUP_SCORE_IMMEDIATELY = 4f;
         private const float MAX_DISTANCE_TO_BE_NEIGHBORS = 20f;
+        private const float BONUS_SCORE_PER_NEIGHBOR = 0.1f;
 
         private readonly Dictionary<Pickable, float> neighborsScore = new Dictionary<Pickable, float>();
 
@@ -83,7 +83,7 @@ namespace AssemblyAI.AI.Layer3
                     }
                 }
 
-                neighborsScore[pickup1] = Math.Min(1.0f, neighbors / 5f);
+                neighborsScore[pickup1] = Math.Min(0.5f, neighbors * BONUS_SCORE_PER_NEIGHBOR);
             }
         }
 
@@ -159,6 +159,9 @@ namespace AssemblyAI.AI.Layer3
 
             if (bestPickup == null)
             {
+                chosenPickup = null;
+                chosenPickupScore = float.MinValue;
+                chosenPickupEstimatedActivationTime = float.MaxValue;
                 return;
             }
 
@@ -261,7 +264,7 @@ namespace AssemblyAI.AI.Layer3
 
                 var recoveredAmmo = Mathf.Min(pickupAmmo, maxAmmo - currentAmmo);
                 var ammoCrateValue = (1 - ammoNecessityWeight) * recoveredAmmo / maxAmmo;
-                var ammoCrateWant = ammoNecessityWeight * (maxAmmo - currentAmmo) / maxAmmo;
+                var ammoCrateWant = ammoNecessityWeight * Mathf.Pow(((float) maxAmmo - currentAmmo) / maxAmmo, 2f);
 
                 totalCrateScore += ammoCrateValue + ammoCrateWant;
             }

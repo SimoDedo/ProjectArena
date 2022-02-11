@@ -3,7 +3,6 @@ using AssemblyAI.AI.Layer2;
 using AssemblyAI.Behaviours.Variables;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
-using Others;
 using UnityEngine;
 using UnityEngine.AI;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
@@ -14,9 +13,9 @@ namespace AssemblyAI.Behaviours.Actions
     [Serializable]
     public class CalculateCampDestination : Action
     {
-        [SerializeField] private float minRadius = 10;
+        [SerializeField] private float minRadius = 1;
         [SerializeField] private float maxRadius = 20;
-        [SerializeField] private float maxNumVertices = 20;
+        [SerializeField] private int maxNumVertices = 20;
         [SerializeField] private float maxRadiusAttempts = 3;
         [SerializeField] private SharedVector3 campLocation;
         [SerializeField] private SharedSelectedPathInfo pathChosen;
@@ -25,10 +24,13 @@ namespace AssemblyAI.Behaviours.Actions
             Physics.DefaultRaycastLayers ^ (1 << UnityEngine.LayerMask.NameToLayer("Entity"));
 
         private NavigationSystem navSystem;
-
+        private int startVertex;
+        
         public override void OnAwake()
         {
             navSystem = GetComponent<AIEntity>().NavigationSystem;
+            startVertex = Random.Range(0, maxNumVertices);
+            Debug.Log(gameObject.name + " selected start vertex as " + startVertex);
         }
 
         public override TaskStatus OnUpdate()
@@ -43,7 +45,7 @@ namespace AssemblyAI.Behaviours.Actions
             {
                 var direction = currentPos - campLocation.Value;
                 direction.y = 0;
-                var angle = attemptNum * 360 / maxNumVertices;
+                var angle = (startVertex + attemptNum) % maxNumVertices * 360 / maxNumVertices;
                 var newDirection = Quaternion.AngleAxis(angle, Vector3.up) * direction;
                 newDirection.Normalize();
                 for (var j = 0; j < maxRadiusAttempts; j++)
