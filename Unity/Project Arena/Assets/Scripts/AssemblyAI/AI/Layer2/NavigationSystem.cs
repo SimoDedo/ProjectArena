@@ -56,6 +56,17 @@ namespace AssemblyAI.AI.Layer2
             return rtn;
         }
 
+        public NavMeshPath CalculatePath(Vector3 origin, Vector3 destination, bool throwIfNotComplete = false)
+        {
+            var rtn = new NavMeshPath();
+            NavMesh.CalculatePath(origin, destination, agent.areaMask, rtn);
+            if (throwIfNotComplete && !rtn.IsComplete())
+            {
+                throw new InvalidOperationException("Attempted to calculate incomplete path");
+            }
+            return rtn;
+        }
+
         public static bool IsPointOnNavMesh(Vector3 point, out Vector3 validPoint)
         {
             var filter = new NavMeshQueryFilter {areaMask = 1};
