@@ -6,9 +6,10 @@ using UnityEngine;
 namespace AssemblyAI.Behaviours.Conditions
 {
     [Serializable]
-    public class ShouldGoToPickup: Conditional
+    public class ShouldGoToPickup : Conditional
     {
         private PickupPlanner pickupPlanner;
+
         public override void OnAwake()
         {
             pickupPlanner = GetComponent<AIEntity>().PickupPlanner;
@@ -16,8 +17,9 @@ namespace AssemblyAI.Behaviours.Conditions
 
         public override TaskStatus OnUpdate()
         {
-            var (_, _, activationTime) = pickupPlanner.GetBestPickupInfo();
-            return Time.time >= activationTime ? TaskStatus.Success : TaskStatus.Running;
+            return Time.time >= pickupPlanner.GetChosenPickupEstimatedActivationTime()
+                ? TaskStatus.Success
+                : TaskStatus.Running;
         }
     }
 }

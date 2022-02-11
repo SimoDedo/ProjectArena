@@ -25,9 +25,8 @@ namespace AssemblyAI.GoalMachine.Goal
 
         public float GetScore()
         {
-            var (pickup, score, _) = pickupPlanner.GetBestPickupInfo();
-            nextPickable = pickup;
-            return score;
+            nextPickable = pickupPlanner.GetChosenPickup();
+            return pickupPlanner.GetChosenPickupScore();
         }
 
 

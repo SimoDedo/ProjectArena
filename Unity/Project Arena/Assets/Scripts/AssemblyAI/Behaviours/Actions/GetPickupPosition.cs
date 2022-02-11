@@ -20,7 +20,7 @@ namespace AssemblyAI.Behaviours.Actions
 
         public override TaskStatus OnUpdate()
         {
-            var (pickup, _, _) = pickupPlanner.GetBestPickupInfo();
+            var pickup = pickupPlanner.GetChosenPickup();
             pickupPosition.Value = pickup.transform.position;
             return TaskStatus.Success;
         }

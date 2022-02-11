@@ -1,47 +1,28 @@
 using System;
 using System.Collections.Generic;
 using AI.KnowledgeBase;
-using AssemblyAI.AI.Layer1.Actuator;
 using AssemblyAI.AI.Layer1.Sensors;
 using AssemblyAI.AI.Layer2;
 using AssemblyEntity.Component;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace AssemblyAI.AI.Layer3
 {
     public class PickupPlanner
     {
-        public readonly struct ChosenPickupInfo
-        {
-            public readonly Pickable pickup;
-            public readonly float score;
-            public readonly float estimatedActivationTime;
-            
-            public ChosenPickupInfo(Pickable pickup, float score, float estimatedActivationTime)
-            {
-                this.pickup = pickup;
-                this.score = score;
-                this.estimatedActivationTime = estimatedActivationTime;
-            }
-
-            public void Deconstruct(out Pickable pickup, out float score, out float estimatedActivationTime)
-            {
-                pickup = this.pickup;
-                score = this.score;
-                estimatedActivationTime = this.estimatedActivationTime;
-            }    
-        }
-        
         private readonly AIEntity me;
         private PickupKnowledgeBase knowledgeBase;
         private NavigationSystem navSystem;
         private GunManager gunManager;
         private AISightSensor sightSensor;
-        private ChosenPickupInfo chosenPickupInfo;
         
+        private Pickable chosenPickup;
+        private float chosenPickupScore = float.MinValue;
+        private float chosenPickupEstimatedActivationTime = float.MaxValue;
+
         private float nextUpdateTime;
         private const float UPDATE_COOLDOWN = 0.5f;
+        private const float MAX_SQR_DISTANCE_TO_CALCULATE_PICKUP_SCORE_IMMEDIATELY = 4f;
 
         private static readonly AnimationCurve TimeValueCurve = new AnimationCurve(
             new Keyframe(0, 2.5f),
@@ -55,7 +36,6 @@ namespace AssemblyAI.AI.Layer3
         {
             me = entity;
             nextUpdateTime = float.MinValue;
-            chosenPickupInfo = new ChosenPickupInfo(null, 0, float.MaxValue);
         }
 
         public void Prepare()
@@ -70,52 +50,72 @@ namespace AssemblyAI.AI.Layer3
         {
             if (Time.time < nextUpdateTime)
             {
-                // Too soon to update? Should at least consider if there is a pickup very, very close and it's not the
-                // one we care atm
+                ScorePickups(true);
                 return;
             }
 
             nextUpdateTime = Time.time + UPDATE_COOLDOWN;
-            ScorePickups();
+            ScorePickups(false);
         }
 
         public void ForceUpdate()
         {
             nextUpdateTime = Time.time + UPDATE_COOLDOWN;
-            ScorePickups();
+            ScorePickups(false);
         }
 
-        
-        
-        public ChosenPickupInfo GetBestPickupInfo()
+        public float GetChosenPickupScore()
         {
-            return chosenPickupInfo;
+            return Math.Min(1.0f, chosenPickupScore);
+        }
+
+        public float GetChosenPickupEstimatedActivationTime()
+        {
+            return chosenPickupEstimatedActivationTime;
+        }
+
+        public Pickable GetChosenPickup()
+        {
+            return chosenPickup;
         }
         
-        private void ScorePickups()
+        private void ScorePickups(bool considerOnlyClosePickups)
         {
             var pickables = knowledgeBase.GetPickupKnowledge();
-            var bestPickupValue = float.MinValue;
             var bestPickupTimeToPick = float.MaxValue;
-            var bestPickupScore = 0f;
+            var bestPickupScore = float.MinValue;
             Pickable bestPickup = null;
-            
+
+            var position = me.transform.position;
+
             foreach (var entry in pickables)
             {
-                // TODO Find nice way to estimate score
-                var (score,time) = ScorePickup(pickables, entry.Key);
-                if (score == 0) continue;
-                if (score > bestPickupValue || Mathf.Abs(score - bestPickupScore) < 0.05f && time < bestPickupTimeToPick)
+                if (considerOnlyClosePickups && (position - entry.Key.transform.position).sqrMagnitude >
+                    MAX_SQR_DISTANCE_TO_CALCULATE_PICKUP_SCORE_IMMEDIATELY)
                 {
-                    bestPickupScore = Mathf.Min(1f, score / time / 5);
-                    bestPickupValue = score;
+                    continue;
+                }
+
+                // TODO Find nice way to estimate score
+                var (score, time) = ScorePickup(pickables, entry.Key);
+                if (score == 0) continue;
+                if (score > bestPickupScore ||
+                    Mathf.Abs(score - bestPickupScore) < 0.05f && time < bestPickupTimeToPick)
+                {
+                    bestPickupScore = score;
                     bestPickupTimeToPick = time;
                     bestPickup = entry.Key;
                 }
             }
 
-            var activationTime = bestPickup == null ? float.MinValue : pickables[bestPickup];
-            chosenPickupInfo = new ChosenPickupInfo(bestPickup, bestPickupValue, activationTime);
+            if (bestPickup == null)
+            {
+                return;
+            }
+
+            chosenPickupEstimatedActivationTime = pickables[bestPickup];
+            chosenPickup = bestPickup;
+            chosenPickupScore = bestPickupScore;
         }
 
         /**
@@ -132,6 +132,7 @@ namespace AssemblyAI.AI.Layer3
                 // This pickup is not useful for us... 
                 return new Tuple<float, float>(valueScore, float.MaxValue);
             }
+
             var neighborhoodScore = ScoreNeighborhood(pickup, pickables);
 
             var path = navSystem.CalculatePath(pickupPosition);
@@ -148,7 +149,8 @@ namespace AssemblyAI.AI.Layer3
             else
             {
                 totalTime = pathTime;
-                if (sightSensor.CanSeeObject(pickup.transform, Physics.AllLayers)) // Use all layers since the crates are in ignore layer
+                if (sightSensor.CanSeeObject(pickup.transform, Physics.AllLayers)
+                ) // Use all layers since the crates are in ignore layer
                 {
                     // I can see the object for now, so there is no uncertainty, the object is there!
                     timeUncertainty = 0;
@@ -159,7 +161,7 @@ namespace AssemblyAI.AI.Layer3
                     timeUncertainty = estimatedArrival - activationTime;
                 }
             }
-            
+
             var timeMultiplier = ScoreTimeToCollect(totalTime);
             var uncertaintyMultiplier = ScoreUncertaintyTime(timeUncertainty);
 
@@ -246,8 +248,7 @@ namespace AssemblyAI.AI.Layer3
             {
                 if (entry == pickup) continue;
                 var distanceSquared = (entry.transform.position - pickupPos).sqrMagnitude;
-                if (distanceSquared <= maxSquaredDistance)
-                    neighborsCount++;
+                if (distanceSquared <= maxSquaredDistance) neighborsCount++;
             }
 
             return Mathf.Min(maxNeighborhoodScore, neighborsCount * neighborScore);
@@ -258,7 +259,7 @@ namespace AssemblyAI.AI.Layer3
         {
             return TimeValueCurve.Evaluate(timeToCollect);
         }
-        
+
         private static float ScoreUncertaintyTime(float uncertaintyTime)
         {
             return TimeValueCurve.Evaluate(uncertaintyTime);
