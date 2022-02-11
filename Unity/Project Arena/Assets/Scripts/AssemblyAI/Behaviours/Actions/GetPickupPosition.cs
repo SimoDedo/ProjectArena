@@ -1,0 +1,28 @@
+using System;
+using AssemblyAI.AI.Layer3;
+using BehaviorDesigner.Runtime;
+using BehaviorDesigner.Runtime.Tasks;
+using UnityEngine;
+using Action = BehaviorDesigner.Runtime.Tasks.Action;
+
+namespace AssemblyAI.Behaviours.Actions
+{
+    [Serializable]
+    public class GetPickupPosition : Action
+    {
+        private PickupPlanner pickupPlanner;
+        [SerializeField] private SharedVector3 pickupPosition;
+
+        public override void OnAwake()
+        {
+            pickupPlanner = GetComponent<AIEntity>().PickupPlanner;
+        }
+
+        public override TaskStatus OnUpdate()
+        {
+            var (pickup, _, _) = pickupPlanner.GetBestPickupInfo();
+            pickupPosition.Value = pickup.transform.position;
+            return TaskStatus.Success;
+        }
+    }
+}

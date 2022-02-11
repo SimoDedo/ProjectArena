@@ -1,5 +1,5 @@
 using System;
-using AssemblyAI.Behaviours.Variables;
+using AssemblyAI.AI.Layer3;
 using BehaviorDesigner.Runtime.Tasks;
 using UnityEngine;
 
@@ -8,11 +8,16 @@ namespace AssemblyAI.Behaviours.Conditions
     [Serializable]
     public class ShouldGoToPickup: Conditional
     {
-        [SerializeField] private SharedSelectedPickupInfo pickupInfo;
+        private PickupPlanner pickupPlanner;
+        public override void OnAwake()
+        {
+            pickupPlanner = GetComponent<AIEntity>().PickupPlanner;
+        }
 
         public override TaskStatus OnUpdate()
         {
-            return Time.time >= pickupInfo.Value.estimatedActivationTime ? TaskStatus.Success : TaskStatus.Running;
+            var (_, _, activationTime) = pickupPlanner.GetBestPickupInfo();
+            return Time.time >= activationTime ? TaskStatus.Success : TaskStatus.Running;
         }
     }
 }

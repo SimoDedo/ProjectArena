@@ -176,7 +176,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 60
+  orthographic size: 26
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -200,7 +200,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 380802320}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 65.29671, y: 140.57845, z: 52.3658}
+  m_LocalPosition: {x: 41.304104, y: 86.30634, z: 29.904259}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -643,7 +643,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   wallHeight: 30
   squareSize: 1
-  isSkyVisibile: 1
+  isSkyVisibile: 0
   topMaterial: {fileID: 2100000, guid: c0613303af609ef4e9a058dbd6a9e117, type: 2}
   wallMaterial: {fileID: 2100000, guid: fb414c8d4e64f1d47926c89b9dd84470, type: 2}
   floorMaterial: {fileID: 2100000, guid: c0613303af609ef4e9a058dbd6a9e117, type: 2}

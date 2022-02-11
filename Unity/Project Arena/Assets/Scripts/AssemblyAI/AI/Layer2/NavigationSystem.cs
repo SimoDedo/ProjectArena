@@ -45,10 +45,14 @@ namespace AssemblyAI.AI.Layer2
             agent.angularSpeed = AngularSpeed;
         }
 
-        public NavMeshPath CalculatePath(Vector3 destination)
+        public NavMeshPath CalculatePath(Vector3 destination, bool throwIfNotComplete = false)
         {
             var rtn = new NavMeshPath();
             agent.CalculatePath(destination, rtn);
+            if (throwIfNotComplete && !rtn.IsComplete())
+            {
+                throw new InvalidOperationException("Attempted to calculate incomplete path");
+            }
             return rtn;
         }
 

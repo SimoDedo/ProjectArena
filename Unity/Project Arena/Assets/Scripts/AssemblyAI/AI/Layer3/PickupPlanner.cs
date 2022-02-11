@@ -79,6 +79,12 @@ namespace AssemblyAI.AI.Layer3
             ScorePickups();
         }
 
+        public void ForceUpdate()
+        {
+            nextUpdateTime = Time.time + UPDATE_COOLDOWN;
+            ScorePickups();
+        }
+
         
         
         public ChosenPickupInfo GetBestPickupInfo()

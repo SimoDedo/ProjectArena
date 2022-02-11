@@ -1,10 +1,7 @@
-using AssemblyAI.AI.Layer2;
 using AssemblyAI.AI.Layer3;
-using AssemblyAI.Behaviours.Variables;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace AssemblyAI.GoalMachine.Goal
 {
@@ -13,16 +10,12 @@ namespace AssemblyAI.GoalMachine.Goal
         private readonly ExternalBehaviorTree externalBt;
         private readonly BehaviorTree behaviorTree;
         private readonly PickupPlanner pickupPlanner;
-        private readonly NavigationSystem navSystem;
         private Pickable currentPickable;
         private Pickable nextPickable;
-        private float nextPickableActivationTime;
-        private NavMeshPath newPath;
 
         public LookForPickups(AIEntity entity)
         {
             pickupPlanner = entity.PickupPlanner;
-            navSystem = entity.NavigationSystem;
             externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/NewPickup");
             behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
             behaviorTree.StartWhenEnabled = false;
@@ -32,10 +25,8 @@ namespace AssemblyAI.GoalMachine.Goal
 
         public float GetScore()
         {
-            var (pickup, score, estimatedActivationTime) = pickupPlanner.GetBestPickupInfo();
+            var (pickup, score, _) = pickupPlanner.GetBestPickupInfo();
             nextPickable = pickup;
-            nextPickableActivationTime = estimatedActivationTime;
-            newPath = navSystem.CalculatePath(nextPickable.transform.position);
             return score;
         }
 
@@ -54,23 +45,27 @@ namespace AssemblyAI.GoalMachine.Goal
                 behaviorTree.EnableBehavior();
                 BehaviorManager.instance.RestartBehavior(behaviorTree);
 
-                var pickupInfo = new SelectedPickupInfo
-                {
-                    pickup = nextPickable,
-                    estimatedActivationTime = nextPickableActivationTime
-                };
-                behaviorTree.SetVariableValue("ChosenPickup", pickupInfo);
-                behaviorTree.SetVariableValue("ChosenPickupPosition", nextPickable.transform.position);
-                behaviorTree.SetVariableValue("ChosenPath", newPath);
+                // var pickupInfo = new SelectedPickupInfo
+                // {
+                //     pickup = nextPickable,
+                //     estimatedActivationTime = nextPickableActivationTime
+                // };
+                // behaviorTree.SetVariableValue("ChosenPickup", pickupInfo);
+                // behaviorTree.SetVariableValue("ChosenPickupPosition", nextPickable.transform.position);
+                // behaviorTree.SetVariableValue("ChosenPath", newPath);
 
                 currentPickable = nextPickable;
             }
-            
+
             BehaviorManager.instance.Tick(behaviorTree);
-            
-            if (behaviorTree.ExecutionStatus == TaskStatus.Failure)
+
+            if (behaviorTree.ExecutionStatus != TaskStatus.Running)
             {
-                Debug.LogError("What happened?");
+                // The tree finished execution. We must have picked up the pickable or maybe our activation time
+                // estimate was wrong. Force update of the planner?
+                // Must first force update of the knowledge base? The knowledge base automatically knows the status
+                // of the pickup if we are close (even when not looking).
+                pickupPlanner.ForceUpdate();
             }
         }
 
