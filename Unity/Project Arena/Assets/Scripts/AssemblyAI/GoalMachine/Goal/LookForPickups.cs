@@ -65,6 +65,9 @@ namespace AssemblyAI.GoalMachine.Goal
                 // Must first force update of the knowledge base? The knowledge base automatically knows the status
                 // of the pickup if we are close (even when not looking).
                 pickupPlanner.ForceUpdate();
+                behaviorTree.DisableBehavior();
+                behaviorTree.EnableBehavior();
+                BehaviorManager.instance.RestartBehavior(behaviorTree);
             }
         }
 
