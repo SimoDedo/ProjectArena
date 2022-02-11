@@ -91,18 +91,37 @@ namespace AssemblyAI.AI.Layer3
         {
             if (Time.time < nextUpdateTime)
             {
-                ScorePickups(true);
+                ScoreFastPickups();
                 return;
             }
 
             nextUpdateTime = Time.time + UPDATE_COOLDOWN;
-            ScorePickups(false);
+            ScorePickups();
+        }
+
+        private void ScoreFastPickups()
+        {
+            // var pickables = knowledgeBase.GetPickupsEstimatedActivationTimes();
+            // var bestPickupScore = float.MinValue;
+            // Pickable bestPickup = null;
+            //
+            // var myPosition = me.transform.position;
+            // foreach (var entry in pickables)
+            // {
+            //     if ((myPosition - entry.Key.transform.position).sqrMagnitude >
+            //         MAX_SQR_DISTANCE_TO_CALCULATE_PICKUP_SCORE_IMMEDIATELY)
+            //     {
+            //         continue;
+            //     }
+            //     
+            //     
+            // }
         }
 
         public void ForceUpdate()
         {
             nextUpdateTime = Time.time + UPDATE_COOLDOWN;
-            ScorePickups(false);
+            ScorePickups();
         }
 
         public float GetChosenPickupScore()
@@ -120,22 +139,14 @@ namespace AssemblyAI.AI.Layer3
             return chosenPickup;
         }
 
-        private void ScorePickups(bool considerOnlyClosePickups)
+        private void ScorePickups()
         {
             var pickables = knowledgeBase.GetPickupsEstimatedActivationTimes();
             var bestPickupScore = float.MinValue;
             Pickable bestPickup = null;
 
-            var position = me.transform.position;
-
             foreach (var entry in pickables)
             {
-                if (considerOnlyClosePickups && (position - entry.Key.transform.position).sqrMagnitude >
-                    MAX_SQR_DISTANCE_TO_CALCULATE_PICKUP_SCORE_IMMEDIATELY)
-                {
-                    continue;
-                }
-
                 // TODO Find nice way to estimate score
                 var score = ScorePickup(pickables, entry.Key);
                 if (score == 0) continue;
