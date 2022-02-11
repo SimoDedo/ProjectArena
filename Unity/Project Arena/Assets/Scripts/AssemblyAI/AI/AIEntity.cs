@@ -167,6 +167,7 @@ public class AIEntity : Entity, ILoggable
         goalMachine = new EntityGoalMachine(this);
         BotState = new BotState();
 
+        NavigationSystem.Prepare();
         GunManager.Prepare(gms, this, null, ag);
         TargetKb.Prepare();
         PickupKnowledgeBase.Prepare();
@@ -174,7 +175,6 @@ public class AIEntity : Entity, ILoggable
         SightSensor.Prepare();
         MovementController.Prepare();
         PickupPlanner.Prepare();
-        NavigationSystem.Prepare();
     }
 
     public override void SetupEntity(int th, bool[] ag, GameManager gms, int id)
