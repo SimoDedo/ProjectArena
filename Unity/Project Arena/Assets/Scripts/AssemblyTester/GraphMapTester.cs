@@ -19,7 +19,7 @@ namespace AssemblyTester
         [SerializeField] private SpawnPointManager spawnPointManager;
         [SerializeField] private int numExperiments = 1;
         [SerializeField] private string experimentName = "experiment";
-        private const int GAME_LENGTH = 600;
+        private const int GAME_LENGTH = 300;
         private string importPath;
         private string mapsPath;
         private string botsPath;
@@ -92,14 +92,19 @@ namespace AssemblyTester
             var (bot1Params, activeGunsBot1) = LoadBotCharacteristics(botsPath, bot1ParamsFilenamePrefix);
             var (bot2Params, activeGunsBot2) = LoadBotCharacteristics(botsPath, bot2ParamsFilenamePrefix);
 
-            var mapPath = mapsPath + mapName + ".txt";
-            if (!File.Exists(mapPath))
+            string mapPath = null;
+            if (!string.IsNullOrEmpty(mapName))
             {
-                Debug.LogWarning("File " + mapPath + " doesn't exist!");
-                mapPath = null;
+                mapPath = mapsPath + mapName + ".txt";
+                if (!File.Exists(mapPath))
+                {
+                    Debug.LogWarning("File " + mapPath + " doesn't exist!");
+                    mapPath = null;
+                }
             }
 
-            manager.SetParameters(botPrefab,
+            manager.SetParameters(
+                botPrefab,
                 BOT1_ID,
                 bot1Params,
                 activeGunsBot1,
@@ -125,7 +130,7 @@ namespace AssemblyTester
             results.Add(analyzer.CompileResults(GAME_LENGTH));
 
             experimentNumber++;
-            
+
             if (experimentNumber >= numExperiments)
             {
                 ExportResults(JsonConvert.SerializeObject(results), experimentName);
