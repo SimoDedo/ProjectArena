@@ -1,42 +1,46 @@
 ﻿using System.Collections.Generic;
-using ExperimentObjects;
+using Logging;
+using Managers;
 using UnityEngine;
 
-/// <summary>
-/// ExperimentInitializer allows to define experiments.
-/// </summary>
-public class ExperimentInitializer : MonoBehaviour {
+namespace Others
+{
+    /// <summary>
+    /// ExperimentInitializer allows to define experiments.
+    /// </summary>
+    public class ExperimentInitializer : MonoBehaviour {
 
-    [Header("Tutorial")] [SerializeField] private Case tutorial;
-    [SerializeField] private bool playTutorial;
+        [Header("Tutorial")] [SerializeField] private Case tutorial;
+        [SerializeField] private bool playTutorial;
 
-    [Header("Experiment")] [SerializeField] private List<Study> studies;
-    [SerializeField] private int casesPerUsers;
-    [SerializeField] private string experimentName;
+        [Header("Experiment")] [SerializeField] private List<Study> studies;
+        [SerializeField] private int casesPerUsers;
+        [SerializeField] private string experimentName;
 
-    [Header("Survey")] [SerializeField] private Case survey;
-    [SerializeField] private bool playSurvey;
+        [Header("Survey")] [SerializeField] private Case survey;
+        [SerializeField] private bool playSurvey;
 
-    [Header("Logging")] [SerializeField] private bool logOffline;
-    [SerializeField] private bool logOnline;
-    [SerializeField] private bool logGame;
-    [SerializeField] private bool logStatistics;
+        [Header("Logging")] [SerializeField] private bool logOffline;
+        [SerializeField] private bool logOnline;
+        [SerializeField] private bool logGame;
+        [SerializeField] private bool logStatistics;
     
-    private ExperimentManager experimentManager;
+        private ExperimentManager experimentManager;
 
-    void Awake() {
-        if (ParameterManager.HasInstance()) {
-            logOnline = ParameterManager.Instance.LogOnline;
-            logOffline = ParameterManager.Instance.LogOffline;
+        void Awake() {
+            if (ParameterManager.HasInstance()) {
+                logOnline = ParameterManager.Instance.LogOnline;
+                logOffline = ParameterManager.Instance.LogOffline;
+            }
+
+            if (experimentManager == null)
+            {
+                var obj = new GameObject("ExperimentManager");
+                experimentManager = obj.AddComponent<ExperimentManager>();
+                experimentManager.Setup(tutorial, playTutorial, studies, casesPerUsers,
+                    experimentName, survey, playSurvey, logOffline, logOnline, logGame, logStatistics);
+            }
         }
 
-        if (experimentManager == null)
-        {
-            var obj = new GameObject("ExperimentManager");
-            experimentManager = obj.AddComponent<ExperimentManager>();
-            experimentManager.Setup(tutorial, playTutorial, studies, casesPerUsers,
-                experimentName, survey, playSurvey, logOffline, logOnline, logGame, logStatistics);
-        }
     }
-
 }

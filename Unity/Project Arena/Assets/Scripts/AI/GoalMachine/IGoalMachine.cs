@@ -1,0 +1,9 @@
+namespace AI.GoalMachine
+{
+    public interface IGoalMachine
+    {
+        void Update();
+        void SetIsIdle(bool idle = true);
+        void Reset();
+    }
+}
