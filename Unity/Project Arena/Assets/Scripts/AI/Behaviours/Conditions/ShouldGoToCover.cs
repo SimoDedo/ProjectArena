@@ -7,11 +7,9 @@ using Random = UnityEngine.Random;
 
 namespace AI.Behaviours.Conditions
 {
-    // We might want to search for cover if the weapon we are using is running out of ammo
-    // and, despite this, it remains the best weapon we can use in this situation.
-    // Despite this, apply a random probability of actually going to take cover!
-
-    // TODO Check how often conditionals with abort are reevaluated
+    /// <summary>
+    /// Return Success if we are better of searching for cover, Failure otherwise.
+    /// </summary>
     [Serializable]
     public class ShouldGoToCover : Conditional
     {
@@ -20,10 +18,8 @@ namespace AI.Behaviours.Conditions
         private const float CHARGER_PERCENTAGE = 0.4f;
         private const float AVOID_COVER_PROBABILITY = 0.3f;
 
-        /// <summary>
-        ///     If true, we must now consider the random failure probability until we find out that we no longer
-        ///     need to cover
-        /// </summary>
+        // If true, we must now consider the random failure probability until we find out that we no longer need to
+        // cover
         [SerializeField] private SharedBool isGoingToCover;
 
         private Entity.Entity enemy;

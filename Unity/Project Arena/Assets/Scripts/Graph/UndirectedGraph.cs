@@ -25,7 +25,10 @@ namespace Graph
         }
     }
 
-    public class DirectedGraph
+    /// <summary>
+    /// Represents a undirected graphs. Wraps many functionalities of Quikgraph under an easier to use interface.
+    /// </summary>
+    public class UndirectedGraph
     {
         private readonly BidirectionalGraph<int, TaggedEdge<int, float>> graph =
             new BidirectionalGraph<int, TaggedEdge<int, float>>();
@@ -33,7 +36,7 @@ namespace Graph
         private readonly Dictionary<int, NodeProperties> nodeProperties = new Dictionary<int, NodeProperties>();
 
         /// <summary>
-        ///     Adds a node with given id to the graph, if one isn't already present
+        /// Adds a node with given id to the graph, if one isn't already present
         /// </summary>
         /// <param name="id">The unique id of the node</param>
         /// <param name="attributes">The list of attributes of the node</param>
@@ -48,54 +51,68 @@ namespace Graph
         }
 
         /// <summary>
-        ///     Adds edge connecting nodeAID and nodeBID and vice versa, if they both exist
+        /// Adds edge connecting nodeAID and nodeBID, if they both exist
         /// </summary>
         /// <param name="nodeAID">The unique id of first node to link</param>
         /// <param name="nodeBID">The unique id of the second node to link</param>
         /// <param name="weight">The weight of the edge</param>
         /// <returns>True if the edge was added successfully</returns>
-        public bool AddEdges(int nodeAID, int nodeBID, float weight = 1f)
+        public bool AddEdge(int nodeAID, int nodeBID, float weight = 1f)
         {
             return graph.AddEdge(new TaggedEdge<int, float>(nodeAID, nodeBID, weight))
                    & graph.AddEdge(new TaggedEdge<int, float>(nodeBID, nodeAID, weight));
         }
 
+        /// <summary>
+        /// Returns whether the graph contains a node with the given id.
+        /// </summary>
         public bool HasNode(int id)
         {
             return graph.ContainsVertex(id);
         }
 
+        /// <summary>
+        /// Returns an array containing all the ids of the nodes in the graph.
+        /// </summary>
+        /// <returns></returns>
         public int[] GetNodeIDs()
         {
             return graph.Vertices.ToArray();
         }
-
-        // public TaggedUndirectedEdge<int,float>[] GetEdgesFromNode(int nodeID)
-        // {
-        //     return graph.AdjacentEdges(nodeID).ToArray();
-        // }
-
+        
+        /// <summary>
+        /// Gets the id of nodes adjacent to the given one.
+        /// </summary>
         public IEnumerable<int> GetAdjacentNodes(int nodeID)
         {
             return graph.OutEdges(nodeID).Select(it => it.Target);
         }
 
+        /// <summary>
+        /// Gets the in/out degree of a node.
+        /// </summary>
         public int GetNodeDegree(int nodeID)
         {
             return graph.OutDegree(nodeID);
         }
 
+        /// <summary>
+        /// Returns the properties stored in the node with the given id.
+        /// </summary>
         public NodeProperties GetNodeProperties(int nodeID)
         {
-            if (!nodeProperties.ContainsKey(nodeID)) Debug.Log("!?");
+            if (!nodeProperties.ContainsKey(nodeID)) Debug.LogError("!?");
             return nodeProperties[nodeID];
         }
-
+        
         private static double GetEdgeWeightFunc(TaggedEdge<int, float> edge)
         {
             return edge.Tag;
         }
 
+        /// <summary>
+        /// Calculates the lenght of the shortest path connecting source and target.
+        /// </summary>
         public float CalculateShortestPathLenght(int source, int target)
         {
             var a = new DijkstraShortestPathAlgorithm<int, TaggedEdge<int, float>>(graph, GetEdgeWeightFunc);
@@ -103,6 +120,9 @@ namespace Graph
             return a.TryGetDistance(target, out var rtn) ? (float) rtn : float.MaxValue;
         }
 
+        /// <summary>
+        /// Calculates the lenght of the shortest path connecting source and target and the betweeness of each node.
+        /// </summary>
         public float CalculateShortestPathLenghtAndBetweeness(
             int source,
             int target,
@@ -152,7 +172,7 @@ namespace Graph
                 }
                 else
                 {
-                    Debug.Log("This map has more than one shortest path between nodes!");
+                    Debug.LogError("This map has more than one shortest path between nodes!");
                 }
 
                 // DO not consider final vertex in path
@@ -163,11 +183,18 @@ namespace Graph
             return minDistance;
         }
 
+        /// <summary>
+        /// Returns the edges coming out of a node.
+        /// </summary>
         public IEnumerable<Tuple<int, float>> GetOutEdges(int node)
         {
             return graph.OutEdges(node).Select(it => new Tuple<int, float>(it.Target, it.Tag));
         }
 
+        /// <summary>
+        /// Removes the node with the given id.
+        /// </summary>
+        /// <returns>True if the node with the given id was found and removed, false otherwise.</returns>
         public bool RemoveNode(int it)
         {
             return graph.RemoveVertex(it);

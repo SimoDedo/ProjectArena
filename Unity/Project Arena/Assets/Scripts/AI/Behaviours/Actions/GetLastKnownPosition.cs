@@ -11,6 +11,9 @@ using Random = UnityEngine.Random;
 
 namespace AI.Behaviours.Actions
 {
+    /// <summary>
+    /// Estimates the position of the enemy, either because we are searching for it or because we recently took damage.
+    /// </summary>
     [Serializable]
     public class GetLastKnownPosition : Action
     {

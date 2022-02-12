@@ -7,6 +7,10 @@ using Random = UnityEngine.Random;
 
 namespace AI.AI.Layer2
 {
+    /// <summary>
+    /// This component represents the entity knowledge of the map. It requires support from the map itself, which
+    /// must expose its <see cref="Area"/> representation.
+    /// </summary>
     public class MapKnowledge
     {
         private readonly Area[] areas;
@@ -35,11 +39,19 @@ namespace AI.AI.Layer2
             gridScale = gms.GetMapScale();
         }
 
+        /// <summary>
+        /// Can this component be used? If not, any operation will return InvalidOperationException.
+        /// </summary>
         public bool CanBeUsed => areas.Length != 0;
 
         public void Update()
         {
-            if (!CanBeUsed) return;
+            if (!CanBeUsed)
+            {
+                throw new InvalidOperationException(
+                    "Cannot update the map knowledge, no knowledge is available!"
+                );
+            }
 
             // PrintAreas();
 
@@ -50,7 +62,6 @@ namespace AI.AI.Layer2
                 {
                     // TODO Maybe use our own counter?
                     areaScores[i] = Time.frameCount;
-
                     PrintArea(areas[i], Color.magenta);
                 }
         }
@@ -73,12 +84,10 @@ namespace AI.AI.Layer2
             Debug.DrawLine(topRight, topLeft, color, 2, false);
         }
 
-        /**
-         * Returns a possible destination to wander to based on:
-         * - Knowledge: prefer going to areas which haven been visited in a while
-         * - ? Size: prefer visiting big (small?) areas
-         * - ? Closeness
-         */
+        /// <summary>
+        /// Returns a possible wander destination by selecting an area which hasn't been visited recently.
+        /// Can be used only is CanBeUsed returns true.
+        /// </summary>
         public Vector3 GetRecommendedDestination()
         {
             if (!CanBeUsed)

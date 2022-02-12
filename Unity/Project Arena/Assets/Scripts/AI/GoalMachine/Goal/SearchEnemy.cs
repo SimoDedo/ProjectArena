@@ -5,6 +5,11 @@ using UnityEngine;
 
 namespace AI.GoalMachine.Goal
 {
+    /// <summary>
+    /// Search enemy goal.
+    /// Deals with searching/predicting the position of the enemy and reaching it.
+    /// The goal plan is contained in a behaviour tree.
+    /// </summary>
     public class SearchEnemy : IGoal
     {
         private const float NO_TIME = -1;

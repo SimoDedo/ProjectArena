@@ -7,6 +7,9 @@ using UnityEngine.SceneManagement;
 
 namespace Tester
 {
+    /// <summary>
+    /// A MonoBehaviour able to dispatch to the correct scene depending on the command line parameters.
+    /// </summary>
     public class ExperimentDispatcher : MonoBehaviour
     {
         private const string EXPERIMENT_PARAM = "-experimentType=";

@@ -1,11 +1,17 @@
+using System;
 using AI.AI.Layer1;
 using AI.AI.Layer2;
 using BehaviorDesigner.Runtime.Tasks;
 using Entity.Component;
 using UnityEngine;
+using Action = BehaviorDesigner.Runtime.Tasks.Action;
 
 namespace AI.Behaviours.Actions
 {
+    /// <summary>
+    /// Selects the best weapon to use during a fight.
+    /// </summary>
+    [Serializable]
     public class NewChooseWeapon : Action
     {
         private Entity.Entity enemy;

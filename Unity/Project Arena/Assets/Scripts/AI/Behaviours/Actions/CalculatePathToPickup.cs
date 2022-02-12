@@ -8,6 +8,9 @@ using Action = BehaviorDesigner.Runtime.Tasks.Action;
 
 namespace AI.Behaviours.Actions
 {
+    /// <summary>
+    /// Calculates and saves the path needed to reach the pickup chosen by the pickup planner.
+    /// </summary>
     [Serializable]
     public class CalculatePathToPickup : Action
     {

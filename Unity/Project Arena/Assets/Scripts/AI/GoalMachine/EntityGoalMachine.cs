@@ -3,6 +3,9 @@ using BehaviorDesigner.Runtime;
 
 namespace AI.GoalMachine
 {
+    /// <summary>
+    /// Default goal machine of an entity.
+    /// </summary>
     public class EntityGoalMachine : IGoalMachine
     {
         private readonly IGoal[] goals;

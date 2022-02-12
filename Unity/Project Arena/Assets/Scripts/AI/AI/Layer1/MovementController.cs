@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace AI.AI.Layer1
 {
+    /// <summary>
+    /// This component deals with moving the entity around.
+    /// </summary>
     public class MovementController
     {
         private readonly Transform transform;
@@ -14,12 +17,15 @@ namespace AI.AI.Layer1
             this.speed = speed;
         }
 
+        // Prepares the component
         public void Prepare()
         {
             previousPosition = transform.position;
         }
-
-
+        
+        /// <summary>
+        /// Moves the entity to the position specified.
+        /// </summary>
         public void MoveToPosition(Vector3 position)
         {
             // TODO Control movement for this frame, prevent moving too fast
@@ -27,6 +33,9 @@ namespace AI.AI.Layer1
             transform.position = position;
         }
 
+        /// <summary>
+        /// Returns the current velocity of the entity.
+        /// </summary>
         public Vector3 GetVelocity()
         {
             return (transform.position - previousPosition) / Time.deltaTime;

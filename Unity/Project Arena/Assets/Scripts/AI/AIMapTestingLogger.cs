@@ -16,14 +16,14 @@ using UnityEngine.SceneManagement;
 namespace AI
 {
     /// <summary>
-    ///     ExperimentManager allows to manage experiments. An experiment is composed of different studies
-    ///     (a set of maps), each one composed by cases (a set of map variations). Each time a new
-    ///     experiment is requested, a list of cases from the less played study is provided to the user
-    ///     to be played. A tutorial and a survey scene can be added at the beginning and at the end of
-    ///     the experiment, respectively. When ExperimentManager is used to log online data, before creating
-    ///     a new list of cases or before saving data on the server, the experiment completion is retrieved
-    ///     from the server. When sending data to the server this information is stored in the comment field
-    ///     of each entry as the sum of the retrieved completion and the completion progress stored locally.
+    /// ExperimentManager allows to manage experiments. An experiment is composed of different studies
+    /// (a set of maps), each one composed by cases (a set of map variations). Each time a new
+    /// experiment is requested, a list of cases from the less played study is provided to the user
+    /// to be played. A tutorial and a survey scene can be added at the beginning and at the end of
+    /// the experiment, respectively. When ExperimentManager is used to log online data, before creating
+    /// a new list of cases or before saving data on the server, the experiment completion is retrieved
+    /// from the server. When sending data to the server this information is stored in the comment field
+    /// of each entry as the sum of the retrieved completion and the completion progress stored locally.
     /// </summary>
     public class AIMapTestingLogger : MonoBehaviour, ILoggable
     {

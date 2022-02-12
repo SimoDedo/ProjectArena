@@ -8,6 +8,9 @@ using Action = BehaviorDesigner.Runtime.Tasks.Action;
 
 namespace AI.Behaviours.Actions
 {
+    /// <summary>
+    /// Selects the area to visit next while wandering, based on the selection given by the <see cref="MapKnowledge"/>
+    /// </summary>
     [Serializable]
     public class SelectAreaToVisit : Action
     {

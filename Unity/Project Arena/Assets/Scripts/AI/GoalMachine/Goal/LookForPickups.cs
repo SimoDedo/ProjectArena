@@ -6,6 +6,11 @@ using UnityEngine;
 
 namespace AI.GoalMachine.Goal
 {
+    /// <summary>
+    /// Pickup goal.
+    /// Deals with selecting and reaching a pickup, plus fighting the enemy if required.
+    /// The goal plan is contained in a behaviour tree.
+    /// </summary>
     public class LookForPickups : IGoal
     {
         private readonly BehaviorTree behaviorTree;

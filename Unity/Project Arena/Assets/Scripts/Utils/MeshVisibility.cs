@@ -4,7 +4,7 @@ namespace Utils
 {
     public static class MeshVisibility
     {
-        // Hides/shows the meshe.
+        // Hides/shows the mesh.
         public static void SetMeshVisible(Transform father, bool isVisible)
         {
             foreach (Transform children in father)

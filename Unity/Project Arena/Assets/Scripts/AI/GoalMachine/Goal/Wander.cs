@@ -3,6 +3,11 @@ using UnityEngine;
 
 namespace AI.GoalMachine.Goal
 {
+    /// <summary>
+    /// Select wander destination.
+    /// Deals with selecting a wander destination and reaching it.
+    /// The goal plan is contained in a behaviour tree.
+    /// </summary>
     public class Wander : IGoal
     {
         private readonly BehaviorTree behaviorTree;

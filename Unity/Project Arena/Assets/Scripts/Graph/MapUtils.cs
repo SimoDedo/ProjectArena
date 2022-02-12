@@ -3,8 +3,14 @@ using UnityEngine;
 
 namespace Graph
 {
+    /// <summary>
+    /// Contains utility methods to work with char maps and Areas.
+    /// </summary>
     public static class MapUtils
     {
+        /// <summary>
+        /// Returns the string representation of the given char map.
+        /// </summary>
         public static string GetStringFromCharMap(char[,] map)
         {
             var builder = new StringBuilder();
@@ -18,6 +24,9 @@ namespace Graph
             return builder.ToString();
         }
 
+        /// <summary>
+        /// Returns a possible char map representation of the given Areas array.
+        /// </summary>
         public static char[,] TranslateAreaMap(Area[] areas)
         {
             var minCoords = new Vector2Int();

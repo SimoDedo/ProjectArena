@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace AI.GoalMachine.Goal
 {
+    /// <summary>
+    /// Fighting goal. Deals with moving, shooting, finding cover, reloading and so on.
+    /// The goal plan is contained in a behaviour tree.
+    /// </summary>
     public class Fight : IGoal
     {
         private const float LOW_HEALTH_PENALTY = 0.6f;

@@ -28,7 +28,7 @@ namespace Graph
         private const float TOLERANCE = 0.001f;
         private static readonly float Sqrt2 = Mathf.Sqrt(2);
 
-        public static DirectedGraph GenerateTileGraph(char[,] map)
+        public static UndirectedGraph GenerateTileGraph(char[,] map)
         {
             var tileGraph = GenerateTileGraphNodesFromMap(map, out var rows, out var columns);
             for (var column = 0; column < columns; column++)
@@ -36,20 +36,20 @@ namespace Graph
             {
                 if (map[row, column] == WALL_CHAR) continue;
                 if (row + 1 < rows && map[row + 1, column] != WALL_CHAR)
-                    tileGraph.AddEdges(
+                    tileGraph.AddEdge(
                         GetTileIndexFromCoordinates(row, column, rows, columns),
                         GetTileIndexFromCoordinates(row + 1, column, rows, columns)
                     );
 
                 if (column + 1 < columns && map[row, column + 1] != WALL_CHAR)
-                    tileGraph.AddEdges(
+                    tileGraph.AddEdge(
                         GetTileIndexFromCoordinates(row, column, rows, columns),
                         GetTileIndexFromCoordinates(row, column + 1, rows, columns)
                     );
 
                 if (row + 1 < rows && column + 1 < columns && map[row, column + 1] != WALL_CHAR &&
                     map[row + 1, column] != WALL_CHAR && map[row + 1, column + 1] != WALL_CHAR)
-                    tileGraph.AddEdges(
+                    tileGraph.AddEdge(
                         GetTileIndexFromCoordinates(row, column, rows, columns),
                         GetTileIndexFromCoordinates(row + 1, column + 1, rows, columns),
                         Sqrt2
@@ -57,7 +57,7 @@ namespace Graph
 
                 if (row - 1 > 0 && column + 1 < columns && map[row, column + 1] != WALL_CHAR &&
                     map[row - 1, column] != WALL_CHAR && map[row - 1, column + 1] != WALL_CHAR)
-                    tileGraph.AddEdges(
+                    tileGraph.AddEdge(
                         GetTileIndexFromCoordinates(row, column, rows, columns),
                         GetTileIndexFromCoordinates(row - 1, column + 1, rows, columns),
                         Sqrt2
@@ -67,11 +67,11 @@ namespace Graph
             return tileGraph;
         }
 
-        private static DirectedGraph GenerateTileGraphNodesFromMap(char[,] map, out int rows, out int columns)
+        private static UndirectedGraph GenerateTileGraphNodesFromMap(char[,] map, out int rows, out int columns)
         {
             rows = map.GetLength(0);
             columns = map.GetLength(1);
-            var tileGraph = new DirectedGraph();
+            var tileGraph = new UndirectedGraph();
             for (var column = 0; column < columns; column++)
             for (var row = 0; row < rows; row++)
             {
@@ -87,7 +87,7 @@ namespace Graph
             return tileGraph;
         }
 
-        private static DirectedGraph GenerateVisibilityGraph(char[,] map)
+        private static UndirectedGraph GenerateVisibilityGraph(char[,] map)
         {
             var visibilityGraph = GenerateTileGraphNodesFromMap(map, out var rows, out var columns);
             var visibilities = new int[rows, columns];
@@ -108,7 +108,7 @@ namespace Graph
                     if (IsTileVisible(row1, col1, row2, col2, map))
                     {
                         var nodeBID = GetTileIndexFromCoordinates(row2, col2, rows, columns);
-                        visibilityGraph.AddEdges(nodeAID, nodeBID, EuclideanDistance(row1, col1, row2, col2));
+                        visibilityGraph.AddEdge(nodeAID, nodeBID, EuclideanDistance(row1, col1, row2, col2));
                     }
                 }
 
@@ -174,9 +174,9 @@ namespace Graph
             return visibilityMatrix;
         }
 
-        public static DirectedGraph GenerateRoomsCorridorsGraph(Area[] areas)
+        public static UndirectedGraph GenerateRoomsCorridorsGraph(Area[] areas)
         {
-            var roomsCorridorsGraph = new DirectedGraph();
+            var roomsCorridorsGraph = new UndirectedGraph();
             // ID of each area is simply it's index in the for loop
             for (var index = 0; index < areas.Length; index++)
             {
@@ -213,7 +213,7 @@ namespace Graph
                         var centerColumn2 = (area2.leftColumn + area2.rightColumn) / 2f;
                         var centerRow2 = (area2.topRow + area2.bottomRow) / 2f;
                         var distance = EuclideanDistance(centerColumn1, centerRow1, centerColumn2, centerRow2);
-                        roomsCorridorsGraph.AddEdges(GetRoomIndexFromIndex(index1), GetRoomIndexFromIndex(index2),
+                        roomsCorridorsGraph.AddEdge(GetRoomIndexFromIndex(index1), GetRoomIndexFromIndex(index2),
                             distance);
                     }
                 }
@@ -222,7 +222,7 @@ namespace Graph
             return roomsCorridorsGraph;
         }
 
-        public static DirectedGraph GenerateRoomsGraph(Area[] areas)
+        public static UndirectedGraph GenerateRoomsGraph(Area[] areas)
         {
             var roomsCorridorsGraph = GenerateRoomsCorridorsGraph(areas);
             // Now, find all the areas which are corridors, find all the vertices connected to them, connect them and
@@ -243,7 +243,7 @@ namespace Graph
                         for (var j = i + 1; j < outEdges.Count; j++)
                         {
                             var (nodeB, lengthB) = outEdges[j];
-                            roomsCorridorsGraph.AddEdges(nodeA, nodeB, lengthA + lengthB);
+                            roomsCorridorsGraph.AddEdge(nodeA, nodeB, lengthA + lengthB);
                         }
                     }
 
@@ -266,7 +266,7 @@ namespace Graph
                             for (var j = i + 1; j < outEdges.Count; j++)
                             {
                                 var (nodeB, lengthB) = outEdges[j];
-                                roomsCorridorsGraph.AddEdges(nodeA, nodeB, lengthA + lengthB);
+                                roomsCorridorsGraph.AddEdge(nodeA, nodeB, lengthA + lengthB);
                             }
                         }
 
@@ -278,7 +278,7 @@ namespace Graph
             return roomsCorridorsGraph;
         }
 
-        public static DirectedGraph GenerateRoomsCorridorsObjectsGraph(Area[] areas, char[,] map, char[] excludedChars)
+        public static UndirectedGraph GenerateRoomsCorridorsObjectsGraph(Area[] areas, char[,] map, char[] excludedChars)
         {
             if (map.GetLength(1) > MAX_MAP_WIDTH)
                 throw new InvalidOperationException("Cannot handle maps with width > " + MAX_MAP_WIDTH);
@@ -312,7 +312,7 @@ namespace Graph
                             var centerColumn = (area.leftColumn + area.rightColumn) / 2f;
                             var centerRow = (area.topRow + area.bottomRow) / 2f;
                             var distance = EuclideanDistance(centerColumn, centerRow, col, row);
-                            graph.AddEdges(GetRoomIndexFromIndex(roomIndex), objectNodeId, distance);
+                            graph.AddEdge(GetRoomIndexFromIndex(roomIndex), objectNodeId, distance);
                         }
                     }
                 }
@@ -426,7 +426,7 @@ namespace Graph
         }
 
         // Dijkstra, assume edge weights are positive
-        private static float CalculateShortestPathLength(DirectedGraph input, int nodeA, int nodeB)
+        private static float CalculateShortestPathLength(UndirectedGraph input, int nodeA, int nodeB)
         {
             return input.CalculateShortestPathLenght(nodeA, nodeB);
         }
@@ -609,7 +609,7 @@ namespace Graph
         private static void TryAddResource(
             Vector2Int bestTile,
             char spawnPointsChar,
-            DirectedGraph roomGraph,
+            UndirectedGraph roomGraph,
             char[,] map,
             List<Vector2Int> objectsPlacedPos
         )
@@ -642,7 +642,7 @@ namespace Graph
                     var centerColumn = (leftColumn + rightColumn) / 2f;
                     var centerRow = (topRow + bottomRow) / 2f;
                     var distance = EuclideanDistance(centerColumn, centerRow, bestTile.x, bestTile.y);
-                    roomGraph.AddEdges(objectNodeID, nodeID, distance);
+                    roomGraph.AddEdge(objectNodeID, nodeID, distance);
                 }
             }
 
@@ -651,7 +651,7 @@ namespace Graph
         }
 
         private static Vector2Int GetBestTile(
-            DirectedGraph roomGraph,
+            UndirectedGraph roomGraph,
             float diameter,
             float diagonal,
             char spawnPointsChar,
@@ -750,7 +750,7 @@ namespace Graph
         }
 
         private static float RoomFit(
-            DirectedGraph roomGraph,
+            UndirectedGraph roomGraph,
             float diameter,
             int roomID,
             float degreeFit,
@@ -766,7 +766,7 @@ namespace Graph
         }
 
         private static float ResourceRedundancy(
-            DirectedGraph roomGraph,
+            UndirectedGraph roomGraph,
             int roomID,
             char spawnPointsChar,
             int numSpawnPoints
@@ -784,7 +784,7 @@ namespace Graph
         }
 
         private static float ResourceDistance(
-            DirectedGraph roomGraph,
+            UndirectedGraph roomGraph,
             float diameter,
             int roomID,
             List<char> objectTypesConsidered
@@ -822,7 +822,7 @@ namespace Graph
                 degree => 1f - (degree.Value - minFitness) / variation);
         }
 
-        private static float ComputeDiameter(Area[] areas, DirectedGraph areaGraph)
+        private static float ComputeDiameter(Area[] areas, UndirectedGraph areaGraph)
         {
             var diameter = float.MinValue;
             for (var i1 = 0; i1 < areas.Length; i1++)
@@ -838,7 +838,7 @@ namespace Graph
         }
 
         private static Dictionary<int, float> ComputeNormalizedDegree(
-            DirectedGraph roomGraph,
+            UndirectedGraph roomGraph,
             bool discardDeadEnds = false
         )
         {

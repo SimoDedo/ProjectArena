@@ -3,6 +3,9 @@ using Utils;
 
 namespace AI.AI.Layer1
 {
+    /// <summary>
+    /// This component is used to query whether any object is in view or not.
+    /// </summary>
     public class SightSensor
     {
         private readonly float fov;
@@ -16,44 +19,17 @@ namespace AI.AI.Layer1
             this.fov = fov;
         }
 
-        public void Prepare()
+        /// <summary>
+        /// Returns whether the position specified by that transform can be seen or not.
+        /// Can additionally specify a mask of layers to ignore.
+        /// </summary>
+        public bool CanSeeObject(Transform transform, int layerMask = Physics.DefaultRaycastLayers)
         {
-            /* Nothing to do */
-        }
-
-        public float GetAngleFromLookDirection(Vector3 direction)
-        {
-            return Vector3.Angle(head.transform.forward, direction);
-        }
-
-        public bool CanSeeObject(Transform obj, int ignoreLayers)
-        {
-            var visibility = VisibilityUtils.CanSeeTarget(head.transform, obj, ignoreLayers);
+            var visibility = VisibilityUtils.CanSeeTarget(head.transform, transform, layerMask);
             if (!visibility.isVisible) return false;
             if (visibility.distance > maxSightRange) return false;
             if (visibility.angle > fov) return false;
             return true;
-        }
-
-        public bool CanSeePosition(Vector3 position, int ignoreLayers = Physics.DefaultRaycastLayers)
-        {
-            var visibility = VisibilityUtils.CanSeePosition(head.transform, position, ignoreLayers);
-            if (!visibility.isVisible) return false;
-            if (visibility.distance > maxSightRange) return false;
-            if (visibility.angle > fov) return false;
-            return true;
-        }
-
-        public float GetObstacleDistanceInDirection(Vector3 position, Vector3 direction, int ignoreLayers)
-        {
-            return !Physics.Raycast(position, direction, out var hit, maxSightRange, ignoreLayers)
-                ? maxSightRange
-                : hit.distance;
-        }
-
-        public Vector3 GetLookDirection()
-        {
-            return head.transform.forward;
         }
     }
 }

@@ -11,6 +11,10 @@ using Random = UnityEngine.Random;
 // Current version is this one!
 namespace AI.Behaviours.Actions
 {
+    /// <summary>
+    /// Lets the entity look around while moving. How much it can rotate the view depends on the
+    /// <see cref="CuriosityLevel"/>
+    /// </summary>
     [Serializable]
     public class LookAround : Action
     {
@@ -126,7 +130,7 @@ namespace AI.Behaviours.Actions
                 lookPoint = transform.position + newDirection * 100;
             }
 
-            sightController.LookAtPoint(lookPoint, 0.3f);
+            sightController.LookAtPoint(lookPoint);
             return TaskStatus.Running;
         }
 

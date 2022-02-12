@@ -11,10 +11,14 @@ using Action = BehaviorDesigner.Runtime.Tasks.Action;
 
 namespace AI.Behaviours.Actions
 {
+    /// <summary>
+    /// Fight using the gun currently equipped.
+    /// </summary>
     [Serializable]
-    public class UseChosenGun : Action
+    public class UseEquippedGun : Action
     {
-        private const float UPDATE_INTERVAL = 0.5f;
+        // Time (in seconds) after which recalculating the aim delay.
+        private const float AIM_UPDATE_INTERVAL = 0.5f;
         [SerializeField] private int lookBackFrames = -3;
         [SerializeField] private int lookAheadFrames = 3;
         [SerializeField] private float lookAheadTimeStep = 0.3f;
@@ -59,12 +63,12 @@ namespace AI.Behaviours.Actions
             {
                 previousReflexDelay = targetReflexDelay;
                 targetReflexDelay = (float) distribution.Generate();
-                nextDelayRecalculation = Time.time + UPDATE_INTERVAL;
+                nextDelayRecalculation = Time.time + AIM_UPDATE_INTERVAL;
             }
 
             var currentDelay =
                 previousReflexDelay + (targetReflexDelay - previousReflexDelay) *
-                (Time.time - (nextDelayRecalculation - UPDATE_INTERVAL)) / UPDATE_INTERVAL;
+                (Time.time - (nextDelayRecalculation - AIM_UPDATE_INTERVAL)) / AIM_UPDATE_INTERVAL;
 
             var lastSightedDelay = Time.time - lastSightedTime;
 
@@ -87,10 +91,9 @@ namespace AI.Behaviours.Actions
             return TaskStatus.Running;
         }
 
-        /**
-         * Tries to find the best position to aim at accounting for the weapon speed and the enemy estimated velocity.
-         * In case the weapon is a blast weapon, positions at the
-         */
+        
+        // Tries to find the best position to aim at accounting for the weapon speed and the enemy estimated velocity.
+        // In case the weapon is a blast weapon, aims at the floor.
         private void AimProjectileWeapon(Vector3 position, Vector3 velocity)
         {
             var projectileSpeed = gunManager.GetCurrentGunProjectileSpeed();
@@ -129,13 +132,15 @@ namespace AI.Behaviours.Actions
 
             var angle = sightController.LookAtPoint(chosenPoint);
 
-            if (angle < 10 && gunManager.CanCurrentGunShoot() && ShouldShootWeapon(chosenPoint, isGunBlast))
-            {
-                Debug.DrawRay(ourStartingPoint, sightController.GetHeadForward() * 100f, Color.blue, 2f);
-                gunManager.ShootCurrentGun();
-            }
+            if (!(angle < 10) || !gunManager.CanCurrentGunShoot() || !ShouldShootWeapon(chosenPoint, isGunBlast)) 
+                return;
+            Debug.DrawRay(ourStartingPoint, sightController.GetHeadForward() * 100f, Color.blue, 2f);
+            gunManager.ShootCurrentGun();
         }
 
+        
+        // Tries to find the best position to aim given that the weapon hits immediately.
+        // In case the weapon is a blast weapon, aims at the floor.
         private void AimRaycastWeapon(Vector3 position, float lastSightedTime)
         {
             // TODO Do not shoot if outside of gun range
@@ -144,8 +149,6 @@ namespace AI.Behaviours.Actions
                 // We don't see the enemy and we are not using a blast weapon, do not shoot.
                 return;
 
-            // TODO Understand angle... I should avoid shooting if I am using a blast weapon and the position in 
-            // front of me is too close!
             if (angle < 10 && gunManager.CanCurrentGunShoot() &&
                 ShouldShootWeapon(position, gunManager.IsCurrentGunBlastWeapon()))
                 gunManager.ShootCurrentGun();

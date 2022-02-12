@@ -7,6 +7,10 @@ using UnityEngine;
 
 namespace AI.Behaviours.Conditions
 {
+    /// <summary>
+    /// Detects whether there is a rocket to dodge and, saving it and returning Success in case there is or returning
+    /// Failure otherwise.
+    /// </summary>
     [Serializable]
     public class HasRocketToDodge : Conditional
     {
@@ -44,6 +48,7 @@ namespace AI.Behaviours.Conditions
             return TaskStatus.Success;
         }
 
+        // Finds if there is any rocket in view which is not mine and needs to be dodged.
         private Projectile FindRocketToDodge()
         {
             Projectile projectileToDodge = null;
@@ -80,7 +85,7 @@ namespace AI.Behaviours.Conditions
 
                 var projectileTransform = projectile.transform;
 
-                if (!sightSensor.CanSeeObject(projectileTransform, Physics.DefaultRaycastLayers))
+                if (!sightSensor.CanSeeObject(projectileTransform))
                     // Cannot react to rockets I do not see!
                     continue;
 

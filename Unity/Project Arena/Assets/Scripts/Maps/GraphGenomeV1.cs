@@ -4,6 +4,7 @@ using Graph;
 
 namespace Maps
 {
+    // TODO Improve
     public class GraphGenomeV1
     {
         public readonly int columnSeparationWidth; // DO NOT CHANGE during evolution

@@ -9,6 +9,10 @@ using Random = UnityEngine.Random;
 
 namespace AI.Behaviours.Actions
 {
+    /// <summary>
+    /// Attempts to estimated the current position of an enemy after it was lost.
+    /// The higher the prediction score of the enemy, the more likely the prediction is correct.
+    /// </summary>
     [Serializable]
     public class PredictTargetPosition : Action
     {

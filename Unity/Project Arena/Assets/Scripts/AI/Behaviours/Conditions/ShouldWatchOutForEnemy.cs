@@ -1,8 +1,13 @@
+using System;
 using AI.AI.Layer1;
 using BehaviorDesigner.Runtime.Tasks;
 
 namespace AI.Behaviours.Conditions
 {
+    /// <summary>
+    /// Returns Success if we have taken damage recently and should react about it, Failure otherwise.
+    /// </summary>
+    [Serializable]
     public class ShouldWatchOutForEnemy : Conditional
     {
         private DamageSensor damageSensor;

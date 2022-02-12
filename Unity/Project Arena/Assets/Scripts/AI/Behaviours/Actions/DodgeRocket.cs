@@ -8,6 +8,9 @@ using Action = BehaviorDesigner.Runtime.Tasks.Action;
 
 namespace AI.Behaviours.Actions
 {
+    /// <summary>
+    /// Attempts to dodge the rocket specified.
+    /// </summary>
     [Serializable]
     public class DodgeRocket : Action
     {

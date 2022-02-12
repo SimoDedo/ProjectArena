@@ -1,8 +1,13 @@
+using System;
 using AI.AI.Layer2;
 using BehaviorDesigner.Runtime.Tasks;
 
 namespace AI.Behaviours.Conditions
 {
+    /// <summary>
+    /// Returns Success if we should fight the enemy, Failure otherwise.
+    /// </summary>
+    [Serializable]
     public class ShouldFight : Conditional
     {
         private AIEntity entity;

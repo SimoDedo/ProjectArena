@@ -4,7 +4,6 @@ using AI.AI.Layer2;
 using AI.AI.Layer3;
 using AI.GoalMachine;
 using Entity.Component;
-using JetBrains.Annotations;
 using Logging;
 using Managers.Mode;
 using Others;
@@ -12,52 +11,87 @@ using Pickables;
 using UnityEngine;
 using Utils;
 
+// TODO Move logging logic to another component?
+
 namespace AI
 {
     /// <summary>
-    ///     Class representing an entity which is played by a bot.
+    /// Characteristics of a bot
     /// </summary>
-
-    // List of characteristics of a bot:
-// Movement: How good the bot is to move around when fighting.
-// Curiosity: How much the bot looks around himself when wandering
-// Aim: How good is the player aim
-// Hoarder: How likely is the bot to move towards a collectible even during other actions
-// Aggressiveness: How aggressively the bot plays, ignoring its own safety
-// Camp: How much the bot tends to stay in the same place
-// Weapon preference: how much a bot likes a specific weapon. 
-// Reflexes: How quick the player reacts to events
-// Premonition: How likely the player is at correctly guessing a lost target position
-
-// Aside from reflexes, all the other properties fall in [0-1] range
     [Serializable]
     public struct BotCharacteristics
     {
+        /// <summary>
+        /// Speed of the bot.
+        /// </summary>
         [Header("Movement parameters")] [SerializeField]
         public float speed;
 
+        /// <summary>
+        /// Ability of the bot to move tactically during a fight.
+        /// </summary>
         [SerializeField] public FightingMovementSkill movementSkill;
 
+        /// <summary>
+        /// Field of view of the bot.
+        /// </summary>
         [Header("Sight parameters")] [SerializeField]
         public float fov;
 
+        /// <summary>
+        /// Maximum angular speed of the bot view.
+        /// </summary>
         [SerializeField] public float maxCameraSpeed;
+
+        /// <summary>
+        /// Maximum angular acceleration of the bot view.
+        /// </summary>
         [SerializeField] public float maxCameraAcceleration;
 
+        /// <summary>
+        /// Maximum sight range of the bot.
+        /// </summary>
         [Header("Target reaction parameter")] [SerializeField]
         public float maxRange;
 
+        /// <summary>
+        /// Length (in second) of the bot memory for target sighting info.
+        /// </summary>
         [SerializeField] public float memoryWindow;
+    
+        /// <summary>
+        /// Lenght (in second) of the most recent interval of time in which to search for enemy actual detection.  
+        /// </summary>
         [SerializeField] public float detectionWindow;
+        
+        /// <summary>
+        /// (Non-consecutive) time in seconds that the enemy must be sighted before it is detected.
+        /// </summary>
         [SerializeField] public float timeBeforeCanReact;
 
+        /// <summary>
+        /// Entity tendency to look around when moving.
+        /// </summary>
         [Header("Others")] [SerializeField] public CuriosityLevel curiosity;
+
+        /// <summary>
+        /// Ability of the both to predict exactly where an enemy he is following is.
+        /// </summary>
         [SerializeField] [Range(0f, 1f)] public float predictionSkill;
+        
+        /// <summary>
+        /// Ability of the bot to aim at a target.
+        /// </summary>
         [SerializeField] [Range(0f, 1f)] public float aimingSkill;
 
-        // For how long the entity remains wary after receiving damage
-        [SerializeField] public float recentDamageTimeout;
+        /// <summary>
+        /// For how long the entity remains wary after receiving damage
+        /// </summary>
+            [SerializeField] public float recentDamageTimeout;
 
+        /// <summary>
+        /// Default characteristics of a bot. Average abilities all around.
+        /// </summary>
         public static BotCharacteristics Default =>
             new BotCharacteristics
             {
@@ -77,22 +111,31 @@ namespace AI
             };
     }
 
+    /// <summary>
+    /// Determines how the bot is able to move when fighting an enemy.
+    /// </summary>
     public enum FightingMovementSkill
     {
-        StandStill,
-        MoveStraight,
-        CircleStrife,
-        CircleStrifeChangeDirection
+        StandStill, // Cannot move and aim at the same time.
+        MoveStraight, // Can move, but only toward / away from the target in a straight line.
+        CircleStrife, // Can strife around the target, but only in one direction.
+        CircleStrifeChangeDirection // Can strife around the target, changing direction if necessary.
     }
 
+    /// <summary>
+    /// Determines how much the bot tends to look around when moving.
+    /// </summary>
     public enum CuriosityLevel
     {
-        Low,
-        Medium,
-        High
+        Low, // The bot only looks forward.
+        Medium, // The bot looks forward and at the sides.
+        High // The bot looks all around itself.
     }
 
 
+    /// <summary>
+    /// Class representing an entity which is played by a bot.
+    /// </summary>
     public class AIEntity : Entity.Entity, ILoggable
     {
         [SerializeField] private GameObject head;
@@ -101,13 +144,11 @@ namespace AI
 
         [SerializeField] private BotState botState;
 
-        [SerializeField] [NotNull] private Entity.Entity enemy;
+        [SerializeField] private Entity.Entity enemy;
 
         private bool enemyInSightPreviously;
 
-        /// <summary>
-        ///     Time end last fight event or first respawn time
-        /// </summary>
+        /// Time end last fight event or first respawn time
         private float engageIntervalStartTime;
 
         private IGoalMachine goalMachine;
@@ -197,63 +238,59 @@ namespace AI
                     TargetKb.Reset();
                 else
                     TargetKb.Update();
-                MapKnowledge.Update();
+                if (MapKnowledge.CanBeUsed) MapKnowledge.Update();
                 PickupKnowledgeBase.Update();
                 // Important: Pickup planner must be updated after pickup knowledge base
                 PickupPlanner.Update();
                 goalMachine.Update();
             }
 
-            if (loggedFirstRespawn)
+            if (!loggedFirstRespawn) return;
+            if (previousFightStatus != IsFocusingOnEnemy)
             {
-                if (previousFightStatus != IsFocusingOnEnemy)
+                // Changed fighting status this turn!
+                if (!IsFocusingOnEnemy)
                 {
-                    // Changed fighting status this turn!
-                    if (!IsFocusingOnEnemy)
+                    engageIntervalStartTime = Time.time;
+                    totalTimeInFight += Time.time - startFightEventTime;
+                    numberOfFights++;
+                    if (enemy.IsAlive)
                     {
-                        engageIntervalStartTime = Time.time;
-                        totalTimeInFight += Time.time - startFightEventTime;
-                        numberOfFights++;
-                        if (enemy.IsAlive)
-                        {
-                            totalTimeToSurrender +=
-                                Time.time - Mathf.Max(startFightEventTime, TargetKb.LastTimeDetected);
-                            numberOfRetreats++;
-                        }
-                    }
-                    else
-                    {
-                        totalTimeToEngage += Time.time - engageIntervalStartTime;
-                        startFightEventTime = Time.time;
-
-                        // First detection status of this fight!
-                        enemyInSightPreviously = TargetKb.HasSeenTarget();
-                        previousDetectionTime = TargetKb.LastTimeDetected;
+                        totalTimeToSurrender +=
+                            Time.time - Mathf.Max(startFightEventTime, TargetKb.LastTimeDetected);
+                        numberOfRetreats++;
                     }
                 }
-                else if (IsFocusingOnEnemy)
+                else
                 {
-                    // We are in a fight event, so keep track of everything needed
-                    var isEnemyInSightNow = TargetKb.HasSeenTarget();
-                    if (isEnemyInSightNow && !enemyInSightPreviously)
-                        // Update time between sights, but only if enemy was lost in this event
-                        if (startFightEventTime <= previousDetectionTime)
-                            totalTimeBetweenSights += Time.time - previousDetectionTime;
+                    totalTimeToEngage += Time.time - engageIntervalStartTime;
+                    startFightEventTime = Time.time;
 
+                    // First detection status of this fight!
+                    enemyInSightPreviously = TargetKb.HasSeenTarget();
                     previousDetectionTime = TargetKb.LastTimeDetected;
-                    enemyInSightPreviously = isEnemyInSightNow;
                 }
+            }
+            else if (IsFocusingOnEnemy)
+            {
+                // We are in a fight event, so keep track of everything needed
+                var isEnemyInSightNow = TargetKb.HasSeenTarget();
+                if (isEnemyInSightNow && !enemyInSightPreviously)
+                    // Update time between sights, but only if enemy was lost in this event
+                    if (startFightEventTime <= previousDetectionTime)
+                        totalTimeBetweenSights += Time.time - previousDetectionTime;
+
+                previousDetectionTime = TargetKb.LastTimeDetected;
+                enemyInSightPreviously = isEnemyInSightNow;
             }
         }
 
         private void LateUpdate()
         {
-            if (inGame && mustProcessDeath)
-            {
-                mustProcessDeath = false;
-                // Kill the entity.
-                Die(killerId);
-            }
+            if (!inGame || !mustProcessDeath) return;
+            mustProcessDeath = false;
+            // Kill the entity.
+            Die(killerId);
         }
 
         public void SetupLogging()
@@ -261,6 +298,7 @@ namespace AI
             loggingGame = true;
         }
 
+        // Prepares all the AI components
         private void PrepareComponents(GameManager gms, bool[] ag)
         {
             MovementController = new MovementController(this, botParams.speed);
@@ -287,8 +325,6 @@ namespace AI
             GunManager.Prepare(gms, this, null, ag);
             TargetKb.Prepare();
             PickupKnowledgeBase.Prepare();
-            SightController.Prepare();
-            SightSensor.Prepare();
             MovementController.Prepare();
             PickupPlanner.Prepare();
         }
@@ -297,14 +333,10 @@ namespace AI
         {
             PrepareComponents(gms, ag);
             gameManagerScript = gms;
-
             totalHealth = th;
             Health = th;
             entityID = id;
-
-
             GunManager.TryEquipGun(GunManager.FindLowestActiveGun());
-
             var position = transform.position;
             SpawnInfoGameEvent.Instance.Raise(
                 new SpawnInfo {x = position.x, z = position.z, entityId = entityID, spawnEntity = gameObject.name}
@@ -313,35 +345,29 @@ namespace AI
 
         public override void TakeDamage(int damage, int killerID)
         {
-            if (inGame)
-            {
-                Health -= damage;
-                var position = transform.position;
-                HitInfoGameEvent.Instance.Raise(
-                    new HitInfo
-                    {
-                        damage = damage,
-                        hitEntityID = entityID,
-                        hitEntity = gameObject.name,
-                        hitterEntityID = killerID,
-                        hitterEntity = "Player " + killerID,
-                        x = position.x,
-                        z = position.z
-                    }
-                );
-                if (killerID != entityID)
-                    // We just got damaged and it was not self-inflicted, we might need to search the enemy.
-                    DamageSensor.GotDamaged();
+            if (!inGame) return;
+            Health -= damage;
+            var position = transform.position;
+            HitInfoGameEvent.Instance.Raise(
+                new HitInfo
+                {
+                    damage = damage,
+                    hitEntityID = entityID,
+                    hitEntity = gameObject.name,
+                    hitterEntityID = killerID,
+                    hitterEntity = "Player " + killerID,
+                    x = position.x,
+                    z = position.z
+                }
+            );
+            if (killerID != entityID)
+                // We just got damaged and it was not self-inflicted, we might need to search the enemy.
+                DamageSensor.GotDamaged();
 
-                if (Health <= 0)
-                    // Health = 0;
-                    // TODO What if multiple entities kill the same one on the same frame?
-                    // TODO What if I get killed but in my last frame I pickup a medkit?
-                    if (!mustProcessDeath)
-                    {
-                        mustProcessDeath = true;
-                        killerId = killerID;
-                    }
+            if (Health <= 0 && !mustProcessDeath)
+            {
+                mustProcessDeath = true;
+                killerId = killerID;
             }
         }
 
@@ -443,40 +469,57 @@ namespace AI
                 );
         }
 
+        /// <summary>
+        /// Returns the curiosity level of the entity.
+        /// </summary>
         public CuriosityLevel GetCuriosity()
         {
             return botParams.curiosity;
         }
 
+        /// <summary>
+        /// Returns the prediction skill of the entity.
+        /// </summary>
         public float GetPredictionSkill()
         {
             return botParams.predictionSkill;
         }
 
+        /// <summary>
+        /// Returns the enemy of this entity.
+        /// </summary>
         public Entity.Entity GetEnemy()
         {
             return enemy;
         }
 
+        /// <summary>
+        /// Sets the enemy of this entity. Use this before a call to <see cref="SetupEntity"/>
+        /// </summary>
         public void SetEnemy(Entity.Entity enemy)
         {
             this.enemy = enemy;
         }
 
+        /// <summary>
+        /// Returns the aiming skill of the entity.
+        /// </summary>
         public float GetAimingSkill()
         {
             return botParams.aimingSkill;
         }
 
 
-        // Won't work if bot was already set up.
+        /// <summary>
+        /// Sets the characteristics of the bot. Must be used before calling <see cref="SetupEntity"/>
+        /// </summary>
         public void SetCharacteristics(BotCharacteristics botParams)
         {
             this.botParams = botParams;
         }
     }
 
-// TODO Define BotState contents (health, ammo, current target, timeouts for stuff, ...)
+    // TODO Define BotState contents (health, ammo, current target, timeouts for stuff, ...) or remove this...
     [Serializable]
     public class BotState
     {

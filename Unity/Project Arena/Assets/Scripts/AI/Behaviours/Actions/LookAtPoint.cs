@@ -8,6 +8,9 @@ using Action = BehaviorDesigner.Runtime.Tasks.Action;
 
 namespace AI.Behaviours.Actions
 {
+    /// <summary>
+    /// Looks at the specified point.
+    /// </summary>
     [Serializable]
     public class LookAtPoint : Action
     {

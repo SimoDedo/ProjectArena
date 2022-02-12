@@ -12,6 +12,9 @@ using Random = UnityEngine.Random;
 
 namespace AI.Behaviours.Actions
 {
+    /// <summary>
+    /// Selects a wander destination. Can be used when the better <see cref="SelectAreaToVisit"/> cannot be used.
+    /// </summary>
     [Serializable]
     public class SelectWanderDestination : Action
     {

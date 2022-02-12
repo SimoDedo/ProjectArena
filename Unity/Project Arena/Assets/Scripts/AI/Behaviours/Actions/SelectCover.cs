@@ -10,7 +10,9 @@ using Random = UnityEngine.Random;
 
 namespace AI.Behaviours.Actions
 {
-    // For the purpose of this class, a cover is any position from where the enemy cannot be seen.
+    /// <summary>
+    /// Selects a cover position. Any position from which the enemy cannot be seen is considered a cover.
+    /// </summary>
     [Serializable]
     public class SelectCover : Action
     {

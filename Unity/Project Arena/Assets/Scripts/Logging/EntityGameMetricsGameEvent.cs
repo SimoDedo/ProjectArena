@@ -2,6 +2,9 @@ using ScriptableObjectArchitecture;
 
 namespace Logging
 {
+    /// <summary>
+    /// Represents the game metrics as calculated by an entity.
+    /// </summary>
     public struct GameMetrics
     {
         public int entityId;

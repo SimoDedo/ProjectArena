@@ -1,11 +1,18 @@
+using System;
 using BehaviorDesigner.Runtime.Tasks;
 using Entity.Component;
 using UnityEngine;
+using Action = BehaviorDesigner.Runtime.Tasks.Action;
+using Random = UnityEngine.Random;
 
 namespace AI.Behaviours.Actions
 {
     // TODO Associate skill to prevent n00b players from reloading like this
-    // TODO Should probably add activation chance so that we don't just start reloading every other second
+
+    /// <summary>
+    /// Reloads weapons if needed, but not necessarily every time.
+    /// </summary>
+    [Serializable]
     public class ReloadWeapons : Action
     {
         private const float TIMEOUT = 1.5f;

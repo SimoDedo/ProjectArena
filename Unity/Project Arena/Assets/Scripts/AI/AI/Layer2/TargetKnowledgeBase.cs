@@ -7,12 +7,21 @@ using UnityEngine;
 namespace AI.AI.Layer2
 {
     /// <summary>
-    ///     The TargetKnowledgeBase should allow us to know when the enemy is spotted and we can react to it or
-    ///     when the enemy was instead lost.
-    ///     - Enemy spotted: The enemy was sighted for at least nonConsecutiveTimeBeforeReaction seconds in the last
-    ///     memoryWindow seconds
-    ///     - Enemy lost: The enemy is not currently spotted, but it was X seconds ago.
+    /// This component keeps track of when the provided target was visibile and when we should consider they
+    /// as spotted or lost.
+    ///
+    /// Detection or loss of the enemy is based around the following concepts:
+    /// - Memory window: interval of time, starting from the current instant and going back, for which detection
+    ///   events are remembered. Older events are discarded;
+    /// - Detection window: interval of time, starting from the current instant and going back, for which sighting
+    ///   of the enemy contributes to determining if the enemy is actually detected or not.
+    /// - Detection: An enemy is detected if it is sight during the detection window for a sufficient amount of time.
+    ///   Each sight event has a weight based on how close the enemy was (the closer, the more relevant the sighting).
+    /// - Loss: An enemy is lost if if is not detected considering only the events in the detection window, but it is
+    ///   detected when considering the whole memory window.
     /// </summary>
+    
+    // TODO maybe separate responsibility of enemy knowledge vs extraction of info (e.g. can react to enemy).
     public class TargetKnowledgeBase
     {
         private static readonly AnimationCurve DistanceScore = new AnimationCurve(
@@ -23,71 +32,64 @@ namespace AI.AI.Layer2
         );
 
         /// <summary>
-        ///     TODO Define this better!
-        ///     Tempo massimo in cui andare indietro per cercare avvistamenti del nemico / tempo limite passato il quale
-        ///     calcolare se abbiamo perso o meno il nemico cercando di vedere se era visibile prima di questo tempo
+        /// Length of the detection window (in seconds).
         /// </summary>
-        private readonly float detectionWindow;
+        private readonly float detectionWindowLenght;
 
-        /// <summary>
-        ///     The entity this component belongs to
-        /// </summary>
+        // The entity this component belongs to.
         private readonly AIEntity me;
 
-        /// <summary>
-        ///     Size (in seconds) of the memory of this component. Detection event older than this will be forgotten.
-        /// </summary>
-        private readonly float memoryWindow;
+        // Lenght of the memory window (in seconds).
+        private readonly float memoryWindowLength;
 
-        /// <summary>
-        ///     Total time (in the detection window) that the enemy must be seen before declaring that
-        ///     we can detect it.
-        /// </summary>
+        // Total time (in the detection window) that the enemy must be seen in the detection interval before declaring
+        // tha we can detect it.
         private readonly float nonConsecutiveTimeBeforeReaction;
 
-        /// <summary>
-        ///     The target that must be spotted
-        /// </summary>
+        // The target that must be spotted
         private readonly Entity.Entity target;
 
-        /// <summary>
-        ///     List of visibility data gathered so far, excluding data older than memoryWindow
-        /// </summary>
+        // List of visibility data gathered so far, excluding data older than memoryWindow
         private readonly List<VisibilityInInterval> results = new List<VisibilityInInterval>();
 
-        /// <summary>
-        ///     The sensor used to detect the target presence
-        /// </summary>
+        /// The sensor used to detect the target presence
         private SightSensor sensor;
 
         public TargetKnowledgeBase(
             AIEntity me,
             Entity.Entity target,
-            float memoryWindow,
-            float detectionWindow,
+            float memoryWindowLength,
+            float detectionWindowLenght,
             float nonConsecutiveTimeBeforeReaction
         )
         {
             this.target = target;
-            this.memoryWindow = memoryWindow;
-            this.detectionWindow = detectionWindow;
+            this.memoryWindowLength = memoryWindowLength;
+            this.detectionWindowLenght = detectionWindowLenght;
             this.nonConsecutiveTimeBeforeReaction = nonConsecutiveTimeBeforeReaction;
             this.me = me;
         }
 
+        /// <summary>
+        /// Stores the last time the enemy was considered detected.
+        /// </summary>
         public float LastTimeDetected { get; private set; } = float.MinValue;
 
+        // Finishes preparing the componet.
         public void Prepare()
         {
             sensor = me.SightSensor;
         }
 
+        /// <summary>
+        /// Updates the target knowledge base by checking if the target is sighted or not.
+        /// </summary>
         public void Update()
         {
             var targetTransform = target.transform;
             // TODO Understand if this can be removed to avoid magically knowing enemy position when sneaking behind
             var isTargetClose = target.IsAlive && (targetTransform.position - me.transform.position).sqrMagnitude < 10;
-            var result = isTargetClose || sensor.CanSeeObject(targetTransform, Physics.DefaultRaycastLayers);
+            var result = isTargetClose || sensor.CanSeeObject(targetTransform);
 
             var score = 0f;
             if (result)
@@ -112,30 +114,43 @@ namespace AI.AI.Layer2
             if (HasSeenTarget()) LastTimeDetected = Time.time;
         }
 
+        /// <summary>
+        /// Forgets all detection data.
+        /// </summary>
         public void Reset()
         {
             results.Clear();
+            LastTimeDetected = float.MinValue;
         }
 
+        /// <summary>
+        /// Returns whether we consider the target as detected.
+        /// </summary>
         public bool HasSeenTarget()
         {
-            if (!target.IsAlive) return false;
-            return TestDetection(
-                Time.time - detectionWindow,
-                Time.time
-            );
+            if (!target.IsAlive)
+            {
+                // If the enemy is not alive, immediately stop considering it as detected.
+                return false;
+            }
+            return TestDetection(Time.time - detectionWindowLenght, Time.time);
         }
 
+
+        /// <summary>
+        /// Returns whether we consider the target as lost.
+        /// </summary>
         public bool HasLostTarget()
         {
             if (!target.IsAlive) return false;
-            return !HasSeenTarget() && TestDetection(Time.time - memoryWindow, Time.time - detectionWindow);
+            return !HasSeenTarget() && TestDetection(Time.time - memoryWindowLength, Time.time - detectionWindowLenght);
         }
 
+        // Forgets data which doesn't fit the memory window.
         private void ForgetOldData()
         {
             // Remove all data which is too old
-            var firstIndexToKeep = results.FindIndex(it => it.endTime > Time.time - memoryWindow);
+            var firstIndexToKeep = results.FindIndex(it => it.endTime > Time.time - memoryWindowLength);
             if (firstIndexToKeep == -1)
             {
                 // Nothing to keep
@@ -145,10 +160,11 @@ namespace AI.AI.Layer2
 
             results.RemoveRange(0, firstIndexToKeep);
             var first = results.First();
-            first.startTime = Mathf.Max(first.startTime, Time.time - memoryWindow);
+            first.startTime = Mathf.Max(first.startTime, Time.time - memoryWindowLength);
         }
 
 
+        // Tests detection in the interval specified.
         private bool TestDetection(float beginTime, float endTime)
         {
             var totalTimeVisible = 0f;
@@ -170,7 +186,7 @@ namespace AI.AI.Layer2
         }
 
         /// <summary>
-        ///     Represents whether the target was visible during the interval specified.
+        /// Represents whether the target was visible during the interval specified.
         /// </summary>
         private class VisibilityInInterval
         {

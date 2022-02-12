@@ -6,6 +6,10 @@ using UnityEngine;
 
 namespace AI.Behaviours.Conditions
 {
+    /// <summary>
+    /// Returns Success if the cover position is still valid (that is, there is an obstacle between the position and the enemy),
+    /// Failure otherwise.
+    /// </summary>
     [Serializable]
     public class IsCoverStillValid : Conditional
     {

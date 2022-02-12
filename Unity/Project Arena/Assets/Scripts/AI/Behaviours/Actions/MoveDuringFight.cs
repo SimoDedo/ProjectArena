@@ -10,6 +10,10 @@ using Random = UnityEngine.Random;
 
 namespace AI.Behaviours.Actions
 {
+    /// <summary>
+    /// Handles moving during fight. How tactical the movement is (e.g. strifing) depends on the
+    /// <see cref="FightingMovementSkill"/>
+    /// </summary>
     [Serializable]
     public class MoveDuringFight : Action
     {

@@ -5,6 +5,7 @@ using UnityEngine;
 
 // TODO the circularQueue is dependent on the FPS of the game. Bad refresh rate will cause the positions
 // to go even more in the past
+// TODO Maybe remove this. Let the target knowledge base keep track of the last known enemy positions instead.
 namespace Entity
 {
     public class PositionTracker : MonoBehaviour
@@ -12,7 +13,6 @@ namespace Entity
         private const float MEMORY_WINDOW = 0.5f;
         private const float MEMORY_WINDOW_END_WEIGHT = 10;
 
-        // Considering 60 FPS, we save position up to the half a second ago
         private List<Tuple<Vector3, float>> positions = new List<Tuple<Vector3, float>>();
         private Transform t;
 

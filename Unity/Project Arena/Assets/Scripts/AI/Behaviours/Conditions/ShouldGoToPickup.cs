@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace AI.Behaviours.Conditions
 {
+    /// <summary>
+    /// Returns Success if we should go to the pickup, Running otherwise
+    /// </summary>
     [Serializable]
     public class ShouldGoToPickup : Conditional
     {

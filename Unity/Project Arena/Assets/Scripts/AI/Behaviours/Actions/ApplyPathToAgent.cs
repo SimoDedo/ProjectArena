@@ -7,6 +7,10 @@ using Action = BehaviorDesigner.Runtime.Tasks.Action;
 
 namespace AI.Behaviours.Actions
 {
+    /// <summary>
+    /// Applies the path given in pathToApply to the agent, returning Running while the destination has not been reached
+    ///   and Success after.
+    /// </summary>
     [Serializable]
     public class ApplyPathToAgent : Action
     {

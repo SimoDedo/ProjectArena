@@ -10,6 +10,10 @@ using Random = UnityEngine.Random;
 
 namespace AI.Behaviours.Actions
 {
+    /// <summary>
+    /// Calculates a possible location where to camp given the position around which to camp.
+    /// Camping locations are chosen in order to circle around the spot.
+    /// </summary>
     [Serializable]
     public class CalculateCampDestination : Action
     {

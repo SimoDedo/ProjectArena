@@ -3,8 +3,12 @@ using UnityEngine;
 
 namespace AI.AI.Layer1
 {
+    /// <summary>
+    /// This component deals with rotating the view of the entity.
+    /// </summary>
     public class SightController
     {
+        private const float LOOK_STRAIGHT_DISTANCE = 10f;
         private readonly Transform bodyTransform;
         private readonly GameObject head;
         private readonly float maxAcceleration;
@@ -13,12 +17,7 @@ namespace AI.AI.Layer1
         private float currentHeadSpeed;
         private float inputPenalty = 1f;
 
-        public SightController(
-            AIEntity entity,
-            GameObject head,
-            float maxSpeed,
-            float maxAcceleration
-        )
+        public SightController(AIEntity entity, GameObject head, float maxSpeed, float maxAcceleration)
         {
             bodyTransform = entity.transform;
             this.head = head;
@@ -26,30 +25,21 @@ namespace AI.AI.Layer1
             this.maxAcceleration = maxAcceleration;
         }
 
-        public void Prepare() { /* Nothing to do */ }
-
         /// <summary>
         /// This functions rotates head and body of the entity in order to look at the provided target.
         /// The rotation is subjected to the limitation given by the sensibility of the camera, so it might
         /// not be possible to immediately look at the target
         /// </summary>
-        /// <param name="target">The point to look</param>
-        /// <param name="sensibilityAdjustment">The speed change to use when moving</param>ù
-        /// <param name="forceLookStraightWhenClose"></param>
-        /// <returns>The angle between the new look direction and the target</returns>
-        /// 
-        public float LookAtPoint(
-            Vector3 target,
-            float sensibilityAdjustment = 1f,
-            bool forceLookStraightWhenClose = true
-        )
+        /// <param name="target">The point to look.</param>
+        /// <param name="forceLookStraightWhenClose"> HOT FIX: prevents looking up or down when getting close to the
+        ///   point we want to look.</param>
+        /// <returns>The angle between the new look direction and the target.</returns>
+        public float LookAtPoint(Vector3 target, bool forceLookStraightWhenClose = true)
         {
             var headTransform = head.transform;
             var position = headTransform.position;
-
-            var distance = (target - position).magnitude;
-
-            if (distance < 10 && forceLookStraightWhenClose) target.y = position.y;
+            if (forceLookStraightWhenClose && (target - position).magnitude < LOOK_STRAIGHT_DISTANCE)
+                target.y = position.y;
 
             var direction = (target - position).normalized;
             var rotation = Quaternion.LookRotation(direction);
@@ -69,8 +59,6 @@ namespace AI.AI.Layer1
             currentBodySpeed = CalculateNewSpeed(angles.y, currentHeadAngles.y, currentBodySpeed);
             currentHeadSpeed = CalculateNewSpeed(angles.x, currentHeadAngles.x, currentHeadSpeed);
 
-            // Debug.Log(gameObject.name + " new speeds: " + currentBodySpeed + ", " + currentHeadSpeed);
-
             var maxAngleBody = Math.Abs(currentBodySpeed * Time.deltaTime);
             var maxAngleHead = Math.Abs(currentHeadSpeed * Time.deltaTime);
 
@@ -80,18 +68,17 @@ namespace AI.AI.Layer1
             headTransform.localRotation = newHeadRotation;
             bodyTransform.localRotation = newBodyRotation;
 
-            // Debug.DrawRay(head.transform.position, headTransform.forward, Color.green);
-            // Debug.DrawLine(head.transform.position, target, Color.blue);
             return Vector3.Angle(headTransform.forward, direction);
         }
 
+        // Calculate the next angular velocity given the target angle, the actual one and the actual speed. 
         private float CalculateNewSpeed(float target, float actual, float previousSpeed)
         {
             var clampedAcceleration = maxAcceleration * inputPenalty;
             var angleToPerform = target - actual;
             var timeDeceleration = previousSpeed / clampedAcceleration;
             var angleDuringDeceleration = previousSpeed * timeDeceleration +
-                1f / 2f * clampedAcceleration * timeDeceleration * timeDeceleration;
+                                          1f / 2f * clampedAcceleration * timeDeceleration * timeDeceleration;
 
             if (Math.Abs(angleDuringDeceleration) < Math.Abs(angleToPerform))
             {
@@ -103,6 +90,7 @@ namespace AI.AI.Layer1
             return previousSpeed + Mathf.Sign(-previousSpeed) * clampedAcceleration * Time.deltaTime;
         }
 
+        // Converts an angle from (0,360) to (-180, 180).
         private static Vector3 ConvertTo180Based(Vector3 angles)
         {
             if (angles.x > 180f) angles.x -= 360f;
@@ -111,16 +99,20 @@ namespace AI.AI.Layer1
             return angles;
         }
 
+
+        // Sets slowdown of view
         public void SetInputPenalty(float inputPenalty)
         {
             this.inputPenalty = inputPenalty;
         }
 
+        // Returns the head position in global space.
         public Vector3 GetHeadPosition()
         {
             return head.transform.position;
         }
 
+        // Returns the current look direction of the head.
         public Vector3 GetHeadForward()
         {
             return head.transform.forward;

@@ -6,6 +6,9 @@ using Utils;
 
 namespace Tester
 {
+    /// <summary>
+    /// Collects game statistics events and compiles them into their final results.
+    /// </summary>
     public class GameResultsAnalyzer
     {
         private readonly int bot1ID;
