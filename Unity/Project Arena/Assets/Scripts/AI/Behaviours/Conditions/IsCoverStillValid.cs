@@ -7,7 +7,7 @@ using UnityEngine;
 namespace AI.Behaviours.Conditions
 {
     [Serializable]
-    public class IsCoverStillValid: Conditional
+    public class IsCoverStillValid : Conditional
     {
         [SerializeField] private SharedSelectedPathInfo pathInfo;
         private Entity.Entity enemy;
@@ -21,12 +21,10 @@ namespace AI.Behaviours.Conditions
 
         public override TaskStatus OnUpdate()
         {
-             if (!Physics.Linecast(finalPos, enemy.transform.position, out var hit) ||
+            if (!Physics.Linecast(finalPos, enemy.transform.position, out var hit) ||
                 hit.collider.gameObject == enemy.gameObject)
-            {
                 // We can see the enemy from that position, no good! 
                 return TaskStatus.Failure;
-            }
             return TaskStatus.Success;
         }
     }

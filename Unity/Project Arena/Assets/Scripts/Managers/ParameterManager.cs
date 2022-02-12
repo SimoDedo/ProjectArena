@@ -5,11 +5,17 @@ using UnityEngine;
 namespace Managers
 {
     /// <summary>
-    /// ParameterManager allows to exchange information between different scenes.
+    ///     ParameterManager allows to exchange information between different scenes.
     /// </summary>
-    public class ParameterManager : SceneSingleton<ParameterManager> {
-
-        public enum BuildVersion { COMPLETE, GAME_ONLY, EXPERIMENT_CONTROL, EXPERIMENT_ONLY };
+    public class ParameterManager : SceneSingleton<ParameterManager>
+    {
+        public enum BuildVersion
+        {
+            COMPLETE,
+            GAME_ONLY,
+            EXPERIMENT_CONTROL,
+            EXPERIMENT_ONLY
+        }
 
         // Map data.
         [HideInInspector] public int GenerationMode { get; set; }
@@ -41,7 +47,8 @@ namespace Managers
         [HideInInspector] public BuildVersion Version { get; set; }
         [HideInInspector] public string InitialScene { get; set; }
 
-        void Awake() {
+        private void Awake()
+        {
             ErrorCode = 0;
 
             GenerationMode = 0;
@@ -55,11 +62,9 @@ namespace Managers
             MaxSensibility = 2.75f;
             DefaultSensibility = 1.75f;
             WebSensibilityDownscale = 3f;
-        
-        
+
 
             DontDestroyOnLoad(transform.gameObject);
         }
-
     }
 }

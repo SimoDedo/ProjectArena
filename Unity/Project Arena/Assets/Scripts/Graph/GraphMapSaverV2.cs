@@ -21,9 +21,9 @@ namespace Graph
         [SerializeField] private string statsPrefix;
 
         [SerializeField] private int mapsToGenerate = 10;
+        private string experimentDirectory;
 
         private int mapsGenerated;
-        private string experimentDirectory;
 
         private void Start()
         {
@@ -33,7 +33,7 @@ namespace Graph
         }
 
         // Update is called once per frame
-        void Update()
+        private void Update()
         {
             if (mapsGenerated >= mapsToGenerate) return;
             var random = new Random(startingSeed++);
@@ -46,7 +46,7 @@ namespace Graph
             var properties = MapAnalyzer.CalculateGraphProperties(areas);
 
             MapAnalyzer.AddEverything(areas, map);
-        
+
             map = MapEdit.AddBorders(map, 5, 'w');
 
             var finalMap = MapUtils.GetStringFromCharMap(map);
@@ -55,11 +55,11 @@ namespace Graph
 
             if (properties.degreeAvg > 2.5f && properties.diameter > 60)
             {
-
                 var propertiesLog = JsonUtility.ToJson(properties);
 
                 File.WriteAllText(experimentDirectory + "/" + mapPrefix + "_" + mapsGenerated + ".txt", finalMap);
-                File.WriteAllText(experimentDirectory + "/" + statsPrefix + "_" + mapsGenerated + ".json", propertiesLog);
+                File.WriteAllText(experimentDirectory + "/" + statsPrefix + "_" + mapsGenerated + ".json",
+                    propertiesLog);
             }
 
             Debug.Log("DONE map " + mapsGenerated + "!");

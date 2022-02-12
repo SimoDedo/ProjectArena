@@ -9,9 +9,9 @@ using UnityEngine.Serialization;
 namespace Managers.Mode
 {
     /// <summary>
-    /// BotGameManager is an implementation of GameManager. The bot game mode consists in a deathmatch
-    /// between two bots. Each time a bot kills his opponent he scores one point. If a bot
-    /// kills himself he loses one point. Who has more points when time runs up wins.
+    ///     BotGameManager is an implementation of GameManager. The bot game mode consists in a deathmatch
+    ///     between two bots. Each time a bot kills his opponent he scores one point. If a bot
+    ///     kills himself he loses one point. Who has more points when time runs up wins.
     /// </summary>
     public class BotGameManager : GameManager
     {
@@ -27,21 +27,22 @@ namespace Managers.Mode
         [SerializeField] private bool[] activeGunsOpponent;
 
         [FormerlySerializedAs("mapTesting")] [SerializeField]
-        AIMapTestingLogger mapTestingLogger;
+        private AIMapTestingLogger mapTestingLogger;
 
         [Header("Duel variables")] [SerializeField]
         protected DuelGameUIManager duelGameUIManagerScript;
 
-        private AIEntity firstAI;
         [SerializeField] private string firstBotParamsFile = "bot1.json";
-        private AIEntity secondAI;
         [SerializeField] private string secondBotParamsFile = "bot2.json";
 
-        private int playerKillCount = 0;
-        private int opponentKillCount = 0;
+        private AIEntity firstAI;
+        private readonly int opponentID = 2;
+        private int opponentKillCount;
 
-        private int playerID = 1;
-        private int opponentID = 2;
+        private readonly int playerID = 1;
+
+        private int playerKillCount;
+        private AIEntity secondAI;
 
         private void Start()
         {
@@ -106,10 +107,7 @@ namespace Managers.Mode
         private static BotCharacteristics LoadBotCharacteristics(string botFilename)
         {
             var importPath = Application.persistentDataPath + "/Import";
-            if (!Directory.Exists(importPath))
-            {
-                Directory.CreateDirectory(importPath);
-            }
+            if (!Directory.Exists(importPath)) Directory.CreateDirectory(importPath);
 
             var filePath = importPath + "/" + botFilename;
             try
@@ -200,12 +198,9 @@ namespace Managers.Mode
                 case 1:
                     // Update the time.
                     duelGameUIManagerScript.SetTime((int) (startTime + readyDuration + gameDuration
-                        - Time.time));
+                                                           - Time.time));
                     // Pause or unpause if needed.
-                    if (Input.GetKeyDown(KeyCode.Escape))
-                    {
-                        Pause();
-                    }
+                    if (Input.GetKeyDown(KeyCode.Escape)) Pause();
 
                     break;
                 case 2:
@@ -220,24 +215,16 @@ namespace Managers.Mode
             if (killerIdentifier == killedID)
             {
                 if (killerIdentifier == playerID)
-                {
                     playerKillCount--;
-                }
                 else
-                {
                     opponentKillCount--;
-                }
             }
             else
             {
                 if (killerIdentifier == playerID)
-                {
                     playerKillCount++;
-                }
                 else
-                {
                     opponentKillCount++;
-                }
             }
 
             duelGameUIManagerScript.SetKills(playerKillCount, opponentKillCount);

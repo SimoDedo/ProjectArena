@@ -13,11 +13,12 @@ namespace AI.Behaviours.Actions
     public class PredictTargetPosition : Action
     {
         [SerializeField] private SharedSelectedPathInfo pathChosen;
-        private AIEntity entity;
         private Entity.Entity enemy;
+        private AIEntity entity;
+        private bool failedPreviousPrediction;
         private NavigationSystem navSystem;
         private float predictionSkill;
-        private bool failedPreviousPrediction;
+
         public override void OnAwake()
         {
             entity = GetComponent<AIEntity>();
@@ -40,10 +41,7 @@ namespace AI.Behaviours.Actions
             if (path.IsComplete())
             {
                 pathChosen.Value = path;
-                if (pathChosen.Value.corners.Length == 0)
-                {
-                    Debug.Log("NO");
-                }
+                if (pathChosen.Value.corners.Length == 0) Debug.Log("NO");
 
                 return TaskStatus.Success;
             }

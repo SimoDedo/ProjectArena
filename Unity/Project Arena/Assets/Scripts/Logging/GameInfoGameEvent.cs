@@ -8,7 +8,11 @@ namespace Logging
         public string scene;
     }
 
-    public class BaseGameInfoGameEvent : GameEventBase<GameInfo> { }
+    public class BaseGameInfoGameEvent : GameEventBase<GameInfo>
+    {
+    }
 
-    public sealed class GameInfoGameEvent : ScriptableObjectSingleton<BaseGameInfoGameEvent> { }
+    public sealed class GameInfoGameEvent : ScriptableObjectSingleton<BaseGameInfoGameEvent>
+    {
+    }
 }

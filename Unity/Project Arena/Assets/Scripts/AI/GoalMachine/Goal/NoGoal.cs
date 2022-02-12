@@ -7,10 +7,16 @@ namespace AI.GoalMachine.Goal
             return float.MinValue;
         }
 
-        public void Enter() { }
+        public void Enter()
+        {
+        }
 
-        public void Update() { }
+        public void Update()
+        {
+        }
 
-        public void Exit() { }
+        public void Exit()
+        {
+        }
     }
 }

@@ -5,10 +5,9 @@ namespace AI.GoalMachine
 {
     public class EntityGoalMachine : IGoalMachine
     {
-        private bool isIdle = true;
-        private int currentGoalIndex;
         private readonly IGoal[] goals;
-        private IGoal CurrentGoal => goals[currentGoalIndex];
+        private int currentGoalIndex;
+        private bool isIdle = true;
 
         public EntityGoalMachine(AIEntity entity)
         {
@@ -22,6 +21,8 @@ namespace AI.GoalMachine
             currentGoalIndex = 0;
             CurrentGoal.Enter();
         }
+
+        private IGoal CurrentGoal => goals[currentGoalIndex];
 
         public void Update()
         {

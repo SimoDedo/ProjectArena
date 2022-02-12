@@ -8,78 +8,32 @@ using UnityEngine;
 namespace Managers.Mode
 {
     /// <summary>
-    /// BotGameManager is an implementation of GameManager. The bot game mode consists in a deathmatch
-    /// between two bots. Each time a bot kills his opponent he scores one point. If a bot
-    /// kills himself he loses one point. Who has more points when time runs up wins.
+    ///     BotGameManager is an implementation of GameManager. The bot game mode consists in a deathmatch
+    ///     between two bots. Each time a bot kills his opponent he scores one point. If a bot
+    ///     kills himself he loses one point. Who has more points when time runs up wins.
     /// </summary>
     public class GraphTesterGameManager : GameManager
     {
         private const int TOTAL_HEALTH_BOT = 100;
         private bool[] activeGunsBot1;
-        private int bot1ID;
         private bool[] activeGunsBot2;
-        private int bot2ID;
-
-        private GameObject bot1;
-        private GameObject bot2;
-        private BotCharacteristics bot1Params;
-        private BotCharacteristics bot2Params;
 
         private AIEntity ai1;
         private AIEntity ai2;
 
-        private int playerKillCount;
+        private GameObject bot1;
+        private int bot1ID;
+        private BotCharacteristics bot1Params;
+        private GameObject bot2;
+        private int bot2ID;
+        private BotCharacteristics bot2Params;
         private int opponentKillCount;
-    
+
+        private int playerKillCount;
+
         private void Awake()
         {
             if (generateOnly) throw new ArgumentException("Generate only is unsupported!");
-        }
-
-        public void SetParameters(
-            GameObject botPrefab,
-            int bot1ID,
-            BotCharacteristics bot1Params,
-            bool[] activeGunsBot1,
-            int bot2ID,
-            BotCharacteristics bot2Params,
-            bool[] activeGunsBot2,
-            string mapPath,
-            MapManager mapManager,
-            SpawnPointManager spawnPointManager,
-            int gameDuration = 600,
-            int readyDuration = 1,
-            int scoreDuration = 0,
-            float respawnDuration = 3
-        )
-        {
-            this.gameDuration = gameDuration;
-            this.readyDuration = readyDuration;
-            this.scoreDuration = scoreDuration;
-            this.respawnDuration = respawnDuration;
-        
-            this.bot1Params = bot1Params;
-            this.bot2Params = bot2Params;
-
-            bot1 = Instantiate(botPrefab);
-            bot1.name = "AIEntity1";
-            this.bot1ID = bot1ID;
-            this.activeGunsBot1 = activeGunsBot1;
-            ai1 = bot1.GetComponent<AIEntity>();
-
-            bot2 = Instantiate(botPrefab);
-            bot2.name = "AIEntity2";
-            this.bot2ID = bot2ID;
-            this.activeGunsBot2 = activeGunsBot2;
-            ai2 = bot2.GetComponent<AIEntity>();
-
-            mapManagerScript = mapManager;
-            spawnPointManagerScript = spawnPointManager;
-
-            if (mapPath != null)
-            {
-                mapManagerScript.SetTextFile(mapPath);
-            }
         }
 
         private void Update()
@@ -110,10 +64,54 @@ namespace Managers.Mode
                 startTime = Time.time;
 
                 SetReady(true);
-            } else if (IsReady())
+            }
+            else if (IsReady())
             {
                 ManageGame();
             }
+        }
+
+        public void SetParameters(
+            GameObject botPrefab,
+            int bot1ID,
+            BotCharacteristics bot1Params,
+            bool[] activeGunsBot1,
+            int bot2ID,
+            BotCharacteristics bot2Params,
+            bool[] activeGunsBot2,
+            string mapPath,
+            MapManager mapManager,
+            SpawnPointManager spawnPointManager,
+            int gameDuration = 600,
+            int readyDuration = 1,
+            int scoreDuration = 0,
+            float respawnDuration = 3
+        )
+        {
+            this.gameDuration = gameDuration;
+            this.readyDuration = readyDuration;
+            this.scoreDuration = scoreDuration;
+            this.respawnDuration = respawnDuration;
+
+            this.bot1Params = bot1Params;
+            this.bot2Params = bot2Params;
+
+            bot1 = Instantiate(botPrefab);
+            bot1.name = "AIEntity1";
+            this.bot1ID = bot1ID;
+            this.activeGunsBot1 = activeGunsBot1;
+            ai1 = bot1.GetComponent<AIEntity>();
+
+            bot2 = Instantiate(botPrefab);
+            bot2.name = "AIEntity2";
+            this.bot2ID = bot2ID;
+            this.activeGunsBot2 = activeGunsBot2;
+            ai2 = bot2.GetComponent<AIEntity>();
+
+            mapManagerScript = mapManager;
+            spawnPointManagerScript = spawnPointManager;
+
+            if (mapPath != null) mapManagerScript.SetTextFile(mapPath);
         }
 
         // Updates the phase of the game.
@@ -165,26 +163,23 @@ namespace Managers.Mode
             if (killerIdentifier == killedID)
             {
                 if (killerIdentifier == bot1ID)
-                {
                     playerKillCount--;
-                } else
-                {
+                else
                     opponentKillCount--;
-                }
-            } else
+            }
+            else
             {
                 if (killerIdentifier == bot1ID)
-                {
                     playerKillCount++;
-                } else
-                {
+                else
                     opponentKillCount++;
-                }
             }
         }
 
         // Sets the color of the UI.
-        public override void SetUIColor(Color c) { }
+        public override void SetUIColor(Color c)
+        {
+        }
 
         // Pauses and unpauses the game.
         public override void Pause()

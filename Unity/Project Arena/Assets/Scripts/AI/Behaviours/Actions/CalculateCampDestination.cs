@@ -13,6 +13,9 @@ namespace AI.Behaviours.Actions
     [Serializable]
     public class CalculateCampDestination : Action
     {
+        private static readonly int LayerMask =
+            Physics.DefaultRaycastLayers ^ (1 << UnityEngine.LayerMask.NameToLayer("Entity"));
+
         [SerializeField] private float minRadius = 1;
         [SerializeField] private float maxRadius = 20;
         [SerializeField] private int maxNumVertices = 20;
@@ -20,12 +23,9 @@ namespace AI.Behaviours.Actions
         [SerializeField] private SharedVector3 campLocation;
         [SerializeField] private SharedSelectedPathInfo pathChosen;
 
-        private static readonly int LayerMask =
-            Physics.DefaultRaycastLayers ^ (1 << UnityEngine.LayerMask.NameToLayer("Entity"));
-
         private NavigationSystem navSystem;
         private int startVertex;
-        
+
         public override void OnAwake()
         {
             navSystem = GetComponent<AIEntity>().NavigationSystem;
@@ -52,10 +52,8 @@ namespace AI.Behaviours.Actions
                     var randomRadius = Random.value * (maxRadius - minRadius) + minRadius;
                     var newPoint = newDirection * randomRadius + campLocation.Value;
                     if (Physics.Linecast(campLocation.Value, newPoint, LayerMask))
-                    {
                         // Chosen point is behind something, ignore!
                         continue;
-                    }
                     // if (!NavigationSystem.IsPointOnNavMesh(newPoint, out var finalPoint)) continue;
 
                     var path = navSystem.CalculatePath(newPoint);

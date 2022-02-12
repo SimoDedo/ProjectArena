@@ -11,7 +11,7 @@ using UnityEngine.UI;
 namespace Guns
 {
     /// <summary>
-    /// Gun is an abstract class used to implement any kind of ranged weapon.
+    ///     Gun is an abstract class used to implement any kind of ranged weapon.
     /// </summary>
     public abstract class Gun : MonoBehaviour, ILoggable
     {
@@ -21,9 +21,9 @@ namespace Guns
         [Header("Gun parameters")] [SerializeField]
         protected int damage = 10;
 
-        [SerializeField] protected float dispersion = 0f;
+        [SerializeField] protected float dispersion;
         [SerializeField] protected int projectilesPerShot = 1;
-        [SerializeField] protected bool infinteAmmo = false;
+        [SerializeField] protected bool infinteAmmo;
         [SerializeField] protected int chargerSize;
         [SerializeField] protected int maximumAmmo;
         [SerializeField] protected float reloadTime = 1f;
@@ -31,6 +31,91 @@ namespace Guns
         [SerializeField] protected float cooldownTime = 0.1f;
 
         [SerializeField] private bool isBlastWeapon;
+
+        [Header("Appearence")] [SerializeField]
+        protected float muzzleFlashDuration = 0.05f;
+
+        [SerializeField] protected float recoil = 0.05f;
+
+        [Header("Aim")] [SerializeField] protected bool aimEnabled;
+        [SerializeField] protected bool overlayEnabled;
+        [SerializeField] protected float zoom = 1f;
+        [SerializeField] protected Camera weaponCamera;
+        [SerializeField] protected Vector3 aimPosition;
+        [SerializeField] protected Image aimOverlay;
+
+        [Header("UI")] [SerializeField] protected bool displayUIIfAvailable = true;
+
+        // Variables to manage the aim.
+        private bool aiming;
+        private float aimStart;
+
+        // Variables to manage ammo.
+        protected int ammoInCharger;
+        private bool animatingAim;
+
+        protected bool canDisplayUI;
+
+        // Variables to manage cooldown and reload.
+        private float cooldownStart;
+        private bool coolingDown;
+
+        // Default ammo.
+        private int defaultAmmoInCharger;
+        private int defaultTotalAmmo;
+
+        // Is the input enabled?
+        // Gun identifier.
+        protected int gunId;
+
+        protected GunUIManager gunUIManagerScript;
+
+        // Do I have to log?
+        protected bool loggingGame = true;
+        private float originalFOV;
+        protected Entity.Entity ownerEntityScript;
+        private PlayerUIManager playerUIManagerScript;
+        private float reloadStart;
+        protected int totalAmmo;
+
+        // Is the gun being used?
+        private bool used;
+
+        public bool IsReloading { get; private set; }
+
+        public bool IsBlastWeapon => isBlastWeapon;
+
+        public abstract bool IsProjectileWeapon { get; }
+
+        public abstract float MaxRange { get; }
+
+        protected void Awake()
+        {
+            if (aimEnabled) originalFOV = headCamera.fieldOfView;
+        }
+
+        protected void Update()
+        {
+            if (used)
+            {
+                if (IsReloading || coolingDown) UpdateTimers();
+
+                if (animatingAim) AnimateAim();
+            }
+        }
+
+        protected void OnDisable()
+        {
+            if (aimEnabled) ResetAim();
+
+            if (muzzleFlash.activeSelf) muzzleFlash.SetActive(false);
+        }
+
+        // Setups stuff for the loggingGame.
+        public void SetupLogging()
+        {
+            loggingGame = true;
+        }
         // [SerializeField] protected GunType gunType;
 
         // public GunType GetGunType()
@@ -49,96 +134,6 @@ namespace Guns
         public abstract float GetProjectileSpeed();
         public abstract Vector3 GetProjectileSpawnerForwardDirection();
 
-        [Header("Appearence")] [SerializeField]
-        protected float muzzleFlashDuration = 0.05f;
-
-        [SerializeField] protected float recoil = 0.05f;
-
-        [Header("Aim")] [SerializeField] protected bool aimEnabled = false;
-        [SerializeField] protected bool overlayEnabled = false;
-        [SerializeField] protected float zoom = 1f;
-        [SerializeField] protected Camera weaponCamera;
-        [SerializeField] protected Vector3 aimPosition;
-        [SerializeField] protected Image aimOverlay;
-
-        [Header("UI")] 
-        [SerializeField] protected bool displayUIIfAvailable = true;
-
-        protected bool canDisplayUI;
-
-        // Default ammo.
-        private int defaultAmmoInCharger;
-        private int defaultTotalAmmo;
-
-        // Variables to manage ammo.
-        protected int ammoInCharger;
-        protected int totalAmmo;
-
-        // Variables to manage cooldown and reload.
-        private float cooldownStart;
-        private float reloadStart;
-        private bool coolingDown;
-        private bool reloading;
-
-        // Variables to manage the aim.
-        private bool aiming;
-        private bool animatingAim;
-        private float aimStart;
-        private float originalFOV;
-
-        protected GunUIManager gunUIManagerScript;
-        private PlayerUIManager playerUIManagerScript;
-        protected Entity.Entity ownerEntityScript;
-
-        // Is the gun being used?
-        private bool used;
-
-        // Is the input enabled?
-        // Gun identifier.
-        protected int gunId;
-
-        // Do I have to log?
-        protected bool loggingGame = true;
-
-        public bool IsReloading => reloading;
-
-        protected void Awake()
-        {
-            if (aimEnabled)
-            {
-                originalFOV = headCamera.fieldOfView;
-            }
-        }
-
-        protected void Update()
-        {
-            if (used)
-            {
-                if (reloading || coolingDown)
-                {
-                    UpdateTimers();
-                }
-
-                if (animatingAim)
-                {
-                    AnimateAim();
-                }
-            }
-        }
-
-        protected void OnDisable()
-        {
-            if (aimEnabled)
-            {
-                ResetAim();
-            }
-
-            if (muzzleFlash.activeSelf)
-            {
-                muzzleFlash.SetActive(false);
-            }
-        }
-
         // Allows accepting input and enables all the childrens.
         public void Wield()
         {
@@ -146,27 +141,18 @@ namespace Guns
             muzzleFlash.SetActive(false);
             used = true;
 
-            if (ammoInCharger == 0 && CanReload())
-            {
-                Reload();
-            }
+            if (ammoInCharger == 0 && CanReload()) Reload();
         }
 
         // Stops reloading, stops aiming, disallows accepting input and disables all the childrens.
         public void Stow()
         {
             // When I switch guns I stop the reloading, but not the cooldown.
-            reloading = false;
+            IsReloading = false;
 
-            if (canDisplayUI)
-            {
-                playerUIManagerScript.StopReloading();
-            }
+            if (canDisplayUI) playerUIManagerScript.StopReloading();
 
-            if (aimEnabled)
-            {
-                ResetAim();
-            }
+            if (aimEnabled) ResetAim();
 
             SetChildrenEnabled(false);
             used = false;
@@ -175,13 +161,12 @@ namespace Guns
         // Ends the reload or the cooldown phases if possible. 
         private void UpdateTimers()
         {
-            if (reloading)
+            if (IsReloading)
             {
                 if (Time.time > reloadStart + reloadTime)
                 {
                     // Log if needed.
                     if (loggingGame)
-                    {
                         ReloadInfoGameEvent.Instance.Raise(new ReloadInfo
                         {
                             ownerId = ownerEntityScript.GetID(),
@@ -189,10 +174,9 @@ namespace Guns
                             ammoInCharger = ammoInCharger,
                             totalAmmo = totalAmmo
                         });
-                    }
 
                     // Stop the reloading.
-                    reloading = false;
+                    IsReloading = false;
                     // Update charger and total ammo count.
                     if (infinteAmmo)
                     {
@@ -210,18 +194,12 @@ namespace Guns
                     }
 
                     // Set the ammo in the UI.
-                    if (canDisplayUI)
-                    {
-                        gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
-                    }
+                    if (canDisplayUI) gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
                 }
             }
             else if (coolingDown)
             {
-                if (Time.time > cooldownStart + cooldownTime)
-                {
-                    coolingDown = false;
-                }
+                if (Time.time > cooldownStart + cooldownTime) coolingDown = false;
             }
         }
 
@@ -239,7 +217,7 @@ namespace Guns
 
             gunId = id;
 
-            canDisplayUI = displayUIIfAvailable && playerUIManagerScript != null; 
+            canDisplayUI = displayUIIfAvailable && playerUIManagerScript != null;
             if (canDisplayUI)
             {
                 gunUIManagerScript = GetComponent<GunUIManager>();
@@ -265,14 +243,14 @@ namespace Guns
         // I can reload when I have ammo left, my charger isn't full and I'm not reloading.
         public bool CanReload()
         {
-            return (totalAmmo > 0 || infinteAmmo) && ammoInCharger < chargerSize && !reloading;
+            return (totalAmmo > 0 || infinteAmmo) && ammoInCharger < chargerSize && !IsReloading;
         }
 
         // I can shoot when I'm not reloading and I'm not in cooldown.
         // FIXME is it ok if I report being able to shoot even if not equipped?
         public bool CanShoot()
         {
-            return !reloading && !coolingDown && ammoInCharger > 0;
+            return !IsReloading && !coolingDown && ammoInCharger > 0;
         }
 
         public bool CanAim()
@@ -302,15 +280,11 @@ namespace Guns
         protected void AnimateAim()
         {
             if (aiming)
-            {
                 transform.localPosition = Vector3.Lerp(transform.localPosition, aimPosition,
                     (Time.time - aimStart) * 10f);
-            }
             else
-            {
                 transform.localPosition = Vector3.Lerp(transform.localPosition, Vector3.zero,
                     (Time.time - aimStart) * 10f);
-            }
 
             if (transform.localPosition == aimPosition && aiming)
             {
@@ -367,7 +341,7 @@ namespace Guns
         protected void SetReload()
         {
             reloadStart = Time.time;
-            reloading = true;
+            IsReloading = true;
         }
 
         // Tells if the gun has the maximum number of ammo.
@@ -380,29 +354,15 @@ namespace Guns
         public void AddAmmo(int amount)
         {
             if (totalAmmo + amount < maximumAmmo)
-            {
                 totalAmmo += amount;
-            }
             else
-            {
                 totalAmmo = maximumAmmo;
-            }
 
             if (gameObject.activeSelf && canDisplayUI)
             {
                 gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
-                if (used && ammoInCharger == 0 && CanReload())
-                {
-                    Reload();
-                }
+                if (used && ammoInCharger == 0 && CanReload()) Reload();
             }
-        }
-
-        public bool IsBlastWeapon => isBlastWeapon;
-
-        public abstract bool IsProjectileWeapon
-        {
-            get;
         }
 
         // Show muzzle flash.
@@ -422,20 +382,14 @@ namespace Guns
                 transform.position.z);
             muzzleFlash.SetActive(false);
             // Reload if needed.
-            if (ammoInCharger == 0 && CanReload())
-            {
-                Reload();
-            }
+            if (ammoInCharger == 0 && CanReload()) Reload();
         }
 
         // Activates/deactivates the children objects, with the exception of muzzle flashed which must
         // always be deactivated.
         private void SetChildrenEnabled(bool active)
         {
-            foreach (Transform child in transform)
-            {
-                child.gameObject.SetActive(active);
-            }
+            foreach (Transform child in transform) child.gameObject.SetActive(active);
         }
 
         // Resets the ammo.
@@ -444,16 +398,7 @@ namespace Guns
             ammoInCharger = defaultAmmoInCharger;
             totalAmmo = defaultTotalAmmo;
 
-            if (canDisplayUI)
-            {
-                gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
-            }
-        }
-
-        // Setups stuff for the loggingGame.
-        public void SetupLogging()
-        {
-            loggingGame = true;
+            if (canDisplayUI) gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
         }
 
         public int GetCurrentAmmo()
@@ -470,12 +415,10 @@ namespace Guns
         {
             return chargerSize;
         }
-    
+
         public int GetLoadedAmmo()
         {
             return ammoInCharger;
         }
-
-        public abstract float MaxRange { get; } 
     }
 }

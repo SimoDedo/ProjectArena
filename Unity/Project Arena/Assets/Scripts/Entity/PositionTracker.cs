@@ -9,12 +9,12 @@ namespace Entity
 {
     public class PositionTracker : MonoBehaviour
     {
-        private Transform t;
+        private const float MEMORY_WINDOW = 0.5f;
+        private const float MEMORY_WINDOW_END_WEIGHT = 10;
 
         // Considering 60 FPS, we save position up to the half a second ago
         private List<Tuple<Vector3, float>> positions = new List<Tuple<Vector3, float>>();
-        private const float MEMORY_WINDOW = 0.5f;
-        private const float MEMORY_WINDOW_END_WEIGHT = 10;
+        private Transform t;
 
         private void Start()
         {
@@ -27,13 +27,13 @@ namespace Entity
         }
 
         /// <summary>
-        /// Obtains the position and the velocity of this GameObject some time ago, according to delay.
-        /// The position is calculated by interpolating from the position samples saved, while the
-        /// velocity is obtained smoothing the velocity of the entity in every point in time saved
-        /// before delay, giving to each sample a weight that is proportional to
-        /// (1/2)^(MEMORY_WINDOW*MEMORY_WINDOW_END_WEIGHT/sample_delay).
-        /// In order to have a continuous sampling, the integral of such formula (stripped of constants)
-        /// is used. 
+        ///     Obtains the position and the velocity of this GameObject some time ago, according to delay.
+        ///     The position is calculated by interpolating from the position samples saved, while the
+        ///     velocity is obtained smoothing the velocity of the entity in every point in time saved
+        ///     before delay, giving to each sample a weight that is proportional to
+        ///     (1/2)^(MEMORY_WINDOW*MEMORY_WINDOW_END_WEIGHT/sample_delay).
+        ///     In order to have a continuous sampling, the integral of such formula (stripped of constants)
+        ///     is used.
         /// </summary>
         /// <param name="delay"></param>
         /// <returns></returns>
@@ -73,7 +73,7 @@ namespace Entity
 
                 var velocity = (positions[i + 1].Item1 - positions[i].Item1) / (beginDelay - endDelay);
 
-                var integral = (Mathf.Pow(2, -endExponent) - Mathf.Pow(2, -beginExponent));
+                var integral = Mathf.Pow(2, -endExponent) - Mathf.Pow(2, -beginExponent);
                 smoothedVelocity += integral * velocity;
             }
 

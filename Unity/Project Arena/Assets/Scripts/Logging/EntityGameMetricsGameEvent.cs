@@ -4,8 +4,8 @@ namespace Logging
 {
     public struct GameMetrics
     {
-        public int entityId; 
-        
+        public int entityId;
+
         public float timeToEngage;
 
         public int numberOfFights;
@@ -17,7 +17,11 @@ namespace Logging
         public float timeBetweenSights;
     }
 
-    public class BaseEntityGameMetricsGameEvent : GameEventBase<GameMetrics> { }
+    public class BaseEntityGameMetricsGameEvent : GameEventBase<GameMetrics>
+    {
+    }
 
-    public class EntityGameMetricsGameEvent : ScriptableObjectSingleton<BaseEntityGameMetricsGameEvent> { }
+    public class EntityGameMetricsGameEvent : ScriptableObjectSingleton<BaseEntityGameMetricsGameEvent>
+    {
+    }
 }

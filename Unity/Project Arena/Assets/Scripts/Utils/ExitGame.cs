@@ -6,7 +6,7 @@ namespace Utils
     {
         private void Start()
         {
-            Application.Quit();   
+            Application.Quit();
         }
     }
 }

@@ -11,14 +11,15 @@ using Action = BehaviorDesigner.Runtime.Tasks.Action;
 namespace AI.Behaviours.Actions
 {
     [Serializable]
-    public class ChooseWeapon: Action
+    public class ChooseWeapon : Action
     {
-        private AIEntity entity;
         [SerializeField] private SharedInt chosenGunIndex;
+        private Transform enemyTransform;
+        private AIEntity entity;
         private GunManager gunManager;
         private int gunsCount;
-        private Transform enemyTransform;
         private Transform t;
+
         public override void OnAwake()
         {
             entity = gameObject.GetComponent<AIEntity>();
@@ -34,7 +35,6 @@ namespace AI.Behaviours.Actions
             var chosenIndex = -1;
             var bestScore = float.MinValue;
             for (var i = 0; i < gunsCount; i++)
-            {
                 if (gunManager.IsGunActive(i))
                 {
                     var currentScore = gunManager.GetGunScore(i, distance);
@@ -44,13 +44,10 @@ namespace AI.Behaviours.Actions
                         chosenIndex = i;
                     }
                 }
-            }
 
             if (chosenIndex == -1)
-            {
                 // Find first active weapon
                 chosenIndex = gunManager.FindLowestActiveGun();
-            }
 
             chosenGunIndex.Value = chosenIndex;
             return TaskStatus.Success;

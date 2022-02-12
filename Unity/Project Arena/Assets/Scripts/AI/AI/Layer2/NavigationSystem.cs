@@ -8,16 +8,12 @@ namespace AI.AI.Layer2
 {
     public class NavigationSystem
     {
+        private static readonly float AgentHeight = NavMesh.GetSettingsByIndex(0).agentHeight;
         private readonly AIEntity me;
         private readonly Transform transform;
-        private float Acceleration { get; }
-        private float AngularSpeed { get; }
-        public float Speed { get; }
-        
+
         private NavMeshAgent agent;
         private MovementController mover;
-
-        private static readonly float AgentHeight = NavMesh.GetSettingsByIndex(0).agentHeight;
 
         public NavigationSystem(AIEntity me, float speed)
         {
@@ -27,6 +23,10 @@ namespace AI.AI.Layer2
             Acceleration = 100;
             AngularSpeed = 1000000;
         }
+
+        private float Acceleration { get; }
+        private float AngularSpeed { get; }
+        public float Speed { get; }
 
         public void Prepare()
         {
@@ -50,9 +50,7 @@ namespace AI.AI.Layer2
             var rtn = new NavMeshPath();
             agent.CalculatePath(destination, rtn);
             if (throwIfNotComplete && !rtn.IsComplete())
-            {
                 throw new InvalidOperationException("Attempted to calculate incomplete path");
-            }
             return rtn;
         }
 
@@ -61,9 +59,7 @@ namespace AI.AI.Layer2
             var rtn = new NavMeshPath();
             NavMesh.CalculatePath(origin, destination, agent.areaMask, rtn);
             if (throwIfNotComplete && !rtn.IsComplete())
-            {
                 throw new InvalidOperationException("Attempted to calculate incomplete path");
-            }
             return rtn;
         }
 
@@ -80,9 +76,10 @@ namespace AI.AI.Layer2
                     return true;
                 }
             }
+
             validPoint = point;
             return false;
-        } 
+        }
 
         public void MoveAlongPath()
         {
@@ -94,16 +91,13 @@ namespace AI.AI.Layer2
 
         public void CancelPath()
         {
-            if (agent.isOnNavMesh)
-            {
-                agent.ResetPath();
-            }
+            if (agent.isOnNavMesh) agent.ResetPath();
         }
 
         /// <summary>
-        /// Use this to set a path to the navigation system.
-        /// If this method is called multiple times during a frame, only the last call counts to
-        /// determine the destination of the agent path.
+        ///     Use this to set a path to the navigation system.
+        ///     If this method is called multiple times during a frame, only the last call counts to
+        ///     determine the destination of the agent path.
         /// </summary>
         public void SetPath(NavMeshPath path)
         {
@@ -111,18 +105,15 @@ namespace AI.AI.Layer2
         }
 
         /// <summary>
-        /// Use this to set a destination to the navigation system.
-        /// If this method is called multiple times during a frame, only the last call counts to
-        /// determine the destination of the agent path.
-        /// If the destination is not reachable, this method throws an exception!
+        ///     Use this to set a destination to the navigation system.
+        ///     If this method is called multiple times during a frame, only the last call counts to
+        ///     determine the destination of the agent path.
+        ///     If the destination is not reachable, this method throws an exception!
         /// </summary>
         public void SetDestination(Vector3 destination)
         {
             var path = CalculatePath(destination);
-            if (!path.IsComplete())
-            {
-                throw new ArgumentException("Destination is not reachable!");
-            }
+            if (!path.IsComplete()) throw new ArgumentException("Destination is not reachable!");
 
             agent.SetPath(path);
         }

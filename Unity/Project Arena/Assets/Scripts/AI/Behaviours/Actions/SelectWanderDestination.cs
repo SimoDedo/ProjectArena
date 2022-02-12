@@ -15,6 +15,10 @@ namespace AI.Behaviours.Actions
     [Serializable]
     public class SelectWanderDestination : Action
     {
+        // TODO Cooldown should be only after 
+        private const float UNRESTRICTED_TRAVEL_COOLDOWN = 20;
+
+        private const float LOOK_AHEAD = 10f;
         [SerializeField] private SharedInt maxRetries = 10;
         [SerializeField] private SharedFloat wanderRate = 1;
         [SerializeField] private SharedFloat minWanderDistance = 20;
@@ -22,9 +26,6 @@ namespace AI.Behaviours.Actions
         [SerializeField] private SharedSelectedPathInfo pathChosen;
 
         [SerializeField] private float nextUnrestrictedTravelTime;
-
-        // TODO Cooldown should be only after 
-        private const float UNRESTRICTED_TRAVEL_COOLDOWN = 20;
 
         private MovementController movementController;
         private NavigationSystem navSystem;
@@ -41,25 +42,17 @@ namespace AI.Behaviours.Actions
         public override TaskStatus OnUpdate()
         {
             var result = false;
-            if (nextUnrestrictedTravelTime < Time.time)
-            {
-                result = SelectLongWanderDestination();
-            }
+            if (nextUnrestrictedTravelTime < Time.time) result = SelectLongWanderDestination();
 
             if (result)
-            {
                 // We got a valid destination! Apply cooldown
                 nextUnrestrictedTravelTime = Time.time + navSystem.EstimatePathDuration(pathChosen.Value) +
-                    UNRESTRICTED_TRAVEL_COOLDOWN;
-            }
+                                             UNRESTRICTED_TRAVEL_COOLDOWN;
             else
-            {
                 // We didn't got a result, apply short travel for now...
                 result = SelectShortWanderDestination();
-            }
-            
+
             return result ? TaskStatus.Success : TaskStatus.Failure;
-            
         }
 
         private bool SelectLongWanderDestination()
@@ -71,7 +64,7 @@ namespace AI.Behaviours.Actions
                 var chosenDestination = currentPos;
                 chosenDestination.x += displacement.x;
                 chosenDestination.z += displacement.y;
-                
+
                 var path = navSystem.CalculatePath(chosenDestination);
                 if (path.IsComplete())
                 {
@@ -82,8 +75,6 @@ namespace AI.Behaviours.Actions
 
             return false;
         }
-
-        private const float LOOK_AHEAD = 10f;
 
         private bool SelectShortWanderDestination()
         {
@@ -108,17 +99,14 @@ namespace AI.Behaviours.Actions
                     var penultimatePoint = corners.Length < 2 ? transform.position : corners[corners.Length - 2];
 
                     var forwardDirectionAtArrival = (onGroundDestination - penultimatePoint).normalized;
-                    
+
                     for (var i = -4; i <= 4; i++)
                     {
                         var angle = i * 90f / 4;
 
                         var currentLookDirection = Quaternion.AngleAxis(angle, Vector3.up) * forwardDirectionAtArrival;
-                        
-                        if (!Physics.Raycast(onGroundDestination, currentLookDirection, LOOK_AHEAD))
-                        {
-                            validPointsFound++;
-                        }
+
+                        if (!Physics.Raycast(onGroundDestination, currentLookDirection, LOOK_AHEAD)) validPointsFound++;
                     }
 
                     if (validPointsFound > 3)

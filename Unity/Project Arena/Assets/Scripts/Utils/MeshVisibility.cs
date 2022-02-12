@@ -9,10 +9,7 @@ namespace Utils
         {
             foreach (Transform children in father)
             {
-                if (children.GetComponent<MeshRenderer>())
-                {
-                    children.GetComponent<MeshRenderer>().enabled = isVisible;
-                }
+                if (children.GetComponent<MeshRenderer>()) children.GetComponent<MeshRenderer>().enabled = isVisible;
 
                 SetMeshVisible(children, isVisible);
             }

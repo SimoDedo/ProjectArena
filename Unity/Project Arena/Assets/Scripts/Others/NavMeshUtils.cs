@@ -13,12 +13,10 @@ namespace Others
                 totalLength += (corners[i - 1] - corners[i]).sqrMagnitude;
             return Mathf.Sqrt(totalLength);
         }
-        
+
         public static bool IsComplete(this NavMeshPath path)
         {
             return path.status == NavMeshPathStatus.PathComplete;
         }
-        
-        
     }
 }

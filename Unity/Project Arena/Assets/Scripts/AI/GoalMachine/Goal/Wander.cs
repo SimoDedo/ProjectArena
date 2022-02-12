@@ -5,9 +5,9 @@ namespace AI.GoalMachine.Goal
 {
     public class Wander : IGoal
     {
-        private readonly ExternalBehaviorTree externalBt;
         private readonly BehaviorTree behaviorTree;
-        
+        private readonly ExternalBehaviorTree externalBt;
+
         public Wander(AIEntity entity)
         {
             externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/Wander");

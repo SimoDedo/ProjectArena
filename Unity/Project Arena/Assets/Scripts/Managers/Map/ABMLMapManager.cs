@@ -1,173 +1,185 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Maps.MapGenerator;
 using UnityEngine;
 
 namespace Managers.Map
 {
     /// <summary>
-    /// SLMapManager is an implementation of MapManager used to manage multi-level AB maps.
+    ///     SLMapManager is an implementation of MapManager used to manage multi-level AB maps.
     /// </summary>
-    public class ABMLMapManager : MLMapManager {
-
-        [Header("AB generation")]
-        [SerializeField]
+    public class ABMLMapManager : MLMapManager
+    {
+        [Header("AB generation")] [SerializeField]
         private MapGenerator diggerGeneratorScript;
 
         private List<bool> usesDiggerGeneratorList;
 
-        public override void ManageMap(bool assembleMap) {
-            if (loadMapFromFile) {
+        public override void ManageMap(bool assembleMap)
+        {
+            if (loadMapFromFile)
+            {
                 // Load the map.
                 LoadMapFromText();
-            } else {
+            }
+            else
+            {
                 // Extract the genomes.
-                List<Genome> genomes = ExtractGenomes(seed);
+                var genomes = ExtractGenomes(seed);
                 // Initialize the generation mode list.
                 usesDiggerGeneratorList = new List<bool>();
                 // Generate the map.
-                for (int i = 0; i < genomes.Count; i++) {
+                for (var i = 0; i < genomes.Count; i++)
+                {
                     mapGeneratorScript.ResetMapSize();
-                    if (ParameterManager.HasInstance()) {
-                        if (genomes[i].useDefaultGenerator) {
+                    if (ParameterManager.HasInstance())
+                    {
+                        if (genomes[i].useDefaultGenerator)
+                        {
                             maps.Add(mapGeneratorScript.GenerateMap(genomes[i].genome, false, null));
                             usesDiggerGeneratorList.Add(false);
-                        } else {
-                            if (i > 0) {
+                        }
+                        else
+                        {
+                            if (i > 0)
                                 maps.Add(diggerGeneratorScript.GenerateMap(genomes[i].genome,
                                     maps[i - 1].GetLength(0), maps[i - 1].GetLength(1), false, null));
-                            } else {
+                            else
                                 maps.Add(diggerGeneratorScript.GenerateMap(genomes[i].genome, false,
                                     null));
-                            }
                             usesDiggerGeneratorList.Add(true);
                         }
-                    } else {
+                    }
+                    else
+                    {
                         maps.Add(mapGeneratorScript.GenerateMap());
                         usesDiggerGeneratorList.Add(false);
                     }
+
                     mapGeneratorScript.ResetMapSize();
                 }
+
                 // Resize all the maps.
                 ResizeAllMaps();
                 // Add the stairs.
                 stairsGeneratorScript.GenerateStairs(maps, usesDiggerGeneratorList, mapGeneratorScript,
                     GenomeHasObjects(seed));
                 // Save the map.
-                if (export) {
+                if (export)
+                {
                     seed = seed.GetHashCode().ToString();
                     SaveMLMapAsText();
                 }
             }
 
-            if (assembleMap) {
+            if (assembleMap)
+            {
                 // Assemble the map.
                 mapAssemblerScript.AssembleMap(maps, mapGeneratorScript.GetWallChar(),
                     mapGeneratorScript.GetRoomChar(), stairsGeneratorScript.GetVoidChar());
                 // Displace the objects.
-                for (int i = 0; i < maps.Count; i++) {
+                for (var i = 0; i < maps.Count; i++)
                     objectDisplacerScript.DisplaceObjects(maps[i], mapAssemblerScript.GetSquareSize(),
                         mapAssemblerScript.GetWallHeight() * i);
-                }
             }
         }
 
         // Resizes all the maps.
-        private void ResizeAllMaps() {
-            int maxWidth = 0;
-            int maxHeight = 0;
+        private void ResizeAllMaps()
+        {
+            var maxWidth = 0;
+            var maxHeight = 0;
 
-            foreach (char[,] m in maps) {
-                if (m.GetLength(0) > maxWidth) {
-                    maxWidth = m.GetLength(0);
-                }
-                if (m.GetLength(1) > maxHeight) {
-                    maxHeight = m.GetLength(1);
-                }
+            foreach (var m in maps)
+            {
+                if (m.GetLength(0) > maxWidth) maxWidth = m.GetLength(0);
+                if (m.GetLength(1) > maxHeight) maxHeight = m.GetLength(1);
             }
 
-            for (int i = 0; i < maps.Count; i++) {
-                if (maps[i].GetLength(0) < maxWidth || maps[i].GetLength(1) < maxHeight) {
+            for (var i = 0; i < maps.Count; i++)
+                if (maps[i].GetLength(0) < maxWidth || maps[i].GetLength(1) < maxHeight)
                     maps[i] = ResizeMap(maps[i], maxWidth, maxHeight);
-                }
-            }
         }
 
         // Resizes a map.
-        private char[,] ResizeMap(char[,] map, int maxWidth, int maxHeight) {
-            char[,] resizedMap = new char[maxWidth, maxHeight];
+        private char[,] ResizeMap(char[,] map, int maxWidth, int maxHeight)
+        {
+            var resizedMap = new char[maxWidth, maxHeight];
 
-            char wallChar = mapGeneratorScript.GetWallChar();
+            var wallChar = mapGeneratorScript.GetWallChar();
 
-            for (int x = 0; x < maxWidth; x++) {
-                for (int y = 0; y < maxHeight; y++) {
-                    if (x < map.GetLength(0) && y < map.GetLength(1)) {
-                        resizedMap[x, y] = map[x, y];
-                    } else {
-                        resizedMap[x, y] = wallChar;
-                    }
-                }
-            }
+            for (var x = 0; x < maxWidth; x++)
+            for (var y = 0; y < maxHeight; y++)
+                if (x < map.GetLength(0) && y < map.GetLength(1))
+                    resizedMap[x, y] = map[x, y];
+                else
+                    resizedMap[x, y] = wallChar;
 
             return resizedMap;
         }
 
         // Extracts the genomes from the seed.
-        private List<Genome> ExtractGenomes(string seed) {
-            List<Genome> genomes = new List<Genome>();
+        private List<Genome> ExtractGenomes(string seed)
+        {
+            var genomes = new List<Genome>();
 
-            string processedString = "";
-            int genesCount = 1;
-            bool counting = true;
+            var processedString = "";
+            var genesCount = 1;
+            var counting = true;
 
-            for (int i = 0; i < seed.Length; i++) {
-                if (i < seed.Length - 1 && seed[i] == '|' && seed[i + 1] == '|') {
+            for (var i = 0; i < seed.Length; i++)
+                if (i < seed.Length - 1 && seed[i] == '|' && seed[i + 1] == '|')
+                {
                     genomes.Add(CreateNewGenome(processedString, genesCount));
                     processedString = "";
                     counting = true;
                     genesCount = 1;
                     i++;
-                } else if (i == seed.Length - 1) {
+                }
+                else if (i == seed.Length - 1)
+                {
                     genomes.Add(CreateNewGenome(processedString + seed[i], genesCount));
-                } else if (seed[i] == ',') {
+                }
+                else if (seed[i] == ',')
+                {
                     processedString += seed[i];
-                    if (counting) {
-                        genesCount++;
-                    }
-                } else if (seed[i] == '<') {
+                    if (counting) genesCount++;
+                }
+                else if (seed[i] == '<')
+                {
                     processedString += seed[i];
-                    if (genesCount > 1) {
-                        counting = false;
-                    }
-                } else {
+                    if (genesCount > 1) counting = false;
+                }
+                else
+                {
                     processedString += seed[i];
                 }
-            }
 
             return genomes;
         }
 
-        private Genome CreateNewGenome(string s, int g) {
-            return new Genome {
+        private Genome CreateNewGenome(string s, int g)
+        {
+            return new Genome
+            {
                 genome = s,
-                useDefaultGenerator = (g == 5) ? false : true
+                useDefaultGenerator = g == 5 ? false : true
             };
         }
 
         // Tells if the genome includes objects.
-        public static bool GenomeHasObjects(string genome) {
-            foreach (char c in genome) {
-                if (Char.IsLetter(c)) {
+        public static bool GenomeHasObjects(string genome)
+        {
+            foreach (var c in genome)
+                if (char.IsLetter(c))
                     return true;
-                }
-            };
+            ;
             return false;
         }
 
-        private struct Genome {
+        private struct Genome
+        {
             public string genome;
             public bool useDefaultGenerator;
         }
-
     }
 }

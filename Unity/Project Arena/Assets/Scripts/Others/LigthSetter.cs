@@ -3,30 +3,37 @@
 namespace Others
 {
     /// <summary>
-    /// LigthSetter sets the main ligth of the current scene depending on the build.
+    ///     LigthSetter sets the main ligth of the current scene depending on the build.
     /// </summary>
     [RequireComponent(typeof(Light))]
-    public class LigthSetter : MonoBehaviour {
+    public class LigthSetter : MonoBehaviour
+    {
+        [Header("Standalone settings")] [SerializeField]
+        private LightShadows standaloneShadowType;
 
-        [Header("Standalone settings")] [SerializeField] LightShadows standaloneShadowType;
-        [SerializeField] float standaloneLightIntensity;
+        [SerializeField] private float standaloneLightIntensity;
 
-        [Header("Web settings")] [SerializeField] LightShadows webShadowType;
-        [SerializeField] float webLightIntensity;
+        [Header("Web settings")] [SerializeField]
+        private LightShadows webShadowType;
+
+        [SerializeField] private float webLightIntensity;
 
         private Light sceneLigth;
 
-        void Start() {
+        private void Start()
+        {
             sceneLigth = gameObject.GetComponent<Light>();
 
-            if (Application.platform == RuntimePlatform.WebGLPlayer) {
+            if (Application.platform == RuntimePlatform.WebGLPlayer)
+            {
                 sceneLigth.shadows = webShadowType;
                 sceneLigth.intensity = webLightIntensity;
-            } else {
+            }
+            else
+            {
                 sceneLigth.shadows = standaloneShadowType;
                 sceneLigth.intensity = standaloneLightIntensity;
             }
         }
-
     }
 }

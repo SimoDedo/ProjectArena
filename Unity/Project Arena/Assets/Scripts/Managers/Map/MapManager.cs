@@ -9,40 +9,50 @@ using UnityEngine;
 namespace Managers.Map
 {
     /// <summary>
-    /// MapManager is an abstract class used to implement any kind of map manager. A map manager manages
-    /// the creation process of a map, which consists in generation (performed by a map generator), 
-    /// assembling (performed by a map assembler) and population (performed by an object displacer).
+    ///     MapManager is an abstract class used to implement any kind of map manager. A map manager manages
+    ///     the creation process of a map, which consists in generation (performed by a map generator),
+    ///     assembling (performed by a map assembler) and population (performed by an object displacer).
     /// </summary>
-    public abstract class MapManager : CoreComponent {
-
-        [Header("Core components")]
-        [SerializeField]
+    public abstract class MapManager : CoreComponent
+    {
+        [Header("Core components")] [SerializeField]
         protected MapGenerator mapGeneratorScript;
-        [SerializeField]
-        protected MapAssembler mapAssemblerScript;
-        [SerializeField]
-        protected ObjectDisplacer objectDisplacerScript;
+
+        [SerializeField] protected MapAssembler mapAssemblerScript;
+
+        [SerializeField] protected ObjectDisplacer objectDisplacerScript;
 
         [Header("Import")]
         // Do I have to load the map from a .txt?
         [SerializeField]
-        protected bool loadMapFromFile = false;
+        protected bool loadMapFromFile;
+
         // Path of the map to be laoded.
-        [SerializeField]
-        protected string textFilePath = null;
+        [SerializeField] protected string textFilePath;
 
         [Header("Other")]
         // Category of the spawn point gameobjects in the object displacer. 
         [SerializeField]
         protected string spawnPointCategory;
 
-        protected string seed;
         protected bool export;
         protected string exportPath;
         protected bool flip;
 
-        private void Start() {
+        protected string seed;
+
+        public float MapScale => mapAssemblerScript.GetSquareSize();
+
+        private void Start()
+        {
             ExtractParametersFromManager();
+        }
+
+        private void Update()
+        {
+            if (!IsReady() && mapAssemblerScript.IsReady() && mapGeneratorScript.IsReady() &&
+                objectDisplacerScript.IsReady())
+                SetReady(true);
         }
 
         public void SetTextFile(string mapPath)
@@ -51,17 +61,11 @@ namespace Managers.Map
             textFilePath = mapPath;
         }
 
-        private void Update() {
-            if (!IsReady() && mapAssemblerScript.IsReady() && mapGeneratorScript.IsReady() &&
-                objectDisplacerScript.IsReady()) {
-                SetReady(true);
-            }
-        }
-
         public abstract void ManageMap(bool assembleMap);
 
         // Returns the spawn points.k
-        public List<GameObject> GetSpawnPoints() {
+        public List<GameObject> GetSpawnPoints()
+        {
             return objectDisplacerScript.GetObjectsByCategory(spawnPointCategory);
         }
 
@@ -69,13 +73,16 @@ namespace Managers.Map
         protected abstract void LoadMapFromText();
 
         // Extracts the parameters from the parameter Manager, if any.
-        protected void ExtractParametersFromManager() {
-            if (ParameterManager.HasInstance()) {
+        protected void ExtractParametersFromManager()
+        {
+            if (ParameterManager.HasInstance())
+            {
                 export = ParameterManager.Instance.Export;
                 exportPath = ParameterManager.Instance.ExportPath;
                 flip = ParameterManager.Instance.Flip;
 
-                switch (ParameterManager.Instance.GenerationMode) {
+                switch (ParameterManager.Instance.GenerationMode)
+                {
                     case 0:
                         loadMapFromFile = false;
                         seed = ParameterManager.Instance.MapDNA;
@@ -104,30 +111,32 @@ namespace Managers.Map
         }
 
         // Returns the Map Generator.
-        public MapGenerator GetMapGenerator() {
+        public MapGenerator GetMapGenerator()
+        {
             return mapGeneratorScript;
         }
 
         // Returns the Map Assembler.
-        public MapAssembler GetMapAssembler() {
+        public MapAssembler GetMapAssembler()
+        {
             return mapAssemblerScript;
         }
 
         // Resets the map.
-        public void ResetMap() {
+        public void ResetMap()
+        {
             mapGeneratorScript.ResetMapSize();
             mapAssemblerScript.ClearMap();
             objectDisplacerScript.DestroyAllCustomObjects();
             SetReady(false);
         }
 
-        public bool GetFlip() {
+        public bool GetFlip()
+        {
             return flip;
         }
 
         public abstract char[,] GetMap();
         public abstract Area[] GetAreas();
-    
-        public float MapScale => mapAssemblerScript.GetSquareSize();
     }
 }

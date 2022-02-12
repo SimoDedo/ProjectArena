@@ -16,28 +16,50 @@ using UnityEngine.SceneManagement;
 namespace AI
 {
     /// <summary>
-    /// ExperimentManager allows to manage experiments. An experiment is composed of different studies 
-    /// (a set of maps), each one composed by cases (a set of map variations). Each time a new
-    /// experiment is requested, a list of cases from the less played study is provided to the user
-    /// to be played. A tutorial and a survey scene can be added at the beginning and at the end of
-    /// the experiment, respectively. When ExperimentManager is used to log online data, before creating
-    /// a new list of cases or before saving data on the server, the experiment completion is retrieved
-    /// from the server. When sending data to the server this information is stored in the comment field 
-    /// of each entry as the sum of the retrieved completion and the completion progress stored locally.
+    ///     ExperimentManager allows to manage experiments. An experiment is composed of different studies
+    ///     (a set of maps), each one composed by cases (a set of map variations). Each time a new
+    ///     experiment is requested, a list of cases from the less played study is provided to the user
+    ///     to be played. A tutorial and a survey scene can be added at the beginning and at the end of
+    ///     the experiment, respectively. When ExperimentManager is used to log online data, before creating
+    ///     a new list of cases or before saving data on the server, the experiment completion is retrieved
+    ///     from the server. When sending data to the server this information is stored in the comment field
+    ///     of each entry as the sum of the retrieved completion and the completion progress stored locally.
     /// </summary>
     public class AIMapTestingLogger : MonoBehaviour, ILoggable
     {
+        public string experimentName;
+        public string testID = GetTimeStamp();
+
+        // Current distance.
+        private readonly Dictionary<int, float> distancesBetweenKills = new Dictionary<int, float>();
+
+        // Total hits.
+        private readonly Dictionary<int, int> hitsTaken = new Dictionary<int, int>();
+        private readonly Dictionary<int, Vector2> initialPositions = new Dictionary<int, Vector2>();
+
+        // Total destoryed targets.
+        private readonly Dictionary<int, int> killCounts = new Dictionary<int, int>();
+
+        // Position of the player.
+        private readonly Dictionary<int, Vector2> lastPositions = new Dictionary<int, Vector2>();
+
+        // Total shots.
+        private readonly Dictionary<int, int> shotCounts = new Dictionary<int, int>();
+
+        // Total distance.
+        private readonly Dictionary<int, float> totalDistances = new Dictionary<int, float>();
+
         // Directory for this esperiment files.
         private string experimentDirectory;
+
+        // Is the map flip?
+        private bool flip;
 
         // Label of the current game log.
         private string gameLabel;
 
         // Support object to format the log.
         private JsonGameLog jGameLog;
-
-        // Label of the current statistic log.
-        private string statisticsLabel;
 
         // Support object to format the log.
         private JsonAIStatisticsLog jStatisticsLog;
@@ -47,36 +69,14 @@ namespace AI
         // Start time of the log.
         private float logStart;
 
-        // Current distance.
-        private readonly Dictionary<int, float> distancesBetweenKills = new Dictionary<int, float>();
+        // Label of the current map log.
+        private string mapLabel;
 
-        // Total distance.
-        private readonly Dictionary<int, float> totalDistances = new Dictionary<int, float>();
-
-        // Total shots.
-        private readonly Dictionary<int, int> shotCounts = new Dictionary<int, int>();
-
-        // Total hits.
-        private readonly Dictionary<int, int> hitsTaken = new Dictionary<int, int>();
-
-        // Total destoryed targets.
-        private readonly Dictionary<int, int> killCounts = new Dictionary<int, int>();
+        // Label of the current statistic log.
+        private string statisticsLabel;
 
         // Size of a maps tile.
         private float tileSize = 1;
-
-        // Is the map flip?
-        private bool flip;
-
-        public string experimentName;
-        public string testID = GetTimeStamp();
-
-        // Position of the player.
-        private readonly Dictionary<int, Vector2> lastPositions = new Dictionary<int, Vector2>();
-        private readonly Dictionary<int, Vector2> initialPositions = new Dictionary<int, Vector2>();
-
-        // Label of the current map log.
-        private string mapLabel;
 
         private void Awake()
         {
@@ -96,6 +96,18 @@ namespace AI
             KillInfoGameEvent.Instance.AddListener(LogKill);
             HitInfoGameEvent.Instance.AddListener(LogHit);
             SaveMapTextGameEvent.Instance.AddListener(SaveMapText);
+        }
+
+
+        // Sets up logging.
+        public void SetupLogging()
+        {
+            var gm = FindObjectOfType(typeof(GameManager)) as GameManager;
+            if (gm != null) gm.LoggingHandshake();
+
+            gameLabel = SceneManager.GetActiveScene().name + "_game";
+            statisticsLabel = SceneManager.GetActiveScene().name + "_statistics";
+            mapLabel = SceneManager.GetActiveScene().name + "_map";
         }
 
         private void SaveMapText(string textMap)
@@ -125,21 +137,6 @@ namespace AI
             CreateDirectory(experimentDirectory);
         }
 
-
-        // Sets up logging.
-        public void SetupLogging()
-        {
-            GameManager gm = FindObjectOfType(typeof(GameManager)) as GameManager;
-            if (gm != null)
-            {
-                gm.LoggingHandshake();
-            }
-
-            gameLabel = SceneManager.GetActiveScene().name + "_game";
-            statisticsLabel = SceneManager.GetActiveScene().name + "_statistics";
-            mapLabel = SceneManager.GetActiveScene().name + "_map";
-        }
-
         // Starts loggingGame.
         public void StartLogging()
         {
@@ -150,10 +147,7 @@ namespace AI
             foreach (var o in FindObjectsOfType(typeof(MonoBehaviour)))
             {
                 var monoBehaviour = (MonoBehaviour) o;
-                if (monoBehaviour is ILoggable logger)
-                {
-                    logger.SetupLogging();
-                }
+                if (monoBehaviour is ILoggable logger) logger.SetupLogging();
             }
         }
 
@@ -171,10 +165,7 @@ namespace AI
 
             log = JsonUtility.ToJson(jGameLog);
 
-            if (jGameLog.logPart > 0)
-            {
-                gameLabel += ("_" + jGameLog.logPart);
-            }
+            if (jGameLog.logPart > 0) gameLabel += "_" + jGameLog.logPart;
 
             File.WriteAllText(experimentDirectory + "/" + gameLabel + ".json", log);
         }
@@ -314,9 +305,9 @@ namespace AI
                 var killCount = killCounts.ContainsKey(entity) ? killCounts[entity] : 0;
 
                 var statistic = new JsonFinalStatistics(shotCount, hitCount,
-                    (shotCount > 0) ? (hitCount / (float) shotCount) : 0,
-                    totalDistance, (killCount > 0) ? (jStatisticsLog.gameInfo.duration / killCount) : 0,
-                    (killCount > 0) ? (totalDistance / killCount) : 0);
+                    shotCount > 0 ? hitCount / (float) shotCount : 0,
+                    totalDistance, killCount > 0 ? jStatisticsLog.gameInfo.duration / killCount : 0,
+                    killCount > 0 ? totalDistance / killCount : 0);
                 finalStatisticsMap[entity] = statistic;
             }
 
@@ -347,13 +338,11 @@ namespace AI
             z /= tileSize;
 
             if (flip)
-            {
                 return new Coord
                 {
                     x = z,
                     z = x
                 };
-            }
 
             return new Coord
             {
@@ -379,7 +368,7 @@ namespace AI
         // If an angle is negative it makes it positive.
         private static float NormalizeAngle(float angle)
         {
-            return (angle < 0) ? (360 + angle % 360) : (angle % 360);
+            return angle < 0 ? 360 + angle % 360 : angle % 360;
         }
     }
 }

@@ -8,11 +8,11 @@ namespace AI.Behaviours.Actions
 {
     public class NewChooseWeapon : Action
     {
-        private AIEntity entity;
         private Entity.Entity enemy;
+        private AIEntity entity;
+        private GunManager gunManager;
         private SightController sightController;
         private TargetKnowledgeBase targetKb;
-        private GunManager gunManager;
 
         public override void OnAwake()
         {
@@ -32,7 +32,7 @@ namespace AI.Behaviours.Actions
             // Choose blast weapon if we cannot see the enemy right now
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             var mustChooseBlastWeapon = targetKb.LastTimeDetected != Time.time;
-            
+
             var selectedGun = -1;
             var bestGunScore = 0f;
             for (var i = 0; i < gunManager.NumberOfGuns; i++)
@@ -49,10 +49,8 @@ namespace AI.Behaviours.Actions
             }
 
             if (selectedGun != -1)
-            {
                 // We found a good weapon, switch!
                 gunManager.TryEquipGun(selectedGun);
-            }
 
             return TaskStatus.Running;
         }

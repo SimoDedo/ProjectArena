@@ -7,71 +7,58 @@ using UnityEngine;
 namespace AI.AI.Layer2
 {
     /// <summary>
-    /// The TargetKnowledgeBase should allow us to know when the enemy is spotted and we can react to it or
-    /// when the enemy was instead lost.
-    /// - Enemy spotted: The enemy was sighted for at least nonConsecutiveTimeBeforeReaction seconds in the last
+    ///     The TargetKnowledgeBase should allow us to know when the enemy is spotted and we can react to it or
+    ///     when the enemy was instead lost.
+    ///     - Enemy spotted: The enemy was sighted for at least nonConsecutiveTimeBeforeReaction seconds in the last
     ///     memoryWindow seconds
-    /// - Enemy lost: The enemy is not currently spotted, but it was X seconds ago.
-    ///
+    ///     - Enemy lost: The enemy is not currently spotted, but it was X seconds ago.
     /// </summary>
     public class TargetKnowledgeBase
     {
-        /// <summary>
-        /// Represents whether the target was visible during the interval specified.
-        /// </summary>
-        private class VisibilityInInterval
-        {
-            public float startTime; // Inclusive
-            public float endTime; // Exclusive
-            public float visibilityScore;
-        }
-
-        /// <summary>
-        /// The entity this component belongs to
-        /// </summary>
-        private readonly AIEntity me;
-
-        /// <summary>
-        /// The target that must be spotted
-        /// </summary>
-        private readonly Entity.Entity target;
-
-        /// <summary>
-        /// The sensor used to detect the target presence
-        /// </summary>
-        private SightSensor sensor;
-
-        /// <summary>
-        /// Size (in seconds) of the memory of this component. Detection event older than this will be forgotten. 
-        /// </summary>
-        private readonly float memoryWindow;
-
-        /// <summary>
-        /// TODO Define this better!
-        /// Tempo massimo in cui andare indietro per cercare avvistamenti del nemico / tempo limite passato il quale
-        /// calcolare se abbiamo perso o meno il nemico cercando di vedere se era visibile prima di questo tempo
-        /// </summary>
-        private readonly float detectionWindow;
-
-        /// <summary>
-        /// Total time (in the detection window) that the enemy must be seen before declaring that
-        /// we can detect it.
-        /// </summary>
-        private readonly float nonConsecutiveTimeBeforeReaction;
-
-        /// <summary>
-        /// List of visibility data gathered so far, excluding data older than memoryWindow
-        /// </summary>
-        private List<VisibilityInInterval> results = new List<VisibilityInInterval>();
-
-        public float LastTimeDetected { get; private set; } = float.MinValue;
-        
         private static readonly AnimationCurve DistanceScore = new AnimationCurve(
             new Keyframe(0f, 5f),
             new Keyframe(10f, 3f),
             new Keyframe(30f, 1.5f),
             new Keyframe(50f, 1f)
         );
+
+        /// <summary>
+        ///     TODO Define this better!
+        ///     Tempo massimo in cui andare indietro per cercare avvistamenti del nemico / tempo limite passato il quale
+        ///     calcolare se abbiamo perso o meno il nemico cercando di vedere se era visibile prima di questo tempo
+        /// </summary>
+        private readonly float detectionWindow;
+
+        /// <summary>
+        ///     The entity this component belongs to
+        /// </summary>
+        private readonly AIEntity me;
+
+        /// <summary>
+        ///     Size (in seconds) of the memory of this component. Detection event older than this will be forgotten.
+        /// </summary>
+        private readonly float memoryWindow;
+
+        /// <summary>
+        ///     Total time (in the detection window) that the enemy must be seen before declaring that
+        ///     we can detect it.
+        /// </summary>
+        private readonly float nonConsecutiveTimeBeforeReaction;
+
+        /// <summary>
+        ///     The target that must be spotted
+        /// </summary>
+        private readonly Entity.Entity target;
+
+        /// <summary>
+        ///     List of visibility data gathered so far, excluding data older than memoryWindow
+        /// </summary>
+        private readonly List<VisibilityInInterval> results = new List<VisibilityInInterval>();
+
+        /// <summary>
+        ///     The sensor used to detect the target presence
+        /// </summary>
+        private SightSensor sensor;
 
         public TargetKnowledgeBase(
             AIEntity me,
@@ -87,6 +74,8 @@ namespace AI.AI.Layer2
             this.nonConsecutiveTimeBeforeReaction = nonConsecutiveTimeBeforeReaction;
             this.me = me;
         }
+
+        public float LastTimeDetected { get; private set; } = float.MinValue;
 
         public void Prepare()
         {
@@ -104,28 +93,23 @@ namespace AI.AI.Layer2
             if (result)
             {
                 score = DistanceScore.Evaluate((me.transform.position - targetTransform.position).magnitude);
-                results.Add(new VisibilityInInterval {visibilityScore = score, startTime = Time.time - Time.deltaTime, endTime = Time.time});
+                results.Add(new VisibilityInInterval
+                    {visibilityScore = score, startTime = Time.time - Time.deltaTime, endTime = Time.time});
             }
             else
             {
                 VisibilityInInterval last;
                 if (results.Count != 0 && (last = results.Last()).visibilityScore == 0)
-                {
                     last.endTime = Time.time;
-                }
                 else
-                {
-                    results.Add(new VisibilityInInterval {visibilityScore = score, startTime = Time.time - Time.deltaTime, endTime = Time.time});
-                }               
+                    results.Add(new VisibilityInInterval
+                        {visibilityScore = score, startTime = Time.time - Time.deltaTime, endTime = Time.time});
             }
 
 
             ForgetOldData();
 
-            if (HasSeenTarget())
-            {
-                LastTimeDetected = Time.time;
-            }
+            if (HasSeenTarget()) LastTimeDetected = Time.time;
         }
 
         public void Reset()
@@ -147,7 +131,7 @@ namespace AI.AI.Layer2
             if (!target.IsAlive) return false;
             return !HasSeenTarget() && TestDetection(Time.time - memoryWindow, Time.time - detectionWindow);
         }
-        
+
         private void ForgetOldData()
         {
             // Remove all data which is too old
@@ -158,7 +142,7 @@ namespace AI.AI.Layer2
                 results.Clear();
                 return;
             }
-            
+
             results.RemoveRange(0, firstIndexToKeep);
             var first = results.First();
             first.startTime = Mathf.Max(first.startTime, Time.time - memoryWindow);
@@ -176,12 +160,23 @@ namespace AI.AI.Layer2
                 if (t.startTime > endTime) continue;
 
                 var windowLenght = Math.Min(t.endTime, endTime) -
-                    Math.Max(t.startTime, beginTime);
+                                   Math.Max(t.startTime, beginTime);
 
                 totalTimeVisible += windowLenght * t.visibilityScore;
                 if (totalTimeVisible > nonConsecutiveTimeBeforeReaction) return true;
             }
+
             return false;
+        }
+
+        /// <summary>
+        ///     Represents whether the target was visible during the interval specified.
+        /// </summary>
+        private class VisibilityInInterval
+        {
+            public float endTime; // Exclusive
+            public float startTime; // Inclusive
+            public float visibilityScore;
         }
     }
 }

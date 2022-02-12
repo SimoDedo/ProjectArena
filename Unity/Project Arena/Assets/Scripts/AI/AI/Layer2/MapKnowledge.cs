@@ -9,12 +9,14 @@ namespace AI.AI.Layer2
 {
     public class MapKnowledge
     {
-        // private readonly AIEntity me;
-        private readonly Transform transform;
         private readonly Area[] areas;
 
         private readonly int[] areaScores;
+
         private readonly float gridScale;
+
+        // private readonly AIEntity me;
+        private readonly Transform transform;
 
 
         public MapKnowledge(AIEntity entity, GameManager gms)
@@ -33,36 +35,29 @@ namespace AI.AI.Layer2
             gridScale = gms.GetMapScale();
         }
 
+        public bool CanBeUsed => areas.Length != 0;
+
         public void Update()
         {
-            if (!CanBeUsed)
-            {
-                return;
-            }
+            if (!CanBeUsed) return;
 
             // PrintAreas();
-            
+
             // Check in which areas I am in. Mark them as visited (immediately? no timeout?)
             var currentPosition = ConvertToAreasCoordinate(transform.position);
             for (var i = 0; i < areas.Length; i++)
-            {
                 if (PositionInArea(areas[i], currentPosition))
                 {
                     // TODO Maybe use our own counter?
                     areaScores[i] = Time.frameCount;
-                    
+
                     PrintArea(areas[i], Color.magenta);
-                    
                 }
-            }
         }
 
         private void PrintAreas()
         {
-            foreach (var area in areas)
-            {
-                PrintArea(area, Color.green);
-            }
+            foreach (var area in areas) PrintArea(area, Color.green);
         }
 
         private void PrintArea(Area area, Color color)
@@ -71,15 +66,12 @@ namespace AI.AI.Layer2
             var bottomLeft = ConvertToActualMapCoordinate(new Vector3(area.leftColumn, 0, area.bottomRow));
             var topRight = ConvertToActualMapCoordinate(new Vector3(area.rightColumn, 0, area.topRow));
             var bottomRight = ConvertToActualMapCoordinate(new Vector3(area.rightColumn, 0, area.bottomRow));
-                
+
             Debug.DrawLine(topLeft, bottomLeft, color, 2, false);
-            Debug.DrawLine( bottomLeft, bottomRight, color, 2, false);
+            Debug.DrawLine(bottomLeft, bottomRight, color, 2, false);
             Debug.DrawLine(bottomRight, topRight, color, 2, false);
             Debug.DrawLine(topRight, topLeft, color, 2, false);
-            
         }
-
-        public bool CanBeUsed => areas.Length != 0;
 
         /**
          * Returns a possible destination to wander to based on:
@@ -90,11 +82,9 @@ namespace AI.AI.Layer2
         public Vector3 GetRecommendedDestination()
         {
             if (!CanBeUsed)
-            {
                 throw new InvalidOperationException(
                     "Cannot use map knowledge destination recommender, no area info available"
                 );
-            }
 
             var leastKnownArea = 0;
             var leastKnownAreaScore = int.MaxValue;
@@ -114,7 +104,7 @@ namespace AI.AI.Layer2
             }
 
             var selectedArea = areas[leastKnownArea];
-            
+
             PrintArea(selectedArea, Color.blue);
 
             var columnDelta = selectedArea.rightColumn - selectedArea.leftColumn;
@@ -124,21 +114,21 @@ namespace AI.AI.Layer2
                 0,
                 selectedArea.bottomRow + Random.value * rowDelta
             );
-            
+
             return ConvertToActualMapCoordinate(areaCenter);
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool PositionInArea(Area area, Vector3 position)
         {
             return !(position.z < area.topRow) && !(position.z > area.bottomRow) && !(position.x < area.leftColumn) &&
-                !(position.x > area.rightColumn);
+                   !(position.x > area.rightColumn);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Vector3 ConvertToAreasCoordinate(Vector3 position)
         {
-            return (position) / gridScale;
+            return position / gridScale;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

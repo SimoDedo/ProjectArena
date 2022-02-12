@@ -8,20 +8,13 @@ namespace Tester
 {
     public class GameResultsAnalyzer
     {
-        // DONE!
-        private readonly Dictionary<int, float> timeToEngage = new Dictionary<int, float>();
+        private readonly int bot1ID;
+        private readonly int bot2ID;
+        private readonly Dictionary<int, int> currentKillStreak = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> killStreakMax = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> killStreaksSum = new Dictionary<int, int>();
 
-        // DONE!
-        private readonly Dictionary<int, float> timeInFight = new Dictionary<int, float>();
-
-        // DONE!
-        private readonly Dictionary<int, float> timeBetweenSights = new Dictionary<int, float>();
-
-        // DONE!
-        private readonly Dictionary<int, float> timeToSurrender = new Dictionary<int, float>();
-
-        // DONE!
-        private readonly Dictionary<int, int> numberOfRetreats = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> nonZeroKillStreaksCount = new Dictionary<int, int>();
 
         // DONE!
         private readonly Dictionary<int, int> numberOfFights = new Dictionary<int, int>();
@@ -29,29 +22,36 @@ namespace Tester
         // DONE!
         private readonly Dictionary<int, int> numberOfFrags = new Dictionary<int, int>();
 
-        // TODO!
-        private readonly Dictionary<int, int> numberOfSuicides = new Dictionary<int, int>();
+        // DONE!
+        private readonly Dictionary<int, int> numberOfHits = new Dictionary<int, int>();
+
+        // DONE!
+        private readonly Dictionary<int, int> numberOfRetreats = new Dictionary<int, int>();
 
         // DONE!
         private readonly Dictionary<int, int> numberOfShots = new Dictionary<int, int>();
 
+        // TODO!
+        private readonly Dictionary<int, int> numberOfSuicides = new Dictionary<int, int>();
+
         // DONE!
-        private readonly Dictionary<int, int> numberOfHits = new Dictionary<int, int>();
+        private readonly Dictionary<int, float> timeBetweenSights = new Dictionary<int, float>();
 
-        private readonly Dictionary<int, int> nonZeroKillStreaksCount = new Dictionary<int, int>();
-        private readonly Dictionary<int, int> killStreaksSum = new Dictionary<int, int>();
-        private readonly Dictionary<int, int> currentKillStreak = new Dictionary<int, int>();
-        private readonly Dictionary<int, int> killStreakMax = new Dictionary<int, int>();
+        // DONE!
+        private readonly Dictionary<int, float> timeInFight = new Dictionary<int, float>();
 
-        private readonly int bot1ID;
-        private readonly int bot2ID;
+        // DONE!
+        private readonly Dictionary<int, float> timeToEngage = new Dictionary<int, float>();
+
+        // DONE!
+        private readonly Dictionary<int, float> timeToSurrender = new Dictionary<int, float>();
 
         public GameResultsAnalyzer(int bot1ID, int bot2ID)
         {
             this.bot1ID = bot1ID;
             this.bot2ID = bot2ID;
         }
-        
+
         public void Setup()
         {
             EntityGameMetricsGameEvent.Instance.AddListener(LogMetrics);
@@ -76,7 +76,7 @@ namespace Tester
             numberOfRetreats.Clear();
             timeToSurrender.Clear();
             timeBetweenSights.Clear();
-            
+
             numberOfFrags.Clear();
             numberOfSuicides.Clear();
             numberOfShots.Clear();
@@ -115,8 +115,8 @@ namespace Tester
                 CloseKillStreak(receivedInfo.killedEntityID);
                 numberOfSuicides.AddToKey(receivedInfo.killedEntityID, 1);
                 return;
-            } 
-         
+            }
+
             numberOfFrags.AddToKey(receivedInfo.killerEntityID, 1);
             // TODO This is slightly wrong, what if I have a reciprocal kill? 
             // One of the entities would get the point now, and the other only after death.
@@ -148,10 +148,7 @@ namespace Tester
 
                 // Update max kill streak if needed
                 var hadMax = killStreakMax.TryGetValue(entityId, out var max);
-                if (!hadMax || streak > max)
-                {
-                    killStreakMax[entityId] = streak;
-                }
+                if (!hadMax || streak > max) killStreakMax[entityId] = streak;
             }
         }
 
@@ -170,13 +167,9 @@ namespace Tester
                 numberOfShots.TryGetValue(key, out var shots);
                 numberOfHits.TryGetValue(key, out var hits);
                 if (hits == 0)
-                {
                     accuracy.Add(key, 0);
-                }
                 else
-                {
                     accuracy.Add(key, hits / (float) shots);
-                }
             }
 
             var killStreakAverage = new Dictionary<int, float>();
@@ -193,7 +186,7 @@ namespace Tester
                 entry => -entry.Value / (float) totalFrags * Mathf.Log(entry.Value / (float) totalFrags, 2)
             );
 
-            var numberOfFightsSum = this.numberOfFights.Sum(entry => entry.Value);
+            var numberOfFightsSum = numberOfFights.Sum(entry => entry.Value);
             var timeToEngageSum = timeToEngage.Sum(entry => entry.Value);
             var pace = 2 * 1 / (1 + Mathf.Exp(-3 * numberOfFightsSum / timeToEngageSum)) - 1;
 
@@ -206,7 +199,7 @@ namespace Tester
 
             var sightLossRate = timeBetweenSightsSum / timeInFightSum;
             var targetLossRate = numberOfRetreatsSum / (float) numberOfFightsSum;
-            
+
             return new Dictionary<string, object>
             {
                 {"timeInFight1", timeInFight.GetOrDefault(bot1ID)},
@@ -240,7 +233,7 @@ namespace Tester
                 {"fightTime", fightTime},
                 {"pursueTime", pursueTime},
                 {"sightLossRate", sightLossRate},
-                {"targetLossRate", targetLossRate},
+                {"targetLossRate", targetLossRate}
             };
         }
     }

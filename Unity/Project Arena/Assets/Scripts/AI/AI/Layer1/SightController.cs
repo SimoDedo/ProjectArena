@@ -7,11 +7,11 @@ namespace AI.AI.Layer1
     {
         private readonly Transform bodyTransform;
         private readonly GameObject head;
-        private readonly float maxSpeed;
         private readonly float maxAcceleration;
-        private float inputPenalty = 1f;
+        private readonly float maxSpeed;
         private float currentBodySpeed;
         private float currentHeadSpeed;
+        private float inputPenalty = 1f;
 
         public SightController(
             AIEntity entity,
@@ -84,7 +84,7 @@ namespace AI.AI.Layer1
             // Debug.DrawLine(head.transform.position, target, Color.blue);
             return Vector3.Angle(headTransform.forward, direction);
         }
-        
+
         private float CalculateNewSpeed(float target, float actual, float previousSpeed)
         {
             var clampedAcceleration = maxAcceleration * inputPenalty;

@@ -13,17 +13,16 @@ namespace AI.Behaviours.Actions
     [Serializable]
     public class MoveDuringFight : Action
     {
-        private AIEntity entity;
-        private NavigationSystem navSystem;
-        private GunManager gunManager;
-        private Entity.Entity target;
-
-        private bool strifeRight = Random.value < 0.5;
-        private int remainingStrafes = Random.Range(MIN_STRAFE_LENGTH, MAX_STRAFE_LENGTH);
-
         private const int MIN_STRAFE_LENGTH = 10;
         private const int MAX_STRAFE_LENGTH = 30;
+        private AIEntity entity;
+        private GunManager gunManager;
+        private NavigationSystem navSystem;
+        private int remainingStrafes = Random.Range(MIN_STRAFE_LENGTH, MAX_STRAFE_LENGTH);
         private FightingMovementSkill skill;
+
+        private bool strifeRight = Random.value < 0.5;
+        private Entity.Entity target;
 
         public override void OnStart()
         {
@@ -71,7 +70,7 @@ namespace AI.Behaviours.Actions
 
             // Check if we can see enemy from where we are
             canSeeEnemyFromStartingPoint = !Physics.Linecast(currentPos, targetPos, out var canSeeEnemyHit) ||
-                canSeeEnemyHit.collider.gameObject == target.gameObject;
+                                           canSeeEnemyHit.collider.gameObject == target.gameObject;
 
             // We do not care if enemy is above or below us, the move straight/strife movement should be
             // parallel to the floor.
@@ -94,10 +93,8 @@ namespace AI.Behaviours.Actions
                 else if (distance > farRange)
                     movementDirectionDueToGun = direction;
                 else
-                {
                     // Randomly move through the optimal range of the gun, but not too much
                     movementDirectionDueToGun = direction * (Random.value > 0.5f ? -0.3f : 0.3f);
-                }
 
                 if (skill >= FightingMovementSkill.CircleStrife)
                 {
@@ -131,9 +128,7 @@ namespace AI.Behaviours.Actions
                     if (path.status != NavMeshPathStatus.PathComplete)
                         strifeRight = !strifeRight;
                     else
-                    {
                         navSystem.SetPath(path);
-                    }
                 }
                 else
                 {
@@ -173,12 +168,10 @@ namespace AI.Behaviours.Actions
                 // that it might be fleeing...
                 var enemyPath = navSystem.CalculatePath(targetPos);
                 if (!enemyPath.IsComplete())
-                {
                     Debug.LogError(
                         "Enemy is not reachable! My pos: (" + currentPos.x + " , " + currentPos.y + ", " +
                         currentPos.z + "), enemyPos (" + targetPos.x + " , " + targetPos.y + ", " + targetPos.z + ")"
                     );
-                }
 
                 navSystem.SetPath(enemyPath);
             }

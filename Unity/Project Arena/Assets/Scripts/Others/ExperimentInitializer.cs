@@ -6,14 +6,16 @@ using UnityEngine;
 namespace Others
 {
     /// <summary>
-    /// ExperimentInitializer allows to define experiments.
+    ///     ExperimentInitializer allows to define experiments.
     /// </summary>
-    public class ExperimentInitializer : MonoBehaviour {
-
+    public class ExperimentInitializer : MonoBehaviour
+    {
         [Header("Tutorial")] [SerializeField] private Case tutorial;
         [SerializeField] private bool playTutorial;
 
-        [Header("Experiment")] [SerializeField] private List<Study> studies;
+        [Header("Experiment")] [SerializeField]
+        private List<Study> studies;
+
         [SerializeField] private int casesPerUsers;
         [SerializeField] private string experimentName;
 
@@ -24,11 +26,13 @@ namespace Others
         [SerializeField] private bool logOnline;
         [SerializeField] private bool logGame;
         [SerializeField] private bool logStatistics;
-    
+
         private ExperimentManager experimentManager;
 
-        void Awake() {
-            if (ParameterManager.HasInstance()) {
+        private void Awake()
+        {
+            if (ParameterManager.HasInstance())
+            {
                 logOnline = ParameterManager.Instance.LogOnline;
                 logOffline = ParameterManager.Instance.LogOffline;
             }
@@ -41,6 +45,5 @@ namespace Others
                     experimentName, survey, playSurvey, logOffline, logOnline, logGame, logStatistics);
             }
         }
-
     }
 }

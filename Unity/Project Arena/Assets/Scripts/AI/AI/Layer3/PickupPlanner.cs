@@ -11,22 +11,9 @@ namespace AI.AI.Layer3
 {
     public class PickupPlanner
     {
-        private readonly AIEntity me;
-        private PickupKnowledgeBase knowledgeBase;
-        private NavigationSystem navSystem;
-        private GunManager gunManager;
-        private SightSensor sightSensor;
-
-        private Pickable chosenPickup;
-        private float chosenPickupScore = float.MinValue;
-        private float chosenPickupEstimatedActivationTime = float.MaxValue;
-
-        private float nextUpdateTime;
         private const float UPDATE_COOLDOWN = 0.5f;
         private const float MAX_DISTANCE_TO_BE_NEIGHBORS = 20f;
         private const float BONUS_SCORE_PER_NEIGHBOR = 0.1f;
-
-        private readonly Dictionary<Pickable, float> neighborsScore = new Dictionary<Pickable, float>();
 
         private static readonly AnimationCurve TimeToCollectValueCurve = new AnimationCurve(
             new Keyframe(0, 1.0f),
@@ -44,6 +31,20 @@ namespace AI.AI.Layer3
             new Keyframe(20f, 0.2f),
             new Keyframe(100f, 0.1666f)
         );
+
+        private readonly AIEntity me;
+
+        private readonly Dictionary<Pickable, float> neighborsScore = new Dictionary<Pickable, float>();
+
+        private Pickable chosenPickup;
+        private float chosenPickupEstimatedActivationTime = float.MaxValue;
+        private float chosenPickupScore = float.MinValue;
+        private GunManager gunManager;
+        private PickupKnowledgeBase knowledgeBase;
+        private NavigationSystem navSystem;
+
+        private float nextUpdateTime;
+        private SightSensor sightSensor;
 
 
         public PickupPlanner(AIEntity entity)
@@ -68,10 +69,7 @@ namespace AI.AI.Layer3
                 var neighbors = 0;
                 foreach (var pickup2 in pickups)
                 {
-                    if (pickup1 == pickup2)
-                    {
-                        continue;
-                    }
+                    if (pickup1 == pickup2) continue;
 
                     var pickup2Position = pickup2.transform.position;
                     var path = navSystem.CalculatePath(pickup1Position, pickup2Position);
@@ -176,10 +174,7 @@ namespace AI.AI.Layer3
             var pickupPosition = pickup.transform.position;
 
             var valueScore = ScorePickupByType(pickup);
-            if (valueScore == 0f)
-            {
-                return valueScore;
-            }
+            if (valueScore == 0f) return valueScore;
 
             var neighborhoodScore = neighborsScore[pickup];
 
@@ -199,22 +194,18 @@ namespace AI.AI.Layer3
                 totalTime = pathTime;
                 // Use all layers since the crates are in ignore layer
                 if (sightSensor.CanSeeObject(pickup.transform, Physics.AllLayers))
-                {
                     // I can see the object for now, so there is no uncertainty, the object is there!
                     timeUncertainty = 0;
-                }
                 else
-                {
                     // In this amount of time the pickup can be potentially be taken by someone before me
                     timeUncertainty = estimatedArrival - activationTime;
-                }
             }
 
             var timeMultiplier = ScoreTimeToCollect(totalTime);
             var uncertaintyMultiplier = ScoreUncertaintyTime(timeUncertainty);
 
             var finalScore = (valueScore + neighborhoodScore) * timeMultiplier * uncertaintyMultiplier;
-            
+
             return finalScore;
         }
 

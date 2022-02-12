@@ -8,19 +8,12 @@ namespace AI.Guns
 {
     public class ControlPointsGunScorer : GunScorer
     {
-        [Serializable]
-        private struct ControlPoint
-        {
-            public float distance;
-            public float score;
-        }
-
         [SerializeField] public float minRangeBest;
         [SerializeField] public float maxRangeBest;
-        private Tuple<float, float> rangeTuple;
 
         [SerializeField] private List<ControlPoint> controlPoints;
         private Gun gun;
+        private Tuple<float, float> rangeTuple;
 
         private void Awake()
         {
@@ -32,7 +25,7 @@ namespace AI.Guns
         public override float GetGunScore(float distance, bool fakeEmptyCharger = false)
         {
             var currentAmmo = gun.GetCurrentAmmo();
-            if (fakeEmptyCharger) {currentAmmo -= gun.GetLoadedAmmo();}
+            if (fakeEmptyCharger) currentAmmo -= gun.GetLoadedAmmo();
             if (currentAmmo == 0)
                 return 0.0f;
 
@@ -85,6 +78,13 @@ namespace AI.Guns
             //     if (controlPoints[i].score)
             // }
             //
+        }
+
+        [Serializable]
+        private struct ControlPoint
+        {
+            public float distance;
+            public float score;
         }
     }
 }

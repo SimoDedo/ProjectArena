@@ -39,24 +39,16 @@ namespace Graph
             var rows = rtn.GetLength(0);
             var columns = rtn.GetLength(1);
             for (var row = 0; row < rows; row++)
-            {
-                for (var col = 0; col < columns; col++)
-                    rtn[row, col] = 'w';
-            }
+            for (var col = 0; col < columns; col++)
+                rtn[row, col] = 'w';
 
             foreach (var area in areas)
-            {
                 for (var row = area.topRow; row < area.bottomRow; row++)
-                {
-                    for (var col = area.leftColumn; col < area.rightColumn; col++)
-                    {
-                        // if (area.isCorridor)
-                        //     rtn[row - minCoords.y, col - minCoords.x] = 'R';
-                        // else
-                            rtn[row - minCoords.y, col - minCoords.x] = 'r';
-                    }
-                }
-            }
+                for (var col = area.leftColumn; col < area.rightColumn; col++)
+                    // if (area.isCorridor)
+                    //     rtn[row - minCoords.y, col - minCoords.x] = 'R';
+                    // else
+                    rtn[row - minCoords.y, col - minCoords.x] = 'r';
 
             return rtn;
         }

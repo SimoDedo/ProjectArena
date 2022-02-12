@@ -1,16 +1,17 @@
+using System;
 using BehaviorDesigner.Runtime;
 using Pickables;
 
 namespace AI.Behaviours.Variables
 {
-    [System.Serializable]
+    [Serializable]
     public struct SelectedPickupInfo
     {
         public Pickable pickup;
         public float estimatedActivationTime;
     }
 
-    [System.Serializable]
+    [Serializable]
     public class SharedSelectedPickupInfo : SharedVariable<SelectedPickupInfo>
     {
         public static implicit operator SharedSelectedPickupInfo(SelectedPickupInfo value)

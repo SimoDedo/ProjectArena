@@ -11,9 +11,9 @@ namespace AI.Behaviours.Actions
     [Serializable]
     public class SelectAreaToVisit : Action
     {
+        [SerializeField] private SharedSelectedPathInfo pathChosen;
         private MapKnowledge mapKnowledge;
         private NavigationSystem navSystem;
-        [SerializeField] private SharedSelectedPathInfo pathChosen;
 
         public override void OnAwake()
         {
@@ -26,10 +26,7 @@ namespace AI.Behaviours.Actions
         {
             var destination = mapKnowledge.GetRecommendedDestination();
             var path = navSystem.CalculatePath(destination);
-            if (!path.IsComplete())
-            {
-                return TaskStatus.Running;
-            }
+            if (!path.IsComplete()) return TaskStatus.Running;
             pathChosen.Value = path;
             return TaskStatus.Success;
         }

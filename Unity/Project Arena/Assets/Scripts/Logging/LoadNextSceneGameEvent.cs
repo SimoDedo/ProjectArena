@@ -2,7 +2,11 @@ using ScriptableObjectArchitecture;
 
 namespace Logging
 {
-    public class BaseLoadNextSceneGameEvent : GameEventBase { }
+    public class BaseLoadNextSceneGameEvent : GameEventBase
+    {
+    }
 
-    public sealed class LoadNextSceneGameEvent : ScriptableObjectSingleton<BaseLoadNextSceneGameEvent> { }
+    public sealed class LoadNextSceneGameEvent : ScriptableObjectSingleton<BaseLoadNextSceneGameEvent>
+    {
+    }
 }

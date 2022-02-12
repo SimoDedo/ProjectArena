@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace UI
 {
     /// <summary>
-    /// TargetRushGameUIManager is an implementation of GameUIManager. The figth UI shows the number of
-    /// the current wave, the number of alive targets, the score and the residual time.
+    ///     TargetRushGameUIManager is an implementation of GameUIManager. The figth UI shows the number of
+    ///     the current wave, the number of alive targets, the score and the residual time.
     /// </summary>
-    public class TargetRushGameUIManager : GameUIManager {
-
+    public class TargetRushGameUIManager : GameUIManager
+    {
         // Elements of the ready UI.
         [Header("Ready UI")] [SerializeField] private Text countdown;
 
@@ -27,79 +26,93 @@ namespace UI
         [SerializeField] private GameObject victory;
         [SerializeField] private Text finalScore;
         [SerializeField] private Text finalWave;
+        private bool addedScoreDisplayed;
+        private float addedScoreTime;
+        private bool addedTimeDisplayed;
+        private float addedTimeTime;
+        private readonly string additiveScore = "";
+        private readonly Queue<string> additiveScoreQueue = new Queue<string>();
+        private readonly string additiveTime = "";
 
-        private Queue<string> additiveTimeQueue = new Queue<string>();
-        private Queue<string> additiveScoreQueue = new Queue<string>();
-        private float addedTimeTime = 0f;
-        private float addedScoreTime = 0f;
-        private bool addedTimeDisplayed = false;
-        private bool addedScoreDisplayed = false;
-        private string additiveTime = "";
-        private string additiveScore = "";
-        private string timeValue = "";
+        private readonly Queue<string> additiveTimeQueue = new Queue<string>();
         private string scoreValue = "";
+        private string timeValue = "";
 
-        public void Start() {
+        public void Start()
+        {
             SetReady(true);
         }
 
-        public void Update() {
-            if (fightUI.activeSelf) {
+        public void Update()
+        {
+            if (fightUI.activeSelf)
+            {
                 // Menage the time adder.
-                if (addedTimeDisplayed) {
-                    if (Time.time > addedTimeTime + 0.5f) {
+                if (addedTimeDisplayed)
+                {
+                    if (Time.time > addedTimeTime + 0.5f)
+                    {
                         additiveTimeText.text = "";
                         addedTimeDisplayed = false;
                     }
-                } else if (additiveTimeQueue.Count > 0 && Time.time > addedTimeTime + 1f) {
-                    String additive = additiveTimeQueue.Dequeue();
+                }
+                else if (additiveTimeQueue.Count > 0 && Time.time > addedTimeTime + 1f)
+                {
+                    var additive = additiveTimeQueue.Dequeue();
                     additiveTimeText.text =
                         GetSpacesString((additive.Length + time.text.Length) * 2 - 1) + additive;
                     addedTimeDisplayed = true;
                     addedTimeTime = Time.time;
                 }
+
                 // Menage the score adder.
-                if (addedScoreDisplayed) {
-                    if (Time.time > addedScoreTime + 0.5f) {
+                if (addedScoreDisplayed)
+                {
+                    if (Time.time > addedScoreTime + 0.5f)
+                    {
                         additiveScoreText.text = "";
                         addedScoreDisplayed = false;
                     }
-                } else if (additiveScoreQueue.Count > 0 && Time.time > addedScoreTime + 1f) {
-                    String additive = additiveScoreQueue.Dequeue();
+                }
+                else if (additiveScoreQueue.Count > 0 && Time.time > addedScoreTime + 1f)
+                {
+                    var additive = additiveScoreQueue.Dequeue();
                     additiveScoreText.text =
-                        GetSpacesString((additive.Length + score.text.Length) * 2 - 1) + additive; ;
+                        GetSpacesString((additive.Length + score.text.Length) * 2 - 1) + additive;
+                    ;
                     addedScoreDisplayed = true;
                     addedScoreTime = Time.time;
                 }
             }
         }
 
-        private string GetSpacesString(int n) {
-            string spaces = "";
+        private string GetSpacesString(int n)
+        {
+            var spaces = "";
 
-            for (int i = 0; i < n; i++) {
-                spaces += " ";
-            }
+            for (var i = 0; i < n; i++) spaces += " ";
 
             return spaces;
         }
 
         // Sets the countdown.
-        public void SetCountdown(int i) {
-            if (i > 0) {
+        public void SetCountdown(int i)
+        {
+            if (i > 0)
                 countdown.text = i.ToString();
-            } else {
+            else
                 countdown.text = "Fight!";
-            }
         }
 
         // Sets the remaining time.
-        public void SetTime(int t) {
+        public void SetTime(int t)
+        {
             timeValue = TimeToString(t / 60) + ":" + TimeToString(t % 60);
             time.text = timeValue + additiveTime;
         }
 
-        public override void SetColorAll(Color c) {
+        public override void SetColorAll(Color c)
+        {
             time.color = c;
             score.color = c;
             wave.color = c;
@@ -108,44 +121,54 @@ namespace UI
             additiveTimeText.color = c;
         }
 
-        public void SetScore(int s) {
+        public void SetScore(int s)
+        {
             scoreValue = s.ToString();
             score.text = scoreValue + additiveScore;
         }
 
-        public void SetTargets(int t) {
+        public void SetTargets(int t)
+        {
             targets.text = "Targets: " + t;
         }
 
-        public void SetFinalScore(int s) {
+        public void SetFinalScore(int s)
+        {
             finalScore.text = "Score: " + s;
         }
 
-        public void SetFinalWave(int w) {
+        public void SetFinalWave(int w)
+        {
             finalWave.text = "Wave: " + w;
         }
 
-        public void SetWave(int w) {
+        public void SetWave(int w)
+        {
             wave.text = "Wave: " + w;
         }
 
-        public void SetVictory(bool b) {
-            if (b) {
+        public void SetVictory(bool b)
+        {
+            if (b)
+            {
                 victory.SetActive(true);
                 gameover.SetActive(false);
-            } else {
+            }
+            else
+            {
                 victory.SetActive(false);
                 gameover.SetActive(true);
             }
         }
 
-        public void AddTime(int t) {
+        public void AddTime(int t)
+        {
             additiveTimeQueue.Enqueue(" +" + t);
         }
 
-        public void AddScore(int s) {
+        public void AddScore(int s)
+        {
             additiveScoreQueue.Enqueue(" +" + s);
         }
-
     }
 }

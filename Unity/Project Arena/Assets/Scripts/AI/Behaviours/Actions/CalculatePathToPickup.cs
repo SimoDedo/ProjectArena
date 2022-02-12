@@ -11,9 +11,9 @@ namespace AI.Behaviours.Actions
     [Serializable]
     public class CalculatePathToPickup : Action
     {
-        private PickupPlanner pickupPlanner;
-        private NavigationSystem navSystem;
         [SerializeField] private SharedSelectedPathInfo chosenPath;
+        private NavigationSystem navSystem;
+        private PickupPlanner pickupPlanner;
 
         public override void OnAwake()
         {

@@ -12,8 +12,8 @@ namespace AI.Behaviours.Actions
     public class DodgeRocket : Action
     {
         [SerializeField] private SharedTransform rocketToDodge;
-        private NavigationSystem navSystem;
         private Transform entityTransform;
+        private NavigationSystem navSystem;
 
         public override void OnAwake()
         {
@@ -34,7 +34,7 @@ namespace AI.Behaviours.Actions
                 navSystem.MoveAlongPath();
                 return TaskStatus.Running;
             }
-            
+
             // This rocket is not mine... How do I dodge it?
             // Calculate it's trajectory and try to get away from it
 
@@ -58,10 +58,7 @@ namespace AI.Behaviours.Actions
                 true
             );
             var path = navSystem.CalculatePath(entityPosition + avoidDirection);
-            if (path.IsComplete())
-            {
-                navSystem.SetPath(path);
-            }
+            if (path.IsComplete()) navSystem.SetPath(path);
 
             return TaskStatus.Running;
         }

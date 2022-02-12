@@ -19,13 +19,11 @@ namespace Utils
             rtn.angle = Vector3.Angle(user.forward, direction);
 
             if (Physics.Raycast(user.position, direction, out var hit, float.PositiveInfinity, ignoreLayers))
-            {
                 if (hit.collider.transform == target)
                 {
                     rtn.isVisible = true;
                     rtn.distance = hit.distance;
                 }
-            }
 
             return rtn;
         }

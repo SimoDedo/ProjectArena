@@ -5,9 +5,9 @@ namespace AI.Behaviours.Conditions
 {
     public class ShouldFight : Conditional
     {
+        private AIEntity entity;
         private FightingMovementSkill skill;
         private TargetKnowledgeBase targetKb;
-        private AIEntity entity;
 
         public override void OnAwake()
         {
@@ -19,10 +19,8 @@ namespace AI.Behaviours.Conditions
         public override TaskStatus OnUpdate()
         {
             if (skill == FightingMovementSkill.StandStill)
-            {
                 // Never fight back if I don't have the required movement skill!
                 return TaskStatus.Failure;
-            }
 
             if (targetKb.HasSeenTarget())
             {

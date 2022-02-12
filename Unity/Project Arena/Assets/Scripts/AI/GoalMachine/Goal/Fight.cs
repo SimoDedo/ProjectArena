@@ -8,11 +8,11 @@ namespace AI.GoalMachine.Goal
     public class Fight : IGoal
     {
         private const float LOW_HEALTH_PENALTY = 0.6f;
-        private readonly AIEntity entity;
-        private readonly TargetKnowledgeBase targetKb;
-        private readonly GunManager gunManager;
-        private readonly ExternalBehaviorTree externalBt;
         private readonly BehaviorTree behaviorTree;
+        private readonly AIEntity entity;
+        private readonly ExternalBehaviorTree externalBt;
+        private readonly GunManager gunManager;
+        private readonly TargetKnowledgeBase targetKb;
 
         public Fight(AIEntity entity)
         {

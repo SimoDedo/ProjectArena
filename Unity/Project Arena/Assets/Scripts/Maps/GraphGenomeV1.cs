@@ -6,22 +6,22 @@ namespace Maps
 {
     public class GraphGenomeV1
     {
-        public readonly int numRows; // DO NOT CHANGE during evolution
-        public readonly int numColumns; // DO NOT CHANGE during evolution
-
-        public readonly int roomMaxSize; // DO NOT CHANGE during evolution
+        public readonly int columnSeparationWidth; // DO NOT CHANGE during evolution
+        public readonly int corridorThickness; // DO NOT CHANGE during evolution
+        public readonly bool[,] horizontalConnections;
+        public readonly float maxRatio; // DO NOT CHANGE during evolution
 
         // Ratio: width / height
         public readonly float minRatio; // DO NOT CHANGE during evolution
-        public readonly float maxRatio; // DO NOT CHANGE during evolution
-        public readonly int corridorThickness; // DO NOT CHANGE during evolution
-        public readonly int rowSeparationHeight; // DO NOT CHANGE during evolution
-        public readonly int columnSeparationWidth; // DO NOT CHANGE during evolution
+        public readonly int numColumns; // DO NOT CHANGE during evolution
+        public readonly int numRows; // DO NOT CHANGE during evolution
+
+        public readonly int roomMaxSize; // DO NOT CHANGE during evolution
 
         // Real Genome 
         public readonly AreaSize[,] roomSizes;
+        public readonly int rowSeparationHeight; // DO NOT CHANGE during evolution
         public readonly bool[,] verticalConnections;
-        public readonly bool[,] horizontalConnections;
 
         public GraphGenomeV1(
             int numRows,
@@ -53,8 +53,8 @@ namespace Maps
 
     public class AreaSize
     {
-        public readonly int width;
         public readonly int height;
+        public readonly int width;
 
         public AreaSize(int width, int height)
         {
@@ -62,7 +62,7 @@ namespace Maps
             this.height = height;
         }
 
-        public bool IsInvalid => width == 0 ^ height == 0;
+        public bool IsInvalid => (width == 0) ^ (height == 0);
         public bool IsZeroSized => width == 0 && height == 0;
     }
 
@@ -101,23 +101,17 @@ namespace Maps
             //Check that at least one room exists
             var foundValidRoom = false;
             for (var r = 0; r < genome.numRows && !foundValidRoom; r++)
-            {
-                for (var c = 0; c < genome.numColumns && !foundValidRoom; c++)
-                    foundValidRoom |= !genome.roomSizes[r, c].IsZeroSized;
-            }
+            for (var c = 0; c < genome.numColumns && !foundValidRoom; c++)
+                foundValidRoom |= !genome.roomSizes[r, c].IsZeroSized;
 
             if (!foundValidRoom) throw new ApplicationException("Invalid genome: no rooms!");
             // Check that no room has height greater than max
             for (var r = 0; r < genome.numRows; r++)
-            {
-                for (var c = 0; c < genome.numColumns; c++)
-                {
-                    if (genome.roomSizes[r, c].height > genome.roomMaxSize)
-                        throw new ApplicationException(
-                            "Invalid genome: room " + r + ", " + c + " height is greater than the max row height"
-                        );
-                }
-            }
+            for (var c = 0; c < genome.numColumns; c++)
+                if (genome.roomSizes[r, c].height > genome.roomMaxSize)
+                    throw new ApplicationException(
+                        "Invalid genome: room " + r + ", " + c + " height is greater than the max row height"
+                    );
 
             // // Check that no column has only 0 sized rooms
             // for (var c = 0; c < genome.numColumns; c++)
@@ -133,39 +127,29 @@ namespace Maps
 
             // Check that no room has width greater than max
             for (var r = 0; r < genome.numRows; r++)
-            {
-                for (var c = 0; c < genome.numColumns; c++)
-                {
-                    if (genome.roomSizes[r, c].width > genome.roomMaxSize)
-                        throw new ApplicationException(
-                            "Invalid genome: room " + r + ", " + c + " width is greater than the max column width"
-                        );
-                }
-            }
+            for (var c = 0; c < genome.numColumns; c++)
+                if (genome.roomSizes[r, c].width > genome.roomMaxSize)
+                    throw new ApplicationException(
+                        "Invalid genome: room " + r + ", " + c + " width is greater than the max column width"
+                    );
 
             // Check that, if a room has 0 width/height, then also the height/width is zero
             for (var r = 0; r < genome.numRows; r++)
-            {
-                for (var c = 0; c < genome.numColumns; c++)
-                {
-                    if (genome.roomSizes[r, c].IsInvalid)
-                        throw new ApplicationException("Invalid genome: room " + r + ", " + c +
-                            " has invalid dimensions!");
-                }
-            }
+            for (var c = 0; c < genome.numColumns; c++)
+                if (genome.roomSizes[r, c].IsInvalid)
+                    throw new ApplicationException("Invalid genome: room " + r + ", " + c +
+                                                   " has invalid dimensions!");
 
             // Check that ratio are respected
             for (var r = 0; r < genome.numRows; r++)
+            for (var c = 0; c < genome.numColumns; c++)
             {
-                for (var c = 0; c < genome.numColumns; c++)
-                {
-                    var size = genome.roomSizes[r, c];
-                    if (size.IsZeroSized) continue;
-                    var ratio = size.width / (float) size.height;
-                    if (ratio < genome.minRatio || ratio > genome.maxRatio)
-                        throw new ApplicationException("Invalid genome: room " + r + ", " + c +
-                            " has invalid dimensions!");
-                }
+                var size = genome.roomSizes[r, c];
+                if (size.IsZeroSized) continue;
+                var ratio = size.width / (float) size.height;
+                if (ratio < genome.minRatio || ratio > genome.maxRatio)
+                    throw new ApplicationException("Invalid genome: room " + r + ", " + c +
+                                                   " has invalid dimensions!");
             }
 
             // TODO other checks?
@@ -176,22 +160,18 @@ namespace Maps
             var biggestCC = 0;
             var biggestCCSize = 0;
             for (var r = 0; r < genome.numRows; r++)
-            {
-                for (var c = 0; c < genome.numColumns; c++)
+            for (var c = 0; c < genome.numColumns; c++)
+                if (roomCCs[r, c] == 0)
                 {
-                    if (roomCCs[r, c] == 0)
+                    var ccSize = GenomeGraphVisit(ccCurrentNum, r, c, genome, roomCCs);
+                    if (ccSize > biggestCCSize)
                     {
-                        var ccSize = GenomeGraphVisit(ccCurrentNum, r, c, genome, roomCCs);
-                        if (ccSize > biggestCCSize)
-                        {
-                            biggestCC = ccCurrentNum;
-                            biggestCCSize = ccSize;
-                        }
-
-                        ccCurrentNum++;
+                        biggestCC = ccCurrentNum;
+                        biggestCCSize = ccSize;
                     }
+
+                    ccCurrentNum++;
                 }
-            }
 
             // Step 1: find real height of every row, calculated as the max height of the rooms in that row which are
             // connected to the biggest subgraph
@@ -200,10 +180,8 @@ namespace Maps
             {
                 var maxHeightRow = 0;
                 for (var c = 0; c < genome.numColumns; c++)
-                {
                     if (roomCCs[r, c] == biggestCC && maxHeightRow < genome.roomSizes[r, c].height)
                         maxHeightRow = genome.roomSizes[r, c].height;
-                }
 
                 rowHeights[r] = maxHeightRow;
             }
@@ -215,10 +193,8 @@ namespace Maps
             {
                 var maxWidthColumns = 0;
                 for (var r = 0; r < genome.numRows; r++)
-                {
                     if (roomCCs[r, c] == biggestCC && maxWidthColumns < genome.roomSizes[r, c].width)
                         maxWidthColumns = genome.roomSizes[r, c].width;
-                }
 
                 columnWidths[c] = maxWidthColumns;
             }
@@ -236,50 +212,40 @@ namespace Maps
             var placedRoomsMapping = new Dictionary<int, Area>();
             var areasList = new List<Area>();
             for (var r = 0; r < genome.numRows; r++)
+            for (var c = 0; c < genome.numColumns; c++)
             {
-                for (var c = 0; c < genome.numColumns; c++)
-                {
-                    if (roomCCs[r, c] != biggestCC) continue;
-                    var area = CreateRoom(r, c, rowStartingPos[r], columnStartingPos[c], rowHeights[r], columnWidths[c],
-                        genome, random);
-                    areasList.Add(area);
-                    placedRoomsMapping.Add(GetRoomIndex(r, c, genome), area);
-                }
+                if (roomCCs[r, c] != biggestCC) continue;
+                var area = CreateRoom(r, c, rowStartingPos[r], columnStartingPos[c], rowHeights[r], columnWidths[c],
+                    genome, random);
+                areasList.Add(area);
+                placedRoomsMapping.Add(GetRoomIndex(r, c, genome), area);
             }
 
             // Place vertical corridors
             for (var r = 0; r < genome.numRows - 1; r++)
-            {
-                for (var c = 0; c < genome.numColumns; c++)
+            for (var c = 0; c < genome.numColumns; c++)
+                if (genome.verticalConnections[r, c] && roomCCs[r, c] == biggestCC &&
+                    roomCCs[r + 1, c] == biggestCC)
                 {
-                    if (genome.verticalConnections[r, c] && roomCCs[r, c] == biggestCC &&
-                        roomCCs[r + 1, c] == biggestCC)
-                    {
-                        var topRow = placedRoomsMapping[GetRoomIndex(r, c, genome)].bottomRow;
-                        var bottomRow = placedRoomsMapping[GetRoomIndex(r + 1, c, genome)].topRow;
-                        areasList.Add(CreateVerticalCorridor(genome.corridorThickness, topRow, bottomRow,
-                            columnStartingPos[c],
-                            columnWidths[c]));
-                    }
+                    var topRow = placedRoomsMapping[GetRoomIndex(r, c, genome)].bottomRow;
+                    var bottomRow = placedRoomsMapping[GetRoomIndex(r + 1, c, genome)].topRow;
+                    areasList.Add(CreateVerticalCorridor(genome.corridorThickness, topRow, bottomRow,
+                        columnStartingPos[c],
+                        columnWidths[c]));
                 }
-            }
 
             // Place horizontal corridors
             for (var r = 0; r < genome.numRows; r++)
-            {
-                for (var c = 0; c < genome.numColumns - 1; c++)
+            for (var c = 0; c < genome.numColumns - 1; c++)
+                if (genome.horizontalConnections[r, c] && roomCCs[r, c] == biggestCC &&
+                    roomCCs[r, c + 1] == biggestCC)
                 {
-                    if (genome.horizontalConnections[r, c] && roomCCs[r, c] == biggestCC &&
-                        roomCCs[r, c + 1] == biggestCC)
-                    {
-                        var leftColumn = placedRoomsMapping[GetRoomIndex(r, c, genome)].rightColumn;
-                        var rightColumn = placedRoomsMapping[GetRoomIndex(r, c + 1, genome)].leftColumn;
-                        areasList.Add(CreateHorizontalCorridor(genome.corridorThickness, rowStartingPos[r],
-                            rowHeights[r],
-                            leftColumn, rightColumn));
-                    }
+                    var leftColumn = placedRoomsMapping[GetRoomIndex(r, c, genome)].rightColumn;
+                    var rightColumn = placedRoomsMapping[GetRoomIndex(r, c + 1, genome)].leftColumn;
+                    areasList.Add(CreateHorizontalCorridor(genome.corridorThickness, rowStartingPos[r],
+                        rowHeights[r],
+                        leftColumn, rightColumn));
                 }
-            }
 
             areas = areasList.ToArray();
             map = MapUtils.TranslateAreaMap(areas);
@@ -296,7 +262,7 @@ namespace Maps
             int corridorStartingRow;
             var corridorHeight = corridorThickness;
             if (corridorHeight <= currentRowMaxHeight / 2)
-                corridorStartingRow = currentRowStartingIndex + (currentRowMaxHeight / 2) - corridorHeight;
+                corridorStartingRow = currentRowStartingIndex + currentRowMaxHeight / 2 - corridorHeight;
             else
                 corridorStartingRow = currentRowStartingIndex;
 
@@ -330,9 +296,10 @@ namespace Maps
             {
                 var possibleStartingColumns = roomWidth;
                 selectedStartingColumn =
-                    columnStartingPos + (columnWidth / 2) - roomWidth +
+                    columnStartingPos + columnWidth / 2 - roomWidth +
                     pseudoRandomGen.Next(0, possibleStartingColumns);
-            } else
+            }
+            else
             {
                 var possibleStartingColumns = columnWidth - roomWidth;
                 selectedStartingColumn = columnStartingPos + pseudoRandomGen.Next(0, possibleStartingColumns);
@@ -342,9 +309,10 @@ namespace Maps
             {
                 var possibleStartingRows = roomHeight;
                 selectedStartingRow =
-                    rowStartingPos + (rowHeight / 2) - roomHeight +
+                    rowStartingPos + rowHeight / 2 - roomHeight +
                     pseudoRandomGen.Next(0, possibleStartingRows);
-            } else
+            }
+            else
             {
                 var possibleStartingRows = rowHeight - roomHeight;
                 selectedStartingRow = rowStartingPos + pseudoRandomGen.Next(0, possibleStartingRows);
@@ -370,7 +338,7 @@ namespace Maps
             int corridorStartingColumn;
             var corridorWidth = corridorThickness;
             if (corridorWidth <= currentColumnMaxWidth / 2)
-                corridorStartingColumn = currentColumnStartingIndex + (currentColumnMaxWidth / 2) - corridorWidth;
+                corridorStartingColumn = currentColumnStartingIndex + currentColumnMaxWidth / 2 - corridorWidth;
             else
                 corridorStartingColumn = currentColumnStartingIndex;
 

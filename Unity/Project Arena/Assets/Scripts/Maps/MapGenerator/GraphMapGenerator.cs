@@ -35,12 +35,12 @@ namespace Maps.MapGenerator
 
             var realWidth = width;
             var realHeight = height;
-            
+
             width += borderSize * 2;
             height += borderSize * 2;
-            
-            map = new char[width,height];
-            
+
+            map = new char[width, height];
+
             MapEdit.FillMap(map, wallChar);
             InitializePseudoRandomGenerator();
 
@@ -55,18 +55,17 @@ namespace Maps.MapGenerator
                 roomsWidth[row] = new int[maxNumberOfColumns];
                 roomsHeight[row] = new int[maxNumberOfColumns];
                 for (var column = 0; column < maxNumberOfColumns; column++)
-                {
                     if (pseudoRandomGen.NextDouble() < 0.5)
                     {
                         roomsWidth[row][column] = pseudoRandomGen.Next(minRoomWidth, maxRoomWidth);
                         roomsHeight[row][column] = pseudoRandomGen.Next(minRoomHeight, maxRoomHeight);
                         // placedRoomWidth = true;
-                    } else
+                    }
+                    else
                     {
                         roomsWidth[row][column] = minCorridorThickness;
                         roomsHeight[row][column] = minCorridorThickness;
                     }
-                }
             }
 
             // Initialize array containing separation height between cells rows
@@ -81,18 +80,14 @@ namespace Maps.MapGenerator
             // Calculate max height of each row
             var maxRowHeight = new int[maxNumberOfRows];
             for (var row = 0; row < maxNumberOfRows; row++)
-            {
-                for (var column = 0; column < maxNumberOfColumns; column++)
-                    maxRowHeight[row] = Mathf.Max(maxRowHeight[row], roomsHeight[row][column]);
-            }
+            for (var column = 0; column < maxNumberOfColumns; column++)
+                maxRowHeight[row] = Mathf.Max(maxRowHeight[row], roomsHeight[row][column]);
 
             // Calculate max width of each column
             var maxColumnWidth = new int[maxNumberOfColumns];
             for (var row = 0; row < maxNumberOfRows; row++)
-            {
-                for (var column = 0; column < maxNumberOfColumns; column++)
-                    maxColumnWidth[column] = Mathf.Max(maxColumnWidth[column], roomsWidth[row][column]);
-            }
+            for (var column = 0; column < maxNumberOfColumns; column++)
+                maxColumnWidth[column] = Mathf.Max(maxColumnWidth[column], roomsWidth[row][column]);
 
             // Initialize array containing the width of the corridor connecting cell (i,j) with (i+1,j).
             // A value of 0 indicates that there is no corridor
@@ -101,18 +96,13 @@ namespace Maps.MapGenerator
             {
                 verticalCorridorsWidths[row] = new int[maxNumberOfColumns];
                 for (var column = 0; column < maxNumberOfColumns; column++)
-                {
                     if (pseudoRandomGen.NextDouble() < 0.5)
-                    {
                         verticalCorridorsWidths[row][column] = Mathf.Min(
                             pseudoRandomGen.Next(minCorridorThickness, maxCorridorThickness),
                             maxColumnWidth[column]
                         );
-                    } else
-                    {
+                    else
                         verticalCorridorsWidths[row][column] = 0;
-                    }
-                }
             }
 
             // Initialize array containing the height of the corridor connecting cell (i,j) with (i,j+1).
@@ -122,18 +112,13 @@ namespace Maps.MapGenerator
             {
                 horizontalCorridorsHeights[row] = new int[maxNumberOfColumns - 1];
                 for (var column = 0; column < maxNumberOfColumns - 1; column++)
-                {
                     if (pseudoRandomGen.NextDouble() < 0.5)
-                    {
                         horizontalCorridorsHeights[row][column] = Mathf.Min(
                             pseudoRandomGen.Next(minCorridorThickness, maxCorridorThickness),
                             maxColumnWidth[column]
                         );
-                    } else
-                    {
+                    else
                         horizontalCorridorsHeights[row][column] = 0;
-                    }
-                }
             }
 
             // Calculate starting row index in the char[,] map of each row
@@ -141,14 +126,14 @@ namespace Maps.MapGenerator
             rowStartingIndexes[0] = borderSize;
             for (var row = 1; row < maxNumberOfRows; row++)
                 rowStartingIndexes[row] = rowStartingIndexes[row - 1] + maxRowHeight[row - 1] +
-                    gridVerticalSeparations[row - 1];
+                                          gridVerticalSeparations[row - 1];
 
             // Calculate starting column index in the char[,] map of each column
             var columnStartingIndex = new int[maxNumberOfColumns];
             columnStartingIndex[0] = borderSize;
             for (var column = 1; column < maxNumberOfColumns; column++)
                 columnStartingIndex[column] = columnStartingIndex[column - 1] + maxColumnWidth[column - 1] +
-                    gridHorizontalSeparations[column - 1];
+                                              gridHorizontalSeparations[column - 1];
 
             // Graph visit initialization, every room has not been visited
             var roomConnectedComponentNum = new int[maxNumberOfRows][];
@@ -161,78 +146,58 @@ namespace Maps.MapGenerator
             var bestConnectedComponentSize = 0;
 
             for (var row = 0; row < maxNumberOfRows; row++)
-            {
-                for (var column = 0; column < maxNumberOfColumns; column++)
+            for (var column = 0; column < maxNumberOfColumns; column++)
+                if (roomConnectedComponentNum[row][column] == 0)
                 {
-                    if (roomConnectedComponentNum[row][column] == 0)
+                    if (roomsHeight[row][column] == 0 || roomsWidth[row][column] == 0) continue;
+                    var connectedRooms = VisitCell(currentConnectedNumber, row, column, roomConnectedComponentNum,
+                        horizontalCorridorsHeights, verticalCorridorsWidths);
+                    if (connectedRooms > bestConnectedComponentSize)
                     {
-                        if (roomsHeight[row][column] == 0 || roomsWidth[row][column] == 0) continue;
-                        var connectedRooms = VisitCell(currentConnectedNumber, row, column, roomConnectedComponentNum,
-                            horizontalCorridorsHeights, verticalCorridorsWidths);
-                        if (connectedRooms > bestConnectedComponentSize)
-                        {
-                            bestConnectedComponent = currentConnectedNumber;
-                            bestConnectedComponentSize = connectedRooms;
-                        }
-
-                        currentConnectedNumber++;
+                        bestConnectedComponent = currentConnectedNumber;
+                        bestConnectedComponentSize = connectedRooms;
                     }
+
+                    currentConnectedNumber++;
                 }
-            }
 
             // Fill the map with the rooms and corridors belonging to the connected component
             for (var row = 0; row < maxNumberOfRows; row++)
-            {
-                for (var column = 0; column < maxNumberOfColumns; column++)
+            for (var column = 0; column < maxNumberOfColumns; column++)
+                if (roomConnectedComponentNum[row][column] == bestConnectedComponent)
                 {
-                    if (roomConnectedComponentNum[row][column] == bestConnectedComponent)
-                    {
-                        roomsDictionary.Add(row * maxNumberOfColumns + column, areas.Count);
-                        areas.Add(CreateRoom(rowStartingIndexes[row], columnStartingIndex[column],
-                            maxColumnWidth[column],
-                            maxRowHeight[row], roomsWidth[row][column], roomsHeight[row][column]));
-                    }
+                    roomsDictionary.Add(row * maxNumberOfColumns + column, areas.Count);
+                    areas.Add(CreateRoom(rowStartingIndexes[row], columnStartingIndex[column],
+                        maxColumnWidth[column],
+                        maxRowHeight[row], roomsWidth[row][column], roomsHeight[row][column]));
                 }
-            }
 
             // Fill vertical corridors
             for (var row = 0; row < maxNumberOfRows - 1; row++)
-            {
-                for (var column = 0; column < maxNumberOfColumns; column++)
-                {
-                    if (verticalCorridorsWidths[row][column] > 0 &&
-                        roomConnectedComponentNum[row][column] == bestConnectedComponent)
-                    {
-                        areas.Add(CreateVerticalCorridor(verticalCorridorsWidths[row][column],
-                            areas[roomsDictionary[row * maxNumberOfColumns + column]],
-                            areas[roomsDictionary[(row + 1) * maxNumberOfColumns + column]],
-                            columnStartingIndex[column],
-                            maxColumnWidth[column]));
-                    }
-                }
-            }
+            for (var column = 0; column < maxNumberOfColumns; column++)
+                if (verticalCorridorsWidths[row][column] > 0 &&
+                    roomConnectedComponentNum[row][column] == bestConnectedComponent)
+                    areas.Add(CreateVerticalCorridor(verticalCorridorsWidths[row][column],
+                        areas[roomsDictionary[row * maxNumberOfColumns + column]],
+                        areas[roomsDictionary[(row + 1) * maxNumberOfColumns + column]],
+                        columnStartingIndex[column],
+                        maxColumnWidth[column]));
 
             // Fill horizontal corridors
             for (var row = 0; row < maxNumberOfRows; row++)
-            {
-                for (var column = 0; column < maxNumberOfColumns - 1; column++)
-                {
-                    if (horizontalCorridorsHeights[row][column] > 0 &&
-                        roomConnectedComponentNum[row][column] == bestConnectedComponent)
-                    {
-                        areas.Add(CreateHorizontalCorridor(horizontalCorridorsHeights[row][column],
-                            rowStartingIndexes[row],
-                            areas[roomsDictionary[row * maxNumberOfColumns + column]],
-                            areas[roomsDictionary[row * maxNumberOfColumns + column + 1]],
-                            maxRowHeight[row]));
-                    }
-                }
-            }
+            for (var column = 0; column < maxNumberOfColumns - 1; column++)
+                if (horizontalCorridorsHeights[row][column] > 0 &&
+                    roomConnectedComponentNum[row][column] == bestConnectedComponent)
+                    areas.Add(CreateHorizontalCorridor(horizontalCorridorsHeights[row][column],
+                        rowStartingIndexes[row],
+                        areas[roomsDictionary[row * maxNumberOfColumns + column]],
+                        areas[roomsDictionary[row * maxNumberOfColumns + column + 1]],
+                        maxRowHeight[row]));
 
             FillMap(areas);
             // ProcessMap();
             PopulateMap();
-            
+
             var textMap = GetMapAsText();
             SaveMapTextGameEvent.Instance.Raise(textMap);
             if (createTextFile) SaveMapAsText(textMap);
@@ -243,15 +208,9 @@ namespace Maps.MapGenerator
         {
             // TODO Areas are flipped vertically. Understand why
             foreach (var area in areas)
-            {
                 for (var row = area.topRow; row < area.bottomRow; row++)
-                {
-                    for (var col = area.leftColumn; col < area.rightColumn; col++)
-                    {
-                        map[height - row - 1, col] = 'r';
-                    }
-                }
-            }
+                for (var col = area.leftColumn; col < area.rightColumn; col++)
+                    map[height - row - 1, col] = 'r';
         }
 
         private static Area CreateVerticalCorridor(
@@ -268,7 +227,7 @@ namespace Maps.MapGenerator
             int corridorStartingColumn;
             var corridorWidth = corridorThickness;
             if (corridorWidth <= currentColumnMaxWidth / 2)
-                corridorStartingColumn = currentColumnStartingIndex + (currentColumnMaxWidth / 2) - corridorWidth;
+                corridorStartingColumn = currentColumnStartingIndex + currentColumnMaxWidth / 2 - corridorWidth;
             else
                 corridorStartingColumn = currentColumnStartingIndex;
 
@@ -291,7 +250,7 @@ namespace Maps.MapGenerator
             int corridorStartingRow;
             var corridorHeight = corridorThickness;
             if (corridorHeight <= currentRowMaxHeight / 2)
-                corridorStartingRow = currentRowStartingIndex + (currentRowMaxHeight / 2) - corridorHeight;
+                corridorStartingRow = currentRowStartingIndex + currentRowMaxHeight / 2 - corridorHeight;
             else
                 corridorStartingRow = currentRowStartingIndex;
 
@@ -315,9 +274,10 @@ namespace Maps.MapGenerator
             {
                 var possibleStartingColumns = roomWidth;
                 selectedStartingColumn =
-                    columnStartingIndex + (columnWidth / 2) - roomWidth +
+                    columnStartingIndex + columnWidth / 2 - roomWidth +
                     pseudoRandomGen.Next(0, possibleStartingColumns);
-            } else
+            }
+            else
             {
                 var possibleStartingColumns = columnWidth - roomWidth;
                 selectedStartingColumn = columnStartingIndex + pseudoRandomGen.Next(0, possibleStartingColumns);
@@ -327,9 +287,10 @@ namespace Maps.MapGenerator
             {
                 var possibleStartingRows = roomHeight;
                 selectedStartingRow =
-                    rowStartingIndex + (rowHeight / 2) - roomHeight +
+                    rowStartingIndex + rowHeight / 2 - roomHeight +
                     pseudoRandomGen.Next(0, possibleStartingRows);
-            } else
+            }
+            else
             {
                 var possibleStartingRows = rowHeight - roomHeight;
                 selectedStartingRow = rowStartingIndex + pseudoRandomGen.Next(0, possibleStartingRows);

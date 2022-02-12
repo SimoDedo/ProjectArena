@@ -14,13 +14,13 @@ namespace AI.Behaviours.Actions
     [Serializable]
     public class SelectCover : Action
     {
-        [SerializeField] private float minCoverDistance = 0f;
+        [SerializeField] private float minCoverDistance;
         [SerializeField] private float maxCoverDistance = 10f;
         [SerializeField] private int maxCoverSearchAttempts = 10;
         [SerializeField] private SharedSelectedPathInfo pathInfo;
+        private Entity.Entity enemy;
 
         private NavigationSystem navSystem;
-        private Entity.Entity enemy;
 
         public override void OnAwake()
         {
@@ -53,17 +53,13 @@ namespace AI.Behaviours.Actions
                 var path = navSystem.CalculatePath(finalPos);
                 var pathLength = path.Length();
                 if (!path.IsComplete() || pathLength > maxCoverDistance)
-                {
                     // Path invalid or too long!
                     continue;
-                }
-                
+
                 if (!Physics.Linecast(finalPos, enemy.transform.position, out var hit) ||
                     hit.collider.gameObject == enemy.gameObject)
-                {
                     // We can still see the enemy from that position, no good! 
                     continue;
-                }
 
                 if (pathLength < smallestPathFound)
                 {
@@ -78,6 +74,7 @@ namespace AI.Behaviours.Actions
                 pathInfo.Value = selectedPath;
                 return TaskStatus.Success;
             }
+
             // Found no cover position around me...
             return TaskStatus.Failure;
         }

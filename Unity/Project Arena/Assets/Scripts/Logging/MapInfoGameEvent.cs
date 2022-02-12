@@ -10,7 +10,11 @@ namespace Logging
         public bool f;
     }
 
-    public class BaseMapInfoGameEvent : GameEventBase<MapInfo> { }
+    public class BaseMapInfoGameEvent : GameEventBase<MapInfo>
+    {
+    }
 
-    public sealed class MapInfoGameEvent : ScriptableObjectSingleton<BaseMapInfoGameEvent> { }
+    public sealed class MapInfoGameEvent : ScriptableObjectSingleton<BaseMapInfoGameEvent>
+    {
+    }
 }

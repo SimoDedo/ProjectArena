@@ -4,7 +4,11 @@ using ScriptableObjectArchitecture;
 
 namespace Logging
 {
-    public class BaseSaveSurveyAnswersGameEvent : GameEventBase<List<JsonAnswer>> { }
+    public class BaseSaveSurveyAnswersGameEvent : GameEventBase<List<JsonAnswer>>
+    {
+    }
 
-    public sealed class SaveSurveyAnswersGameEvent : ScriptableObjectSingleton<BaseSaveSurveyAnswersGameEvent> { }
+    public sealed class SaveSurveyAnswersGameEvent : ScriptableObjectSingleton<BaseSaveSurveyAnswersGameEvent>
+    {
+    }
 }

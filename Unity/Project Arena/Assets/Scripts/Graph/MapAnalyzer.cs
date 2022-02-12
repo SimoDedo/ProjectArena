@@ -4,13 +4,13 @@ using System.Linq;
 using Accord.Math;
 using UnityEngine;
 
-namespace Graph {
+namespace Graph
+{
     // FIXME Limitation: due to the usage of integer ids in the graph for the nodes, I cannot handle maps with have a width
 // greater than MAX_MAP_WIDTH, otherwise I'll get clashes between room indexes and tile indexes
 // ReSharper disable class InconsistentNaming
     public static class MapAnalyzer
     {
-        private static readonly float Sqrt2 = Mathf.Sqrt(2);
         private const int MAX_MAP_WIDTH = 10000;
         private const string RESOURCE = "resource";
         private const string ROW = "col";
@@ -26,51 +26,42 @@ namespace Graph {
         private const char WALL_CHAR = 'w';
         private const char FLOOR_CHAR = 'r';
         private const float TOLERANCE = 0.001f;
+        private static readonly float Sqrt2 = Mathf.Sqrt(2);
 
         public static DirectedGraph GenerateTileGraph(char[,] map)
         {
             var tileGraph = GenerateTileGraphNodesFromMap(map, out var rows, out var columns);
             for (var column = 0; column < columns; column++)
+            for (var row = 0; row < rows; row++)
             {
-                for (var row = 0; row < rows; row++)
-                {
-                    if (map[row, column] == WALL_CHAR) continue;
-                    if (row + 1 < rows && map[row + 1, column] != WALL_CHAR)
-                    {
-                        tileGraph.AddEdges(
-                            GetTileIndexFromCoordinates(row, column, rows, columns),
-                            GetTileIndexFromCoordinates(row + 1, column, rows, columns)
-                        );
-                    }
+                if (map[row, column] == WALL_CHAR) continue;
+                if (row + 1 < rows && map[row + 1, column] != WALL_CHAR)
+                    tileGraph.AddEdges(
+                        GetTileIndexFromCoordinates(row, column, rows, columns),
+                        GetTileIndexFromCoordinates(row + 1, column, rows, columns)
+                    );
 
-                    if (column + 1 < columns && map[row, column + 1] != WALL_CHAR)
-                    {
-                        tileGraph.AddEdges(
-                            GetTileIndexFromCoordinates(row, column, rows, columns),
-                            GetTileIndexFromCoordinates(row, column + 1, rows, columns)
-                        );
-                    }
+                if (column + 1 < columns && map[row, column + 1] != WALL_CHAR)
+                    tileGraph.AddEdges(
+                        GetTileIndexFromCoordinates(row, column, rows, columns),
+                        GetTileIndexFromCoordinates(row, column + 1, rows, columns)
+                    );
 
-                    if (row + 1 < rows && column + 1 < columns && map[row, column + 1] != WALL_CHAR &&
-                        map[row + 1, column] != WALL_CHAR && map[row + 1, column + 1] != WALL_CHAR)
-                    {
-                        tileGraph.AddEdges(
-                            GetTileIndexFromCoordinates(row, column, rows, columns),
-                            GetTileIndexFromCoordinates(row + 1, column + 1, rows, columns),
-                            Sqrt2
-                        );
-                    }
+                if (row + 1 < rows && column + 1 < columns && map[row, column + 1] != WALL_CHAR &&
+                    map[row + 1, column] != WALL_CHAR && map[row + 1, column + 1] != WALL_CHAR)
+                    tileGraph.AddEdges(
+                        GetTileIndexFromCoordinates(row, column, rows, columns),
+                        GetTileIndexFromCoordinates(row + 1, column + 1, rows, columns),
+                        Sqrt2
+                    );
 
-                    if (row - 1 > 0 && column + 1 < columns && map[row, column + 1] != WALL_CHAR &&
-                        map[row - 1, column] != WALL_CHAR && map[row - 1, column + 1] != WALL_CHAR)
-                    {
-                        tileGraph.AddEdges(
-                            GetTileIndexFromCoordinates(row, column, rows, columns),
-                            GetTileIndexFromCoordinates(row - 1, column + 1, rows, columns),
-                            Sqrt2
-                        );
-                    }
-                }
+                if (row - 1 > 0 && column + 1 < columns && map[row, column + 1] != WALL_CHAR &&
+                    map[row - 1, column] != WALL_CHAR && map[row - 1, column + 1] != WALL_CHAR)
+                    tileGraph.AddEdges(
+                        GetTileIndexFromCoordinates(row, column, rows, columns),
+                        GetTileIndexFromCoordinates(row - 1, column + 1, rows, columns),
+                        Sqrt2
+                    );
             }
 
             return tileGraph;
@@ -82,17 +73,15 @@ namespace Graph {
             columns = map.GetLength(1);
             var tileGraph = new DirectedGraph();
             for (var column = 0; column < columns; column++)
+            for (var row = 0; row < rows; row++)
             {
-                for (var row = 0; row < rows; row++)
-                {
-                    if (map[row, column] == WALL_CHAR) continue;
-                    var idx = GetTileIndexFromCoordinates(row, column, rows, columns);
-                    tileGraph.AddNode(idx,
-                        new Tuple<string, object>(ROW, row),
-                        new Tuple<string, object>(COLUMN, column),
-                        new Tuple<string, object>(OBJECT, map[row, column])
-                    );
-                }
+                if (map[row, column] == WALL_CHAR) continue;
+                var idx = GetTileIndexFromCoordinates(row, column, rows, columns);
+                tileGraph.AddNode(idx,
+                    new Tuple<string, object>(ROW, row),
+                    new Tuple<string, object>(COLUMN, column),
+                    new Tuple<string, object>(OBJECT, map[row, column])
+                );
             }
 
             return tileGraph;
@@ -105,46 +94,40 @@ namespace Graph {
             var maxVisibility = float.MinValue;
             var minVisibility = float.MaxValue;
             for (var row1 = 0; row1 < rows; row1++)
+            for (var col1 = 0; col1 < columns; col1++)
             {
-                for (var col1 = 0; col1 < columns; col1++)
+                if (map[row1, col1] == WALL_CHAR) continue;
+                var nodeAID = GetTileIndexFromCoordinates(row1, col1, rows, columns);
+                // Now, we need to check, for each tile, if it is visible from our position
+                for (var row2 = 0; row2 < rows; row2++)
+                for (var col2 = 0; col2 < columns; col2++)
                 {
-                    if (map[row1, col1] == WALL_CHAR) continue;
-                    var nodeAID = GetTileIndexFromCoordinates(row1, col1, rows, columns);
-                    // Now, we need to check, for each tile, if it is visible from our position
-                    for (var row2 = 0; row2 < rows; row2++)
+                    if (map[row2, col2] == WALL_CHAR) continue;
+                    if (row1 == row2 && col1 == col2) continue;
+                    // The two cells are not walls. We need to check every cell in between
+                    if (IsTileVisible(row1, col1, row2, col2, map))
                     {
-                        for (var col2 = 0; col2 < columns; col2++)
-                        {
-                            if (map[row2, col2] == WALL_CHAR) continue;
-                            if (row1 == row2 && col1 == col2) continue;
-                            // The two cells are not walls. We need to check every cell in between
-                            if (IsTileVisible(row1, col1, row2, col2, map))
-                            {
-                                var nodeBID = GetTileIndexFromCoordinates(row2, col2, rows, columns);
-                                visibilityGraph.AddEdges(nodeAID, nodeBID, EuclideanDistance(row1, col1, row2, col2));
-                            }
-                        }
+                        var nodeBID = GetTileIndexFromCoordinates(row2, col2, rows, columns);
+                        visibilityGraph.AddEdges(nodeAID, nodeBID, EuclideanDistance(row1, col1, row2, col2));
                     }
-
-                    var visibility = visibilityGraph.GetNodeDegree(nodeAID);
-                    visibilities[row1, col1] = visibility;
-                    if (visibility > maxVisibility)
-                        maxVisibility = visibility;
-                    else if (visibility < minVisibility) minVisibility = visibility;
                 }
+
+                var visibility = visibilityGraph.GetNodeDegree(nodeAID);
+                visibilities[row1, col1] = visibility;
+                if (visibility > maxVisibility)
+                    maxVisibility = visibility;
+                else if (visibility < minVisibility) minVisibility = visibility;
             }
 
             var visibilityInterval = maxVisibility - minVisibility;
             for (var row = 0; row < rows; row++)
+            for (var col = 0; col < columns; col++)
             {
-                for (var col = 0; col < columns; col++)
-                {
-                    if (map[row, col] == WALL_CHAR) continue;
-                    var visibility = (visibilities[row, col] - minVisibility) / visibilityInterval;
-                    var node =
-                        visibilityGraph.GetNodeProperties(GetTileIndexFromCoordinates(row, col, rows, columns));
-                    node[VISIBILITY] = visibility;
-                }
+                if (map[row, col] == WALL_CHAR) continue;
+                var visibility = (visibilities[row, col] - minVisibility) / visibilityInterval;
+                var node =
+                    visibilityGraph.GetNodeProperties(GetTileIndexFromCoordinates(row, col, rows, columns));
+                node[VISIBILITY] = visibility;
             }
 
             return visibilityGraph;
@@ -159,39 +142,33 @@ namespace Graph {
             var minVisibility = float.MaxValue;
 
             for (var row1 = 0; row1 < rows; row1++)
+            for (var col1 = 0; col1 < columns; col1++)
             {
-                for (var col1 = 0; col1 < columns; col1++)
+                if (map[row1, col1] == WALL_CHAR) continue;
+                // Now, we need to check, for each tile, if it is visible from our position
+                for (var row2 = 0; row2 < rows; row2++)
+                for (var col2 = 0; col2 < columns; col2++)
                 {
-                    if (map[row1, col1] == WALL_CHAR) continue;
-                    // Now, we need to check, for each tile, if it is visible from our position
-                    for (var row2 = 0; row2 < rows; row2++)
-                    {
-                        for (var col2 = 0; col2 < columns; col2++)
-                        {
-                            if (map[row2, col2] == WALL_CHAR) continue;
-                            if (row1 == row2 && col1 == col2) continue;
-                            // The two cells are not walls. We need to check every cell in between
-                            if (IsTileVisible(row1, col1, row2, col2, map)) visibilityMatrix[row1, col1]++;
-                        }
-                    }
-
-                    var visibility = visibilityMatrix[row1, col1];
-                    visibilityMatrix[row1, col1] = visibility;
-                    if (visibility > maxVisibility) maxVisibility = visibility;
-                    if (visibility < minVisibility) minVisibility = visibility;
+                    if (map[row2, col2] == WALL_CHAR) continue;
+                    if (row1 == row2 && col1 == col2) continue;
+                    // The two cells are not walls. We need to check every cell in between
+                    if (IsTileVisible(row1, col1, row2, col2, map)) visibilityMatrix[row1, col1]++;
                 }
+
+                var visibility = visibilityMatrix[row1, col1];
+                visibilityMatrix[row1, col1] = visibility;
+                if (visibility > maxVisibility) maxVisibility = visibility;
+                if (visibility < minVisibility) minVisibility = visibility;
             }
 
             var visibilityInterval = maxVisibility - minVisibility;
             if (visibilityInterval == 0) visibilityInterval = maxVisibility; // Everything will be normalized to 1
 
             for (var row = 0; row < rows; row++)
+            for (var col = 0; col < columns; col++)
             {
-                for (var col = 0; col < columns; col++)
-                {
-                    if (map[row, col] == WALL_CHAR) continue;
-                    visibilityMatrix[row, col] = (visibilityMatrix[row, col] - minVisibility) / visibilityInterval;
-                }
+                if (map[row, col] == WALL_CHAR) continue;
+                visibilityMatrix[row, col] = (visibilityMatrix[row, col] - minVisibility) / visibilityInterval;
             }
 
             return visibilityMatrix;
@@ -223,9 +200,9 @@ namespace Graph {
                 {
                     var area2 = areas[index2];
                     var overlapColumn = Math.Min(area1.rightColumn, area2.rightColumn) -
-                        Math.Max(area1.leftColumn, area2.leftColumn);
+                                        Math.Max(area1.leftColumn, area2.leftColumn);
                     var overlapRow = Math.Min(area1.bottomRow, area2.bottomRow) -
-                        Math.Max(area1.topRow, area2.topRow);
+                                     Math.Max(area1.topRow, area2.topRow);
 
                     if (overlapColumn >= 0 && overlapRow >= 0)
                     {
@@ -276,7 +253,6 @@ namespace Graph {
 
             var discardDummies = areas.Any(it => !it.isCorridor && !it.isDummyRoom);
             if (discardDummies)
-            {
                 foreach (var node in nodes)
                 {
                     var isDummy = roomsCorridorsGraph.GetNodeProperties(node)[IS_DUMMY];
@@ -297,7 +273,6 @@ namespace Graph {
                         nodesToRemove.Add(node);
                     }
                 }
-            }
 
             nodesToRemove.ForEach(it => roomsCorridorsGraph.RemoveNode(it));
             return roomsCorridorsGraph;
@@ -306,9 +281,7 @@ namespace Graph {
         public static DirectedGraph GenerateRoomsCorridorsObjectsGraph(Area[] areas, char[,] map, char[] excludedChars)
         {
             if (map.GetLength(1) > MAX_MAP_WIDTH)
-            {
                 throw new InvalidOperationException("Cannot handle maps with width > " + MAX_MAP_WIDTH);
-            }
 
             var graph = GenerateRoomsCorridorsGraph(areas);
 
@@ -316,64 +289,35 @@ namespace Graph {
             var columns = map.GetLength(1);
 
             for (var row = 0; row < rows; row++)
-            {
-                for (var col = 0; col < columns; col++)
+            for (var col = 0; col < columns; col++)
+                if (!excludedChars.Contains(map[row, col]))
                 {
-                    if (!excludedChars.Contains(map[row, col]))
-                    {
-                        var objectNodeId = GetTileIndexFromCoordinates(row, col, rows, columns);
-                        graph.AddNode(GetTileIndexFromCoordinates(row, col, rows, columns),
-                            new Tuple<string, object>(OBJECT, map[row, col]),
-                            new Tuple<string, object>(ROW, row),
-                            new Tuple<string, object>(COLUMN, col)
-                        );
+                    var objectNodeId = GetTileIndexFromCoordinates(row, col, rows, columns);
+                    graph.AddNode(GetTileIndexFromCoordinates(row, col, rows, columns),
+                        new Tuple<string, object>(OBJECT, map[row, col]),
+                        new Tuple<string, object>(ROW, row),
+                        new Tuple<string, object>(COLUMN, col)
+                    );
 
-                        // Find all the areas which contain this item
-                        for (var roomIndex = 0; roomIndex < areas.Length; roomIndex++)
+                    // Find all the areas which contain this item
+                    for (var roomIndex = 0; roomIndex < areas.Length; roomIndex++)
+                    {
+                        var area = areas[roomIndex];
+                        // Is object in room
+                        if (col >= area.leftColumn &&
+                            col < area.rightColumn &&
+                            row >= area.topRow &&
+                            row < area.bottomRow)
                         {
-                            var area = areas[roomIndex];
-                            // Is object in room
-                            if (col >= area.leftColumn &&
-                                col < area.rightColumn &&
-                                row >= area.topRow &&
-                                row < area.bottomRow)
-                            {
-                                var centerColumn = (area.leftColumn + area.rightColumn) / 2f;
-                                var centerRow = (area.topRow + area.bottomRow) / 2f;
-                                var distance = EuclideanDistance(centerColumn, centerRow, col, row);
-                                graph.AddEdges(GetRoomIndexFromIndex(roomIndex), objectNodeId, distance);
-                            }
+                            var centerColumn = (area.leftColumn + area.rightColumn) / 2f;
+                            var centerRow = (area.topRow + area.bottomRow) / 2f;
+                            var distance = EuclideanDistance(centerColumn, centerRow, col, row);
+                            graph.AddEdges(GetRoomIndexFromIndex(roomIndex), objectNodeId, distance);
                         }
                     }
                 }
-            }
 
             return graph;
-        }
-
-        // TODO Convert to struct
-        [Serializable]
-        public class MapProperties
-        {
-            public int degreeMax;
-            public int degreeMin;
-            public float degreeAvg;
-
-            public float cCentralityMin;
-            public float cCentralityMax;
-            public float cCentralityAvg;
-
-            public float bCentralityMin;
-            public float bCentralityMax;
-            public float bCentralityAvg;
-
-            public float radius;
-            public float centerSetSize;
-            public float diameter;
-            public float peripherySetSize;
-            public float avgEccentricity;
-
-            public float density;
         }
 
         public static MapProperties CalculateGraphProperties(Area[] areas)
@@ -418,20 +362,19 @@ namespace Graph {
                 var totalPathLength = 0f;
                 var eccentricityNode = float.MinValue;
                 foreach (var node2 in nodes)
-                {
                     if (node1 != node2)
                     {
                         var pathLenght = roomGraph.CalculateShortestPathLenghtAndBetweeness(node1, node2, betweenness);
                         totalPathLength += pathLenght;
                         if (pathLenght > eccentricityNode) eccentricityNode = pathLenght;
                     }
-                }
 
                 if (eccentricityNode < radius)
                 {
                     radius = eccentricityNode;
                     centerSetSize = 1;
-                } else if (Math.Abs(eccentricityNode - radius) < TOLERANCE)
+                }
+                else if (Math.Abs(eccentricityNode - radius) < TOLERANCE)
                 {
                     centerSetSize++;
                 }
@@ -440,7 +383,8 @@ namespace Graph {
                 {
                     diameter = eccentricityNode;
                     peripherySetSize = 1;
-                } else if (Math.Abs(eccentricityNode - diameter) < TOLERANCE)
+                }
+                else if (Math.Abs(eccentricityNode - diameter) < TOLERANCE)
                 {
                     peripherySetSize++;
                 }
@@ -508,9 +452,8 @@ namespace Graph {
                 var min = Mathf.Min(y1, y2);
                 var max = Mathf.Max(y1, y2);
                 for (var i = min; i <= max; i++)
-                {
-                    if (map[i, x1] == WALL_CHAR) return false;
-                }
+                    if (map[i, x1] == WALL_CHAR)
+                        return false;
 
                 return true;
             }
@@ -520,9 +463,8 @@ namespace Graph {
                 var min = Mathf.Min(x1, x2);
                 var max = Mathf.Max(x1, x2);
                 for (var i = min; i <= max; i++)
-                {
-                    if (map[y1, i] == WALL_CHAR) return false;
-                }
+                    if (map[y1, i] == WALL_CHAR)
+                        return false;
 
                 return true;
             }
@@ -541,7 +483,8 @@ namespace Graph {
                     var ceil = (int) Mathf.Min(map.GetLength(1), Mathf.Ceil(loc));
                     if (map[i, floor] == WALL_CHAR && map[i, ceil] == WALL_CHAR) return false;
                 }
-            } else
+            }
+            else
             {
                 // If we travel more horizontally then vertically
                 var min = Mathf.Min(x1, x2);
@@ -658,11 +601,9 @@ namespace Graph {
             var rows = map.GetLength(0);
             var columns = map.GetLength(1);
             for (var row = 0; row < rows; row++)
-            {
-                for (var col = 0; col < columns; col++)
-                    if (map[row, col] != WALL_CHAR && map[row, col] != FLOOR_CHAR)
-                        map[row, col] = FLOOR_CHAR;
-            }
+            for (var col = 0; col < columns; col++)
+                if (map[row, col] != WALL_CHAR && map[row, col] != FLOOR_CHAR)
+                    map[row, col] = FLOOR_CHAR;
         }
 
         private static void TryAddResource(
@@ -788,8 +729,8 @@ namespace Graph {
         )
         {
             return tileWeights[0] * visibilityFit +
-                tileWeights[1] * WallDistance(originX, originY, endX, endY, row, col) +
-                tileWeights[2] * ObjectDistance(row, col, objectsPlaced, diagonal);
+                   tileWeights[1] * WallDistance(originX, originY, endX, endY, row, col) +
+                   tileWeights[2] * ObjectDistance(row, col, objectsPlaced, diagonal);
         }
 
         private static float ObjectDistance(int x, int y, List<Vector2Int> objectsPlaced, float diagonal)
@@ -803,7 +744,7 @@ namespace Graph {
         private static float WallDistance(int leftColumn, int topRow, int rightColumn, int bottomRow, int col, int row)
         {
             var distance = Mathf.Min(col - leftColumn, rightColumn - 1 - col) +
-                Mathf.Min(row - topRow, bottomRow - 1 - row) + 1f;
+                           Mathf.Min(row - topRow, bottomRow - 1 - row) + 1f;
             var normalizingFactor = (rightColumn - leftColumn + bottomRow - topRow) / 2f;
             return distance / normalizingFactor;
         }
@@ -885,14 +826,12 @@ namespace Graph {
         {
             var diameter = float.MinValue;
             for (var i1 = 0; i1 < areas.Length; i1++)
+            for (var i2 = i1 + 1; i2 < areas.Length; i2++)
             {
-                for (var i2 = i1 + 1; i2 < areas.Length; i2++)
-                {
-                    var distance = CalculateShortestPathLength(areaGraph,
-                        GetRoomIndexFromIndex(i1),
-                        GetRoomIndexFromIndex(i2));
-                    if (distance > diameter) diameter = distance;
-                }
+                var distance = CalculateShortestPathLength(areaGraph,
+                    GetRoomIndexFromIndex(i1),
+                    GetRoomIndexFromIndex(i2));
+                if (distance > diameter) diameter = distance;
             }
 
             return diameter;
@@ -916,16 +855,15 @@ namespace Graph {
 
             var degreeVariation = maxDegree - minDegree;
             foreach (var id in ids)
-            {
                 if (degreeVariation == 0)
                 {
                     rtn.Add(id, 1f);
-                } else
+                }
+                else
                 {
                     var degree = roomGraph.GetNodeDegree(id);
                     if (!discardDeadEnds || degree != 1) rtn.Add(id, (degree - minDegree) / degreeVariation);
                 }
-            }
 
             return rtn;
         }
@@ -935,16 +873,41 @@ namespace Graph {
             if (value >= min && value <= max) return 0;
             return value < min ? Mathf.Abs(min - value) : Mathf.Abs(value - max);
         }
+
+        // TODO Convert to struct
+        [Serializable]
+        public class MapProperties
+        {
+            public int degreeMax;
+            public int degreeMin;
+            public float degreeAvg;
+
+            public float cCentralityMin;
+            public float cCentralityMax;
+            public float cCentralityAvg;
+
+            public float bCentralityMin;
+            public float bCentralityMax;
+            public float bCentralityAvg;
+
+            public float radius;
+            public float centerSetSize;
+            public float diameter;
+            public float peripherySetSize;
+            public float avgEccentricity;
+
+            public float density;
+        }
     }
 
     public class Area
     {
-        public readonly int leftColumn;
-        public readonly int topRow;
-        public readonly int rightColumn;
         public readonly int bottomRow;
         public readonly bool isCorridor;
         public readonly bool isDummyRoom;
+        public readonly int leftColumn;
+        public readonly int rightColumn;
+        public readonly int topRow;
 
         public Area(
             int leftColumn,

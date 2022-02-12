@@ -8,8 +8,8 @@ namespace AI.GoalMachine.Goal
 {
     public class LookForPickups : IGoal
     {
-        private readonly ExternalBehaviorTree externalBt;
         private readonly BehaviorTree behaviorTree;
+        private readonly ExternalBehaviorTree externalBt;
         private readonly PickupPlanner pickupPlanner;
         private Pickable currentPickable;
         private Pickable nextPickable;

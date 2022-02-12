@@ -14,14 +14,37 @@ namespace AI.Behaviours.Actions
     [Serializable]
     public class LookAround : Action
     {
+        private const float THRESHOLD = 10f;
+        private const float MIN_UPDATE_TIME = 0.3f;
+        private const float MAX_UPDATE_TIME = 0.8f;
+
+        private static readonly ReadOnlyCollection<AngleScore> AngleScores = new ReadOnlyCollection<AngleScore>(new[]
+        {
+            new AngleScore {angle = 0, score = 100, minLevel = CuriosityLevel.Low, allowedIfFocused = true},
+            new AngleScore
+                {angle = -45, score = 60, minLevel = CuriosityLevel.Medium, allowedIfFocused = true},
+            new AngleScore
+                {angle = +45, score = 60, minLevel = CuriosityLevel.Medium, allowedIfFocused = true},
+            new AngleScore
+                {angle = -90, score = 30, minLevel = CuriosityLevel.Medium, allowedIfFocused = false},
+            new AngleScore
+                {angle = +90, score = 30, minLevel = CuriosityLevel.Medium, allowedIfFocused = false},
+            new AngleScore
+                {angle = -135, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false},
+            new AngleScore
+                {angle = +135, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false},
+            new AngleScore
+                {angle = +180, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false}
+        });
+
         [SerializeField] private bool focused;
-        private MovementController movementController;
-        private SightController sightController;
         private CuriosityLevel curiosity;
         private Vector3 lookPoint;
-        private float nextUpdateTime;
         private float maxAngle;
+        private MovementController movementController;
         private List<AngleScore> myValidAngles = new List<AngleScore>();
+        private float nextUpdateTime;
+        private SightController sightController;
 
         public override void OnAwake()
         {
@@ -30,21 +53,17 @@ namespace AI.Behaviours.Actions
 
             movementController = entity.MovementController;
             curiosity = entity.GetCuriosity();
-            
+
             nextUpdateTime = float.MinValue;
 
             // Avoid recomputing and adding again all valid angles if already computed
             if (myValidAngles.Count == 0)
-            {
                 foreach (var angleScore in AngleScores)
-                {
                     if (curiosity >= angleScore.minLevel && (!focused || angleScore.allowedIfFocused))
                     {
                         maxAngle = Mathf.Max(maxAngle, Mathf.Abs(angleScore.angle));
                         myValidAngles.Add(angleScore);
                     }
-                }
-            }
         }
 
         public override TaskStatus OnUpdate()
@@ -75,7 +94,8 @@ namespace AI.Behaviours.Actions
                     var direction = Quaternion.AngleAxis(angleScore.angle, up) * realForward;
                     var distance =
                         Physics.Raycast(transform.position, direction, out var hit, 50)
-                            ? hit.distance : 50;
+                            ? hit.distance
+                            : 50;
                     distance = Mathf.Clamp(distance, 0, 50);
                     scores.Add(distance * distance / 2500 * angleScore.score);
                     angles.Add(angleScore.angle);
@@ -131,10 +151,6 @@ namespace AI.Behaviours.Actions
             nextUpdateTime = Time.time + Random.Range(MIN_UPDATE_TIME, MAX_UPDATE_TIME);
         }
 
-        private const float THRESHOLD = 10f;
-        private const float MIN_UPDATE_TIME = 0.3f;
-        private const float MAX_UPDATE_TIME = 0.8f;
-
         private struct AngleScore
         {
             public int angle;
@@ -142,24 +158,5 @@ namespace AI.Behaviours.Actions
             public CuriosityLevel minLevel;
             public bool allowedIfFocused;
         }
-
-        private static readonly ReadOnlyCollection<AngleScore> AngleScores = new ReadOnlyCollection<AngleScore>(new[]
-        {
-            new AngleScore {angle = 0, score = 100, minLevel = CuriosityLevel.Low, allowedIfFocused = true},
-            new AngleScore
-                {angle = -45, score = 60, minLevel = CuriosityLevel.Medium, allowedIfFocused = true},
-            new AngleScore
-                {angle = +45, score = 60, minLevel = CuriosityLevel.Medium, allowedIfFocused = true},
-            new AngleScore
-                {angle = -90, score = 30, minLevel = CuriosityLevel.Medium, allowedIfFocused = false},
-            new AngleScore
-                {angle = +90, score = 30, minLevel = CuriosityLevel.Medium, allowedIfFocused = false},
-            new AngleScore
-                {angle = -135, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false},
-            new AngleScore
-                {angle = +135, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false},
-            new AngleScore
-                {angle = +180, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false}
-        });
     }
 }

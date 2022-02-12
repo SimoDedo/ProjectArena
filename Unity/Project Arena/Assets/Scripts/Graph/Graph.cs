@@ -2,64 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Graph {
+namespace Graph
+{
     // Represents a undirected graph. At most one edge between two nodes is permitted.
 // TODO Move to another assembly so that I can put addEdge method internal
     public class Graph
     {
-        public readonly struct Node
-        {
-            public readonly int id;
-            private readonly List<Edge> connectedEdges;
-            private readonly Dictionary<string, object> properties;
-
-            public Node(int id, Dictionary<string, object> properties)
-            {
-                this.id = id;
-                connectedEdges = new List<Edge>();
-                this.properties = properties;
-            }
-
-            public void AddEdge(Edge edge)
-            {
-                connectedEdges.Add(edge);
-            }
-
-
-            public object this[string key]
-            {
-                get => properties.TryGetValue(key, out var rtn) ? rtn : null;
-                set => properties[key] = value;
-            }
-
-            public Edge[] edges => connectedEdges.ToArray();
-        }
-
-        public readonly struct Edge
-        {
-            public Edge(int node1, int node2, float weight, List<Tuple<string, object>> properties)
-            {
-                this.node1 = node1;
-                this.node2 = node2;
-                this.weight = weight;
-                this.properties = properties;
-            }
-
-            public readonly int node1;
-            public readonly int node2;
-            public readonly float weight;
-            public readonly List<Tuple<string, object>> properties;
-
-            public float EdgeID => EdgeUtils.GetEdgeKey(node1, node2);
-        }
-
-        private readonly Dictionary<int, Node> nodes = new Dictionary<int, Node>();
-
         private readonly Dictionary<long, Edge> edges =
             new Dictionary<long, Edge>();
 
+        private readonly Dictionary<int, Node> nodes = new Dictionary<int, Node>();
+
         /// <summary>
-        /// Adds a node with given id to the graph, if one isn't already present
+        ///     Adds a node with given id to the graph, if one isn't already present
         /// </summary>
         /// <param name="id">The unique id of the node</param>
         /// <param name="attributes">The list of attributes of the node</param>
@@ -73,7 +28,7 @@ namespace Graph {
         }
 
         /// <summary>
-        /// Adds an edge between the given nodeAID and nodeB, if they both exist
+        ///     Adds an edge between the given nodeAID and nodeB, if they both exist
         /// </summary>
         /// <param name="nodeAID">The unique id of first node to link</param>
         /// <param name="nodeBID">The unique id of the second node to link</param>
@@ -126,6 +81,52 @@ namespace Graph {
         public Edge[] GetEdgesFromNode(int nodeID)
         {
             return !nodes.ContainsKey(nodeID) ? Array.Empty<Edge>() : nodes[nodeID].edges;
+        }
+
+        public readonly struct Node
+        {
+            public readonly int id;
+            private readonly List<Edge> connectedEdges;
+            private readonly Dictionary<string, object> properties;
+
+            public Node(int id, Dictionary<string, object> properties)
+            {
+                this.id = id;
+                connectedEdges = new List<Edge>();
+                this.properties = properties;
+            }
+
+            public void AddEdge(Edge edge)
+            {
+                connectedEdges.Add(edge);
+            }
+
+
+            public object this[string key]
+            {
+                get => properties.TryGetValue(key, out var rtn) ? rtn : null;
+                set => properties[key] = value;
+            }
+
+            public Edge[] edges => connectedEdges.ToArray();
+        }
+
+        public readonly struct Edge
+        {
+            public Edge(int node1, int node2, float weight, List<Tuple<string, object>> properties)
+            {
+                this.node1 = node1;
+                this.node2 = node2;
+                this.weight = weight;
+                this.properties = properties;
+            }
+
+            public readonly int node1;
+            public readonly int node2;
+            public readonly float weight;
+            public readonly List<Tuple<string, object>> properties;
+
+            public float EdgeID => EdgeUtils.GetEdgeKey(node1, node2);
         }
     }
 

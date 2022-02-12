@@ -4,17 +4,16 @@ namespace AI.AI.Layer1
 {
     public class MovementController
     {
-        private float speed;
-
         private readonly Transform transform;
         private Vector3 previousPosition;
+        private float speed;
 
         public MovementController(AIEntity entity, float speed)
         {
             transform = entity.transform;
             this.speed = speed;
         }
-    
+
         public void Prepare()
         {
             previousPosition = transform.position;

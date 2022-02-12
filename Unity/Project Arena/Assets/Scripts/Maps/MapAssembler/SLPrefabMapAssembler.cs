@@ -4,19 +4,20 @@ using UnityEngine;
 namespace Maps.MapAssembler
 {
     /// <summary>
-    /// SLPrefabMapAssembler is an implementation of PrefabMapAssembler for single-level maps.
-    ///
-    /// WARNING: This implementation is currently broken!
+    ///     SLPrefabMapAssembler is an implementation of PrefabMapAssembler for single-level maps.
+    ///     WARNING: This implementation is currently broken!
     /// </summary>
-    public class SLPrefabMapAssembler : PrefabMapAssembler {
+    public class SLPrefabMapAssembler : PrefabMapAssembler
+    {
+        private MeshCollider ceilCollider;
+
+        private MeshCollider floorCollider;
 
         // Map.
         private char[,] map;
 
-        private MeshCollider floorCollider;
-        private MeshCollider ceilCollider;
-
-        void Start() {
+        private void Start()
+        {
             GameObject childObject;
 
             childObject = new GameObject("Floor - Collider");
@@ -32,7 +33,8 @@ namespace Maps.MapAssembler
             SetReady(true);
         }
 
-        public override void AssembleMap(char[,] m, char wChar, char rChar) {
+        public override void AssembleMap(char[,] m, char wChar, char rChar)
+        {
             wallChar = wChar;
             roomChar = rChar;
             width = m.GetLength(0);
@@ -42,19 +44,18 @@ namespace Maps.MapAssembler
             // Process all the tiles.
             ProcessTiles();
 
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    if (map[x, y] != wallChar) {
-                        string currentMask = GetNeighbourhoodMask(x, y);
-                        foreach (ProcessedTilePrefab p in processedTilePrefabs) {
-                            if (p.mask == currentMask) {
-                                AddPrefab(p.prefab, x, y, squareSize, p.rotation, wallHeight);
-                                break;
-                            }
+            for (var x = 0; x < width; x++)
+            for (var y = 0; y < height; y++)
+                if (map[x, y] != wallChar)
+                {
+                    var currentMask = GetNeighbourhoodMask(x, y);
+                    foreach (var p in processedTilePrefabs)
+                        if (p.mask == currentMask)
+                        {
+                            AddPrefab(p.prefab, x, y, squareSize, p.rotation, wallHeight);
+                            break;
                         }
-                    }
                 }
-            }
 
             // Generate floor and ceil colliders.
             floorCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, wallHeight +
@@ -64,11 +65,14 @@ namespace Maps.MapAssembler
         }
 
         public override void AssembleMap(List<char[,]> maps, char wallChar, char roomChar,
-            char voidChar) { }
+            char voidChar)
+        {
+        }
 
         // Gets the neighbours of a cell as a mask.
-        protected string GetNeighbourhoodMask(int gridX, int gridY) {
-            char[] mask = new char[4];
+        protected string GetNeighbourhoodMask(int gridX, int gridY)
+        {
+            var mask = new char[4];
             mask[0] = GetTileChar(gridX, gridY + 1);
             mask[1] = GetTileChar(gridX + 1, gridY);
             mask[2] = GetTileChar(gridX, gridY - 1);
@@ -77,18 +81,17 @@ namespace Maps.MapAssembler
         }
 
         // Returns the char of a tile.
-        protected char GetTileChar(int x, int y) {
-            if (MapInfo.IsInMapRange(x, y, width, height)) {
+        protected char GetTileChar(int x, int y)
+        {
+            if (MapInfo.IsInMapRange(x, y, width, height))
                 return map[x, y] == wallChar ? wallChar : roomChar;
-            } else {
-                return wallChar;
-            }
+            return wallChar;
         }
 
         // Clears the map.
-        public override void ClearMap() {
-            DestroyAllPrefabs(new List<string> { "Floor - Collider", "Ceil - Collider" });
+        public override void ClearMap()
+        {
+            DestroyAllPrefabs(new List<string> {"Floor - Collider", "Ceil - Collider"});
         }
-
     }
 }

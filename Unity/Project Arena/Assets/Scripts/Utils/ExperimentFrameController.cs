@@ -6,10 +6,7 @@ namespace Utils
     {
         private void Start()
         {
-            if (Application.isBatchMode)
-            {
-                Time.captureFramerate = 30;
-            }
+            if (Application.isBatchMode) Time.captureFramerate = 30;
         }
     }
 }

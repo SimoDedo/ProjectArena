@@ -4,39 +4,46 @@ using UnityEngine.UI;
 namespace UI
 {
     /// <summary>
-    /// CircularLoadingAnimation applies a period circular fill animation to an image.
+    ///     CircularLoadingAnimation applies a period circular fill animation to an image.
     /// </summary>
     [RequireComponent(typeof(Image))]
-    public class CircularLoadingAnimation : MonoBehaviour {
-
+    public class CircularLoadingAnimation : MonoBehaviour
+    {
         [SerializeField] private float speed = 1f;
 
         private Image circle;
 
-        private void Awake() {
+        private void Awake()
+        {
             circle = transform.GetComponent<Image>();
         }
 
-        private void OnEnable() {
-            circle.fillAmount = 0;
-            circle.fillClockwise = true;
-        }
-
-        void Update () {
-            if (circle.fillClockwise) {
+        private void Update()
+        {
+            if (circle.fillClockwise)
+            {
                 circle.fillAmount += Time.deltaTime * speed;
-                if (circle.fillAmount >= 1) {
+                if (circle.fillAmount >= 1)
+                {
                     circle.fillAmount = 1;
                     circle.fillClockwise = false;
                 }
-            } else {
+            }
+            else
+            {
                 circle.fillAmount -= Time.deltaTime * speed;
-                if (circle.fillAmount <= 0) {
+                if (circle.fillAmount <= 0)
+                {
                     circle.fillAmount = 0;
                     circle.fillClockwise = true;
                 }
             }
         }
 
+        private void OnEnable()
+        {
+            circle.fillAmount = 0;
+            circle.fillClockwise = true;
+        }
     }
 }

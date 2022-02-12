@@ -11,10 +11,9 @@ namespace AI.Behaviours.Actions
     [Serializable]
     public class LookAtPoint : Action
     {
-        private SightController sightController;
-
         [SerializeField] private SharedSelectedPathInfo pathInfo;
         private Vector3 lookPoint;
+        private SightController sightController;
 
         public override void OnAwake()
         {

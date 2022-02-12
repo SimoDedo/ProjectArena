@@ -5,10 +5,14 @@ using UnityEngine.AI;
 namespace Maps.MapAssembler
 {
     /// <summary>
-    /// MeshMapAssembler is an implementation of MapAssembler that assembles the maps using meshes.
+    ///     MeshMapAssembler is an implementation of MapAssembler that assembles the maps using meshes.
     /// </summary>
     public class MeshMapAssembler : MapAssembler
     {
+        private const int TOP_LEFT_WALL = 8;
+        private const int TOP_RIGHT_WALL = 4;
+        private const int BOTTOM_RIGHT_WALL = 2;
+        private const int BOTTOM_LEFT_WALL = 1;
         [SerializeField] private bool isSkyVisibile;
 
         [Header("Mesh materials")] [SerializeField]
@@ -17,27 +21,27 @@ namespace Maps.MapAssembler
         [SerializeField] private Material wallMaterial;
         [SerializeField] private Material floorMaterial;
 
-        private SquareGrid squareGrid;
-        private MeshFilter topMeshFilter;
-        private MeshFilter wallsMeshFilter;
-        private MeshFilter floorMeshFilter;
-        private MeshCollider wallsCollider;
+        // We use this so that if we have checked a vertex we won't check it again;
+        private readonly HashSet<int> checkedVertices = new HashSet<int>();
         private MeshCollider floorCollider;
-        private MeshCollider topCollider;
+        private MeshFilter floorMeshFilter;
         private GameObject navMeshObject;
 
-        private List<Vector3> vertices;
-        private List<int> triangles;
+        // We can have multiple outlines, each one is a list of vertices.
+        private readonly List<List<int>> outlines = new List<List<int>>();
+
+        private SquareGrid squareGrid;
+        private MeshCollider topCollider;
+        private MeshFilter topMeshFilter;
 
         // A dictionary contains key-value pairs. We use the vertex index as a key and as value the list 
         // off all triangles that own that vertex.
-        private Dictionary<int, List<Triangle>> triangleDictionary = new Dictionary<int, List<Triangle>>();
+        private readonly Dictionary<int, List<Triangle>> triangleDictionary = new Dictionary<int, List<Triangle>>();
+        private List<int> triangles;
 
-        // We can have multiple outlines, each one is a list of vertices.
-        List<List<int>> outlines = new List<List<int>>();
-
-        // We use this so that if we have checked a vertex we won't check it again;
-        HashSet<int> checkedVertices = new HashSet<int>();
+        private List<Vector3> vertices;
+        private MeshCollider wallsCollider;
+        private MeshFilter wallsMeshFilter;
 
         private void Start()
         {
@@ -100,14 +104,10 @@ namespace Maps.MapAssembler
 
             var gridRows = squareGrid.squares.GetLength(0);
             var gridColumns = squareGrid.squares.GetLength(1);
-        
+
             for (var r = 0; r < gridRows; r++)
-            {
-                for (var c = 0; c < gridColumns; c++)
-                {
-                    TriangulateSquare(squareGrid.squares[r, c]);
-                }
-            }
+            for (var c = 0; c < gridColumns; c++)
+                TriangulateSquare(squareGrid.squares[r, c]);
 
             CreateTopMesh(map.GetLength(0), map.GetLength(1));
 
@@ -125,19 +125,22 @@ namespace Maps.MapAssembler
             char wallChar,
             char roomChar,
             char voidChar
-        ) { }
+        )
+        {
+        }
 
         // Creates the top mesh.
         private void CreateTopMesh(int rows, int columns)
         {
             if (isSkyVisibile)
             {
-                Mesh topMesh = new Mesh {vertices = vertices.ToArray(), triangles = triangles.ToArray()};
+                var topMesh = new Mesh {vertices = vertices.ToArray(), triangles = triangles.ToArray()};
                 topMesh.RecalculateNormals();
                 topMeshFilter.mesh = topMesh;
-            } else
+            }
+            else
             {
-                Mesh topMesh = CreateRectangularMesh(rows, columns, squareSize, wallHeight, isSkyVisibile);
+                var topMesh = CreateRectangularMesh(rows, columns, squareSize, wallHeight, isSkyVisibile);
                 topMeshFilter.mesh = topMesh;
                 topCollider.sharedMesh = topMesh;
             }
@@ -148,22 +151,21 @@ namespace Maps.MapAssembler
         {
             CalculateMeshOutilnes();
 
-            List<Vector3> wallVertices = new List<Vector3>();
-            List<int> wallTriangles = new List<int>();
+            var wallVertices = new List<Vector3>();
+            var wallTriangles = new List<int>();
 
-            Mesh wallsMesh = new Mesh();
+            var wallsMesh = new Mesh();
 
-            foreach (List<int> outline in outlines)
-            {
-                for (int i = 0; i < outline.Count - 1; i++)
+            foreach (var outline in outlines)
+                for (var i = 0; i < outline.Count - 1; i++)
                 {
-                    int startIndex = wallVertices.Count;
+                    var startIndex = wallVertices.Count;
                     // Left vertex of the wall panel.
                     wallVertices.Add(vertices[outline[i]]);
                     // Rigth vertex of the wall panel.
                     wallVertices.Add(vertices[outline[i + 1]]);
                     // Bottom left vertex of the wall panel.
-                    wallVertices.Add(vertices[outline[i]] - Vector3.up * wallHeight );
+                    wallVertices.Add(vertices[outline[i]] - Vector3.up * wallHeight);
                     // Bottom rigth vertex of the wall panel.
                     wallVertices.Add(vertices[outline[i + 1]] - Vector3.up * wallHeight);
 
@@ -176,7 +178,6 @@ namespace Maps.MapAssembler
                     wallTriangles.Add(startIndex + 1);
                     wallTriangles.Add(startIndex + 0);
                 }
-            }
 
             wallsMesh.vertices = wallVertices.ToArray();
             wallsMesh.triangles = wallTriangles.ToArray();
@@ -310,32 +311,19 @@ namespace Maps.MapAssembler
         {
             AssignVertices(points);
 
-            if (points.Length >= 3)
-            {
-                CreateTriangle(points[0], points[1], points[2]);
-            }
+            if (points.Length >= 3) CreateTriangle(points[0], points[1], points[2]);
 
-            if (points.Length >= 4)
-            {
-                CreateTriangle(points[0], points[2], points[3]);
-            }
+            if (points.Length >= 4) CreateTriangle(points[0], points[2], points[3]);
 
-            if (points.Length >= 5)
-            {
-                CreateTriangle(points[0], points[3], points[4]);
-            }
+            if (points.Length >= 5) CreateTriangle(points[0], points[3], points[4]);
 
-            if (points.Length >= 6)
-            {
-                CreateTriangle(points[0], points[4], points[5]);
-            }
+            if (points.Length >= 6) CreateTriangle(points[0], points[4], points[5]);
         }
 
         // I add the Nodes to the vertices list after assigning them an incremental ID.
         private void AssignVertices(Node[] points)
         {
-            for (int i = 0; i < points.Length; i++)
-            {
+            for (var i = 0; i < points.Length; i++)
                 // vertexIndex default value is -1, if the value is still the same the vertix has not
                 // been assigned.
                 if (points[i].vertexIndex == -1)
@@ -343,7 +331,6 @@ namespace Maps.MapAssembler
                     points[i].vertexIndex = vertices.Count;
                     vertices.Add(points[i].position);
                 }
-            }
         }
 
         // Create a new triangle by adding its vertices to the triangle list.
@@ -353,7 +340,7 @@ namespace Maps.MapAssembler
             triangles.Add(b.vertexIndex);
             triangles.Add(c.vertexIndex);
 
-            Triangle triangle = new Triangle(a.vertexIndex, b.vertexIndex, c.vertexIndex);
+            var triangle = new Triangle(a.vertexIndex, b.vertexIndex, c.vertexIndex);
             AddTriangleToDictionary(triangle.vertexIndexA, triangle);
             AddTriangleToDictionary(triangle.vertexIndexB, triangle);
             AddTriangleToDictionary(triangle.vertexIndexC, triangle);
@@ -363,24 +350,22 @@ namespace Maps.MapAssembler
         // it until it meets up with itself. Then it adds it to the outline list.
         private void CalculateMeshOutilnes()
         {
-            for (int vertexIndex = 0; vertexIndex < vertices.Count; vertexIndex++)
-            {
+            for (var vertexIndex = 0; vertexIndex < vertices.Count; vertexIndex++)
                 if (!checkedVertices.Contains(vertexIndex))
                 {
-                    int newOutlineVertex = GetConnectedOutlineVertex(vertexIndex);
+                    var newOutlineVertex = GetConnectedOutlineVertex(vertexIndex);
 
                     if (newOutlineVertex != -1)
                     {
                         checkedVertices.Add(vertexIndex);
 
-                        List<int> newOutline = new List<int>();
+                        var newOutline = new List<int>();
                         newOutline.Add(vertexIndex);
                         outlines.Add(newOutline);
                         FollowOutline(newOutlineVertex, outlines.Count - 1);
                         outlines[outlines.Count - 1].Add(vertexIndex);
                     }
                 }
-            }
         }
 
         // Starting from a vertex it scans the outline the vertex belongs to.
@@ -388,12 +373,9 @@ namespace Maps.MapAssembler
         {
             outlines[outlineIndex].Add(vertexIndex);
             checkedVertices.Add(vertexIndex);
-            int nextVertexIndex = GetConnectedOutlineVertex(vertexIndex);
+            var nextVertexIndex = GetConnectedOutlineVertex(vertexIndex);
 
-            if (nextVertexIndex != -1)
-            {
-                FollowOutline(nextVertexIndex, outlineIndex);
-            }
+            if (nextVertexIndex != -1) FollowOutline(nextVertexIndex, outlineIndex);
         }
 
         // Returns a connected vertex, if any, which forms an outline edge with the one passed as 
@@ -401,23 +383,19 @@ namespace Maps.MapAssembler
         private int GetConnectedOutlineVertex(int vertexIndex)
         {
             // List of all the triangles containing the vertex index.
-            List<Triangle> trianglesContainingVertex = triangleDictionary[vertexIndex];
+            var trianglesContainingVertex = triangleDictionary[vertexIndex];
 
-            for (int i = 0; i < trianglesContainingVertex.Count; i++)
+            for (var i = 0; i < trianglesContainingVertex.Count; i++)
             {
-                Triangle triangle = trianglesContainingVertex[i];
+                var triangle = trianglesContainingVertex[i];
 
-                for (int j = 0; j < 3; j++)
+                for (var j = 0; j < 3; j++)
                 {
-                    int vertexB = triangle[j];
+                    var vertexB = triangle[j];
 
                     if (vertexB != vertexIndex && !checkedVertices.Contains(vertexB))
-                    {
                         if (IsOutlineEdge(vertexIndex, vertexB))
-                        {
                             return vertexB;
-                        }
-                    }
                 }
             }
 
@@ -428,21 +406,16 @@ namespace Maps.MapAssembler
         // triangle.
         private bool IsOutlineEdge(int vertexA, int vertexB)
         {
-            List<Triangle> trianglesContainingVertexA = triangleDictionary[vertexA];
-            int sharedTriangleCount = 0;
+            var trianglesContainingVertexA = triangleDictionary[vertexA];
+            var sharedTriangleCount = 0;
 
-            for (int i = 0; i < trianglesContainingVertexA.Count; i++)
-            {
+            for (var i = 0; i < trianglesContainingVertexA.Count; i++)
                 if (trianglesContainingVertexA[i].Contains(vertexB))
                 {
                     sharedTriangleCount++;
 
-                    if (sharedTriangleCount > 1)
-                    {
-                        break;
-                    }
+                    if (sharedTriangleCount > 1) break;
                 }
-            }
 
             return sharedTriangleCount == 1;
         }
@@ -453,12 +426,26 @@ namespace Maps.MapAssembler
             if (triangleDictionary.ContainsKey(vertexIndexKey))
             {
                 triangleDictionary[vertexIndexKey].Add(triangle);
-            } else
+            }
+            else
             {
-                List<Triangle> triangleList = new List<Triangle>();
+                var triangleList = new List<Triangle>();
                 triangleList.Add(triangle);
                 triangleDictionary.Add(vertexIndexKey, triangleList);
             }
+        }
+
+        public override void ClearMap()
+        {
+            topMeshFilter.mesh.Clear();
+            wallsMeshFilter.mesh.Clear();
+            floorMeshFilter.mesh.Clear();
+            wallsCollider.sharedMesh.Clear();
+            floorCollider.sharedMesh.Clear();
+            if (!isSkyVisibile) topCollider.sharedMesh.Clear();
+
+            var navMeshes = navMeshObject.GetComponents<NavMeshSurface>();
+            foreach (var navMesh in navMeshes) Destroy(navMesh);
         }
 
         // A triangle is generated by three vertices.
@@ -467,7 +454,7 @@ namespace Maps.MapAssembler
             public int vertexIndexA;
             public int vertexIndexB;
             public int vertexIndexC;
-            int[] vertices;
+            private readonly int[] vertices;
 
             public Triangle(int a, int b, int c)
             {
@@ -482,15 +469,12 @@ namespace Maps.MapAssembler
             }
 
             // An indexer allows to get elements of a struct as an array.
-            public int this[int i]
-            {
-                get { return vertices[i]; }
-            }
+            public int this[int i] => vertices[i];
 
             public bool Contains(int vertexIndex)
             {
                 return vertexIndex == vertexIndexA || vertexIndex == vertexIndexB ||
-                    vertexIndex == vertexIndexC;
+                       vertexIndex == vertexIndexC;
             }
         }
 
@@ -509,26 +493,20 @@ namespace Maps.MapAssembler
 
                 var halfSquareSize = 0.5f;
                 for (var r = 0; r < rows; r++)
+                for (var c = 0; c < columns; c++)
                 {
-                    for (var c = 0; c < columns; c++)
-                    {
-                        var pos = new Vector3(halfSquareSize + c * squareSize, wallHeight, halfSquareSize + (rows - r - 1) * squareSize);
-                        controlNodes[r, c] = new ControlNode(pos, map[r, c] == charWall, squareSize);
-                    
-                    }
+                    var pos = new Vector3(halfSquareSize + c * squareSize, wallHeight,
+                        halfSquareSize + (rows - r - 1) * squareSize);
+                    controlNodes[r, c] = new ControlNode(pos, map[r, c] == charWall, squareSize);
                 }
 
                 // We create a grid of Squares out of the Control Nodes.
                 squares = new Square[rows - 1, columns - 1];
 
                 for (var r = 0; r < rows - 1; r++)
-                {
-                    for (var c = 0; c < columns - 1; c++)
-                    {
-                        squares[r, c] = new Square(controlNodes[r, c], controlNodes[r, c + 1],
-                            controlNodes[r + 1, c + 1], controlNodes[r + 1, c]);
-                    }
-                }
+                for (var c = 0; c < columns - 1; c++)
+                    squares[r, c] = new Square(controlNodes[r, c], controlNodes[r, c + 1],
+                        controlNodes[r + 1, c + 1], controlNodes[r + 1, c]);
             }
         }
 
@@ -537,9 +515,9 @@ namespace Maps.MapAssembler
         // c   4   d    configuration,which depends on which Control Nodes are active.
         public class Square
         {
-            public ControlNode topLeft, topRight, bottomRight, bottomLeft;
             public Node centreTop, centreRight, centreBottom, centreLeft;
             public int configuration;
+            public ControlNode topLeft, topRight, bottomRight, bottomLeft;
 
             public Square(ControlNode tl, ControlNode tr, ControlNode br, ControlNode bl)
             {
@@ -553,25 +531,13 @@ namespace Maps.MapAssembler
                 centreBottom = bottomLeft.right;
                 centreLeft = bottomLeft.above;
 
-                if (topLeft.active)
-                {
-                    configuration |= TOP_LEFT_WALL;
-                }
+                if (topLeft.active) configuration |= TOP_LEFT_WALL;
 
-                if (topRight.active)
-                {
-                    configuration |= TOP_RIGHT_WALL;
-                }
+                if (topRight.active) configuration |= TOP_RIGHT_WALL;
 
-                if (bottomRight.active)
-                {
-                    configuration |= BOTTOM_RIGHT_WALL;
-                }
+                if (bottomRight.active) configuration |= BOTTOM_RIGHT_WALL;
 
-                if (bottomLeft.active)
-                {
-                    configuration |= BOTTOM_LEFT_WALL;
-                }
+                if (bottomLeft.active) configuration |= BOTTOM_LEFT_WALL;
             }
         }
 
@@ -590,8 +556,8 @@ namespace Maps.MapAssembler
         // An active Control NodeProperties is a wall.
         public class ControlNode : Node
         {
-            public bool active;
             public Node above, right;
+            public bool active;
 
             public ControlNode(Vector3 p, bool a, float squareSize) : base(p)
             {
@@ -600,29 +566,5 @@ namespace Maps.MapAssembler
                 right = new Node(position + Vector3.right * squareSize / 2f);
             }
         }
-
-        public override void ClearMap()
-        {
-            topMeshFilter.mesh.Clear();
-            wallsMeshFilter.mesh.Clear();
-            floorMeshFilter.mesh.Clear();
-            wallsCollider.sharedMesh.Clear();
-            floorCollider.sharedMesh.Clear();
-            if (!isSkyVisibile)
-            {
-                topCollider.sharedMesh.Clear();
-            }
-
-            var navMeshes = navMeshObject.GetComponents<NavMeshSurface>();
-            foreach (var navMesh in navMeshes)
-            {
-                Destroy(navMesh);
-            }
-        }
-    
-        private const int TOP_LEFT_WALL = 8;
-        private const int TOP_RIGHT_WALL = 4;
-        private const int BOTTOM_RIGHT_WALL = 2;
-        private const int BOTTOM_LEFT_WALL = 1;
     }
 }

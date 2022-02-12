@@ -5,29 +5,31 @@ using UnityEngine.SceneManagement;
 namespace Others
 {
     /// <summary>
-    /// CoreComponent is an abstract class that must be extended by all classes that have to be fully
-    /// initialized before the game can start. It also provides methods to menage errors.
+    ///     CoreComponent is an abstract class that must be extended by all classes that have to be fully
+    ///     initialized before the game can start. It also provides methods to menage errors.
     /// </summary>
-    public abstract class CoreComponent : MonoBehaviour {
-
-        protected enum Error { SOFT_ERROR, HARD_ERROR, RETRY_ERROR };
+    public abstract class CoreComponent : MonoBehaviour
+    {
+        // Has the script completed the execution of the start method?
+        private bool ready;
 
         // Has the script completed the execution of the start method?
-        private bool ready = false;
-
-        // Has the script completed the execution of the start method?
-        protected void SetReady(bool r) {
+        protected void SetReady(bool r)
+        {
             ready = r;
         }
 
         // Tells if the scipt is done loading.
-        public bool IsReady() {
+        public bool IsReady()
+        {
             return ready;
         }
 
         // Menages errors going back to the main menu.
-        protected void ManageError(Error error, int errorCode) {
-            switch (error) {
+        protected void ManageError(Error error, int errorCode)
+        {
+            switch (error)
+            {
                 case Error.SOFT_ERROR:
                     Debug.LogError("Unexpected soft error with code " + errorCode + ".");
                     break;
@@ -36,15 +38,17 @@ namespace Others
                     break;
                 case Error.RETRY_ERROR:
                     Debug.LogError("Unexpected error with code " + errorCode + ". The scene will be" +
-                        " reloaded.");
+                                   " reloaded.");
                     SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                     break;
             }
         }
 
         // Menages errors going back to the main menu.
-        protected void ManageError(Error error, string errorMessage) {
-            switch (error) {
+        protected void ManageError(Error error, string errorMessage)
+        {
+            switch (error)
+            {
                 case Error.SOFT_ERROR:
                     Debug.LogError("Unexpected soft error. " + errorMessage);
                     break;
@@ -53,11 +57,17 @@ namespace Others
                     break;
                 case Error.RETRY_ERROR:
                     Debug.LogError("Unexpected  error. " + errorMessage + " The scene will be " +
-                        "reloaded.");
+                                   "reloaded.");
                     SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                     break;
             }
         }
 
+        protected enum Error
+        {
+            SOFT_ERROR,
+            HARD_ERROR,
+            RETRY_ERROR
+        }
     }
 }

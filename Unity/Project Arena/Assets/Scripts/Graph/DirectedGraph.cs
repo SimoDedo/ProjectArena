@@ -27,13 +27,13 @@ namespace Graph
 
     public class DirectedGraph
     {
-        private readonly Dictionary<int, NodeProperties> nodeProperties = new Dictionary<int, NodeProperties>();
-
         private readonly BidirectionalGraph<int, TaggedEdge<int, float>> graph =
             new BidirectionalGraph<int, TaggedEdge<int, float>>();
 
+        private readonly Dictionary<int, NodeProperties> nodeProperties = new Dictionary<int, NodeProperties>();
+
         /// <summary>
-        /// Adds a node with given id to the graph, if one isn't already present
+        ///     Adds a node with given id to the graph, if one isn't already present
         /// </summary>
         /// <param name="id">The unique id of the node</param>
         /// <param name="attributes">The list of attributes of the node</param>
@@ -48,7 +48,7 @@ namespace Graph
         }
 
         /// <summary>
-        /// Adds edge connecting nodeAID and nodeBID and vice versa, if they both exist
+        ///     Adds edge connecting nodeAID and nodeBID and vice versa, if they both exist
         /// </summary>
         /// <param name="nodeAID">The unique id of first node to link</param>
         /// <param name="nodeBID">The unique id of the second node to link</param>
@@ -57,7 +57,7 @@ namespace Graph
         public bool AddEdges(int nodeAID, int nodeBID, float weight = 1f)
         {
             return graph.AddEdge(new TaggedEdge<int, float>(nodeAID, nodeBID, weight))
-                & graph.AddEdge(new TaggedEdge<int, float>(nodeBID, nodeAID, weight));
+                   & graph.AddEdge(new TaggedEdge<int, float>(nodeBID, nodeAID, weight));
         }
 
         public bool HasNode(int id)
@@ -87,10 +87,7 @@ namespace Graph
 
         public NodeProperties GetNodeProperties(int nodeID)
         {
-            if (!nodeProperties.ContainsKey(nodeID))
-            {
-                Debug.Log("!?");
-            }
+            if (!nodeProperties.ContainsKey(nodeID)) Debug.Log("!?");
             return nodeProperties[nodeID];
         }
 
@@ -147,11 +144,13 @@ namespace Graph
                 {
                     foundValue = true;
                     minDistance = sum;
-                } else if (sum > minDistance)
+                }
+                else if (sum > minDistance)
                 {
                     // TODO are the paths returned in lenght order?
                     break;
-                } else
+                }
+                else
                 {
                     Debug.Log("This map has more than one shortest path between nodes!");
                 }

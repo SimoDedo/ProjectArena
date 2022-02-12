@@ -26,7 +26,7 @@ namespace AI.Behaviours.Actions
 
         public override TaskStatus OnUpdate()
         {
-            if(navSystem.HasArrivedToDestination())
+            if (navSystem.HasArrivedToDestination())
                 return TaskStatus.Success;
             navSystem.MoveAlongPath();
             return TaskStatus.Running;

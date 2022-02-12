@@ -13,110 +13,110 @@ using Managers.Mode;
 using Others;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Random = System.Random;
 
 namespace Managers
 {
     /// <summary>
-    /// ExperimentManager allows to manage experiments. An experiment is composed of different studies 
-    /// (a set of maps), each one composed by cases (a set of map varaitions). Each time a new
-    /// experiment is requested, a list of cases from the less played study is provided to the user
-    /// to be played. A tutorial and a survey scene can be added at the beginning and at the end of
-    /// the experiment, respectevely. When ExperimentManager is used to log online data, before creating
-    /// a new list of cases or before saving data on the server, the experiment completion is retrieved
-    /// from the server. When sending data to the server this information is stored in the comment field 
-    /// of each entry as the sum of the retrieved completion and the completion progress stored locally.
+    ///     ExperimentManager allows to manage experiments. An experiment is composed of different studies
+    ///     (a set of maps), each one composed by cases (a set of map varaitions). Each time a new
+    ///     experiment is requested, a list of cases from the less played study is provided to the user
+    ///     to be played. A tutorial and a survey scene can be added at the beginning and at the end of
+    ///     the experiment, respectevely. When ExperimentManager is used to log online data, before creating
+    ///     a new list of cases or before saving data on the server, the experiment completion is retrieved
+    ///     from the server. When sending data to the server this information is stored in the comment field
+    ///     of each entry as the sum of the retrieved completion and the completion progress stored locally.
     /// </summary>
     public class ExperimentManager : MonoBehaviour
     {
-        private Case tutorial;
-        private bool playTutorial;
-
-        private List<Study> studies;
-        private int casesPerUsers;
-        private string experimentName;
-
-        private Case survey;
-        private bool playSurvey;
-
-        private bool logOffline;
-        private bool logOnline;
-        private bool logGame;
-        private bool logStatistics;
-
         // List of cases the current player has to play.
         private List<Case> caseList;
+        private int casesPerUsers;
+        private int currentCase = -1;
+
+        // Current distance.
+        private float currentDistance;
+
+        private int currentStudy = -1;
 
         // Directory for this esperiment files.
         private string experimentDirectory;
+        private string experimentName;
+
+        // Is the map flip?
+        private bool flip;
 
         // Label of the current game log.
         private string gameLabel;
 
-        // Support object to format the log.
-        private JsonGameLog jGameLog;
-
         // Length of the current game log.
         private int gameLogLength;
 
-        // Label of the current statistic log.
-        private string statisticsLabel;
-
-        // Support object to format the log.
-        private JsonStatisticsLog jStatisticsLog;
-
-        // Length of the current statistics log.
-        private int statisticsLogLength;
-
-        // Start time of the log.
-        private float logStart;
-
-        // Completion trackers.
-        private List<StudyCompletionTracker> studyCompletionTrackers;
-
-        // Time of last target log.
-        private float lastTargetLog = 0;
-
-        // Current distance.
-        private float currentDistance = 0;
-
-        // Total distance.
-        private float totalDistance = 0;
-
-        // Total shots.
-        private int shotCount = 0;
-
         // Total hits.
-        private int hitCount = 0;
-
-        // Total destoryed targets.
-        private float killCount = 0;
-
-        // Size of a maps tile.
-        private float tileSize = 1;
-
-        // Is the map flip?
-        private bool flip = false;
-
-        // Position of the player.
-        private Vector3 lastPosition = new Vector3(-1, -1, -1);
-
-        // Initial target position.
-        private Vector3 initialTargetPosition = new Vector3(-1, -1, -1);
+        private int hitCount;
 
         // Initial player position.
         private Vector3 initialPlayerPosition = new Vector3(-1, -1, -1);
 
-        private Queue<Entry> postQueue;
+        // Initial target position.
+        private Vector3 initialTargetPosition = new Vector3(-1, -1, -1);
+
+        // Support object to format the log.
+        private JsonGameLog jGameLog;
+
+        // Support object to format the log.
+        private JsonStatisticsLog jStatisticsLog;
+
+        // Total destoryed targets.
+        private float killCount;
+
+        // Position of the player.
+        private Vector3 lastPosition = new Vector3(-1, -1, -1);
+
+        // Time of last target log.
+        private float lastTargetLog;
+        private bool logGame;
+
+        private bool loggingGame;
+        private bool loggingStatistics;
+
+        private bool logOffline;
+        private bool logOnline;
+
+        // Start time of the log.
+        private float logStart;
+        private bool logStatistics;
+        private bool playSurvey;
+        private bool playTutorial;
         private bool postCompletion;
 
-        private int currentStudy = -1;
-        private int currentCase = -1;
+        private Queue<Entry> postQueue;
+
+        // Total shots.
+        private int shotCount;
+
+        // Label of the current statistic log.
+        private string statisticsLabel;
+
+        // Length of the current statistics log.
+        private int statisticsLogLength;
+
+        private List<Study> studies;
+
+        // Completion trackers.
+        private List<StudyCompletionTracker> studyCompletionTrackers;
+
+        private Case survey;
         private string testID;
 
-        private bool loggingGame = false;
-        private bool loggingStatistics = false;
+        // Size of a maps tile.
+        private float tileSize = 1;
 
-        void Awake()
+        // Total distance.
+        private float totalDistance;
+        private Case tutorial;
+
+        private void Awake()
         {
             DontDestroyOnLoad(transform.gameObject);
 
@@ -128,10 +128,7 @@ namespace Managers
                 logOffline = ParameterManager.Instance.LogOffline;
             }
 
-            if (logOffline && Application.platform == RuntimePlatform.WebGLPlayer)
-            {
-                logOffline = false;
-            }
+            if (logOffline && Application.platform == RuntimePlatform.WebGLPlayer) logOffline = false;
 
             if (!logOffline && !logOnline)
             {
@@ -140,15 +137,12 @@ namespace Managers
             }
         }
 
-        void Start()
+        private void Start()
         {
             if (logOffline)
             {
                 SetupDirectories();
-                if (!logOnline)
-                {
-                    SetCompletionOffline();
-                }
+                if (!logOnline) SetCompletionOffline();
             }
 
             if (logOnline)
@@ -160,7 +154,7 @@ namespace Managers
             StartLoggingGameEvent.Instance.AddListener(StartLogging);
             LoadNextSceneGameEvent.Instance.AddListener(LoadNextScene);
             StartNewExperimentGameEvent.Instance.AddListener(StartNewExperiment);
-            if (MustSaveSurvey()) 
+            if (MustSaveSurvey())
                 SaveSurveyQuestionsGameEvent.Instance.AddListener(SaveSurvey);
             SaveSurveyAnswersGameEvent.Instance.AddListener(SaveAnswers);
             PositionInfoGameEvent.Instance.AddListener(LogPosition);
@@ -173,18 +167,16 @@ namespace Managers
             HitInfoGameEvent.Instance.AddListener(LogHit);
         }
 
-        void OnEnable()
+        private void OnEnable()
         {
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
-        void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             if ((logGame || logStatistics) && !(playTutorial && currentCase == 0) && !(playSurvey
                 && currentCase == caseList.Count - 2) && currentCase != caseList.Count - 1)
-            {
                 SetupLogging();
-            }
         }
 
         // Sets up the experiment manager.
@@ -209,23 +201,20 @@ namespace Managers
         private IEnumerator ContactServer()
         {
             while (true)
-            {
                 if (postQueue.Count > 0)
                 {
-                    Entry currentEntry = postQueue.Dequeue();
+                    var currentEntry = postQueue.Dequeue();
                     // Debug.Log("I'm posting " + currentEntry.Label + "...");
                     // Wait for the Data Manager to finish the current operation, if any.
                     yield return StartCoroutine(WaitForDataManager());
                     // Get the log count of the last log on the server.
                     RemoteDataManager.Instance.GetLastEntry();
                     yield return StartCoroutine(WaitForDataManager());
-                    JsonCompletionTracker jcp =
+                    var jcp =
                         ExtractCompletionTracker(RemoteDataManager.Instance.Result);
                     jcp.logsCount++;
                     if (currentEntry.Comment == ConnectionSettings.KEEP_LOCAL_COMPLETION)
-                    {
                         jcp.studyCompletionTrackers = studyCompletionTrackers;
-                    }
 
                     // Post the data.
                     RemoteDataManager.Instance.SaveData(new Entry(currentEntry.Label, currentEntry.Data,
@@ -236,7 +225,6 @@ namespace Managers
                     // Debug.Log("I'm doing nothing...");
                     yield return new WaitForSeconds(ConnectionSettings.SERVER_CONNECTION_PERIOD);
                 }
-            }
         }
 
         /* EXPERIMENT */
@@ -247,17 +235,11 @@ namespace Managers
             testID = GetTimeStamp();
             caseList.Clear();
 
-            if (playTutorial)
-            {
-                caseList.Add(tutorial);
-            }
+            if (playTutorial) caseList.Add(tutorial);
 
             caseList.AddRange(GetCases(casesPerUsers));
 
-            if (playSurvey)
-            {
-                caseList.Add(survey);
-            }
+            if (playSurvey) caseList.Add(survey);
 
             caseList.Add(new Case
             {
@@ -271,28 +253,26 @@ namespace Managers
         private string GetTimeStamp()
         {
             return DateTime.Now.ToString("yy") + DateTime.Now.ToString("MM") +
-                DateTime.Now.ToString("dd") + DateTime.Now.ToString("HH") +
-                DateTime.Now.ToString("mm") + DateTime.Now.ToString("ss") +
-                DateTime.Now.ToString("ff");
+                   DateTime.Now.ToString("dd") + DateTime.Now.ToString("HH") +
+                   DateTime.Now.ToString("mm") + DateTime.Now.ToString("ss") +
+                   DateTime.Now.ToString("ff");
         }
 
         // Gets the cases to add in a round-robin fashion.
         private List<Case> GetCases(int count)
         {
-            List<Case> lessPlayedCases = new List<Case>();
+            var lessPlayedCases = new List<Case>();
 
             // Get the least played study.
-            int minValue = studyCompletionTrackers[0].studyCompletion;
+            var minValue = studyCompletionTrackers[0].studyCompletion;
             currentStudy = 0;
 
-            for (int i = 0; i < studyCompletionTrackers.Count; i++)
-            {
+            for (var i = 0; i < studyCompletionTrackers.Count; i++)
                 if (studyCompletionTrackers[i].studyCompletion < minValue)
                 {
                     minValue = studyCompletionTrackers[i].studyCompletion;
                     currentStudy = i;
                 }
-            }
 
             // Get the least played cases in the least played study.
             if (count < studies[currentStudy].cases.Count)
@@ -300,7 +280,7 @@ namespace Managers
                 var sorted = studyCompletionTrackers[currentStudy].casesCompletion.Select((v, i) =>
                     i).OrderBy(v => v).ToList();
 
-                for (int i = 0; i < count; i++)
+                for (var i = 0; i < count; i++)
                 {
                     studies[currentStudy].cases[sorted[i]].RandomizeCurrentMap();
                     lessPlayedCases.Add(studies[currentStudy].cases[sorted[i]]);
@@ -310,7 +290,7 @@ namespace Managers
             }
             else
             {
-                for (int i = 0; i < studies[currentStudy].cases.Count; i++)
+                for (var i = 0; i < studies[currentStudy].cases.Count; i++)
                 {
                     studies[currentStudy].cases[i].RandomizeCurrentMap();
                     lessPlayedCases.Add(studies[currentStudy].cases[i]);
@@ -335,10 +315,7 @@ namespace Managers
         // Starts a new experiment.
         private IEnumerator StartNewExperimentCoroutine()
         {
-            if (logOnline)
-            {
-                yield return StartCoroutine(SetCompletionOnline());
-            }
+            if (logOnline) yield return StartCoroutine(SetCompletionOnline());
 
             CreateNewList();
             LoadNextScene();
@@ -352,18 +329,15 @@ namespace Managers
         // Retuns the next scene to be played.
         public void LoadNextScene()
         {
-            if (loggingGame || loggingStatistics)
-            {
-                StopLogging();
-            }
+            if (loggingGame || loggingStatistics) StopLogging();
 
             currentCase++;
 
-            Case c = caseList[currentCase];
+            var c = caseList[currentCase];
 
             ParameterManager.Instance.Flip = currentCase % 2 == 0 ? true : false;
             ParameterManager.Instance.GenerationMode = 4;
-            ParameterManager.Instance.MapDNA = (c.maps == null || c.maps.Count == 0) ? "" : c.GetCurrentMap().text;
+            ParameterManager.Instance.MapDNA = c.maps == null || c.maps.Count == 0 ? "" : c.GetCurrentMap().text;
 
             SceneManager.LoadScene(c.scene);
         }
@@ -376,25 +350,21 @@ namespace Managers
             experimentDirectory = Application.persistentDataPath + "/Export/" + experimentName;
             CreateDirectory(experimentDirectory);
             // Create the case directories if needed.
-            foreach (Study s in studies)
+            foreach (var s in studies)
             {
                 CreateDirectory(experimentDirectory + "/" + s.studyName);
                 CreateDirectory(experimentDirectory + "/" + s.studyName + "/Maps");
-                foreach (Case c in s.cases)
-                {
-                    foreach (TextAsset map in c.maps)
-                    {
-                        File.WriteAllText(@experimentDirectory + "/" + s.studyName + "/Maps/" +
-                            map.name + ".txt", map.text);
-                    }
-                }
+                foreach (var c in s.cases)
+                foreach (var map in c.maps)
+                    File.WriteAllText(experimentDirectory + "/" + s.studyName + "/Maps/" +
+                                      map.name + ".txt", map.text);
             }
         }
 
         // Sets the completion (online).
         private IEnumerator SetCompletionOnline()
         {
-            int connectionAttempts = 0;
+            var connectionAttempts = 0;
 
             // Wait for the Connection Manager.
             while (connectionAttempts * ConnectionSettings.SERVER_CONNECTION_PERIOD <
@@ -415,7 +385,7 @@ namespace Managers
                     ConnectionSettings.SERVER_CONNECTION_PERIOD));
                 if (RemoteDataManager.Instance.IsResultReady)
                 {
-                    JsonCompletionTracker jcp =
+                    var jcp =
                         ExtractCompletionTracker(RemoteDataManager.Instance.Result);
                     studyCompletionTrackers = jcp.studyCompletionTrackers;
                     postCompletion = true;
@@ -438,35 +408,27 @@ namespace Managers
         {
             studyCompletionTrackers = new List<StudyCompletionTracker>();
 
-            foreach (Study s in studies)
+            foreach (var s in studies)
             {
-                string[] allFiles = Directory.GetFiles(experimentDirectory + "/" + s.studyName);
+                var allFiles = Directory.GetFiles(experimentDirectory + "/" + s.studyName);
 
-                int studyCompletion = 0;
-                List<int> casesCompletion = new List<int>();
+                var studyCompletion = 0;
+                var casesCompletion = new List<int>();
 
-                foreach (Case c in s.cases)
+                foreach (var c in s.cases)
                 {
-                    int gameCount = 0;
-                    int statisticsCount = 0;
+                    var gameCount = 0;
+                    var statisticsCount = 0;
 
-                    foreach (TextAsset map in c.maps)
+                    foreach (var map in c.maps)
+                    foreach (var file in allFiles)
                     {
-                        foreach (string file in allFiles)
-                        {
-                            if (file.Contains(map.name.Replace(".map", "") + "_game"))
-                            {
-                                gameCount++;
-                            }
+                        if (file.Contains(map.name.Replace(".map", "") + "_game")) gameCount++;
 
-                            if (file.Contains(map.name.Replace(".map", "") + "_statistics"))
-                            {
-                                statisticsCount++;
-                            }
-                        }
+                        if (file.Contains(map.name.Replace(".map", "") + "_statistics")) statisticsCount++;
                     }
 
-                    casesCompletion.Add((gameCount > statisticsCount) ? gameCount : statisticsCount);
+                    casesCompletion.Add(gameCount > statisticsCount ? gameCount : statisticsCount);
                     studyCompletion += casesCompletion.Last();
                 }
 
@@ -478,23 +440,16 @@ namespace Managers
         // Sets up logging.
         private void SetupLogging()
         {
-            GameManager gm = FindObjectOfType(typeof(GameManager)) as GameManager;
-            if (gm != null)
-            {
-                gm.LoggingHandshake();
-            }
+            var gm = FindObjectOfType(typeof(GameManager)) as GameManager;
+            if (gm != null) gm.LoggingHandshake();
 
             if (logGame)
-            {
                 gameLabel = testID + "_" +
-                    caseList[currentCase].GetCurrentMap().name.Replace(".map", "") + "_game";
-            }
+                            caseList[currentCase].GetCurrentMap().name.Replace(".map", "") + "_game";
 
             if (logStatistics)
-            {
                 statisticsLabel = testID + "_" +
-                    caseList[currentCase].GetCurrentMap().name.Replace(".map", "") + "_statistics";
-            }
+                                  caseList[currentCase].GetCurrentMap().name.Replace(".map", "") + "_statistics";
         }
 
         // Starts loggingGame.
@@ -530,18 +485,15 @@ namespace Managers
 
             foreach (MonoBehaviour monoBehaviour in FindObjectsOfType(typeof(MonoBehaviour)))
             {
-                ILoggable logger = monoBehaviour as ILoggable;
-                if (logger != null)
-                {
-                    logger.SetupLogging();
-                }
+                var logger = monoBehaviour as ILoggable;
+                if (logger != null) logger.SetupLogging();
             }
         }
 
         // Stops loggingGame and saves the log.
         public void StopLogging()
         {
-            string log = "";
+            var log = "";
 
             // Save the statistics log, if any.
             if (loggingStatistics)
@@ -550,22 +502,15 @@ namespace Managers
 
                 log = JsonUtility.ToJson(jStatisticsLog);
 
-                if (jStatisticsLog.logPart > 0)
-                {
-                    statisticsLabel += ("_" + jStatisticsLog.logPart);
-                }
+                if (jStatisticsLog.logPart > 0) statisticsLabel += "_" + jStatisticsLog.logPart;
 
                 if (logOffline)
-                {
                     File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName + "/"
-                        + statisticsLabel + ".json", log);
-                }
+                                      + statisticsLabel + ".json", log);
 
                 if (logOnline)
-                {
                     postQueue.Enqueue(new Entry(ConnectionSettings.SERVER_STATISTICS_LABEL, log,
                         ConnectionSettings.DISCARD_LOCAL_COMPLETION));
-                }
 
                 loggingStatistics = false;
             }
@@ -575,22 +520,15 @@ namespace Managers
             {
                 log = JsonUtility.ToJson(jGameLog);
 
-                if (jGameLog.logPart > 0)
-                {
-                    gameLabel += ("_" + jGameLog.logPart);
-                }
+                if (jGameLog.logPart > 0) gameLabel += "_" + jGameLog.logPart;
 
                 if (logOffline)
-                {
                     File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName + "/"
-                        + gameLabel + ".json", log);
-                }
+                                      + gameLabel + ".json", log);
 
                 if (logOnline)
-                {
                     postQueue.Enqueue(new Entry(ConnectionSettings.SERVER_GAME_LABEL, log,
                         ConnectionSettings.DISCARD_LOCAL_COMPLETION));
-                }
 
                 loggingGame = false;
             }
@@ -600,15 +538,13 @@ namespace Managers
         private void CheckGameLogLength(int increment)
         {
             // I add 1 to the increment to considern the comma.
-            gameLogLength += (increment + 1);
+            gameLogLength += increment + 1;
 
             if (gameLogLength > ConnectionSettings.SERVER_MAXIMUM_DATA_LENGTH)
             {
                 if (logOffline)
-                {
                     File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName + "/"
-                        + gameLabel + "_" + jGameLog.logPart + ".json", JsonUtility.ToJson(jGameLog));
-                }
+                                      + gameLabel + "_" + jGameLog.logPart + ".json", JsonUtility.ToJson(jGameLog));
 
                 postQueue.Enqueue(new Entry(ConnectionSettings.SERVER_GAME_LABEL,
                     JsonUtility.ToJson(jGameLog), ConnectionSettings.DISCARD_LOCAL_COMPLETION));
@@ -621,16 +557,14 @@ namespace Managers
         private void CheckStatisticsLogLength(int increment)
         {
             // I add 1 to the increment to considern the comma.
-            statisticsLogLength += (increment + 1);
+            statisticsLogLength += increment + 1;
 
             if (statisticsLogLength > ConnectionSettings.SERVER_MAXIMUM_DATA_LENGTH)
             {
                 if (logOffline)
-                {
                     File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName + "/"
-                        + statisticsLabel + "_" + jStatisticsLog.logPart + ".json",
+                                      + statisticsLabel + "_" + jStatisticsLog.logPart + ".json",
                         JsonUtility.ToJson(jStatisticsLog));
-                }
 
                 postQueue.Enqueue(new Entry(ConnectionSettings.SERVER_STATISTICS_LABEL,
                     JsonUtility.ToJson(jStatisticsLog), ConnectionSettings.DISCARD_LOCAL_COMPLETION));
@@ -645,26 +579,20 @@ namespace Managers
             tileSize = info.ts;
             flip = info.f;
 
-            string currentMap = caseList[currentCase].GetCurrentMap().name.Replace(".map", "");
+            var currentMap = caseList[currentCase].GetCurrentMap().name.Replace(".map", "");
 
             if (loggingGame)
             {
                 jGameLog.mapInfo = new JsonMapInfo(currentMap, info.height, info.width, tileSize, flip);
 
-                if (logOnline)
-                {
-                    CheckGameLogLength(JsonUtility.ToJson(jGameLog.mapInfo).Length);
-                }
+                if (logOnline) CheckGameLogLength(JsonUtility.ToJson(jGameLog.mapInfo).Length);
             }
 
             if (loggingStatistics)
             {
                 jStatisticsLog.mapInfo = new JsonMapInfo(currentMap, info.height, info.width, tileSize, flip);
 
-                if (logOnline)
-                {
-                    CheckStatisticsLogLength(JsonUtility.ToJson(jStatisticsLog.mapInfo).Length);
-                }
+                if (logOnline) CheckStatisticsLogLength(JsonUtility.ToJson(jStatisticsLog.mapInfo).Length);
             }
         }
 
@@ -675,20 +603,14 @@ namespace Managers
             {
                 jGameLog.gameInfo = new JsonGameInfo(info.gameDuration, info.scene, experimentName);
 
-                if (logOnline)
-                {
-                    CheckGameLogLength(JsonUtility.ToJson(jGameLog.gameInfo).Length);
-                }
+                if (logOnline) CheckGameLogLength(JsonUtility.ToJson(jGameLog.gameInfo).Length);
             }
 
             if (loggingStatistics)
             {
                 jStatisticsLog.gameInfo = new JsonGameInfo(info.gameDuration, info.scene, experimentName);
 
-                if (logOnline)
-                {
-                    CheckStatisticsLogLength(JsonUtility.ToJson(jStatisticsLog.gameInfo).Length);
-                }
+                if (logOnline) CheckStatisticsLogLength(JsonUtility.ToJson(jStatisticsLog.gameInfo).Length);
             }
         }
 
@@ -697,14 +619,11 @@ namespace Managers
         {
             if (loggingGame)
             {
-                JsonReload jReload = new JsonReload(Time.time - logStart, info.ownerId, info.gunId, info.ammoInCharger,
+                var jReload = new JsonReload(Time.time - logStart, info.ownerId, info.gunId, info.ammoInCharger,
                     info.totalAmmo);
                 jGameLog.reloadLogs.Add(jReload);
 
-                if (logOnline)
-                {
-                    CheckGameLogLength(JsonUtility.ToJson(jReload).Length);
-                }
+                if (logOnline) CheckGameLogLength(JsonUtility.ToJson(jReload).Length);
             }
         }
 
@@ -713,46 +632,37 @@ namespace Managers
         {
             if (loggingGame)
             {
-                Coord coord = NormalizeFlipCoord(info.x, info.z);
+                var coord = NormalizeFlipCoord(info.x, info.z);
 
-                JsonShot jShot = new JsonShot(Time.time - logStart, coord.x, coord.z,
+                var jShot = new JsonShot(Time.time - logStart, coord.x, coord.z,
                     NormalizeFlipAngle(info.direction), info.ownerId, info.gunID, info.ammoInCharger, info.totalAmmo);
                 jGameLog.shotLogs.Add(jShot);
 
-                if (logOnline)
-                {
-                    CheckGameLogLength(JsonUtility.ToJson(jShot).Length);
-                }
+                if (logOnline) CheckGameLogLength(JsonUtility.ToJson(jShot).Length);
             }
 
-            if (loggingStatistics)
-            {
-                shotCount++;
-            }
+            if (loggingStatistics) shotCount++;
         }
 
         // Logs the position (x and z respectively correspond to row and column in matrix notation).
         private void LogPosition(PositionInfo info)
         {
-            Coord coord = NormalizeFlipCoord(info.x, info.z);
+            var coord = NormalizeFlipCoord(info.x, info.z);
 
             if (loggingGame)
             {
-                JsonPosition jPosition = new JsonPosition(Time.time - logStart, info.entityID, coord.x, coord.z,
+                var jPosition = new JsonPosition(Time.time - logStart, info.entityID, coord.x, coord.z,
                     NormalizeFlipAngle(info.dir));
                 jGameLog.positionLogs.Add(jPosition);
 
-                if (logOnline)
-                {
-                    CheckGameLogLength(JsonUtility.ToJson(jPosition).Length);
-                }
+                if (logOnline) CheckGameLogLength(JsonUtility.ToJson(jPosition).Length);
             }
 
             if (loggingStatistics)
             {
                 if (lastPosition.x != -1)
                 {
-                    float delta = EulerDistance(coord.x, coord.z, lastPosition.x, lastPosition.z);
+                    var delta = EulerDistance(coord.x, coord.z, lastPosition.x, lastPosition.z);
                     totalDistance += delta;
                     currentDistance += delta;
                 }
@@ -765,20 +675,17 @@ namespace Managers
         // Logs spawn.
         private void LogSpawn(SpawnInfo info)
         {
-            Coord coord = NormalizeFlipCoord(info.x, info.z);
+            var coord = NormalizeFlipCoord(info.x, info.z);
 
             if (loggingGame)
             {
-                JsonSpawn jSpawn = new JsonSpawn(Time.time - logStart, coord.x, coord.z,
+                var jSpawn = new JsonSpawn(Time.time - logStart, coord.x, coord.z,
                     info.entityId,
                     info.spawnEntity
                 );
                 jGameLog.spawnLogs.Add(jSpawn);
 
-                if (logOnline)
-                {
-                    CheckGameLogLength(JsonUtility.ToJson(jSpawn).Length);
-                }
+                if (logOnline) CheckGameLogLength(JsonUtility.ToJson(jSpawn).Length);
             }
 
             if (loggingStatistics)
@@ -792,11 +699,11 @@ namespace Managers
         // Logs a kill.
         private void LogKill(KillInfo info)
         {
-            Coord coord = NormalizeFlipCoord(info.x, info.z);
+            var coord = NormalizeFlipCoord(info.x, info.z);
 
             if (loggingGame)
             {
-                JsonKill jKill = new JsonKill(Time.time - logStart, coord.x, coord.z, 
+                var jKill = new JsonKill(Time.time - logStart, coord.x, coord.z,
                     info.killedEntityID,
                     info.killedEntity,
                     info.killerEntityID,
@@ -804,10 +711,7 @@ namespace Managers
                 );
                 jGameLog.killLogs.Add(jKill);
 
-                if (logOnline)
-                {
-                    CheckGameLogLength(JsonUtility.ToJson(jKill).Length);
-                }
+                if (logOnline) CheckGameLogLength(JsonUtility.ToJson(jKill).Length);
             }
 
             if (loggingStatistics)
@@ -821,11 +725,11 @@ namespace Managers
         // Logs a hit.
         private void LogHit(HitInfo info)
         {
-            Coord coord = NormalizeFlipCoord(info.x, info.z);
+            var coord = NormalizeFlipCoord(info.x, info.z);
 
             if (loggingGame)
             {
-                JsonHit jHit = new JsonHit(Time.time - logStart, coord.x, coord.z, 
+                var jHit = new JsonHit(Time.time - logStart, coord.x, coord.z,
                     info.hitEntityID,
                     info.hitEntity,
                     info.hitterEntityID,
@@ -833,16 +737,10 @@ namespace Managers
                     info.damage);
                 jGameLog.hitLogs.Add(jHit);
 
-                if (logOnline)
-                {
-                    CheckGameLogLength(JsonUtility.ToJson(jHit).Length);
-                }
+                if (logOnline) CheckGameLogLength(JsonUtility.ToJson(jHit).Length);
             }
 
-            if (loggingStatistics)
-            {
-                hitCount++;
-            }
+            if (loggingStatistics) hitCount++;
         }
 
         // Logs statistics about the performance of the player finding the target.
@@ -850,17 +748,14 @@ namespace Managers
         {
             if (loggingStatistics)
             {
-                JsonTargetStatistics jTargetStatistics = new JsonTargetStatistics(Time.time - logStart,
+                var jTargetStatistics = new JsonTargetStatistics(Time.time - logStart,
                     initialPlayerPosition.x, initialPlayerPosition.z, lastPosition.x, lastPosition.z, x,
-                    z, currentDistance, (Time.time - logStart - lastTargetLog),
+                    z, currentDistance, Time.time - logStart - lastTargetLog,
                     currentDistance / (Time.time - logStart - lastTargetLog));
                 jStatisticsLog.targetStatisticsLogs.Add(jTargetStatistics);
                 lastTargetLog = Time.time - logStart;
 
-                if (logOnline)
-                {
-                    CheckStatisticsLogLength(JsonUtility.ToJson(jTargetStatistics).Length);
-                }
+                if (logOnline) CheckStatisticsLogLength(JsonUtility.ToJson(jTargetStatistics).Length);
             }
         }
 
@@ -868,12 +763,10 @@ namespace Managers
         private void LogGameStatistics()
         {
             if (loggingStatistics)
-            {
                 jStatisticsLog.finalStatistics = new JsonFinalStatistics(shotCount, hitCount,
-                    (shotCount > 0) ? (hitCount / (float) shotCount) : 0,
-                    totalDistance, (killCount > 0) ? (jStatisticsLog.gameInfo.duration / killCount) : 0,
-                    (killCount > 0) ? (totalDistance / killCount) : 0);
-            }
+                    shotCount > 0 ? hitCount / (float) shotCount : 0,
+                    totalDistance, killCount > 0 ? jStatisticsLog.gameInfo.duration / killCount : 0,
+                    killCount > 0 ? totalDistance / killCount : 0);
         }
 
         /* SURVEY*/
@@ -882,7 +775,7 @@ namespace Managers
         public bool MustSaveSurvey()
         {
             return logOffline && (logGame || logStatistics) &&
-                !File.Exists(experimentDirectory + "/survey.json");
+                   !File.Exists(experimentDirectory + "/survey.json");
         }
 
         // Save survey. This has to be done once.
@@ -897,20 +790,16 @@ namespace Managers
         {
             if (logGame || logStatistics)
             {
-                string log = JsonUtility.ToJson(new JsonAnswers(testID, GetCurrentCasesArray(),
+                var log = JsonUtility.ToJson(new JsonAnswers(testID, GetCurrentCasesArray(),
                     answers));
 
                 if (logOnline)
-                {
                     postQueue.Enqueue(new Entry(ConnectionSettings.SERVER_ANSWERS_LABEL, log,
                         ConnectionSettings.DISCARD_LOCAL_COMPLETION));
-                }
 
                 if (logOffline)
-                {
                     File.WriteAllText(experimentDirectory + "/" + studies[currentStudy].studyName +
-                        "/" + testID + "_answers.json", log);
-                }
+                                      "/" + testID + "_answers.json", log);
             }
         }
 
@@ -919,11 +808,9 @@ namespace Managers
         {
             try
             {
-                string[] maps = new string[casesPerUsers];
-                for (int i = 0; i < casesPerUsers; i++)
-                {
+                var maps = new string[casesPerUsers];
+                for (var i = 0; i < casesPerUsers; i++)
                     maps[i] = playTutorial ? caseList[i + 1].GetCurrentMap().name : caseList[i].GetCurrentMap().name;
-                }
 
                 return maps;
             }
@@ -955,21 +842,16 @@ namespace Managers
             z /= tileSize;
 
             if (flip)
-            {
                 return new Coord
                 {
                     x = z,
                     z = x
                 };
-            }
-            else
+            return new Coord
             {
-                return new Coord
-                {
-                    x = x,
-                    z = z
-                };
-            }
+                x = x,
+                z = z
+            };
         }
 
         // Normalizes and, if needed, flips an angle with respect to the y = -x axis.
@@ -989,20 +871,20 @@ namespace Managers
         // If an angle is negative it makes it positive.
         private float NormalizeAngle(float angle)
         {
-            return (angle < 0) ? (360 + angle % 360) : (angle % 360);
+            return angle < 0 ? 360 + angle % 360 : angle % 360;
         }
 
         // Shuffles a list.
         private void Shuffle<T>(IList<T> list)
         {
-            var random = new System.Random();
-            int n = list.Count;
+            var random = new Random();
+            var n = list.Count;
 
             while (n > 1)
             {
                 n--;
-                int k = random.Next(n + 1);
-                T value = list[k];
+                var k = random.Next(n + 1);
+                var value = list[k];
                 list[k] = list[n];
                 list[n] = value;
             }
@@ -1012,31 +894,27 @@ namespace Managers
         private IEnumerator WaitForDataManager()
         {
             while (!RemoteDataManager.Instance.IsResultReady)
-            {
                 yield return new WaitForSeconds(ConnectionSettings.SERVER_CONNECTION_PERIOD);
-            }
         }
 
         // Waits the Data Manager to complete the current operation, but with a timeout.
         private IEnumerator WaitForDataManager(float timeout)
         {
-            int connectionAttempts = 0;
+            var connectionAttempts = 0;
 
             while (connectionAttempts * ConnectionSettings.SERVER_CONNECTION_PERIOD < timeout &&
-                !RemoteDataManager.Instance.IsResultReady)
-            {
+                   !RemoteDataManager.Instance.IsResultReady)
                 yield return new WaitForSeconds(ConnectionSettings.SERVER_CONNECTION_PERIOD);
-            }
         }
 
         // Returns a tracker with all the values set to zero.
         private List<StudyCompletionTracker> GetZeroTracker()
         {
-            List<StudyCompletionTracker> zeroTracker = new List<StudyCompletionTracker>();
+            var zeroTracker = new List<StudyCompletionTracker>();
 
-            foreach (Study s in studies)
+            foreach (var s in studies)
             {
-                int[] casesCompletion = new int[s.cases.Count];
+                var casesCompletion = new int[s.cases.Count];
                 zeroTracker.Add(new StudyCompletionTracker(0, casesCompletion));
             }
 
@@ -1046,16 +924,13 @@ namespace Managers
         // Returns a tracker with random completions.
         private List<StudyCompletionTracker> GetRandomTracker()
         {
-            List<StudyCompletionTracker> randomTracker = new List<StudyCompletionTracker>();
+            var randomTracker = new List<StudyCompletionTracker>();
 
-            foreach (Study s in studies)
+            foreach (var s in studies)
             {
-                int[] casesCompletion = new int[s.cases.Count];
+                var casesCompletion = new int[s.cases.Count];
                 // Assign a random completion to the cases.
-                for (int i = 0; i < s.cases.Count; i++)
-                {
-                    casesCompletion[i] = UnityEngine.Random.Range(0, s.cases.Count);
-                }
+                for (var i = 0; i < s.cases.Count; i++) casesCompletion[i] = UnityEngine.Random.Range(0, s.cases.Count);
 
                 // Assign a random completion to the study.
                 randomTracker.Add(new StudyCompletionTracker(UnityEngine.Random.Range(0, studies.Count),
@@ -1068,23 +943,18 @@ namespace Managers
         // Extracts the completion tracker from a log.
         private JsonCompletionTracker ExtractCompletionTracker(string result)
         {
-            string[] splittedResult = result.Split('|');
+            var splittedResult = result.Split('|');
 
             if (splittedResult.Length == 6)
-            {
                 try
                 {
-                    JsonCompletionTracker jct =
+                    var jct =
                         JsonUtility.FromJson<JsonCompletionTracker>(splittedResult[4]);
-                    if (jct != null && jct.studyCompletionTrackers.Count > 0)
-                    {
-                        return jct;
-                    }
+                    if (jct != null && jct.studyCompletionTrackers.Count > 0) return jct;
                 }
                 catch
                 {
                 }
-            }
 
             return new JsonCompletionTracker(0, GetZeroTracker());
         }

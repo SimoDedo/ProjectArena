@@ -10,9 +10,9 @@ namespace AI.Behaviours.Actions
     public class LookAtDamageDirection : Action
     {
         private DamageSensor damageSensor;
-        private SightController sightController;
         private Vector3 lookPosition;
-        
+        private SightController sightController;
+
         public override void OnAwake()
         {
             var entity = GetComponent<AIEntity>();
@@ -23,7 +23,7 @@ namespace AI.Behaviours.Actions
             var delay = damageSensor.LastTimeDamaged - Time.time;
             (lookPosition, _) = enemyTracker.GetPositionAndVelocityFromDelay(delay);
         }
-        
+
         public override TaskStatus OnUpdate()
         {
             sightController.LookAtPoint(lookPosition);

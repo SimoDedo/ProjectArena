@@ -5,8 +5,8 @@ namespace AI.Behaviours.Conditions
 {
     public class ShouldWatchOutForEnemy : Conditional
     {
-        private FightingMovementSkill skill;
         private DamageSensor damageSensor;
+        private FightingMovementSkill skill;
 
         public override void OnAwake()
         {
@@ -18,10 +18,8 @@ namespace AI.Behaviours.Conditions
         public override TaskStatus OnUpdate()
         {
             if (skill == FightingMovementSkill.StandStill)
-            {
                 // Never fight back if I don't have the required movement skill!
                 return TaskStatus.Failure;
-            }
 
             return damageSensor.WasDamagedRecently ? TaskStatus.Success : TaskStatus.Failure;
         }

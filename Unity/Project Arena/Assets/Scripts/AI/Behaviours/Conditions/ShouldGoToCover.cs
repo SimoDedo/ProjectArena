@@ -10,27 +10,28 @@ namespace AI.Behaviours.Conditions
     // We might want to search for cover if the weapon we are using is running out of ammo
     // and, despite this, it remains the best weapon we can use in this situation.
     // Despite this, apply a random probability of actually going to take cover!
-    
+
     // TODO Check how often conditionals with abort are reevaluated
     [Serializable]
     public class ShouldGoToCover : Conditional
     {
-        private AIEntity entity;
-        private Entity.Entity enemy;
-        private GunManager gunManager;
+        private const float TIMEOUT = 1.5f;
+
+        private const float CHARGER_PERCENTAGE = 0.4f;
+        private const float AVOID_COVER_PROBABILITY = 0.3f;
+
         /// <summary>
-        /// If true, we must now consider the random failure probability until we find out that we no longer
-        /// need to cover
+        ///     If true, we must now consider the random failure probability until we find out that we no longer
+        ///     need to cover
         /// </summary>
         [SerializeField] private SharedBool isGoingToCover;
 
+        private Entity.Entity enemy;
+        private AIEntity entity;
+        private GunManager gunManager;
+
         private float nextCoverAttempt;
 
-        private const float TIMEOUT = 1.5f;
-        
-        private const float CHARGER_PERCENTAGE = 0.4f;
-        private const float AVOID_COVER_PROBABILITY = 0.3f;
-        
         public override void OnAwake()
         {
             entity = gameObject.GetComponent<AIEntity>();
@@ -41,10 +42,8 @@ namespace AI.Behaviours.Conditions
         public override TaskStatus OnUpdate()
         {
             if (nextCoverAttempt >= Time.time)
-            {
                 // We were able to cover some time ago but decided not to. Do not change our mind too soon
                 return TaskStatus.Failure;
-            }
 
             var currentGun = gunManager.CurrentGunIndex;
             // TODO Do not evaluate by percentage but by speed of depletion of ammo
@@ -77,7 +76,7 @@ namespace AI.Behaviours.Conditions
                 isGoingToCover.Value = false;
                 return TaskStatus.Failure;
             }
-            
+
             // TODO Make this a bot parameter? Tendency to cover?
             if (!isGoingToCover.Value && Random.value < AVOID_COVER_PROBABILITY)
             {

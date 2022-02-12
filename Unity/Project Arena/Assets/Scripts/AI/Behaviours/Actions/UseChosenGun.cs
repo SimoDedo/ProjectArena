@@ -14,22 +14,22 @@ namespace AI.Behaviours.Actions
     [Serializable]
     public class UseChosenGun : Action
     {
+        private const float UPDATE_INTERVAL = 0.5f;
         [SerializeField] private int lookBackFrames = -3;
         [SerializeField] private int lookAheadFrames = 3;
         [SerializeField] private float lookAheadTimeStep = 0.3f;
         [SerializeField] private SharedBool isGoingForCover;
-        private AIEntity entity;
-        private GunManager gunManager;
-        private Entity.Entity enemy;
-        private PositionTracker enemyPositionTracker;
-        private TargetKnowledgeBase targetKb;
-        private SightController sightController;
 
         private NormalDistribution distribution;
-        private float previousReflexDelay;
-        private float targetReflexDelay;
+        private Entity.Entity enemy;
+        private PositionTracker enemyPositionTracker;
+        private AIEntity entity;
+        private GunManager gunManager;
         private float nextDelayRecalculation = float.MinValue;
-        private const float UPDATE_INTERVAL = 0.5f;
+        private float previousReflexDelay;
+        private SightController sightController;
+        private TargetKnowledgeBase targetKb;
+        private float targetReflexDelay;
 
         public override void OnAwake()
         {
@@ -52,10 +52,8 @@ namespace AI.Behaviours.Actions
         {
             var lastSightedTime = targetKb.LastTimeDetected;
             if (lastSightedTime != Time.time && isGoingForCover.Value && !gunManager.IsCurrentGunReloading())
-            {
                 //We cannot see the enemy and we were looking for cover, reload now!
                 gunManager.ReloadCurrentGun();
-            }
 
             if (nextDelayRecalculation <= Time.time)
             {
@@ -74,32 +72,24 @@ namespace AI.Behaviours.Actions
             Vector3 enemyVelocity;
 
             if (!float.IsNaN(lastSightedDelay) && lastSightedDelay > currentDelay)
-            {
                 // We don't know the exact position of the enemy currentDelay ago, so just consider
                 // its last know position (with velocity zero, so that we won't correct the shooting position)
                 (enemyPosition, enemyVelocity) = enemyPositionTracker.GetPositionAndVelocityFromDelay(lastSightedDelay);
-            }
             else
-            {
                 // We know the position of the enemy at currentDelay seconds ago, so use it directly.
                 (enemyPosition, enemyVelocity) = enemyPositionTracker.GetPositionAndVelocityFromDelay(currentDelay);
-            }
 
             if (gunManager.IsCurrentGunProjectileWeapon())
-            {
                 AimProjectileWeapon(enemyPosition, enemyVelocity);
-            }
             else
-            {
                 AimRaycastWeapon(enemyPosition, lastSightedTime);
-            }
 
             return TaskStatus.Running;
         }
 
         /**
          * Tries to find the best position to aim at accounting for the weapon speed and the enemy estimated velocity.
-         * In case the weapon is a blast weapon, positions at the 
+         * In case the weapon is a blast weapon, positions at the
          */
         private void AimProjectileWeapon(Vector3 position, Vector3 velocity)
         {
@@ -114,21 +104,15 @@ namespace AI.Behaviours.Actions
                 var newPos = enemyStartPos + velocity * (i * lookAheadTimeStep);
 
                 if (isGunBlast)
-                {
                     // The weapon is a blast weapon. Aim at the enemy's feet.
                     // TODO Check this raycast works. It fails sometimes... why?
                     if (Physics.Raycast(newPos, Vector3.down * 5f, out var downRayHit))
-                    {
                         newPos = downRayHit.point;
-                    }
-                }
 
                 Debug.DrawLine(ourStartingPoint, newPos);
                 if (Physics.Linecast(ourStartingPoint, newPos, out var hit) && hit.point != newPos)
-                {
                     // Looks like there is an obstacle from out head to that position...
                     continue;
-                }
 
                 var timeBeforeProjectileReachesNewPos = (ourStartingPoint - newPos).magnitude / projectileSpeed;
                 var timeError = Mathf.Abs(timeBeforeProjectileReachesNewPos - i * lookAheadTimeStep);
@@ -157,18 +141,14 @@ namespace AI.Behaviours.Actions
             // TODO Do not shoot if outside of gun range
             var angle = sightController.LookAtPoint(position);
             if (lastSightedTime != Time.time && !gunManager.IsGunBlastWeapon(gunManager.CurrentGunIndex))
-            {
                 // We don't see the enemy and we are not using a blast weapon, do not shoot.
                 return;
-            }
 
             // TODO Understand angle... I should avoid shooting if I am using a blast weapon and the position in 
             // front of me is too close!
             if (angle < 10 && gunManager.CanCurrentGunShoot() &&
                 ShouldShootWeapon(position, gunManager.IsCurrentGunBlastWeapon()))
-            {
                 gunManager.ShootCurrentGun();
-            }
         }
 
         // I can shoot a gun if I do not detect any obstacle in the path from startingPos to position.
@@ -180,10 +160,8 @@ namespace AI.Behaviours.Actions
             var distance = (startingPos - position).magnitude;
             var weaponRange = gunManager.GetGunMaxRange(gunManager.CurrentGunIndex);
             if (weaponRange < distance)
-            {
                 // Outside of weapon range...
                 return false;
-            }
 
             // TODO try to raycast from my position forward. If the distance I hit is not too smaller than the distance
             // of the target, than you can shoot.
@@ -193,15 +171,11 @@ namespace AI.Behaviours.Actions
 
             var hitSomething = Physics.Raycast(startingPos, headForward, out var hit, weaponRange);
             if (hitSomething && hit.collider.gameObject != enemy.gameObject && hit.distance <= distance * 0.9f)
-            {
                 // Looks like there is an obstacle between me and the point I wanted to shoot. Avoid shooting
                 return false;
-            }
             if (!isBlastWeapon)
-            {
                 // No more checks needed now
                 return true;
-            }
 
             // Try to cast a ray from our position looking forward. If we hit something, check it's not too close to
             // hurt ourselves

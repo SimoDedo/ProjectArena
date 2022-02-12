@@ -4,27 +4,27 @@ using UnityEngine.UI;
 namespace UI
 {
     /// <summary>
-    /// This class manages the UI of a gun, i.e. its ammo.
+    ///     This class manages the UI of a gun, i.e. its ammo.
     /// </summary>
-    public class GunUIManager : MonoBehaviour {
-
+    public class GunUIManager : MonoBehaviour
+    {
         [SerializeField] private GameObject ammo;
 
         private string infinite;
 
-        private void Awake() {
-            if (Application.platform == RuntimePlatform.WebGLPlayer) {
+        private void Awake()
+        {
+            if (Application.platform == RuntimePlatform.WebGLPlayer)
                 infinite = "INF";
-            } else {
+            else
                 infinite = "∞";
-            }
         }
 
         // Sets the ammo.
-        public void SetAmmo(int charger, int tot) {
-            ammo.GetComponent<Text>().text = charger.ToString() + "/" +
-                ((tot == -1) ? infinite : tot.ToString());
+        public void SetAmmo(int charger, int tot)
+        {
+            ammo.GetComponent<Text>().text = charger + "/" +
+                                             (tot == -1 ? infinite : tot.ToString());
         }
-
     }
 }

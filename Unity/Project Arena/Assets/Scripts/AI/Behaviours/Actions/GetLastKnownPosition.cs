@@ -15,12 +15,12 @@ namespace AI.Behaviours.Actions
     public class GetLastKnownPosition : Action
     {
         [SerializeField] private SharedSelectedPathInfo lastKnownPositionPath;
-        private AIEntity entity;
+        private DamageSensor damageSensor;
         private Entity.Entity enemy;
         private PositionTracker enemyTracker;
+        private AIEntity entity;
         private TargetKnowledgeBase knowledgeBase;
         private NavigationSystem navSystem;
-        private DamageSensor damageSensor;
 
         public override void OnAwake()
         {
@@ -35,16 +35,14 @@ namespace AI.Behaviours.Actions
         public override TaskStatus OnUpdate()
         {
             var damageTime = damageSensor.WasDamagedRecently
-                ? (damageSensor.LastTimeDamaged)
+                ? damageSensor.LastTimeDamaged
                 : float.MinValue;
 
             var lossTime = knowledgeBase.LastTimeDetected;
 
             if (damageTime > lossTime)
-            {
                 // The most recent event was getting damaged, so use this knowledge to guess its position
                 return EstimateEnemyPositionFromDamage();
-            }
             // The most recent event was losing the enemy, so use this knowledge to guess its position
             return EstimateEnemyPositionFromKnowledge();
         }
@@ -53,7 +51,7 @@ namespace AI.Behaviours.Actions
         {
             var delay = Time.time - knowledgeBase.LastTimeDetected;
             var (delayedPosition, velocity) = enemyTracker.GetPositionAndVelocityFromDelay(delay);
-            
+
             // Try to estimate the position of the enemy after it has gone out of sight
             var estimatedPosition = delayedPosition + velocity * 0.1f;
 
@@ -62,7 +60,6 @@ namespace AI.Behaviours.Actions
             {
                 lastKnownPositionPath.Value = pathToEstimatedPos;
                 return TaskStatus.Success;
-                
             }
 
             // Point wasn't valid, perhaps estimated position was OOB, use position
@@ -72,7 +69,7 @@ namespace AI.Behaviours.Actions
                 lastKnownPositionPath.Value = pathToDelayedPosition;
                 return TaskStatus.Success;
             }
-            
+
             throw new ArgumentException("Impossible to reach the enemy, estimated position in not valid!");
         }
 
@@ -106,13 +103,15 @@ namespace AI.Behaviours.Actions
                     lastKnownPositionPath.Value = path;
                     return TaskStatus.Success;
                 }
+
                 // The position chosen is not valid... choose the point we have hit?
                 var path2 = navSystem.CalculatePath(hit.point);
                 if (path2.IsComplete())
                 {
-                    lastKnownPositionPath.Value = path2; 
+                    lastKnownPositionPath.Value = path2;
                     return TaskStatus.Success;
                 }
+
                 // todo i'd like to understand why is the point unreachable here...
                 // ... choose enemy position...
                 var path3 = navSystem.CalculatePath(enemyPos);
@@ -121,9 +120,11 @@ namespace AI.Behaviours.Actions
                     lastKnownPositionPath.Value = path3;
                     return TaskStatus.Success;
                 }
+
                 // Give up on life
                 throw new ArgumentException("Cannot get valid path to enemy");
             }
+
             // How come we haven't spotted anything in the enemy direction? Not even the enemy? Impossible!
             throw new ApplicationException("We couldn't spot the enemy even when raycasting towards it!");
         }

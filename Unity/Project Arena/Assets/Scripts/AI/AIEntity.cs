@@ -15,10 +15,10 @@ using Utils;
 namespace AI
 {
     /// <summary>
-    /// Class representing an entity which is played by a bot.
+    ///     Class representing an entity which is played by a bot.
     /// </summary>
 
-// List of characteristics of a bot:
+    // List of characteristics of a bot:
 // Movement: How good the bot is to move around when fighting.
 // Curiosity: How much the bot looks around himself when wandering
 // Aim: How good is the player aim
@@ -73,7 +73,7 @@ namespace AI
                 movementSkill = FightingMovementSkill.CircleStrife,
                 predictionSkill = 0.5f,
                 speed = 16,
-                recentDamageTimeout = 0.5f,
+                recentDamageTimeout = 0.5f
             };
     }
 
@@ -82,14 +82,14 @@ namespace AI
         StandStill,
         MoveStraight,
         CircleStrife,
-        CircleStrifeChangeDirection,
+        CircleStrifeChangeDirection
     }
 
     public enum CuriosityLevel
     {
         Low,
         Medium,
-        High,
+        High
     }
 
 
@@ -99,13 +99,40 @@ namespace AI
 
         [SerializeField] private BotCharacteristics botParams = BotCharacteristics.Default;
 
-        // Do I have to log?
-        private bool loggingGame;
+        [SerializeField] private BotState botState;
+
+        [SerializeField] [NotNull] private Entity.Entity enemy;
+
+        private bool enemyInSightPreviously;
+
+        /// <summary>
+        ///     Time end last fight event or first respawn time
+        /// </summary>
+        private float engageIntervalStartTime;
+
+        private IGoalMachine goalMachine;
+        private int killerId;
 
         // Time of the last position log.
         private float lastPositionLog;
+        private bool loggedFirstRespawn;
 
-        [SerializeField] private BotState botState;
+        // Do I have to log?
+        private bool loggingGame;
+        private bool mustProcessDeath;
+        private int numberOfFights;
+        private int numberOfRetreats;
+
+        private float previousDetectionTime;
+        private float startFightEventTime;
+
+        private float totalTimeBetweenSights;
+
+        private float totalTimeInFight;
+
+        private float totalTimeToEngage;
+
+        private float totalTimeToSurrender;
 
         private BotState BotState
         {
@@ -142,16 +169,103 @@ namespace AI
 
         public bool IsFocusingOnEnemy { get; set; }
 
-        private IGoalMachine goalMachine;
-        private bool mustProcessDeath;
-        private int killerId;
-
         public override bool IsAlive => isActiveAndEnabled && (Health > 0 || mustProcessDeath);
+
+        public FightingMovementSkill MovementSkill => botParams.movementSkill;
+
+        private void Update()
+        {
+            if (loggingGame && Time.time > lastPositionLog + 0.5)
+            {
+                var t = transform;
+                var position = t.position;
+                PositionInfoGameEvent.Instance.Raise(
+                    new PositionInfo {x = position.x, z = position.z, dir = t.eulerAngles.y, entityID = entityID}
+                );
+                lastPositionLog = Time.time;
+            }
+
+            var previousFightStatus = IsFocusingOnEnemy;
+            // Reset to false. Combat-driven behaviour will know when to set this to true
+            IsFocusingOnEnemy = false;
+
+            if (inGame)
+            {
+                if (!enemy.IsAlive)
+                    // Bug fix: forget enemy position, because if it dies and respawns before I lose track of the last
+                    //   position occupied, I will shoot at that point as soon as the enemy respawns 
+                    TargetKb.Reset();
+                else
+                    TargetKb.Update();
+                MapKnowledge.Update();
+                PickupKnowledgeBase.Update();
+                // Important: Pickup planner must be updated after pickup knowledge base
+                PickupPlanner.Update();
+                goalMachine.Update();
+            }
+
+            if (loggedFirstRespawn)
+            {
+                if (previousFightStatus != IsFocusingOnEnemy)
+                {
+                    // Changed fighting status this turn!
+                    if (!IsFocusingOnEnemy)
+                    {
+                        engageIntervalStartTime = Time.time;
+                        totalTimeInFight += Time.time - startFightEventTime;
+                        numberOfFights++;
+                        if (enemy.IsAlive)
+                        {
+                            totalTimeToSurrender +=
+                                Time.time - Mathf.Max(startFightEventTime, TargetKb.LastTimeDetected);
+                            numberOfRetreats++;
+                        }
+                    }
+                    else
+                    {
+                        totalTimeToEngage += Time.time - engageIntervalStartTime;
+                        startFightEventTime = Time.time;
+
+                        // First detection status of this fight!
+                        enemyInSightPreviously = TargetKb.HasSeenTarget();
+                        previousDetectionTime = TargetKb.LastTimeDetected;
+                    }
+                }
+                else if (IsFocusingOnEnemy)
+                {
+                    // We are in a fight event, so keep track of everything needed
+                    var isEnemyInSightNow = TargetKb.HasSeenTarget();
+                    if (isEnemyInSightNow && !enemyInSightPreviously)
+                        // Update time between sights, but only if enemy was lost in this event
+                        if (startFightEventTime <= previousDetectionTime)
+                            totalTimeBetweenSights += Time.time - previousDetectionTime;
+
+                    previousDetectionTime = TargetKb.LastTimeDetected;
+                    enemyInSightPreviously = isEnemyInSightNow;
+                }
+            }
+        }
+
+        private void LateUpdate()
+        {
+            if (inGame && mustProcessDeath)
+            {
+                mustProcessDeath = false;
+                // Kill the entity.
+                Die(killerId);
+            }
+        }
+
+        public void SetupLogging()
+        {
+            loggingGame = true;
+        }
 
         private void PrepareComponents(GameManager gms, bool[] ag)
         {
             MovementController = new MovementController(this, botParams.speed);
-            SightController = new SightController(this, head, botParams.maxCameraSpeed, botParams.maxCameraAcceleration);
+            SightController =
+                new SightController(this, head, botParams.maxCameraSpeed, botParams.maxCameraAcceleration);
             SightSensor = new SightSensor(head, botParams.maxRange, botParams.fov);
             MapKnowledge = new MapKnowledge(this, gms);
             TargetKb = new TargetKnowledgeBase(
@@ -216,13 +330,10 @@ namespace AI
                     }
                 );
                 if (killerID != entityID)
-                {
                     // We just got damaged and it was not self-inflicted, we might need to search the enemy.
                     DamageSensor.GotDamaged();
-                }
 
                 if (Health <= 0)
-                {
                     // Health = 0;
                     // TODO What if multiple entities kill the same one on the same frame?
                     // TODO What if I get killed but in my last frame I pickup a medkit?
@@ -231,17 +342,6 @@ namespace AI
                         mustProcessDeath = true;
                         killerId = killerID;
                     }
-                }
-            }
-        }
-
-        private void LateUpdate()
-        {
-            if (inGame && mustProcessDeath)
-            {
-                mustProcessDeath = false;
-                // Kill the entity.
-                Die(killerId);
             }
         }
 
@@ -291,107 +391,6 @@ namespace AI
             SetInGame(true);
         }
 
-        private float totalTimeToEngage;
-
-        private float totalTimeInFight;
-        private int numberOfFights;
-
-        private float totalTimeBetweenSights;
-
-        private float totalTimeToSurrender;
-        private int numberOfRetreats;
-
-        private bool enemyInSightPreviously;
-        private bool loggedFirstRespawn;
-        private float startFightEventTime;
-
-        /// <summary>
-        /// Time end last fight event or first respawn time
-        /// </summary>
-        private float engageIntervalStartTime;
-
-        private float previousDetectionTime;
-
-        private void Update()
-        {
-            if (loggingGame && Time.time > lastPositionLog + 0.5)
-            {
-                var t = transform;
-                var position = t.position;
-                PositionInfoGameEvent.Instance.Raise(
-                    new PositionInfo {x = position.x, z = position.z, dir = t.eulerAngles.y, entityID = entityID}
-                );
-                lastPositionLog = Time.time;
-            }
-
-            var previousFightStatus = IsFocusingOnEnemy;
-            // Reset to false. Combat-driven behaviour will know when to set this to true
-            IsFocusingOnEnemy = false;
-
-            if (inGame)
-            {
-                if (!enemy.IsAlive)
-                {
-                    // Bug fix: forget enemy position, because if it dies and respawns before I lose track of the last
-                    //   position occupied, I will shoot at that point as soon as the enemy respawns 
-                    TargetKb.Reset();
-                }
-                else
-                {
-                    TargetKb.Update();
-                }
-                MapKnowledge.Update();
-                PickupKnowledgeBase.Update();
-                // Important: Pickup planner must be updated after pickup knowledge base
-                PickupPlanner.Update();
-                goalMachine.Update();
-            }
-
-            if (loggedFirstRespawn)
-            {
-                if (previousFightStatus != IsFocusingOnEnemy)
-                {
-                    // Changed fighting status this turn!
-                    if (!IsFocusingOnEnemy)
-                    {
-                        engageIntervalStartTime = Time.time;
-                        totalTimeInFight += Time.time - startFightEventTime;
-                        numberOfFights++;
-                        if (enemy.IsAlive)
-                        {
-                            totalTimeToSurrender += Time.time - Mathf.Max(startFightEventTime, TargetKb.LastTimeDetected);
-                            numberOfRetreats++;
-                        }
-                    }
-                    else
-                    {
-                        totalTimeToEngage += Time.time - engageIntervalStartTime;
-                        startFightEventTime = Time.time;
-
-                        // First detection status of this fight!
-                        enemyInSightPreviously = TargetKb.HasSeenTarget();
-                        previousDetectionTime = TargetKb.LastTimeDetected;
-                    }
-                }
-                else if (IsFocusingOnEnemy)
-                {
-                    // We are in a fight event, so keep track of everything needed
-                    var isEnemyInSightNow = TargetKb.HasSeenTarget();
-                    if (isEnemyInSightNow && !enemyInSightPreviously)
-                    {
-                        // Update time between sights, but only if enemy was lost in this event
-                        if (startFightEventTime <= previousDetectionTime)
-                        {
-                            totalTimeBetweenSights += Time.time - previousDetectionTime;
-                        }
-                    }
-
-                    previousDetectionTime = TargetKb.LastTimeDetected;
-                    enemyInSightPreviously = isEnemyInSightNow;
-                }
-            }
-        }
-
 
         public override void SlowEntity(float penalty)
         {
@@ -400,19 +399,12 @@ namespace AI
 
         public override void HealFromMedkit(MedkitPickable medkit)
         {
-            if (mustProcessDeath)
-            {
-                Debug.LogWarning("An entity recovered health in the same turn it died!");
-            }
+            if (mustProcessDeath) Debug.LogWarning("An entity recovered health in the same turn it died!");
 
             if (Health + medkit.RestoredHealth > totalHealth)
-            {
                 Health = totalHealth;
-            }
             else
-            {
                 Health += medkit.RestoredHealth;
-            }
 
             PickupKnowledgeBase.MarkConsumed(medkit);
         }
@@ -436,7 +428,6 @@ namespace AI
             inGame = b;
 
             if (isGameEnded)
-            {
                 // Send all logging info
                 EntityGameMetricsGameEvent.Instance.Raise(
                     new GameMetrics
@@ -450,15 +441,7 @@ namespace AI
                         numberOfFights = numberOfFights
                     }
                 );
-            }
         }
-
-        public void SetupLogging()
-        {
-            loggingGame = true;
-        }
-
-        public FightingMovementSkill MovementSkill => botParams.movementSkill;
 
         public CuriosityLevel GetCuriosity()
         {
@@ -469,8 +452,6 @@ namespace AI
         {
             return botParams.predictionSkill;
         }
-
-        [SerializeField] [NotNull] private Entity.Entity enemy;
 
         public Entity.Entity GetEnemy()
         {
@@ -497,7 +478,7 @@ namespace AI
 
 // TODO Define BotState contents (health, ammo, current target, timeouts for stuff, ...)
     [Serializable]
-    public partial class BotState
+    public class BotState
     {
         [SerializeField] private int health;
 

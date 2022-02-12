@@ -1,55 +1,61 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
-namespace Logging {
-
+namespace Logging
+{
     [Serializable]
-    public class Study {
+    public class Study
+    {
         [SerializeField] public string studyName;
         [SerializeField] public bool flip;
         [SerializeField] public List<Case> cases;
     }
 
     [Serializable]
-    public class Case {
+    public class Case
+    {
         [SerializeField] public string caseName;
         [SerializeField] public List<TextAsset> maps;
         [SerializeField] public string scene;
         [NonSerialized] public int mapIndex;
 
-        public Case() {
+        public Case()
+        {
             RandomizeCurrentMap();
         }
 
-        public TextAsset GetCurrentMap() {
+        public TextAsset GetCurrentMap()
+        {
             return maps[mapIndex];
         }
 
-        public void RandomizeCurrentMap() {
-            if (maps != null) {
-                mapIndex = UnityEngine.Random.Range(0, maps.Count);
-            } else {
+        public void RandomizeCurrentMap()
+        {
+            if (maps != null)
+                mapIndex = Random.Range(0, maps.Count);
+            else
                 mapIndex = 0;
-            }
         }
     }
 
     [Serializable]
-    public class StudyCompletionTracker {
+    public class StudyCompletionTracker
+    {
         public int studyCompletion;
         public int[] casesCompletion;
 
-        public StudyCompletionTracker(int studyCompletion, int[] casesCompletion) {
+        public StudyCompletionTracker(int studyCompletion, int[] casesCompletion)
+        {
             this.studyCompletion = studyCompletion;
             this.casesCompletion = casesCompletion;
-
         }
     }
 
-    public struct Coord {
+    public struct Coord
+    {
         public float x;
         public float z;
     }
-
 }

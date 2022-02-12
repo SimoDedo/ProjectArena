@@ -10,7 +10,11 @@ namespace Logging
         public string spawnEntity;
     }
 
-    public class BaseSpawnInfoGameEvent : GameEventBase<SpawnInfo> { }
+    public class BaseSpawnInfoGameEvent : GameEventBase<SpawnInfo>
+    {
+    }
 
-    public sealed class SpawnInfoGameEvent : ScriptableObjectSingleton<BaseSpawnInfoGameEvent> { }
+    public sealed class SpawnInfoGameEvent : ScriptableObjectSingleton<BaseSpawnInfoGameEvent>
+    {
+    }
 }

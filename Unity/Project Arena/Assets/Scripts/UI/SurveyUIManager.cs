@@ -8,8 +8,8 @@ using UnityEngine;
 namespace UI
 {
     /// <summary>
-    /// This class manages the UI of the survey. A survey is a sequence of screens that starts with an
-    /// introduction, continues with some questions and ends with a thanks.
+    ///     This class manages the UI of the survey. A survey is a sequence of screens that starts with an
+    ///     introduction, continues with some questions and ends with a thanks.
     /// </summary>
     public class SurveyUIManager : MonoBehaviour
     {
@@ -21,10 +21,10 @@ namespace UI
 
         [Header("Other")] [SerializeField] private RotateTranslateByAxis backgroundScript;
 
-        private int currentQuestion = 0;
+        private int currentQuestion;
+        private List<JsonAnswer> jAnswers;
 
         private List<JsonQuestion> jQuestions;
-        private List<JsonAnswer> jAnswers;
 
         private void Start()
         {

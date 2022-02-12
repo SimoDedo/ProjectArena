@@ -8,11 +8,11 @@ namespace AI.GoalMachine.Goal
     public class SearchEnemy : IGoal
     {
         private const float NO_TIME = -1;
-        private readonly AIEntity entity;
-        private readonly TargetKnowledgeBase targetKb;
-        private readonly DamageSensor damageSensor;
-        private readonly ExternalBehaviorTree externalBt;
         private readonly BehaviorTree behaviorTree;
+        private readonly DamageSensor damageSensor;
+        private readonly AIEntity entity;
+        private readonly ExternalBehaviorTree externalBt;
+        private readonly TargetKnowledgeBase targetKb;
         private float startSearchTime = NO_TIME;
 
         public SearchEnemy(AIEntity entity)
@@ -25,7 +25,6 @@ namespace AI.GoalMachine.Goal
             behaviorTree.StartWhenEnabled = false;
             behaviorTree.RestartWhenComplete = true;
             behaviorTree.ExternalBehavior = externalBt;
-
         }
 
         public float GetScore()
@@ -43,7 +42,7 @@ namespace AI.GoalMachine.Goal
 
             return 0f;
         }
-        
+
         public void Enter()
         {
             behaviorTree.EnableBehavior();

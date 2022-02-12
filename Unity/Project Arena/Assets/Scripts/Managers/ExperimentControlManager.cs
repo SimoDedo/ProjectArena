@@ -17,7 +17,7 @@ using UnityEngine;
 namespace Managers
 {
     /// <summary>
-    /// Allows to start a new experiment and download its logs.
+    ///     Allows to start a new experiment and download its logs.
     /// </summary>
     public static class ExperimentControlManager
     {
@@ -26,10 +26,7 @@ namespace Managers
         {
             RemoteDataManager.Instance.SaveData(ConnectionSettings.SERVER_RESET_LABEL, "", "");
 
-            while (!RemoteDataManager.Instance.IsResultReady)
-            {
-                yield return new WaitForSeconds(0.25f);
-            }
+            while (!RemoteDataManager.Instance.IsResultReady) yield return new WaitForSeconds(0.25f);
         }
 
         // Downloads all the logs of the current experiment and eventually merge them and reconstruct the
@@ -38,10 +35,7 @@ namespace Managers
         {
             RemoteDataManager.Instance.GetLastEntry();
 
-            while (!RemoteDataManager.Instance.IsResultReady)
-            {
-                yield return new WaitForSeconds(0.25f);
-            }
+            while (!RemoteDataManager.Instance.IsResultReady) yield return new WaitForSeconds(0.25f);
 
             int downloadCount;
             try
@@ -55,30 +49,25 @@ namespace Managers
                 yield break;
             }
 
-            List<JsonStatisticsLog> statisticsLogs = new List<JsonStatisticsLog>();
-            List<JsonGameLog> gameLogs = new List<JsonGameLog>();
-            List<JsonStatisticsLog> refinedStatisticsLogs = new List<JsonStatisticsLog>();
-            List<JsonGameLog> refinedGameLogs = new List<JsonGameLog>();
+            var statisticsLogs = new List<JsonStatisticsLog>();
+            var gameLogs = new List<JsonGameLog>();
+            var refinedStatisticsLogs = new List<JsonStatisticsLog>();
+            var refinedGameLogs = new List<JsonGameLog>();
 
             RemoteDataManager.Instance.GetLastEntries(downloadCount);
 
-            while (!RemoteDataManager.Instance.IsResultReady)
-            {
-                yield return new WaitForSeconds(0.25f);
-            }
+            while (!RemoteDataManager.Instance.IsResultReady) yield return new WaitForSeconds(0.25f);
 
-            string[] results = RemoteDataManager.Instance.Result.Split('\n');
+            var results = RemoteDataManager.Instance.Result.Split('\n');
 
             try
             {
-                foreach (string result in results)
+                foreach (var result in results)
                 {
-                    string[] resultFields = result.Split('|');
+                    var resultFields = result.Split('|');
                     if (resultFields.Length == 6)
-                    {
                         if (resultFields[2] != ConnectionSettings.SERVER_COMPLETION_LABEL &&
                             resultFields[2] != ConnectionSettings.SERVER_RESET_LABEL)
-                        {
                             switch (resultFields[2])
                             {
                                 case ConnectionSettings.SERVER_GAME_LABEL:
@@ -89,11 +78,11 @@ namespace Managers
                                     }
                                     else
                                     {
-                                        JsonGameLog jGameLog =
+                                        var jGameLog =
                                             JsonUtility.FromJson<JsonGameLog>(resultFields[3]);
                                         File.WriteAllText(downloadDirectory + "/" + jGameLog.testID +
-                                            "_" + jGameLog.mapInfo.name + "_game_" + jGameLog.logPart
-                                            + ".json", resultFields[3]);
+                                                          "_" + jGameLog.mapInfo.name + "_game_" + jGameLog.logPart
+                                                          + ".json", resultFields[3]);
                                     }
 
                                     break;
@@ -105,47 +94,40 @@ namespace Managers
                                     }
                                     else
                                     {
-                                        JsonStatisticsLog jStatisticLog =
+                                        var jStatisticLog =
                                             JsonUtility.FromJson<JsonStatisticsLog>(resultFields[3]);
                                         File.WriteAllText(downloadDirectory + "/" + jStatisticLog.testID
-                                            + "_" + jStatisticLog.mapInfo.name + "_statistics_" +
-                                            jStatisticLog.logPart + ".json",
+                                                          + "_" + jStatisticLog.mapInfo.name + "_statistics_" +
+                                                          jStatisticLog.logPart + ".json",
                                             JsonUtility.ToJson(jStatisticLog));
                                     }
 
                                     break;
                                 case ConnectionSettings.SERVER_ANSWERS_LABEL:
-                                    JsonAnswers jAnswers =
+                                    var jAnswers =
                                         JsonUtility.FromJson<JsonAnswers>(resultFields[3]);
                                     File.WriteAllText(downloadDirectory + "/" + jAnswers.testID +
-                                        "_answers" + ".json", resultFields[3]);
+                                                      "_answers" + ".json", resultFields[3]);
                                     break;
                             }
-                        }
-                    }
                 }
 
                 if (mergeLogs)
                 {
                     // Merge the game logs.
-                    foreach (JsonGameLog gameLog in gameLogs)
-                    {
+                    foreach (var gameLog in gameLogs)
                         if (gameLog.logPart == 0)
                         {
-                            JsonGameLog refinedGameLog = gameLog;
+                            var refinedGameLog = gameLog;
 
-                            int count = 0;
-                            int lastPart = 0;
+                            var count = 0;
+                            var lastPart = 0;
 
-                            foreach (JsonGameLog gl in gameLogs)
-                            {
+                            foreach (var gl in gameLogs)
                                 if (gl.testID == gameLog.testID &&
                                     gl.mapInfo.name == gameLog.mapInfo.name && gl.logPart > 0)
                                 {
-                                    if (gl.logPart > lastPart)
-                                    {
-                                        lastPart = gl.logPart;
-                                    }
+                                    if (gl.logPart > lastPart) lastPart = gl.logPart;
 
                                     refinedGameLog.hitLogs.AddRange(gl.hitLogs);
                                     refinedGameLog.killLogs.AddRange(gl.killLogs);
@@ -155,7 +137,6 @@ namespace Managers
                                     refinedGameLog.spawnLogs.AddRange(gl.spawnLogs);
                                     count++;
                                 }
-                            }
 
                             refinedGameLog.hitLogs.Sort((p, q) => p.timestamp.CompareTo(q.timestamp));
                             refinedGameLog.killLogs.Sort((p, q) => p.timestamp.CompareTo(q.timestamp));
@@ -169,27 +150,20 @@ namespace Managers
 
                             // Set the part to -1 if the log is incomplete, to 0 if it is complete.
                             if (lastPart != count)
-                            {
                                 refinedGameLog.logPart = -1;
-                            }
                             else
-                            {
                                 refinedGameLog.logPart = 0;
-                            }
 
                             refinedGameLogs.Add(refinedGameLog);
                         }
-                    }
 
                     // Merge the statistics logs.
-                    foreach (JsonStatisticsLog statisticsLog in statisticsLogs)
-                    {
+                    foreach (var statisticsLog in statisticsLogs)
                         if (statisticsLog.logPart == 0)
                         {
-                            JsonStatisticsLog refinedStatisticLog = statisticsLog;
+                            var refinedStatisticLog = statisticsLog;
 
-                            foreach (JsonStatisticsLog sl in statisticsLogs)
-                            {
+                            foreach (var sl in statisticsLogs)
                                 if (sl.testID == statisticsLog.testID &&
                                     sl.mapInfo.name == statisticsLog.mapInfo.name && sl.logPart > 0)
                                 {
@@ -198,31 +172,27 @@ namespace Managers
                                     refinedStatisticLog.targetStatisticsLogs.AddRange(
                                         sl.targetStatisticsLogs);
                                 }
-                            }
 
                             refinedStatisticLog.targetStatisticsLogs.Sort((p, q) =>
                                 p.timestamp.CompareTo(q.timestamp));
                             refinedStatisticsLogs.Add(refinedStatisticLog);
                         }
-                    }
 
                     gameLogs.Clear();
                     statisticsLogs.Clear();
 
                     // Generate the statistics from the game log if they have not been retrieved or if 
                     // they have not been saved correctly (no target kills logged).
-                    foreach (JsonGameLog gameLog in refinedGameLogs)
+                    foreach (var gameLog in refinedGameLogs)
                     {
                         JsonStatisticsLog statisticsLog = null;
 
-                        foreach (JsonStatisticsLog sl in refinedStatisticsLogs)
-                        {
+                        foreach (var sl in refinedStatisticsLogs)
                             if (sl.testID == gameLog.testID && sl.mapInfo.name == gameLog.mapInfo.name)
                             {
                                 statisticsLog = sl;
                                 break;
                             }
-                        }
 
                         if (statisticsLog == null)
                         {
@@ -240,55 +210,50 @@ namespace Managers
 
                         if (statisticsLog.targetStatisticsLogs.Count == 0)
                         {
-                            List<JsonTargetStatistics> targetStatistics =
+                            var targetStatistics =
                                 new List<JsonTargetStatistics>();
 
-                            foreach (JsonKill k in gameLog.killLogs)
-                            {
+                            foreach (var k in gameLog.killLogs)
                                 targetStatistics.Add(new JsonTargetStatistics((float) k.timestamp, 0, 0,
                                     0, 0, (float) k.x, (float) k.y, 0, 0, 0));
-                            }
 
                             statisticsLog.targetStatisticsLogs = targetStatistics;
 
                             statisticsLog.finalStatistics.totalHits = gameLog.hitLogs.Count;
                             statisticsLog.finalStatistics.totalShots = gameLog.shotLogs.Count;
                             statisticsLog.finalStatistics.accuracy =
-                                (statisticsLog.finalStatistics.totalShots == 0)
+                                statisticsLog.finalStatistics.totalShots == 0
                                     ? 0
                                     : statisticsLog.finalStatistics.totalHits /
-                                    (statisticsLog.finalStatistics.totalShots * 1f);
+                                      (statisticsLog.finalStatistics.totalShots * 1f);
                             statisticsLog.finalStatistics.coveredDistance = 0;
                             statisticsLog.finalStatistics.mediumKillTime =
-                                (statisticsLog.targetStatisticsLogs.Count == 0)
+                                statisticsLog.targetStatisticsLogs.Count == 0
                                     ? 0
-                                    : (statisticsLog.gameInfo.duration * 1f) /
-                                    statisticsLog.targetStatisticsLogs.Count;
+                                    : statisticsLog.gameInfo.duration * 1f /
+                                      statisticsLog.targetStatisticsLogs.Count;
                             statisticsLog.finalStatistics.mediumKillDistance =
-                                (statisticsLog.targetStatisticsLogs.Count == 0)
+                                statisticsLog.targetStatisticsLogs.Count == 0
                                     ? 0
                                     : statisticsLog.finalStatistics.coveredDistance /
-                                    statisticsLog.targetStatisticsLogs.Count;
+                                      statisticsLog.targetStatisticsLogs.Count;
                         }
                     }
 
                     // Save the game logs.
-                    foreach (JsonGameLog gameLog in refinedGameLogs)
-                    {
+                    foreach (var gameLog in refinedGameLogs)
                         File.WriteAllText(downloadDirectory + "/" + gameLog.testID + "_" +
-                            gameLog.mapInfo.name + "_game" + ((gameLog.logPart == -1) ? "_incomplete" : "") +
-                            ".json", JsonUtility.ToJson(gameLog));
-                    }
+                                          gameLog.mapInfo.name + "_game" +
+                                          (gameLog.logPart == -1 ? "_incomplete" : "") +
+                                          ".json", JsonUtility.ToJson(gameLog));
 
                     // Save the statistics logs.
-                    foreach (JsonStatisticsLog statisticsLog in refinedStatisticsLogs)
-                    {
+                    foreach (var statisticsLog in refinedStatisticsLogs)
                         File.WriteAllText(downloadDirectory + "/" + statisticsLog.testID + "_" +
-                            statisticsLog.mapInfo.name + "_statistics" +
-                            ((statisticsLog.finalStatistics.coveredDistance == 0) ? "_generated" : "") +
-                            ((statisticsLog.logPart == -1) ? "_incomplete" : "") + ".json",
+                                          statisticsLog.mapInfo.name + "_statistics" +
+                                          (statisticsLog.finalStatistics.coveredDistance == 0 ? "_generated" : "") +
+                                          (statisticsLog.logPart == -1 ? "_incomplete" : "") + ".json",
                             JsonUtility.ToJson(statisticsLog));
-                    }
                 }
             }
             catch (Exception e)
@@ -304,10 +269,7 @@ namespace Managers
         {
             RemoteDataManager.Instance.GetLastEntry();
 
-            while (!RemoteDataManager.Instance.IsResultReady)
-            {
-                yield return new WaitForSeconds(0.25f);
-            }
+            while (!RemoteDataManager.Instance.IsResultReady) yield return new WaitForSeconds(0.25f);
 
             int downloadCount;
             try
@@ -323,30 +285,27 @@ namespace Managers
 
             RemoteDataManager.Instance.GetLastEntries(downloadCount);
 
-            while (!RemoteDataManager.Instance.IsResultReady)
-            {
-                yield return new WaitForSeconds(0.25f);
-            }
+            while (!RemoteDataManager.Instance.IsResultReady) yield return new WaitForSeconds(0.25f);
 
-            string[] results = RemoteDataManager.Instance.Result.Split('\n');
+            var results = RemoteDataManager.Instance.Result.Split('\n');
 
-            List<List<Coord>> coords = new List<List<Coord>>();
-            Dictionary<string, int> mapIndexDictionary = new Dictionary<string, int>();
+            var coords = new List<List<Coord>>();
+            var mapIndexDictionary = new Dictionary<string, int>();
 
 
             try
             {
-                foreach (string result in results)
+                foreach (var result in results)
                 {
-                    string[] resultFields = result.Split('|');
+                    var resultFields = result.Split('|');
                     if (resultFields.Length == 6 && resultFields[2] ==
                         ConnectionSettings.SERVER_GAME_LABEL)
                     {
-                        JsonGameLog jGameLog =
+                        var jGameLog =
                             JsonUtility.FromJson<JsonGameLog>(resultFields[3]);
 
                         // Remove the placement ID from the map name.
-                        string name = Regex.Replace(jGameLog.mapInfo.name, @"[\d-]", string.Empty);
+                        var name = Regex.Replace(jGameLog.mapInfo.name, @"[\d-]", string.Empty);
                         int index;
 
                         if (mapIndexDictionary.ContainsKey(name))
@@ -362,33 +321,24 @@ namespace Managers
                             coords.Add(new List<Coord>());
                         }
 
-                        foreach (JsonPosition position in jGameLog.positionLogs)
-                        {
+                        foreach (var position in jGameLog.positionLogs)
                             if (jGameLog.mapInfo.flip)
-                            {
                                 coords[index].Add(new Coord(
                                     (int) jGameLog.mapInfo.height - (int) position.y - 1,
                                     (int) jGameLog.mapInfo.width - (int) position.x - 1));
-                            }
                             else
-                            {
                                 coords[index].Add(new Coord((int) position.x, (int) position.y));
-                            }
-                        }
                     }
                 }
 
-                for (int i = 0; i < coords.Count; i++)
+                for (var i = 0; i < coords.Count; i++)
                 {
-                    string data = "";
+                    var data = "";
 
-                    foreach (Coord coord in coords[i])
-                    {
-                        data += (coord.tileX + ";" + coord.tileY + "\n");
-                    }
+                    foreach (var coord in coords[i]) data += coord.tileX + ";" + coord.tileY + "\n";
 
                     File.WriteAllText(downloadDirectory + "/heatmap_" +
-                        mapIndexDictionary.FirstOrDefault(x => x.Value == i).Key + ".csv", data);
+                                      mapIndexDictionary.FirstOrDefault(x => x.Value == i).Key + ".csv", data);
                 }
             }
             catch (Exception e)
@@ -411,22 +361,19 @@ namespace Managers
                 throw;
             }
 
-            while (!RemoteDataManager.Instance.IsResultReady)
-            {
-                yield return new WaitForSeconds(0.25f);
-            }
+            while (!RemoteDataManager.Instance.IsResultReady) yield return new WaitForSeconds(0.25f);
 
             try
             {
-                string[] results = RemoteDataManager.Instance.Result.Split('\n');
+                var results = RemoteDataManager.Instance.Result.Split('\n');
 
-                for (int i = results.Length - 1; i >= 0; i--)
+                for (var i = results.Length - 1; i >= 0; i--)
                 {
-                    string[] resultFields = results[i].Split('|');
+                    var resultFields = results[i].Split('|');
                     if (resultFields.Length == 6 && resultFields[2] ==
                         ConnectionSettings.SERVER_GAME_LABEL)
                     {
-                        JsonGameLog jGameLog =
+                        var jGameLog =
                             JsonUtility.FromJson<JsonGameLog>(resultFields[3]);
 
                         if (jGameLog.testID == id)
@@ -438,9 +385,6 @@ namespace Managers
                 }
             }
             catch
-            {
-            }
-            finally
             {
             }
         }

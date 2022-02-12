@@ -5,18 +5,21 @@ namespace AI.AI.Layer1
 {
     public class SightSensor
     {
+        private readonly float fov;
         private readonly GameObject head;
         private readonly float maxSightRange;
-        private readonly float fov;
-        
+
         public SightSensor(GameObject head, float maxSightRange, float fov)
         {
             this.head = head;
             this.maxSightRange = maxSightRange;
             this.fov = fov;
         }
-        
-        public void Prepare() { /* Nothing to do */ }
+
+        public void Prepare()
+        {
+            /* Nothing to do */
+        }
 
         public float GetAngleFromLookDirection(Vector3 direction)
         {

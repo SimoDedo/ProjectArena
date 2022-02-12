@@ -18,29 +18,28 @@ namespace Tester
 
         private void Awake()
         {
-            #if !UNITY_EDITOR
+#if !UNITY_EDITOR
                 Time.captureFramerate = 30;
                 Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
-            #endif
+#endif
 
             if (!Application.isBatchMode)
             {
                 QuitWithError("This scene should be played in batch mode!");
                 return;
             }
-            
+
             var args = Environment.GetCommandLineArgs();
             string experimentType = null;
             foreach (var arg in args)
-            {
-                if (arg.StartsWith(EXPERIMENT_PARAM)) experimentType = arg.Substring(EXPERIMENT_PARAM.Length);
-            }
+                if (arg.StartsWith(EXPERIMENT_PARAM))
+                    experimentType = arg.Substring(EXPERIMENT_PARAM.Length);
 
             if (experimentType == null)
             {
                 // Debug.LogError("You must supply the type of experiment to run with " + EXPERIMENT_PARAM);
                 // This doesn't work...
-                
+
                 QuitWithError("You must supply the type of experiment to run with " + EXPERIMENT_PARAM);
                 return;
             }
@@ -69,7 +68,6 @@ namespace Tester
         {
             // TODO Understand how to quit batchmode
             Application.Quit(-1);
-            
         }
     }
 }

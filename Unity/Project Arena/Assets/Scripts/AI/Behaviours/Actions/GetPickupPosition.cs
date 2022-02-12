@@ -10,8 +10,8 @@ namespace AI.Behaviours.Actions
     [Serializable]
     public class GetPickupPosition : Action
     {
-        private PickupPlanner pickupPlanner;
         [SerializeField] private SharedVector3 pickupPosition;
+        private PickupPlanner pickupPlanner;
 
         public override void OnAwake()
         {

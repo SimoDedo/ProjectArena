@@ -5,9 +5,9 @@ namespace Utils
 {
     public class CircularQueue<T>
     {
-        private T[] values;
-        private int headIndex;
         private int elemCount;
+        private int headIndex;
+        private readonly T[] values;
 
         public CircularQueue(int size)
         {
@@ -27,7 +27,8 @@ namespace Utils
         {
             if (indexFromNew > elemCount)
             {
-                Debug.LogError("Cannot extract element " + indexFromNew + ", since the queue has " + elemCount + " elements");
+                Debug.LogError("Cannot extract element " + indexFromNew + ", since the queue has " + elemCount +
+                               " elements");
                 return values[(headIndex - elemCount + values.Length) % values.Length];
             }
 
@@ -38,6 +39,5 @@ namespace Utils
         {
             return elemCount;
         }
-        
     }
 }

@@ -1,7 +1,7 @@
 ﻿namespace Connectivity
 {
-    public static class ConnectionSettings {
-
+    public static class ConnectionSettings
+    {
         public const float SERVER_CONNECTION_PERIOD = 0.1f;
         public const float SERVER_CONNECTION_TIMEOUT = 10f;
         public const float SERVER_MAXIMUM_DATA_LENGTH = 4250;
@@ -14,6 +14,5 @@
 
         public const string KEEP_LOCAL_COMPLETION = "KEEP_LOCAL_COMPLETION";
         public const string DISCARD_LOCAL_COMPLETION = "DISCARD_LOCAL_COMPLETION";
-
     }
 }

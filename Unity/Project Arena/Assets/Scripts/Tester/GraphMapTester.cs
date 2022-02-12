@@ -14,6 +14,13 @@ namespace Tester
 {
     public class GraphMapTester : MonoBehaviour
     {
+        private const int GAME_LENGTH = 300;
+
+        private const int BOT1_ID = 1;
+        private const int BOT2_ID = 2;
+
+        // Size of a maps tile.
+        private const float TILE_SIZE = 1;
         [SerializeField] private GameObject botPrefab;
         [SerializeField] private string mapName;
         [SerializeField] private string bot1ParamsFilenamePrefix;
@@ -22,30 +29,23 @@ namespace Tester
         [SerializeField] private SpawnPointManager spawnPointManager;
         [SerializeField] private int numExperiments = 1;
         [SerializeField] private string experimentName = "experiment";
-        private const int GAME_LENGTH = 300;
-        private string importPath;
-        private string mapsPath;
-        private string botsPath;
-
-        private const int BOT1_ID = 1;
-        private const int BOT2_ID = 2;
-
-        // Size of a maps tile.
-        private const float TILE_SIZE = 1;
-
-        private GraphTesterGameManager manager;
-        private GameResultsAnalyzer analyzer;
-
-        private int experimentNumber;
 
         private readonly List<Dictionary<string, object>> results = new List<Dictionary<string, object>>();
+        private GameResultsAnalyzer analyzer;
+        private string botsPath;
+
+        private int experimentNumber;
+        private string importPath;
+
+        private GraphTesterGameManager manager;
+        private string mapsPath;
 
         private void Awake()
         {
-            #if !UNITY_EDITOR
+#if !UNITY_EDITOR
                 Time.captureFramerate = 30;
                 Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
-            #endif
+#endif
             var args = Environment.GetCommandLineArgs();
             foreach (var arg in args)
             {
@@ -60,20 +60,11 @@ namespace Tester
             mapsPath = importPath + "Maps/";
             botsPath = importPath + "Bots/";
 
-            if (!Directory.Exists(importPath))
-            {
-                Directory.CreateDirectory(importPath);
-            }
+            if (!Directory.Exists(importPath)) Directory.CreateDirectory(importPath);
 
-            if (!Directory.Exists(mapsPath))
-            {
-                Directory.CreateDirectory(mapsPath);
-            }
+            if (!Directory.Exists(mapsPath)) Directory.CreateDirectory(mapsPath);
 
-            if (!Directory.Exists(botsPath))
-            {
-                Directory.CreateDirectory(botsPath);
-            }
+            if (!Directory.Exists(botsPath)) Directory.CreateDirectory(botsPath);
 
             analyzer = new GameResultsAnalyzer(BOT1_ID, BOT2_ID);
             analyzer.Setup();
@@ -151,10 +142,7 @@ namespace Tester
         private static void ExportResults(string compileResults, string experimentName)
         {
             var exportPath = Application.persistentDataPath + "/Export/" + experimentName;
-            if (!Directory.Exists(exportPath))
-            {
-                Directory.CreateDirectory(exportPath);
-            }
+            if (!Directory.Exists(exportPath)) Directory.CreateDirectory(exportPath);
 
             var filePath = exportPath + "/" + "result.json";
             try

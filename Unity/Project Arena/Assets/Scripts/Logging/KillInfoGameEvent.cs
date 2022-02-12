@@ -12,7 +12,11 @@ namespace Logging
         public string killerEntity;
     }
 
-    public class BaseKillInfoGameEvent : GameEventBase<KillInfo> { }
+    public class BaseKillInfoGameEvent : GameEventBase<KillInfo>
+    {
+    }
 
-    public sealed class KillInfoGameEvent : ScriptableObjectSingleton<BaseKillInfoGameEvent> { }
+    public sealed class KillInfoGameEvent : ScriptableObjectSingleton<BaseKillInfoGameEvent>
+    {
+    }
 }

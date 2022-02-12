@@ -152,7 +152,7 @@ namespace Logging
                 public string hitterEntity;
                 public int damage;
 
-                public JsonHit(float timestamp, float x, float y, 
+                public JsonHit(float timestamp, float x, float y,
                     int hitEntityID, string hitEntity,
                     int hitterEntityID, string hitterEntity, int damage)
                 {
@@ -217,14 +217,14 @@ namespace Logging
                     Reset();
                 }
             }
-            
+
             [Serializable]
             public class JsonAIStatisticsLog
             {
                 public string testID;
                 public JsonMapInfo mapInfo;
                 public JsonGameInfo gameInfo;
-                
+
                 // TODO atm Unity JSONUtility doesn't handle dictionaries...
                 public Dictionary<int, JsonFinalStatistics> finalStatistics;
 
@@ -404,7 +404,7 @@ namespace Logging
             public JsonCompletionTracker(int logCount, List<StudyCompletionTracker>
                 studyCompletionTrackers)
             {
-                this.logsCount = logCount;
+                logsCount = logCount;
                 this.studyCompletionTrackers = studyCompletionTrackers;
             }
         }

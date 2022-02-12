@@ -5,22 +5,25 @@ using UnityEngine;
 namespace Entity
 {
     /// <summary>
-    /// Entity is an abstract class used to implement any kind of agent. An entity can spawn, recive
-    /// damage and die. An entity can also be healed, supplied with ammunitions and have weapons.
+    ///     Entity is an abstract class used to implement any kind of agent. An entity can spawn, recive
+    ///     damage and die. An entity can also be healed, supplied with ammunitions and have weapons.
     /// </summary>
     [RequireComponent(typeof(PositionTracker))]
     public abstract class Entity : MonoBehaviour
     {
         [SerializeField] protected int totalHealth;
 
-        // TODO Move to subclasses, no reason for this to be public
-        public virtual int Health { get; protected set; }
-
         protected int entityID;
+
+        protected GameManager gameManagerScript;
         protected bool inGame = false;
         protected int originalLayer;
 
-        protected GameManager gameManagerScript;
+        // TODO Move to subclasses, no reason for this to be public
+        public virtual int Health { get; protected set; }
+
+        // Returns whether the entity is in game or not
+        public virtual bool IsAlive => isActiveAndEnabled && Health > 0;
 
         // Sets all the entity parameters.
         public abstract void SetupEntity(int th, bool[] ag, GameManager gms, int id);
@@ -33,9 +36,6 @@ namespace Entity
 
         // Respawns the entity.
         public abstract void Respawn();
-
-        // Returns whether the entity is in game or not
-        public virtual bool IsAlive => isActiveAndEnabled && Health > 0;
 
         // Slows down the entity.
         public abstract void SlowEntity(float penalty);
@@ -55,7 +55,7 @@ namespace Entity
 
         // Increases the ammo of the available guns.
         public abstract void SupplyGuns(bool[] suppliedGuns, int[] ammoAmounts);
-    
+
         // Sets if the entity is in game, i.e. if it can move, shoot, interact
         // with object and be hit.
         public abstract void SetInGame(bool inGame, bool isGameEnded = false);

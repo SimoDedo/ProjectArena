@@ -10,8 +10,8 @@ using UnityEngine;
 namespace Entity
 {
     /// <summary>
-    /// Player is an implementation of Entity with a ILoggable interface, which allows its actions
-    /// to be logged. Player is the agent controlled by the user.
+    ///     Player is an implementation of Entity with a ILoggable interface, which allows its actions
+    ///     to be logged. Player is the agent controlled by the user.
     /// </summary>
     public class Player : Entity, ILoggable
     {
@@ -22,47 +22,26 @@ namespace Entity
         [SerializeField] private float jumpSpeed = 8f;
         [SerializeField] private float gravity = 100f;
         [SerializeField] private Transform point;
-        private int CurrentGun => gunManager.CurrentGunIndex;
-    
+
         // Smoothing factor.
         [SerializeField] private float smoothing = 2.0f;
 
-    
+
         // Player controller.
         private CharacterController controller;
 
-        // Tracks the movement the mouse has made.
-        private Vector2 mouseLook;
-
-        // Smoothed value of the mouse
-        private Vector2 smoothedDelta;
-
-        // Sensibility of the mouse.
-        private float sensibility = 2f;
-
-        // Vector used to apply the movement.
-        private Vector3 moveDirection = Vector3.zero;
-
-        // Penalty applied to mouse and keyboard movement.
-        private float inputPenalty = 1f;
-
         // Is the cursor locked?
-        private bool cursorLocked = false;
+        private bool cursorLocked;
+        private GunManager gunManager;
 
         // Is the input enabled?
         private bool inputEnabled = true;
 
-        // Do I have to log?
-        private bool loggingGame = false;
-
-        // Time of the last position log.
-        private float lastPositionLog = 0;
-
-        private PlayerUIManager playerUIManagerScript;
-        private GunManager gunManager;
+        // Penalty applied to mouse and keyboard movement.
+        private float inputPenalty = 1f;
 
         // Codes of the numeric keys.
-        private KeyCode[] keyCodes =
+        private readonly KeyCode[] keyCodes =
         {
             KeyCode.Alpha1,
             KeyCode.Alpha2,
@@ -72,8 +51,32 @@ namespace Entity
             KeyCode.Alpha6,
             KeyCode.Alpha7,
             KeyCode.Alpha8,
-            KeyCode.Alpha9,
+            KeyCode.Alpha9
         };
+
+        // Time of the last position log.
+        private float lastPositionLog;
+
+        // Do I have to log?
+        private bool loggingGame;
+
+        // Tracks the movement the mouse has made.
+        private Vector2 mouseLook;
+
+        // Vector used to apply the movement.
+        private Vector3 moveDirection = Vector3.zero;
+
+        private PlayerUIManager playerUIManagerScript;
+
+
+        private int previousGun = GunManager.NO_GUN;
+
+        // Sensibility of the mouse.
+        private float sensibility = 2f;
+
+        // Smoothed value of the mouse
+        private Vector2 smoothedDelta;
+        private int CurrentGun => gunManager.CurrentGunIndex;
 
         private void Awake()
         {
@@ -87,13 +90,9 @@ namespace Entity
 
             // Get the mouse sensibility.
             if (PlayerPrefs.HasKey("MouseSensibility"))
-            {
                 SetSensibility(PlayerPrefs.GetFloat("MouseSensibility"));
-            }
             else
-            {
                 SetSensibility(ParameterManager.Instance.DefaultSensibility);
-            }
         }
 
         private void Update()
@@ -102,38 +101,25 @@ namespace Entity
             {
                 // If the cursor should be locked but it isn't, lock it when the user clicks.
                 if (Input.GetMouseButtonDown(0))
-                {
                     if (cursorLocked && Cursor.lockState != CursorLockMode.Locked)
                     {
                         Cursor.lockState = CursorLockMode.Locked;
                         Cursor.visible = false;
                     }
-                }
 
                 if (inGame)
                 {
                     if (gunManager.CanCurrentGunAim())
                     {
-                        if (Input.GetButtonDown("Fire2"))
-                        {
-                            gunManager.SetCurrentGunAim(true);
-                        }
+                        if (Input.GetButtonDown("Fire2")) gunManager.SetCurrentGunAim(true);
 
-                        if (Input.GetButtonUp("Fire2"))
-                        {
-                            gunManager.SetCurrentGunAim(false);
-                        }
+                        if (Input.GetButtonUp("Fire2")) gunManager.SetCurrentGunAim(false);
                     }
 
-                    if (Input.GetButton("Fire1") && gunManager.CanCurrentGunShoot())
-                    {
-                        gunManager.ShootCurrentGun();
-                    }
+                    if (Input.GetButton("Fire1") && gunManager.CanCurrentGunShoot()) gunManager.ShootCurrentGun();
 
                     if (Input.GetButtonDown("Reload") && gunManager.CanCurrentGunReload())
-                    {
                         gunManager.ReloadCurrentGun();
-                    }
 
                     UpdateCameraPosition();
                     UpdatePosition();
@@ -159,6 +145,12 @@ namespace Entity
             }
         }
 
+        // Setups stuff for the loggingGame.
+        public void SetupLogging()
+        {
+            loggingGame = true;
+        }
+
         // Returns the next or the previous active gun.
         private int GetActiveGun(int currentGun, bool next)
         {
@@ -167,21 +159,13 @@ namespace Entity
             {
                 // Try for the guns after it
                 for (var i = currentGun + 1; i < gunsCount; i++)
-                {
                     if (gunManager.IsGunActive(i))
-                    {
                         return i;
-                    }
-                }
 
                 // Try for the guns before it
                 for (var i = 0; i < currentGun; i++)
-                {
                     if (gunManager.IsGunActive(i))
-                    {
                         return i;
-                    }
-                }
 
                 // There's no other gun, return itself.
                 return currentGun;
@@ -189,21 +173,13 @@ namespace Entity
 
             // Try for the guns before it
             for (var i = currentGun - 1; i >= 0; i--)
-            {
                 if (gunManager.IsGunActive(i))
-                {
                     return i;
-                }
-            }
 
             // Try for the guns after it
             for (var i = gunsCount - 1; i > currentGun; i--)
-            {
                 if (gunManager.IsGunActive(i))
-                {
                     return i;
-                }
-            }
 
             // There's no other gun, return itself.
             return currentGun;
@@ -247,13 +223,9 @@ namespace Entity
         public override void HealFromMedkit(MedkitPickable medkitPickable)
         {
             if (Health + medkitPickable.RestoredHealth > totalHealth)
-            {
                 Health = totalHealth;
-            }
             else
-            {
                 Health += medkitPickable.RestoredHealth;
-            }
 
             playerUIManagerScript.SetHealth(Health, totalHealth);
         }
@@ -267,7 +239,7 @@ namespace Entity
         {
             gunManager.SupplyGuns(suppliedGuns, ammoAmounts);
         }
-    
+
         // Kills the player.
         protected override void Die(int id)
         {
@@ -318,13 +290,9 @@ namespace Entity
             {
                 var gunsCount = gunManager.NumberOfGuns;
                 for (var i = 0; i < gunsCount; i++)
-                {
                     if (i != CurrentGun && gunManager.IsGunActive(i) && Input.GetKeyDown(keyCodes[i]))
-                    {
                         if (gunManager.TrySwitchGuns(CurrentGun, i))
                             break;
-                    }
-                }
             }
         }
 
@@ -353,10 +321,7 @@ namespace Entity
                 moveDirection = transform.TransformDirection(moveDirection);
                 moveDirection *= speed * inputPenalty;
                 // Jump if needed.
-                if (Input.GetButton("Jump"))
-                {
-                    moveDirection.y = jumpSpeed;
-                }
+                if (Input.GetButton("Jump")) moveDirection.y = jumpSpeed;
             }
 
             // Apply gravity to the direction and apply it using the controller.
@@ -398,7 +363,7 @@ namespace Entity
         // Updates the camera position.
         private void UpdateCameraPosition()
         {
-            Vector2 mouseDelta = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
+            var mouseDelta = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
 
             // Extract the delta of the mouse.
             mouseDelta = Vector2.Scale(mouseDelta, new Vector2(sensibility * smoothing * inputPenalty,
@@ -460,8 +425,6 @@ namespace Entity
             inputPenalty = penalty;
         }
 
-
-        private int previousGun = GunManager.NO_GUN;
         // Shows current guns
         public void ShowGun(bool b)
         {
@@ -481,15 +444,7 @@ namespace Entity
         {
             sensibility = s;
             if (Application.platform == RuntimePlatform.WebGLPlayer)
-            {
                 sensibility /= ParameterManager.Instance.WebSensibilityDownscale;
-            }
-        }
-
-        // Setups stuff for the loggingGame.
-        public void SetupLogging()
-        {
-            loggingGame = true;
         }
     }
 }

@@ -13,22 +13,28 @@ namespace Entity.Component
     // TODO expose view of GunView instead of all the methods to query stuff 
     public class GunManager
     {
+        private const float switchWait = 0.05f;
+
+        public const int NO_GUN = -1;
+
+        private readonly Entity me;
         private List<Gun> guns;
         private List<GunScorer> gunScorers;
 
-        private void SetGunActive(int index, bool value)
+        // Variables to slow down the gun switching.
+        private float lastSwitched = float.MinValue;
+
+        public GunManager(Entity entity)
         {
-            guns[index].enabled = value;
+            me = entity;
         }
 
         public int CurrentGunIndex { get; private set; } = NO_GUN;
         public int NumberOfGuns => guns.Count;
 
-        private readonly Entity me;
-
-        public GunManager(Entity entity)
+        private void SetGunActive(int index, bool value)
         {
-            me = entity;
+            guns[index].enabled = value;
         }
 
         public void Prepare(GameManager gms, Entity parent, PlayerUIManager pms, bool[] ag)
@@ -51,10 +57,6 @@ namespace Entity.Component
             if (index < 0 || index > guns.Count) return false;
             return IsGunActive(index) && TrySwitchGuns(CurrentGunIndex, index);
         }
-
-        // Variables to slow down the gun switching.
-        private float lastSwitched = float.MinValue;
-        private const float switchWait = 0.05f;
 
         /// <returns>True if the gun currently active is the one requested</returns>
         public bool TrySwitchGuns(int toDeactivate, int toActivate)
@@ -89,12 +91,8 @@ namespace Entity.Component
         public bool CanBeSupplied(bool[] suppliedGuns)
         {
             for (var i = 0; i < Math.Min(suppliedGuns.Length, guns.Count); i++)
-            {
                 if (suppliedGuns[i] && IsGunActive(i) && !guns[i].IsFull())
-                {
                     return true;
-                }
-            }
 
             return false;
         }
@@ -102,12 +100,8 @@ namespace Entity.Component
         public void SupplyGuns(bool[] suppliedGuns, int[] ammoAmounts)
         {
             for (var i = 0; i < suppliedGuns.Length; i++)
-            {
                 if (suppliedGuns[i] && IsGunActive(i))
-                {
                     guns[i].AddAmmo(ammoAmounts[i]);
-                }
-            }
         }
 
         public int GetMaxAmmoForGun(int index)
@@ -134,12 +128,8 @@ namespace Entity.Component
         public void ResetAmmo()
         {
             for (var i = 0; i < guns.Count; i++)
-            {
                 if (IsGunActive(i))
-                {
                     guns[i].ResetAmmo();
-                }
-            }
         }
 
         public bool IsGunActive(int index)
@@ -211,7 +201,7 @@ namespace Entity.Component
         {
             return guns[CurrentGunIndex].IsBlastWeapon;
         }
-        
+
         public bool IsCurrentGunProjectileWeapon()
         {
             return guns[CurrentGunIndex].IsProjectileWeapon;
@@ -232,8 +222,6 @@ namespace Entity.Component
         {
             return gunScorers[CurrentGunIndex].GetOptimalRange();
         }
-
-        public const int NO_GUN = -1;
 
         public bool HasAmmo()
         {

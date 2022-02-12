@@ -8,11 +8,11 @@ using UnityEngine.UI;
 namespace UI
 {
     /// <summary>
-    /// This class manages the UI of the experiment menu. The exit/quit button is enabled by pressing
-    /// "e", "s" and "c" at the same time.
+    ///     This class manages the UI of the experiment menu. The exit/quit button is enabled by pressing
+    ///     "e", "s" and "c" at the same time.
     /// </summary>
-    public class ExperimentMenuUIManager : MonoBehaviour {
-
+    public class ExperimentMenuUIManager : MonoBehaviour
+    {
         [Header("Menu")] [SerializeField] private GameObject menu;
         [SerializeField] private GameObject loading;
 
@@ -21,67 +21,77 @@ namespace UI
 
         private bool exitMustQuit;
 
-        void Start() {
+        private void Start()
+        {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
 
-            if (ParameterManager.HasInstance()) {
+            if (ParameterManager.HasInstance())
+            {
                 backgroundScript.SetRotation(ParameterManager.Instance.BackgroundRotation);
                 if (ParameterManager.Instance.Version == ParameterManager.BuildVersion.COMPLETE ||
                     ParameterManager.Instance.Version ==
-                    ParameterManager.BuildVersion.EXPERIMENT_CONTROL) {
+                    ParameterManager.BuildVersion.EXPERIMENT_CONTROL)
                     SetExitButton(false);
-                } else {
+                else
                     SetExitButton(true);
-                }
-            } else {
+            }
+            else
+            {
                 SetExitButton(true);
             }
         }
 
-        private void Update() {
-            if (Input.GetKey(KeyCode.E) && Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.C)) {
-                if (!exitMustQuit || Application.platform != RuntimePlatform.WebGLPlayer) {
+        private void Update()
+        {
+            if (Input.GetKey(KeyCode.E) && Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.C))
+                if (!exitMustQuit || Application.platform != RuntimePlatform.WebGLPlayer)
                     exitButton.interactable = true;
-                }
-            }
         }
 
         // Loads the level indicated by the Experiment Manager.
-        public void Play() {
+        public void Play()
+        {
             SetLoadingVisible(true);
             StartNewExperimentGameEvent.Instance.Raise();
         }
 
-        public void Exit() {
-            if (exitMustQuit) {
+        public void Exit()
+        {
+            if (exitMustQuit)
+            {
                 Application.Quit();
-            } else {
+            }
+            else
+            {
                 ParameterManager.Instance.BackgroundRotation = backgroundScript.GetRotation();
                 SceneManager.LoadScene(ParameterManager.Instance.ExperimentControlScene);
             }
         }
 
-        public void SetLoadingVisible(bool visible) {
-            if (visible) {
+        public void SetLoadingVisible(bool visible)
+        {
+            if (visible)
+            {
                 menu.SetActive(false);
                 loading.SetActive(true);
-            } else {
+            }
+            else
+            {
                 menu.SetActive(true);
                 loading.SetActive(false);
             }
         }
 
-        private void SetExitButton(bool mustQuit) {
-            if (mustQuit) {
+        private void SetExitButton(bool mustQuit)
+        {
+            if (mustQuit)
                 exitButton.GetComponentInChildren<Text>().text = "Quit";
-            } else {
+            else
                 exitButton.GetComponentInChildren<Text>().text = "Back";
-            }
 
             exitButton.interactable = false;
             exitMustQuit = mustQuit;
         }
-
     }
 }
