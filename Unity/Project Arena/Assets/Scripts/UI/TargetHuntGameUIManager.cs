@@ -22,15 +22,15 @@ namespace UI
         // Elements of the score UI.
         [Header("Score UI")] [SerializeField] private GameObject gameover;
         [SerializeField] private Text finalScore;
-        private bool addedScoreDisplayed;
-        private float addedScoreTime;
-        private bool addedTimeDisplayed;
-        private float addedTimeTime;
         private readonly string additiveScore = "";
         private readonly Queue<string> additiveScoreQueue = new Queue<string>();
         private readonly string additiveTime = "";
 
         private readonly Queue<string> additiveTimeQueue = new Queue<string>();
+        private bool addedScoreDisplayed;
+        private float addedScoreTime;
+        private bool addedTimeDisplayed;
+        private float addedTimeTime;
         private string scoreValue = "";
         private string timeValue = "";
 

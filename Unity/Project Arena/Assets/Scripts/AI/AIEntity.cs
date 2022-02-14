@@ -58,12 +58,12 @@ namespace AI
         /// Length (in second) of the bot memory for target sighting info.
         /// </summary>
         [SerializeField] public float memoryWindow;
-    
+
         /// <summary>
         /// Lenght (in second) of the most recent interval of time in which to search for enemy actual detection.  
         /// </summary>
         [SerializeField] public float detectionWindow;
-        
+
         /// <summary>
         /// (Non-consecutive) time in seconds that the enemy must be sighted before it is detected.
         /// </summary>
@@ -78,7 +78,7 @@ namespace AI
         /// Ability of the both to predict exactly where an enemy he is following is.
         /// </summary>
         [SerializeField] [Range(0f, 1f)] public float predictionSkill;
-        
+
         /// <summary>
         /// Ability of the bot to aim at a target.
         /// </summary>
@@ -87,7 +87,7 @@ namespace AI
         /// <summary>
         /// For how long the entity remains wary after receiving damage
         /// </summary>
-            [SerializeField] public float recentDamageTimeout;
+        [SerializeField] public float recentDamageTimeout;
 
         /// <summary>
         /// Default characteristics of a bot. Average abilities all around.

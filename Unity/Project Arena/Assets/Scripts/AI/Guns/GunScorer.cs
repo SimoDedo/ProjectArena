@@ -16,7 +16,7 @@ namespace AI.Guns
         /// <param name="fakeEmptyCharger"></param>
         /// <returns></returns>
         public abstract float GetGunScore(float distance, bool fakeEmptyCharger = false);
-        
+
         /// <summary>
         /// Get the optimal range of the weapon.
         /// </summary>

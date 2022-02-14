@@ -34,12 +34,12 @@ namespace Managers.Mode
 
         [SerializeField] private string firstBotParamsFile = "bot1.json";
         [SerializeField] private string secondBotParamsFile = "bot2.json";
-
-        private AIEntity firstAI;
         private readonly int opponentID = 2;
-        private int opponentKillCount;
 
         private readonly int playerID = 1;
+
+        private AIEntity firstAI;
+        private int opponentKillCount;
 
         private int playerKillCount;
         private AIEntity secondAI;

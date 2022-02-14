@@ -47,11 +47,9 @@ namespace AI.AI.Layer2
         public void Update()
         {
             if (!CanBeUsed)
-            {
                 throw new InvalidOperationException(
                     "Cannot update the map knowledge, no knowledge is available!"
                 );
-            }
 
             // PrintAreas();
 

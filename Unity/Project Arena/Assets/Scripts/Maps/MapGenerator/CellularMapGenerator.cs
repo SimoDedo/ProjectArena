@@ -320,10 +320,10 @@ namespace Maps.MapGenerator
         {
             public readonly List<Room> connectedRooms;
             public readonly List<Coord> edgeTiles;
-            public bool isAccessibleFromMainRoom;
-            public bool isMainRoom;
             public readonly int roomSize;
             public readonly List<Coord> tiles;
+            public bool isAccessibleFromMainRoom;
+            public bool isMainRoom;
 
             public Room()
             {

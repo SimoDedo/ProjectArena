@@ -66,23 +66,16 @@ namespace Guns
                 });
             }
 
-            if (canDisplayUI)
-            {
-                gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
-            }
+            if (canDisplayUI) gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
 
             for (var i = 0; i < projectilesPerShot; i++)
             {
                 Quaternion rotation;
 
                 if (dispersion != 0)
-                {
                     rotation = GetDeviatedRotation(t.rotation, dispersion);
-                }
                 else
-                {
                     rotation = t.rotation;
-                }
 
                 InstantiateProjectile(rotation);
             }

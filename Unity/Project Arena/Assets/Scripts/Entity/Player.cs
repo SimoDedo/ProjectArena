@@ -26,20 +26,6 @@ namespace Entity
         // Smoothing factor.
         [SerializeField] private float smoothing = 2.0f;
 
-
-        // Player controller.
-        private CharacterController controller;
-
-        // Is the cursor locked?
-        private bool cursorLocked;
-        private GunManager gunManager;
-
-        // Is the input enabled?
-        private bool inputEnabled = true;
-
-        // Penalty applied to mouse and keyboard movement.
-        private float inputPenalty = 1f;
-
         // Codes of the numeric keys.
         private readonly KeyCode[] keyCodes =
         {
@@ -53,6 +39,20 @@ namespace Entity
             KeyCode.Alpha8,
             KeyCode.Alpha9
         };
+
+
+        // Player controller.
+        private CharacterController controller;
+
+        // Is the cursor locked?
+        private bool cursorLocked;
+        private GunManager gunManager;
+
+        // Is the input enabled?
+        private bool inputEnabled = true;
+
+        // Penalty applied to mouse and keyboard movement.
+        private float inputPenalty = 1f;
 
         // Time of the last position log.
         private float lastPositionLog;

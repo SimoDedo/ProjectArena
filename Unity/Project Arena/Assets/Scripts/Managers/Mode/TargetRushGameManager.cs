@@ -24,8 +24,9 @@ namespace Managers.Mode
         [Header("Target hunt variables")] [SerializeField]
         protected TargetRushGameUIManager targetRushGameUIManagerScript;
 
-        private int currentWave = 1;
         private readonly int playerID = 0;
+
+        private int currentWave = 1;
         private int playerScore;
 
         private Player playerScript;

@@ -23,8 +23,9 @@ namespace Managers.Mode
         [Header("Target Hunt variables")] [SerializeField]
         protected TargetHuntGameUIManager targetHuntGameUIManagerScript;
 
-        private int currentTarget;
         private readonly int playerID = 0;
+
+        private int currentTarget;
         private int playerScore;
 
         private Player playerScript;

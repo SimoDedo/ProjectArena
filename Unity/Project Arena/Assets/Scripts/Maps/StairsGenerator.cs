@@ -17,12 +17,12 @@ namespace Maps
         [SerializeField] private char stairCharDown = 'S';
         [SerializeField] private char stairCharLeft = 'A';
 
+        private readonly char[] stairChars = new char[4];
+
         private MapGenerator.MapGenerator mapGeneratorScript;
         private List<char[,]> maps;
 
         private char roomChar;
-
-        private readonly char[] stairChars = new char[4];
         private char wallChar;
 
         private void Start()

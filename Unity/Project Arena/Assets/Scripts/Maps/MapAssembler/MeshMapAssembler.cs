@@ -23,20 +23,20 @@ namespace Maps.MapAssembler
 
         // We use this so that if we have checked a vertex we won't check it again;
         private readonly HashSet<int> checkedVertices = new HashSet<int>();
-        private MeshCollider floorCollider;
-        private MeshFilter floorMeshFilter;
-        private GameObject navMeshObject;
 
         // We can have multiple outlines, each one is a list of vertices.
         private readonly List<List<int>> outlines = new List<List<int>>();
 
-        private SquareGrid squareGrid;
-        private MeshCollider topCollider;
-        private MeshFilter topMeshFilter;
-
         // A dictionary contains key-value pairs. We use the vertex index as a key and as value the list 
         // off all triangles that own that vertex.
         private readonly Dictionary<int, List<Triangle>> triangleDictionary = new Dictionary<int, List<Triangle>>();
+        private MeshCollider floorCollider;
+        private MeshFilter floorMeshFilter;
+        private GameObject navMeshObject;
+
+        private SquareGrid squareGrid;
+        private MeshCollider topCollider;
+        private MeshFilter topMeshFilter;
         private List<int> triangles;
 
         private List<Vector3> vertices;

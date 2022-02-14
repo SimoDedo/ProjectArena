@@ -22,7 +22,7 @@ namespace AI.AI.Layer1
         {
             previousPosition = transform.position;
         }
-        
+
         /// <summary>
         /// Moves the entity to the position specified.
         /// </summary>

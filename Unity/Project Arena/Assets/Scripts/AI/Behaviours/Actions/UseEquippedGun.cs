@@ -91,7 +91,7 @@ namespace AI.Behaviours.Actions
             return TaskStatus.Running;
         }
 
-        
+
         // Tries to find the best position to aim at accounting for the weapon speed and the enemy estimated velocity.
         // In case the weapon is a blast weapon, aims at the floor.
         private void AimProjectileWeapon(Vector3 position, Vector3 velocity)
@@ -132,13 +132,13 @@ namespace AI.Behaviours.Actions
 
             var angle = sightController.LookAtPoint(chosenPoint);
 
-            if (!(angle < 10) || !gunManager.CanCurrentGunShoot() || !ShouldShootWeapon(chosenPoint, isGunBlast)) 
+            if (!(angle < 10) || !gunManager.CanCurrentGunShoot() || !ShouldShootWeapon(chosenPoint, isGunBlast))
                 return;
             Debug.DrawRay(ourStartingPoint, sightController.GetHeadForward() * 100f, Color.blue, 2f);
             gunManager.ShootCurrentGun();
         }
 
-        
+
         // Tries to find the best position to aim given that the weapon hits immediately.
         // In case the weapon is a blast weapon, aims at the floor.
         private void AimRaycastWeapon(Vector3 position, float lastSightedTime)

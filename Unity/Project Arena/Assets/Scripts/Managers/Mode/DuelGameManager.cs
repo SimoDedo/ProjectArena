@@ -28,10 +28,10 @@ namespace Managers.Mode
         protected DuelGameUIManager duelGameUIManagerScript;
 
         private readonly int opponentID = 2;
-        private int opponentKillCount;
-        private Entity.Entity opponentScript;
 
         private readonly int playerID = 1;
+        private int opponentKillCount;
+        private Entity.Entity opponentScript;
 
         private int playerKillCount;
 

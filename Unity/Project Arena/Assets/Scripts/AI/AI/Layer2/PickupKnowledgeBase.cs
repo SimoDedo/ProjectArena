@@ -76,7 +76,7 @@ namespace AI.AI.Layer2
             return estimatedActivationTime.Keys.ToList();
         }
 
-        
+
         /// <summary>
         /// Returns the estimated activation times for each power up handled by the knowledge base.
         /// </summary>

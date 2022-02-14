@@ -20,7 +20,7 @@ namespace AI.AI.Layer2
     /// - Loss: An enemy is lost if if is not detected considering only the events in the detection window, but it is
     ///   detected when considering the whole memory window.
     /// </summary>
-    
+
     // TODO maybe separate responsibility of enemy knowledge vs extraction of info (e.g. can react to enemy).
     public class TargetKnowledgeBase
     {
@@ -46,11 +46,11 @@ namespace AI.AI.Layer2
         // tha we can detect it.
         private readonly float nonConsecutiveTimeBeforeReaction;
 
-        // The target that must be spotted
-        private readonly Entity.Entity target;
-
         // List of visibility data gathered so far, excluding data older than memoryWindow
         private readonly List<VisibilityInInterval> results = new List<VisibilityInInterval>();
+
+        // The target that must be spotted
+        private readonly Entity.Entity target;
 
         /// The sensor used to detect the target presence
         private SightSensor sensor;
@@ -129,10 +129,8 @@ namespace AI.AI.Layer2
         public bool HasSeenTarget()
         {
             if (!target.IsAlive)
-            {
                 // If the enemy is not alive, immediately stop considering it as detected.
                 return false;
-            }
             return TestDetection(Time.time - detectionWindowLenght, Time.time);
         }
 

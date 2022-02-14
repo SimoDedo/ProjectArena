@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Guns;
 using UnityEngine;
 
@@ -13,20 +12,17 @@ namespace AI.Guns
     {
         [SerializeField] public float minRangeBest;
         [SerializeField] public float maxRangeBest;
-        private Tuple<float, float> rangeTuple;
 
         [SerializeField] private List<ControlPoint> controlPoints;
-        private Gun gun;
         private readonly AnimationCurve scoreCurve = new AnimationCurve();
-        
+        private Gun gun;
+        private Tuple<float, float> rangeTuple;
+
         private void Awake()
         {
             gun = GetComponent<Gun>();
-            foreach (var point in controlPoints)
-            {
-                scoreCurve.AddKey(point.distance, point.score);
-            }
-            
+            foreach (var point in controlPoints) scoreCurve.AddKey(point.distance, point.score);
+
             rangeTuple = new Tuple<float, float>(minRangeBest, maxRangeBest);
         }
 

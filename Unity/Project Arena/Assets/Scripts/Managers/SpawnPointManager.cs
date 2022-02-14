@@ -73,8 +73,8 @@ namespace Managers
 
         private class SpawnPoint
         {
-            public float lastUsed;
             public readonly Vector3 spawnPosition;
+            public float lastUsed;
 
             public SpawnPoint(Vector3 sp, float lu)
             {

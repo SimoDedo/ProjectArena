@@ -25,8 +25,10 @@ namespace AI.AI.Layer3
     {
         // How often the plan should be recalculated, in seconds.
         private const float UPDATE_COOLDOWN = 0.5f;
+
         // Two pickups are considered neighbors if they are closer than this distance. 
         private const float MAX_DISTANCE_TO_BE_NEIGHBORS = 20f;
+
         // Bonus score given to a pickup for each neighbor it has.
         private const float BONUS_SCORE_PER_NEIGHBOR = 0.1f;
 
@@ -84,16 +86,14 @@ namespace AI.AI.Layer3
         public void Update()
         {
             if (Time.time < nextUpdateTime)
-            {
                 // TODO maybe find a way to give a score to pickups which are active and very close to me.
                 //   They should not require any heavy calculation and can be picked up very fast.
                 return;
-            }
 
             nextUpdateTime = Time.time + UPDATE_COOLDOWN;
             ScorePickups();
         }
-        
+
         /// <summary>
         /// Immediately forces update of the planner.
         /// </summary>

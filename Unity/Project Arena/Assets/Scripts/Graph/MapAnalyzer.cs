@@ -278,7 +278,8 @@ namespace Graph
             return roomsCorridorsGraph;
         }
 
-        public static UndirectedGraph GenerateRoomsCorridorsObjectsGraph(Area[] areas, char[,] map, char[] excludedChars)
+        public static UndirectedGraph GenerateRoomsCorridorsObjectsGraph(Area[] areas, char[,] map,
+            char[] excludedChars)
         {
             if (map.GetLength(1) > MAX_MAP_WIDTH)
                 throw new InvalidOperationException("Cannot handle maps with width > " + MAX_MAP_WIDTH);

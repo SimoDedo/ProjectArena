@@ -26,15 +26,15 @@ namespace UI
         [SerializeField] private GameObject victory;
         [SerializeField] private Text finalScore;
         [SerializeField] private Text finalWave;
-        private bool addedScoreDisplayed;
-        private float addedScoreTime;
-        private bool addedTimeDisplayed;
-        private float addedTimeTime;
         private readonly string additiveScore = "";
         private readonly Queue<string> additiveScoreQueue = new Queue<string>();
         private readonly string additiveTime = "";
 
         private readonly Queue<string> additiveTimeQueue = new Queue<string>();
+        private bool addedScoreDisplayed;
+        private float addedScoreTime;
+        private bool addedTimeDisplayed;
+        private float addedTimeTime;
         private string scoreValue = "";
         private string timeValue = "";
 

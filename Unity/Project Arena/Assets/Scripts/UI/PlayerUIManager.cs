@@ -16,14 +16,14 @@ namespace UI
         [SerializeField] private GameObject[] gunNumbers;
         [SerializeField] private Color[] gunColors;
 
+        // Variables for the damage.
+        private readonly float damageDuration = 0.25f;
+        private readonly float damageWait = 0.5f;
+
         // Variables for the cooldawn.
         private float cooldownDuration;
         private float cooldownStart;
-
-        // Variables for the damage.
-        private readonly float damageDuration = 0.25f;
         private float damageStart;
-        private readonly float damageWait = 0.5f;
         private bool mustCooldown;
 
         private void Update()

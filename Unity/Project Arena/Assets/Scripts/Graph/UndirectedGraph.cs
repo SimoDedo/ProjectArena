@@ -79,7 +79,7 @@ namespace Graph
         {
             return graph.Vertices.ToArray();
         }
-        
+
         /// <summary>
         /// Gets the id of nodes adjacent to the given one.
         /// </summary>
@@ -104,7 +104,7 @@ namespace Graph
             if (!nodeProperties.ContainsKey(nodeID)) Debug.LogError("!?");
             return nodeProperties[nodeID];
         }
-        
+
         private static double GetEdgeWeightFunc(TaggedEdge<int, float> edge)
         {
             return edge.Tag;

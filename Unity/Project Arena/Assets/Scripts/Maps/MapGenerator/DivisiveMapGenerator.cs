@@ -368,10 +368,8 @@ namespace Maps.MapGenerator
             if (MapInfo.IsInMapRange(originX, originY, width, height) &&
                 MapInfo.IsInMapRange(originX + roomWidth, originY + roomHeigth, width, height) &&
                 roomWidth > minimumRoomDimension && roomHeigth > minimumRoomDimension)
-            {
                 // Add it to the room list.
                 rooms.Add(new Room(originX, originY, roomWidth, roomHeigth));
-            }
         }
 
         // Places a room.
@@ -480,12 +478,12 @@ namespace Maps.MapGenerator
 
             public readonly List<Room> connectedRooms;
             public readonly int height;
-            public bool isAccessibleFromMainRoom;
-            public bool isMainRoom;
             public readonly int originX;
             public readonly int originY;
             public readonly int roomSize;
             public readonly int width;
+            public bool isAccessibleFromMainRoom;
+            public bool isMainRoom;
 
             public Room()
             {
