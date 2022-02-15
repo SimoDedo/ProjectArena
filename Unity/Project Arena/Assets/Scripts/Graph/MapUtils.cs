@@ -29,22 +29,22 @@ namespace Graph
         /// </summary>
         public static char[,] TranslateAreaMap(Area[] areas)
         {
-            var minCoords = new Vector2Int();
+            // var minCoords = new Vector2Int();
             var maxCoords = new Vector2Int();
 
             foreach (var area in areas)
             {
-                if (area.leftColumn < minCoords.x)
-                    minCoords.x = area.leftColumn;
-                if (area.topRow < minCoords.y)
-                    minCoords.y = area.topRow;
+                // if (area.leftColumn < minCoords.x)
+                //     minCoords.x = area.leftColumn;
+                // if (area.topRow < minCoords.y)
+                //     minCoords.y = area.topRow;
                 if (area.rightColumn > maxCoords.x)
                     maxCoords.x = area.rightColumn;
-                if (area.bottomRow > maxCoords.y)
-                    maxCoords.y = area.bottomRow;
+                if (area.topRow > maxCoords.y)
+                    maxCoords.y = area.topRow;
             }
 
-            var rtn = new char[maxCoords.y - minCoords.y, maxCoords.x - minCoords.x];
+            var rtn = new char[maxCoords.y/* - minCoords.y*/, maxCoords.x/* - minCoords.x*/];
             var rows = rtn.GetLength(0);
             var columns = rtn.GetLength(1);
             for (var row = 0; row < rows; row++)
@@ -52,12 +52,12 @@ namespace Graph
                 rtn[row, col] = 'w';
 
             foreach (var area in areas)
-                for (var row = area.topRow; row < area.bottomRow; row++)
+                for (var row = area.bottomRow; row < area.topRow; row++)
                 for (var col = area.leftColumn; col < area.rightColumn; col++)
                     // if (area.isCorridor)
                     //     rtn[row - minCoords.y, col - minCoords.x] = 'R';
                     // else
-                    rtn[row - minCoords.y, col - minCoords.x] = 'r';
+                    rtn[rows - row - 1/* - minCoords.y*/, col/* - minCoords.x*/] = 'r';
 
             return rtn;
         }

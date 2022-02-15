@@ -912,17 +912,17 @@ namespace Graph
 
         public Area(
             int leftColumn,
-            int topRow,
-            int rightColumn,
             int bottomRow,
+            int rightColumn,
+            int topRow,
             bool isCorridor = false,
             bool isDummyRoom = false
         )
         {
             this.leftColumn = leftColumn;
-            this.topRow = topRow;
-            this.rightColumn = rightColumn;
             this.bottomRow = bottomRow;
+            this.rightColumn = rightColumn;
+            this.topRow = topRow;
             this.isCorridor = isCorridor;
             this.isDummyRoom = isDummyRoom;
         }

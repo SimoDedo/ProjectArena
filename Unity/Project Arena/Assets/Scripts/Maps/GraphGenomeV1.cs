@@ -7,13 +7,14 @@ namespace Maps
     // TODO Improve
     public class GraphGenomeV1
     {
+        public readonly int rowSeparationHeight; // DO NOT CHANGE during evolution
         public readonly int columnSeparationWidth; // DO NOT CHANGE during evolution
         public readonly int corridorThickness; // DO NOT CHANGE during evolution
-        public readonly bool[,] horizontalConnections;
-        public readonly float maxRatio; // DO NOT CHANGE during evolution
 
         // Ratio: width / height
         public readonly float minRatio; // DO NOT CHANGE during evolution
+        public readonly float maxRatio; // DO NOT CHANGE during evolution
+
         public readonly int numColumns; // DO NOT CHANGE during evolution
         public readonly int numRows; // DO NOT CHANGE during evolution
 
@@ -21,8 +22,8 @@ namespace Maps
 
         // Real Genome 
         public readonly AreaSize[,] roomSizes;
-        public readonly int rowSeparationHeight; // DO NOT CHANGE during evolution
         public readonly bool[,] verticalConnections;
+        public readonly bool[,] horizontalConnections;
 
         public GraphGenomeV1(
             int numRows,
