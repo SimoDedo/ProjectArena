@@ -310,7 +310,7 @@ GameObject:
   - component: {fileID: 296767515}
   - component: {fileID: 296767516}
   m_Layer: 0
-  m_Name: GenomeMapGenerator
+  m_Name: Genome Map Generator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
