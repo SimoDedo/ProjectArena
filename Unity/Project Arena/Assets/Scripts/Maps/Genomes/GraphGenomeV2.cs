@@ -19,8 +19,20 @@ namespace Maps.Genomes
     {
         public int cellsWidth;
         public int cellsHeight;
-        public int squareSize = 3;
+        public int squareSize;
         public Room[,] rooms;
+
+        public GraphGenomeV2()
+        {
+        }
+
+        public GraphGenomeV2(int cellsWidth, int cellsHeight, int squareSize, Room[,] rooms)
+        {
+            this.cellsHeight = cellsHeight;
+            this.cellsWidth = cellsWidth;
+            this.squareSize = squareSize;
+            this.rooms = rooms;
+        }
 
         public bool IsGenomeValid()
         {
@@ -53,14 +65,14 @@ namespace Maps.Genomes
 
         public int GetHeight()
         {
-            return rooms.GetLength(0) * cellsHeight;
+            return rooms.GetLength(0) * cellsHeight * squareSize;
         }
- 
+
         public int GetWidth()
         {
-            return rooms.GetLength(1) * cellsWidth;
+            return rooms.GetLength(1) * cellsWidth * squareSize;
         }
-        
+
         public Area[] ConvertToAreas()
         {
             if (!IsGenomeValid())
@@ -92,12 +104,10 @@ namespace Maps.Genomes
                     ShrinkHorizontallyIfNeeded(r, c);
                 }
             }
-            
-            // TODO Must find which components are connected and select only the biggest tree in the forest
 
             var cellTreeNumbers = new int[numRows, numColumns];
             var bestTreeNumber = VisitForest(cellTreeNumbers);
-            
+
             // Start placing the Areas for Rooms
             for (var r = 0; r < numRows; r++)
             {
@@ -105,7 +115,7 @@ namespace Maps.Genomes
                 {
                     var room = rooms[r, c];
                     if (!room.isReal) continue;
-                    if (cellTreeNumbers[r,c] != bestTreeNumber) continue;
+                    if (cellTreeNumbers[r, c] != bestTreeNumber) continue;
                     var area = new Area(
                         c * cellsWidth + room.startingX,
                         r * cellsHeight + room.startingY,
@@ -117,19 +127,13 @@ namespace Maps.Genomes
                 }
             }
 
-            // TODO Place corridors.
-            // Corridor placing logic?
 
-            // To place a corridor:
-            // - Decide where the start point of a corridor is (middle of the room?)
-
-            // TODO If possible place direct corridors instead of curving ones.
-            
+            // Place corridors
             for (var r = 1; r < numRows; r++)
             {
                 for (var c = 0; c < numColumns; c++)
                 {
-                    if (cellTreeNumbers[r,c] != bestTreeNumber) continue;
+                    if (cellTreeNumbers[r, c] != bestTreeNumber) continue;
                     PlaceVerticalConnectionsIfNeeded(areas, r, c);
                 }
             }
@@ -138,11 +142,11 @@ namespace Maps.Genomes
             {
                 for (var r = 0; r < numRows; r++)
                 {
-                    if (cellTreeNumbers[r,c] != bestTreeNumber) continue;
+                    if (cellTreeNumbers[r, c] != bestTreeNumber) continue;
                     PlaceHorizontalConnectionsIfNeeded(areas, r, c);
                 }
             }
-            
+
             return areas.Select(it => ScaleArea(it, squareSize)).ToArray();
         }
 
@@ -183,23 +187,27 @@ namespace Maps.Genomes
                 // cell already visited.
                 return 0;
             }
+
             cellTreeNumber[r, c] = visitNumber;
             if (!rooms[r, c].isReal) return 0;
 
             var totalSize = 1;
-            if (r > 0 && rooms[r-1, c].isConnectedToTheTop)
+            if (r > 0 && rooms[r - 1, c].isConnectedToTheTop)
             {
                 totalSize += VisitTree(cellTreeNumber, visitNumber, r - 1, c);
             }
-            if (r < rooms.GetLength(0) - 1 && rooms[r,c].isConnectedToTheTop)
+
+            if (r < rooms.GetLength(0) - 1 && rooms[r, c].isConnectedToTheTop)
             {
                 totalSize += VisitTree(cellTreeNumber, visitNumber, r + 1, c);
             }
-            if (c > 0 && rooms[r,c-1].isConnectedToTheRight)
+
+            if (c > 0 && rooms[r, c - 1].isConnectedToTheRight)
             {
                 totalSize += VisitTree(cellTreeNumber, visitNumber, r, c - 1);
             }
-            if (c < rooms.GetLength(1) - 1 && rooms[r,c].isConnectedToTheRight)
+
+            if (c < rooms.GetLength(1) - 1 && rooms[r, c].isConnectedToTheRight)
             {
                 totalSize += VisitTree(cellTreeNumber, visitNumber, r, c + 1);
             }
@@ -217,7 +225,7 @@ namespace Maps.Genomes
                 area.isCorridor,
                 area.isDummyRoom);
         }
-        
+
         private void PlaceVerticalConnectionsIfNeeded(List<Area> areas, int r, int c)
         {
             var topRoom = rooms[r, c];
@@ -245,12 +253,32 @@ namespace Maps.Genomes
                 return;
             }
 
-            // Find X1 and X2 of the corridor.
-            var middleXTopRoom = c * cellsWidth + (topRoom.startingX + topRoom.endingX) / 2;
-            var middleXBottomRoom = c * cellsWidth + (bottomRoom.startingX + bottomRoom.endingX) / 2;
+            // TODO If rooms are aligned in some way, then use a straight corridor.
 
             var topY = r * cellsHeight + topRoom.startingY;
             var bottomY = (r - 1) * cellsHeight + bottomRoom.endingY;
+
+            var maxOfMinX = Mathf.Max(bottomRoom.startingX, topRoom.startingX);
+            var minOfMaxX = Mathf.Min(bottomRoom.endingX, topRoom.endingX);
+
+            if (maxOfMinX < minOfMaxX)
+            {
+                // We can place a straight corridor.
+                var startX = c * cellsWidth + Random.Range(maxOfMinX, minOfMaxX);
+                areas.Add(new Area(
+                    startX,
+                    bottomY,
+                    startX + 1,
+                    topY,
+                    true));
+                return;
+            }
+
+            // We cannot place a straight corridor. Place an twisted one.
+
+            // Find X1 and X2 of the corridor.
+            var middleXTopRoom = c * cellsWidth + (topRoom.startingX + topRoom.endingX) / 2;
+            var middleXBottomRoom = c * cellsWidth + (bottomRoom.startingX + bottomRoom.endingX) / 2;
 
             var corridorY = Random.Range(bottomY, topY);
             // Vertical corridor from bottom room
@@ -269,14 +297,8 @@ namespace Maps.Genomes
                 topY,
                 true));
 
-            if (middleXBottomRoom == middleXTopRoom)
-            {
-                // No horizontal corridor to place
-                return;
-            }
-
             var startingX = Mathf.Min(middleXBottomRoom, middleXTopRoom);
-            var endingX = Mathf.Max(middleXBottomRoom, middleXTopRoom);
+            var endingX = Mathf.Max(middleXBottomRoom, middleXTopRoom) + 1;
             // Horizontal corridor
             areas.Add(new Area(
                 startingX,
@@ -313,12 +335,29 @@ namespace Maps.Genomes
                 return;
             }
 
+            var rightX = c * cellsWidth + rightRoom.startingX;
+            var leftX = (c - 1) * cellsWidth + leftRoom.endingX;
+
+            var maxOfMinY = Mathf.Max(leftRoom.startingY, rightRoom.startingY);
+            var minOfMaxY = Mathf.Min(leftRoom.endingY, rightRoom.endingY);
+
+            if (maxOfMinY < minOfMaxY)
+            {
+                // We can place a straight corridor.
+                var startY = r * cellsHeight + Random.Range(maxOfMinY, minOfMaxY);
+                areas.Add(new Area(
+                    leftX,
+                    startY,
+                    rightX,
+                    startY + 1,
+                    true));
+                return;
+            }
+
+            // We cannot place a straight corridor. Place an twisted one.
             // Find Y1 and Y2 of the corridor.
             var middleYRightRoom = r * cellsHeight + (rightRoom.startingY + rightRoom.endingY) / 2;
             var middleYLeftRoom = r * cellsHeight + (leftRoom.startingY + leftRoom.endingY) / 2;
-
-            var rightX = c * cellsWidth + rightRoom.startingX;
-            var leftX = (c - 1) * cellsWidth + leftRoom.endingX;
 
             var corridorX = Random.Range(leftX, rightX);
             // Vertical corridor from bottom room
@@ -337,14 +376,8 @@ namespace Maps.Genomes
                 middleYRightRoom + 1,
                 true));
 
-            if (middleYLeftRoom == middleYRightRoom)
-            {
-                // No horizontal corridor to place
-                return;
-            }
-
             var startingY = Mathf.Min(middleYLeftRoom, middleYRightRoom);
-            var endingY = Mathf.Max(middleYLeftRoom, middleYRightRoom);
+            var endingY = Mathf.Max(middleYLeftRoom, middleYRightRoom) + 1;
             // Horizontal corridor
             areas.Add(new Area(
                 corridorX,
@@ -443,7 +476,22 @@ namespace Maps.Genomes
                 oldRoom.isConnectedToTheTop
             );
         }
+
+        public static GraphGenomeV2 Default = new GraphGenomeV2(
+            10, 10, 3, new[,]
+            {
+                {
+                    new Room(0, 10, 0, 10, true, false),
+                    new Room(7, 9, 2, 4, false, true),
+                },
+                {
+                    new Room(0, 10, 0, 10, true, false),
+                    new Room(3, 5, 6, 9, false, false),
+                }
+            }
+        );
     }
+
 
     /// <summary>
     /// Represents the position and dimension of a room inside a cell in the graph.

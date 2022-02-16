@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using Graph;
 using Logging;
@@ -10,12 +9,13 @@ namespace Maps.MapGenerator
     // this class.
     public class GenomeV2MapGenerator : MapGenerator
     {
-        public GraphGenomeV2 genome;
+        private GraphGenomeV2 genome;
         private Area[] areas;
 
         public void SetGenome(GraphGenomeV2 genome)
         {
             this.genome = genome;
+            InitializePseudoRandomGenerator();
             SetReady(true);
         }
         
@@ -55,7 +55,7 @@ namespace Maps.MapGenerator
         {
             // TODO Areas are flipped vertically. Understand why
             foreach (var area in areas)
-                for (var row = area.topRow; row < area.bottomRow; row++)
+                for (var row = area.bottomRow; row < area.topRow; row++)
                 for (var col = area.leftColumn; col < area.rightColumn; col++)
                     map[height - row - 1, col] = 'r';
         }
