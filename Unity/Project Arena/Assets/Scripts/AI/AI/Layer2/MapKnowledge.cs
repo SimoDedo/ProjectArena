@@ -128,7 +128,7 @@ namespace AI.AI.Layer2
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool PositionInArea(Area area, Vector3 position)
         {
-            return !(position.z < area.topRow) && !(position.z > area.bottomRow) && !(position.x < area.leftColumn) &&
+            return !(position.z > area.topRow) && !(position.z < area.bottomRow) && !(position.x < area.leftColumn) &&
                    !(position.x > area.rightColumn);
         }
 
