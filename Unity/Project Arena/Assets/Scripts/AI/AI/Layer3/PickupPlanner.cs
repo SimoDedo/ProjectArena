@@ -30,7 +30,7 @@ namespace AI.AI.Layer3
         private const float MAX_DISTANCE_TO_BE_NEIGHBORS = 20f;
 
         // Bonus score given to a pickup for each neighbor it has.
-        private const float BONUS_SCORE_PER_NEIGHBOR = 0.1f;
+        private const float BONUS_SCORE_PER_NEIGHBOR = 0.04f;
 
         // Curve used to calculate the multiplier due to the time to collect.
         private static readonly AnimationCurve TimeToCollectValueCurve = new AnimationCurve(
@@ -195,7 +195,7 @@ namespace AI.AI.Layer3
             var timeMultiplier = GetTimeToCollectMultiplier(totalTime);
             var uncertaintyMultiplier = GetUncertaintyTimeMultiplier(timeUncertainty);
 
-            var finalScore = (valueScore + neighborhoodScore) * timeMultiplier * uncertaintyMultiplier;
+            var finalScore = valueScore * neighborhoodScore * timeMultiplier * uncertaintyMultiplier;
 
             return finalScore;
         }
@@ -290,7 +290,7 @@ namespace AI.AI.Layer3
                     }
                 }
 
-                neighborsScore[pickup1] = Math.Min(0.5f, neighbors * BONUS_SCORE_PER_NEIGHBOR);
+                neighborsScore[pickup1] = 1.0f * Math.Min(0.2f, neighbors * BONUS_SCORE_PER_NEIGHBOR);
             }
         }
 
