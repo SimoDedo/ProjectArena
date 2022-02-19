@@ -57,9 +57,6 @@ namespace Maps.Genomes
                     return false;
                 }
             }
-
-            // TODO Rooms should not be smaller than corridor thickness?
-
             return true;
         }
 
@@ -89,17 +86,17 @@ namespace Maps.Genomes
             // order to prevent them from touching. This is needed because thin walls are not supported in the char map.
             // At the same time, if I have two adjacent rooms but they don't really touch each other, I need to separate
             // them just a little.
-            for (var r = 1; r < numRows; r++)
+            for (var c = 0; c < numColumns; c++)
             {
-                for (var c = 0; c < numColumns; c++)
+                for (var r = numRows - 1; r > 0; r--)
                 {
                     ShrinkVerticallyIfNeeded(r, c);
                 }
             }
 
-            for (var c = 1; c < numColumns; c++)
+            for (var r = 0; r < numRows; r++)
             {
-                for (var r = 0; r < numRows; r++)
+                for (var c = numColumns - 1; c > 0; c--)
                 {
                     ShrinkHorizontallyIfNeeded(r, c);
                 }
@@ -425,7 +422,7 @@ namespace Maps.Genomes
             rooms[r - 1, c] = new Room(
                 oldRoom.startingX,
                 oldRoom.endingX,
-                oldRoom.startingY,
+                Mathf.Max(0, oldRoom.startingY - 1),
                 oldRoom.endingY - 1,
                 oldRoom.isConnectedToTheRight,
                 oldRoom.isConnectedToTheTop
@@ -468,7 +465,7 @@ namespace Maps.Genomes
             // We need space, either to separate the two rooms or to fit a corridor in the middle.
             var oldRoom = leftRoom;
             rooms[r, c - 1] = new Room(
-                oldRoom.startingX,
+                Mathf.Max(0, oldRoom.startingX - 1),
                 oldRoom.endingX - 1,
                 oldRoom.startingY,
                 oldRoom.endingY,
