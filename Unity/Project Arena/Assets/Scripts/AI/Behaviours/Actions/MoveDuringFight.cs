@@ -18,8 +18,8 @@ namespace AI.Behaviours.Actions
     [Serializable]
     public class MoveDuringFight : Action
     {
-        private const int MIN_STRAFE_LENGTH = 10;
-        private const int MAX_STRAFE_LENGTH = 30;
+        private const int MIN_STRAFE_LENGTH = 60;
+        private const int MAX_STRAFE_LENGTH = 420;
         private AIEntity entity;
         private GunManager gunManager;
         private NavigationSystem navSystem;
@@ -28,7 +28,8 @@ namespace AI.Behaviours.Actions
 
         private bool strifeRight = Random.value < 0.5;
         private Entity.Entity target;
-
+        private const int maxAttempts = 10;
+        
         public override void OnStart()
         {
             entity = GetComponent<AIEntity>();
@@ -99,7 +100,6 @@ namespace AI.Behaviours.Actions
 
             // Also reset strife
             strifeRight = Random.value > 0.5f;
-            const int maxAttempts = 10;
             for (var i = 0; i < maxAttempts; i++)
             {
                 var randomDir = Random.insideUnitCircle;
@@ -145,7 +145,7 @@ namespace AI.Behaviours.Actions
             var totalMovement = movementDirectionDueToStrife + movementDirectionDueToGun * 3f;
             var newPos = currentPos + totalMovement;
 
-            var canSeeSomething = Physics.Linecast(newPos, targetPos, out var hit, Physics.IgnoreRaycastLayer);
+            var canSeeSomething = Physics.Linecast(newPos, targetPos, out var hit, Physics.DefaultRaycastLayers);
             if (!canSeeSomething || hit.collider.gameObject == target.gameObject)
             {
                 // I can see the enemy from the new position.
@@ -187,6 +187,7 @@ namespace AI.Behaviours.Actions
                 if (skill == FightingMovementSkill.CircleStrifeChangeDirection)
                 {
                     remainingStrafes--;
+                    Debug.Log("Remaining strifes: " + remainingStrafes);
                     if (remainingStrafes < 0)
                     {
                         remainingStrafes = Random.Range(MIN_STRAFE_LENGTH, MAX_STRAFE_LENGTH);
