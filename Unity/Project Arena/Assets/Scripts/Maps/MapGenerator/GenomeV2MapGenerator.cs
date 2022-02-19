@@ -28,7 +28,7 @@ namespace Maps.MapGenerator
             width = genome.GetWidth() + borderSize * 2;
             height = genome.GetHeight() + borderSize * 2;
             
-            map = new char[width, height];
+            map = new char[height, width];
             MapEdit.FillMap(map, wallChar);
             
             FillMap(areas);

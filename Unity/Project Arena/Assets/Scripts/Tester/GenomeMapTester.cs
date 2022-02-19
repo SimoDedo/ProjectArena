@@ -74,12 +74,45 @@ namespace Tester
 
             StartNewExperimentGameEvent.Instance.AddListener(NewExperimentStarted);
             ExperimentEndedGameEvent.Instance.AddListener(ExperimentEnded);
-
+            
             StartNewExperiment();
 
             // Register start and end experiment events, so that I can finalize the analyzer and
             // reset it
         }
+
+        // private void AAA()
+        // {
+        //     var genome = new GraphGenomeV2();
+        //     genome.cellsHeight = 5;
+        //     genome.cellsWidth = 5;
+        //     genome.squareSize = 3;
+        //     genome.rooms = new[,]
+        //     {
+        //         {
+        //             new Room(0, 5, 0, 4, true, true), 
+        //             new Room(0, 5, 0, 5, true, true), 
+        //             new Room(0, 5, 0, 4, true, false), 
+        //             new Room(0, 5, 0, 5, true, true), 
+        //             new Room(0, 5, 0, 4, true, true), 
+        //         },
+        //         {
+        //             new Room(0, 4, 0, 5, true, true), 
+        //             new Room(0, 5, 0, 5, true, true), 
+        //             new Room(0, 5, 0, 5, true, false), 
+        //             new Room(0, 5, 0, 5, true, true), 
+        //             new Room(1, 5, 0, 5, true, true), 
+        //         },
+        //         {
+        //             new Room(0, 5, 1, 5, true, true), 
+        //             new Room(0, 5, 0, 5, true, true), 
+        //             new Room(0, 5, 1, 5, true, false), 
+        //             new Room(0, 5, 0, 5, true, true), 
+        //             new Room(0, 5, 1, 5, true, true), 
+        //         }
+        //     };
+        //     ReadFromFile(genomesPath + genomeName + ".aaa", genome);
+        // }
 
         private void StartNewExperiment()
         {

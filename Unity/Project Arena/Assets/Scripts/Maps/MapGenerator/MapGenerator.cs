@@ -267,10 +267,10 @@ namespace Maps.MapGenerator
         protected string GetMapAsText()
         {
             var textMap = new StringBuilder();
-            for (var x = 0; x < width; x++)
+            for (var r = 0; r < height; r++)
             {
-                for (var y = 0; y < height; y++) textMap.Append(map[x, y]);
-                if (x < width - 1) textMap.Append("\n");
+                for (var c = 0; c < width; c++) textMap.Append(map[r, c]);
+                if (r < height - 1) textMap.Append("\n");
             }
 
             return textMap.ToString();
