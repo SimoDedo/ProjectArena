@@ -147,6 +147,11 @@ namespace Maps.Genomes
                 }
             }
 
+            if (areas.Any(it => it.bottomRow == it.topRow || it.leftColumn == it.rightColumn))
+            {
+                Debug.LogError("There is an invalid area!");
+            }
+            
             return areas.Select(it => ScaleArea(it, squareSize)).ToArray();
         }
 
