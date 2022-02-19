@@ -25,9 +25,9 @@ namespace AI.AI.Layer1
         /// </summary>
         public bool CanSeeObject(Transform transform, int layerMask = Physics.DefaultRaycastLayers)
         {
-            var visibility = VisibilityUtils.CanSeeTarget(head.transform, transform, layerMask);
+            // TODO Add maxSightRange here!
+            var visibility = VisibilityUtils.CanSeeTarget(head.transform, transform, layerMask, maxSightRange);
             if (!visibility.isVisible) return false;
-            if (visibility.distance > maxSightRange) return false;
             if (visibility.angle > fov) return false;
             return true;
         }
