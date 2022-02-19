@@ -493,6 +493,7 @@ namespace Maps.Genomes
     }
 
 
+    // FIXME I'd like this to be a readonly struct, but there are some problems with serialization in that way...
     /// <summary>
     /// Represents the position and dimension of a room inside a cell in the graph.
     /// (x,y) coordinates are to be interpreted as:
@@ -502,17 +503,29 @@ namespace Maps.Genomes
     // A room starts at the coordinate specified and ends just before the coordinate specified.
     // So, for example, a room with X start and end point of 1 and 3 would start at position 1, fill the squares 1 and 2
     // and end at the end of square 2 / start of square 3.
-    public readonly struct Room
+    [Serializable]
+    public class Room
     {
         // If false, this instance is just used to fill the array but otherwise there is no room in that space.
         // In that situation, every variable has value 0.
-        public readonly bool isReal;
-        public readonly int startingX;
-        public readonly int endingX;
-        public readonly int startingY;
-        public readonly int endingY;
-        public readonly bool isConnectedToTheRight;
-        public readonly bool isConnectedToTheTop;
+        public bool isReal;
+        public int startingX;
+        public int endingX;
+        public int startingY;
+        public int endingY;
+        public bool isConnectedToTheRight;
+        public bool isConnectedToTheTop;
+
+        public Room()
+        {
+            
+        }
+
+    // public Room(int startingX, int endingX, int startingY, int endingY, bool isConnectedToTheRight,
+    //         bool isConnectedToTheTop) : this(true, startingX, endingX, startingY, endingY, isConnectedToTheRight,
+    //         isConnectedToTheTop)
+    //     {
+    //     }
 
         public Room(int startingX, int endingX, int startingY, int endingY, bool isConnectedToTheRight,
             bool isConnectedToTheTop)
