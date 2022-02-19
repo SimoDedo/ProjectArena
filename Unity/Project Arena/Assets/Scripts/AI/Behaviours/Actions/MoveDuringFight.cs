@@ -18,8 +18,8 @@ namespace AI.Behaviours.Actions
     [Serializable]
     public class MoveDuringFight : Action
     {
-        private const int MIN_STRAFE_LENGTH = 60;
-        private const int MAX_STRAFE_LENGTH = 420;
+        private const int MIN_STRAFE_LENGTH = 15;
+        private const int MAX_STRAFE_LENGTH = 40;
         private AIEntity entity;
         private GunManager gunManager;
         private NavigationSystem navSystem;
@@ -212,6 +212,7 @@ namespace AI.Behaviours.Actions
                 movementDirectionDueToGun = direction;
             else
                 // Randomly move through the optimal range of the gun, but not too much
+                // TODO Perhaps have a flag like strife to avoid oscillating too much
                 movementDirectionDueToGun = direction * (Random.value > 0.5f ? -0.1f : 0.1f);
             return movementDirectionDueToGun;
         }
