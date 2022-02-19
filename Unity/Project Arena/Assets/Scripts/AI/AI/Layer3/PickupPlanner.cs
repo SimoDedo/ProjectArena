@@ -290,7 +290,7 @@ namespace AI.AI.Layer3
                     }
                 }
 
-                neighborsScore[pickup1] = 1.0f * Math.Min(0.2f, neighbors * BONUS_SCORE_PER_NEIGHBOR);
+                neighborsScore[pickup1] = 1.0f + Math.Min(0.2f, neighbors * BONUS_SCORE_PER_NEIGHBOR);
             }
         }
 
