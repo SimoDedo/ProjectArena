@@ -18,5 +18,10 @@ namespace Others
         {
             return path.status == NavMeshPathStatus.PathComplete;
         }
+        
+        public static bool IsValid(this NavMeshPath path)
+        {
+            return path.status != NavMeshPathStatus.PathInvalid;
+        }
     }
 }
