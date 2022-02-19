@@ -14,22 +14,26 @@ namespace AI.Behaviours.Conditions
     public class IsCoverStillValid : Conditional
     {
         [SerializeField] private SharedSelectedPathInfo pathInfo;
+        private AIEntity me;
         private Entity.Entity enemy;
         private Vector3 finalPos;
 
         public override void OnStart()
         {
             finalPos = pathInfo.Value.corners.Last();
-            enemy = gameObject.GetComponent<AIEntity>().GetEnemy();
+            me = gameObject.GetComponent<AIEntity>();
+            enemy = me.GetEnemy();
         }
 
         public override TaskStatus OnUpdate()
         {
-            if (!Physics.Linecast(finalPos, enemy.transform.position, out var hit) ||
-                hit.collider.gameObject == enemy.gameObject)
-                // We can see the enemy from that position, no good! 
-                return TaskStatus.Failure;
-            return TaskStatus.Success;
+            me.SetIgnoreRaycast(true);
+            var canSeeEnemyFromFinalPosition =
+                !Physics.Linecast(finalPos, enemy.transform.position, out var hit, Physics.DefaultRaycastLayers) ||
+                hit.collider.gameObject == enemy.gameObject;
+            me.SetIgnoreRaycast(false);
+
+            return canSeeEnemyFromFinalPosition ? TaskStatus.Failure : TaskStatus.Success;
         }
     }
 }
