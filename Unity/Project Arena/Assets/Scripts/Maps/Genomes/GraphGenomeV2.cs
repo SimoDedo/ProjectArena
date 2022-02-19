@@ -57,6 +57,7 @@ namespace Maps.Genomes
                     return false;
                 }
             }
+
             return true;
         }
 
@@ -148,7 +149,7 @@ namespace Maps.Genomes
             {
                 Debug.LogError("There is an invalid area!");
             }
-            
+
             return areas.Select(it => ScaleArea(it, squareSize)).ToArray();
         }
 
@@ -246,7 +247,7 @@ namespace Maps.Genomes
             }
 
             var spacedVertically = bottomRoom.endingY != cellsHeight || topRoom.startingY != 0;
-            var intersectHorizontally = // TODO Check
+            var intersectHorizontally =
                 bottomRoom.startingX < topRoom.endingX && topRoom.startingX < bottomRoom.endingX;
 
             if (!spacedVertically && intersectHorizontally)
@@ -264,7 +265,8 @@ namespace Maps.Genomes
             if (maxOfMinX < minOfMaxX)
             {
                 // We can place a straight corridor.
-                var startX = c * cellsWidth + Random.Range(maxOfMinX, minOfMaxX);
+                // var startX = c * cellsWidth + Random.Range(maxOfMinX, minOfMaxX);
+                var startX = c * cellsWidth + (maxOfMinX + minOfMaxX) / 2;
                 areas.Add(new Area(
                     startX,
                     bottomY,
@@ -280,7 +282,8 @@ namespace Maps.Genomes
             var middleXTopRoom = c * cellsWidth + (topRoom.startingX + topRoom.endingX) / 2;
             var middleXBottomRoom = c * cellsWidth + (bottomRoom.startingX + bottomRoom.endingX) / 2;
 
-            var corridorY = Random.Range(bottomY, topY);
+            // var corridorY = Random.Range(bottomY, topY);
+            var corridorY = (bottomY + topY) / 2;
 
             if (bottomY != corridorY)
             {
@@ -323,7 +326,7 @@ namespace Maps.Genomes
             }
 
             var spacedHorizontally = leftRoom.endingX != cellsWidth || rightRoom.startingX != 0;
-            var intersectVertically = // TODO Check
+            var intersectVertically =
                 leftRoom.startingY < rightRoom.endingY && rightRoom.startingY < leftRoom.endingY;
 
             if (!spacedHorizontally && intersectVertically)
@@ -341,7 +344,7 @@ namespace Maps.Genomes
             if (maxOfMinY < minOfMaxY)
             {
                 // We can place a straight corridor.
-                var startY = r * cellsHeight + Random.Range(maxOfMinY, minOfMaxY);
+                var startY = r * cellsHeight + (maxOfMinY + minOfMaxY) / 2;
                 areas.Add(new Area(
                     leftX,
                     startY,
@@ -356,7 +359,7 @@ namespace Maps.Genomes
             var middleYRightRoom = r * cellsHeight + (rightRoom.startingY + rightRoom.endingY) / 2;
             var middleYLeftRoom = r * cellsHeight + (leftRoom.startingY + leftRoom.endingY) / 2;
 
-            var corridorX = Random.Range(leftX, rightX);
+            var corridorX = (leftX + rightX) / 2;
             // Vertical corridor from bottom room
             areas.Add(new Area(
                 leftX,
