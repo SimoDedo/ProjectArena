@@ -17,8 +17,7 @@ namespace AI.Behaviours.Actions
     [Serializable]
     public class CalculateCampDestination : Action
     {
-        private static readonly int LayerMask =
-            Physics.DefaultRaycastLayers ^ (1 << UnityEngine.LayerMask.NameToLayer("Entity"));
+        private int layerMask = 0;
 
         [SerializeField] private float minRadius = 1;
         [SerializeField] private float maxRadius = 20;
@@ -32,6 +31,7 @@ namespace AI.Behaviours.Actions
 
         public override void OnAwake()
         {
+            layerMask = ~LayerMask.GetMask("Entity", "Ignore Raycast");
             navSystem = GetComponent<AIEntity>().NavigationSystem;
             startVertex = Random.Range(0, maxNumVertices);
         }
@@ -55,7 +55,7 @@ namespace AI.Behaviours.Actions
                 {
                     var randomRadius = Random.value * (maxRadius - minRadius) + minRadius;
                     var newPoint = newDirection * randomRadius + campLocation.Value;
-                    if (Physics.Linecast(campLocation.Value, newPoint, LayerMask))
+                    if (Physics.Linecast(campLocation.Value, newPoint, layerMask))
                         // Chosen point is behind something, ignore!
                         continue;
                     // if (!NavigationSystem.IsPointOnNavMesh(newPoint, out var finalPoint)) continue;
