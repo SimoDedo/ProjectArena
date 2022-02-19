@@ -212,7 +212,7 @@ namespace AI.Behaviours.Actions
                 movementDirectionDueToGun = direction;
             else
                 // Randomly move through the optimal range of the gun, but not too much
-                movementDirectionDueToGun = direction * (Random.value > 0.5f ? -0.3f : 0.3f);
+                movementDirectionDueToGun = direction * (Random.value > 0.5f ? -0.1f : 0.1f);
             return movementDirectionDueToGun;
         }
     }
