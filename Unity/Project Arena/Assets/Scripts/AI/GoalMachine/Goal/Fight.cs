@@ -1,3 +1,4 @@
+using System;
 using AI.AI.Layer2;
 using BehaviorDesigner.Runtime;
 using Entity.Component;
@@ -17,11 +18,26 @@ namespace AI.GoalMachine.Goal
         private readonly ExternalBehaviorTree externalBt;
         private readonly GunManager gunManager;
         private readonly TargetKnowledgeBase targetKb;
+        private readonly float scoreMultiplier = 1.0f;
 
         public Fight(AIEntity entity)
         {
             this.entity = entity;
             targetKb = entity.TargetKb;
+            var recklessness = entity.Recklessness;
+            switch (recklessness)
+            {
+                case Recklessness.Low:
+                    scoreMultiplier /= 1.3f;
+                    break;
+                case Recklessness.Neutral:
+                    break;
+                case Recklessness.High:
+                    scoreMultiplier *= 1.3f;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
             gunManager = entity.GunManager;
             externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/NewFight");
             behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
@@ -36,7 +52,7 @@ namespace AI.GoalMachine.Goal
             // TODO maybe we see enemy, but we want to run away?
             var canSee = targetKb.HasSeenTarget() && entity.GetEnemy().IsAlive;
             var inverseHealthPercentage = 1f - (float) entity.Health / entity.MaxHealth;
-            return canSee ? 0.8f - inverseHealthPercentage * LOW_HEALTH_PENALTY : 0.0f;
+            return canSee ? scoreMultiplier * (1.0f - inverseHealthPercentage * LOW_HEALTH_PENALTY) : 0.0f;
         }
 
 

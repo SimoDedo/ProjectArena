@@ -24,19 +24,17 @@ namespace AI
         /// <summary>
         /// Speed of the bot.
         /// </summary>
-        [Header("Movement parameters")] [SerializeField]
-        public float speed;
+        [SerializeField] public float speed;
 
         /// <summary>
         /// Ability of the bot to move tactically during a fight.
         /// </summary>
         [SerializeField] public FightingMovementSkill movementSkill;
-
+        
         /// <summary>
         /// Field of view of the bot.
         /// </summary>
-        [Header("Sight parameters")] [SerializeField]
-        public float fov;
+        [SerializeField] public float fov;
 
         /// <summary>
         /// Maximum angular speed of the bot view.
@@ -51,8 +49,7 @@ namespace AI
         /// <summary>
         /// Maximum sight range of the bot.
         /// </summary>
-        [Header("Target reaction parameter")] [SerializeField]
-        public float maxRange;
+        [SerializeField] public float maxRange;
 
         /// <summary>
         /// Length (in second) of the bot memory for target sighting info.
@@ -72,7 +69,7 @@ namespace AI
         /// <summary>
         /// Entity tendency to look around when moving.
         /// </summary>
-        [Header("Others")] [SerializeField] public CuriosityLevel curiosity;
+        [SerializeField] public CuriosityLevel curiosity;
 
         /// <summary>
         /// Ability of the both to predict exactly where an enemy he is following is.
@@ -89,6 +86,12 @@ namespace AI
         /// </summary>
         [SerializeField] public float recentDamageTimeout;
 
+        /// <summary>
+        /// Enemy tendency to behave recklessly or not.
+        /// </summary>
+        [SerializeField] public Recklessness recklessness;
+
+        
         /// <summary>
         /// Default characteristics of a bot. Average abilities all around.
         /// </summary>
@@ -107,7 +110,8 @@ namespace AI
                 movementSkill = FightingMovementSkill.CircleStrife,
                 predictionSkill = 0.5f,
                 speed = 16,
-                recentDamageTimeout = 0.5f
+                recentDamageTimeout = 0.5f,
+                recklessness = Recklessness.Neutral
             };
     }
 
@@ -130,6 +134,16 @@ namespace AI
         Low, // The bot only looks forward.
         Medium, // The bot looks forward and at the sides.
         High // The bot looks all around itself.
+    } 
+    
+    /// <summary>
+    /// Determines if the enemy tends to be cautious or dives head-on into battle.
+    /// </summary>
+    public enum Recklessness
+    {
+        Low, // The bot prefers avoiding fights, so it will look for cover and pickup more.
+        Neutral, // The bot is not overly cautious or reckless.
+        High // The bot prefers to fight head on, hardly using cover or retreating for pickups.
     }
 
 
@@ -213,6 +227,8 @@ namespace AI
         public override bool IsAlive => isActiveAndEnabled && (Health > 0 || mustProcessDeath);
 
         public FightingMovementSkill MovementSkill => botParams.movementSkill;
+
+        public Recklessness Recklessness => botParams.recklessness;
 
         private void Update()
         {

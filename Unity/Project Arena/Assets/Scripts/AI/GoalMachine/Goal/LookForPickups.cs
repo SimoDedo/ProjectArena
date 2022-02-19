@@ -1,3 +1,4 @@
+using System;
 using AI.AI.Layer3;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
@@ -16,12 +17,28 @@ namespace AI.GoalMachine.Goal
         private readonly BehaviorTree behaviorTree;
         private readonly ExternalBehaviorTree externalBt;
         private readonly PickupPlanner pickupPlanner;
+        private readonly float scoreMultiplier = 1.0f;
         private Pickable currentPickable;
         private Pickable nextPickable;
 
         public LookForPickups(AIEntity entity)
         {
             pickupPlanner = entity.PickupPlanner;
+            var recklessness = entity.Recklessness;
+            switch (recklessness)
+            {
+                case Recklessness.Low:
+                    scoreMultiplier *= 1.3f;
+                    break;
+                case Recklessness.Neutral:
+                    break;
+                case Recklessness.High:
+                    scoreMultiplier /= 1.3f;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            
             externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/NewPickup");
             behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
             behaviorTree.StartWhenEnabled = false;
@@ -32,7 +49,7 @@ namespace AI.GoalMachine.Goal
         public float GetScore()
         {
             nextPickable = pickupPlanner.GetChosenPickup();
-            return pickupPlanner.GetChosenPickupScore();
+            return scoreMultiplier * pickupPlanner.GetChosenPickupScore();
         }
 
 

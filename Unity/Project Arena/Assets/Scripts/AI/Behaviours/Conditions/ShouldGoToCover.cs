@@ -16,7 +16,6 @@ namespace AI.Behaviours.Conditions
         private const float TIMEOUT = 1.5f;
 
         private const float CHARGER_PERCENTAGE = 0.4f;
-        private const float AVOID_COVER_PROBABILITY = 0.3f;
 
         // If true, we must now consider the random failure probability until we find out that we no longer need to
         // cover
@@ -26,6 +25,7 @@ namespace AI.Behaviours.Conditions
         private AIEntity entity;
         private FightingMovementSkill skill;
         private GunManager gunManager;
+        private float avoidCoverProbability = 0.3f;
 
         private float nextCoverAttempt;
 
@@ -35,6 +35,20 @@ namespace AI.Behaviours.Conditions
             skill = entity.MovementSkill;
             enemy = entity.GetEnemy();
             gunManager = entity.GunManager;
+            var recklessness = entity.Recklessness;
+            switch (recklessness)
+            {
+                case Recklessness.High:
+                    avoidCoverProbability *= 3.0f;
+                    break;
+                case Recklessness.Low:
+                    avoidCoverProbability /= 2f;
+                    break;
+                case Recklessness.Neutral:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         public override TaskStatus OnUpdate()
@@ -44,7 +58,7 @@ namespace AI.Behaviours.Conditions
                 // Too noob to consider cover.
                 return TaskStatus.Failure;
             }
-            
+
             if (nextCoverAttempt >= Time.time)
                 // We were able to cover some time ago but decided not to. Do not change our mind too soon
                 return TaskStatus.Failure;
@@ -82,7 +96,7 @@ namespace AI.Behaviours.Conditions
             }
 
             // TODO Make this a bot parameter? Tendency to cover?
-            if (!isGoingToCover.Value && Random.value < AVOID_COVER_PROBABILITY)
+            if (!isGoingToCover.Value && Random.value < avoidCoverProbability)
             {
                 nextCoverAttempt = Time.time + TIMEOUT;
                 // Avoid always rushing towards a cover point to not be predictable
