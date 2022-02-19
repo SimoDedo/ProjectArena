@@ -253,8 +253,6 @@ namespace Maps.Genomes
                 return;
             }
 
-            // TODO If rooms are aligned in some way, then use a straight corridor.
-
             var topY = r * cellsHeight + topRoom.startingY;
             var bottomY = (r - 1) * cellsHeight + bottomRoom.endingY;
 
@@ -281,21 +279,18 @@ namespace Maps.Genomes
             var middleXBottomRoom = c * cellsWidth + (bottomRoom.startingX + bottomRoom.endingX) / 2;
 
             var corridorY = Random.Range(bottomY, topY);
-            // Vertical corridor from bottom room
-            areas.Add(new Area(
-                middleXBottomRoom,
-                bottomY,
-                middleXBottomRoom + 1,
-                corridorY,
-                true));
 
-            // Vertical corridor from top room
-            areas.Add(new Area(
-                middleXTopRoom,
-                corridorY,
-                middleXTopRoom + 1,
-                topY,
-                true));
+            if (bottomY != corridorY)
+            {
+                // Vertical corridor from bottom room
+                areas.Add(new Area(middleXBottomRoom, bottomY, middleXBottomRoom + 1, corridorY, true));
+            }
+
+            if (topY != corridorY)
+            {
+                // Vertical corridor from top room
+                areas.Add(new Area(middleXTopRoom, corridorY, middleXTopRoom + 1, topY, true));
+            }
 
             var startingX = Mathf.Min(middleXBottomRoom, middleXTopRoom);
             var endingX = Mathf.Max(middleXBottomRoom, middleXTopRoom) + 1;
