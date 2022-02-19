@@ -113,21 +113,6 @@ namespace Tester
             );
         }
 
-        private GraphGenomeV2 LoadGenome()
-        {
-            var genomePath = genomesPath + genomeName + ".txt";
-            if (!File.Exists(genomePath))
-            {
-                throw new InvalidOperationException("File " + genomePath + " doesn't exist!");
-                // TODO Build default genome?
-            }
-
-            using var reader = new StreamReader(genomePath);
-            var genome = JsonConvert.DeserializeObject<GraphGenomeV2>(reader.ReadToEnd());
-
-            return genome;
-        }
-
         private void ExperimentEnded()
         {
             Debug.Log("Experiment num " + +experimentNumber + " ended!");
