@@ -8,7 +8,6 @@ using UnityEngine;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
 using Random = UnityEngine.Random;
 
-// Current version is this one!
 namespace AI.Behaviours.Actions
 {
     /// <summary>
