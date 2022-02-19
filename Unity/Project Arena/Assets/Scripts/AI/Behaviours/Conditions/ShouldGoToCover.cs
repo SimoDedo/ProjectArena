@@ -24,6 +24,7 @@ namespace AI.Behaviours.Conditions
 
         private Entity.Entity enemy;
         private AIEntity entity;
+        private FightingMovementSkill skill;
         private GunManager gunManager;
 
         private float nextCoverAttempt;
@@ -31,12 +32,19 @@ namespace AI.Behaviours.Conditions
         public override void OnAwake()
         {
             entity = gameObject.GetComponent<AIEntity>();
+            skill = entity.MovementSkill;
             enemy = entity.GetEnemy();
             gunManager = entity.GunManager;
         }
 
         public override TaskStatus OnUpdate()
         {
+            if (skill < FightingMovementSkill.CircleStrife)
+            {
+                // Too noob to consider cover.
+                return TaskStatus.Failure;
+            }
+            
             if (nextCoverAttempt >= Time.time)
                 // We were able to cover some time ago but decided not to. Do not change our mind too soon
                 return TaskStatus.Failure;
