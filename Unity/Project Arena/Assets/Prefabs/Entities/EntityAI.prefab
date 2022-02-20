@@ -1018,7 +1018,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minRangeBest: 50
-  maxRangeBest: 100
+  maxRangeBest: 80
   controlPoints:
   - distance: 25
     score: 0.1
@@ -2045,14 +2045,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   headCamera: {fileID: 20788917190633434}
   muzzleFlash: {fileID: 1869087715720208}
-  damage: 15
-  dispersion: 0
+  damage: 22
+  dispersion: 5
   projectilesPerShot: 1
   infinteAmmo: 0
-  chargerSize: 32
-  maximumAmmo: 120
+  chargerSize: 20
+  maximumAmmo: 80
   reloadTime: 1
-  cooldownTime: 0.08
+  cooldownTime: 0.1
   isBlastWeapon: 0
   muzzleFlashDuration: 0.05
   recoil: 0.02
@@ -2063,8 +2063,8 @@ MonoBehaviour:
   aimPosition: {x: 0, y: 0, z: 0}
   aimOverlay: {fileID: 0}
   displayUIIfAvailable: 1
-  limitRange: 0
-  range: 100
+  limitRange: 1
+  range: 80
   sparkPrefab: {fileID: 1898888085525940, guid: f32340268f5f82147a7b25d160d8f0ee,
     type: 3}
   sparkDuration: 0.05
@@ -3513,10 +3513,10 @@ MonoBehaviour:
   headCamera: {fileID: 20788917190633434}
   muzzleFlash: {fileID: 1478163250820970}
   damage: 20
-  dispersion: 15
+  dispersion: 13
   projectilesPerShot: 8
   infinteAmmo: 0
-  chargerSize: 3
+  chargerSize: 4
   maximumAmmo: 24
   reloadTime: 1
   cooldownTime: 0.75
