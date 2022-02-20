@@ -361,20 +361,26 @@ namespace Maps.Genomes
 
             var corridorX = (leftX + rightX) / 2;
             // Vertical corridor from bottom room
-            areas.Add(new Area(
-                leftX,
-                middleYLeftRoom,
-                corridorX,
-                middleYLeftRoom + 1,
-                true));
+            if (leftX != corridorX)
+            {
+                areas.Add(new Area(
+                    leftX,
+                    middleYLeftRoom,
+                    corridorX,
+                    middleYLeftRoom + 1,
+                    true));
+            }
 
-            // Vertical corridor from top room
-            areas.Add(new Area(
-                corridorX,
-                middleYRightRoom,
-                rightX,
-                middleYRightRoom + 1,
-                true));
+            if (corridorX != rightX)
+            {
+                // Vertical corridor from top room
+                areas.Add(new Area(
+                    corridorX,
+                    middleYRightRoom,
+                    rightX,
+                    middleYRightRoom + 1,
+                    true));
+            }
 
             var startingY = Mathf.Min(middleYLeftRoom, middleYRightRoom);
             var endingY = Mathf.Max(middleYLeftRoom, middleYRightRoom) + 1;
