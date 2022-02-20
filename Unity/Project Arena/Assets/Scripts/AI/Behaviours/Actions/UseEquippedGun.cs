@@ -46,8 +46,15 @@ namespace AI.Behaviours.Actions
 
             // TODO Find better values
             var skill = entity.GetAimingSkill();
-            var mean = 0.4f - 0.6f * skill; // [-0.2, 0.4]
-            var stdDev = 0.3f - 0.1f * skill; // [0.2, 0.3]
+            const float stdDev = 0.2f;
+            var mean = skill switch
+            {
+                AimingSkill.Low => 0.105f,
+                AimingSkill.Medium => -0.05f,
+                AimingSkill.High => -0.33f,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
             distribution = new NormalDistribution(mean, stdDev);
             targetReflexDelay = (float) distribution.Generate();
         }
