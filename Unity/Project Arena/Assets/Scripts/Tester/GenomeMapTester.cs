@@ -20,7 +20,7 @@ namespace Tester
     /// </summary>
     public class GenomeMapTester : MonoBehaviour
     {
-        private const int GAME_LENGTH = 300;
+        private const int GAME_LENGTH = 240;
 
         private const int BOT1_ID = 1;
         private const int BOT2_ID = 2;
@@ -48,7 +48,7 @@ namespace Tester
         private void Awake()
         {
 #if !UNITY_EDITOR
-                Time.captureFramerate = 30;
+                Time.captureFramerate = 24;
                 Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
 #endif
             var args = Environment.GetCommandLineArgs();
@@ -109,7 +109,7 @@ namespace Tester
                 mapManager,
                 spawnPointManager,
                 GAME_LENGTH,
-                respawnDuration: 1.5f
+                respawnDuration: 1.0f
             );
         }
 
