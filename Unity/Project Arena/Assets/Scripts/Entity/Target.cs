@@ -168,7 +168,7 @@ namespace Entity
             return false;
         }
 
-        public override void SupplyGuns(bool[] suppliedGuns, int[] ammoAmounts)
+        public override void SupplyFromAmmoCrate(AmmoPickable ammoCrate)
         {
             throw new InvalidOperationException();
         }

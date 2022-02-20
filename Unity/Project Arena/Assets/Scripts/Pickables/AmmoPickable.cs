@@ -21,7 +21,7 @@ namespace Pickables
 
         protected override void PickUp(GameObject entity)
         {
-            entity.GetComponent<Entity.Entity>().SupplyGuns(suppliedGuns, ammoAmounts);
+            entity.GetComponent<Entity.Entity>().SupplyFromAmmoCrate(this);
         }
     }
 }

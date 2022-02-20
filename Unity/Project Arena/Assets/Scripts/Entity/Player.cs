@@ -235,9 +235,9 @@ namespace Entity
             return gunManager.CanBeSupplied(suppliedGuns);
         }
 
-        public override void SupplyGuns(bool[] suppliedGuns, int[] ammoAmounts)
+        public override void SupplyFromAmmoCrate(AmmoPickable ammoCrate)
         {
-            gunManager.SupplyGuns(suppliedGuns, ammoAmounts);
+            gunManager.SupplyGuns(ammoCrate.SuppliedGuns, ammoCrate.AmmoAmounts);
         }
 
         // Kills the player.

@@ -455,9 +455,10 @@ namespace AI
             return GunManager.CanBeSupplied(suppliedGuns);
         }
 
-        public override void SupplyGuns(bool[] suppliedGuns, int[] ammoAmounts)
+        public override void SupplyFromAmmoCrate(AmmoPickable ammoCrate)
         {
-            GunManager.SupplyGuns(suppliedGuns, ammoAmounts);
+            GunManager.SupplyGuns(ammoCrate.SuppliedGuns, ammoCrate.AmmoAmounts);
+            PickupKnowledgeBase.MarkConsumed(ammoCrate);
         }
 
         public override void SetInGame(bool b, bool isGameEnded = false)

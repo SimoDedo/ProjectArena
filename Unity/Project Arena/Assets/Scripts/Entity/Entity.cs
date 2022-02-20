@@ -54,7 +54,7 @@ namespace Entity
         public abstract bool CanBeSupplied(bool[] suppliedGuns);
 
         // Increases the ammo of the available guns.
-        public abstract void SupplyGuns(bool[] suppliedGuns, int[] ammoAmounts);
+        public abstract void SupplyFromAmmoCrate(AmmoPickable ammoCrate);
 
         // Sets if the entity is in game, i.e. if it can move, shoot, interact
         // with object and be hit.
