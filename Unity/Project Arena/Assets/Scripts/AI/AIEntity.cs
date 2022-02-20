@@ -30,7 +30,7 @@ namespace AI
         /// Ability of the bot to move tactically during a fight.
         /// </summary>
         [SerializeField] public FightingMovementSkill movementSkill;
-        
+
         /// <summary>
         /// Field of view of the bot.
         /// </summary>
@@ -91,7 +91,6 @@ namespace AI
         /// </summary>
         [SerializeField] public Recklessness recklessness;
 
-        
         /// <summary>
         /// Default characteristics of a bot. Average abilities all around.
         /// </summary>
@@ -134,8 +133,8 @@ namespace AI
         Low, // The bot only looks forward.
         Medium, // The bot looks forward and at the sides.
         High // The bot looks all around itself.
-    } 
-    
+    }
+
     /// <summary>
     /// Determines if the enemy tends to be cautious or dives head-on into battle.
     /// </summary>

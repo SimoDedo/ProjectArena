@@ -187,7 +187,6 @@ namespace AI.Behaviours.Actions
                 if (skill == FightingMovementSkill.CircleStrifeChangeDirection)
                 {
                     remainingStrafes--;
-                    Debug.Log("Remaining strifes: " + remainingStrafes);
                     if (remainingStrafes < 0)
                     {
                         remainingStrafes = Random.Range(MIN_STRAFE_LENGTH, MAX_STRAFE_LENGTH);
