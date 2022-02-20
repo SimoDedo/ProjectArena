@@ -76,7 +76,7 @@ namespace Guns
         protected Entity.Entity ownerEntityScript;
         private PlayerUIManager playerUIManagerScript;
         private float reloadStart;
-        protected int totalAmmo;
+        protected int ammoNotInCharger;
 
         // Is the gun being used?
         private bool used;
@@ -172,7 +172,7 @@ namespace Guns
                             ownerId = ownerEntityScript.GetID(),
                             gunId = gunId,
                             ammoInCharger = ammoInCharger,
-                            totalAmmo = totalAmmo
+                            totalAmmo = ammoNotInCharger
                         });
 
                     // Stop the reloading.
@@ -182,19 +182,19 @@ namespace Guns
                     {
                         ammoInCharger = chargerSize;
                     }
-                    else if (totalAmmo >= chargerSize - ammoInCharger)
+                    else if (ammoNotInCharger >= chargerSize - ammoInCharger)
                     {
-                        totalAmmo -= chargerSize - ammoInCharger;
+                        ammoNotInCharger -= chargerSize - ammoInCharger;
                         ammoInCharger = chargerSize;
                     }
                     else
                     {
-                        ammoInCharger += totalAmmo;
-                        totalAmmo = 0;
+                        ammoInCharger += ammoNotInCharger;
+                        ammoNotInCharger = 0;
                     }
 
                     // Set the ammo in the UI.
-                    if (canDisplayUI) gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
+                    if (canDisplayUI) gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : ammoNotInCharger);
                 }
             }
             else if (coolingDown)
@@ -211,9 +211,9 @@ namespace Guns
             playerUIManagerScript = puims;
 
             ammoInCharger = chargerSize;
-            totalAmmo = maximumAmmo / 2 - chargerSize;
+            ammoNotInCharger = maximumAmmo / 2 - chargerSize;
             defaultAmmoInCharger = ammoInCharger;
-            defaultTotalAmmo = totalAmmo;
+            defaultTotalAmmo = ammoNotInCharger;
 
             gunId = id;
 
@@ -221,7 +221,7 @@ namespace Guns
             if (canDisplayUI)
             {
                 gunUIManagerScript = GetComponent<GunUIManager>();
-                gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
+                gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : ammoNotInCharger);
             }
         }
 
@@ -234,16 +234,16 @@ namespace Guns
             canDisplayUI = false;
 
             ammoInCharger = chargerSize;
-            totalAmmo = maximumAmmo / 2 - chargerSize;
+            ammoNotInCharger = maximumAmmo / 2 - chargerSize;
 
             defaultAmmoInCharger = ammoInCharger;
-            defaultTotalAmmo = totalAmmo;
+            defaultTotalAmmo = ammoNotInCharger;
         }
 
         // I can reload when I have ammo left, my charger isn't full and I'm not reloading.
         public bool CanReload()
         {
-            return (totalAmmo > 0 || infinteAmmo) && ammoInCharger < chargerSize && !IsReloading;
+            return (ammoNotInCharger > 0 || infinteAmmo) && ammoInCharger < chargerSize && !IsReloading;
         }
 
         // I can shoot when I'm not reloading and I'm not in cooldown.
@@ -325,7 +325,7 @@ namespace Guns
 
             if (canDisplayUI)
             {
-                gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
+                gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : ammoNotInCharger);
                 playerUIManagerScript.SetCooldown(reloadTime);
             }
         }
@@ -347,20 +347,20 @@ namespace Guns
         // Tells if the gun has the maximum number of ammo.
         public bool IsFull()
         {
-            return totalAmmo == maximumAmmo || infinteAmmo;
+            return ammoNotInCharger == maximumAmmo || infinteAmmo;
         }
 
         // Adds ammo.
         public void AddAmmo(int amount)
         {
-            if (totalAmmo + amount < maximumAmmo)
-                totalAmmo += amount;
+            if (ammoNotInCharger + amount < maximumAmmo)
+                ammoNotInCharger += amount;
             else
-                totalAmmo = maximumAmmo;
+                ammoNotInCharger = maximumAmmo;
 
             if (gameObject.activeSelf && canDisplayUI)
             {
-                gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
+                gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : ammoNotInCharger);
                 if (used && ammoInCharger == 0 && CanReload()) Reload();
             }
         }
@@ -396,14 +396,14 @@ namespace Guns
         public void ResetAmmo()
         {
             ammoInCharger = defaultAmmoInCharger;
-            totalAmmo = defaultTotalAmmo;
+            ammoNotInCharger = defaultTotalAmmo;
 
-            if (canDisplayUI) gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
+            if (canDisplayUI) gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : ammoNotInCharger);
         }
 
         public int GetCurrentAmmo()
         {
-            return infinteAmmo ? maximumAmmo : totalAmmo;
+            return infinteAmmo ? maximumAmmo : (ammoNotInCharger + ammoInCharger);
         }
 
         public int GetMaxAmmo()

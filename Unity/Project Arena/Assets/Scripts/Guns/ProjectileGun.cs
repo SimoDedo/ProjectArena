@@ -62,11 +62,11 @@ namespace Guns
                     direction = root.eulerAngles.y,
                     ownerId = ownerEntityScript.GetID(),
                     gunID = gunId,
-                    totalAmmo = totalAmmo
+                    ammoNotInCharger = ammoNotInCharger
                 });
             }
 
-            if (canDisplayUI) gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : totalAmmo);
+            if (canDisplayUI) gunUIManagerScript.SetAmmo(ammoInCharger, infinteAmmo ? -1 : ammoNotInCharger);
 
             for (var i = 0; i < projectilesPerShot; i++)
             {

@@ -203,7 +203,7 @@ namespace AI
             var coord = NormalizeFlipCoord(info.x, info.z);
 
             var jShot = new JsonShot(Time.time - logStart, coord.x, coord.z, NormalizeFlipAngle(info.direction),
-                info.ownerId, info.gunID, info.ammoInCharger, info.totalAmmo);
+                info.ownerId, info.gunID, info.ammoInCharger, info.ammoNotInCharger);
             jGameLog.shotLogs.Add(jShot);
 
             if (shotCounts.ContainsKey(info.ownerId))

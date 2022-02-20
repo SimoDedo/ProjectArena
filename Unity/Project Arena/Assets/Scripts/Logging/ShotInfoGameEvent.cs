@@ -10,7 +10,7 @@ namespace Logging
         public int ownerId;
         public int gunID;
         public int ammoInCharger;
-        public int totalAmmo;
+        public int ammoNotInCharger;
     }
 
     public class BaseShotInfoGameEvent : GameEventBase<ShotInfo>
