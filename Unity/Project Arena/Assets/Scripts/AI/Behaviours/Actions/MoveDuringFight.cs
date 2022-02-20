@@ -52,6 +52,7 @@ namespace AI.Behaviours.Actions
                 navSystem.MoveAlongPath();
                 return TaskStatus.Running;
             }
+            navSystem.CancelPath();
 
             // We won't interfere raycasts and linecasts with our own presence
             entity.SetIgnoreRaycast(true);

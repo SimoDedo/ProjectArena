@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using AI.AI.Layer1;
 using Others;
 using UnityEngine;
@@ -102,7 +103,18 @@ namespace AI.AI.Layer2
         /// </summary>
         public void SetPath(NavMeshPath path)
         {
-            agent.SetPath(path);
+            // Check that I didn't have a path already
+
+            if (!agent.SetPath(path))
+            {
+                // Bug fix: Sometimes the agent gets stuck in a position from where it is unable to set a path.
+                // When that happens, warping helps.
+                agent.Warp(agent.transform.position);
+                if (!agent.SetPath(path))
+                {
+                    Debug.LogError("It was impossible to fix the problem!");
+                }
+            }
         }
 
         /// <summary>
