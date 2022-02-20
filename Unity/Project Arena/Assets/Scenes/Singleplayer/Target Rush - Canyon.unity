@@ -326,12 +326,27 @@ PrefabInstance:
     - target: {fileID: 114940447452184972, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
         type: 3}
       propertyPath: customObjects.Array.data[0].heightCorrection
-      value: -1.25
+      value: 1.3
       objectReference: {fileID: 0}
     - target: {fileID: 114940447452184972, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
         type: 3}
       propertyPath: customObjects.Array.data[1].heightCorrection
-      value: -1.25
+      value: 1.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114940447452184972, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
+        type: 3}
+      propertyPath: customObjects.Array.data[2].heightCorrection
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114940447452184972, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
+        type: 3}
+      propertyPath: customObjects.Array.data[3].heightCorrection
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114940447452184972, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
+        type: 3}
+      propertyPath: customObjects.Array.data[4].heightCorrection
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 114940447452184972, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
         type: 3}
@@ -471,7 +486,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4921396627691554, guid: dd9d36f2a25c2684895ad6a1351c1780, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4921396627691554, guid: dd9d36f2a25c2684895ad6a1351c1780, type: 3}
       propertyPath: m_LocalPosition.z

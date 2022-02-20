@@ -74,6 +74,8 @@ namespace Entity
             }
 
             StartCoroutine(FadeIn());
+                
+            MoveTowardsGround();
         }
 
         private IEnumerator FadeIn()
@@ -175,6 +177,14 @@ namespace Entity
 
         public override void Respawn()
         {
+            MoveTowardsGround();
+        }
+
+        private void MoveTowardsGround()
+        {
+            var position = transform.position;
+            position.y -= 2f;
+            transform.position = position;
         }
 
         public override void SetInGame(bool b, bool isGameEnded = false)
