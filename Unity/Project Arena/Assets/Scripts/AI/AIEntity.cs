@@ -440,13 +440,22 @@ namespace AI
 
         public override void HealFromMedkit(MedkitPickable medkit)
         {
-            if (mustProcessDeath) Debug.LogWarning("An entity recovered health in the same turn it died!");
-
             if (Health + medkit.RestoredHealth > totalHealth)
                 Health = totalHealth;
             else
                 Health += medkit.RestoredHealth;
 
+            if (mustProcessDeath)
+            {
+                Debug.LogWarning("An entity recovered health in the same turn it died!");
+                if (Health > 0)
+                {
+                    Debug.LogWarning("Additionally, it should no longer die");
+                    mustProcessDeath = false;
+                }
+            }
+
+            
             PickupKnowledgeBase.MarkConsumed(medkit);
         }
 
