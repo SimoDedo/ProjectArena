@@ -986,7 +986,7 @@ MonoBehaviour:
   chargerSize: 5
   maximumAmmo: 30
   reloadTime: 1
-  cooldownTime: 0.9
+  cooldownTime: 1.2
   isBlastWeapon: 0
   muzzleFlashDuration: 0.1
   recoil: 0.05
@@ -2052,7 +2052,7 @@ MonoBehaviour:
   chargerSize: 32
   maximumAmmo: 120
   reloadTime: 1
-  cooldownTime: 0.1
+  cooldownTime: 0.08
   isBlastWeapon: 0
   muzzleFlashDuration: 0.05
   recoil: 0.02
@@ -3514,7 +3514,7 @@ MonoBehaviour:
   muzzleFlash: {fileID: 1478163250820970}
   damage: 20
   dispersion: 15
-  projectilesPerShot: 10
+  projectilesPerShot: 8
   infinteAmmo: 0
   chargerSize: 3
   maximumAmmo: 24
