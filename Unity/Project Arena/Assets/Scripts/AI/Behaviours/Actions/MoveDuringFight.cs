@@ -29,7 +29,13 @@ namespace AI.Behaviours.Actions
         private bool strifeRight = Random.value < 0.5;
         private Entity.Entity target;
         private const int maxAttempts = 10;
-        
+
+        private int lineCastLayerMask;
+        public override void OnAwake()
+        {
+            lineCastLayerMask = ~LayerMask.GetMask("Ignore Raycast", "Entity", "Projectile");
+        }
+
         public override void OnStart()
         {
             entity = GetComponent<AIEntity>();
@@ -55,9 +61,9 @@ namespace AI.Behaviours.Actions
             navSystem.CancelPath();
 
             // We won't interfere raycasts and linecasts with our own presence
-            entity.SetIgnoreRaycast(true);
+            // entity.SetIgnoreRaycast(true);
             TrySelectDestination();
-            entity.SetIgnoreRaycast(false);
+            // entity.SetIgnoreRaycast(false);
             return TaskStatus.Running;
         }
 
@@ -76,8 +82,7 @@ namespace AI.Behaviours.Actions
             bool canSeeEnemyFromStartingPoint;
 
             // Check if we can see enemy from where we are
-            canSeeEnemyFromStartingPoint = !Physics.Linecast(currentPos, targetPos, out var canSeeEnemyHit) ||
-                                           canSeeEnemyHit.collider.gameObject == target.gameObject;
+            canSeeEnemyFromStartingPoint = !Physics.Linecast(currentPos, targetPos, lineCastLayerMask);
 
             // We do not care if enemy is above or below us, the move straight/strife movement should be
             // parallel to the floor.
@@ -108,8 +113,7 @@ namespace AI.Behaviours.Actions
                 newPos.x += randomDir.x;
                 newPos.z += randomDir.y;
 
-                if (!Physics.Linecast(newPos, targetPos, out var finalPosVisibility)
-                    || finalPosVisibility.collider.gameObject == target.gameObject)
+                if (!Physics.Linecast(newPos, targetPos, lineCastLayerMask))
                 {
                     // Can see enemy from here, found new position!
 
@@ -130,7 +134,9 @@ namespace AI.Behaviours.Actions
                     "Enemy is not reachable! My pos: (" + currentPos.x + " , " + currentPos.y + ", " +
                     currentPos.z + "), enemyPos (" + targetPos.x + " , " + targetPos.y + ", " + targetPos.z + ")"
                 );
-
+            
+            // TODO you should not get all the way to the enemy position.
+            // Instead, you should stop following the path as soon as you can see again the enemy.
             navSystem.SetPath(enemyPath);
         }
 
@@ -146,8 +152,7 @@ namespace AI.Behaviours.Actions
             var totalMovement = movementDirectionDueToStrife + movementDirectionDueToGun * 3f;
             var newPos = currentPos + totalMovement;
 
-            var canSeeSomething = Physics.Linecast(newPos, targetPos, out var hit, Physics.DefaultRaycastLayers);
-            if (!canSeeSomething || hit.collider.gameObject == target.gameObject)
+            if (!Physics.Linecast(newPos, targetPos, lineCastLayerMask))
             {
                 // I can see the enemy from the new position.
                 var path = navSystem.CalculatePath(newPos);
@@ -165,7 +170,7 @@ namespace AI.Behaviours.Actions
             else
             {
                 // TODO I Cannot set the enemy. I should move somewhere else. Move toward the enemy.
-                // Can be done if I clean up the code
+                // However, do not 
                 MoveToLocationWithEnemyInSight(currentPos, targetPos);
             }
         }

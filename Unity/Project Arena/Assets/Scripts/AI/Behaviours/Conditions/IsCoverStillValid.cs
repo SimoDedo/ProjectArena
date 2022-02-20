@@ -17,6 +17,12 @@ namespace AI.Behaviours.Conditions
         private AIEntity me;
         private Entity.Entity enemy;
         private Vector3 finalPos;
+        private int lineCastLayerMask;
+
+        public override void OnAwake()
+        {
+            lineCastLayerMask = ~LayerMask.GetMask("Entity", "Projectile", "Ignore Raycast");
+        }
 
         public override void OnStart()
         {
@@ -27,12 +33,8 @@ namespace AI.Behaviours.Conditions
 
         public override TaskStatus OnUpdate()
         {
-            me.SetIgnoreRaycast(true);
             var canSeeEnemyFromFinalPosition =
-                !Physics.Linecast(finalPos, enemy.transform.position, out var hit, Physics.DefaultRaycastLayers) ||
-                hit.collider.gameObject == enemy.gameObject;
-            me.SetIgnoreRaycast(false);
-
+                !Physics.Linecast(finalPos, enemy.transform.position, lineCastLayerMask);
             return canSeeEnemyFromFinalPosition ? TaskStatus.Failure : TaskStatus.Success;
         }
     }
