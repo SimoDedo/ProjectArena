@@ -31,6 +31,7 @@ namespace AI.Behaviours.Actions
         private const int maxAttempts = 10;
 
         private int lineCastLayerMask;
+        private bool isChasingEnemy;
         public override void OnAwake()
         {
             lineCastLayerMask = ~LayerMask.GetMask("Ignore Raycast", "Entity", "Projectile");
@@ -53,7 +54,7 @@ namespace AI.Behaviours.Actions
 
         public override TaskStatus OnUpdate()
         {
-            if (navSystem.HasPath() && !navSystem.HasArrivedToDestination())
+            if (navSystem.HasPath() && !navSystem.HasArrivedToDestination() && !ShouldRecomputePath())
             {
                 navSystem.MoveAlongPath();
                 return TaskStatus.Running;
@@ -65,6 +66,23 @@ namespace AI.Behaviours.Actions
             TrySelectDestination();
             // entity.SetIgnoreRaycast(false);
             return TaskStatus.Running;
+        }
+
+        private bool ShouldRecomputePath()
+        {
+            if (!isChasingEnemy)
+            {
+                // Is not chasing enemy, so we do not have anything to check
+                return false;
+            }
+
+            if (!Physics.Linecast(transform.position, target.transform.position, lineCastLayerMask))
+            {
+                // We can see the enemy, no longer need to chase
+                isChasingEnemy = false;
+                return true;
+            }
+            return false;
         }
 
         private void TrySelectDestination()
@@ -137,6 +155,8 @@ namespace AI.Behaviours.Actions
             
             // TODO you should not get all the way to the enemy position.
             // Instead, you should stop following the path as soon as you can see again the enemy.
+
+            isChasingEnemy = true;
             navSystem.SetPath(enemyPath);
         }
 
