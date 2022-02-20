@@ -82,7 +82,7 @@ namespace Guns
                 Vector3 direction;
 
                 if (dispersion != 0)
-                    direction = GetDeviatedDirection(headCamera.transform.forward, dispersion);
+                    direction = GetDeviatedDirection(headCamera.transform.forward);
                 else
                     direction = headCamera.transform.forward;
 
@@ -128,7 +128,7 @@ namespace Guns
         }
 
         // Deviates the direction randomly inside a cone with the given aperture.
-        private Vector3 GetDeviatedDirection(Vector3 direction, float deviation)
+        private Vector3 GetDeviatedDirection(Vector3 direction)
         {
             direction = headCamera.transform.eulerAngles;
             direction.x += Random.Range(-dispersion / 2, dispersion / 2);
