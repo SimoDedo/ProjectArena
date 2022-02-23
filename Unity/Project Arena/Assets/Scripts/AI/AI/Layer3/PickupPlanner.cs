@@ -27,7 +27,7 @@ namespace AI.AI.Layer3
         private const float UPDATE_COOLDOWN = 0.5f;
 
         // Two pickups are considered neighbors if they are closer than this distance. 
-        private const float MAX_DISTANCE_TO_BE_NEIGHBORS = 20f;
+        private const float MAX_DISTANCE_TO_BE_NEIGHBORS = 10f;
 
         // Bonus score given to a pickup for each neighbor it has.
         private const float BONUS_SCORE_PER_NEIGHBOR = 0.04f;
