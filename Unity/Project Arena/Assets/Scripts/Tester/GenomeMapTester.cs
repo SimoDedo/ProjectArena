@@ -95,6 +95,11 @@ namespace Tester
             var activeGunsBot2 = ReadFromFile(botsPath + bot2ParamsFilenamePrefix + "guns.json", defaultGuns);
 
             var genome = ReadFromFile(genomesPath + genomeName, GraphGenomeV2.Default);
+            if (!genome.IsGenomeValid())
+            {
+                Debug.LogError("Genome read from file is invalid!");
+                genome = GraphGenomeV2.Default;
+            }
             genomeMapGenerator.SetGenome(genome);
 
             manager = gameObject.AddComponent<GenomeTesterGameManager>();

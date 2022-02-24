@@ -93,7 +93,7 @@ namespace Maps.MapGenerator
                 ConnectClosestRooms(survivingRooms);
             }
 
-            PopulateMap();
+            PopulateMap(map);
         }
 
         // Connects each room which the closest one.

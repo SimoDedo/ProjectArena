@@ -119,11 +119,12 @@ namespace Maps.MapGenerator
         /* OBJECT GENERATION */
 
         // Erodes the map once, scans custom objects and adds them to the map using the rigth method.
-        protected void PopulateMap()
+        // We provide map as parameter to allow the various generators to exclude additional parts of the map.
+        protected void PopulateMap(char[,] validAreasMap)
         {
             if (mapObjects.Length > 0)
             {
-                var restrictedMap = map.Clone() as char[,];
+                var restrictedMap = validAreasMap.Clone() as char[,];
 
                 if (objectToWallDistance > 0) MapEdit.ErodeMap(restrictedMap, wallChar);
 

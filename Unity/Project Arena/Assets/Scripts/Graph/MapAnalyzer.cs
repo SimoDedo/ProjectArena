@@ -509,7 +509,7 @@ namespace Graph
             return Mathf.Sqrt(Mathf.Pow(x2 - x1, 2) + Mathf.Pow(y2 - y1, 2));
         }
 
-        public static void AddEverything(Area[] areas, char[,] map)
+        public static void AddEverything(Area[] areas, char[,] map, int spawnPoints, int ammoCrates, int medKits)
         {
             ClearMap(map);
             var height = map.GetLength(0);
@@ -525,16 +525,15 @@ namespace Graph
 
             var objectsPlacedPos = new List<Vector2Int>();
             const char spawnPointsChar = 's';
-            const int numSpawnPointsToPlace = 5;
             var objectTypesConsidered = new List<char> {spawnPointsChar};
 
             var spawnPointsRoomWeights = new[] {1f, 0.25f, -2f};
             var spawnPointsTileWeights = new[] {1f, 0.5f, 0.5f};
             var spawnPointsVisibilityFit = visibilityMatrix.Convert(it => 1 - it);
             var spawnPointNormDegreeFitness = ComputeNormalizedDegreeFitness(normalizedDegrees, 0.1f, 0.3f);
-            for (var i = 0; i < numSpawnPointsToPlace; i++)
+            for (var i = 0; i < spawnPoints; i++)
             {
-                var bestTile = GetBestTile(roomGraph, diameter, diagonal, spawnPointsChar, numSpawnPointsToPlace,
+                var bestTile = GetBestTile(roomGraph, diameter, diagonal, spawnPointsChar, spawnPoints,
                     objectTypesConsidered,
                     objectsPlacedPos,
                     spawnPointNormDegreeFitness, spawnPointsVisibilityFit, spawnPointsRoomWeights,
@@ -544,35 +543,33 @@ namespace Graph
             }
 
             Debug.Log("Finished placing spawn points");
-            const char medkitsChar = 'h';
-            const int numMedkitsToPlace = 2;
-            var medkitsRoomWeights = new[] {1f, 0.25f, 0f};
-            var medkitsTileWeights = new[] {1f, 0.25f, 0.5f};
-            var medkitsVisibilityFit = visibilityMatrix.Convert(it => 1 - Mathf.Abs(0.5f - it));
-            var medkitsNormDegreeFitness = ComputeNormalizedDegreeFitness(normalizedDegrees, 0.3f, 0.5f);
-            objectTypesConsidered.Add(medkitsChar);
-            for (var i = 0; i < numMedkitsToPlace; i++)
+            const char medKitsChar = 'h';
+            var medKitsRoomWeights = new[] {1f, 0.25f, 0f};
+            var medKitsTileWeights = new[] {1f, 0.25f, 0.5f};
+            var medKitsVisibilityFit = visibilityMatrix.Convert(it => 1 - Mathf.Abs(0.5f - it));
+            var medKitsNormDegreeFitness = ComputeNormalizedDegreeFitness(normalizedDegrees, 0.3f, 0.5f);
+            objectTypesConsidered.Add(medKitsChar);
+            for (var i = 0; i < medKits; i++)
             {
-                var bestTile = GetBestTile(roomGraph, diameter, diagonal, medkitsChar, numMedkitsToPlace,
+                var bestTile = GetBestTile(roomGraph, diameter, diagonal, medKitsChar, medKits,
                     objectTypesConsidered,
                     objectsPlacedPos,
-                    medkitsNormDegreeFitness, medkitsVisibilityFit, medkitsRoomWeights, medkitsTileWeights);
+                    medKitsNormDegreeFitness, medKitsVisibilityFit, medKitsRoomWeights, medKitsTileWeights);
 
-                TryAddResource(bestTile, medkitsChar, roomGraph, map, objectsPlacedPos);
+                TryAddResource(bestTile, medKitsChar, roomGraph, map, objectsPlacedPos);
             }
 
-            Debug.Log("Finished placing medkits");
+            Debug.Log("Finished placing medKits");
             const char ammoCrateChar = 'a';
-            const int numAmmoCratesToPlace = 2;
             var ammoCrateRoomWeights = new[] {1f, 0.25f, 0f};
             var ammoCrateTileWeights = new[] {1f, 0.25f, 0.5f};
             var ammoCrateNormDegreeFitness1 = ComputeNormalizedDegreeFitness(normalizedDegrees, 0.2f, 0.4f);
             var ammoCrateNormDegreeFitness2 = ComputeNormalizedDegreeFitness(normalizedDegrees, 0.8f, 0.9f);
             var ammoCratesVisibilityFit = visibilityMatrix;
             objectTypesConsidered.Add(ammoCrateChar);
-            for (var i = 0; i < numAmmoCratesToPlace / 2; i++)
+            for (var i = 0; i < ammoCrates / 2; i++)
             {
-                var bestTile = GetBestTile(roomGraph, diameter, diagonal, ammoCrateChar, numAmmoCratesToPlace,
+                var bestTile = GetBestTile(roomGraph, diameter, diagonal, ammoCrateChar, ammoCrates,
                     objectTypesConsidered,
                     objectsPlacedPos,
                     ammoCrateNormDegreeFitness1, ammoCratesVisibilityFit, ammoCrateRoomWeights, ammoCrateTileWeights);
@@ -582,9 +579,9 @@ namespace Graph
 
             Debug.Log("Finished placing ammo 1");
 
-            for (var i = numAmmoCratesToPlace / 2; i < numAmmoCratesToPlace; i++)
+            for (var i = ammoCrates / 2; i < ammoCrates; i++)
             {
-                var bestTile = GetBestTile(roomGraph, diameter, diagonal, ammoCrateChar, numAmmoCratesToPlace,
+                var bestTile = GetBestTile(roomGraph, diameter, diagonal, ammoCrateChar, ammoCrates,
                     objectTypesConsidered,
                     objectsPlacedPos,
                     ammoCrateNormDegreeFitness2, ammoCratesVisibilityFit, ammoCrateRoomWeights, ammoCrateTileWeights);
@@ -593,8 +590,6 @@ namespace Graph
             }
 
             Debug.Log("Finished placing ammo 2");
-
-            Debug.Log("Fine");
         }
 
         private static void ClearMap(char[,] map)

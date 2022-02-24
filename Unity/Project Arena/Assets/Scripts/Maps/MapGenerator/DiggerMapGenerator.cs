@@ -69,7 +69,7 @@ namespace Maps.MapGenerator
             }
             else
             {
-                PopulateMap();
+                PopulateMap(map);
             }
 
             map = MapEdit.AddBorders(map, borderSize, wallChar);

@@ -31,8 +31,14 @@ namespace Maps.MapGenerator
             map = new char[height, width];
             MapEdit.FillMap(map, wallChar);
             
-            FillMap(areas);
-            PopulateMap();
+            FillMap(areas, map);
+            
+            // Compute map excluding corridors, since we do not want to place anything there
+            var noCorridorsMap = new char[height, width];
+            MapEdit.FillMap(noCorridorsMap, wallChar);
+            FillMap(areas, noCorridorsMap, true);
+            
+            PopulateMap(noCorridorsMap);
 
             var textMap = GetMapAsText();
             SaveMapTextGameEvent.Instance.Raise(textMap);
@@ -50,14 +56,19 @@ namespace Maps.MapGenerator
                 area.isCorridor,
                 area.isDummyRoom);
         }
-        
-        private void FillMap(Area[] areas)
+
+        private void FillMap(Area[] areas, char[,] map, bool ignoreCorridors = false)
         {
             // TODO Areas are flipped vertically. Understand why
             foreach (var area in areas)
+            {
+                if (ignoreCorridors && area.isCorridor) continue;
                 for (var row = area.bottomRow; row < area.topRow; row++)
-                for (var col = area.leftColumn; col < area.rightColumn; col++)
-                    map[height - row - 1, col] = 'r';
+                {
+                    for (var col = area.leftColumn; col < area.rightColumn; col++)
+                        map[height - row - 1, col] = 'r';
+                }
+            }
         }
 
         public override string ConvertMapToAB(bool exportObjects = true)

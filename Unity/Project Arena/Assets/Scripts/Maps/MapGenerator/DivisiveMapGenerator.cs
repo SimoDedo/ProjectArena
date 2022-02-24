@@ -119,7 +119,7 @@ namespace Maps.MapGenerator
 
                 AddRandomConnections();
 
-                PopulateMap();
+                PopulateMap(map);
             }
             else
             {

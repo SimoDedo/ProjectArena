@@ -298,7 +298,7 @@ namespace Maps.MapGenerator
             }
             else
             {
-                PopulateMap();
+                PopulateMap(map);
             }
         }
 

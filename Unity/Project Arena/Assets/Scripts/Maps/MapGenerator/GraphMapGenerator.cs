@@ -196,7 +196,7 @@ namespace Maps.MapGenerator
 
             FillMap(areas);
             // ProcessMap();
-            PopulateMap();
+            PopulateMap(map);
 
             var textMap = GetMapAsText();
             SaveMapTextGameEvent.Instance.Raise(textMap);

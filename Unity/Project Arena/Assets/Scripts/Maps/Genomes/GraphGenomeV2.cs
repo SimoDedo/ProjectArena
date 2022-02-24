@@ -1,10 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Graph;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Maps.Genomes
 {
@@ -21,24 +19,35 @@ namespace Maps.Genomes
         public int cellsHeight;
         public int squareSize;
         public Room[,] rooms;
+        public bool[,] verticalCorridors;
+        public bool[,] horizontalCorridors;
 
         public GraphGenomeV2()
         {
         }
 
-        public GraphGenomeV2(int cellsWidth, int cellsHeight, int squareSize, Room[,] rooms)
+        public GraphGenomeV2(int cellsWidth, int cellsHeight, int squareSize, Room[,] rooms, bool[,] verticalCorridors,
+            bool[,] horizontalCorridors)
         {
             this.cellsHeight = cellsHeight;
             this.cellsWidth = cellsWidth;
             this.squareSize = squareSize;
             this.rooms = rooms;
+            this.verticalCorridors = verticalCorridors;
+            this.horizontalCorridors = horizontalCorridors;
         }
 
         public bool IsGenomeValid()
         {
+            if (rooms == null || verticalCorridors == null || horizontalCorridors == null)
+            {
+                // Missing genome data
+                return false;
+            }
+
             if (rooms.Length == 0)
             {
-                // Empty genome is not valid
+                // Genome must have at least one room
                 return false;
             }
 
@@ -48,10 +57,26 @@ namespace Maps.Genomes
                 return false;
             }
 
+            var numRows = rooms.GetLength(0);
+            var numColumns = rooms.GetLength(1);
+
+            if (verticalCorridors.GetLength(0) != numRows - 1 || verticalCorridors.GetLength(1) != numColumns)
+            {
+                // Invalid number of vertical corridors
+                return false;
+            }
+
+            if (horizontalCorridors.GetLength(0) != numRows || horizontalCorridors.GetLength(1) != numColumns - 1)
+            {
+                // Invalid number of horizontal corridors
+                return false;
+            }
+
+
             foreach (var room in rooms)
             {
-                if (room.startingX < 0 || room.startingY < 0 ||
-                    room.endingX > cellsWidth || room.endingY > cellsHeight)
+                if (room.leftColumn < 0 || room.bottomRow < 0 ||
+                    room.rightColumn > cellsWidth || room.topRow > cellsHeight)
                 {
                     // Genome contains invalid room.
                     return false;
@@ -115,10 +140,10 @@ namespace Maps.Genomes
                     if (!room.isReal) continue;
                     if (cellTreeNumbers[r, c] != bestTreeNumber) continue;
                     var area = new Area(
-                        c * cellsWidth + room.startingX,
-                        r * cellsHeight + room.startingY,
-                        c * cellsWidth + room.endingX,
-                        r * cellsHeight + room.endingY
+                        c * cellsWidth + room.leftColumn,
+                        r * cellsHeight + room.bottomRow,
+                        c * cellsWidth + room.rightColumn,
+                        r * cellsHeight + room.topRow
                         // TODO Dummy room flag when?
                     );
                     areas.Add(area);
@@ -195,22 +220,22 @@ namespace Maps.Genomes
             if (!rooms[r, c].isReal) return 0;
 
             var totalSize = 1;
-            if (r > 0 && rooms[r - 1, c].isConnectedToTheTop)
+            if (r > 0 && verticalCorridors[r - 1, c])
             {
                 totalSize += VisitTree(cellTreeNumber, visitNumber, r - 1, c);
             }
 
-            if (r < rooms.GetLength(0) - 1 && rooms[r, c].isConnectedToTheTop)
+            if (r < rooms.GetLength(0) - 1 && verticalCorridors[r, c])
             {
                 totalSize += VisitTree(cellTreeNumber, visitNumber, r + 1, c);
             }
 
-            if (c > 0 && rooms[r, c - 1].isConnectedToTheRight)
+            if (c > 0 && horizontalCorridors[r, c - 1])
             {
                 totalSize += VisitTree(cellTreeNumber, visitNumber, r, c - 1);
             }
 
-            if (c < rooms.GetLength(1) - 1 && rooms[r, c].isConnectedToTheRight)
+            if (c < rooms.GetLength(1) - 1 && horizontalCorridors[r, c])
             {
                 totalSize += VisitTree(cellTreeNumber, visitNumber, r, c + 1);
             }
@@ -240,15 +265,15 @@ namespace Maps.Genomes
                 return;
             }
 
-            if (!bottomRoom.isConnectedToTheTop)
+            if (!verticalCorridors[r - 1, c])
             {
                 // Rooms are not connected, nothing to do.
                 return;
             }
 
-            var spacedVertically = bottomRoom.endingY != cellsHeight || topRoom.startingY != 0;
+            var spacedVertically = bottomRoom.topRow != cellsHeight || topRoom.bottomRow != 0;
             var intersectHorizontally =
-                bottomRoom.startingX < topRoom.endingX && topRoom.startingX < bottomRoom.endingX;
+                bottomRoom.leftColumn < topRoom.rightColumn && topRoom.leftColumn < bottomRoom.rightColumn;
 
             if (!spacedVertically && intersectHorizontally)
             {
@@ -256,11 +281,11 @@ namespace Maps.Genomes
                 return;
             }
 
-            var topY = r * cellsHeight + topRoom.startingY;
-            var bottomY = (r - 1) * cellsHeight + bottomRoom.endingY;
+            var topY = r * cellsHeight + topRoom.bottomRow;
+            var bottomY = (r - 1) * cellsHeight + bottomRoom.topRow;
 
-            var maxOfMinX = Mathf.Max(bottomRoom.startingX, topRoom.startingX);
-            var minOfMaxX = Mathf.Min(bottomRoom.endingX, topRoom.endingX);
+            var maxOfMinX = Mathf.Max(bottomRoom.leftColumn, topRoom.leftColumn);
+            var minOfMaxX = Mathf.Min(bottomRoom.rightColumn, topRoom.rightColumn);
 
             if (maxOfMinX < minOfMaxX)
             {
@@ -279,8 +304,8 @@ namespace Maps.Genomes
             // We cannot place a straight corridor. Place an twisted one.
 
             // Find X1 and X2 of the corridor.
-            var middleXTopRoom = c * cellsWidth + (topRoom.startingX + topRoom.endingX) / 2;
-            var middleXBottomRoom = c * cellsWidth + (bottomRoom.startingX + bottomRoom.endingX) / 2;
+            var middleXTopRoom = c * cellsWidth + (topRoom.leftColumn + topRoom.rightColumn) / 2;
+            var middleXBottomRoom = c * cellsWidth + (bottomRoom.leftColumn + bottomRoom.rightColumn) / 2;
 
             // var corridorY = Random.Range(bottomY, topY);
             var corridorY = (bottomY + topY) / 2;
@@ -319,15 +344,15 @@ namespace Maps.Genomes
                 return;
             }
 
-            if (!leftRoom.isConnectedToTheRight)
+            if (!horizontalCorridors[r, c - 1])
             {
                 // Rooms are not connected, nothing to do.
                 return;
             }
 
-            var spacedHorizontally = leftRoom.endingX != cellsWidth || rightRoom.startingX != 0;
+            var spacedHorizontally = leftRoom.rightColumn != cellsWidth || rightRoom.leftColumn != 0;
             var intersectVertically =
-                leftRoom.startingY < rightRoom.endingY && rightRoom.startingY < leftRoom.endingY;
+                leftRoom.bottomRow < rightRoom.topRow && rightRoom.bottomRow < leftRoom.topRow;
 
             if (!spacedHorizontally && intersectVertically)
             {
@@ -335,11 +360,11 @@ namespace Maps.Genomes
                 return;
             }
 
-            var rightX = c * cellsWidth + rightRoom.startingX;
-            var leftX = (c - 1) * cellsWidth + leftRoom.endingX;
+            var rightX = c * cellsWidth + rightRoom.leftColumn;
+            var leftX = (c - 1) * cellsWidth + leftRoom.rightColumn;
 
-            var maxOfMinY = Mathf.Max(leftRoom.startingY, rightRoom.startingY);
-            var minOfMaxY = Mathf.Min(leftRoom.endingY, rightRoom.endingY);
+            var maxOfMinY = Mathf.Max(leftRoom.bottomRow, rightRoom.bottomRow);
+            var minOfMaxY = Mathf.Min(leftRoom.topRow, rightRoom.topRow);
 
             if (maxOfMinY < minOfMaxY)
             {
@@ -356,8 +381,8 @@ namespace Maps.Genomes
 
             // We cannot place a straight corridor. Place an twisted one.
             // Find Y1 and Y2 of the corridor.
-            var middleYRightRoom = r * cellsHeight + (rightRoom.startingY + rightRoom.endingY) / 2;
-            var middleYLeftRoom = r * cellsHeight + (leftRoom.startingY + leftRoom.endingY) / 2;
+            var middleYRightRoom = r * cellsHeight + (rightRoom.bottomRow + rightRoom.topRow) / 2;
+            var middleYLeftRoom = r * cellsHeight + (leftRoom.bottomRow + leftRoom.topRow) / 2;
 
             var corridorX = (leftX + rightX) / 2;
             // Vertical corridor from bottom room
@@ -403,7 +428,7 @@ namespace Maps.Genomes
                 return;
             }
 
-            var spacedVertically = bottomRoom.endingY != cellsHeight || topRoom.startingY != 0;
+            var spacedVertically = bottomRoom.topRow != cellsHeight || topRoom.bottomRow != 0;
             if (spacedVertically)
             {
                 // There is space for a corridor or to keep the rooms separated.
@@ -411,15 +436,15 @@ namespace Maps.Genomes
             }
 
             var intersectHorizontally = // TODO Check
-                bottomRoom.startingX < topRoom.endingX && topRoom.startingX < bottomRoom.endingX;
+                bottomRoom.leftColumn < topRoom.rightColumn && topRoom.leftColumn < bottomRoom.rightColumn;
 
-            if (bottomRoom.isConnectedToTheTop && intersectHorizontally)
+            if (verticalCorridors[r - 1, c] && intersectHorizontally)
             {
                 // The rooms touch each other, so there is no need to make space for a corridor.
                 return;
             }
 
-            if (!bottomRoom.isConnectedToTheTop && !intersectHorizontally)
+            if (!verticalCorridors[r - 1, c] && !intersectHorizontally)
             {
                 // The rooms are separated and do not need a corridor.
                 return;
@@ -429,12 +454,10 @@ namespace Maps.Genomes
             // We need space, either to separate the two rooms or to fit a corridor in the middle.
             var oldRoom = bottomRoom;
             rooms[r - 1, c] = new Room(
-                oldRoom.startingX,
-                oldRoom.endingX,
-                Mathf.Max(0, oldRoom.startingY - 1),
-                oldRoom.endingY - 1,
-                oldRoom.isConnectedToTheRight,
-                oldRoom.isConnectedToTheTop
+                oldRoom.leftColumn,
+                oldRoom.rightColumn,
+                Mathf.Max(0, oldRoom.bottomRow - 1),
+                oldRoom.topRow - 1
             );
         }
 
@@ -448,7 +471,7 @@ namespace Maps.Genomes
                 return;
             }
 
-            var spacedHorizontally = leftRoom.endingX != cellsWidth || rightRoom.startingX != 0;
+            var spacedHorizontally = leftRoom.rightColumn != cellsWidth || rightRoom.leftColumn != 0;
             if (spacedHorizontally)
             {
                 // There is space for a corridor or to keep the rooms separated.
@@ -456,15 +479,15 @@ namespace Maps.Genomes
             }
 
             var intersectVertically = // TODO Check
-                leftRoom.startingY < rightRoom.endingY && rightRoom.startingY < leftRoom.endingY;
+                leftRoom.bottomRow < rightRoom.topRow && rightRoom.bottomRow < leftRoom.topRow;
 
-            if (leftRoom.isConnectedToTheRight && intersectVertically)
+            if (horizontalCorridors[r, c - 1] && intersectVertically)
             {
                 // The rooms touch each other, so there is no need to make space for a corridor.
                 return;
             }
 
-            if (!leftRoom.isConnectedToTheRight && !intersectVertically)
+            if (!horizontalCorridors[r, c - 1] && !intersectVertically)
             {
                 // The rooms are separated and do not need a corridor.
                 return;
@@ -474,12 +497,10 @@ namespace Maps.Genomes
             // We need space, either to separate the two rooms or to fit a corridor in the middle.
             var oldRoom = leftRoom;
             rooms[r, c - 1] = new Room(
-                Mathf.Max(0, oldRoom.startingX - 1),
-                oldRoom.endingX - 1,
-                oldRoom.startingY,
-                oldRoom.endingY,
-                oldRoom.isConnectedToTheRight,
-                oldRoom.isConnectedToTheTop
+                Mathf.Max(0, oldRoom.leftColumn - 1),
+                oldRoom.rightColumn - 1,
+                oldRoom.bottomRow,
+                oldRoom.topRow
             );
         }
 
@@ -487,14 +508,15 @@ namespace Maps.Genomes
             10, 10, 3, new[,]
             {
                 {
-                    new Room(0, 10, 0, 10, true, false),
-                    new Room(7, 9, 2, 4, false, true),
+                    new Room(0, 10, 0, 10),
+                    new Room(7, 9, 2, 4)
                 },
                 {
-                    new Room(0, 10, 0, 10, true, false),
-                    new Room(3, 5, 6, 9, false, false),
+                    new Room(0, 10, 0, 10),
+                    new Room(3, 5, 6, 9)
                 }
-            }
+            }, new[,] {{false, true}},
+            new[,] {{true}, {true}}
         );
     }
 
@@ -515,34 +537,23 @@ namespace Maps.Genomes
         // If false, this instance is just used to fill the array but otherwise there is no room in that space.
         // In that situation, every variable has value 0.
         public bool isReal;
-        public int startingX;
-        public int endingX;
-        public int startingY;
-        public int endingY;
-        public bool isConnectedToTheRight;
-        public bool isConnectedToTheTop;
+        public int leftColumn;
+        public int rightColumn;
+        public int bottomRow;
+        public int topRow;
 
         public Room()
         {
-            
         }
 
-    // public Room(int startingX, int endingX, int startingY, int endingY, bool isConnectedToTheRight,
-    //         bool isConnectedToTheTop) : this(true, startingX, endingX, startingY, endingY, isConnectedToTheRight,
-    //         isConnectedToTheTop)
-    //     {
-    //     }
 
-        public Room(int startingX, int endingX, int startingY, int endingY, bool isConnectedToTheRight,
-            bool isConnectedToTheTop)
+        public Room(int leftColumn, int rightColumn, int bottomRow, int topRow)
         {
             isReal = true;
-            this.startingX = startingX;
-            this.endingX = endingX;
-            this.startingY = startingY;
-            this.endingY = endingY;
-            this.isConnectedToTheRight = isConnectedToTheRight;
-            this.isConnectedToTheTop = isConnectedToTheTop;
+            this.leftColumn = leftColumn;
+            this.rightColumn = rightColumn;
+            this.bottomRow = bottomRow;
+            this.topRow = topRow;
         }
     }
 }
