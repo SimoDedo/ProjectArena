@@ -20,7 +20,7 @@ namespace Tester
     /// </summary>
     public class GenomeMapTester : MonoBehaviour
     {
-        private const int GAME_LENGTH = 240;
+        private const int DEFAULT_GAME_LENGTH = 240;
 
         private const int BOT1_ID = 1;
         private const int BOT2_ID = 2;
@@ -45,6 +45,8 @@ namespace Tester
         private GenomeTesterGameManager manager;
         private string genomesPath;
 
+        private int gameLength = DEFAULT_GAME_LENGTH;
+        
         private void Awake()
         {
 #if !UNITY_EDITOR
@@ -59,6 +61,7 @@ namespace Tester
                 if (arg.StartsWith("-numExperiments=")) numExperiments = int.Parse(arg.Substring(16));
                 if (arg.StartsWith("-experimentName=")) experimentName = arg.Substring(16);
                 if (arg.StartsWith("-genomeName=")) genomeName = arg.Substring(12);
+                if (arg.StartsWith("-gameLength=")) gameLength = int.Parse(arg.Substring(12));
             }
 
             importPath = Application.persistentDataPath + "/Import/";
@@ -113,7 +116,7 @@ namespace Tester
                 activeGunsBot2,
                 mapManager,
                 spawnPointManager,
-                GAME_LENGTH,
+                gameLength,
                 respawnDuration: 1.0f
             );
         }
@@ -126,7 +129,7 @@ namespace Tester
             Destroy(manager);
 
             // TODO provide correct length 
-            results.Add(analyzer.CompileResults(GAME_LENGTH));
+            results.Add(analyzer.CompileResults(DEFAULT_GAME_LENGTH));
 
             experimentNumber++;
 
@@ -147,9 +150,7 @@ namespace Tester
         private static void ExportResults(string compileResults, string experimentName)
         {
             var exportPath = Application.persistentDataPath + "/Export/" + experimentName;
-            if (!Directory.Exists(exportPath)) Directory.CreateDirectory(exportPath);
-
-            var filePath = exportPath + "/" + "result.json";
+            var filePath = exportPath + "." + "json";
             try
             {
                 using var writer = new StreamWriter(filePath);
