@@ -164,7 +164,7 @@ namespace Tester
 
         private IEnumerator WaitAndStart()
         {
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.2f);
             StartNewExperiment();
         }
 
@@ -180,7 +180,7 @@ namespace Tester
                 using var reader = new StreamReader(filePath);
                 return JsonConvert.DeserializeObject<T>(reader.ReadToEnd());
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 try
                 {
