@@ -219,6 +219,7 @@ namespace AI
         public DamageSensor DamageSensor { get; private set; }
 
         public MovementController MovementController { get; private set; }
+
         public SightSensor SightSensor { get; private set; }
 
         public SightController SightController { get; private set; }
@@ -232,6 +233,8 @@ namespace AI
         public GunManager GunManager { get; private set; }
 
         public MapKnowledge MapKnowledge { get; private set; }
+
+        public MapWanderPlanner MapWanderPlanner { get; private set; }
 
         public bool IsFocusingOnEnemy { get; set; }
 
@@ -269,7 +272,7 @@ namespace AI
                     TargetPlanner.Update();
                 }
                 
-                if (MapKnowledge.CanBeUsed) MapKnowledge.Update();
+                MapKnowledge.Update();
                 PickupKnowledgeBase.Update();
                 // Important: Pickup planner must be updated after pickup knowledge base
                 PickupPlanner.Update();
@@ -337,6 +340,7 @@ namespace AI
                 new SightController(this, head, botParams.maxCameraSpeed, botParams.maxCameraAcceleration);
             SightSensor = new SightSensor(head, botParams.maxRange, botParams.fov);
             MapKnowledge = new MapKnowledge(this, gms);
+            MapWanderPlanner = new MapWanderPlanner(this);
             TargetKb = new TargetKnowledgeBase(
                 this,
                 enemy,
@@ -363,6 +367,7 @@ namespace AI
             PickupKnowledgeBase.Prepare();
             MovementController.Prepare();
             PickupPlanner.Prepare();
+            MapWanderPlanner.Prepare();
         }
 
         public override void SetupEntity(int th, bool[] ag, GameManager gms, int id)

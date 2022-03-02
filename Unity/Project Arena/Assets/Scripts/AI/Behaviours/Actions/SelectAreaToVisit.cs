@@ -1,5 +1,6 @@
 using System;
 using AI.AI.Layer2;
+using AI.AI.Layer3;
 using AI.Behaviours.Variables;
 using BehaviorDesigner.Runtime.Tasks;
 using Others;
@@ -15,19 +16,19 @@ namespace AI.Behaviours.Actions
     public class SelectAreaToVisit : Action
     {
         [SerializeField] private SharedSelectedPathInfo pathChosen;
-        private MapKnowledge mapKnowledge;
+        private MapWanderPlanner wanderPlanner;
         private NavigationSystem navSystem;
 
         public override void OnAwake()
         {
             var entity = GetComponent<AIEntity>();
-            mapKnowledge = entity.MapKnowledge;
+            wanderPlanner = entity.MapWanderPlanner;
             navSystem = entity.NavigationSystem;
         }
 
         public override TaskStatus OnUpdate()
         {
-            var destination = mapKnowledge.GetRecommendedDestination();
+            var destination = wanderPlanner.GetRecommendedDestination();
             var path = navSystem.CalculatePath(destination);
             if (!path.IsComplete()) return TaskStatus.Running;
             pathChosen.Value = path;

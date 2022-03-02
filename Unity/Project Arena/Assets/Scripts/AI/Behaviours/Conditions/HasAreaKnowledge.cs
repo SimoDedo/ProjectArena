@@ -1,5 +1,6 @@
 using System;
 using AI.AI.Layer2;
+using AI.AI.Layer3;
 using BehaviorDesigner.Runtime.Tasks;
 
 namespace AI.Behaviours.Conditions
@@ -10,16 +11,16 @@ namespace AI.Behaviours.Conditions
     [Serializable]
     public class HasAreaKnowledge : Conditional
     {
-        private MapKnowledge knowledge;
+        private MapWanderPlanner wanderPlanner;
 
         public override void OnAwake()
         {
-            knowledge = GetComponent<AIEntity>().MapKnowledge;
+            wanderPlanner = GetComponent<AIEntity>().MapWanderPlanner;
         }
 
         public override TaskStatus OnUpdate()
         {
-            return knowledge.CanBeUsed ? TaskStatus.Success : TaskStatus.Failure;
+            return wanderPlanner.CanBeUsed ? TaskStatus.Success : TaskStatus.Failure;
         }
     }
 }
