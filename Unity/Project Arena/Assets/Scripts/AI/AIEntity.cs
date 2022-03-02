@@ -214,6 +214,8 @@ namespace AI
 
         public TargetKnowledgeBase TargetKb { get; private set; }
 
+        public TargetPlanner TargetPlanner { get; private set; }
+
         public DamageSensor DamageSensor { get; private set; }
 
         public MovementController MovementController { get; private set; }
@@ -262,7 +264,11 @@ namespace AI
                     //   position occupied, I will shoot at that point as soon as the enemy respawns 
                     TargetKb.Reset();
                 else
+                {
                     TargetKb.Update();
+                    TargetPlanner.Update();
+                }
+                
                 if (MapKnowledge.CanBeUsed) MapKnowledge.Update();
                 PickupKnowledgeBase.Update();
                 // Important: Pickup planner must be updated after pickup knowledge base
@@ -282,7 +288,7 @@ namespace AI
                     if (enemy.IsAlive)
                     {
                         totalTimeToSurrender +=
-                            Time.time - Mathf.Max(startFightEventTime, TargetKb.LastTimeDetected);
+                            Time.time - Mathf.Max(startFightEventTime, TargetPlanner.LastTimeDetected);
                         numberOfRetreats++;
                     }
                 }
@@ -292,20 +298,20 @@ namespace AI
                     startFightEventTime = Time.time;
 
                     // First detection status of this fight!
-                    enemyInSightPreviously = TargetKb.HasSeenTarget();
-                    previousDetectionTime = TargetKb.LastTimeDetected;
+                    enemyInSightPreviously = TargetPlanner.HasSeenTarget();
+                    previousDetectionTime = TargetPlanner.LastTimeDetected;
                 }
             }
             else if (IsFocusingOnEnemy)
             {
                 // We are in a fight event, so keep track of everything needed
-                var isEnemyInSightNow = TargetKb.HasSeenTarget();
+                var isEnemyInSightNow = TargetPlanner.HasSeenTarget();
                 if (isEnemyInSightNow && !enemyInSightPreviously)
                     // Update time between sights, but only if enemy was lost in this event
                     if (startFightEventTime <= previousDetectionTime)
                         totalTimeBetweenSights += Time.time - previousDetectionTime;
 
-                previousDetectionTime = TargetKb.LastTimeDetected;
+                previousDetectionTime = TargetPlanner.LastTimeDetected;
                 enemyInSightPreviously = isEnemyInSightNow;
             }
         }
@@ -334,7 +340,11 @@ namespace AI
             TargetKb = new TargetKnowledgeBase(
                 this,
                 enemy,
-                botParams.memoryWindow,
+                botParams.memoryWindow
+            );
+            TargetPlanner = new TargetPlanner(
+                this,
+                enemy,
                 botParams.detectionWindow,
                 botParams.timeBeforeCanReact
             );
@@ -349,6 +359,7 @@ namespace AI
             NavigationSystem.Prepare();
             GunManager.Prepare(gms, this, null, ag);
             TargetKb.Prepare();
+            TargetPlanner.Prepare();
             PickupKnowledgeBase.Prepare();
             MovementController.Prepare();
             PickupPlanner.Prepare();

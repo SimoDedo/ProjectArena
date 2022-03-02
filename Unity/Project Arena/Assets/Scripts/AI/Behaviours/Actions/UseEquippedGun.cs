@@ -2,6 +2,7 @@ using System;
 using Accord.Statistics.Distributions.Univariate;
 using AI.AI.Layer1;
 using AI.AI.Layer2;
+using AI.AI.Layer3;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
 using Entity;
@@ -32,14 +33,14 @@ namespace AI.Behaviours.Actions
         private float nextDelayRecalculation = float.MinValue;
         private float previousReflexDelay;
         private SightController sightController;
-        private TargetKnowledgeBase targetKb;
+        private TargetPlanner targetPlanner;
         private float targetReflexDelay;
 
         public override void OnAwake()
         {
             entity = GetComponent<AIEntity>();
             gunManager = entity.GunManager;
-            targetKb = entity.TargetKb;
+            targetPlanner = entity.TargetPlanner;
             sightController = entity.SightController;
             enemy = entity.GetEnemy();
             enemyPositionTracker = enemy.GetComponent<PositionTracker>();
@@ -61,7 +62,7 @@ namespace AI.Behaviours.Actions
 
         public override TaskStatus OnUpdate()
         {
-            var lastSightedTime = targetKb.LastTimeDetected;
+            var lastSightedTime = targetPlanner.LastTimeDetected;
             if (lastSightedTime != Time.time && isGoingForCover.Value && !gunManager.IsCurrentGunReloading())
                 //We cannot see the enemy and we were looking for cover, reload now!
                 gunManager.ReloadCurrentGun();

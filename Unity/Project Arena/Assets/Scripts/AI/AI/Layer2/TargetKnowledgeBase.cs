@@ -24,17 +24,26 @@ namespace AI.AI.Layer2
     // TODO maybe separate responsibility of enemy knowledge vs extraction of info (e.g. can react to enemy).
     public class TargetKnowledgeBase
     {
-        private static readonly AnimationCurve DistanceScore = new AnimationCurve(
-            new Keyframe(0f, 5f),
-            new Keyframe(10f, 3f),
-            new Keyframe(30f, 1.5f),
-            new Keyframe(50f, 1f)
-        );
+        public readonly struct EnemyInfo
+        {
+            public readonly bool isVisible;
+            public readonly float distance;
+            public readonly float startTime;
+            public readonly float endTime;
 
-        /// <summary>
-        /// Length of the detection window (in seconds).
-        /// </summary>
-        private readonly float detectionWindowLenght;
+            public EnemyInfo(bool isVisible, float distance, float startTime, float endTime)
+            {
+                this.isVisible = isVisible;
+                this.distance = distance;
+                this.startTime = startTime;
+                this.endTime = endTime;
+            }
+
+            public EnemyInfo CreateWithAdjustedStartTime(float newStartTime)
+            {
+                return new EnemyInfo(isVisible, distance, newStartTime, endTime);
+            }
+        }
 
         // The entity this component belongs to.
         private readonly AIEntity me;
@@ -42,12 +51,8 @@ namespace AI.AI.Layer2
         // Lenght of the memory window (in seconds).
         private readonly float memoryWindowLength;
 
-        // Total time (in the detection window) that the enemy must be seen in the detection interval before declaring
-        // tha we can detect it.
-        private readonly float nonConsecutiveTimeBeforeReaction;
-
         // List of visibility data gathered so far, excluding data older than memoryWindow
-        private readonly List<VisibilityInInterval> results = new List<VisibilityInInterval>();
+        private readonly List<EnemyInfo> results = new List<EnemyInfo>();
 
         // The target that must be spotted
         private readonly Entity.Entity target;
@@ -58,24 +63,15 @@ namespace AI.AI.Layer2
         public TargetKnowledgeBase(
             AIEntity me,
             Entity.Entity target,
-            float memoryWindowLength,
-            float detectionWindowLenght,
-            float nonConsecutiveTimeBeforeReaction
+            float memoryWindowLength
         )
         {
             this.target = target;
             this.memoryWindowLength = memoryWindowLength;
-            this.detectionWindowLenght = detectionWindowLenght;
-            this.nonConsecutiveTimeBeforeReaction = nonConsecutiveTimeBeforeReaction;
             this.me = me;
         }
-
-        /// <summary>
-        /// Stores the last time the enemy was considered detected.
-        /// </summary>
-        public float LastTimeDetected { get; private set; } = float.MinValue;
-
-        // Finishes preparing the componet.
+        
+        // Finishes preparing the component.
         public void Prepare()
         {
             sensor = me.SightSensor;
@@ -88,30 +84,12 @@ namespace AI.AI.Layer2
         {
             var targetTransform = target.transform;
             // TODO Understand if this can be removed to avoid magically knowing enemy position when sneaking behind
-            var isTargetClose = target.IsAlive && (targetTransform.position - me.transform.position).sqrMagnitude < 10;
+            var targetDistance = (targetTransform.position - me.transform.position).magnitude;
+            var isTargetClose = target.IsAlive && targetDistance < 10;
             var result = isTargetClose || sensor.CanSeeObject(targetTransform);
 
-            var score = 0f;
-            if (result)
-            {
-                score = DistanceScore.Evaluate((me.transform.position - targetTransform.position).magnitude);
-                results.Add(new VisibilityInInterval
-                    {visibilityScore = score, startTime = Time.time - Time.deltaTime, endTime = Time.time});
-            }
-            else
-            {
-                VisibilityInInterval last;
-                if (results.Count != 0 && (last = results.Last()).visibilityScore == 0)
-                    last.endTime = Time.time;
-                else
-                    results.Add(new VisibilityInInterval
-                        {visibilityScore = score, startTime = Time.time - Time.deltaTime, endTime = Time.time});
-            }
-
-
+            results.Add(new EnemyInfo(result, targetDistance,  Time.time - Time.deltaTime, Time.time));
             ForgetOldData();
-
-            if (HasSeenTarget()) LastTimeDetected = Time.time;
         }
 
         /// <summary>
@@ -120,28 +98,6 @@ namespace AI.AI.Layer2
         public void Reset()
         {
             results.Clear();
-            LastTimeDetected = float.MinValue;
-        }
-
-        /// <summary>
-        /// Returns whether we consider the target as detected.
-        /// </summary>
-        public bool HasSeenTarget()
-        {
-            if (!target.IsAlive)
-                // If the enemy is not alive, immediately stop considering it as detected.
-                return false;
-            return TestDetection(Time.time - detectionWindowLenght, Time.time);
-        }
-
-
-        /// <summary>
-        /// Returns whether we consider the target as lost.
-        /// </summary>
-        public bool HasLostTarget()
-        {
-            if (!target.IsAlive) return false;
-            return !HasSeenTarget() && TestDetection(Time.time - memoryWindowLength, Time.time - detectionWindowLenght);
         }
 
         // Forgets data which doesn't fit the memory window.
@@ -158,39 +114,12 @@ namespace AI.AI.Layer2
 
             results.RemoveRange(0, firstIndexToKeep);
             var first = results.First();
-            first.startTime = Mathf.Max(first.startTime, Time.time - memoryWindowLength);
+            results[0] = first.CreateWithAdjustedStartTime(Mathf.Max(first.startTime, Time.time - memoryWindowLength));
         }
 
-
-        // Tests detection in the interval specified.
-        private bool TestDetection(float beginTime, float endTime)
+        public List<EnemyInfo> GetEnemyInfo()
         {
-            var totalTimeVisible = 0f;
-
-            for (var i = results.Count - 1; i >= 0; i--)
-            {
-                var t = results[i];
-                if (t.endTime < beginTime) continue;
-                if (t.startTime > endTime) continue;
-
-                var windowLenght = Math.Min(t.endTime, endTime) -
-                                   Math.Max(t.startTime, beginTime);
-
-                totalTimeVisible += windowLenght * t.visibilityScore;
-                if (totalTimeVisible > nonConsecutiveTimeBeforeReaction) return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Represents whether the target was visible during the interval specified.
-        /// </summary>
-        private class VisibilityInInterval
-        {
-            public float endTime; // Exclusive
-            public float startTime; // Inclusive
-            public float visibilityScore;
+            return results;
         }
     }
 }

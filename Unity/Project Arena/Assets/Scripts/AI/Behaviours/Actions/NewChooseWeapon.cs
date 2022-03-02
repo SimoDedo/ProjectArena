@@ -1,6 +1,7 @@
 using System;
 using AI.AI.Layer1;
 using AI.AI.Layer2;
+using AI.AI.Layer3;
 using BehaviorDesigner.Runtime.Tasks;
 using Entity.Component;
 using UnityEngine;
@@ -18,14 +19,14 @@ namespace AI.Behaviours.Actions
         private AIEntity entity;
         private GunManager gunManager;
         private SightController sightController;
-        private TargetKnowledgeBase targetKb;
+        private TargetPlanner targetPlanner;
 
         public override void OnAwake()
         {
             entity = gameObject.GetComponent<AIEntity>();
             enemy = entity.GetEnemy();
             sightController = entity.SightController;
-            targetKb = entity.TargetKb;
+            targetPlanner = entity.TargetPlanner;
             gunManager = entity.GunManager;
         }
 
@@ -37,7 +38,7 @@ namespace AI.Behaviours.Actions
 
             // Choose blast weapon if we cannot see the enemy right now
             // ReSharper disable once CompareOfFloatsByEqualityOperator
-            var mustChooseBlastWeapon = targetKb.LastTimeDetected != Time.time;
+            var mustChooseBlastWeapon = targetPlanner.LastTimeDetected != Time.time;
 
             var selectedGun = -1;
             var bestGunScore = 0f;

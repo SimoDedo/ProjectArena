@@ -1,5 +1,6 @@
 using AI.AI.Layer1;
 using AI.AI.Layer2;
+using AI.AI.Layer3;
 using BehaviorDesigner.Runtime;
 using UnityEngine;
 
@@ -17,13 +18,13 @@ namespace AI.GoalMachine.Goal
         private readonly DamageSensor damageSensor;
         private readonly AIEntity entity;
         private readonly ExternalBehaviorTree externalBt;
-        private readonly TargetKnowledgeBase targetKb;
+        private readonly TargetPlanner targetPlanner;
         private float startSearchTime = NO_TIME;
 
         public SearchEnemy(AIEntity entity)
         {
             this.entity = entity;
-            targetKb = entity.TargetKb;
+            targetPlanner = entity.TargetPlanner;
             damageSensor = entity.DamageSensor;
             externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/SearchEnemy");
             behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
@@ -34,8 +35,8 @@ namespace AI.GoalMachine.Goal
 
         public float GetScore()
         {
-            var searchDueToLoss = targetKb.HasLostTarget();
-            var searchDueToDamage = !targetKb.HasSeenTarget() && damageSensor.WasDamagedRecently;
+            var searchDueToLoss = targetPlanner.HasLostTarget();
+            var searchDueToDamage = !targetPlanner.HasSeenTarget() && damageSensor.WasDamagedRecently;
             if (entity.GetEnemy().IsAlive && (searchDueToLoss || searchDueToDamage))
             {
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
