@@ -180,7 +180,7 @@ namespace Tester
                 using var reader = new StreamReader(filePath);
                 return JsonConvert.DeserializeObject<T>(reader.ReadToEnd());
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 try
                 {
