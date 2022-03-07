@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Accord.Math;
 using UnityEngine;
 
 namespace Graph
@@ -922,4 +921,31 @@ namespace Graph
             this.isDummyRoom = isDummyRoom;
         }
     }
+
+    static class MatrixUtils
+    {
+        /// <summary>
+        ///   Converts the values of a matrix using the given converter expression.
+        /// </summary>
+        /// <typeparam name="TInput">The type of the input.</typeparam>
+        /// <typeparam name="TOutput">The type of the output.</typeparam>
+        /// <param name="matrix">The vector to be converted.</param>
+        /// <param name="converter">The converter function.</param>
+        public static TOutput[,] Convert<TInput, TOutput>(
+            this TInput[,] matrix,
+            Converter<TInput, TOutput> converter)
+        {
+            var length1 = matrix.GetLength(0);
+            var length2 = matrix.GetLength(1);
+            var outputArray = new TOutput[length1, length2];
+            for (var index1 = 0; index1 < length1; ++index1)
+            {
+                for (var index2 = 0; index2 < length2; ++index2)
+                    outputArray[index1, index2] = converter(matrix[index1, index2]);
+            }
+
+            return outputArray;
+        }
+    }
+
 }
