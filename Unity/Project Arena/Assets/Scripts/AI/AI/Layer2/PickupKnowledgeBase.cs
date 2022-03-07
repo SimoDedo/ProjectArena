@@ -11,6 +11,7 @@ namespace AI.AI.Layer2
     /// </summary>
     public class PickupKnowledgeBase
     {
+        // TODO is questionable if this should be here or in the pickup planner
         private readonly Dictionary<Pickable, float> estimatedActivationTime = new Dictionary<Pickable, float>();
         private readonly AIEntity me;
         private SightSensor sightSensor;
