@@ -64,7 +64,7 @@ namespace Tester
                 if (arg.StartsWith("-gameLength=")) gameLength = int.Parse(arg.Substring(12));
             }
 
-            importPath = Application.persistentDataPath + "/Import/";
+            importPath = Directory.GetCurrentDirectory() + "/Import/";
             genomesPath = importPath + "Genomes/";
             botsPath = importPath + "Bots/";
 
@@ -149,7 +149,7 @@ namespace Tester
 
         private static void ExportResults(string compileResults, string experimentName)
         {
-            var exportPath = Application.persistentDataPath + "/Export/" + experimentName;
+            var exportPath = Directory.GetCurrentDirectory() + "/Export/" + experimentName;
             var filePath = exportPath + "." + "json";
             try
             {
