@@ -1,5 +1,5 @@
 using System;
-using AI.AI.Layer2;
+using AI.Layers.KnowledgeBase;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
 using Others;

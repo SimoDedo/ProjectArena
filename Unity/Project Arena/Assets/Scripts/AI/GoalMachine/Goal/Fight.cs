@@ -1,6 +1,5 @@
 using System;
-using AI.AI.Layer2;
-using AI.AI.Layer3;
+using AI.Layers.KnowledgeBase;
 using BehaviorDesigner.Runtime;
 using Entity.Component;
 using UnityEngine;
@@ -18,13 +17,13 @@ namespace AI.GoalMachine.Goal
         private readonly AIEntity entity;
         private readonly ExternalBehaviorTree externalBt;
         private readonly GunManager gunManager;
-        private readonly TargetPlanner targetPlanner;
+        private readonly TargetKnowledgeBase _targetKnowledgeBase;
         private readonly float scoreMultiplier = 1.0f;
 
         public Fight(AIEntity entity)
         {
             this.entity = entity;
-            targetPlanner = entity.TargetPlanner;
+            _targetKnowledgeBase = entity.TargetKnowledgeBase;
             var recklessness = entity.Recklessness;
             switch (recklessness)
             {
@@ -51,7 +50,7 @@ namespace AI.GoalMachine.Goal
         {
             if (!gunManager.HasAmmo()) return 0;
             // TODO maybe we see enemy, but we want to run away?
-            var canSee = targetPlanner.HasSeenTarget() && entity.GetEnemy().IsAlive;
+            var canSee = _targetKnowledgeBase.HasSeenTarget() && entity.GetEnemy().IsAlive;
             var inverseHealthPercentage = 1f - (float) entity.Health / entity.MaxHealth;
             return canSee ? scoreMultiplier * (1.0f - inverseHealthPercentage * LOW_HEALTH_PENALTY) : 0.0f;
         }

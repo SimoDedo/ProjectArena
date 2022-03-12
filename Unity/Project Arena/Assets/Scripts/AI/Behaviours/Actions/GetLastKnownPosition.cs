@@ -1,8 +1,7 @@
 using System;
-using AI.AI.Layer1;
-using AI.AI.Layer2;
-using AI.AI.Layer3;
 using AI.Behaviours.Variables;
+using AI.Layers.KnowledgeBase;
+using AI.Layers.SensingLayer;
 using BehaviorDesigner.Runtime.Tasks;
 using Entity;
 using Others;
@@ -23,14 +22,14 @@ namespace AI.Behaviours.Actions
         private Entity.Entity enemy;
         private PositionTracker enemyTracker;
         private AIEntity entity;
-        private TargetPlanner targetPlanner;
+        private TargetKnowledgeBase _targetKnowledgeBase;
         private NavigationSystem navSystem;
 
         public override void OnAwake()
         {
             entity = GetComponent<AIEntity>();
             enemy = entity.GetEnemy();
-            targetPlanner = entity.TargetPlanner;
+            _targetKnowledgeBase = entity.TargetKnowledgeBase;
             navSystem = entity.NavigationSystem;
             damageSensor = entity.DamageSensor;
             enemyTracker = enemy.GetComponent<PositionTracker>();
@@ -42,7 +41,7 @@ namespace AI.Behaviours.Actions
                 ? damageSensor.LastTimeDamaged
                 : float.MinValue;
 
-            var lossTime = targetPlanner.LastTimeDetected;
+            var lossTime = _targetKnowledgeBase.LastTimeDetected;
 
             if (damageTime > lossTime)
                 // The most recent event was getting damaged, so use this knowledge to guess its position
@@ -53,7 +52,7 @@ namespace AI.Behaviours.Actions
 
         private TaskStatus EstimateEnemyPositionFromKnowledge()
         {
-            var delay = Time.time - targetPlanner.LastTimeDetected;
+            var delay = Time.time - _targetKnowledgeBase.LastTimeDetected;
             var (delayedPosition, velocity) = enemyTracker.GetPositionAndVelocityFromDelay(delay);
 
             // Try to estimate the position of the enemy after it has gone out of sight

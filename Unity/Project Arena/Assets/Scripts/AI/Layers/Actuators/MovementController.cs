@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace AI.AI.Layer1
+namespace AI.Layers.Actuators
 {
     /// <summary>
     /// This component deals with moving the entity around.

@@ -1,6 +1,5 @@
 using System;
-using AI.AI.Layer2;
-using AI.AI.Layer3;
+using AI.Layers.KnowledgeBase;
 using BehaviorDesigner.Runtime.Tasks;
 
 namespace AI.Behaviours.Conditions
@@ -13,12 +12,12 @@ namespace AI.Behaviours.Conditions
     {
         private AIEntity entity;
         private FightingMovementSkill skill;
-        private TargetPlanner targetPlanner;
+        private TargetKnowledgeBase _targetKnowledgeBase;
 
         public override void OnAwake()
         {
             entity = GetComponent<AIEntity>();
-            targetPlanner = entity.TargetPlanner;
+            _targetKnowledgeBase = entity.TargetKnowledgeBase;
             skill = entity.MovementSkill;
         }
 
@@ -28,7 +27,7 @@ namespace AI.Behaviours.Conditions
                 // Never fight back if I don't have the required movement skill!
                 return TaskStatus.Failure;
 
-            if (targetPlanner.HasSeenTarget())
+            if (_targetKnowledgeBase.HasSeenTarget())
             {
                 entity.IsFocusingOnEnemy = true;
                 return TaskStatus.Success;

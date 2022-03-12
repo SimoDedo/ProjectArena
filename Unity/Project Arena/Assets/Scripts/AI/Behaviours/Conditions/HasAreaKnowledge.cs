@@ -1,6 +1,5 @@
 using System;
-using AI.AI.Layer2;
-using AI.AI.Layer3;
+using AI.Layers.Planners;
 using BehaviorDesigner.Runtime.Tasks;
 
 namespace AI.Behaviours.Conditions

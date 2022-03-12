@@ -1,11 +1,10 @@
 using System;
-using System.Linq;
-using AI.AI.Layer1;
+using AI.Layers.Actuators;
 using Others;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace AI.AI.Layer2
+namespace AI.Layers.KnowledgeBase
 {
     /// <summary>
     /// This component deals with planning and execution of paths.

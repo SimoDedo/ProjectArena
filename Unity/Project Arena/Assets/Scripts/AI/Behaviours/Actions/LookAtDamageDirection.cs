@@ -1,5 +1,6 @@
 using System;
-using AI.AI.Layer1;
+using AI.Layers.Actuators;
+using AI.Layers.SensingLayer;
 using BehaviorDesigner.Runtime.Tasks;
 using Entity;
 using UnityEngine;

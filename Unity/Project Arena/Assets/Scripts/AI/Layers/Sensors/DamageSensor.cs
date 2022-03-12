@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace AI.AI.Layer1
+namespace AI.Layers.SensingLayer
 {
     /// <summary>
     /// This AI component is able to keep track on when the entity has been damaged and whether or not the entity
