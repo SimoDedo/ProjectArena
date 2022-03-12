@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using AI.AI.Layer2;
+using AI.Layers.KnowledgeBase;
 using BehaviorDesigner.Runtime.Tasks;
 using Entity.Component;
 using Others;

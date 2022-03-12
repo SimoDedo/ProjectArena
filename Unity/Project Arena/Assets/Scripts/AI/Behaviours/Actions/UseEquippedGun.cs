@@ -1,6 +1,6 @@
 using System;
-using AI.AI.Layer1;
-using AI.AI.Layer3;
+using AI.Layers.Actuators;
+using AI.Layers.KnowledgeBase;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
 using Entity;
@@ -31,7 +31,7 @@ namespace AI.Behaviours.Actions
         private float nextDelayRecalculation = float.MinValue;
         private float previousReflexDelay;
         private SightController sightController;
-        private TargetPlanner targetPlanner;
+        private TargetKnowledgeBase _targetKnowledgeBase;
         private float targetReflexDelay;
         private NormalDistribution distribution;
 
@@ -39,7 +39,7 @@ namespace AI.Behaviours.Actions
         {
             entity = GetComponent<AIEntity>();
             gunManager = entity.GunManager;
-            targetPlanner = entity.TargetPlanner;
+            _targetKnowledgeBase = entity.TargetKnowledgeBase;
             sightController = entity.SightController;
             enemy = entity.GetEnemy();
             enemyPositionTracker = enemy.GetComponent<PositionTracker>();
@@ -61,7 +61,7 @@ namespace AI.Behaviours.Actions
 
         public override TaskStatus OnUpdate()
         {
-            var lastSightedTime = targetPlanner.LastTimeDetected;
+            var lastSightedTime = _targetKnowledgeBase.LastTimeDetected;
             if (lastSightedTime != Time.time && isGoingForCover.Value && !gunManager.IsCurrentGunReloading())
                 //We cannot see the enemy and we were looking for cover, reload now!
                 gunManager.ReloadCurrentGun();

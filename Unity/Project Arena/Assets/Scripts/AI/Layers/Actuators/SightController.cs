@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace AI.AI.Layer1
+namespace AI.Layers.Actuators
 {
     /// <summary>
     /// This component deals with rotating the view of the entity.

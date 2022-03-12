@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
-using AI.AI.Layer1;
-using AI.AI.Layer2;
 using AI.Behaviours.Variables;
+using AI.Layers.Actuators;
+using AI.Layers.KnowledgeBase;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
 using Others;

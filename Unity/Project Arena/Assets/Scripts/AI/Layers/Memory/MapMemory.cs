@@ -1,17 +1,15 @@
-using System;
 using System.Runtime.CompilerServices;
 using Graph;
 using Managers.Mode;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
-namespace AI.AI.Layer2
+namespace AI.Layers.Memory
 {
     /// <summary>
     /// This component represents the entity knowledge of the map. It requires support from the map itself, which
     /// must expose its <see cref="Area"/> representation.
     /// </summary>
-    public class MapKnowledge
+    public class MapMemory
     {
         public readonly Area[] areas;
 
@@ -23,7 +21,7 @@ namespace AI.AI.Layer2
         private readonly Transform transform;
 
 
-        public MapKnowledge(AIEntity entity, GameManager gms)
+        public MapMemory(AIEntity entity, GameManager gms)
         {
             // me = entity;
             transform = entity.transform;

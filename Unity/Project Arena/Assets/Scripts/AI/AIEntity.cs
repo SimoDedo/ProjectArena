@@ -1,8 +1,10 @@
 using System;
-using AI.AI.Layer1;
-using AI.AI.Layer2;
-using AI.AI.Layer3;
 using AI.GoalMachine;
+using AI.Layers.Actuators;
+using AI.Layers.KnowledgeBase;
+using AI.Layers.Memory;
+using AI.Layers.Planners;
+using AI.Layers.SensingLayer;
 using Entity.Component;
 using Logging;
 using Managers.Mode;
@@ -212,9 +214,9 @@ namespace AI
 
         public int MaxHealth => totalHealth;
 
-        public TargetKnowledgeBase TargetKb { get; private set; }
+        public TargetMemory TargetKb { get; private set; }
 
-        public TargetPlanner TargetPlanner { get; private set; }
+        public TargetKnowledgeBase TargetKnowledgeBase { get; private set; }
 
         public DamageSensor DamageSensor { get; private set; }
 
@@ -224,7 +226,9 @@ namespace AI
 
         public SightController SightController { get; private set; }
 
-        public PickupKnowledgeBase PickupKnowledgeBase { get; private set; }
+        public PickupMemory PickupMemory { get; private set; }
+
+        public PickupActivationEstimator PickupKnowledgeBase { get; private set; }
 
         public PickupPlanner PickupPlanner { get; private set; }
 
@@ -232,7 +236,7 @@ namespace AI
 
         public GunManager GunManager { get; private set; }
 
-        public MapKnowledge MapKnowledge { get; private set; }
+        public MapMemory MapMemory { get; private set; }
 
         public MapWanderPlanner MapWanderPlanner { get; private set; }
 
@@ -269,12 +273,13 @@ namespace AI
                 else
                 {
                     TargetKb.Update();
-                    TargetPlanner.Update();
+                    TargetKnowledgeBase.Update();
                 }
                 
-                MapKnowledge.Update();
+                MapMemory.Update();
+                // Important: order of update is important! Keep order of layers as described in thesis.
+                PickupMemory.Update();
                 PickupKnowledgeBase.Update();
-                // Important: Pickup planner must be updated after pickup knowledge base
                 PickupPlanner.Update();
                 goalMachine.Update();
             }
@@ -291,7 +296,7 @@ namespace AI
                     if (enemy.IsAlive)
                     {
                         totalTimeToSurrender +=
-                            Time.time - Mathf.Max(startFightEventTime, TargetPlanner.LastTimeDetected);
+                            Time.time - Mathf.Max(startFightEventTime, TargetKnowledgeBase.LastTimeDetected);
                         numberOfRetreats++;
                     }
                 }
@@ -301,20 +306,20 @@ namespace AI
                     startFightEventTime = Time.time;
 
                     // First detection status of this fight!
-                    enemyInSightPreviously = TargetPlanner.HasSeenTarget();
-                    previousDetectionTime = TargetPlanner.LastTimeDetected;
+                    enemyInSightPreviously = TargetKnowledgeBase.HasSeenTarget();
+                    previousDetectionTime = TargetKnowledgeBase.LastTimeDetected;
                 }
             }
             else if (IsFocusingOnEnemy)
             {
                 // We are in a fight event, so keep track of everything needed
-                var isEnemyInSightNow = TargetPlanner.HasSeenTarget();
+                var isEnemyInSightNow = TargetKnowledgeBase.HasSeenTarget();
                 if (isEnemyInSightNow && !enemyInSightPreviously)
                     // Update time between sights, but only if enemy was lost in this event
                     if (startFightEventTime <= previousDetectionTime)
                         totalTimeBetweenSights += Time.time - previousDetectionTime;
 
-                previousDetectionTime = TargetPlanner.LastTimeDetected;
+                previousDetectionTime = TargetKnowledgeBase.LastTimeDetected;
                 enemyInSightPreviously = isEnemyInSightNow;
             }
         }
@@ -339,21 +344,22 @@ namespace AI
             SightController =
                 new SightController(this, head, botParams.maxCameraSpeed, botParams.maxCameraAcceleration);
             SightSensor = new SightSensor(head, botParams.maxRange, botParams.fov);
-            MapKnowledge = new MapKnowledge(this, gms);
+            MapMemory = new MapMemory(this, gms);
             MapWanderPlanner = new MapWanderPlanner(this);
-            TargetKb = new TargetKnowledgeBase(
+            TargetKb = new TargetMemory(
                 this,
                 enemy,
                 botParams.memoryWindow
             );
-            TargetPlanner = new TargetPlanner(
+            TargetKnowledgeBase = new TargetKnowledgeBase(
                 this,
                 enemy,
                 botParams.detectionWindow,
                 botParams.timeBeforeCanReact
             );
             DamageSensor = new DamageSensor(botParams.recentDamageTimeout);
-            PickupKnowledgeBase = new PickupKnowledgeBase(this);
+            PickupMemory = new PickupMemory(this);
+            PickupKnowledgeBase = new PickupActivationEstimator(this);
             NavigationSystem = new NavigationSystem(this, botParams.speed);
             GunManager = new GunManager(this);
             PickupPlanner = new PickupPlanner(this);
@@ -363,7 +369,8 @@ namespace AI
             NavigationSystem.Prepare();
             GunManager.Prepare(gms, this, null, ag);
             TargetKb.Prepare();
-            TargetPlanner.Prepare();
+            TargetKnowledgeBase.Prepare();
+            PickupMemory.Prepare();
             PickupKnowledgeBase.Prepare();
             MovementController.Prepare();
             PickupPlanner.Prepare();
@@ -482,7 +489,7 @@ namespace AI
             }
 
             
-            PickupKnowledgeBase.MarkConsumed(medkit);
+            PickupMemory.MarkConsumed(medkit);
         }
 
         public override bool CanBeSupplied(bool[] suppliedGuns)
@@ -493,7 +500,7 @@ namespace AI
         public override void SupplyFromAmmoCrate(AmmoPickable ammoCrate)
         {
             GunManager.SupplyGuns(ammoCrate.SuppliedGuns, ammoCrate.AmmoAmounts);
-            PickupKnowledgeBase.MarkConsumed(ammoCrate);
+            PickupMemory.MarkConsumed(ammoCrate);
         }
 
         public override void SetInGame(bool b, bool isGameEnded = false)

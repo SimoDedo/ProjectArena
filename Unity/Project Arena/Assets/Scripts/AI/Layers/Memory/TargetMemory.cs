@@ -1,15 +1,15 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using AI.AI.Layer1;
+using AI.Layers.SensingLayer;
 using UnityEngine;
 
-namespace AI.AI.Layer2
+namespace AI.Layers.Memory
 {
     /// <summary>
     /// This component keeps track of when the provided target was visibile and when we should consider they
     /// as spotted or lost.
     ///
+    /// TODO No longer true!
     /// Detection or loss of the enemy is based around the following concepts:
     /// - Memory window: interval of time, starting from the current instant and going back, for which detection
     ///   events are remembered. Older events are discarded;
@@ -22,7 +22,7 @@ namespace AI.AI.Layer2
     /// </summary>
 
     // TODO maybe separate responsibility of enemy knowledge vs extraction of info (e.g. can react to enemy).
-    public class TargetKnowledgeBase
+    public class TargetMemory
     {
         public readonly struct EnemyInfo
         {
@@ -60,7 +60,7 @@ namespace AI.AI.Layer2
         /// The sensor used to detect the target presence
         private SightSensor sensor;
 
-        public TargetKnowledgeBase(
+        public TargetMemory(
             AIEntity me,
             Entity.Entity target,
             float memoryWindowLength

@@ -1,7 +1,8 @@
 using System;
-using AI.AI.Layer2;
-using AI.AI.Layer3;
 using AI.Behaviours.Variables;
+using AI.Layers.KnowledgeBase;
+using AI.Layers.Memory;
+using AI.Layers.Planners;
 using BehaviorDesigner.Runtime.Tasks;
 using Others;
 using UnityEngine;
@@ -10,7 +11,7 @@ using Action = BehaviorDesigner.Runtime.Tasks.Action;
 namespace AI.Behaviours.Actions
 {
     /// <summary>
-    /// Selects the area to visit next while wandering, based on the selection given by the <see cref="MapKnowledge"/>
+    /// Selects the area to visit next while wandering, based on the selection given by the <see cref="MapMemory"/>
     /// </summary>
     [Serializable]
     public class SelectAreaToVisit : Action

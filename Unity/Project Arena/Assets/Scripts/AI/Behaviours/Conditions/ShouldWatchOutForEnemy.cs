@@ -1,5 +1,5 @@
 using System;
-using AI.AI.Layer1;
+using AI.Layers.SensingLayer;
 using BehaviorDesigner.Runtime.Tasks;
 
 namespace AI.Behaviours.Conditions

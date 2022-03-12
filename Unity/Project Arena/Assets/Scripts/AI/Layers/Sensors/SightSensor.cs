@@ -1,7 +1,7 @@
 using UnityEngine;
 using Utils;
 
-namespace AI.AI.Layer1
+namespace AI.Layers.SensingLayer
 {
     /// <summary>
     /// This component is used to query whether any object is in view or not.

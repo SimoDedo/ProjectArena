@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
-using AI.AI.Layer1;
-using AI.AI.Layer2;
+using AI.Layers.KnowledgeBase;
+using AI.Layers.SensingLayer;
 using Entity.Component;
 using Others;
 using Pickables;
 using UnityEngine;
 
-namespace AI.AI.Layer3
+namespace AI.Layers.Planners
 {
     /// <summary>
     /// This components is able to select which pickup, if any, should the entity try to collect.
@@ -56,7 +56,7 @@ namespace AI.AI.Layer3
         private float chosenPickupEstimatedActivationTime = float.MaxValue;
         private float chosenPickupScore = float.MinValue;
         private GunManager gunManager;
-        private PickupKnowledgeBase knowledgeBase;
+        private PickupActivationEstimator pickupKnowledgeBase;
         private NavigationSystem navSystem;
 
         private float nextUpdateTime;
@@ -73,7 +73,7 @@ namespace AI.AI.Layer3
         public void Prepare()
         {
             navSystem = me.NavigationSystem;
-            knowledgeBase = me.PickupKnowledgeBase;
+            pickupKnowledgeBase = me.PickupKnowledgeBase;
             gunManager = me.GunManager;
             sightSensor = me.SightSensor;
 
@@ -130,7 +130,7 @@ namespace AI.AI.Layer3
         // Score each pickup we know and update the best pickup info.
         private void ScorePickups()
         {
-            var pickables = knowledgeBase.GetPickupsEstimatedActivationTimes();
+            var pickables = pickupKnowledgeBase.GetPickupsEstimatedActivationTimes();
             var bestPickupScore = float.MinValue;
             Pickable bestPickup = null;
 
@@ -270,7 +270,7 @@ namespace AI.AI.Layer3
         // Get score of the pickup neighborhood.
         private void CalculatePickupNeighborhoodScore()
         {
-            var pickups = knowledgeBase.GetPickups();
+            var pickups = pickupKnowledgeBase.GetPickups();
 
             foreach (var pickup1 in pickups)
             {

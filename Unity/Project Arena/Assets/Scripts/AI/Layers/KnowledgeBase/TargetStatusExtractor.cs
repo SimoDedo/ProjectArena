@@ -1,10 +1,10 @@
 using System;
-using AI.AI.Layer2;
+using AI.Layers.Memory;
 using UnityEngine;
 
-namespace AI.AI.Layer3
+namespace AI.Layers.KnowledgeBase
 {
-    public class TargetPlanner
+    public class TargetKnowledgeBase
     {
         private static readonly AnimationCurve DistanceScore = new AnimationCurve(
             new Keyframe(0f, 5f),
@@ -33,9 +33,9 @@ namespace AI.AI.Layer3
         /// </summary>
         private readonly float detectionWindowLenght;
 
-        private TargetKnowledgeBase targetKb;
+        private TargetMemory targetKb;
         
-        public TargetPlanner(AIEntity me, Entity.Entity target,
+        public TargetKnowledgeBase(AIEntity me, Entity.Entity target,
             float detectionWindowLenght, float nonConsecutiveTimeBeforeReaction)
         {
             this.me = me;
