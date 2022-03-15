@@ -2,16 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AI.Layers.Memory;
-using AI.Layers.SensingLayer;
 using Pickables;
 using UnityEngine;
+using Utils;
 
 namespace AI.Layers.KnowledgeBase
 {
     public class PickupActivationEstimator
     {
-        // TODO is questionable if this should be here or in the pickup planner
-        private readonly Dictionary<Pickable, float> estimatedActivationTime = new Dictionary<Pickable, float>();
+        private readonly Dictionary<Pickable, float> estimatedActivationTime =
+            new Dictionary<Pickable, float>(new MonoBehaviourEqualityComparer<Pickable>());
+
         private readonly AIEntity me;
         private PickupMemory memory;
 
@@ -43,8 +44,9 @@ namespace AI.Layers.KnowledgeBase
             var keyList = new List<Pickable>(estimatedActivationTime.Keys);
             foreach (var pickable in keyList)
             {
-                var lastTimeSeen = pickupsInfo[pickable].lastTimeSeen;
-                var lastTimeActive = pickupsInfo[pickable].lastTimeSeenActive;
+                var pickupInfo = pickupsInfo[pickable];
+                var lastTimeSeen = pickupInfo.lastTimeSeen;
+                var lastTimeActive = pickupInfo.lastTimeSeenActive;
 
                 if (lastTimeSeen > lastTimeActive)
                 {
@@ -58,7 +60,7 @@ namespace AI.Layers.KnowledgeBase
                 else if (lastTimeActive == lastTimeSeen)
                 {
                     // ReSharper disable once CompareOfFloatsByEqualityOperator
-                    if (lastTimeActive == pickupsInfo[pickable].lastTimeCollected)
+                    if (lastTimeActive == pickupInfo.lastTimeCollected)
                     {
                         // Last time the object was picked up by us, so we now exactly the new activation time
                         estimatedActivationTime[pickable] = lastTimeActive + pickable.Cooldown;
@@ -68,8 +70,9 @@ namespace AI.Layers.KnowledgeBase
                         // Last time we've seen the object it was active, no need to estimate.
                         estimatedActivationTime[pickable] = lastTimeActive;
                     }
-                } 
-                else {
+                }
+                else
+                {
                     throw new InvalidOperationException();
                 }
             }
@@ -82,7 +85,7 @@ namespace AI.Layers.KnowledgeBase
         {
             return estimatedActivationTime.Keys.ToList();
         }
-        
+
         /// <summary>
         /// Returns the estimated activation times for each power up handled by the knowledge base.
         /// </summary>

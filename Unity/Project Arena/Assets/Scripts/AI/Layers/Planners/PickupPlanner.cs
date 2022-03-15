@@ -6,6 +6,7 @@ using Entity.Component;
 using Others;
 using Pickables;
 using UnityEngine;
+using Utils;
 
 namespace AI.Layers.Planners
 {
@@ -51,7 +52,10 @@ namespace AI.Layers.Planners
         );
 
         private readonly AIEntity me;
-        private readonly Dictionary<Pickable, float> neighborsScore = new Dictionary<Pickable, float>();
+
+        private readonly Dictionary<Pickable, float> neighborsScore =
+            new Dictionary<Pickable, float>(new MonoBehaviourEqualityComparer<Pickable>());
+
         private Pickable chosenPickup;
         private float chosenPickupEstimatedActivationTime = float.MaxValue;
         private float chosenPickupScore = float.MinValue;

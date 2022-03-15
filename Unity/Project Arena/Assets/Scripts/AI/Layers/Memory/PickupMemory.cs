@@ -3,6 +3,7 @@ using System.Linq;
 using AI.Layers.SensingLayer;
 using Pickables;
 using UnityEngine;
+using Utils;
 
 namespace AI.Layers.Memory
 {
@@ -25,9 +26,11 @@ namespace AI.Layers.Memory
                 this.lastTimeCollected = lastTimeCollected;
             }
         }
-        
+
         // TODO is questionable if this should be here or in the pickup planner
-        private readonly Dictionary<Pickable, PickupInfo> pickupInfos = new Dictionary<Pickable, PickupInfo>();
+        private readonly Dictionary<Pickable, PickupInfo> pickupInfos =
+            new Dictionary<Pickable, PickupInfo>(new MonoBehaviourEqualityComparer<Pickable>());
+
         private readonly AIEntity me;
         private SightSensor sightSensor;
 
@@ -95,7 +98,7 @@ namespace AI.Layers.Memory
         {
             return pickupInfos;
         }
-        
+
         /// <summary>
         /// Marks a specific pickup as consumed. 
         /// </summary>
