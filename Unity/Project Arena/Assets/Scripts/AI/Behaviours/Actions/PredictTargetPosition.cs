@@ -45,8 +45,6 @@ namespace AI.Behaviours.Actions
             if (path.IsComplete())
             {
                 pathChosen.Value = path;
-                if (pathChosen.Value.corners.Length == 0) Debug.Log("NO");
-
                 return TaskStatus.Success;
             }
 
