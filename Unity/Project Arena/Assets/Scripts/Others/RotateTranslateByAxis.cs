@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Others
 {
@@ -35,6 +36,14 @@ namespace Others
         private bool xBack;
         private bool yBack;
         private bool zBack;
+
+        #if UNITY_SERVER && !UNITY_EDITOR
+        private void Awake()
+        {
+            // Do not rotate translate in server build, we don't see anything in any case
+            Destroy(this);
+        }
+        #endif
 
         private void Start()
         {
