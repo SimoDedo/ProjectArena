@@ -17,9 +17,13 @@ namespace AI.Behaviours.Actions
         [SerializeField] private SharedSelectedPathInfo pathToApply;
         private NavigationSystem navSystem;
 
-        public override void OnStart()
+        public override void OnAwake()
         {
             navSystem = GetComponent<AIEntity>().NavigationSystem;
+        }
+
+        public override void OnStart()
+        {
             navSystem.SetPath(pathToApply.Value);
         }
 
