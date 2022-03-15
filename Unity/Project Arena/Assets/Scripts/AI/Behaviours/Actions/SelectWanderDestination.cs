@@ -99,7 +99,7 @@ namespace AI.Behaviours.Actions
                     var onGroundDestination = corners.Last();
                     var validPointsFound = 0;
 
-                    var penultimatePoint = corners.Length < 2 ? transform.position : corners[corners.Length - 2];
+                    var penultimatePoint = corners.Length < 2 ? transform.position : corners[^2];
 
                     var forwardDirectionAtArrival = (onGroundDestination - penultimatePoint).normalized;
 
