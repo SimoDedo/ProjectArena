@@ -53,7 +53,9 @@ namespace Guns
 
         public override void Shoot()
         {
+            #if !UNITY_SERVER || UNITY_EDITOR
             StartCoroutine(ShowMuzzleFlash());
+            #endif
 
             ammoInCharger -= 1;
 
@@ -92,7 +94,9 @@ namespace Guns
                     var entityScript = hit.transform.root.GetComponent<Entity.Entity>();
                     if (entityScript != null)
                     {
+                        #if !UNITY_SERVER || UNITY_EDITOR
                         StartCoroutine(ShowSpark(hit));
+                        #endif
                         entityScript.TakeDamage(damage, ownerEntityScript.GetID());
                     }
                 }

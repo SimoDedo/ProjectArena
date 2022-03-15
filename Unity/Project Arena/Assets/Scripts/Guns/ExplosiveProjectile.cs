@@ -34,8 +34,10 @@ namespace Guns
                         if (scaledDamage > 0) entityScript.TakeDamage(scaledDamage, shooterID);
                     }
                 }
-
+                
+                #if !UNITY_SERVER || UNITY_EDITOR 
                 StartCoroutine(AnimateExplosion());
+                #endif
             }
         }
 

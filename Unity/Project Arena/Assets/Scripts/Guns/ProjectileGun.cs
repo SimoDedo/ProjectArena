@@ -45,7 +45,9 @@ namespace Guns
 
         public override void Shoot()
         {
+            #if !UNITY_SERVER || UNITY_EDITOR
             StartCoroutine(ShowMuzzleFlash());
+            #endif
 
             ammoInCharger -= 1;
 
