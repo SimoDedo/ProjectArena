@@ -49,6 +49,9 @@ namespace AI.Behaviours.Actions
         private float nextUpdateTime;
         private SightController sightController;
 
+        private List<float> angles;
+        private List<float> scores;
+
         public override void OnAwake()
         {
             var entity = GetComponent<AIEntity>();
@@ -67,8 +70,11 @@ namespace AI.Behaviours.Actions
                         maxAngle = Mathf.Max(maxAngle, Mathf.Abs(angleScore.angle));
                         myValidAngles.Add(angleScore);
                     }
+            
+            angles = new List<float>(myValidAngles.Count);
+            scores = new List<float>(myValidAngles.Count);
         }
-
+        
         public override TaskStatus OnUpdate()
         {
             var realForward = GetMovementDirection();
@@ -76,6 +82,10 @@ namespace AI.Behaviours.Actions
             if (realForward == Vector3.up || realForward == Vector3.zero)
                 realForward = transform.forward;
             var angleX = 0f;
+            
+            angles.Clear();
+            scores.Clear();
+            
             if (MustUpdate())
             {
                 UpdateNextUpdateTime();
@@ -88,8 +98,6 @@ namespace AI.Behaviours.Actions
 
                 // Score formula: max(0, 10 + distanceScore * 40 + forwardScore * 30)
 
-                var angles = new List<float>();
-                var scores = new List<float>();
                 var up = transform.up;
 
                 foreach (var angleScore in myValidAngles)
