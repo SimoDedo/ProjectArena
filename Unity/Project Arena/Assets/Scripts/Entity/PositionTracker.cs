@@ -93,7 +93,17 @@ namespace Entity
                 positions.RemoveAt(positions.Count - 1);
 
             positions.Add(new Tuple<Vector3, float>(t.position, Time.time));
-            positions = positions.Where(it => it.Item2 > Time.time - MEMORY_WINDOW).ToList();
+            // TODO check correctness
+            var firstIndexToKeep = positions.FindIndex(it => it.Item2 > Time.time - MEMORY_WINDOW);
+            if (firstIndexToKeep == -1)
+            {
+                positions.Clear();
+            }
+            else
+            {
+                positions.RemoveRange(0, firstIndexToKeep);
+            }
+            // positions = positions.Where(it => it.Item2 > Time.time - MEMORY_WINDOW).ToList();
         }
     }
 }
