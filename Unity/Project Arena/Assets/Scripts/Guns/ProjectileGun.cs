@@ -74,8 +74,8 @@ namespace Guns
             {
                 Quaternion rotation;
 
-                if (dispersion != 0)
-                    rotation = GetDeviatedRotation(t.rotation, dispersion);
+                if (Dispersion != 0)
+                    rotation = GetDeviatedRotation();
                 else
                     rotation = t.rotation;
 
@@ -115,11 +115,11 @@ namespace Guns
         }
 
         // Deviates the rotation randomly inside a cone with the given aperture.
-        private Quaternion GetDeviatedRotation(Quaternion rotation, float deviation)
+        private Quaternion GetDeviatedRotation()
         {
-            var eulerRotation = rotation.eulerAngles;
-            eulerRotation.x += Random.Range(-dispersion / 2, dispersion / 2);
-            eulerRotation.y += Random.Range(-dispersion / 2, dispersion / 2);
+            var eulerRotation = t.rotation.eulerAngles;
+            eulerRotation.x += Random.Range(-Dispersion / 2, Dispersion / 2);
+            eulerRotation.y += Random.Range(-Dispersion / 2, Dispersion / 2);
             return Quaternion.Euler(eulerRotation);
         }
 

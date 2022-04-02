@@ -4,6 +4,7 @@ using Managers.Mode;
 using Others;
 using UI;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 // TODO add type (blast vs non-blast)
@@ -21,7 +22,17 @@ namespace Guns
         [Header("Gun parameters")] [SerializeField]
         protected int damage = 10;
 
-        [SerializeField] protected float dispersion;
+        /// <summary>
+        /// Dispersion of the weapon while not isAiming down the sight.
+        /// </summary>
+        [FormerlySerializedAs("dispersion")] [SerializeField] protected float normalDispersion;
+        /// <summary>
+        /// Dispersion of the weapon while isAiming down the sight.
+        /// </summary>
+        [FormerlySerializedAs("dispersion")] [SerializeField] protected float aimingDispersion;
+
+        protected float Dispersion => isAiming ? aimingDispersion : normalDispersion;
+
         [SerializeField] protected int projectilesPerShot = 1;
         [SerializeField] protected bool infinteAmmo;
         [SerializeField] protected int chargerSize;
@@ -47,7 +58,7 @@ namespace Guns
         [Header("UI")] [SerializeField] protected bool displayUIIfAvailable = true;
 
         // Variables to manage the aim.
-        private bool aiming;
+        protected bool isAiming;
         private float aimStart;
 
         // Variables to manage ammo.
@@ -144,7 +155,7 @@ namespace Guns
             if (ammoInCharger == 0 && CanReload()) Reload();
         }
 
-        // Stops reloading, stops aiming, disallows accepting input and disables all the childrens.
+        // Stops reloading, stops isAiming, disallows accepting input and disables all the childrens.
         public void Stow()
         {
             // When I switch guns I stop the reloading, but not the cooldown.
@@ -264,7 +275,7 @@ namespace Guns
         // Aims.
         public void Aim(bool aim)
         {
-            aiming = aim;
+            isAiming = aim;
             animatingAim = true;
             aimStart = Time.time;
 
@@ -279,21 +290,21 @@ namespace Guns
         // Animates the aim.
         protected void AnimateAim()
         {
-            if (aiming)
+            if (isAiming)
                 transform.localPosition = Vector3.Lerp(transform.localPosition, aimPosition,
                     (Time.time - aimStart) * 10f);
             else
                 transform.localPosition = Vector3.Lerp(transform.localPosition, Vector3.zero,
                     (Time.time - aimStart) * 10f);
 
-            if (transform.localPosition == aimPosition && aiming)
+            if (transform.localPosition == aimPosition && isAiming)
             {
                 EnableAimOverlay(true);
                 ownerEntityScript.SlowEntity(0.4f);
                 headCamera.fieldOfView = originalFOV / zoom;
                 animatingAim = false;
             }
-            else if (transform.localPosition == Vector3.zero && !aiming)
+            else if (transform.localPosition == Vector3.zero && !isAiming)
             {
                 animatingAim = false;
             }

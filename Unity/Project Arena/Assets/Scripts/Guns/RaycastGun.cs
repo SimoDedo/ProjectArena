@@ -83,20 +83,22 @@ namespace Guns
                 RaycastHit hit;
                 Vector3 direction;
 
-                if (dispersion != 0)
-                    direction = GetDeviatedDirection(headCamera.transform.forward);
+                if (Dispersion != 0)
+                    direction = GetDeviatedDirection();
                 else
                     direction = headCamera.transform.forward;
 
+                Debug.DrawRay(headCamera.transform.position, direction * 100, Color.blue, 5, false);
+                
                 if (Physics.Raycast(headCamera.transform.position, direction, out hit, range,
                     ignoredLayers))
                 {
+                    #if !UNITY_SERVER || UNITY_EDITOR
+                    StartCoroutine(ShowSpark(hit));
+                    #endif
                     var entityScript = hit.transform.root.GetComponent<Entity.Entity>();
                     if (entityScript != null)
                     {
-                        #if !UNITY_SERVER || UNITY_EDITOR
-                        StartCoroutine(ShowSpark(hit));
-                        #endif
                         entityScript.TakeDamage(damage, ownerEntityScript.GetID());
                     }
                 }
@@ -132,11 +134,11 @@ namespace Guns
         }
 
         // Deviates the direction randomly inside a cone with the given aperture.
-        private Vector3 GetDeviatedDirection(Vector3 direction)
+        private Vector3 GetDeviatedDirection()
         {
-            direction = headCamera.transform.eulerAngles;
-            direction.x += Random.Range(-dispersion / 2, dispersion / 2);
-            direction.y += Random.Range(-dispersion / 2, dispersion / 2);
+            var direction = headCamera.transform.eulerAngles;
+            direction.x += Random.Range(-Dispersion / 2, Dispersion / 2);
+            direction.y += Random.Range(-Dispersion / 2, Dispersion / 2);
             return Quaternion.Euler(direction) * Vector3.forward;
         }
     }
