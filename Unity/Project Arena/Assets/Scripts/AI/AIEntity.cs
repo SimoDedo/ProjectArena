@@ -436,7 +436,7 @@ namespace AI
             );
             gameManagerScript.AddScore(id, entityID);
 
-            TargetKb.Reset();
+//            TargetKb.Reset();
             DamageSensor.Reset();
             goalMachine.SetIsIdle();
             goalMachine.Reset();
