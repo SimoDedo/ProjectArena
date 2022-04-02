@@ -356,17 +356,9 @@ MonoBehaviour:
   wallChar: 119
   mapObjects:
   - objectChar: 115
-    numObjPerMap: 5
+    numObjPerMap: 100
     placeAnywhere: 0
-    positioningMethod: 0
-  - objectChar: 97
-    numObjPerMap: 4
-    placeAnywhere: 0
-    positioningMethod: 0
-  - objectChar: 104
-    numObjPerMap: 4
-    placeAnywhere: 0
-    positioningMethod: 0
+    positioningMethod: 1
   createTextFile: 0
   textFilePath: 
 --- !u!1 &323647564
@@ -546,7 +538,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   wallHeight: 30
   squareSize: 1
-  isSkyVisibile: 0
+  isSkyVisibile: 1
   topMaterial: {fileID: 2100000, guid: c0613303af609ef4e9a058dbd6a9e117, type: 2}
   wallMaterial: {fileID: 2100000, guid: fb414c8d4e64f1d47926c89b9dd84470, type: 2}
   floorMaterial: {fileID: 2100000, guid: c0613303af609ef4e9a058dbd6a9e117, type: 2}
@@ -580,7 +572,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   botPrefab: {fileID: 1128226087601874, guid: 87c5267e1886311258a6f48dac81a1ca, type: 3}
-  genomeName: default.json
+  genomeName: corridors2.json
   bot1ParamsFilenamePrefix: rifle_
   bot2ParamsFilenamePrefix: shotgun_
   mapManager: {fileID: 516550950}
@@ -588,6 +580,9 @@ MonoBehaviour:
   spawnPointManager: {fileID: 323647566}
   numExperiments: 100
   experimentName: experiment
+  gameLength: 240
+  saveMap: 0
+  logPositions: 0
 --- !u!4 &1406895419
 Transform:
   m_ObjectHideFlags: 0
