@@ -34,9 +34,13 @@ namespace Tester
         [SerializeField] private SpawnPointManager spawnPointManager;
         [SerializeField] private int numExperiments = 1;
         [SerializeField] private string experimentName = "experiment";
+        [SerializeField] private int gameLength = DEFAULT_GAME_LENGTH;
+        [SerializeField] private bool saveMap ;
+        [SerializeField] private bool logPositions;
 
         private readonly List<Dictionary<string, object>> results = new List<Dictionary<string, object>>();
         private GameResultsAnalyzer analyzer;
+        private PositionAnalyzer positionAnalyzer;
         private string botsPath;
 
         private int experimentNumber;
@@ -45,7 +49,6 @@ namespace Tester
         private GenomeTesterGameManager manager;
         private string genomesPath;
 
-        private int gameLength = DEFAULT_GAME_LENGTH;
         
         private void Awake()
         {
@@ -62,13 +65,18 @@ namespace Tester
                 if (arg.StartsWith("-experimentName=")) experimentName = arg.Substring(16);
                 if (arg.StartsWith("-genomeName=")) genomeName = arg.Substring(12);
                 if (arg.StartsWith("-gameLength=")) gameLength = int.Parse(arg.Substring(12));
+                if (arg.StartsWith("-saveMap")) saveMap = true;
+                if (arg.StartsWith("-logPositions")) logPositions = true;
+                
             }
 
-            #if UNITY_EDITOR
-            importPath = Application.persistentDataPath + "/Import/";
+            #if UNITY_SERVER && !UNITY_EDITOR
+            var basePath = Directory.GetCurrentDirectory();
             #else
-            importPath = Directory.GetCurrentDirectory() + "/Import/";
+            var basePath = Application.persistentDataPath;
             #endif
+            
+            importPath = basePath + "/Import/";
             genomesPath = importPath + "Genomes/";
             botsPath = importPath + "Bots/";
 
@@ -78,19 +86,39 @@ namespace Tester
 
             analyzer = new GameResultsAnalyzer(BOT1_ID, BOT2_ID);
             analyzer.Setup();
+            if (logPositions)
+            {
+                positionAnalyzer = new PositionAnalyzer(BOT1_ID, BOT2_ID);
+                positionAnalyzer.Setup();
+            }
 
             StartNewExperimentGameEvent.Instance.AddListener(NewExperimentStarted);
             ExperimentEndedGameEvent.Instance.AddListener(ExperimentEnded);
-            
+
+            if (saveMap)
+            {
+                SaveMapTextGameEvent.Instance.AddListener(SaveMap);
+            }
+
             StartNewExperiment();
 
             // Register start and end experiment events, so that I can finalize the analyzer and
             // reset it
         }
         
+        private void SaveMap(string map)
+        {
+            ExportResults(map, experimentName, ".txt");
+            SaveMapTextGameEvent.Instance.RemoveListener(SaveMap);
+        }
+
         private void StartNewExperiment()
         {
             analyzer.Reset();
+            if (logPositions)
+            {
+                positionAnalyzer.Reset();
+            }
 
             var bot1Params = ReadFromFile(botsPath + bot1ParamsFilenamePrefix + "params.json",
                 BotCharacteristics.Default);
@@ -121,7 +149,7 @@ namespace Tester
                 mapManager,
                 spawnPointManager,
                 gameLength,
-                respawnDuration: 1.0f
+                respawnDuration: 3.0f
             );
         }
 
@@ -131,6 +159,13 @@ namespace Tester
 
             manager.StopGame();
             Destroy(manager);
+
+            if (logPositions)
+            {
+                var (positions1, positions2) = positionAnalyzer.CompileResultsAsCSV();
+                ExportResults(positions1, experimentName + experimentNumber + '1', ".csv");
+                ExportResults(positions2, experimentName + experimentNumber + '2', ".csv");
+            }
 
             // TODO provide correct length 
             results.Add(analyzer.CompileResults(DEFAULT_GAME_LENGTH));
@@ -151,7 +186,7 @@ namespace Tester
             }
         }
 
-        private static void ExportResults(string compileResults, string experimentName)
+        private static void ExportResults(string compileResults, string experimentName, string extension = ".json")
         {
 
             #if UNITY_EDITOR
@@ -160,7 +195,7 @@ namespace Tester
             var exportPath = Directory.GetCurrentDirectory() + "/Export/" + experimentName;
             #endif
             
-            var filePath = exportPath + "." + "json";
+            var filePath = exportPath + extension;
             try
             {
                 using var writer = new StreamWriter(filePath);
@@ -192,6 +227,7 @@ namespace Tester
             }
             catch (Exception)
             {
+                Debug.LogError("Failed to load " + filePath);
                 try
                 {
                     var json = JsonConvert.SerializeObject(defaultValue, Formatting.Indented);
