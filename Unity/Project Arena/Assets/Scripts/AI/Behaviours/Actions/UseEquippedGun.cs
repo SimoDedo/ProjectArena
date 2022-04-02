@@ -65,6 +65,11 @@ namespace AI.Behaviours.Actions
             if (lastSightedTime != Time.time && isGoingForCover.Value && !gunManager.IsCurrentGunReloading())
                 //We cannot see the enemy and we were looking for cover, reload now!
                 gunManager.ReloadCurrentGun();
+            if (gunManager.GetAmmoInChargerForGun(gunManager.CurrentGunIndex) == 0 && !gunManager.IsCurrentGunReloading())
+            {
+                // Out of ammo! No matter searching for cover or anything, start reloading now!
+                gunManager.ReloadCurrentGun();
+            }
 
             if (nextDelayRecalculation <= Time.time)
             {
@@ -153,9 +158,11 @@ namespace AI.Behaviours.Actions
             // TODO Do not shoot if outside of gun range
             var angle = sightController.LookAtPoint(position);
             if (lastSightedTime != Time.time && !gunManager.IsGunBlastWeapon(gunManager.CurrentGunIndex))
+            {
                 // We don't see the enemy and we are not using a blast weapon, do not shoot.
                 return;
-
+            }
+            
             if (angle < 10 && gunManager.CanCurrentGunShoot() &&
                 ShouldShootWeapon(position, gunManager.IsCurrentGunBlastWeapon()))
                 gunManager.ShootCurrentGun();
