@@ -360,7 +360,7 @@ namespace AI
             DamageSensor = new DamageSensor(botParams.recentDamageTimeout);
             PickupMemory = new PickupMemory(this);
             PickupKnowledgeBase = new PickupActivationEstimator(this);
-            NavigationSystem = new NavigationSystem(this, botParams.speed);
+            NavigationSystem = new NavigationSystem(this);
             GunManager = new GunManager(this);
             PickupPlanner = new PickupPlanner(this);
             goalMachine = new EntityGoalMachine(this);
@@ -469,6 +469,7 @@ namespace AI
         public override void SlowEntity(float penalty)
         {
             SightController.SetInputPenalty(penalty);
+            MovementController.SetInputPenalty(penalty);
         }
 
         public override void HealFromMedkit(MedkitPickable medkit)

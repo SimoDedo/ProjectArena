@@ -19,16 +19,15 @@ namespace AI.Layers.KnowledgeBase
         private NavMeshAgent agent;
         private MovementController mover;
 
-        public NavigationSystem(AIEntity me, float speed)
+        public NavigationSystem(AIEntity me)
         {
-            Speed = speed;
             this.me = me;
             transform = me.transform;
             acceleration = 100;
             angularSpeed = 1000000;
         }
 
-        public float Speed { get; }
+        public float Speed => mover.Speed;
 
         public void Prepare()
         {
@@ -55,6 +54,7 @@ namespace AI.Layers.KnowledgeBase
         /// path calculated is not complete.</param>
         public NavMeshPath CalculatePath(Vector3 destination, bool throwIfNotComplete = false)
         {
+            agent.speed = Speed;
             var rtn = new NavMeshPath();
             agent.CalculatePath(destination, rtn);
             if (throwIfNotComplete && !rtn.IsComplete())
@@ -71,6 +71,7 @@ namespace AI.Layers.KnowledgeBase
         /// path calculated is not complete.</param>
         public NavMeshPath CalculatePath(Vector3 origin, Vector3 destination, bool throwIfNotComplete = false)
         {
+            agent.speed = Speed;
             var rtn = new NavMeshPath();
             NavMesh.CalculatePath(origin, destination, agent.areaMask, rtn);
             if (throwIfNotComplete && !rtn.IsComplete())
@@ -102,8 +103,8 @@ namespace AI.Layers.KnowledgeBase
         /// </summary>
         public void SetPath(NavMeshPath path)
         {
+            agent.speed = Speed;
             // Check that I didn't have a path already
-
             if (!agent.SetPath(path))
             {
                 // Bug fix: Sometimes the agent gets stuck in a position from where it is unable to set a path.
@@ -114,18 +115,6 @@ namespace AI.Layers.KnowledgeBase
                     Debug.LogError("It was impossible to fix the problem!");
                 }
             }
-        }
-
-        /// <summary>
-        /// Sets a destination that this component should reach.
-        /// If the destination is unreachable, an ArgumentException is thrown.
-        /// </summary>
-        public void SetDestination(Vector3 destination)
-        {
-            var path = CalculatePath(destination);
-            if (!path.IsComplete()) throw new ArgumentException("Destination is not reachable!");
-
-            agent.SetPath(path);
         }
 
         /// <summary>

@@ -34,7 +34,7 @@ namespace AI.Behaviours.Actions
         private TargetKnowledgeBase _targetKnowledgeBase;
         private float targetReflexDelay;
         private NormalDistribution distribution;
-
+        
         public override void OnAwake()
         {
             entity = GetComponent<AIEntity>();
@@ -59,13 +59,22 @@ namespace AI.Behaviours.Actions
             targetReflexDelay = (float) distribution.Generate();
         }
 
+        public override void OnEnd()
+        {
+            if (gunManager.IsCurrentGunAiming())
+            {
+                gunManager.SetCurrentGunAim(false);
+            }
+        }
+
         public override TaskStatus OnUpdate()
         {
             var lastSightedTime = _targetKnowledgeBase.LastTimeDetected;
             if (lastSightedTime != Time.time && isGoingForCover.Value && !gunManager.IsCurrentGunReloading())
                 //We cannot see the enemy and we were looking for cover, reload now!
                 gunManager.ReloadCurrentGun();
-            if (gunManager.GetAmmoInChargerForGun(gunManager.CurrentGunIndex) == 0 && !gunManager.IsCurrentGunReloading())
+            if (gunManager.GetAmmoInChargerForGun(gunManager.CurrentGunIndex) == 0 &&
+                !gunManager.IsCurrentGunReloading())
             {
                 // Out of ammo! No matter searching for cover or anything, start reloading now!
                 gunManager.ReloadCurrentGun();
@@ -143,7 +152,7 @@ namespace AI.Behaviours.Actions
             if (float.IsPositiveInfinity(record)) return;
 
             var angle = sightController.LookAtPoint(chosenPoint);
-
+            TryAimIfRecommended((ourStartingPoint - chosenPoint).magnitude, angle);
             if (!(angle < 10) || !gunManager.CanCurrentGunShoot() || !ShouldShootWeapon(chosenPoint, isGunBlast))
                 return;
             Debug.DrawRay(ourStartingPoint, sightController.GetHeadForward() * 100f, Color.blue, 2f);
@@ -153,19 +162,35 @@ namespace AI.Behaviours.Actions
 
         // Tries to find the best position to aim given that the weapon hits immediately.
         // In case the weapon is a blast weapon, aims at the floor.
-        private void AimRaycastWeapon(Vector3 position, float lastSightedTime)
+        private void AimRaycastWeapon(Vector3 enemyPosition, float lastSightedTime)
         {
             // TODO Do not shoot if outside of gun range
-            var angle = sightController.LookAtPoint(position);
+            var angle = sightController.LookAtPoint(enemyPosition);
             if (lastSightedTime != Time.time && !gunManager.IsGunBlastWeapon(gunManager.CurrentGunIndex))
             {
                 // We don't see the enemy and we are not using a blast weapon, do not shoot.
                 return;
             }
-            
+
+            var currentPosition = sightController.GetHeadPosition();
+            TryAimIfRecommended((currentPosition - enemyPosition).magnitude, angle);
+
             if (angle < 10 && gunManager.CanCurrentGunShoot() &&
-                ShouldShootWeapon(position, gunManager.IsCurrentGunBlastWeapon()))
+                ShouldShootWeapon(enemyPosition, gunManager.IsCurrentGunBlastWeapon()))
                 gunManager.ShootCurrentGun();
+        }
+
+        private void TryAimIfRecommended(float enemyDistance, float angle)
+        {
+            if (gunManager.CanCurrentGunAim() && angle < 20 && enemyDistance > 10)
+            {
+                if (!gunManager.IsCurrentGunAiming())
+                    gunManager.SetCurrentGunAim(true);
+            }
+            else if (gunManager.IsCurrentGunAiming())
+            {
+                gunManager.SetCurrentGunAim(false);
+            }
         }
 
         // I can shoot a gun if I do not detect any obstacle in the path from startingPos to position.

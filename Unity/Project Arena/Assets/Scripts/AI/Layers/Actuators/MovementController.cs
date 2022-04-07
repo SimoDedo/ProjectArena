@@ -9,7 +9,8 @@ namespace AI.Layers.Actuators
     {
         private readonly Transform transform;
         private Vector3 previousPosition;
-        private float speed;
+        private readonly float speed;
+        private float inputPenalty = 1f;
 
         public MovementController(AIEntity entity, float speed)
         {
@@ -40,5 +41,12 @@ namespace AI.Layers.Actuators
         {
             return (transform.position - previousPosition) / Time.deltaTime;
         }
+
+        public void SetInputPenalty(float penalty)
+        {
+            inputPenalty = penalty;
+        }
+
+        public float Speed => speed * inputPenalty;
     }
 }

@@ -31,7 +31,7 @@ namespace Guns
         /// </summary>
         [FormerlySerializedAs("dispersion")] [SerializeField] protected float aimingDispersion;
 
-        protected float Dispersion => isAiming ? aimingDispersion : normalDispersion;
+        protected float Dispersion => isAiming && !animatingAim ? aimingDispersion : normalDispersion;
 
         [SerializeField] protected int projectilesPerShot = 1;
         [SerializeField] protected bool infinteAmmo;
@@ -291,16 +291,18 @@ namespace Guns
         protected void AnimateAim()
         {
             if (isAiming)
+            {
+                ownerEntityScript.SlowEntity(0.6f);
                 transform.localPosition = Vector3.Lerp(transform.localPosition, aimPosition,
-                    (Time.time - aimStart) * 10f);
+                    (Time.time - aimStart) * 3f);
+            }
             else
                 transform.localPosition = Vector3.Lerp(transform.localPosition, Vector3.zero,
-                    (Time.time - aimStart) * 10f);
+                    (Time.time - aimStart) * 6f);
 
             if (transform.localPosition == aimPosition && isAiming)
             {
                 EnableAimOverlay(true);
-                ownerEntityScript.SlowEntity(0.4f);
                 headCamera.fieldOfView = originalFOV / zoom;
                 animatingAim = false;
             }
@@ -430,6 +432,11 @@ namespace Guns
         public int GetLoadedAmmo()
         {
             return ammoInCharger;
+        }
+
+        public bool IsAiming()
+        {
+            return isAiming;
         }
     }
 }

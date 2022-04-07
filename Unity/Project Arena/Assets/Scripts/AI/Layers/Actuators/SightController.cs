@@ -13,6 +13,10 @@ namespace AI.Layers.Actuators
         private readonly GameObject head;
         private readonly float maxAcceleration;
         private readonly float maxSpeed;
+
+        private float CurrentMaxAcceleration => maxAcceleration * inputPenalty;
+        private float CurrentMaxSpeed => maxSpeed * inputPenalty;
+
         private float currentBodySpeed;
         private float currentHeadSpeed;
         private float inputPenalty = 1f;
@@ -74,20 +78,19 @@ namespace AI.Layers.Actuators
         // Calculate the next angular velocity given the target angle, the actual one and the actual speed. 
         private float CalculateNewSpeed(float target, float actual, float previousSpeed)
         {
-            var clampedAcceleration = maxAcceleration * inputPenalty;
             var angleToPerform = target - actual;
-            var timeDeceleration = previousSpeed / clampedAcceleration;
+            var timeDeceleration = previousSpeed / CurrentMaxAcceleration;
             var angleDuringDeceleration = previousSpeed * timeDeceleration +
-                                          1f / 2f * clampedAcceleration * timeDeceleration * timeDeceleration;
+                                          1f / 2f * CurrentMaxAcceleration * timeDeceleration * timeDeceleration;
 
             if (Math.Abs(angleDuringDeceleration) < Math.Abs(angleToPerform))
             {
-                var newSpeed = previousSpeed + Mathf.Sign(angleToPerform) * clampedAcceleration * Time.deltaTime;
-                if (Mathf.Abs(newSpeed) > maxSpeed) newSpeed = maxSpeed * Mathf.Sign(newSpeed);
+                var newSpeed = previousSpeed + Mathf.Sign(angleToPerform) * CurrentMaxAcceleration * Time.deltaTime;
+                if (Mathf.Abs(newSpeed) > CurrentMaxSpeed) newSpeed = CurrentMaxSpeed * Mathf.Sign(newSpeed);
                 return newSpeed;
             }
 
-            return previousSpeed + Mathf.Sign(-previousSpeed) * clampedAcceleration * Time.deltaTime;
+            return previousSpeed + Mathf.Sign(-previousSpeed) * CurrentMaxAcceleration * Time.deltaTime;
         }
 
         // Converts an angle from (0,360) to (-180, 180).

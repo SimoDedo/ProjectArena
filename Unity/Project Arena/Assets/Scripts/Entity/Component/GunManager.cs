@@ -152,11 +152,6 @@ namespace Entity.Component
             guns[CurrentGunIndex].Aim(aim);
         }
 
-        public bool CanGunShoot(int index)
-        {
-            return guns[index].CanShoot();
-        }
-
         public bool CanCurrentGunShoot()
         {
             return guns[CurrentGunIndex].CanShoot();
@@ -231,6 +226,11 @@ namespace Entity.Component
         public float GetGunMaxRange(int index)
         {
             return guns[index].MaxRange;
+        }
+
+        public bool IsCurrentGunAiming()
+        {
+            return guns[CurrentGunIndex].IsAiming();
         }
     }
 }
