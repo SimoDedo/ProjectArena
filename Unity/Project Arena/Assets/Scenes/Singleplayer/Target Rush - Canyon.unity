@@ -222,6 +222,16 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114553068300837960, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
+        type: 3}
+      propertyPath: textFilePath
+      value: /home/jimbo/.config/unity3d/Polimi Games Collective/Project Arena/Import/Maps/assault_sniper_corridors_6.txt
+      objectReference: {fileID: 0}
+    - target: {fileID: 114553068300837960, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
+        type: 3}
+      propertyPath: loadMapFromFile
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 114810593565605670, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
         type: 3}
       propertyPath: isSkyVisibile

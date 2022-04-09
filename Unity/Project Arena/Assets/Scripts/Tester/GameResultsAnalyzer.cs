@@ -23,6 +23,9 @@ namespace Tester
         private readonly Dictionary<int, int> numberOfFights = new Dictionary<int, int>();
 
         // DONE!
+        private readonly Dictionary<int, int> numberOfSights = new Dictionary<int, int>();
+
+        // DONE!
         private readonly Dictionary<int, int> numberOfFrags = new Dictionary<int, int>();
 
         // DONE!
@@ -98,6 +101,7 @@ namespace Tester
             numberOfRetreats.Add(receivedInfo.entityId, receivedInfo.numberOfRetreats);
             timeToSurrender.Add(receivedInfo.entityId, receivedInfo.timeToSurrender);
             timeBetweenSights.Add(receivedInfo.entityId, receivedInfo.timeBetweenSights);
+            numberOfSights.Add(receivedInfo.entityId, receivedInfo.numberOfSights);
         }
 
         private void LogHit(HitInfo receivedInfo)
@@ -211,6 +215,8 @@ namespace Tester
                 {"timeToEngage2", timeToEngage.GetOrDefault(bot2ID)},
                 {"numberOfFights1", numberOfFights.GetOrDefault(bot1ID)},
                 {"numberOfFights2", numberOfFights.GetOrDefault(bot2ID)},
+                {"numberOfSights1", numberOfSights.GetOrDefault(bot1ID)},
+                {"numberOfSights2", numberOfSights.GetOrDefault(bot2ID)},
                 {"timeBetweenSights1", timeBetweenSights.GetOrDefault(bot1ID)},
                 {"timeBetweenSights2", timeBetweenSights.GetOrDefault(bot2ID)},
                 {"timeToSurrender1", timeToSurrender.GetOrDefault(bot1ID)},

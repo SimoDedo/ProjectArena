@@ -574,13 +574,13 @@ MonoBehaviour:
   botPrefab: {fileID: 1128226087601874, guid: 87c5267e1886311258a6f48dac81a1ca, type: 3}
   genomeName: corridors2.json
   bot1ParamsFilenamePrefix: rifle_
-  bot2ParamsFilenamePrefix: shotgun_
+  bot2ParamsFilenamePrefix: sniper_
   mapManager: {fileID: 516550950}
   genomeMapGenerator: {fileID: 296767516}
   spawnPointManager: {fileID: 323647566}
   numExperiments: 100
   experimentName: experiment
-  gameLength: 240
+  gameLength: 600
   saveMap: 0
   logPositions: 0
 --- !u!4 &1406895419

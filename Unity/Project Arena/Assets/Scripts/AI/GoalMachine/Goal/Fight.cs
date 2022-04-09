@@ -2,6 +2,7 @@ using System;
 using AI.Layers.KnowledgeBase;
 using BehaviorDesigner.Runtime;
 using Entity.Component;
+using Logging;
 using UnityEngine;
 
 namespace AI.GoalMachine.Goal
@@ -58,19 +59,20 @@ namespace AI.GoalMachine.Goal
 
         public void Enter()
         {
+            FocusingOnEnemyGameEvent.Instance.Raise(new FocusOnEnemyInfo {entityID = entity.GetID(), isFocusing = true});
             behaviorTree.EnableBehavior();
             BehaviorManager.instance.RestartBehavior(behaviorTree);
         }
 
         public void Update()
         {
-            entity.IsFocusingOnEnemy = true;
+            // FocusingOnEnemyGameEvent.Instance.Raise(new FocusOnEnemyInfo {entityID = entity.GetID(), isFocusing = true});
             BehaviorManager.instance.Tick(behaviorTree);
         }
 
         public void Exit()
         {
-            entity.IsFocusingOnEnemy = false;
+            FocusingOnEnemyGameEvent.Instance.Raise(new FocusOnEnemyInfo {entityID = entity.GetID(), isFocusing = false});
             behaviorTree.DisableBehavior();
             // Resources.UnloadAsset(externalBt);
             // Object.Destroy(behaviorTree);

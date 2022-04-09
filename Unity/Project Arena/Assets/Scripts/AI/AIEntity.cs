@@ -5,6 +5,7 @@ using AI.Layers.KnowledgeBase;
 using AI.Layers.Memory;
 using AI.Layers.Planners;
 using AI.Layers.SensingLayer;
+using AI.Layers.Statistics;
 using Entity.Component;
 using Logging;
 using Managers.Mode;
@@ -12,8 +13,6 @@ using Others;
 using Pickables;
 using UnityEngine;
 using Utils;
-
-// TODO Move logging logic to another component?
 
 namespace AI
 {
@@ -171,10 +170,6 @@ namespace AI
 
         [SerializeField] private Entity.Entity enemy;
 
-        private bool enemyInSightPreviously;
-
-        /// Time end last fight event or first respawn time
-        private float engageIntervalStartTime;
 
         private IGoalMachine goalMachine;
         private int killerId;
@@ -186,19 +181,6 @@ namespace AI
         // Do I have to log?
         private bool loggingGame;
         private bool mustProcessDeath;
-        private int numberOfFights;
-        private int numberOfRetreats;
-
-        private float previousDetectionTime;
-        private float startFightEventTime;
-
-        private float totalTimeBetweenSights;
-
-        private float totalTimeInFight;
-
-        private float totalTimeToEngage;
-
-        private float totalTimeToSurrender;
 
         private BotState BotState
         {
@@ -214,7 +196,7 @@ namespace AI
 
         public int MaxHealth => totalHealth;
 
-        public TargetMemory TargetKb { get; private set; }
+        public TargetMemory TargetMemory { get; private set; }
 
         public TargetKnowledgeBase TargetKnowledgeBase { get; private set; }
 
@@ -242,13 +224,14 @@ namespace AI
 
         public MapWanderPlanner MapWanderPlanner { get; private set; }
 
-        public bool IsFocusingOnEnemy { get; set; }
 
         public override bool IsAlive => isActiveAndEnabled && (Health > 0 || mustProcessDeath);
 
         public FightingMovementSkill MovementSkill => botParams.movementSkill;
 
         public Recklessness Recklessness => botParams.recklessness;
+
+        private LoggingComponent loggingComponent;
 
         private void Update()
         {
@@ -262,19 +245,15 @@ namespace AI
                 lastPositionLog = Time.time;
             }
 
-            var previousFightStatus = IsFocusingOnEnemy;
-            // Reset to false. Combat-driven behaviour will know when to set this to true
-            IsFocusingOnEnemy = false;
-
             if (inGame)
             {
                 if (!enemy.IsAlive)
                     // Bug fix: forget enemy position, because if it dies and respawns before I lose track of the last
                     //   position occupied, I will shoot at that point as soon as the enemy respawns 
-                    TargetKb.Reset();
+                    TargetMemory.Reset();
                 else
                 {
-                    TargetKb.Update();
+                    TargetMemory.Update();
                     TargetKnowledgeBase.Update();
                 }
                 
@@ -285,45 +264,7 @@ namespace AI
                 PickupPlanner.Update();
                 goalMachine.Update();
             }
-
-            if (!loggedFirstRespawn) return;
-            if (previousFightStatus != IsFocusingOnEnemy)
-            {
-                // Changed fighting status this turn!
-                if (!IsFocusingOnEnemy)
-                {
-                    engageIntervalStartTime = Time.time;
-                    totalTimeInFight += Time.time - startFightEventTime;
-                    numberOfFights++;
-                    if (enemy.IsAlive)
-                    {
-                        totalTimeToSurrender +=
-                            Time.time - Mathf.Max(startFightEventTime, TargetKnowledgeBase.LastTimeDetected);
-                        numberOfRetreats++;
-                    }
-                }
-                else
-                {
-                    totalTimeToEngage += Time.time - engageIntervalStartTime;
-                    startFightEventTime = Time.time;
-
-                    // First detection status of this fight!
-                    enemyInSightPreviously = TargetKnowledgeBase.HasSeenTarget();
-                    previousDetectionTime = TargetKnowledgeBase.LastTimeDetected;
-                }
-            }
-            else if (IsFocusingOnEnemy)
-            {
-                // We are in a fight event, so keep track of everything needed
-                var isEnemyInSightNow = TargetKnowledgeBase.HasSeenTarget();
-                if (isEnemyInSightNow && !enemyInSightPreviously)
-                    // Update time between sights, but only if enemy was lost in this event
-                    if (startFightEventTime <= previousDetectionTime)
-                        totalTimeBetweenSights += Time.time - previousDetectionTime;
-
-                previousDetectionTime = TargetKnowledgeBase.LastTimeDetected;
-                enemyInSightPreviously = isEnemyInSightNow;
-            }
+            loggingComponent.Update();
         }
 
         private void LateUpdate()
@@ -337,6 +278,7 @@ namespace AI
         public void SetupLogging()
         {
             loggingGame = true;
+            loggingComponent = new LoggingComponent(this);
         }
 
         // Prepares all the AI components
@@ -348,7 +290,7 @@ namespace AI
             SightSensor = new SightSensor(head, botParams.maxRange, botParams.fov);
             MapMemory = new MapMemory(this, gms);
             MapWanderPlanner = new MapWanderPlanner(this);
-            TargetKb = new TargetMemory(
+            TargetMemory = new TargetMemory(
                 this,
                 enemy,
                 botParams.memoryWindow
@@ -371,7 +313,7 @@ namespace AI
 
             NavigationSystem.Prepare();
             GunManager.Prepare(gms, this, null, ag);
-            TargetKb.Prepare();
+            TargetMemory.Prepare();
             TargetKnowledgeBase.Prepare();
             PickupMemory.Prepare();
             PickupKnowledgeBase.Prepare();
@@ -439,7 +381,7 @@ namespace AI
             );
             gameManagerScript.AddScore(id, entityID);
 
-            // TargetKb.Reset();
+            // TargetMemory.Reset();
             // SoundSensor.Reset();
             DamageSensor.Reset();
             goalMachine.SetIsIdle();
@@ -459,12 +401,6 @@ namespace AI
             Health = totalHealth;
             GunManager.ResetAmmo();
             // ActivateLowestGun();
-
-            if (!loggedFirstRespawn)
-            {
-                loggedFirstRespawn = true;
-                engageIntervalStartTime = Time.time;
-            }
 
             SetInGame(true);
         }
@@ -516,20 +452,11 @@ namespace AI
             MeshVisibility.SetMeshVisible(transform, b);
             inGame = b;
 
-            if (isGameEnded)
+            if (isGameEnded && loggingGame)
+            {
                 // Send all logging info
-                EntityGameMetricsGameEvent.Instance.Raise(
-                    new GameMetrics
-                    {
-                        entityId = GetID(),
-                        timeBetweenSights = totalTimeBetweenSights,
-                        timeInFights = totalTimeInFight,
-                        timeToSurrender = totalTimeToSurrender,
-                        timeToEngage = totalTimeToEngage,
-                        numberOfRetreats = numberOfRetreats,
-                        numberOfFights = numberOfFights
-                    }
-                );
+                loggingComponent.PublishAndRelease();
+            }
         }
 
         /// <summary>

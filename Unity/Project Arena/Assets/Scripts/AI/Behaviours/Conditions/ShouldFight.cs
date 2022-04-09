@@ -1,6 +1,7 @@
 using System;
 using AI.Layers.KnowledgeBase;
 using BehaviorDesigner.Runtime.Tasks;
+using Logging;
 
 namespace AI.Behaviours.Conditions
 {
@@ -29,10 +30,10 @@ namespace AI.Behaviours.Conditions
 
             if (_targetKnowledgeBase.HasSeenTarget())
             {
-                entity.IsFocusingOnEnemy = true;
+                FocusingOnEnemyGameEvent.Instance.Raise(new FocusOnEnemyInfo {entityID = entity.GetID(), isFocusing = true});
                 return TaskStatus.Success;
             }
-
+            FocusingOnEnemyGameEvent.Instance.Raise(new FocusOnEnemyInfo {entityID = entity.GetID(), isFocusing = false});
             return TaskStatus.Failure;
         }
     }

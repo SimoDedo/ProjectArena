@@ -1,6 +1,7 @@
 using AI.Layers.KnowledgeBase;
 using AI.Layers.SensingLayer;
 using BehaviorDesigner.Runtime;
+using Logging;
 using UnityEngine;
 
 namespace AI.GoalMachine.Goal
@@ -53,6 +54,7 @@ namespace AI.GoalMachine.Goal
 
         public void Enter()
         {
+            FocusingOnEnemyGameEvent.Instance.Raise(new FocusOnEnemyInfo {entityID = entity.GetID(), isFocusing = true});
             behaviorTree.EnableBehavior();
             BehaviorManager.instance.RestartBehavior(behaviorTree);
             // TODO searchStartTime should be replaced by last time enemy detected / last time took damage
@@ -61,14 +63,13 @@ namespace AI.GoalMachine.Goal
 
         public void Update()
         {
-            entity.IsFocusingOnEnemy = true;
             BehaviorManager.instance.Tick(behaviorTree);
         }
 
         public void Exit()
         {
             startSearchTime = NO_TIME;
-            entity.IsFocusingOnEnemy = false;
+            FocusingOnEnemyGameEvent.Instance.Raise(new FocusOnEnemyInfo {entityID = entity.GetID(), isFocusing = false});
             behaviorTree.DisableBehavior();
         }
     }

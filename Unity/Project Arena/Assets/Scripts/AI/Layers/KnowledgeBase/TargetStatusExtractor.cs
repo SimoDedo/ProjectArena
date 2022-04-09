@@ -46,7 +46,7 @@ namespace AI.Layers.KnowledgeBase
 
         public void Prepare()
         {
-            targetKb = me.TargetKb;
+            targetKb = me.TargetMemory;
         }
 
         public void Update()

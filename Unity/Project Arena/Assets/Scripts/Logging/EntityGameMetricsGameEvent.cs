@@ -17,6 +17,7 @@ namespace Logging
         public int numberOfRetreats;
         public float timeToSurrender;
 
+        public int numberOfSights;
         public float timeBetweenSights;
     }
 
