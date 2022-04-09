@@ -168,7 +168,7 @@ namespace Tester
             }
 
             // TODO provide correct length 
-            results.Add(analyzer.CompileResults(DEFAULT_GAME_LENGTH));
+            results.Add(analyzer.CompileResults(gameLength));
 
             experimentNumber++;
 
