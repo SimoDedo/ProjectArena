@@ -220,6 +220,8 @@ namespace AI
 
         public DamageSensor DamageSensor { get; private set; }
 
+        public SoundSensor SoundSensor { get; private set; }
+
         public MovementController MovementController { get; private set; }
 
         public SightSensor SightSensor { get; private set; }
@@ -358,6 +360,7 @@ namespace AI
                 botParams.timeBeforeCanReact
             );
             DamageSensor = new DamageSensor(botParams.recentDamageTimeout);
+            SoundSensor = new SoundSensor(botParams.recentDamageTimeout, GetID(), head.transform, 0.4f); // TODO params
             PickupMemory = new PickupMemory(this);
             PickupKnowledgeBase = new PickupActivationEstimator(this);
             NavigationSystem = new NavigationSystem(this);
@@ -379,11 +382,11 @@ namespace AI
 
         public override void SetupEntity(int th, bool[] ag, GameManager gms, int id)
         {
+            entityID = id;
             PrepareComponents(gms, ag);
-            gameManagerScript = gms;
             totalHealth = th;
             Health = th;
-            entityID = id;
+            gameManagerScript = gms;
             GunManager.TryEquipGun(GunManager.FindLowestActiveGun());
             var position = transform.position;
             SpawnInfoGameEvent.Instance.Raise(
@@ -436,7 +439,8 @@ namespace AI
             );
             gameManagerScript.AddScore(id, entityID);
 
-//            TargetKb.Reset();
+            // TargetKb.Reset();
+            // SoundSensor.Reset();
             DamageSensor.Reset();
             goalMachine.SetIsIdle();
             goalMachine.Reset();
@@ -575,6 +579,11 @@ namespace AI
         public void SetCharacteristics(BotCharacteristics botParams)
         {
             this.botParams = botParams;
+        }
+
+        private void OnDestroy()
+        {
+            SoundSensor.Release();
         }
     }
 

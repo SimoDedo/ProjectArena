@@ -48,6 +48,9 @@ namespace Guns
 
         [SerializeField] protected float recoil = 0.05f;
 
+        // Noise decay: 1/distanceSquared
+        [Header("Noise")] [SerializeField] private float shotNoise = 3000;
+        
         [Header("Aim")] [SerializeField] protected bool aimEnabled;
         [SerializeField] protected bool overlayEnabled;
         [SerializeField] protected float zoom = 1f;
@@ -270,7 +273,15 @@ namespace Guns
         }
 
         // Shots.
-        public abstract void Shoot();
+        public virtual void Shoot()
+        {
+            ShootingSoundGameEvent.Instance.Raise(new GunShootingSoundInfo
+            {
+                gunOwnerId = ownerEntityScript.GetID(),
+                gunLoudness = shotNoise,
+                gunPosition = transform.position
+            });
+        }
 
         // Aims.
         public void Aim(bool aim)

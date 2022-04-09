@@ -172,6 +172,9 @@ namespace AI.Behaviours.Actions
             var totalMovement = movementDirectionDueToStrife + movementDirectionDueToGun * 3f;
             var newPos = currentPos + totalMovement;
 
+            Debug.DrawLine(currentPos, newPos, Color.yellow, 1, false);
+            Debug.DrawLine(newPos, targetPos, Color.red, 1, false);
+            
             if (!Physics.Linecast(newPos, targetPos, lineCastLayerMask))
             {
                 // I can see the enemy from the new position.

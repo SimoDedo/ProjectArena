@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Transactions;
 using Logging;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -53,6 +54,7 @@ namespace Guns
 
         public override void Shoot()
         {
+            base.Shoot();
             #if !UNITY_SERVER || UNITY_EDITOR
             StartCoroutine(ShowMuzzleFlash());
             #endif

@@ -15,6 +15,7 @@ namespace AI.GoalMachine.Goal
         private const float NO_TIME = -1;
         private readonly BehaviorTree behaviorTree;
         private readonly DamageSensor damageSensor;
+        private readonly SoundSensor soundSensor;
         private readonly AIEntity entity;
         private readonly ExternalBehaviorTree externalBt;
         private readonly TargetKnowledgeBase _targetKnowledgeBase;
@@ -25,6 +26,7 @@ namespace AI.GoalMachine.Goal
             this.entity = entity;
             _targetKnowledgeBase = entity.TargetKnowledgeBase;
             damageSensor = entity.DamageSensor;
+            soundSensor = entity.SoundSensor;
             externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/SearchEnemy");
             behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
             behaviorTree.StartWhenEnabled = false;
@@ -35,8 +37,9 @@ namespace AI.GoalMachine.Goal
         public float GetScore()
         {
             var searchDueToLoss = _targetKnowledgeBase.HasLostTarget();
-            var searchDueToDamage = !_targetKnowledgeBase.HasSeenTarget() && damageSensor.WasDamagedRecently;
-            if (entity.GetEnemy().IsAlive && (searchDueToLoss || searchDueToDamage))
+            var searchDueToSuspectedEnemy = !_targetKnowledgeBase.HasSeenTarget() && 
+                                            (damageSensor.WasDamagedRecently || soundSensor.HeardShotRecently);
+            if (entity.GetEnemy().IsAlive && (searchDueToLoss || searchDueToSuspectedEnemy))
             {
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (startSearchTime == NO_TIME)

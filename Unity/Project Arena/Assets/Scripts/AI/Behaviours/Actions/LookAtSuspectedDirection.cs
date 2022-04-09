@@ -9,9 +9,9 @@ using Action = BehaviorDesigner.Runtime.Tasks.Action;
 namespace AI.Behaviours.Actions
 {
     /// <summary>
-    /// Makes the entity look at the direction where damage came from.
+    /// Makes the entity look at the direction where damage or sound came from.
     /// </summary>
-    public class LookAtDamageDirection : Action
+    public class LookAtSuspectedDirection : Action
     {
         private DamageSensor damageSensor;
         private Vector3 lookPosition;

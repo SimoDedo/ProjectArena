@@ -45,6 +45,7 @@ namespace Guns
 
         public override void Shoot()
         {
+            base.Shoot();
             #if !UNITY_SERVER || UNITY_EDITOR
             StartCoroutine(ShowMuzzleFlash());
             #endif
