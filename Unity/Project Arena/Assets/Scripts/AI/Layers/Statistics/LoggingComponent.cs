@@ -11,40 +11,41 @@ namespace AI.Layers.Statistics
         // Di cosa devo mettermi in ascolto qui?
         // Entrata e uscita da fight di mia entity
         // Respawn 
-        
+
         private readonly AIEntity entity;
 
         private bool loggedFirstRespawn;
-        
+
         private float lastRespawnTime;
         private float currentFightStartTime;
         private float previousFightEndTime;
-        
+
         private int numberOfFights;
         private int numberOfRetreats;
-        
+
         private float totalTimeBetweenSights;
 
         private float totalTimeInFight;
-        
+
         private float totalTimeToEngage;
 
         private int numberOfSights;
-        
+
         private float totalTimeToSurrender;
 
         // Focusing status of the current frame.
         // It might change any time and any amount of time between calls to Update()
         private bool isFocusingOnEnemy;
+
         // Focusing status of the previous frame
         private bool previousFocusingStatus;
 
         private bool wasEnemyVisibleLastFrame;
         private float enemySightLossTime;
-        
+
         public LoggingComponent(AIEntity entity)
         {
-            this.entity = entity; 
+            this.entity = entity;
             SpawnInfoGameEvent.Instance.AddListener(RespawnEvent);
             FocusingOnEnemyGameEvent.Instance.AddListener(FocusingEvent);
         }
@@ -73,33 +74,34 @@ namespace AI.Layers.Statistics
                     {
                         // I am no longer in combat but the enemy is alive. Did I gave up on searching?
                         totalTimeToSurrender += Mathf.Max(0f, Time.time - entity.TargetKnowledgeBase.LastTimeDetected);
-                        numberOfRetreats++;
+                        numberOfRetreats++; 
                     }
                 }
 
-                if (isFocusingOnEnemy)
-                {
-                    var isCurrentlyVisible = entity.TargetMemory.GetEnemyInfo().Last().isVisible;
-                    if (wasEnemyVisibleLastFrame != isCurrentlyVisible)
-                    {
-                        // Debug.Log(entity.name + " changed target sight to " + isCurrentlyVisible);
-                        if (!isCurrentlyVisible)
-                        {
-                            // Enemy sight lost
-                            enemySightLossTime = Time.time;
-                        }
-                        else
-                        {
-                            // Enemy sight reestablished
-                            totalTimeBetweenSights = Time.time - enemySightLossTime;
-                            numberOfSights++;
-                        }
+                previousFocusingStatus = isFocusingOnEnemy;
+            }
 
-                        wasEnemyVisibleLastFrame = isCurrentlyVisible;
+            if (isFocusingOnEnemy)
+            {
+                var isCurrentlyVisible = entity.TargetMemory.GetEnemyInfo().Last().isVisible;
+                if (wasEnemyVisibleLastFrame != isCurrentlyVisible)
+                {
+                    // Debug.Log(entity.name + " changed target sight to " + isCurrentlyVisible);
+                    if (!isCurrentlyVisible)
+                    {
+                        // Enemy sight lost
+                        enemySightLossTime = Time.time;
                     }
+                    else
+                    {
+                        // Enemy sight reestablished
+                        totalTimeBetweenSights = Time.time - enemySightLossTime;
+                        numberOfSights++;
+                    }
+
+                    wasEnemyVisibleLastFrame = isCurrentlyVisible;
                 }
             }
-            previousFocusingStatus = isFocusingOnEnemy;
         }
 
         public void PublishAndRelease()
@@ -121,6 +123,7 @@ namespace AI.Layers.Statistics
             SpawnInfoGameEvent.Instance.RemoveListener(RespawnEvent);
             FocusingOnEnemyGameEvent.Instance.RemoveListener(FocusingEvent);
         }
+
         private void RespawnEvent(SpawnInfo info)
         {
             if (info.entityId != entity.GetID()) return;
