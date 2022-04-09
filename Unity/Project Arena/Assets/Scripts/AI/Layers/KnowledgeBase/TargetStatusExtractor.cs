@@ -7,9 +7,9 @@ namespace AI.Layers.KnowledgeBase
     public class TargetKnowledgeBase
     {
         private static readonly AnimationCurve DistanceScore = new AnimationCurve(
-            new Keyframe(0f, 5f),
-            new Keyframe(10f, 3f),
-            new Keyframe(30f, 1.5f),
+            new Keyframe(0f, 2.5f),
+            new Keyframe(10f, 1.5f),
+            new Keyframe(30f, 1.2f),
             new Keyframe(50f, 1f)
         );
 
