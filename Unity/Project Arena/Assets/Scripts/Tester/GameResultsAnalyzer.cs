@@ -87,6 +87,7 @@ namespace Tester
             numberOfSuicides.Clear();
             numberOfShots.Clear();
             numberOfHits.Clear();
+            numberOfSights.Clear();
             killStreakMax.Clear();
             killStreaksSum.Clear();
             currentKillStreak.Clear();
