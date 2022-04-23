@@ -10,7 +10,7 @@ namespace Maps.MapGenerator
     public class GenomeV2MapGenerator : MapGenerator
     {
         private GraphGenomeV2 genome;
-        private Area[] areas;
+        private Area[] areas = new Area[0];
 
         public void SetGenome(GraphGenomeV2 genome)
         {
