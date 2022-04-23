@@ -97,7 +97,7 @@ namespace Maps.MapAssembler
             checkedVertices.Clear();
             triangleDictionary.Clear();
 
-            squareGrid = new SquareGrid(map, wallChar, squareSize, wallHeight);
+            squareGrid = new SquareGrid(map, wallChar, mapScale, wallHeight);
 
             vertices = new List<Vector3>();
             triangles = new List<int>();
@@ -140,7 +140,7 @@ namespace Maps.MapAssembler
             }
             else
             {
-                var topMesh = CreateRectangularMesh(rows, columns, squareSize, wallHeight, isSkyVisibile);
+                var topMesh = CreateRectangularMesh(rows, columns, mapScale, wallHeight, isSkyVisibile);
                 topMeshFilter.mesh = topMesh;
                 topCollider.sharedMesh = topMesh;
             }
@@ -191,7 +191,7 @@ namespace Maps.MapAssembler
         // Creates the floor mesh.
         private void CreateFloorMesh(int rows, int columns)
         {
-            var floorMesh = CreateRectangularMesh(rows, columns, squareSize, 0, true);
+            var floorMesh = CreateRectangularMesh(rows, columns, mapScale, 0, true);
 
             floorMeshFilter.mesh = floorMesh;
             floorCollider.sharedMesh = floorMesh;

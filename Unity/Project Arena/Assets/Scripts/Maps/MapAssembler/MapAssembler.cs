@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Others;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Maps.MapAssembler
 {
@@ -13,17 +14,22 @@ namespace Maps.MapAssembler
         // Wall height.
         [SerializeField] protected float wallHeight = 5f;
 
-        // Square size.
-        [SerializeField] protected float squareSize = 1f;
+        // Map scale.
+        [SerializeField] protected float mapScale = 1f;
 
         public abstract void AssembleMap(char[,] map, char wallChar, char roomChar);
 
         public abstract void AssembleMap(List<char[,]> maps, char wallChar, char roomChar,
             char voidChar);
 
-        public float GetSquareSize()
+        public void SetMapScale(float mapScale)
         {
-            return squareSize;
+            this.mapScale = mapScale;
+        }
+
+        public float GetMapScale()
+        {
+            return mapScale;
         }
 
         public float GetWallHeight()

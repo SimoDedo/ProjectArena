@@ -18,6 +18,7 @@ namespace Maps.Genomes
         public int cellsWidth;
         public int cellsHeight;
         public int squareSize;
+        public float mapScale;
         public Room[,] rooms;
         public bool[,] verticalCorridors;
         public bool[,] horizontalCorridors;
@@ -26,12 +27,13 @@ namespace Maps.Genomes
         {
         }
 
-        public GraphGenomeV2(int cellsWidth, int cellsHeight, int squareSize, Room[,] rooms, bool[,] verticalCorridors,
+        public GraphGenomeV2(int cellsWidth, int cellsHeight, int squareSize, float mapScale, Room[,] rooms, bool[,] verticalCorridors,
             bool[,] horizontalCorridors)
         {
             this.cellsHeight = cellsHeight;
             this.cellsWidth = cellsWidth;
             this.squareSize = squareSize;
+            this.mapScale = mapScale;
             this.rooms = rooms;
             this.verticalCorridors = verticalCorridors;
             this.horizontalCorridors = horizontalCorridors;
@@ -56,6 +58,11 @@ namespace Maps.Genomes
                 // Grid size invalid
                 return false;
             }
+
+            // if (mapScale < 1 || mapScale > 3)
+            // {
+            //     return false;
+            // }
 
             var numRows = rooms.GetLength(0);
             var numColumns = rooms.GetLength(1);
@@ -505,7 +512,7 @@ namespace Maps.Genomes
         }
 
         public static GraphGenomeV2 Default = new GraphGenomeV2(
-            10, 10, 3, new[,]
+            10, 10, 3, 1, new[,]
             {
                 {
                     new Room(0, 10, 0, 10),

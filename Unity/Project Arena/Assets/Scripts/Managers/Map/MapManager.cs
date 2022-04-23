@@ -41,7 +41,7 @@ namespace Managers.Map
 
         protected string seed;
 
-        public float MapScale => mapAssemblerScript.GetSquareSize();
+        public float MapScale => mapAssemblerScript.GetMapScale();
 
         private void Start()
         {

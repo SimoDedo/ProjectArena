@@ -36,7 +36,7 @@ namespace Managers.Map
                 mapAssemblerScript.AssembleMap(map, mapGeneratorScript.GetWallChar(),
                     mapGeneratorScript.GetRoomChar());
                 // Displace the objects.
-                objectDisplacerScript.DisplaceObjects(map, mapAssemblerScript.GetSquareSize(),
+                objectDisplacerScript.DisplaceObjects(map, mapAssemblerScript.GetMapScale(),
                     0);
             }
         }

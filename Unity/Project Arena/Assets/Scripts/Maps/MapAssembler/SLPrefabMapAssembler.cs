@@ -52,15 +52,15 @@ namespace Maps.MapAssembler
                     foreach (var p in processedTilePrefabs)
                         if (p.mask == currentMask)
                         {
-                            AddPrefab(p.prefab, x, y, squareSize, p.rotation, wallHeight);
+                            AddPrefab(p.prefab, x, y, mapScale, p.rotation, wallHeight);
                             break;
                         }
                 }
 
             // Generate floor and ceil colliders.
-            floorCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, wallHeight +
+            floorCollider.sharedMesh = CreateFlatMesh(width, height, mapScale, wallHeight +
                 floorHeight, false);
-            ceilCollider.sharedMesh = CreateFlatMesh(width, height, squareSize, wallHeight +
+            ceilCollider.sharedMesh = CreateFlatMesh(width, height, mapScale, wallHeight +
                 ceilHeight, true);
         }
 

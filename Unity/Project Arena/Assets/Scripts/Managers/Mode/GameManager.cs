@@ -45,7 +45,7 @@ namespace Managers.Mode
             {
                 height = mapManagerScript.GetMapGenerator().GetHeight(),
                 width = mapManagerScript.GetMapGenerator().GetWidth(),
-                ts = mapManagerScript.GetMapAssembler().GetSquareSize(),
+                ts = mapManagerScript.GetMapAssembler().GetMapScale(),
                 f = mapManagerScript.GetFlip()
             });
             GameInfoGameEvent.Instance.Raise(new GameInfo

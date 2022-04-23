@@ -57,11 +57,11 @@ namespace Maps.MapAssembler
                         foreach (var p in processedTilePrefabs)
                             if (p.mask == currentMask)
                             {
-                                AddWallRecursevely(i, x, y, squareSize, currentMask);
+                                AddWallRecursevely(i, x, y, mapScale, currentMask);
                                 break;
                             }
 
-                        AddPrefab(floorPrefab, x, y, squareSize, 0, wallHeight * i);
+                        AddPrefab(floorPrefab, x, y, mapScale, 0, wallHeight * i);
                     }
             }
         }

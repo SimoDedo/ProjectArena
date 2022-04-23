@@ -9,6 +9,7 @@ using Managers;
 using Managers.Map;
 using Managers.Mode;
 using Maps.Genomes;
+using Maps.MapAssembler;
 using Maps.MapGenerator;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -31,6 +32,7 @@ namespace Tester
         [SerializeField] private string bot2ParamsFilenamePrefix;
         [SerializeField] private SLMapManager mapManager;
         [SerializeField] private GenomeV2MapGenerator genomeMapGenerator;
+        [SerializeField] private MapAssembler mapAssembler;
         [SerializeField] private SpawnPointManager spawnPointManager;
         [SerializeField] private int numExperiments = 1;
         [SerializeField] private string experimentName = "experiment";
@@ -136,7 +138,8 @@ namespace Tester
                 genome = GraphGenomeV2.Default;
             }
             genomeMapGenerator.SetGenome(genome);
-
+            mapAssembler.SetMapScale(genome.mapScale);
+            
             manager = gameObject.AddComponent<GenomeTesterGameManager>();
             manager.SetParameters(
                 botPrefab,

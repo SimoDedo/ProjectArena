@@ -60,7 +60,7 @@ namespace Managers.Map
                     mapGeneratorScript.GetRoomChar(), stairsGeneratorScript.GetVoidChar());
                 // Displace the objects.
                 for (var i = 0; i < maps.Count; i++)
-                    objectDisplacerScript.DisplaceObjects(maps[i], mapAssemblerScript.GetSquareSize(),
+                    objectDisplacerScript.DisplaceObjects(maps[i], mapAssemblerScript.GetMapScale(),
                         mapAssemblerScript.GetWallHeight() * i);
             }
         }
