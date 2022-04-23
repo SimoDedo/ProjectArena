@@ -46,12 +46,12 @@ namespace AI.Behaviours.Actions
 
             // TODO Find better values
             var skill = entity.GetAimingSkill();
-            const float stdDev = 0.2f;
+            const float stdDev = 0.003f;
             var mean = skill switch
             {
-                AimingSkill.Low => 0.105f,
-                AimingSkill.Medium => -0.05f,
-                AimingSkill.High => -0.33f,
+                AimingSkill.Low => 0.24f,
+                AimingSkill.Medium => 0.13f,
+                AimingSkill.High => 0.01f,
                 _ => throw new ArgumentOutOfRangeException()
             };
 
