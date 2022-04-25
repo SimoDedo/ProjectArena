@@ -1,5 +1,6 @@
 using System;
 using AI.Layers.Memory;
+using ScriptableObjectArchitecture;
 using UnityEngine;
 
 namespace AI.Layers.KnowledgeBase
@@ -23,6 +24,11 @@ namespace AI.Layers.KnowledgeBase
         /// Stores the last time the enemy was considered detected.
         /// </summary>
         public float LastTimeDetected { get; private set; } = float.MinValue;
+
+        /// <summary>
+        /// Stores the first time the enemy was detected during the current detection event. 
+        /// </summary>
+        public float FirstTimeDetectedInEvent { get; private set; } = float.MinValue;
 
         // Total time (in the detection window) that the enemy must be seen in the detection interval before declaring
         // tha we can detect it.
@@ -53,7 +59,16 @@ namespace AI.Layers.KnowledgeBase
         {
             if (InternalHasSeenTarget())
             {
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                if (FirstTimeDetectedInEvent == float.MinValue)
+                {
+                    FirstTimeDetectedInEvent = Time.time;
+                }
                 LastTimeDetected = Time.time;
+            }
+            else
+            {
+                FirstTimeDetectedInEvent = float.MinValue;
             }
         }
 
