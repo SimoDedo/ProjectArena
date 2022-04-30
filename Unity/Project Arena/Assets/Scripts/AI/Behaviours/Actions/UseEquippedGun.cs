@@ -99,10 +99,22 @@ namespace AI.Behaviours.Actions
             if (!float.IsNaN(lastSightedDelay) && lastSightedDelay > currentDelay)
                 // We don't know the exact position of the enemy currentDelay ago, so just consider
                 // its last know position (with velocity zero, so that we won't correct the shooting position)
-                (enemyPosition, enemyVelocity) = enemyPositionTracker.GetPositionAndVelocityFromDelay(lastSightedDelay);
+                // TODO I am considering it nonetheless?
+                (enemyPosition, enemyVelocity) = enemyPositionTracker.GetPositionAndVelocityForRange(lastSightedTime, lastSightedTime);
             else
+            {
+                const float additionalDelay = 0.100f; // TODO decrease delay based on skill.
+                var currentStartTime = _targetKnowledgeBase.FirstTimeDetectedInEvent;
+                
+                var endTime = Time.time - currentDelay - additionalDelay;
+                if (endTime < currentStartTime)
+                {
+                    return TaskStatus.Running;
+                }
                 // We know the position of the enemy at currentDelay seconds ago, so use it directly.
-                (enemyPosition, enemyVelocity) = enemyPositionTracker.GetPositionAndVelocityFromDelay(currentDelay);
+                (enemyPosition, enemyVelocity) = enemyPositionTracker.GetPositionAndVelocityForRange(currentStartTime, endTime);
+                enemyPosition += enemyVelocity * additionalDelay;
+            }
 
             if (gunManager.IsCurrentGunProjectileWeapon())
                 AimProjectileWeapon(enemyPosition, enemyVelocity);

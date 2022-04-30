@@ -19,6 +19,7 @@ namespace AI.Behaviours.Actions
     {
         [SerializeField] private SharedSelectedPathInfo lastKnownPositionPath;
         private DamageSensor damageSensor;
+        private SoundSensor soundSensor;
         private Entity.Entity enemy;
         private PositionTracker enemyTracker;
         private AIEntity entity;
@@ -32,6 +33,7 @@ namespace AI.Behaviours.Actions
             _targetKnowledgeBase = entity.TargetKnowledgeBase;
             navSystem = entity.NavigationSystem;
             damageSensor = entity.DamageSensor;
+            soundSensor = entity.SoundSensor;
             enemyTracker = enemy.GetComponent<PositionTracker>();
         }
 
@@ -41,19 +43,25 @@ namespace AI.Behaviours.Actions
                 ? damageSensor.LastTimeDamaged
                 : float.MinValue;
 
-            var lossTime = _targetKnowledgeBase.LastTimeDetected;
+            var noiseTime = soundSensor.HeardShotRecently
+                ? soundSensor.LastTimeHeardShot
+                : float.MinValue;
 
-            if (damageTime > lossTime)
-                // The most recent event was getting damaged, so use this knowledge to guess its position
-                return EstimateEnemyPositionFromDamage();
-            // The most recent event was losing the enemy, so use this knowledge to guess its position
+            var triggeringEventTime = Mathf.Max(damageTime, noiseTime);
+            
+            var lossTime = _targetKnowledgeBase.LastTimeDetected;
+            
+            if (triggeringEventTime > lossTime)
+                // The most recent event was getting damaged or hearing noise, so use this knowledge to guess position
+                return EstimateEnemyPositionFromTriggeringEvent(triggeringEventTime);
+            // The most recent event was losing the enemy, so use this knowledge to guess position
             return EstimateEnemyPositionFromKnowledge();
         }
 
         private TaskStatus EstimateEnemyPositionFromKnowledge()
         {
-            var delay = Time.time - _targetKnowledgeBase.LastTimeDetected;
-            var (delayedPosition, velocity) = enemyTracker.GetPositionAndVelocityFromDelay(delay);
+            var delay = _targetKnowledgeBase.LastTimeDetected;
+            var (delayedPosition, velocity) = enemyTracker.GetPositionAndVelocityForRange(delay - 0.5f, delay);
 
             // Try to estimate the position of the enemy after it has gone out of sight
             var estimatedPosition = delayedPosition + velocity * 0.1f;
@@ -76,21 +84,26 @@ namespace AI.Behaviours.Actions
             throw new ArgumentException("Impossible to reach the enemy, estimated position in not valid!");
         }
 
-        private TaskStatus EstimateEnemyPositionFromDamage()
+        private TaskStatus EstimateEnemyPositionFromTriggeringEvent(float time)
         {
             // Estimate enemy position: get enemy position (assuming it's also the position from which 
             // we got damaged. Draw a line between my pos in the direction of the enemy and pick any point
             // in such line (maybe in the second half of the line, otherwise we seek too close). Draw a circle
             // around that point and pick one point inside of it. That's the enemy estimated position.
 
-            var delay = damageSensor.LastTimeDamaged - Time.time;
-            var (enemyPos, _) = enemyTracker.GetPositionAndVelocityFromDelay(delay);
+            var (enemyPos, _) = enemyTracker.GetPositionAndVelocityForRange(time - 0.5f, time);
 
             var myPosition = transform.position;
             var direction = enemyPos - myPosition;
-            if (Physics.Raycast(myPosition, direction, out var hit, direction.magnitude * 2f))
+            var distance = direction.magnitude * 2f;
+            if (Physics.Raycast(myPosition, direction, out var hit, distance))
             {
-                var chosenDistance = (0.5f + Random.value * 0.5f) * hit.distance;
+                distance = hit.distance;
+            }
+
+            for (var i = 0; i < 5; i++)
+            {
+                var chosenDistance = (0.5f + Random.value * 0.5f) * distance;
                 var pointOnLine = myPosition + chosenDistance * direction.normalized;
 
                 // size of radius is 1/3 of the distance, so we avoid looking behind us
@@ -106,30 +119,27 @@ namespace AI.Behaviours.Actions
                     lastKnownPositionPath.Value = path;
                     return TaskStatus.Success;
                 }
-
-                // The position chosen is not valid... choose the point we have hit?
-                var path2 = navSystem.CalculatePath(hit.point);
-                if (path2.IsComplete())
-                {
-                    lastKnownPositionPath.Value = path2;
-                    return TaskStatus.Success;
-                }
-
-                // todo i'd like to understand why is the point unreachable here...
-                // ... choose enemy position...
-                var path3 = navSystem.CalculatePath(enemyPos);
-                if (path3.IsComplete())
-                {
-                    lastKnownPositionPath.Value = path3;
-                    return TaskStatus.Success;
-                }
-
-                // Give up on life
-                throw new ArgumentException("Cannot get valid path to enemy");
             }
 
-            // How come we haven't spotted anything in the enemy direction? Not even the enemy? Impossible!
-            throw new ApplicationException("We couldn't spot the enemy even when raycasting towards it!");
+            // // The position chosen is not valid... choose the point we have hit?
+            // var path2 = navSystem.CalculatePath(hit.point);
+            // if (path2.IsComplete())
+            // {
+            //     lastKnownPositionPath.Value = path2;
+            //     return TaskStatus.Success;
+            // }
+
+            // todo i'd like to understand why is the point unreachable here...
+            // ... choose enemy position...
+            var path3 = navSystem.CalculatePath(enemyPos);
+            if (path3.IsComplete())
+            {
+                lastKnownPositionPath.Value = path3;
+                return TaskStatus.Success;
+            }
+
+            // Give up on life
+            throw new ArgumentException("Cannot get valid path to enemy");
         }
     }
 }

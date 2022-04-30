@@ -24,8 +24,8 @@ namespace AI.Behaviours.Actions
             var enemyTracker = enemy.GetComponent<PositionTracker>();
             damageSensor = entity.DamageSensor;
             sightController = entity.SightController;
-            var delay = damageSensor.LastTimeDamaged - Time.time;
-            (lookPosition, _) = enemyTracker.GetPositionAndVelocityFromDelay(delay);
+            var delay = damageSensor.LastTimeDamaged;
+            (lookPosition, _) = enemyTracker.GetPositionAndVelocityForRange(delay, delay);
         }
 
         public override TaskStatus OnUpdate()
