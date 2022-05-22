@@ -699,7 +699,7 @@ namespace Managers
         // Logs a kill.
         private void LogKill(KillInfo info)
         {
-            var coord = NormalizeFlipCoord(info.x, info.z);
+            var coord = NormalizeFlipCoord(info.killedX, info.killedZ);
 
             if (loggingGame)
             {

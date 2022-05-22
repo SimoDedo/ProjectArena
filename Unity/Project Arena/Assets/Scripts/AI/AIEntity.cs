@@ -368,6 +368,7 @@ namespace AI
         {
             // TODO Reset the various states
             var position = transform.position;
+            var enemyPos = enemy.transform.position;
             KillInfoGameEvent.Instance.Raise(
                 new KillInfo
                 {
@@ -375,8 +376,11 @@ namespace AI
                     killedEntityID = entityID,
                     killerEntity = "Player" + id,
                     killerEntityID = id,
-                    x = position.x,
-                    z = position.z
+                    killedX = position.x,
+                    killedZ = position.z,
+                    // TODO what about suicide?
+                    killerX = enemyPos.x,
+                    killerZ = enemyPos.z,
                 }
             );
             gameManagerScript.AddScore(id, entityID);

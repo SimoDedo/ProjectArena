@@ -146,8 +146,11 @@ namespace Entity
                     killedEntity = gameObject.name,
                     killerEntityID = id,
                     killerEntity = "Player " + id,
-                    x = position.x,
-                    z = position.z
+                    killedX = position.x,
+                    killedZ = position.z,
+                    // TODO
+                    killerX = 0, 
+                    killerZ = 0
                 });
             }
 

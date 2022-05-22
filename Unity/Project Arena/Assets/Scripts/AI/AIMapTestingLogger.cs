@@ -255,7 +255,7 @@ namespace AI
         // Logs a kill.
         private void LogKill(KillInfo info)
         {
-            var coord = NormalizeFlipCoord(info.x, info.z);
+            var coord = NormalizeFlipCoord(info.killedX, info.killedZ);
 
             var jKill = new JsonKill(Time.time - logStart, coord.x, coord.z, info.killedEntityID, info.killedEntity,
                 info.killerEntityID, info.killerEntity);

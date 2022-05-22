@@ -4,12 +4,14 @@ namespace Logging
 {
     public struct KillInfo
     {
-        public float x;
-        public float z;
+        public float killedX;
+        public float killedZ;
         public int killedEntityID;
         public string killedEntity;
         public int killerEntityID;
         public string killerEntity;
+        public float killerX;
+        public float killerZ;
     }
 
     public class BaseKillInfoGameEvent : GameEventBase<KillInfo>

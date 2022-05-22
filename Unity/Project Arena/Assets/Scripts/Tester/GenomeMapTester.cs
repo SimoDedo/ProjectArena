@@ -39,10 +39,12 @@ namespace Tester
         [SerializeField] private int gameLength = DEFAULT_GAME_LENGTH;
         [SerializeField] private bool saveMap ;
         [SerializeField] private bool logPositions;
+        [SerializeField] private bool logKillDistances;
 
         private readonly List<Dictionary<string, object>> results = new List<Dictionary<string, object>>();
         private GameResultsAnalyzer analyzer;
         private PositionAnalyzer positionAnalyzer;
+        private KillDistanceAnalyzer killDistanceAnalyzer;
         private string botsPath;
 
         private int experimentNumber;
@@ -69,7 +71,7 @@ namespace Tester
                 if (arg.StartsWith("-gameLength=")) gameLength = int.Parse(arg.Substring(12));
                 if (arg.StartsWith("-saveMap")) saveMap = true;
                 if (arg.StartsWith("-logPositions")) logPositions = true;
-                
+                if (arg.StartsWith("-logKillDistances")) logKillDistances = true;
             }
 
             #if UNITY_SERVER && !UNITY_EDITOR
@@ -92,6 +94,12 @@ namespace Tester
             {
                 positionAnalyzer = new PositionAnalyzer(BOT1_ID, BOT2_ID);
                 positionAnalyzer.Setup();
+            }
+
+            if (logKillDistances)
+            {
+                killDistanceAnalyzer = new KillDistanceAnalyzer(BOT1_ID, BOT2_ID);
+                killDistanceAnalyzer.Setup();
             }
 
             StartNewExperimentGameEvent.Instance.AddListener(NewExperimentStarted);
@@ -121,6 +129,11 @@ namespace Tester
             {
                 positionAnalyzer.Reset();
             }
+
+            // if (logKillDistances)
+            // {
+            //     killDistanceAnalyzer.Reset();
+            // }
 
             var bot1Params = ReadFromFile(botsPath + bot1ParamsFilenamePrefix + "params.json",
                 BotCharacteristics.Default);
@@ -169,7 +182,7 @@ namespace Tester
                 ExportResults(positions1, experimentName + experimentNumber + '1', ".csv");
                 ExportResults(positions2, experimentName + experimentNumber + '2', ".csv");
             }
-
+            
             // TODO provide correct length 
             results.Add(analyzer.CompileResults(gameLength));
 
@@ -177,6 +190,13 @@ namespace Tester
 
             if (experimentNumber >= numExperiments)
             {
+                if (logKillDistances)
+                {
+                    var (positions1, positions2) = killDistanceAnalyzer.CompileResultsAsCSV();
+                    ExportResults(positions1, experimentName + "_kill_distances_1", ".csv");
+                    ExportResults(positions2, experimentName + "_kill_distances_2", ".csv");
+                }
+
                 ExportResults(JsonConvert.SerializeObject(results), experimentName);
                 Application.Quit();
             }
