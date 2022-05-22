@@ -27,7 +27,7 @@ namespace Guns
         private Transform t;
 
         public override bool IsProjectileWeapon => false;
-        public override float MaxRange => range;
+        public override float MaxRange => limitRange ? range : float.MaxValue;
 
         private void Start()
         {
