@@ -9,6 +9,8 @@ using AI.Layers.Statistics;
 using Entity.Component;
 using Logging;
 using Managers.Mode;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Others;
 using Pickables;
 using UnityEngine;
@@ -30,6 +32,7 @@ namespace AI
         /// <summary>
         /// Ability of the bot to move tactically during a fight.
         /// </summary>
+        [JsonConverter(typeof(StringEnumConverter))]
         [SerializeField] public FightingMovementSkill movementSkill;
 
         /// <summary>
@@ -70,6 +73,7 @@ namespace AI
         /// <summary>
         /// Entity tendency to look around when moving.
         /// </summary>
+        [JsonConverter(typeof(StringEnumConverter))]
         [SerializeField] public CuriosityLevel curiosity;
 
         /// <summary>
@@ -80,6 +84,7 @@ namespace AI
         /// <summary>
         /// Ability of the bot to aim at a target.
         /// </summary>
+        [JsonConverter(typeof(StringEnumConverter))]
         [SerializeField] public AimingSkill aimingSkill;
 
         /// <summary>
@@ -90,6 +95,7 @@ namespace AI
         /// <summary>
         /// Enemy tendency to behave recklessly or not.
         /// </summary>
+        [JsonConverter(typeof(StringEnumConverter))]
         [SerializeField] public Recklessness recklessness;
 
         /// <summary>
