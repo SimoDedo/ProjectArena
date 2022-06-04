@@ -35,6 +35,7 @@ namespace Tester
         [SerializeField] private MapAssembler mapAssembler;
         [SerializeField] private SpawnPointManager spawnPointManager;
         [SerializeField] private int numExperiments = 1;
+        [SerializeField] private string folderName;
         [SerializeField] private string experimentName = "experiment";
         [SerializeField] private int gameLength = DEFAULT_GAME_LENGTH;
         [SerializeField] private bool saveMap ;
@@ -66,6 +67,7 @@ namespace Tester
                 if (arg.StartsWith("-bot1file=")) bot1ParamsFilenamePrefix = arg.Substring(10);
                 if (arg.StartsWith("-bot2file=")) bot2ParamsFilenamePrefix = arg.Substring(10);
                 if (arg.StartsWith("-numExperiments=")) numExperiments = int.Parse(arg.Substring(16));
+                if (arg.StartsWith("-folderName=")) folderName = arg.Substring(12);
                 if (arg.StartsWith("-experimentName=")) experimentName = arg.Substring(16);
                 if (arg.StartsWith("-genomeName=")) genomeName = arg.Substring(12);
                 if (arg.StartsWith("-gameLength=")) gameLength = int.Parse(arg.Substring(12));
@@ -118,7 +120,7 @@ namespace Tester
         
         private void SaveMap(string map)
         {
-            ExportResults(map, experimentName, ".txt");
+            ExportResults(map, folderName + "map_" + experimentName, ".txt");
             SaveMapTextGameEvent.Instance.RemoveListener(SaveMap);
         }
 
@@ -144,7 +146,7 @@ namespace Tester
             var activeGunsBot1 = ReadFromFile(botsPath + bot1ParamsFilenamePrefix + "guns.json", defaultGuns);
             var activeGunsBot2 = ReadFromFile(botsPath + bot2ParamsFilenamePrefix + "guns.json", defaultGuns);
 
-            var genome = ReadFromFile(genomesPath + genomeName, GraphGenomeV2.Default);
+            var genome = ReadFromFile(genomesPath + folderName + genomeName, GraphGenomeV2.Default);
             if (!genome.IsGenomeValid())
             {
                 Debug.LogError("Genome read from file is invalid!");
@@ -179,8 +181,8 @@ namespace Tester
             if (logPositions)
             {
                 var (positions1, positions2) = positionAnalyzer.CompileResultsAsCSV();
-                ExportResults(positions1, experimentName + experimentNumber + '1', ".csv");
-                ExportResults(positions2, experimentName + experimentNumber + '2', ".csv");
+                ExportResults(positions1, folderName + "position_" + experimentName + "_" + experimentNumber + "_bot1", ".csv");
+                ExportResults(positions2, folderName + "position_" + experimentName + "_" + experimentNumber + "_bot2", ".csv");
             }
             
             // TODO provide correct length 
@@ -193,11 +195,11 @@ namespace Tester
                 if (logKillDistances)
                 {
                     var (positions1, positions2) = killDistanceAnalyzer.CompileResultsAsCSV();
-                    ExportResults(positions1, experimentName + "_kill_distances_1", ".csv");
-                    ExportResults(positions2, experimentName + "_kill_distances_2", ".csv");
+                    ExportResults(positions1, folderName + "kill_distances_" + experimentName + "_bot1", ".csv");
+                    ExportResults(positions2, folderName + "kill_distances_" + experimentName + "_bot2", ".csv");
                 }
 
-                ExportResults(JsonConvert.SerializeObject(results), experimentName);
+                ExportResults(JsonConvert.SerializeObject(results), folderName + "final_results_" + experimentName);
                 Application.Quit();
             }
             else
@@ -221,6 +223,7 @@ namespace Tester
             var filePath = exportPath + extension;
             try
             {
+                Debug.Log("Writing to file " + filePath);
                 using var writer = new StreamWriter(filePath);
                 writer.Write(compileResults);
             }
