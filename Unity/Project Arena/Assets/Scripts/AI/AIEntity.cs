@@ -84,8 +84,7 @@ namespace AI
         /// <summary>
         /// Ability of the bot to aim at a target.
         /// </summary>
-        [JsonConverter(typeof(StringEnumConverter))]
-        [SerializeField] public AimingSkill aimingSkill;
+        [SerializeField] [Range(0f, 1f)] public float aimingSkill;
 
         /// <summary>
         /// For how long the entity remains wary after receiving damage
@@ -104,7 +103,7 @@ namespace AI
         public static BotCharacteristics Default =>
             new BotCharacteristics
             {
-                aimingSkill = AimingSkill.Medium,
+                aimingSkill = 0.5f,
                 curiosity = CuriosityLevel.Medium,
                 fov = 60,
                 maxCameraAcceleration = 2000f,
@@ -130,16 +129,6 @@ namespace AI
         MoveStraight, // Can move, but only toward / away from the target in a straight line.
         CircleStrife, // Can strife around the target, but only in one direction.
         CircleStrifeChangeDirection // Can strife around the target, changing direction if necessary.
-    }
-    
-    /// <summary>
-    /// Determines how likely the bot aims exactly where the enemy is.
-    /// </summary>
-    public enum AimingSkill
-    {
-        Low, // Aims at the correct location ~30% of the times.
-        Medium, // Aims at the correct location ~60% of the times.
-        High, // Aims at the correct location ~95% of the times.
     }
 
     /// <summary>
@@ -235,6 +224,8 @@ namespace AI
 
         public FightingMovementSkill MovementSkill => botParams.movementSkill;
 
+        public float AimingSkill => botParams.aimingSkill;
+        
         public Recklessness Recklessness => botParams.recklessness;
 
         private LoggingComponent loggingComponent;
@@ -500,15 +491,6 @@ namespace AI
         {
             this.enemy = enemy;
         }
-
-        /// <summary>
-        /// Returns the aiming skill of the entity.
-        /// </summary>
-        public AimingSkill GetAimingSkill()
-        {
-            return botParams.aimingSkill;
-        }
-
 
         /// <summary>
         /// Sets the characteristics of the bot. Must be used before calling <see cref="SetupEntity"/>

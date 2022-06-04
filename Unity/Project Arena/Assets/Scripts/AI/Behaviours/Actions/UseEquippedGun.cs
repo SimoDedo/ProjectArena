@@ -45,15 +45,9 @@ namespace AI.Behaviours.Actions
             enemyPositionTracker = enemy.GetComponent<PositionTracker>();
 
             // TODO Find better values
-            var skill = entity.GetAimingSkill();
-            const float stdDev = 0.003f;
-            var mean = skill switch
-            {
-                AimingSkill.Low => 0.24f,
-                AimingSkill.Medium => 0.13f,
-                AimingSkill.High => 0.01f,
-                _ => throw new ArgumentOutOfRangeException()
-            };
+            var skill = entity.AimingSkill;
+            const float stdDev = 0.03f;
+            var mean = 0.048f - skill * 0.047f;
 
             distribution = new NormalDistribution(mean, stdDev);
             targetReflexDelay = (float) distribution.Generate();
@@ -88,8 +82,8 @@ namespace AI.Behaviours.Actions
             }
 
             var currentDelay =
-                previousReflexDelay + (targetReflexDelay - previousReflexDelay) *
-                (Time.time - (nextDelayRecalculation - AIM_UPDATE_INTERVAL)) / AIM_UPDATE_INTERVAL;
+                Math.Max(0, previousReflexDelay + (targetReflexDelay - previousReflexDelay) *
+                (Time.time - (nextDelayRecalculation - AIM_UPDATE_INTERVAL)) / AIM_UPDATE_INTERVAL);
 
             var lastSightedDelay = Time.time - lastSightedTime;
 
@@ -99,11 +93,11 @@ namespace AI.Behaviours.Actions
             if (!float.IsNaN(lastSightedDelay) && lastSightedDelay > currentDelay)
                 // We don't know the exact position of the enemy currentDelay ago, so just consider
                 // its last know position (with velocity zero, so that we won't correct the shooting position)
-                // TODO I am considering it nonetheless?
+                // TODO I am considering it nonetheless? Shouldn't we reset enemyVelocity to zero?
                 (enemyPosition, enemyVelocity) = enemyPositionTracker.GetPositionAndVelocityForRange(lastSightedTime, lastSightedTime);
             else
             {
-                const float additionalDelay = 0.100f; // TODO decrease delay based on skill.
+                float additionalDelay = 0.080f - 0.020f * entity.AimingSkill; // TODO decrease delay based on skill.
                 var currentStartTime = _targetKnowledgeBase.FirstTimeDetectedInEvent;
                 
                 var endTime = Time.time - currentDelay - additionalDelay;
@@ -113,6 +107,7 @@ namespace AI.Behaviours.Actions
                 }
                 // We know the position of the enemy at currentDelay seconds ago, so use it directly.
                 (enemyPosition, enemyVelocity) = enemyPositionTracker.GetPositionAndVelocityForRange(currentStartTime, endTime);
+
                 enemyPosition += enemyVelocity * additionalDelay;
             }
 
