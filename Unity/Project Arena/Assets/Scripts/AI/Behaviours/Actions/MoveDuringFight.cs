@@ -61,10 +61,7 @@ namespace AI.Behaviours.Actions
             }
             navSystem.CancelPath();
 
-            // We won't interfere raycasts and linecasts with our own presence
-            // entity.SetIgnoreRaycast(true);
             TrySelectDestination();
-            // entity.SetIgnoreRaycast(false);
             return TaskStatus.Running;
         }
 
@@ -192,7 +189,7 @@ namespace AI.Behaviours.Actions
             }
             else
             {
-                // TODO I Cannot set the enemy. I should move somewhere else. Move toward the enemy.
+                // TODO I Cannot see the enemy. I should move somewhere else. Move toward the enemy.
                 // However, do not 
                 MoveToLocationWithEnemyInSight(currentPos, targetPos);
             }

@@ -232,6 +232,7 @@ namespace Maps.MapAssembler
                 wall.AddComponent<MeshRenderer>().material = wallMaterial;
                 var meshCollider = wall.AddComponent<MeshCollider>();
                 meshCollider.sharedMesh = mesh;
+                meshCollider.convex = true;
 
                 wall.isStatic = true;
             }

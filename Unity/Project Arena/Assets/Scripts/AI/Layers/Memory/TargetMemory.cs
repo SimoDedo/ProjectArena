@@ -21,7 +21,6 @@ namespace AI.Layers.Memory
     ///   detected when considering the whole memory window.
     /// </summary>
 
-    // TODO maybe separate responsibility of enemy knowledge vs extraction of info (e.g. can react to enemy).
     public class TargetMemory
     {
         public readonly struct EnemyInfo
@@ -83,10 +82,8 @@ namespace AI.Layers.Memory
         public void Update()
         {
             var targetTransform = target.transform;
-            // TODO Understand if this can be removed to avoid magically knowing enemy position when sneaking behind
             var targetDistance = (targetTransform.position - me.transform.position).magnitude;
-            var isTargetClose = target.IsAlive && targetDistance < 10;
-            var result = isTargetClose || sensor.CanSeeObject(targetTransform);
+            var result = sensor.CanSeeObject(targetTransform);
 
             results.Add(new EnemyInfo(result, targetDistance,  Time.time - Time.deltaTime, Time.time));
             ForgetOldData();

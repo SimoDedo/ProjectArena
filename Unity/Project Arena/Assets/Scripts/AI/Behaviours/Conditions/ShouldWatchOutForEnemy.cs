@@ -29,7 +29,7 @@ namespace AI.Behaviours.Conditions
                 // Never fight back if I don't have the required movement skill!
                 return TaskStatus.Failure;
 
-            Debug.Log(gameObject.name + " will watch out? " + soundSensor.HeardShotRecently);
+            // Debug.Log(gameObject.name + " will watch out? " + soundSensor.HeardShotRecently);
             
             return damageSensor.WasDamagedRecently || soundSensor.HeardShotRecently
                 ? TaskStatus.Success

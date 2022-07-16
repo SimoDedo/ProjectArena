@@ -21,17 +21,6 @@ namespace Tester
 
         private void Awake()
         {
-#if !UNITY_EDITOR
-                Time.captureFramerate = 30;
-                Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
-#endif
-
-            if (!Application.isBatchMode)
-            {
-                QuitWithError("This scene should be played in batch mode!");
-                return;
-            }
-
             var args = Environment.GetCommandLineArgs();
             string experimentType = null;
             foreach (var arg in args)

@@ -23,18 +23,20 @@ namespace AI.Behaviours.Actions
         private Entity.Entity enemy;
 
         private NavigationSystem navSystem;
+        private int lineCastLayerMask;
+
 
         public override void OnAwake()
         {
             var entity = gameObject.GetComponent<AIEntity>();
             navSystem = entity.NavigationSystem;
             enemy = entity.GetEnemy();
+            lineCastLayerMask = ~LayerMask.GetMask("Entity", "Projectile", "Ignore Raycast");
         }
 
         public override TaskStatus OnUpdate()
         {
-            if (Physics.Linecast(transform.position, enemy.transform.position, out var hit1) &&
-                hit1.collider.gameObject != enemy.gameObject)
+            if (Physics.Linecast(transform.position, enemy.transform.position, lineCastLayerMask))
             {
                 // Current position is already covered!
                 pathInfo.Value = navSystem.CalculatePath(transform.position);
@@ -58,8 +60,7 @@ namespace AI.Behaviours.Actions
                     // Path invalid or too long!
                     continue;
 
-                if (!Physics.Linecast(finalPos, enemy.transform.position, out var hit) ||
-                    hit.collider.gameObject == enemy.gameObject)
+                if (!Physics.Linecast(finalPos, enemy.transform.position, lineCastLayerMask))
                     // We can still see the enemy from that position, no good! 
                     continue;
 

@@ -73,7 +73,8 @@ namespace AI.Layers.Statistics
                     if (entity.GetEnemy().IsAlive)
                     {
                         // I am no longer in combat but the enemy is alive. Did I gave up on searching?
-                        totalTimeToSurrender += Mathf.Max(0f, Time.time - entity.TargetKnowledgeBase.LastTimeDetected);
+                        // TODO Avoid the need to use max here (I never detected the enemy in the first place).
+                        totalTimeToSurrender += Mathf.Max(0f, Time.time - Math.Max(0f, entity.TargetKnowledgeBase.LastTimeDetected));
                         numberOfRetreats++; 
                     }
                 }
@@ -106,6 +107,7 @@ namespace AI.Layers.Statistics
 
         public void PublishAndRelease()
         {
+            // TODO update last time with focusing on enemy false
             EntityGameMetricsGameEvent.Instance.Raise(
                 new GameMetrics
                 {

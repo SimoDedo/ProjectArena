@@ -1,56 +1,62 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Logging;
 using UnityEngine;
-using Utils;
 
 namespace Tester
 {
     /// <summary>
     /// Collects game statistics events and compiles them into their final results.
     /// </summary>
-    public class PositionAnalyzer
+    public class DeathPositionAnalyzer
     {
         private readonly int bot1ID;
         private readonly int bot2ID;
-
-        private readonly Dictionary<int, List<Vector2>> positions = new Dictionary<int, List<Vector2>>();
+        private readonly Dictionary<int, List<Vector2>> deathPositions = new Dictionary<int, List<Vector2>>();
         
-        public PositionAnalyzer(int bot1ID, int bot2ID)
+        public DeathPositionAnalyzer(int bot1ID, int bot2ID)
         {
             this.bot1ID = bot1ID;
             this.bot2ID = bot2ID;
-            positions[bot1ID] = new List<Vector2>();
-            positions[bot2ID] = new List<Vector2>();
+            deathPositions.Add(bot1ID, new List<Vector2>());
+            deathPositions.Add(bot2ID, new List<Vector2>());
         }
 
         public void Setup()
         {
-            PositionInfoGameEvent.Instance.AddListener(LogPosition);
-        }
-
-        private void LogPosition(PositionInfo obj)
-        {
-            positions[obj.entityID].Add(new Vector2(obj.x, obj.z));
+            KillInfoGameEvent.Instance.AddListener(LogDeathPosition);
         }
 
         public void TearDown()
         {
-            PositionInfoGameEvent.Instance.RemoveListener(LogPosition);
+            KillInfoGameEvent.Instance.RemoveListener(LogDeathPosition);
         }
 
         public void Reset()
         {    
-            positions[bot1ID].Clear();
-            positions[bot2ID].Clear();
+            deathPositions.Clear();
+            deathPositions.Add(bot1ID, new List<Vector2>());
+            deathPositions.Add(bot2ID, new List<Vector2>());
         }
-        
+
+        private void LogDeathPosition(KillInfo receivedInfo)
+        {
+            if (receivedInfo.killedEntityID == receivedInfo.killerEntityID)
+            {
+                // Suicide!
+                return;
+            }
+
+            // TODO Must adjust position according to map scale
+
+            deathPositions[receivedInfo.killedEntityID].Add(new Vector2(receivedInfo.killedX, receivedInfo.killedZ));
+        }
+
         public Tuple<string,string> CompileResultsAsCSV()
         {
-            var positions1 = positions[bot1ID];
-            var positions2 = positions[bot2ID];
+            var positions1 = deathPositions[bot1ID];
+            var positions2 = deathPositions[bot2ID];
             
             return new Tuple<string, string>(GetCSV(positions1), GetCSV(positions2));
         }

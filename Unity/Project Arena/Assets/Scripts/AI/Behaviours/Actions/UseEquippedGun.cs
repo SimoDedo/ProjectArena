@@ -47,7 +47,7 @@ namespace AI.Behaviours.Actions
             // TODO Find better values
             var skill = entity.AimingSkill;
             const float stdDev = 0.03f;
-            var mean = 0.048f - skill * 0.047f;
+            var mean = 0.090f - skill * 0.089f;
 
             distribution = new NormalDistribution(mean, stdDev);
             targetReflexDelay = (float) distribution.Generate();
@@ -97,7 +97,7 @@ namespace AI.Behaviours.Actions
                 (enemyPosition, enemyVelocity) = enemyPositionTracker.GetPositionAndVelocityForRange(lastSightedTime, lastSightedTime);
             else
             {
-                float additionalDelay = 0.080f - 0.020f * entity.AimingSkill; // TODO decrease delay based on skill.
+                float additionalDelay = 0.080f - 0.020f * entity.AimingSkill;
                 var currentStartTime = _targetKnowledgeBase.FirstTimeDetectedInEvent;
                 
                 var endTime = Time.time - currentDelay - additionalDelay;

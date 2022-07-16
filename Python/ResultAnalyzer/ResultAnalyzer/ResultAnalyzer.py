@@ -520,10 +520,11 @@ def heatmapMenu():
                and option != "6"  and option != "0"):
             option = input("Invalid choice. Option: ")
     
+    
         if option == "1":
-            positionHeatmap("heatmap_arena_SS.csv")
+            positionHeatmap("position_0_3_0_0_bot1.csv")
         elif option == "2":
-            positionHeatmap("heatmap_arena_SUD.csv") 
+            positionHeatmap("position_0_3_0_0_bot2.csv") 
         elif option == "3":
             positionHeatmap("heatmap_corridors_SS.csv")
         elif option == "4":

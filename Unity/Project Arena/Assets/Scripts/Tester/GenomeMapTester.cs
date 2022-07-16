@@ -41,11 +41,13 @@ namespace Tester
         [SerializeField] private bool saveMap ;
         [SerializeField] private bool logPositions;
         [SerializeField] private bool logKillDistances;
+        [SerializeField] private bool logDeathPositions;
 
         private readonly List<Dictionary<string, object>> results = new List<Dictionary<string, object>>();
         private GameResultsAnalyzer analyzer;
         private PositionAnalyzer positionAnalyzer;
         private KillDistanceAnalyzer killDistanceAnalyzer;
+        private DeathPositionAnalyzer deathPositionAnalyzer;
         private string botsPath;
 
         private int experimentNumber;
@@ -57,10 +59,12 @@ namespace Tester
         
         private void Awake()
         {
-#if !UNITY_EDITOR
+            if (Application.isBatchMode)
+            {
                 Time.captureFramerate = 24;
                 Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
-#endif
+            }
+
             var args = Environment.GetCommandLineArgs();
             foreach (var arg in args)
             {
@@ -74,10 +78,11 @@ namespace Tester
                 if (arg.StartsWith("-saveMap")) saveMap = true;
                 if (arg.StartsWith("-logPositions")) logPositions = true;
                 if (arg.StartsWith("-logKillDistances")) logKillDistances = true;
+                if (arg.StartsWith("-logDeathPositions")) logDeathPositions = true;
             }
 
             #if UNITY_SERVER && !UNITY_EDITOR
-            var basePath = Directory.GetCurrentDirectory();
+            var basePath = Directory.GetCurrentDirectory() + "/Data";
             #else
             var basePath = Application.persistentDataPath;
             #endif
@@ -86,7 +91,6 @@ namespace Tester
             genomesPath = importPath + "Genomes/";
             botsPath = importPath + "Bots/";
 
-            if (!Directory.Exists(importPath)) Directory.CreateDirectory(importPath);
             if (!Directory.Exists(genomesPath)) Directory.CreateDirectory(genomesPath);
             if (!Directory.Exists(botsPath)) Directory.CreateDirectory(botsPath);
 
@@ -103,6 +107,12 @@ namespace Tester
                 killDistanceAnalyzer = new KillDistanceAnalyzer(BOT1_ID, BOT2_ID);
                 killDistanceAnalyzer.Setup();
             }
+
+            if (logDeathPositions)
+            {
+                deathPositionAnalyzer = new DeathPositionAnalyzer(BOT1_ID, BOT2_ID);
+                deathPositionAnalyzer.Setup();
+            }            
 
             StartNewExperimentGameEvent.Instance.AddListener(NewExperimentStarted);
             ExperimentEndedGameEvent.Instance.AddListener(ExperimentEnded);
@@ -127,16 +137,7 @@ namespace Tester
         private void StartNewExperiment()
         {
             analyzer.Reset();
-            if (logPositions)
-            {
-                positionAnalyzer.Reset();
-            }
-
-            // if (logKillDistances)
-            // {
-            //     killDistanceAnalyzer.Reset();
-            // }
-
+            
             var bot1Params = ReadFromFile(botsPath + bot1ParamsFilenamePrefix + "params.json",
                 BotCharacteristics.Default);
             var bot2Params = ReadFromFile(botsPath + bot2ParamsFilenamePrefix + "params.json",
@@ -177,13 +178,6 @@ namespace Tester
 
             manager.StopGame();
             Destroy(manager);
-
-            if (logPositions)
-            {
-                var (positions1, positions2) = positionAnalyzer.CompileResultsAsCSV();
-                ExportResults(positions1, folderName + "position_" + experimentName + "_" + experimentNumber + "_bot1", ".csv");
-                ExportResults(positions2, folderName + "position_" + experimentName + "_" + experimentNumber + "_bot2", ".csv");
-            }
             
             // TODO provide correct length 
             results.Add(analyzer.CompileResults(gameLength));
@@ -197,6 +191,19 @@ namespace Tester
                     var (positions1, positions2) = killDistanceAnalyzer.CompileResultsAsCSV();
                     ExportResults(positions1, folderName + "kill_distances_" + experimentName + "_bot1", ".csv");
                     ExportResults(positions2, folderName + "kill_distances_" + experimentName + "_bot2", ".csv");
+                }
+                if (logDeathPositions)
+                {
+                    var (positions1, positions2) = deathPositionAnalyzer.CompileResultsAsCSV();
+                    ExportResults(positions1, folderName + "death_positions_" + experimentName + "_bot1", ".csv");
+                    ExportResults(positions2, folderName + "death_positions_" + experimentName + "_bot2", ".csv");
+                }
+
+                if (logPositions)
+                {
+                    var (positions1, positions2) = positionAnalyzer.CompileResultsAsCSV();
+                    ExportResults(positions1, folderName + "position_" + experimentName + "_bot1", ".csv");
+                    ExportResults(positions2, folderName + "position_" + experimentName + "_bot2", ".csv");
                 }
 
                 ExportResults(JsonConvert.SerializeObject(results), folderName + "final_results_" + experimentName);
@@ -215,9 +222,9 @@ namespace Tester
         {
 
             #if UNITY_EDITOR
-            var exportPath = Application.persistentDataPath + "/Export/" + experimentName;
+            var exportPath = Application.persistentDataPath + "Export/" + experimentName;
             #else
-            var exportPath = Directory.GetCurrentDirectory() + "/Export/" + experimentName;
+            var exportPath = Directory.GetCurrentDirectory() + "/Data/Export/" + experimentName;
             #endif
             
             var filePath = exportPath + extension;

@@ -13,18 +13,25 @@ namespace AI.Behaviours.Actions
     /// </summary>
     public class LookAtSuspectedDirection : Action
     {
+        private AIEntity entity;
         private DamageSensor damageSensor;
+        private SoundSensor soundSensor;
         private Vector3 lookPosition;
         private SightController sightController;
 
         public override void OnAwake()
         {
-            var entity = GetComponent<AIEntity>();
+            entity = GetComponent<AIEntity>();
+            damageSensor = entity.DamageSensor;
+            soundSensor = entity.SoundSensor;
+            sightController = entity.SightController;
+        }
+
+        public override void OnStart()
+        {
             var enemy = entity.GetEnemy();
             var enemyTracker = enemy.GetComponent<PositionTracker>();
-            damageSensor = entity.DamageSensor;
-            sightController = entity.SightController;
-            var delay = damageSensor.LastTimeDamaged;
+            var delay = Mathf.Max(damageSensor.LastTimeDamaged, soundSensor.LastTimeHeardShot);
             (lookPosition, _) = enemyTracker.GetPositionAndVelocityForRange(delay, delay);
         }
 
