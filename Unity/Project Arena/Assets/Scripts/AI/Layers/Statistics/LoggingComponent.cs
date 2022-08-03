@@ -35,14 +35,14 @@ namespace AI.Layers.Statistics
 
         // Focusing status of the current frame.
         // It might change any time and any amount of time between calls to Update()
-        private bool isFocusingOnEnemy;
+        private bool isInCombat;
 
         // Focusing status of the previous frame
-        private bool previousFocusingStatus;
+        private bool previouslyWasInCombat;
 
         private bool wasEnemyVisibleLastFrame;
         private float enemySightLossTime;
-
+        
         public LoggingComponent(AIEntity entity)
         {
             this.entity = entity;
@@ -51,40 +51,41 @@ namespace AI.Layers.Statistics
         }
 
 
+        // TODO Combat event might start even if enemy is not visible
+        // TODO I might give up search before even detecting the enemy in the first place, so the total time to
+        //   surrender is wrong
         public void Update()
         {
-            // if (!entity.IsAlive) return;
-            if (previousFocusingStatus != isFocusingOnEnemy)
+            if (previouslyWasInCombat != isInCombat)
             {
                 // Debug.Log(entity.name + " changed focusing to " + isFocusingOnEnemy);
-                if (isFocusingOnEnemy)
+                if (isInCombat)
                 {
-                    // I am now in combat
+                    // I am now in combat event
                     currentFightStartTime = Time.time;
                     totalTimeToEngage += currentFightStartTime - Mathf.Max(lastRespawnTime, previousFightEndTime);
                     numberOfFights++;
-                    wasEnemyVisibleLastFrame = true;
                 }
                 else
                 {
-                    // I am no longer in combat
+                    // I am no longer in combat event
                     previousFightEndTime = Time.time;
                     totalTimeInFight += previousFightEndTime - currentFightStartTime;
-                    if (entity.GetEnemy().IsAlive)
+                    if (entity.IsAlive && entity.GetEnemy().IsAlive)
                     {
-                        // I am no longer in combat but the enemy is alive. Did I gave up on searching?
-                        // TODO Avoid the need to use max here (I never detected the enemy in the first place).
-                        totalTimeToSurrender += Mathf.Max(0f, Time.time - Math.Max(0f, entity.TargetKnowledgeBase.LastTimeDetected));
+                        // I am no longer in combat but we are both alive. Did I gave up on searching?
+                        totalTimeToSurrender += Time.time - Math.Max(currentFightStartTime, entity.TargetKnowledgeBase.LastTimeDetected);
                         numberOfRetreats++; 
                     }
                 }
-
-                previousFocusingStatus = isFocusingOnEnemy;
+                previouslyWasInCombat = isInCombat;
             }
 
-            if (isFocusingOnEnemy)
+            var enemyInfo = entity.TargetMemory.GetEnemyInfo();
+            if (enemyInfo.Count == 0) return;
+            var isCurrentlyVisible = enemyInfo.Last().isVisible;
+            if (isInCombat)
             {
-                var isCurrentlyVisible = entity.TargetMemory.GetEnemyInfo().Last().isVisible;
                 if (wasEnemyVisibleLastFrame != isCurrentlyVisible)
                 {
                     // Debug.Log(entity.name + " changed target sight to " + isCurrentlyVisible);
@@ -96,13 +97,12 @@ namespace AI.Layers.Statistics
                     else
                     {
                         // Enemy sight reestablished
-                        totalTimeBetweenSights = Time.time - enemySightLossTime;
+                        totalTimeBetweenSights = Time.time - Math.Max(currentFightStartTime, enemySightLossTime);
                         numberOfSights++;
                     }
-
-                    wasEnemyVisibleLastFrame = isCurrentlyVisible;
                 }
             }
+            wasEnemyVisibleLastFrame = isCurrentlyVisible;
         }
 
         public void PublishAndRelease()
@@ -135,7 +135,7 @@ namespace AI.Layers.Statistics
         private void FocusingEvent(FocusOnEnemyInfo info)
         {
             if (info.entityID != entity.GetID()) return;
-            isFocusingOnEnemy = info.isFocusing;
+            isInCombat = info.isFocusing;
         }
     }
 }
