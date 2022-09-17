@@ -11,7 +11,7 @@ namespace Entity
 {
     public class PositionTracker : MonoBehaviour
     {
-        private const float MEMORY_WINDOW = 4f;
+        private const float MEMORY_WINDOW = 10f;
 
         private readonly List<Tuple<Vector3, float>> positions = new List<Tuple<Vector3, float>>();
         private Transform t;
@@ -47,14 +47,14 @@ namespace Entity
             {
                 // I have no idea where the enemy was at that time, what should I return?
                 // In which situation is this possible? It shouldn't be possible...
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("No information known that far away in the past");
             }
 
             var interpolatedPos = positions[0].Item1;
             // Get interpolated position based on stored information
             for (var i = 0; i < positions.Count - 1; i++)
             {
-                if (positions[i + 1].Item2 > endTime)
+                if (positions[i + 1].Item2 >= endTime)
                 {
                     // The next element starts after the requested time, interpolate the position between the two
                     var fraction = (startTime - positions[i].Item2) / (positions[i + 1].Item2 - positions[i].Item2);
@@ -67,7 +67,7 @@ namespace Entity
             const float WEIGHT = 60;
 
             var weighedVelocity = Vector3.zero;
-            
+
             for (var i = 0; i < positions.Count - 1; i++)
             {
                 var (endPosition, intervalEndTime) = positions[i + 1];
@@ -93,6 +93,11 @@ namespace Entity
             }
 
             var weightIntegral = 1 - Mathf.Pow(WEIGHT, startTime - endTime);
+            if (weightIntegral == 0)
+            {
+                // Sometimes (e.g. startTime == endTime) integral area is zero.
+                weightIntegral = 1;
+            }
             return new Tuple<Vector3, Vector3>(interpolatedPos, weighedVelocity / weightIntegral);
 
 
