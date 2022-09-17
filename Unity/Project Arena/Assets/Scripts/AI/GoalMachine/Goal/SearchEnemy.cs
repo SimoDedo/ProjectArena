@@ -1,3 +1,4 @@
+using System;
 using AI.Layers.KnowledgeBase;
 using AI.Layers.SensingLayer;
 using BehaviorDesigner.Runtime;
@@ -21,11 +22,13 @@ namespace AI.GoalMachine.Goal
         private readonly ExternalBehaviorTree externalBt;
         private readonly TargetKnowledgeBase _targetKnowledgeBase;
         private float startSearchTime = NO_TIME;
+        private Recklessness _recklessness;
 
         public SearchEnemy(AIEntity entity)
         {
             this.entity = entity;
             _targetKnowledgeBase = entity.TargetKnowledgeBase;
+            _recklessness = entity.Recklessness;
             damageSensor = entity.DamageSensor;
             soundSensor = entity.SoundSensor;
             externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/SearchEnemy");
@@ -40,16 +43,33 @@ namespace AI.GoalMachine.Goal
             var searchDueToLoss = _targetKnowledgeBase.HasLostTarget();
             var searchDueToSuspectedEnemy = !_targetKnowledgeBase.HasSeenTarget() && 
                                             (damageSensor.WasDamagedRecently || soundSensor.HeardShotRecently);
-            if (entity.GetEnemy().IsAlive && (searchDueToLoss || searchDueToSuspectedEnemy))
+            if (!entity.GetEnemy().IsAlive)
+            {
+                return 0f;
+            }
+
+            if (searchDueToLoss)
             {
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (startSearchTime == NO_TIME)
-                    return 0.7f;
+                    return _recklessness switch
+                    {
+                        Recklessness.Low => 0.3f,
+                        Recklessness.Neutral => 0.6f,
+                        Recklessness.High => 0.9f,
+                        _ => throw new ArgumentOutOfRangeException()
+                    };
                 // Slowly decrease want to search. After 5 secs, it's zero
                 return 1f - (Time.time - startSearchTime) / 5f;
             }
 
-            return 0f;
+            if (!searchDueToSuspectedEnemy) return 0f;
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            if (startSearchTime == NO_TIME)
+                return 0.7f;
+            // Slowly decrease want to search. After 5 secs, it's zero
+            return 1f - (Time.time - startSearchTime) / 5f;
+            
         }
 
         public void Enter()
