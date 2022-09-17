@@ -47,7 +47,7 @@ namespace AI.Behaviours.Actions
             // TODO Find better values
             var skill = entity.AimingSkill;
             const float stdDev = 0.03f;
-            var mean = 0.090f - skill * 0.089f;
+            var mean = 0.100f - skill * 0.150f;
 
             distribution = new NormalDistribution(mean, stdDev);
             targetReflexDelay = (float) distribution.Generate();
@@ -81,23 +81,24 @@ namespace AI.Behaviours.Actions
                 nextDelayRecalculation = Time.time + AIM_UPDATE_INTERVAL;
             }
 
-            var currentDelay =
-                Math.Max(0, previousReflexDelay + (targetReflexDelay - previousReflexDelay) *
-                (Time.time - (nextDelayRecalculation - AIM_UPDATE_INTERVAL)) / AIM_UPDATE_INTERVAL);
+            var currentDelay = Math.Max(
+                0, 
+                previousReflexDelay + (targetReflexDelay - previousReflexDelay) *
+                    (Time.time - (nextDelayRecalculation - AIM_UPDATE_INTERVAL)) / AIM_UPDATE_INTERVAL
+                );
 
             var lastSightedDelay = Time.time - lastSightedTime;
 
             Vector3 enemyPosition;
-            Vector3 enemyVelocity;
+            Vector3 enemyVelocity = Vector3.zero;
 
             if (!float.IsNaN(lastSightedDelay) && lastSightedDelay > currentDelay)
                 // We don't know the exact position of the enemy currentDelay ago, so just consider
                 // its last know position (with velocity zero, so that we won't correct the shooting position)
-                // TODO I am considering it nonetheless? Shouldn't we reset enemyVelocity to zero?
-                (enemyPosition, enemyVelocity) = enemyPositionTracker.GetPositionAndVelocityForRange(lastSightedTime, lastSightedTime);
+                (enemyPosition, _) = enemyPositionTracker.GetPositionAndVelocityForRange(lastSightedTime, lastSightedTime);
             else
             {
-                float additionalDelay = 0.080f - 0.020f * entity.AimingSkill;
+                var additionalDelay = Mathf.Max(0, 0.080f - 0.040f * entity.AimingSkill);
                 var currentStartTime = _targetKnowledgeBase.FirstTimeDetectedInEvent;
                 
                 var endTime = Time.time - currentDelay - additionalDelay;
@@ -160,7 +161,7 @@ namespace AI.Behaviours.Actions
 
             var angle = sightController.LookAtPoint(chosenPoint);
             TryAimIfRecommended((ourStartingPoint - chosenPoint).magnitude, angle);
-            if (!(angle < 10) || !gunManager.CanCurrentGunShoot() || !ShouldShootWeapon(chosenPoint, isGunBlast))
+            if (!(angle < 0.5) || !gunManager.CanCurrentGunShoot() || !ShouldShootWeapon(chosenPoint, isGunBlast))
                 return;
             Debug.DrawRay(ourStartingPoint, sightController.GetHeadForward() * 100f, Color.blue, 2f);
             gunManager.ShootCurrentGun();
@@ -182,14 +183,14 @@ namespace AI.Behaviours.Actions
             var currentPosition = sightController.GetHeadPosition();
             TryAimIfRecommended((currentPosition - enemyPosition).magnitude, angle);
 
-            if (angle < 10 && gunManager.CanCurrentGunShoot() &&
-                ShouldShootWeapon(enemyPosition, gunManager.IsCurrentGunBlastWeapon()))
-                gunManager.ShootCurrentGun();
+            if (!(angle < 0.5) || !gunManager.CanCurrentGunShoot() ||
+                !ShouldShootWeapon(enemyPosition, gunManager.IsCurrentGunBlastWeapon())) return;
+            gunManager.ShootCurrentGun();
         }
 
         private void TryAimIfRecommended(float enemyDistance, float angle)
         {
-            if (gunManager.CanCurrentGunAim() && angle < 20 && enemyDistance > 10)
+            if (gunManager.CanCurrentGunAim() && angle < 10 && enemyDistance > 10)
             {
                 if (!gunManager.IsCurrentGunAiming())
                     gunManager.SetCurrentGunAim(true);
