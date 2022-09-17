@@ -196,7 +196,7 @@ namespace Tester
 
             var numberOfFightsSum = numberOfFights.Sum(entry => entry.Value);
             var timeToEngageSum = timeToEngage.Sum(entry => entry.Value);
-            var pace = 2 * 1 / (1 + Mathf.Exp(-3 * numberOfFightsSum / timeToEngageSum)) - 1;
+            var pace = 2 / (1 + Mathf.Exp(-5 * numberOfFightsSum / timeToEngageSum)) - 1;
 
             var timeInFightSum = timeInFight.Sum(entry => entry.Value);
             var timeBetweenSightsSum = timeBetweenSights.Sum(entry => entry.Value);
