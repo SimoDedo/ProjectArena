@@ -17,7 +17,7 @@ namespace AI.Behaviours.Actions
     [Serializable]
     public class LookAround : Action
     {
-        private const float THRESHOLD = 10f;
+        private const float THRESHOLD = 5f;
         private const float MIN_UPDATE_TIME = 0.3f;
         private const float MAX_UPDATE_TIME = 0.8f;
 
@@ -25,28 +25,29 @@ namespace AI.Behaviours.Actions
         {
             new AngleScore {angle = 0, score = 100, minLevel = CuriosityLevel.Low, allowedIfFocused = true},
             new AngleScore
-                {angle = -45, score = 60, minLevel = CuriosityLevel.Medium, allowedIfFocused = true},
+                {angle = -20, score = 60, minLevel = CuriosityLevel.Medium, allowedIfFocused = true},
             new AngleScore
-                {angle = +45, score = 60, minLevel = CuriosityLevel.Medium, allowedIfFocused = true},
+                {angle = +20, score = 60, minLevel = CuriosityLevel.Medium, allowedIfFocused = true},
             new AngleScore
-                {angle = -90, score = 30, minLevel = CuriosityLevel.Medium, allowedIfFocused = false},
+                {angle = -45, score = 30, minLevel = CuriosityLevel.Medium, allowedIfFocused = false},
             new AngleScore
-                {angle = +90, score = 30, minLevel = CuriosityLevel.Medium, allowedIfFocused = false},
+                {angle = +45, score = 30, minLevel = CuriosityLevel.Medium, allowedIfFocused = false},
             new AngleScore
-                {angle = -135, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false},
+                {angle = -90, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false},
             new AngleScore
-                {angle = +135, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false},
+                {angle = +90, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false},
             new AngleScore
                 {angle = +180, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false}
         });
 
         [SerializeField] private bool focused;
         private CuriosityLevel curiosity;
-        private Vector3 lookPoint;
+        private float lookAngle;
         private float maxAngle;
         private MovementController movementController;
         private List<AngleScore> myValidAngles = new List<AngleScore>();
         private float nextUpdateTime;
+        private float nextWallUpdateTime;
         private SightController sightController;
 
         private List<float> angles;
@@ -86,15 +87,9 @@ namespace AI.Behaviours.Actions
             angles.Clear();
             scores.Clear();
             
-            if (MustUpdate())
+            if (MustUpdate(realForward))
             {
                 UpdateNextUpdateTime();
-                // TODO Agent is not moving, have it slowly look around?
-                // if (realForward == Vector3.zero)
-                // {
-                //     realForward = sightSensor.GetLookDirection();
-                //     angleX = 1;
-                // }
 
                 // Score formula: max(0, 10 + distanceScore * 40 + forwardScore * 30)
 
@@ -132,12 +127,14 @@ namespace AI.Behaviours.Actions
                     }
                 }
 
-                var newDirection = Quaternion.AngleAxis(angleX, transform.up) * realForward;
+                lookAngle = angleX;
+                // var newDirection = Quaternion.AngleAxis(angleX, transform.up) * realForward;
                 // In order to not look down, I should be looking at a point far in the horizon, hence the x100
-                lookPoint = transform.position + newDirection * 100;
+                // lookPoint = transform.position + newDirection * 100;
             }
 
-            sightController.LookAtPoint(lookPoint);
+            sightController.LookAtPoint(transform.position + Quaternion.AngleAxis(angleX, transform.up) * realForward);
+            // sightController.LookAtPoint(lookPoint);
             return TaskStatus.Running;
         }
 
@@ -146,15 +143,28 @@ namespace AI.Behaviours.Actions
             return movementController.GetVelocity().normalized;
         }
 
-        private bool MustUpdate()
+        private float totalInvalidLookTime = 0;
+        private bool MustUpdate(Vector3 movementDirection)
         {
+            if (nextUpdateTime < Time.time)
+            {
+                totalInvalidLookTime = 0;
+                return true;
+            }
+            
             var position = transform.position;
-            var lookDirection = lookPoint - position;
-            var movementDirection = GetMovementDirection();
-
-            var angle = Mathf.Abs(Vector3.Angle(lookDirection, movementDirection));
-            return angle > maxAngle || nextUpdateTime < Time.time ||
-                   Physics.Raycast(position, transform.forward, THRESHOLD);
+            var lookDirection =  sightController.GetHeadForward();
+            if (Physics.Raycast(position, lookDirection,  out var hit, THRESHOLD))
+            {
+                totalInvalidLookTime += Time.deltaTime;
+            }
+            else
+            {
+                totalInvalidLookTime -= Time.deltaTime * 2;
+                totalInvalidLookTime = Mathf.Max(0f, totalInvalidLookTime);
+            }
+            
+            return totalInvalidLookTime > 0.2;
         }
 
         private void UpdateNextUpdateTime()
