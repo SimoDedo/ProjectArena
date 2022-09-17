@@ -25,6 +25,7 @@ namespace AI.Behaviours.Actions
         private NavigationSystem navSystem;
         private int remainingStrafes = Random.Range(MIN_STRAFE_LENGTH, MAX_STRAFE_LENGTH);
         private FightingMovementSkill skill;
+        private Recklessness recklessness;
 
         private bool strifeRight = Random.value < 0.5;
         private Entity.Entity target;
@@ -44,6 +45,7 @@ namespace AI.Behaviours.Actions
             gunManager = entity.GunManager;
             target = entity.GetEnemy();
             skill = entity.MovementSkill;
+            recklessness = entity.Recklessness;
             navSystem.CancelPath();
         }
 
@@ -93,68 +95,12 @@ namespace AI.Behaviours.Actions
 
             var currentPos = transform.position;
             var targetPos = target.transform.position;
-
-            bool canSeeEnemyFromStartingPoint;
-
-            // Check if we can see enemy from where we are
-            canSeeEnemyFromStartingPoint = !Physics.Linecast(currentPos, targetPos, lineCastLayerMask);
-
+            
             // We do not care if enemy is above or below us, the move straight/strife movement should be
             // parallel to the floor.
             targetPos.y = currentPos.y;
 
-            // If we can see the enemy from the starting point, we should play as usual
-            if (canSeeEnemyFromStartingPoint)
-            {
-                SetMoveDestinationWhenEnemyCanBeSeen(currentPos, targetPos);
-            }
-            else
-            {
-                MoveToLocationWithEnemyInSight(currentPos, targetPos);
-            }
-        }
-
-        private void MoveToLocationWithEnemyInSight(Vector3 currentPos, Vector3 targetPos)
-        {
-            // We cannot see the enemy from where we are, try to find a position from where it is visible.
-            // How? For now, random selection (even if this breaks the movement capabilities of the bot)
-
-            // Also reset strife
-            strifeRight = Random.value > 0.5f;
-            for (var i = 0; i < maxAttempts; i++)
-            {
-                var randomDir = Random.insideUnitCircle;
-                var newPos = currentPos;
-                newPos.x += randomDir.x;
-                newPos.z += randomDir.y;
-
-                if (!Physics.Linecast(newPos, targetPos, lineCastLayerMask))
-                {
-                    // Can see enemy from here, found new position!
-
-                    var path = navSystem.CalculatePath(newPos);
-                    if (path.IsComplete())
-                    {
-                        navSystem.SetPath(path);
-                        return;
-                    }
-                }
-            }
-
-            // I couldn't see the enemy from any place. This bot is stupid and will rush towards the enemy, thinking
-            // that it might be fleeing...
-            var enemyPath = navSystem.CalculatePath(targetPos);
-            if (!enemyPath.IsComplete())
-                Debug.LogError(
-                    "Enemy is not reachable! My pos: (" + currentPos.x + " , " + currentPos.y + ", " +
-                    currentPos.z + "), enemyPos (" + targetPos.x + " , " + targetPos.y + ", " + targetPos.z + ")"
-                );
-            
-            // TODO you should not get all the way to the enemy position.
-            // Instead, you should stop following the path as soon as you can see again the enemy.
-
-            isChasingEnemy = true;
-            navSystem.SetPath(enemyPath);
+            SetMoveDestinationWhenEnemyCanBeSeen(currentPos, targetPos);
         }
 
         private void SetMoveDestinationWhenEnemyCanBeSeen(Vector3 currentPos, Vector3 targetPos)
@@ -195,6 +141,62 @@ namespace AI.Behaviours.Actions
             }
         }
 
+        
+        private void MoveToLocationWithEnemyInSight(Vector3 currentPos, Vector3 targetPos)
+        {
+            // We cannot see the enemy from where we are, try to find a position from where it is visible.
+            // How? For now, random selection (even if this breaks the movement capabilities of the bot)
+            
+            // TODO Move towards enemy visible with probability depending on recklessness
+
+            var probabilityToMoveWhereSeeEnemy = recklessness switch
+            {
+                Recklessness.Low => 0.3f,
+                Recklessness.Neutral => 0.6f,
+                Recklessness.High => 0.9f,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            if (probabilityToMoveWhereSeeEnemy < Random.value)
+            {
+                // Also reset strife
+                strifeRight = Random.value > 0.5f;
+                for (var i = 0; i < maxAttempts; i++)
+                {
+                    var randomDir = Random.insideUnitCircle;
+                    var newPos = currentPos;
+                    newPos.x += randomDir.x;
+                    newPos.z += randomDir.y;
+
+                    if (!Physics.Linecast(newPos, targetPos, lineCastLayerMask))
+                    {
+                        // Can see enemy from here, found new position!
+
+                        var path = navSystem.CalculatePath(newPos);
+                        if (path.IsComplete())
+                        {
+                            navSystem.SetPath(path);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // I couldn't see the enemy from any place. This bot is stupid and will rush towards the enemy, thinking
+            // that it might be fleeing...
+            // TODO I should not rush towards the enemy. Keep the optimal distance
+
+            var enemyDirection = targetPos - currentPos;
+            var distance = enemyDirection.magnitude;
+            enemyDirection.Normalize();
+            var movementDirectionDueToGun = GetMoveDirectionDueToGun(distance, enemyDirection);
+            
+            var path2 = navSystem.CalculatePath(currentPos + movementDirectionDueToGun);
+            if (path2.IsValid())
+                navSystem.SetPath(path2);
+        }
+
+        
         private Vector3 GetMovementDirectionDueToStrife(Vector3 direction)
         {
             if (skill < FightingMovementSkill.CircleStrife)
@@ -243,3 +245,5 @@ namespace AI.Behaviours.Actions
         }
     }
 }
+
+// Indipendentemente dal vedere o meno il nemico...
