@@ -18,8 +18,8 @@ namespace AI.Behaviours.Actions
     [Serializable]
     public class MoveDuringFight : Action
     {
-        private const int MIN_STRAFE_LENGTH = 15;
-        private const int MAX_STRAFE_LENGTH = 40;
+        private const int MIN_STRAFE_LENGTH = 40;
+        private const int MAX_STRAFE_LENGTH = 200;
         private AIEntity entity;
         private GunManager gunManager;
         private NavigationSystem navSystem;
@@ -32,7 +32,6 @@ namespace AI.Behaviours.Actions
         private const int maxAttempts = 10;
 
         private int lineCastLayerMask;
-        private bool isChasingEnemy;
         public override void OnAwake()
         {
             lineCastLayerMask = ~LayerMask.GetMask("Ignore Raycast", "Entity", "Projectile");
@@ -56,34 +55,17 @@ namespace AI.Behaviours.Actions
 
         public override TaskStatus OnUpdate()
         {
-            if (navSystem.HasPath() && !navSystem.HasArrivedToDestination() && !ShouldRecomputePath())
-            {
-                navSystem.MoveAlongPath();
-                return TaskStatus.Running;
-            }
-            navSystem.CancelPath();
-
+            // if (navSystem.HasPath() && !navSystem.HasArrivedToDestination())
+            // {
+            //     navSystem.MoveAlongPath();
+            //     return TaskStatus.Running;
+            // }
+            // navSystem.CancelPath();
             TrySelectDestination();
+            navSystem.MoveAlongPath();
             return TaskStatus.Running;
         }
-
-        private bool ShouldRecomputePath()
-        {
-            if (!isChasingEnemy)
-            {
-                // Is not chasing enemy, so we do not have anything to check
-                return false;
-            }
-
-            if (!Physics.Linecast(transform.position, target.transform.position, lineCastLayerMask))
-            {
-                // We can see the enemy, no longer need to chase
-                isChasingEnemy = false;
-                return true;
-            }
-            return false;
-        }
-
+        
         private void TrySelectDestination()
         {
             if (skill == FightingMovementSkill.StandStill)
@@ -116,9 +98,9 @@ namespace AI.Behaviours.Actions
             var newPos = currentPos + totalMovement;
 
             Debug.DrawLine(currentPos, newPos, Color.yellow, 1, false);
-            Debug.DrawLine(newPos, targetPos, Color.red, 1, false);
+            // Debug.DrawLine(newPos, targetPos, Color.red, 1, false);
             
-            if (!Physics.Linecast(newPos, targetPos, lineCastLayerMask))
+            if (!Physics.Linecast(newPos, targetPos, out var hit, lineCastLayerMask))
             {
                 // I can see the enemy from the new position.
                 var path = navSystem.CalculatePath(newPos);
@@ -160,7 +142,6 @@ namespace AI.Behaviours.Actions
             if (probabilityToMoveWhereSeeEnemy < Random.value)
             {
                 // Also reset strife
-                strifeRight = Random.value > 0.5f;
                 for (var i = 0; i < maxAttempts; i++)
                 {
                     var randomDir = Random.insideUnitCircle;
@@ -245,5 +226,3 @@ namespace AI.Behaviours.Actions
         }
     }
 }
-
-// Indipendentemente dal vedere o meno il nemico...
