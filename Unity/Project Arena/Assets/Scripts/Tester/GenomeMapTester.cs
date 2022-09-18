@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using AI;
 using BehaviorDesigner.Runtime;
+using BehaviorDesigner.Runtime.Tasks;
 using Logging;
 using Managers;
 using Managers.Map;
@@ -81,7 +82,7 @@ namespace Tester
                 if (arg.StartsWith("-logDeathPositions")) logDeathPositions = true;
             }
 
-            #if UNITY_SERVER && !UNITY_EDITOR
+            #if !UNITY_EDITOR
             var basePath = Directory.GetCurrentDirectory() + "/Data";
             #else
             var basePath = Application.persistentDataPath;
@@ -140,8 +141,10 @@ namespace Tester
             
             var bot1Params = ReadFromFile(botsPath + bot1ParamsFilenamePrefix + "params.json",
                 BotCharacteristics.Default);
+            Debug.Log("AAA bot1 params is " + bot1Params);
             var bot2Params = ReadFromFile(botsPath + bot2ParamsFilenamePrefix + "params.json",
                 BotCharacteristics.Default);
+            Debug.Log("AAA bot2 params is " + bot2Params);
 
             var defaultGuns = new[] {true, true, true, true};
             var activeGunsBot1 = ReadFromFile(botsPath + bot1ParamsFilenamePrefix + "guns.json", defaultGuns);
@@ -255,6 +258,7 @@ namespace Tester
         {
             try
             {
+                Debug.Log("Reading from " + filePath);
                 using var reader = new StreamReader(filePath);
                 return JsonConvert.DeserializeObject<T>(reader.ReadToEnd());
             }

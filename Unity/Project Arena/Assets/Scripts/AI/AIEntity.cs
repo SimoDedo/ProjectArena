@@ -9,8 +9,6 @@ using AI.Layers.Statistics;
 using Entity.Component;
 using Logging;
 using Managers.Mode;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using Others;
 using Pickables;
 using UnityEngine;
@@ -18,138 +16,107 @@ using Utils;
 
 namespace AI
 {
-    /// <summary>
-    /// Characteristics of a bot
-    /// </summary>
-    [Serializable]
-    public struct BotCharacteristics
-    {
-        /// <summary>
-        /// Speed of the bot.
-        /// </summary>
-        [SerializeField] public float speed;
-
-        /// <summary>
-        /// Ability of the bot to move tactically during a fight.
-        /// </summary>
-        [JsonConverter(typeof(StringEnumConverter))]
-        [SerializeField] public FightingMovementSkill movementSkill;
-
-        /// <summary>
-        /// Field of view of the bot.
-        /// </summary>
-        [SerializeField] public float fov;
-
-        /// <summary>
-        /// Maximum angular speed of the bot view.
-        /// </summary>
-        [SerializeField] public float maxCameraSpeed;
-
-        /// <summary>
-        /// Maximum angular acceleration of the bot view.
-        /// </summary>
-        [SerializeField] public float maxCameraAcceleration;
-
-        /// <summary>
-        /// Maximum sight range of the bot.
-        /// </summary>
-        [SerializeField] public float maxRange;
-
-        /// <summary>
-        /// Length (in second) of the bot memory for target sighting info.
-        /// </summary>
-        [SerializeField] public float memoryWindow;
-
-        /// <summary>
-        /// Lenght (in second) of the most recent interval of time in which to search for enemy actual detection.  
-        /// </summary>
-        [SerializeField] public float detectionWindow;
-
-        /// <summary>
-        /// (Non-consecutive) time in seconds that the enemy must be sighted before it is detected.
-        /// </summary>
-        [SerializeField] public float timeBeforeCanReact;
-
-        /// <summary>
-        /// Entity tendency to look around when moving.
-        /// </summary>
-        [JsonConverter(typeof(StringEnumConverter))]
-        [SerializeField] public CuriosityLevel curiosity;
-
-        /// <summary>
-        /// Ability of the both to predict exactly where an enemy he is following is.
-        /// </summary>
-        [SerializeField] [Range(0f, 1f)] public float predictionSkill;
-
-        /// <summary>
-        /// Ability of the bot to aim at a target.
-        /// </summary>
-        [SerializeField] [Range(0f, 1f)] public float aimingSkill;
-
-        /// <summary>
-        /// For how long the entity remains wary after receiving damage
-        /// </summary>
-        [SerializeField] public float recentDamageTimeout;
-
-        /// <summary>
-        /// Enemy tendency to behave recklessly or not.
-        /// </summary>
-        [JsonConverter(typeof(StringEnumConverter))]
-        [SerializeField] public Recklessness recklessness;
-
-        /// <summary>
-        /// Default characteristics of a bot. Average abilities all around.
-        /// </summary>
-        public static BotCharacteristics Default =>
-            new BotCharacteristics
-            {
-                aimingSkill = 0.5f,
-                curiosity = CuriosityLevel.Medium,
-                fov = 60,
-                maxCameraAcceleration = 2000f,
-                maxCameraSpeed = 2000f,
-                maxRange = 100f,
-                memoryWindow = 4f,
-                detectionWindow = 2f,
-                timeBeforeCanReact = 0.2f,
-                movementSkill = FightingMovementSkill.CircleStrife,
-                predictionSkill = 0.5f,
-                speed = 16,
-                recentDamageTimeout = 0.5f,
-                recklessness = Recklessness.Neutral
-            };
-    }
-
-    /// <summary>
-    /// Determines how the bot is able to move when fighting an enemy.
-    /// </summary>
-    public enum FightingMovementSkill
-    {
-        StandStill, // Cannot move and aim at the same time.
-        MoveStraight, // Can move, but only toward / away from the target in a straight line.
-        CircleStrife, // Can strife around the target, but only in one direction.
-        CircleStrifeChangeDirection // Can strife around the target, changing direction if necessary.
-    }
-
-    /// <summary>
-    /// Determines how much the bot tends to look around when moving.
-    /// </summary>
-    public enum CuriosityLevel
-    {
-        Low, // The bot only looks forward.
-        Medium, // The bot looks forward and at the sides.
-        High // The bot looks all around itself.
-    }
-
-    /// <summary>
-    /// Determines if the enemy tends to be cautious or dives head-on into battle.
-    /// </summary>
-    public enum Recklessness
-    {
-        Low, // The bot prefers avoiding fights, so it will look for cover and pickup more.
-        Neutral, // The bot is not overly cautious or reckless.
-        High // The bot prefers to fight head on, hardly using cover or retreating for pickups.
-    }
+    // /// <summary>
+    // /// Characteristics of a bot
+    // /// </summary>
+    // [Serializable]
+    // public struct BotCharacteristics
+    // {
+    //     /// <summary>
+    //     /// Speed of the bot.
+    //     /// </summary>
+    //     [SerializeField] public float speed;
+    //
+    //     /// <summary>
+    //     /// Ability of the bot to move tactically during a fight.
+    //     /// </summary>
+    //     [JsonConverter(typeof(StringEnumConverter))]
+    //     [SerializeField] public FightingMovementSkill movementSkill;
+    //
+    //     /// <summary>
+    //     /// Field of view of the bot.
+    //     /// </summary>
+    //     [SerializeField] public float fov;
+    //
+    //     /// <summary>
+    //     /// Maximum angular speed of the bot view.
+    //     /// </summary>
+    //     [SerializeField] public float maxCameraSpeed;
+    //
+    //     /// <summary>
+    //     /// Maximum angular acceleration of the bot view.
+    //     /// </summary>
+    //     [SerializeField] public float maxCameraAcceleration;
+    //
+    //     /// <summary>
+    //     /// Maximum sight range of the bot.
+    //     /// </summary>
+    //     [SerializeField] public float maxRange;
+    //
+    //     /// <summary>
+    //     /// Length (in second) of the bot memory for target sighting info.
+    //     /// </summary>
+    //     [SerializeField] public float memoryWindow;
+    //
+    //     /// <summary>
+    //     /// Lenght (in second) of the most recent interval of time in which to search for enemy actual detection.  
+    //     /// </summary>
+    //     [SerializeField] public float detectionWindow;
+    //
+    //     /// <summary>
+    //     /// (Non-consecutive) time in seconds that the enemy must be sighted before it is detected.
+    //     /// </summary>
+    //     [SerializeField] public float timeBeforeCanReact;
+    //
+    //     /// <summary>
+    //     /// Entity tendency to look around when moving.
+    //     /// </summary>
+    //     [JsonConverter(typeof(StringEnumConverter))]
+    //     [SerializeField] public CuriosityLevel curiosity;
+    //
+    //     /// <summary>
+    //     /// Ability of the both to predict exactly where an enemy he is following is.
+    //     /// </summary>
+    //     [SerializeField] [Range(0f, 1f)] public float predictionSkill;
+    //
+    //     /// <summary>
+    //     /// Ability of the bot to aim at a target.
+    //     /// </summary>
+    //     [SerializeField] [Range(0f, 1f)] public float aimingSkill;
+    //
+    //     /// <summary>
+    //     /// For how long the entity remains wary after receiving damage
+    //     /// </summary>
+    //     [SerializeField] public float recentDamageTimeout;
+    //
+    //     /// <summary>
+    //     /// Enemy tendency to behave recklessly or not.
+    //     /// </summary>
+    //     [JsonConverter(typeof(StringEnumConverter))]
+    //     [SerializeField] public Recklessness recklessness;
+    //
+    //     /// <summary>
+    //     /// Default characteristics of a bot. Average abilities all around.
+    //     /// </summary>
+    //     public static BotCharacteristics Default =>
+    //         new BotCharacteristics
+    //         {
+    //             aimingSkill = 0.5f,
+    //             curiosity = CuriosityLevel.Medium,
+    //             fov = 60,
+    //             maxCameraAcceleration = 2000f,
+    //             maxCameraSpeed = 2000f,
+    //             maxRange = 100f,
+    //             memoryWindow = 4f,
+    //             detectionWindow = 2f,
+    //             timeBeforeCanReact = 0.2f,
+    //             movementSkill = FightingMovementSkill.CircleStrife,
+    //             predictionSkill = 0.5f,
+    //             speed = 16,
+    //             recentDamageTimeout = 0.5f,
+    //             recklessness = Recklessness.Neutral
+    //         };
+    // }
 
 
     /// <summary>
@@ -222,11 +189,11 @@ namespace AI
 
         public override bool IsAlive => isActiveAndEnabled && (Health > 0 || mustProcessDeath);
 
-        public FightingMovementSkill MovementSkill => botParams.movementSkill;
+        public FightingMovementSkill MovementSkill => botParams.MovementSkill;
 
-        public float AimingSkill => botParams.aimingSkill;
+        public float AimDelayAverage => botParams.AimDelayAverage;
         
-        public Recklessness Recklessness => botParams.recklessness;
+        public Recklessness Recklessness => botParams.Recklessness;
 
         private LoggingComponent loggingComponent;
 
@@ -281,25 +248,25 @@ namespace AI
         // Prepares all the AI components
         private void PrepareComponents(GameManager gms, bool[] ag)
         {
-            MovementController = new MovementController(this, botParams.speed);
+            MovementController = new MovementController(this, botParams.Speed);
             SightController =
-                new SightController(this, head, botParams.maxCameraSpeed, botParams.maxCameraAcceleration);
-            SightSensor = new SightSensor(head, botParams.maxRange, botParams.fov);
+                new SightController(this, head, botParams.CameraSpeed, botParams.CameraAcceleration);
+            SightSensor = new SightSensor(head, botParams.MaxRange, botParams.FOV);
             MapMemory = new MapMemory(this, gms);
             MapWanderPlanner = new MapWanderPlanner(this);
             TargetMemory = new TargetMemory(
                 this,
                 enemy,
-                botParams.memoryWindow
+                botParams.MemoryWindow
             );
             TargetKnowledgeBase = new TargetKnowledgeBase(
                 this,
                 enemy,
-                botParams.detectionWindow,
-                botParams.timeBeforeCanReact
+                botParams.DetectionWindow,
+                botParams.TimeBeforeReaction
             );
-            DamageSensor = new DamageSensor(botParams.recentDamageTimeout);
-            SoundSensor = new SoundSensor(botParams.recentDamageTimeout, GetID(), head.transform, 0.4f); // TODO params
+            DamageSensor = new DamageSensor(botParams.DamageTimeout);
+            SoundSensor = new SoundSensor(botParams.DamageTimeout, GetID(), head.transform, 0.4f); // TODO params
             PickupMemory = new PickupMemory(this);
             PickupKnowledgeBase = new PickupActivationEstimator(this);
             NavigationSystem = new NavigationSystem(this);
@@ -465,7 +432,7 @@ namespace AI
         /// </summary>
         public CuriosityLevel GetCuriosity()
         {
-            return botParams.curiosity;
+            return botParams.Curiosity;
         }
 
         /// <summary>
@@ -473,7 +440,7 @@ namespace AI
         /// </summary>
         public float GetPredictionSkill()
         {
-            return botParams.predictionSkill;
+            return botParams.Prediction;
         }
 
         /// <summary>
