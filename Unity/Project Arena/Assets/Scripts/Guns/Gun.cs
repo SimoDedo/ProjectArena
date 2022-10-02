@@ -303,7 +303,7 @@ namespace Guns
         {
             if (isAiming)
             {
-                ownerEntityScript.SlowEntity(0.6f);
+                ownerEntityScript.SlowEntity(0.8f);
                 transform.localPosition = Vector3.Lerp(transform.localPosition, aimPosition,
                     (Time.time - aimStart) * 3f);
             }

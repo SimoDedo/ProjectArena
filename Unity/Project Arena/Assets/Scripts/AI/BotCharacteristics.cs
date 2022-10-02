@@ -27,7 +27,6 @@ namespace AI
         // Parameters not influenced by general skill
         [DataMember] private float speed;
         
-        [JsonConverter(typeof(StringEnumConverter))]
         [DataMember] private FightingMovementSkill movementSkill; // TODO understand if we can turn this into something continuous
 
         [JsonConverter(typeof(StringEnumConverter))]
@@ -90,9 +89,14 @@ namespace AI
         private const float MAX_TIME_BEFORE_REACTION = 0.5f;
         private const float MIN_PREDICTION = 0.1f;
         private const float MAX_PREDICTION = 0.8f;
-        private const float MIN_AIM_DELAY_AVERAGE = 0.05f;
-        private const float MAX_AIM_DELAY_AVERAGE = 0.5f;
-        
+        private const float MIN_AIM_DELAY_AVERAGE = -0.05f;
+        private const float MAX_AIM_DELAY_AVERAGE = 0.10f;
+        private const float AIM_DELAY_STD_DEV = 0.06f;
+
+        // With these params, at best an entity will aim at the enemy position ~80% of the times, at
+        // worst ~5% of the times. 
+        // Check from (example) WolframAlpha: 
+        // integrate 1/(sqrt(2*pi)*s)*e^(-(x-m)^2/(2*s^2)) from -infinity to 0 with s = 0.06 and m = <mean>
         
         private static float ScaleScore(float general, float specific)
         {

@@ -11,9 +11,26 @@ namespace Entity
 {
     public class PositionTracker : MonoBehaviour
     {
+        private class PositionInfo
+        {
+            public readonly Vector3 position;
+            public readonly float time;
+
+            public PositionInfo(Vector3 position, float time)
+            {
+                this.position = position;
+                this.time = time;
+            }
+
+            public void Deconstruct(out Vector3 outPosition, out float outTime)
+            {
+                outPosition = position;
+                outTime = time;
+            }
+        }
         private const float MEMORY_WINDOW = 10f;
 
-        private readonly List<Tuple<Vector3, float>> positions = new List<Tuple<Vector3, float>>();
+        private readonly List<PositionInfo> tracked = new List<PositionInfo>();
         private Transform t;
 
         private void Start()
@@ -26,6 +43,88 @@ namespace Entity
             UpdateList();
         }
 
+        public Vector3 GetPositionAtTime(float time)
+        {
+            UpdateList();
+
+            if (time < Time.time - MEMORY_WINDOW)
+            {
+                // I have no idea where the enemy was at that time, what should I return?
+                // In which situation is this possible? It shouldn't be possible...
+                throw new InvalidOperationException("No information known that far away in the past");
+            }
+
+            var interpolatedPos = tracked[0].position;
+            // Get interpolated position based on stored information
+            for (var i = 0; i < tracked.Count - 1; i++)
+            {
+                if (tracked[i + 1].time >= time)
+                {
+                    // The next element starts after the requested time, interpolate the position between the two
+                    var fraction = (time - tracked[i].time) / (tracked[i + 1].time - tracked[i].time);
+                    interpolatedPos = Vector3.Lerp(tracked[i].position,tracked[i + 1].position, fraction);
+                    break;
+                }
+            }
+
+            return interpolatedPos;
+        }
+
+        public Vector3 GetAverageVelocity(float intervalDuration)
+        {
+            var startTime = Time.time - Math.Min(MEMORY_WINDOW, intervalDuration);
+            var endTime = Time.time;
+            
+            // Estimate velocity in the interval            
+            const float WEIGHT = 60;
+
+            var weighedVelocity = Vector3.zero;
+
+            for (var i = 0; i < tracked.Count - 1; i++)
+            {
+                var intervalEndTime = tracked[i + 1].time;
+                if (intervalEndTime <= startTime) continue;
+                var intervalStartTime = tracked[i].time;
+                if (intervalStartTime > endTime) break;
+
+                var velocity = SpeedBetween(tracked[i], tracked[i+1]);
+
+                if (intervalStartTime < startTime)
+                {
+                    intervalStartTime = startTime;
+                }
+
+                if (intervalEndTime > endTime)
+                {
+                    intervalEndTime = endTime;
+                }
+
+                weighedVelocity += (Mathf.Pow(WEIGHT, intervalEndTime - endTime) -
+                                    Mathf.Pow(WEIGHT, intervalStartTime - endTime)) * velocity;
+
+            }
+
+            var weightIntegral = 1 - Mathf.Pow(WEIGHT, startTime - endTime);
+            if (weightIntegral == 0)
+            {
+                // Sometimes (e.g. startTime == endTime) integral area is zero.
+                weightIntegral = 1;
+            }
+
+            return weighedVelocity / weightIntegral;
+        }
+
+        public Vector3 GetCurrentVelocity()
+        {
+            return SpeedBetween(tracked[^1], tracked[^2]);
+        }
+
+        private static Vector3 SpeedBetween(PositionInfo begin, PositionInfo end)
+        {
+            return (end.position - begin.position) / (end.time - begin.time);
+        }
+
+        /// TODO remove usages of this
         /// <summary>
         ///     Obtains the position and the velocity of this GameObject some time ago, according to delay.
         ///     The position is calculated by interpolating from the position samples saved, while the
@@ -50,15 +149,15 @@ namespace Entity
                 throw new InvalidOperationException("No information known that far away in the past");
             }
 
-            var interpolatedPos = positions[0].Item1;
+            var interpolatedPos = tracked[0].position;
             // Get interpolated position based on stored information
-            for (var i = 0; i < positions.Count - 1; i++)
+            for (var i = 0; i < tracked.Count - 1; i++)
             {
-                if (positions[i + 1].Item2 >= endTime)
+                if (tracked[i + 1].time >= endTime)
                 {
                     // The next element starts after the requested time, interpolate the position between the two
-                    var fraction = (startTime - positions[i].Item2) / (positions[i + 1].Item2 - positions[i].Item2);
-                    interpolatedPos = Vector3.Lerp(positions[i].Item1,positions[i + 1].Item1, fraction);
+                    var fraction = (endTime - tracked[i].time) / (tracked[i + 1].time - tracked[i].time);
+                    interpolatedPos = Vector3.Lerp(tracked[i].position, tracked[i + 1].position, fraction);
                     break;
                 }
             }
@@ -68,11 +167,11 @@ namespace Entity
 
             var weighedVelocity = Vector3.zero;
 
-            for (var i = 0; i < positions.Count - 1; i++)
+            for (var i = 0; i < tracked.Count - 1; i++)
             {
-                var (endPosition, intervalEndTime) = positions[i + 1];
+                var (endPosition, intervalEndTime) = tracked[i + 1];
                 if (intervalEndTime <= startTime) continue;
-                var (startPosition, intervalStartTime) = positions[i];
+                var (startPosition, intervalStartTime) = tracked[i];
                 if (intervalStartTime > endTime) break;
 
                 var velocity = (endPosition - startPosition) / (intervalEndTime - intervalStartTime);
@@ -98,75 +197,28 @@ namespace Entity
                 // Sometimes (e.g. startTime == endTime) integral area is zero.
                 weightIntegral = 1;
             }
+
             return new Tuple<Vector3, Vector3>(interpolatedPos, weighedVelocity / weightIntegral);
-
-
-
-            // var startTimeToSearch = Time.time - Mathf.Max(0, startTime);
-            // // Step 1: find the next time instant saved after the delay
-            // var (afterPosition, afterTime) =
-            //     positions.First(it => it.Item2 >= startTimeToSearch);
-            // // Step 2: find the previous time instant saved, if present, otherwise choose previous point again
-            // var (beforePosition, beforeTime) = positions.First().Item2 < startTimeToSearch
-            //     ? positions.Last(it => it.Item2 < startTimeToSearch)
-            //     : new Tuple<Vector3, float>(afterPosition, startTimeToSearch);
-            //
-            // // Step 3: interpolate the two
-            // Vector3 interpolatedPos;
-            // if (startTimeToSearch == afterTime)
-            //     interpolatedPos = afterPosition;
-            // else
-            //     interpolatedPos = Vector3.Lerp(beforePosition, afterPosition,
-            //         (startTimeToSearch - beforeTime) / (afterTime - beforeTime));
-            //
-            //
-            // // Select all element before beforeTime
-            // // Find index of beforeTime
-            // var beforeIndex = positions.FindIndex(it => it.Item2 == beforeTime);
-            //
-            // var smoothedVelocity = Vector3.zero;
-            //
-            // for (var i = 0; i <= beforeIndex; i++)
-            // {
-            //     var beginDelay = startTimeToSearch - positions[i].Item2;
-            //     var beginExponent = beginDelay * MEMORY_WINDOW_END_WEIGHT / MEMORY_WINDOW;
-            //     var endDelay = startTimeToSearch - positions[i + 1].Item2;
-            //     var endExponent = Math.Max(0, endDelay * MEMORY_WINDOW_END_WEIGHT / MEMORY_WINDOW);
-            //
-            //     var velocity = (positions[i + 1].Item1 - positions[i].Item1) / (beginDelay - endDelay);
-            //
-            //     var integral = Mathf.Pow(2, -endExponent) - Mathf.Pow(2, -beginExponent);
-            //     smoothedVelocity += integral * velocity;
-            // }
-            //
-            // // var actualVelocity =
-            // //     (positions[positions.Count - 1].Item1 - positions[positions.Count - 2].Item1) /
-            // //     (positions[positions.Count - 1].Item2 - positions[positions.Count - 2].Item2);
-            //
-            // // Debug.Log("Difference between actual velocity and estimated velocity is "
-            // //           + (actualVelocity - smoothedVelocity).magnitude + "!");
-            //
-            // return new Tuple<Vector3, Vector3>(interpolatedPos, smoothedVelocity);
         }
 
         private void UpdateList()
         {
-            if (positions.Count != 0 && positions.Last().Item2 == Time.time)
-                positions.RemoveAt(positions.Count - 1);
+            if (tracked.Count != 0 && tracked.Last().time == Time.time)
+                tracked.RemoveAt(tracked.Count - 1);
 
-            positions.Add(new Tuple<Vector3, float>(t.position, Time.time));
+            tracked.Add(new PositionInfo(t.position, Time.time));
             // TODO check correctness
-            var firstIndexToKeep = positions.FindIndex(it => it.Item2 > Time.time - MEMORY_WINDOW);
+            var firstIndexToKeep = tracked.FindIndex(it => it.time > Time.time - MEMORY_WINDOW);
             if (firstIndexToKeep == -1)
             {
-                positions.Clear();
+                tracked.Clear();
             }
             else
             {
-                positions.RemoveRange(0, firstIndexToKeep);
+                tracked.RemoveRange(0, firstIndexToKeep);
             }
 
-            // positions = positions.Where(it => it.Item2 > Time.time - MEMORY_WINDOW).ToList();
+            // positions = positions.Where(it => it.time > Time.time - MEMORY_WINDOW).ToList();
         }
     }
 }

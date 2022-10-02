@@ -19,6 +19,8 @@ namespace AI.Behaviours.Actions
     {
         // Time (in seconds) after which recalculating the aim delay.
         private const float AIM_UPDATE_INTERVAL = 0.5f;
+        // Time (in seconds) to smoothly switch between the previous delay and the new one.
+        private const float AIM_COMMUTE_SPEED = 3f;
         [SerializeField] private int lookBackFrames = -3;
         [SerializeField] private int lookAheadFrames = 3;
         [SerializeField] private float lookAheadTimeStep = 0.3f;
@@ -44,10 +46,8 @@ namespace AI.Behaviours.Actions
             enemy = entity.GetEnemy();
             enemyPositionTracker = enemy.GetComponent<PositionTracker>();
 
-            // TODO Find better values
-            var skill = entity.AimingSkill;
-            const float stdDev = 0.03f;
-            var mean = 0.100f - skill * 0.150f;
+            var mean = entity.AimDelayAverage;
+            const float stdDev = 0.06f;
 
             distribution = new NormalDistribution(mean, stdDev);
             targetReflexDelay = (float) distribution.Generate();
@@ -64,11 +64,12 @@ namespace AI.Behaviours.Actions
         public override TaskStatus OnUpdate()
         {
             var lastSightedTime = _targetKnowledgeBase.LastTimeDetected;
+            var lastSightedDelay = Time.time - lastSightedTime;
+
             if (lastSightedTime != Time.time && isGoingForCover.Value && !gunManager.IsCurrentGunReloading())
                 //We cannot see the enemy and we were looking for cover, reload now!
                 gunManager.ReloadCurrentGun();
-            if (gunManager.GetAmmoInChargerForGun(gunManager.CurrentGunIndex) == 0 &&
-                !gunManager.IsCurrentGunReloading())
+            if (gunManager.GetAmmoInChargerForGun(gunManager.CurrentGunIndex) == 0 && !gunManager.IsCurrentGunReloading())
             {
                 // Out of ammo! No matter searching for cover or anything, start reloading now!
                 gunManager.ReloadCurrentGun();
@@ -78,46 +79,57 @@ namespace AI.Behaviours.Actions
             {
                 previousReflexDelay = targetReflexDelay;
                 targetReflexDelay = (float) distribution.Generate();
+                // Debug.Log("Computed new delay for " + entity.name + ": " + targetReflexDelay +", mean is " + entity.AimDelayAverage);
                 nextDelayRecalculation = Time.time + AIM_UPDATE_INTERVAL;
             }
 
-            var currentDelay = Math.Max(
-                0, 
-                previousReflexDelay + (targetReflexDelay - previousReflexDelay) *
-                    (Time.time - (nextDelayRecalculation - AIM_UPDATE_INTERVAL)) / AIM_UPDATE_INTERVAL
-                );
-
-            var lastSightedDelay = Time.time - lastSightedTime;
-
-            Vector3 enemyPosition;
-            Vector3 enemyVelocity = Vector3.zero;
-
-            if (!float.IsNaN(lastSightedDelay) && lastSightedDelay > currentDelay)
-                // We don't know the exact position of the enemy currentDelay ago, so just consider
-                // its last know position (with velocity zero, so that we won't correct the shooting position)
-                (enemyPosition, _) = enemyPositionTracker.GetPositionAndVelocityForRange(lastSightedTime, lastSightedTime);
-            else
-            {
-                var additionalDelay = Mathf.Max(0, 0.080f - 0.040f * entity.AimingSkill);
-                var currentStartTime = _targetKnowledgeBase.FirstTimeDetectedInEvent;
-                
-                var endTime = Time.time - currentDelay - additionalDelay;
-                if (endTime < currentStartTime)
-                {
-                    return TaskStatus.Running;
-                }
-                // We know the position of the enemy at currentDelay seconds ago, so use it directly.
-                (enemyPosition, enemyVelocity) = enemyPositionTracker.GetPositionAndVelocityForRange(currentStartTime, endTime);
-
-                enemyPosition += enemyVelocity * additionalDelay;
-            }
+            var (estimatedPosition, estimatedVelocity) = ComputeAimPositionAndVelocity(lastSightedDelay, lastSightedTime);
 
             if (gunManager.IsCurrentGunProjectileWeapon())
-                AimProjectileWeapon(enemyPosition, enemyVelocity);
+                AimProjectileWeapon(estimatedPosition, estimatedVelocity);
             else
-                AimRaycastWeapon(enemyPosition, lastSightedTime);
+                AimRaycastWeapon(estimatedPosition, lastSightedTime);
 
             return TaskStatus.Running;
+        }
+
+        private Tuple<Vector3, Vector3> ComputeAimPositionAndVelocity(float lastSightedDelay, float lastSightedTime)
+        {
+            // We compute the position and velocity of the enemy by considering two types of delays in the aim:
+            // - Uncorrectable delay: this delay is computed purely based on the bot aiming skill;
+            // - Correctable delay: This delay is constant and can, depending on how predictable the enemy
+            //   movement is, it can be corrected or can further worsen the estimated position
+
+            // TODO If the enemy is far away, decrease precision?
+            // var realEnemyPos = enemy.transform.position;
+            
+            var aimTargetProgress = Mathf.Min(
+                (Time.time - nextDelayRecalculation + AIM_UPDATE_INTERVAL) / AIM_UPDATE_INTERVAL * AIM_COMMUTE_SPEED,
+                    1f
+            );
+            
+            var uncorrectableDelay = Math.Max(
+                0,
+                previousReflexDelay + (targetReflexDelay - previousReflexDelay) * aimTargetProgress
+            );
+            
+            const float correctableDelay = 0.2f;
+            var totalDelay = uncorrectableDelay + correctableDelay;
+            
+            Vector3 enemyPosition;
+            var estimatedVelocity = enemyPositionTracker.GetAverageVelocity(0.5f);
+
+            if (!float.IsNaN(lastSightedDelay) && lastSightedDelay > totalDelay)
+                // We don't know the exact position of the enemy currentDelay ago, so just consider
+                // its last know position (with velocity zero, so that we won't correct the shooting position)
+                enemyPosition = enemyPositionTracker.GetPositionAtTime(lastSightedTime);
+            else
+            {
+                enemyPosition = enemyPositionTracker.GetPositionAtTime(Time.time - totalDelay) + 
+                                correctableDelay * estimatedVelocity;
+            }
+
+            return new Tuple<Vector3, Vector3>(enemyPosition, estimatedVelocity);
         }
 
 
@@ -163,7 +175,7 @@ namespace AI.Behaviours.Actions
             TryAimIfRecommended((ourStartingPoint - chosenPoint).magnitude, angle);
             if (!(angle < 0.5) || !gunManager.CanCurrentGunShoot() || !ShouldShootWeapon(chosenPoint, isGunBlast))
                 return;
-            Debug.DrawRay(ourStartingPoint, sightController.GetHeadForward() * 100f, Color.blue, 2f);
+            // Debug.DrawRay(ourStartingPoint, sightController.GetHeadForward() * 100f, Color.blue, 2f);
             gunManager.ShootCurrentGun();
         }
 
@@ -190,7 +202,7 @@ namespace AI.Behaviours.Actions
 
         private void TryAimIfRecommended(float enemyDistance, float angle)
         {
-            if (gunManager.CanCurrentGunAim() && angle < 10 && enemyDistance > 10)
+            if (!gunManager.IsCurrentGunReloading() && gunManager.CanCurrentGunAim() && angle < 10 && enemyDistance > 10)
             {
                 if (!gunManager.IsCurrentGunAiming())
                     gunManager.SetCurrentGunAim(true);
