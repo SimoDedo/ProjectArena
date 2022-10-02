@@ -24,10 +24,11 @@ namespace AI
         
         [DataMember] [Range(0.5f, 1.5f)] private float aiming;
         
+        [DataMember] [Range(0.5f, 1.5f)] private float movementSkill;
+
         // Parameters not influenced by general skill
         [DataMember] private float speed;
         
-        [DataMember] private FightingMovementSkill movementSkill; // TODO understand if we can turn this into something continuous
 
         [JsonConverter(typeof(StringEnumConverter))]
         [DataMember] private CuriosityLevel curiosity; // TODO understand if we can turn this into something continuous
@@ -53,7 +54,26 @@ namespace AI
         public float AimDelayAverage => Interpolate(MIN_AIM_DELAY_AVERAGE, MAX_AIM_DELAY_AVERAGE, 1.0f - ScaleScore(generalSkill, aiming));
         public float Speed => speed;
         public float FOV => fov;
-        public FightingMovementSkill MovementSkill => movementSkill;
+        // TODO understand if we can turn this into something continuous
+        public FightingMovementSkill MovementSkill
+        {
+            get
+            {
+                if (movementSkill < 0.2f)
+                {
+                    return FightingMovementSkill.StandStill;
+                }
+                if (movementSkill < 0.5)
+                {
+                    return FightingMovementSkill.MoveStraight;
+                }
+                if (movementSkill < 0.8)
+                {
+                    return FightingMovementSkill.CircleStrife;
+                }
+                return FightingMovementSkill.CircleStrifeChangeDirection;
+            }
+        }
         public CuriosityLevel Curiosity => curiosity;
         public Recklessness Recklessness => recklessness;
         public float MaxRange => maxRange;
@@ -71,7 +91,7 @@ namespace AI
                 prediction = 1.0f,
                 aiming = 1.0f,
                 speed = 16f,
-                movementSkill = FightingMovementSkill.CircleStrife,
+                movementSkill = 0.5f,
                 curiosity = CuriosityLevel.Medium,
                 recklessness = Recklessness.Neutral,
                 fov = 60,
