@@ -18,8 +18,8 @@ namespace AI.Behaviours.Actions
     public class LookAround : Action
     {
         private const float THRESHOLD = 5f;
-        private const float MIN_UPDATE_TIME = 0.3f;
-        private const float MAX_UPDATE_TIME = 0.8f;
+        private const float MIN_UPDATE_TIME = 1.5f;
+        private const float MAX_UPDATE_TIME = 2.5f;
 
         private static readonly ReadOnlyCollection<AngleScore> AngleScores = new ReadOnlyCollection<AngleScore>(new[]
         {
@@ -82,13 +82,13 @@ namespace AI.Behaviours.Actions
             // For some reason we spawn moving up, causing weird issues with look direction
             if (realForward == Vector3.up || realForward == Vector3.zero)
                 realForward = transform.forward;
-            var angleX = 0f;
             
             angles.Clear();
             scores.Clear();
             
             if (MustUpdate(realForward))
             {
+                var angleX = 0f;
                 UpdateNextUpdateTime();
 
                 // Score formula: max(0, 10 + distanceScore * 40 + forwardScore * 30)
@@ -133,8 +133,8 @@ namespace AI.Behaviours.Actions
                 // lookPoint = transform.position + newDirection * 100;
             }
 
-            sightController.LookAtPoint(transform.position + Quaternion.AngleAxis(angleX, transform.up) * realForward);
-            // sightController.LookAtPoint(lookPoint);
+            var lookPoint = transform.position + Quaternion.AngleAxis(lookAngle, transform.up) * realForward;
+            sightController.LookAtPoint(lookPoint);
             return TaskStatus.Running;
         }
 
@@ -148,7 +148,6 @@ namespace AI.Behaviours.Actions
         {
             if (nextUpdateTime < Time.time)
             {
-                totalInvalidLookTime = 0;
                 return true;
             }
             
@@ -160,16 +159,16 @@ namespace AI.Behaviours.Actions
             }
             else
             {
-                totalInvalidLookTime -= Time.deltaTime * 2;
-                totalInvalidLookTime = Mathf.Max(0f, totalInvalidLookTime);
+                totalInvalidLookTime -= Mathf.Min(totalInvalidLookTime, Time.deltaTime * 2);
             }
             
-            return totalInvalidLookTime > 0.2;
+            return totalInvalidLookTime > 0.2f;
         }
 
         private void UpdateNextUpdateTime()
         {
             nextUpdateTime = Time.time + Random.Range(MIN_UPDATE_TIME, MAX_UPDATE_TIME);
+            totalInvalidLookTime = 0;
         }
 
         private struct AngleScore
