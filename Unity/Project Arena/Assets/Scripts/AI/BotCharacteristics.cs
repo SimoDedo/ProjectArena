@@ -26,12 +26,10 @@ namespace AI
         
         [DataMember] [Range(0.5f, 1.5f)] private float movementSkill;
 
+        [DataMember] [Range(0.5f, 1.5f)] private float curiosity; // TODO understand if we can turn this into something continuous
+
         // Parameters not influenced by general skill
         [DataMember] private float speed;
-        
-
-        [JsonConverter(typeof(StringEnumConverter))]
-        [DataMember] private CuriosityLevel curiosity; // TODO understand if we can turn this into something continuous
         
         [JsonConverter(typeof(StringEnumConverter))]
         [DataMember] private Recklessness recklessness;
@@ -74,7 +72,24 @@ namespace AI
                 return FightingMovementSkill.CircleStrifeChangeDirection;
             }
         }
-        public CuriosityLevel Curiosity => curiosity;
+
+        public CuriosityLevel Curiosity
+        {
+            get
+            {
+                if (curiosity < 0.3f)
+                {
+                    return CuriosityLevel.Low;
+                }
+
+                if (curiosity < 0.7f)
+                {
+                    return CuriosityLevel.Medium;
+                }
+
+                return CuriosityLevel.High;
+            }
+        }
         public Recklessness Recklessness => recklessness;
         public float MaxRange => maxRange;
         public float DamageTimeout => damageTimeout;
@@ -92,7 +107,7 @@ namespace AI
                 aiming = 1.0f,
                 speed = 16f,
                 movementSkill = 0.5f,
-                curiosity = CuriosityLevel.Medium,
+                curiosity = 0.5f,
                 recklessness = Recklessness.Neutral,
                 fov = 60,
                 maxRange = 100f,
