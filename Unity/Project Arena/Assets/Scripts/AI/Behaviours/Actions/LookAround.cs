@@ -86,7 +86,7 @@ namespace AI.Behaviours.Actions
             angles.Clear();
             scores.Clear();
             
-            if (MustUpdate(realForward))
+            if (MustUpdate())
             {
                 var angleX = 0f;
                 UpdateNextUpdateTime();
@@ -143,8 +143,8 @@ namespace AI.Behaviours.Actions
             return movementController.GetVelocity().normalized;
         }
 
-        private float totalInvalidLookTime = 0;
-        private bool MustUpdate(Vector3 movementDirection)
+        private float totalInvalidLookTime;
+        private bool MustUpdate()
         {
             if (nextUpdateTime < Time.time)
             {
