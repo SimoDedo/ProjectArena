@@ -6,16 +6,23 @@ namespace AI.Layers.SensingLayer
     /// This AI component is able to keep track on when the entity has been damaged and whether or not the entity
     /// was recently damaged.
     /// </summary>
+    ///  TODO Extract detection of damage and keeping track of whether the entity should react to it or not.
     public class DamageSensor
     {
         /// <summary>
         /// Timeout after taking damage for considering the entity as "recently damaged".
         /// </summary>
-        private readonly float recentDamageTimeout;
+        private readonly float recentTimeout;
 
-        public DamageSensor(float recentDamageTimeout)
+        /// <summary>
+        /// Delay before registering that damage was taken.
+        /// </summary>
+        private readonly float reactionDelay;
+
+        public DamageSensor(float recentTimeout, float reactionDelay)
         {
-            this.recentDamageTimeout = recentDamageTimeout;
+            this.recentTimeout = recentTimeout;
+            this.reactionDelay = reactionDelay;
         }
 
         /// <summary>
@@ -24,9 +31,16 @@ namespace AI.Layers.SensingLayer
         public float LastTimeDamaged { get; private set; } = float.MinValue;
 
         /// <summary>
-        /// Returns whether the entity was "recently damaged".
+        /// Returns whether the entity was "recently damaged" and can react to the event.
         /// </summary>
-        public bool WasDamagedRecently => LastTimeDamaged + recentDamageTimeout >= Time.time;
+        public bool WasDamagedRecently
+        {
+            get
+            {
+                var timeDiff = Time.time - LastTimeDamaged;
+                return timeDiff >= reactionDelay && timeDiff < recentTimeout;
+            }
+        }
 
         /// <summary>
         /// To be called when the entity got damage, so as to update the LastTimeDamaged.

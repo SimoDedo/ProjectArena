@@ -120,8 +120,8 @@ namespace AI
         private const float MAX_MEMORY_WINDOW = 5f;
         private const float MIN_DETECTION_WINDOW = 1f;
         private const float MAX_DETECTION_WINDOW = 2f;
-        private const float MIN_TIME_BEFORE_REACTION = 0.1f;
-        private const float MAX_TIME_BEFORE_REACTION = 0.5f;
+        private const float MIN_TIME_BEFORE_REACTION = 0.05f;
+        private const float MAX_TIME_BEFORE_REACTION = 0.3f;
         private const float MIN_PREDICTION = 0.1f;
         private const float MAX_PREDICTION = 0.8f;
         private const float MIN_AIM_DELAY_AVERAGE = -0.05f;

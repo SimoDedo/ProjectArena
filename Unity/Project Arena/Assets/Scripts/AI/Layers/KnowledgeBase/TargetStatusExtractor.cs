@@ -7,11 +7,11 @@ namespace AI.Layers.KnowledgeBase
 {
     public class TargetKnowledgeBase
     {
+        // Used to react slower for distant enemies.
         private static readonly AnimationCurve DistanceScore = new AnimationCurve(
-            new Keyframe(0f, 2.5f),
-            new Keyframe(10f, 1.5f),
-            new Keyframe(30f, 1.2f),
-            new Keyframe(50f, 1f)
+            new Keyframe(0f, 1.0f),
+            new Keyframe(20f, 1.0f),
+            new Keyframe(60f, 0.6f)
         );
 
         // The entity this component belongs to.

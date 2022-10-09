@@ -6,12 +6,14 @@ namespace AI.Layers.SensingLayer
     public class SoundSensor
     {
         private readonly float recentNoiseTimeout;
+        private readonly float recentNoiseDelay;
         private readonly int entityID;
         private readonly float soundThreshold;
         private readonly Transform t;
 
-        public SoundSensor(float recentNoiseTimeout, int entityID, Transform transform, float soundThreshold)
+        public SoundSensor(float recentNoiseDelay, float recentNoiseTimeout, int entityID, Transform transform, float soundThreshold)
         {
+            this.recentNoiseDelay = recentNoiseDelay;
             this.recentNoiseTimeout = recentNoiseTimeout;
             this.entityID = entityID; 
             this.soundThreshold = soundThreshold;
@@ -25,10 +27,16 @@ namespace AI.Layers.SensingLayer
         public float LastTimeHeardShot { get; private set; } = float.MinValue;
 
         /// <summary>
-        /// Returns whether the entity was "recently damaged".
+        /// Returns whether the entity recently heard a suspicious noise.
         /// </summary>
-        public bool HeardShotRecently => LastTimeHeardShot + recentNoiseTimeout >= Time.time;
-        
+        public bool HeardShotRecently
+        {
+            get
+            {
+                var timeDiff = Time.time - LastTimeHeardShot;
+                return timeDiff >= recentNoiseDelay && timeDiff < recentNoiseTimeout;
+            }
+        }
 
         /// <summary>
         /// Forgets the time the entity last heard a gun shot.
