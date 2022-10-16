@@ -8,64 +8,83 @@ using UnityEngine;
 namespace AI
 {
     [DataContract]
-    public struct BotCharacteristics
+    public class JSonBotCharacteristics
     {
-        /// <summary>
-        /// The general skill of the bot, influencing eyeSpeed, reflex, curiosity, prediction and aiming skills.
-        /// </summary>
-        [DataMember] [Range(0.0f, 1.0f)] private float generalSkill;
         // Parameters influenced by general skill
+        [DataMember] [Range(0.5f, 1.5f)] public readonly float eyeSpeed = 1.0f;
+        
+        [DataMember] [Range(0.5f, 1.5f)] public readonly float reflex = 1.0f;
+        
+        [DataMember] [Range(0.5f, 1.5f)] public readonly float prediction = 1.0f;
+        
+        [DataMember] [Range(0.5f, 1.5f)] public readonly float aiming = 1.0f;
+        
+        [DataMember] [Range(0.5f, 1.5f)] public readonly float movementSkill = 0.5f;
 
-        [DataMember] [Range(0.5f, 1.5f)] private float eyeSpeed;
-        
-        [DataMember] [Range(0.5f, 1.5f)] private float reflex;
-        
-        [DataMember] [Range(0.5f, 1.5f)] private float prediction;
-        
-        [DataMember] [Range(0.5f, 1.5f)] private float aiming;
-        
-        [DataMember] [Range(0.5f, 1.5f)] private float movementSkill;
-
-        [DataMember] [Range(0.5f, 1.5f)] private float curiosity; // TODO understand if we can turn this into something continuous
+        [DataMember] [Range(0.5f, 1.5f)] public readonly float curiosity = 0.5f;// TODO understand if we can turn this into something continuous
 
         // Parameters not influenced by general skill
-        [DataMember] private float speed;
+        [DataMember] public readonly float speed = 16f;
         
         [JsonConverter(typeof(StringEnumConverter))]
-        [DataMember] private Recklessness recklessness;
+        [DataMember] public readonly Recklessness recklessness = Recklessness.Neutral;
 
-        [DataMember] [Range(30f, 90f)] private float fov; // TODO maybe this can be slightly influenced by skill (+-10% ?)
+        [DataMember] [Range(30f, 90f)] public readonly float fov = 60f; // TODO maybe this can be slightly influenced by skill (+-10% ?)
 
-        [DataMember] private float maxRange; //TODO same as above?
+        [DataMember] public readonly float maxRange = 100f; //TODO same as above?
 
-        [DataMember] private float damageTimeout;
-        
+        [DataMember] public readonly float damageTimeout = 0.3f;
+    }
+
+    [Serializable]
+    public class BotCharacteristics
+    {
+        [Range(0.0f, 1.0f)] public readonly float generalSkill;
+
+        private JSonBotCharacteristics c;
+
+        public BotCharacteristics(float generalSkill, JSonBotCharacteristics characteristics)
+        {
+            this.generalSkill = generalSkill;
+            c = characteristics;
+        }
+
         // Abilities directly usable by bot
         // TODO Define max and min depending on bot generalSkill and specific ability to help you 
         // better control the influence of the ability scores.
-        public float CameraSpeed => Interpolate(MIN_EYE_SPEED, MAX_EYE_SPEED, ScaleScore(generalSkill,eyeSpeed));
-        public float CameraAcceleration => Interpolate(MIN_EYE_SPEED, MAX_EYE_SPEED, ScaleScore(generalSkill,eyeSpeed));
-        public float MemoryWindow => Interpolate(MIN_MEMORY_WINDOW, MAX_MEMORY_WINDOW, ScaleScore(generalSkill,reflex));
-        public float DetectionWindow => Interpolate(MIN_DETECTION_WINDOW, MAX_DETECTION_WINDOW, ScaleScore(generalSkill,reflex));
-        public float TimeBeforeReaction => Interpolate(MIN_TIME_BEFORE_REACTION, MAX_TIME_BEFORE_REACTION, 1.0f - ScaleScore(generalSkill,reflex));
-        public float Prediction => Interpolate(MIN_PREDICTION, MAX_PREDICTION, ScaleScore(generalSkill, prediction));
-        public float AimDelayAverage => Interpolate(MIN_AIM_DELAY_AVERAGE, MAX_AIM_DELAY_AVERAGE, 1.0f - ScaleScore(generalSkill, aiming));
-        public float Speed => speed;
-        public float FOV => fov;
+        public float CameraSpeed => Interpolate(MIN_EYE_SPEED, MAX_EYE_SPEED, ScaleScore(generalSkill,c.eyeSpeed));
+        public float CameraAcceleration => Interpolate(MIN_EYE_SPEED, MAX_EYE_SPEED, ScaleScore(generalSkill,c.eyeSpeed));
+        public float MemoryWindow => Interpolate(MIN_MEMORY_WINDOW, MAX_MEMORY_WINDOW, ScaleScore(generalSkill,c.reflex));
+        public float DetectionWindow => Interpolate(MIN_DETECTION_WINDOW, MAX_DETECTION_WINDOW, ScaleScore(generalSkill,c.reflex));
+        public float TimeBeforeReaction => Interpolate(MIN_TIME_BEFORE_REACTION, MAX_TIME_BEFORE_REACTION, 1.0f - ScaleScore(generalSkill,c.reflex));
+        public float Prediction => Interpolate(MIN_PREDICTION, MAX_PREDICTION, ScaleScore(generalSkill, c.prediction));
+        public float AimDelayAverage => Interpolate(MIN_AIM_DELAY_AVERAGE, MAX_AIM_DELAY_AVERAGE, 1.0f - ScaleScore(generalSkill, c.aiming));
+        public float Speed => c.speed;
+
+        public float FOV
+        {
+            get
+            {
+                var percentage = (generalSkill - 0.5f) / 5; // +- 10%
+                return c.fov + c.fov * percentage;
+            }
+        }
         // TODO understand if we can turn this into something continuous
         public FightingMovementSkill MovementSkill
         {
             get
             {
-                if (movementSkill < 0.2f)
+                var score = ScaleScore(1.0f, c.movementSkill);
+                // var score = c.movementSkill;
+                if (score < 0.2f)
                 {
                     return FightingMovementSkill.StandStill;
                 }
-                if (movementSkill < 0.5)
+                if (score < 0.5)
                 {
                     return FightingMovementSkill.MoveStraight;
                 }
-                if (movementSkill < 0.8)
+                if (score < 0.8)
                 {
                     return FightingMovementSkill.CircleStrife;
                 }
@@ -77,12 +96,14 @@ namespace AI
         {
             get
             {
-                if (curiosity < 0.3f)
+                var score = ScaleScore(generalSkill, c.curiosity);
+                // var score = ScaleScore(generalSkill, c.curiosity);
+                if (score < 0.3f)
                 {
                     return CuriosityLevel.Low;
                 }
 
-                if (curiosity < 0.7f)
+                if (score < 0.7f)
                 {
                     return CuriosityLevel.Medium;
                 }
@@ -90,38 +111,27 @@ namespace AI
                 return CuriosityLevel.High;
             }
         }
-        public Recklessness Recklessness => recklessness;
-        public float MaxRange => maxRange;
-        public float DamageTimeout => damageTimeout;
-        
+        public Recklessness Recklessness => c.recklessness;
+        public float MaxRange => c.maxRange;
+        public float DamageTimeout => c.damageTimeout;
+
         /// <summary>
         /// Default characteristics of a bot. Average abilities all around.
         /// </summary>
         public static BotCharacteristics Default =>
-            new BotCharacteristics
-            {
-                generalSkill = 0.5f,
-                eyeSpeed = 1.0f,
-                reflex = 1.0f,
-                prediction = 1.0f,
-                aiming = 1.0f,
-                speed = 16f,
-                movementSkill = 0.5f,
-                curiosity = 0.5f,
-                recklessness = Recklessness.Neutral,
-                fov = 60,
-                maxRange = 100f,
-                damageTimeout = 0.3f
-            };
+            new BotCharacteristics(
+                0.5f,
+                new JSonBotCharacteristics()
+            );
         
         private const float MIN_EYE_SPEED = 500f;
-        private const float MAX_EYE_SPEED = 3000f;
+        private const float MAX_EYE_SPEED = 5000f;
         private const float MIN_MEMORY_WINDOW = 2f;
         private const float MAX_MEMORY_WINDOW = 5f;
         private const float MIN_DETECTION_WINDOW = 1f;
-        private const float MAX_DETECTION_WINDOW = 2f;
+        private const float MAX_DETECTION_WINDOW = 3f;
         private const float MIN_TIME_BEFORE_REACTION = 0.05f;
-        private const float MAX_TIME_BEFORE_REACTION = 0.3f;
+        private const float MAX_TIME_BEFORE_REACTION = 0.5f;
         private const float MIN_PREDICTION = 0.1f;
         private const float MAX_PREDICTION = 0.8f;
         private const float MIN_AIM_DELAY_AVERAGE = -0.05f;
