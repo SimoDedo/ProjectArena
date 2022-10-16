@@ -30,7 +30,9 @@ namespace Tester
         [SerializeField] private GameObject botPrefab;
         [SerializeField] private string genomeName;
         [SerializeField] private string bot1ParamsFilenamePrefix;
+        [SerializeField] private float bot1SkillLevel = 0.5f;
         [SerializeField] private string bot2ParamsFilenamePrefix;
+        [SerializeField] private float bot2SkillLevel = 0.5f;
         [SerializeField] private SLMapManager mapManager;
         [SerializeField] private GenomeV2MapGenerator genomeMapGenerator;
         [SerializeField] private MapAssembler mapAssembler;
@@ -70,7 +72,9 @@ namespace Tester
             foreach (var arg in args)
             {
                 if (arg.StartsWith("-bot1file=")) bot1ParamsFilenamePrefix = arg.Substring(10);
+                if (arg.StartsWith("-bot1skill=")) bot1SkillLevel = float.Parse(arg.Substring(11));
                 if (arg.StartsWith("-bot2file=")) bot2ParamsFilenamePrefix = arg.Substring(10);
+                if (arg.StartsWith("-bot2skill=")) bot2SkillLevel = float.Parse(arg.Substring(11));
                 if (arg.StartsWith("-numExperiments=")) numExperiments = int.Parse(arg.Substring(16));
                 if (arg.StartsWith("-folderName=")) folderName = arg.Substring(12);
                 if (arg.StartsWith("-experimentName=")) experimentName = arg.Substring(16);
@@ -139,12 +143,13 @@ namespace Tester
         {
             analyzer.Reset();
             
-            var bot1Params = ReadFromFile(botsPath + bot1ParamsFilenamePrefix + "params.json",
-                BotCharacteristics.Default);
-            Debug.Log("AAA bot1 params is " + bot1Params);
-            var bot2Params = ReadFromFile(botsPath + bot2ParamsFilenamePrefix + "params.json",
-                BotCharacteristics.Default);
-            Debug.Log("AAA bot2 params is " + bot2Params);
+            var bot1JsonParams = ReadFromFile(botsPath + bot1ParamsFilenamePrefix + "params.json",
+                new JSonBotCharacteristics());
+            var bot1Params = new BotCharacteristics(bot1SkillLevel, bot1JsonParams);
+            
+            var bot2JsonParams = ReadFromFile(botsPath + bot2ParamsFilenamePrefix + "params.json",
+                new JSonBotCharacteristics());
+            var bot2Params = new BotCharacteristics(bot2SkillLevel, bot2JsonParams);
 
             var defaultGuns = new[] {true, true, true, true};
             var activeGunsBot1 = ReadFromFile(botsPath + bot1ParamsFilenamePrefix + "guns.json", defaultGuns);
