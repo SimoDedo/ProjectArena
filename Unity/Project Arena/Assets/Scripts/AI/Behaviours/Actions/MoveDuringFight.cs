@@ -68,15 +68,27 @@ namespace AI.Behaviours.Actions
         
         private void TrySelectDestination()
         {
-            if (skill == FightingMovementSkill.StandStill)
-            {
-                // Don't move at all if skill is so low.
-                navSystem.CancelPath();
-                return;
-            }
-
             var currentPos = transform.position;
             var targetPos = target.transform.position;
+
+            if (skill == FightingMovementSkill.StandStill)
+            {
+                var distance = (currentPos - targetPos).magnitude;
+                var weaponRange = gunManager.GetGunMaxRange(gunManager.CurrentGunIndex);
+
+                if (distance > weaponRange || Physics.Linecast(currentPos, targetPos, lineCastLayerMask))
+                {
+                    // I cannot shoot the enemy from here. No matter my skill, I should move somewhere where I can
+                    // see them.
+                    RushTowardsEnemy(currentPos, targetPos);
+                }
+                else
+                {
+                    // Don't move at all if skill is low and I can shoot the target.
+                    navSystem.CancelPath();
+                }
+                return;
+            }
             
             // We do not care if enemy is above or below us, the move straight/strife movement should be
             // parallel to the floor.
@@ -100,7 +112,7 @@ namespace AI.Behaviours.Actions
             Debug.DrawLine(currentPos, newPos, Color.yellow, 1, false);
             // Debug.DrawLine(newPos, targetPos, Color.red, 1, false);
             
-            if (!Physics.Linecast(newPos, targetPos, out var hit, lineCastLayerMask))
+            if (!Physics.Linecast(newPos, targetPos, lineCastLayerMask))
             {
                 // I can see the enemy from the new position.
                 var path = navSystem.CalculatePath(newPos);
@@ -117,8 +129,6 @@ namespace AI.Behaviours.Actions
             }
             else
             {
-                // TODO I Cannot see the enemy. I should move somewhere else. Move toward the enemy.
-                // However, do not 
                 MoveToLocationWithEnemyInSight(currentPos, targetPos);
             }
         }
@@ -163,21 +173,24 @@ namespace AI.Behaviours.Actions
                 }
             }
 
-            // I couldn't see the enemy from any place. This bot is stupid and will rush towards the enemy, thinking
-            // that it might be fleeing...
-            // TODO I should not rush towards the enemy. Keep the optimal distance
+            // I couldn't see the enemy from any place. Rush towards the enemy, it might be fleeing...
+            RushTowardsEnemy(currentPos, targetPos);
+        }
 
+        // TODO This will fail if the enemy is on another floor
+        private void RushTowardsEnemy(Vector3 currentPos, Vector3 targetPos)
+        {
             var enemyDirection = targetPos - currentPos;
             var distance = enemyDirection.magnitude;
             enemyDirection.Normalize();
             var movementDirectionDueToGun = GetMoveDirectionDueToGun(distance, enemyDirection);
-            
+
             var path2 = navSystem.CalculatePath(currentPos + movementDirectionDueToGun);
             if (path2.IsValid())
                 navSystem.SetPath(path2);
         }
 
-        
+
         private Vector3 GetMovementDirectionDueToStrife(Vector3 direction)
         {
             if (skill < FightingMovementSkill.CircleStrife)
