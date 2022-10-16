@@ -40,36 +40,34 @@ namespace AI.GoalMachine.Goal
 
         public float GetScore()
         {
-            var searchDueToLoss = _targetKnowledgeBase.HasLostTarget();
-            var searchDueToSuspectedEnemy = !_targetKnowledgeBase.HasSeenTarget() && 
-                                            (damageSensor.WasDamagedRecently || soundSensor.HeardShotRecently);
             if (!entity.GetEnemy().IsAlive)
             {
+                // Nothing to search
                 return 0f;
             }
 
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            if (startSearchTime != NO_TIME)
+            {
+                // We are already searching the enemy, slowly decrease will to search based on how much time has elapsed
+                return 1f - (Time.time - startSearchTime) / 10f;
+            }
+            
+            var searchDueToLoss = _targetKnowledgeBase.HasLostTarget();
             if (searchDueToLoss)
             {
-                // ReSharper disable once CompareOfFloatsByEqualityOperator
-                if (startSearchTime == NO_TIME)
-                    return _recklessness switch
-                    {
-                        Recklessness.Low => 0.3f,
-                        Recklessness.Neutral => 0.6f,
-                        Recklessness.High => 0.9f,
-                        _ => throw new ArgumentOutOfRangeException()
-                    };
-                // Slowly decrease want to search. After 5 secs, it's zero
-                return 1f - (Time.time - startSearchTime) / 5f;
+                return _recklessness switch
+                {
+                    Recklessness.Low => 0.3f,
+                    Recklessness.Neutral => 0.6f,
+                    Recklessness.High => 0.9f,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
             }
-
-            if (!searchDueToSuspectedEnemy) return 0f;
-            // ReSharper disable once CompareOfFloatsByEqualityOperator
-            if (startSearchTime == NO_TIME)
-                return 0.7f;
-            // Slowly decrease want to search. After 5 secs, it's zero
-            return 1f - (Time.time - startSearchTime) / 5f;
             
+            var searchDueToSuspectedEnemy = !_targetKnowledgeBase.HasSeenTarget() && 
+                                            (damageSensor.WasDamagedRecently || soundSensor.HeardShotRecently);
+            return searchDueToSuspectedEnemy ? 0.7f : 0.0f;
         }
 
         public void Enter()
