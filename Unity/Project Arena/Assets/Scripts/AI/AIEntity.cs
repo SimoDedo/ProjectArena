@@ -196,9 +196,9 @@ namespace AI
         public float CanSelectCoverProbability => botParams.CanSelectCoverProbability;
 
         public float AimDelayAverage => botParams.AimDelayAverage;
-        
-        public Recklessness Recklessness => botParams.Recklessness;
         public float AimingDispersionAngle => botParams.AimingDispersionAngle; 
+        public float AcceptableShootingAngle => botParams.AcceptableShootingAngle; 
+        public Recklessness Recklessness => botParams.Recklessness;
 
         private LoggingComponent loggingComponent;
 

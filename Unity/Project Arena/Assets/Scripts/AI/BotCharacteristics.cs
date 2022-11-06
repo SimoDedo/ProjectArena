@@ -62,6 +62,7 @@ namespace AI
         public float Prediction => Interpolate(MIN_PREDICTION, MAX_PREDICTION, ScaleScore(generalSkill, c.prediction));
         public float AimDelayAverage => Interpolate(MIN_AIM_DELAY_AVERAGE, MAX_AIM_DELAY_AVERAGE, 1.0f - ScaleScore(generalSkill, c.aiming));
         public float AimingDispersionAngle => Interpolate(MIN_AIM_DISPERSION_ANGLE, MAX_AIM_DISPERSION_ANGLE, 1.0f - ScaleScore(generalSkill, c.aiming));
+        public float AcceptableShootingAngle => Interpolate(MIN_ACCEPTABLE_SHOOTING_ANGLE, MAX_ACCEPTABLE_SHOOTING_ANGLE, 1.0f - ScaleScore(generalSkill, c.aiming));
         public float Speed => c.speed;
 
         public float FOV
@@ -139,6 +140,8 @@ namespace AI
 
         private const float MIN_AIM_DISPERSION_ANGLE = 2f;
         private const float MAX_AIM_DISPERSION_ANGLE = 30f;
+        private const float MIN_ACCEPTABLE_SHOOTING_ANGLE = 0.5f;
+        private const float MAX_ACCEPTABLE_SHOOTING_ANGLE = 4f;
 
         private const float MIN_SOUND_THRESHOLD = 0.2f;
         private const float MAX_SOUND_THRESHOLD = 3f;

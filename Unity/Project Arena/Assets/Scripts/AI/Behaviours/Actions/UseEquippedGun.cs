@@ -37,6 +37,7 @@ namespace AI.Behaviours.Actions
         private float targetReflexDelay;
         private NormalDistribution distribution;
         private float aimingDispersionMaxAngle;
+        private float acceptableShootingAngle;
 
         private float aimingDispersionFirstAngle;
         private float aimingDispersionSecondAngle;
@@ -47,6 +48,7 @@ namespace AI.Behaviours.Actions
             _targetKnowledgeBase = entity.TargetKnowledgeBase;
             sightController = entity.SightController;
             aimingDispersionMaxAngle = entity.AimingDispersionAngle;
+            acceptableShootingAngle = entity.AcceptableShootingAngle;
             enemy = entity.GetEnemy();
             enemyPositionTracker = enemy.GetComponent<PositionTracker>();
 
@@ -190,7 +192,7 @@ namespace AI.Behaviours.Actions
 
             var angle = sightController.LookAtPoint(chosenPoint);
             TryAimIfRecommended((ourStartingPoint - chosenPoint).magnitude, angle);
-            if (!(angle < 0.5) || !gunManager.CanCurrentGunShoot() || !ShouldShootWeapon(chosenPoint, isGunBlast))
+            if (angle >= acceptableShootingAngle || !gunManager.CanCurrentGunShoot() || !ShouldShootWeapon(chosenPoint, isGunBlast))
                 return;
             // Debug.DrawRay(ourStartingPoint, sightController.GetHeadForward() * 100f, Color.blue, 2f);
             gunManager.ShootCurrentGun();
@@ -214,7 +216,7 @@ namespace AI.Behaviours.Actions
             var currentPosition = sightController.GetHeadPosition();
             TryAimIfRecommended((currentPosition - aimingPoint).magnitude, angle);
 
-            if (!(angle < 0.5) || !gunManager.CanCurrentGunShoot() ||
+            if (angle >= acceptableShootingAngle || !gunManager.CanCurrentGunShoot() ||
                 !ShouldShootWeapon(aimingPoint, gunManager.IsCurrentGunBlastWeapon())) return;
             gunManager.ShootCurrentGun();
         }
