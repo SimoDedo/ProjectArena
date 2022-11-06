@@ -22,18 +22,20 @@ namespace AI
         [DataMember] [Range(0.5f, 1.5f)] public readonly float movementSkill = 0.5f;
 
         [DataMember] [Range(0.5f, 1.5f)] public readonly float curiosity = 0.5f;// TODO understand if we can turn this into something continuous
-
+        
         // Parameters not influenced by general skill
         [DataMember] public readonly float speed = 16f;
         
         [JsonConverter(typeof(StringEnumConverter))]
         [DataMember] public readonly Recklessness recklessness = Recklessness.Neutral;
 
-        [DataMember] [Range(30f, 90f)] public readonly float fov = 60f; // TODO maybe this can be slightly influenced by skill (+-10% ?)
+        [DataMember] [Range(30f, 90f)] public readonly float fov = 60f;
 
-        [DataMember] public readonly float maxRange = 100f; //TODO same as above?
+        [DataMember] public readonly float maxRange = 100f; //TODO maybe this can slightly increase/decrease depending on skill?
 
-        [DataMember] public readonly float damageTimeout = 0.3f;
+        // Amount of time, measured from the first moment we can react to an enemy event (e.g. heard sound, got damaged),
+        //  after which we "forget" about the event
+        [DataMember] public readonly float eventReactionTimeout = 0.3f;
     }
 
     [Serializable]
@@ -95,7 +97,8 @@ namespace AI
         }
         public Recklessness Recklessness => c.recklessness;
         public float MaxRange => c.maxRange;
-        public float DamageTimeout => c.damageTimeout;
+        public float EventReactionTimeout => c.eventReactionTimeout;
+        public float SoundThreshold => Interpolate(MIN_SOUND_THRESHOLD, MAX_SOUND_THRESHOLD, 1.0f - generalSkill);
 
         /// <summary>
         /// Default characteristics of a bot. Average abilities all around.
@@ -125,16 +128,21 @@ namespace AI
         private const float MAX_DODGE_ROCKET_PROBABILITY = 1.3f;
         private const float MIN_CAN_SELECT_COVER_PROBABILITY = -0.3f;
         private const float MAX_CAN_SELECT_COVER_PROBABILITY = 1.0f;
-        private const float MIN_AIM_DELAY_AVERAGE = -0.025f;
-        private const float MAX_AIM_DELAY_AVERAGE = 0.05f;
-        private const float AIM_DELAY_STD_DEV = 0.06f;
-        private const float MIN_AIM_DISPERSION_ANGLE = 2f;
-        private const float MAX_AIM_DISPERSION_ANGLE = 30f;
 
         // With these params, at best an entity will aim at the enemy position ~80% of the times, at
         // worst ~5% of the times. 
         // Check from (example) WolframAlpha: 
         // integrate 1/(sqrt(2*pi)*s)*e^(-(x-m)^2/(2*s^2)) from -infinity to 0 with s = 0.06 and m = <mean>
+        private const float MIN_AIM_DELAY_AVERAGE = -0.025f;
+        private const float MAX_AIM_DELAY_AVERAGE = 0.05f;
+        private const float AIM_DELAY_STD_DEV = 0.06f;
+
+        private const float MIN_AIM_DISPERSION_ANGLE = 2f;
+        private const float MAX_AIM_DISPERSION_ANGLE = 30f;
+
+        private const float MIN_SOUND_THRESHOLD = 0.2f;
+        private const float MAX_SOUND_THRESHOLD = 3f;
+        
         
         private static float ScaleScore(float general, float specific)
         {

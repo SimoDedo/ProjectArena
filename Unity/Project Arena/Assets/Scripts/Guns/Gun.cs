@@ -49,6 +49,7 @@ namespace Guns
         [SerializeField] protected float recoil = 0.05f;
 
         // Noise decay: 1/distanceSquared
+        // TODO use decibels?
         [Header("Noise")] [SerializeField] private float shotNoise = 3000;
         
         [Header("Aim")] [SerializeField] protected bool aimEnabled;
