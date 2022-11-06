@@ -59,6 +59,7 @@ namespace AI
         public float TimeBeforeReaction => Interpolate(MIN_TIME_BEFORE_REACTION, MAX_TIME_BEFORE_REACTION, 1.0f - ScaleScore(generalSkill,c.reflex));
         public float Prediction => Interpolate(MIN_PREDICTION, MAX_PREDICTION, ScaleScore(generalSkill, c.prediction));
         public float AimDelayAverage => Interpolate(MIN_AIM_DELAY_AVERAGE, MAX_AIM_DELAY_AVERAGE, 1.0f - ScaleScore(generalSkill, c.aiming));
+        public float AimingDispersionAngle => Interpolate(MIN_AIM_DISPERSION_ANGLE, MAX_AIM_DISPERSION_ANGLE, 1.0f - ScaleScore(generalSkill, c.aiming));
         public float Speed => c.speed;
 
         public float FOV
@@ -69,35 +70,16 @@ namespace AI
                 return c.fov + c.fov * percentage;
             }
         }
-        // TODO understand if we can turn this into something continuous
-        public FightingMovementSkill MovementSkill
-        {
-            get
-            {
-                var score = ScaleScore(1.0f, c.movementSkill);
-                // var score = c.movementSkill;
-                if (score < 0.2f)
-                {
-                    return FightingMovementSkill.StandStill;
-                }
-                if (score < 0.5)
-                {
-                    return FightingMovementSkill.MoveStraight;
-                }
-                if (score < 0.8)
-                {
-                    return FightingMovementSkill.CircleStrife;
-                }
-                return FightingMovementSkill.CircleStrifeChangeDirection;
-            }
-        }
+        public float StandStillInFightProbability => Interpolate(MIN_STAND_STILL_IN_FIGHT, MAX_STAND_STILL_IN_FIGHT, 1.0f - ScaleScore(generalSkill, c.movementSkill));
+        public float RandomlyMoveInFightProbability => Interpolate(MIN_RANDOM_MOVE_IN_FIGHT, MAX_RANDOM_MOVE_IN_FIGHT, 1.0f - ScaleScore(generalSkill, c.movementSkill));
+        public float DodgeRocketProbability => Interpolate(MIN_DODGE_ROCKET_PROBABILITY, MAX_DODGE_ROCKET_PROBABILITY, ScaleScore(generalSkill, c.movementSkill));
+        public float CanSelectCoverProbability => Interpolate(MIN_CAN_SELECT_COVER_PROBABILITY, MAX_CAN_SELECT_COVER_PROBABILITY, ScaleScore(generalSkill, c.movementSkill));
 
         public CuriosityLevel Curiosity
         {
             get
             {
                 var score = ScaleScore(generalSkill, c.curiosity);
-                // var score = ScaleScore(generalSkill, c.curiosity);
                 if (score < 0.3f)
                 {
                     return CuriosityLevel.Low;
@@ -123,7 +105,8 @@ namespace AI
                 0.5f,
                 new JSonBotCharacteristics()
             );
-        
+
+
         private const float MIN_EYE_SPEED = 500f;
         private const float MAX_EYE_SPEED = 5000f;
         private const float MIN_MEMORY_WINDOW = 2f;
@@ -134,9 +117,19 @@ namespace AI
         private const float MAX_TIME_BEFORE_REACTION = 0.5f;
         private const float MIN_PREDICTION = 0.1f;
         private const float MAX_PREDICTION = 0.8f;
-        private const float MIN_AIM_DELAY_AVERAGE = -0.05f;
-        private const float MAX_AIM_DELAY_AVERAGE = 0.10f;
+        private const float MIN_STAND_STILL_IN_FIGHT = 0.1f;
+        private const float MAX_STAND_STILL_IN_FIGHT = 1.0f;
+        private const float MIN_RANDOM_MOVE_IN_FIGHT = -0.0f;
+        private const float MAX_RANDOM_MOVE_IN_FIGHT = 1.0f;
+        private const float MIN_DODGE_ROCKET_PROBABILITY = 0.2f;
+        private const float MAX_DODGE_ROCKET_PROBABILITY = 1.3f;
+        private const float MIN_CAN_SELECT_COVER_PROBABILITY = -0.3f;
+        private const float MAX_CAN_SELECT_COVER_PROBABILITY = 1.0f;
+        private const float MIN_AIM_DELAY_AVERAGE = -0.025f;
+        private const float MAX_AIM_DELAY_AVERAGE = 0.05f;
         private const float AIM_DELAY_STD_DEV = 0.06f;
+        private const float MIN_AIM_DISPERSION_ANGLE = 2f;
+        private const float MAX_AIM_DISPERSION_ANGLE = 30f;
 
         // With these params, at best an entity will aim at the enemy position ~80% of the times, at
         // worst ~5% of the times. 

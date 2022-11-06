@@ -189,11 +189,16 @@ namespace AI
 
         public override bool IsAlive => isActiveAndEnabled && (Health > 0 || mustProcessDeath);
 
-        public FightingMovementSkill MovementSkill => botParams.MovementSkill;
+        public float StandStillInFightProbability => botParams.StandStillInFightProbability;
+        public float RandomlyMoveInFightProbability => botParams.RandomlyMoveInFightProbability;
+        public float DodgeRocketProbability => botParams.DodgeRocketProbability;
+        
+        public float CanSelectCoverProbability => botParams.CanSelectCoverProbability;
 
         public float AimDelayAverage => botParams.AimDelayAverage;
         
         public Recklessness Recklessness => botParams.Recklessness;
+        public float AimingDispersionAngle => botParams.AimingDispersionAngle; 
 
         private LoggingComponent loggingComponent;
 
