@@ -23,7 +23,7 @@ namespace AI.Behaviours.Conditions
 
         private Entity.Entity enemy;
         private AIEntity entity;
-        private FightingMovementSkill skill;
+        private float canSelectCoverProbability;
         private GunManager gunManager;
         private float avoidCoverProbability = 0.3f;
 
@@ -32,7 +32,7 @@ namespace AI.Behaviours.Conditions
         public override void OnAwake()
         {
             entity = gameObject.GetComponent<AIEntity>();
-            skill = entity.MovementSkill;
+            canSelectCoverProbability = entity.CanSelectCoverProbability;
             enemy = entity.GetEnemy();
             gunManager = entity.GunManager;
             var recklessness = entity.Recklessness;
@@ -53,9 +53,10 @@ namespace AI.Behaviours.Conditions
 
         public override TaskStatus OnUpdate()
         {
-            if (skill < FightingMovementSkill.CircleStrife)
+            if (Random.value > canSelectCoverProbability)
             {
                 // Too noob to consider cover.
+                nextCoverAttempt = Time.time + TIMEOUT;
                 return TaskStatus.Failure;
             }
 

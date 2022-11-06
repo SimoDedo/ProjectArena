@@ -5,6 +5,8 @@ using BehaviorDesigner.Runtime.Tasks;
 using Guns;
 using UnityEngine;
 
+// TODO
+
 namespace AI.Behaviours.Conditions
 {
     /// <summary>
@@ -28,7 +30,7 @@ namespace AI.Behaviours.Conditions
         {
             var entity = GetComponent<AIEntity>();
             myID = entity.GetID();
-            movementSkill = entity.MovementSkill;
+            // movementSkill = entity.MovementSkill;
             sightSensor = entity.SightSensor;
 
             layerMask = 1 << LayerMask.NameToLayer("Projectile");
@@ -36,16 +38,16 @@ namespace AI.Behaviours.Conditions
 
         public override TaskStatus OnUpdate()
         {
-            if (movementSkill < FightingMovementSkill.CircleStrife)
+            // if (movementSkill < FightingMovementSkill.CircleStrife)
                 // Not skilled enough to dodge
                 return TaskStatus.Failure;
 
-            var projectileToDodge = FindRocketToDodge();
-            if (projectileToDodge == null) return TaskStatus.Failure;
-
-            // TODO should add delay to rocket detection?
-            rocketToDodge.Value = projectileToDodge.transform;
-            return TaskStatus.Success;
+            // var projectileToDodge = FindRocketToDodge();
+            // if (projectileToDodge == null) return TaskStatus.Failure;
+            //
+            // // TODO should add delay to rocket detection?
+            // rocketToDodge.Value = projectileToDodge.transform;
+            // return TaskStatus.Success;
         }
 
         // Finds if there is any rocket in view which is not mine and needs to be dodged.

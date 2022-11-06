@@ -12,22 +12,17 @@ namespace AI.Behaviours.Conditions
     public class ShouldFight : Conditional
     {
         private AIEntity entity;
-        private FightingMovementSkill skill;
         private TargetKnowledgeBase _targetKnowledgeBase;
 
         public override void OnAwake()
         {
             entity = GetComponent<AIEntity>();
             _targetKnowledgeBase = entity.TargetKnowledgeBase;
-            skill = entity.MovementSkill;
         }
 
         public override TaskStatus OnUpdate()
         {
-            if (skill == FightingMovementSkill.StandStill)
-                // Never fight back if I don't have the required movement skill!
-                return TaskStatus.Failure;
-
+            // TODO add possibility to not fight enemy depending on some parameters (Recklessness?)
             if (_targetKnowledgeBase.HasSeenTarget())
             {
                 FocusingOnEnemyGameEvent.Instance.Raise(new FocusOnEnemyInfo {entityID = entity.GetID(), isFocusing = true});

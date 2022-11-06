@@ -24,7 +24,13 @@ namespace AI.Behaviours.Actions
         private GunManager gunManager;
         private NavigationSystem navSystem;
         private int remainingStrafes = Random.Range(MIN_STRAFE_LENGTH, MAX_STRAFE_LENGTH);
-        private FightingMovementSkill skill;
+
+        private float standStillProbability;
+        private float randomlyMoveProbability;
+        private float nextUpdateTime;
+        private bool updateOnlyDueToTimeout;
+        private float UPDATE_PERIOD = 0.5f;
+
         private Recklessness recklessness;
 
         private bool strifeRight = Random.value < 0.5;
@@ -32,6 +38,7 @@ namespace AI.Behaviours.Actions
         private const int maxAttempts = 10;
 
         private int lineCastLayerMask;
+
         public override void OnAwake()
         {
             lineCastLayerMask = ~LayerMask.GetMask("Ignore Raycast", "Entity", "Projectile");
@@ -43,7 +50,8 @@ namespace AI.Behaviours.Actions
             navSystem = entity.NavigationSystem;
             gunManager = entity.GunManager;
             target = entity.GetEnemy();
-            skill = entity.MovementSkill;
+            randomlyMoveProbability = entity.RandomlyMoveInFightProbability;
+            standStillProbability = entity.StandStillInFightProbability;
             recklessness = entity.Recklessness;
             navSystem.CancelPath();
         }
@@ -61,39 +69,63 @@ namespace AI.Behaviours.Actions
             //     return TaskStatus.Running;
             // }
             // navSystem.CancelPath();
-            TrySelectDestination();
+            if (updateOnlyDueToTimeout && Time.time >= nextUpdateTime || !updateOnlyDueToTimeout && navSystem.HasArrivedToDestination())
+            {
+                // Debug.Log("AAAA entity + " + entity.name + " reset True, has arrived to destination? " +
+                          // navSystem.HasArrivedToDestination());
+                TrySelectDestination();
+            }
+            // else
+            // {
+                // Debug.Log("AAAA entity + " + entity.name + "reset false, has arrived to destination? " +
+                          // navSystem.HasArrivedToDestination());
+            // }
+
             navSystem.MoveAlongPath();
             return TaskStatus.Running;
         }
-        
+
         private void TrySelectDestination()
         {
+            // TODO If I cannot see the enemy I should rush?
+
             var currentPos = transform.position;
-            var targetPos = target.transform.position;
 
-            if (skill == FightingMovementSkill.StandStill)
+            if (Random.value < standStillProbability)
             {
-                var distance = (currentPos - targetPos).magnitude;
-                var weaponRange = gunManager.GetGunMaxRange(gunManager.CurrentGunIndex);
-
-                if (distance > weaponRange || Physics.Linecast(currentPos, targetPos, lineCastLayerMask))
-                {
-                    // I cannot shoot the enemy from here. No matter my skill, I should move somewhere where I can
-                    // see them.
-                    RushTowardsEnemy(currentPos, targetPos);
-                }
-                else
-                {
-                    // Don't move at all if skill is low and I can shoot the target.
-                    navSystem.CancelPath();
-                }
+                // We have to stand still for the next updateTime seconds
+                navSystem.CancelPath();
+                nextUpdateTime = Time.time + UPDATE_PERIOD;
+                updateOnlyDueToTimeout = true;
                 return;
             }
-            
+
+            if (Random.value < randomlyMoveProbability)
+            {
+                var randomDirection = Random.insideUnitSphere;
+                randomDirection.y = 0f;
+                randomDirection.Normalize();
+
+                for (var attempt = 0; attempt < maxAttempts; attempt++)
+                {
+                    var finalPosition = currentPos + randomDirection * navSystem.Speed * UPDATE_PERIOD;
+                    var path = navSystem.CalculatePath(finalPosition);
+                    // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+                    if (path.IsValid())
+                    {
+                        navSystem.SetPath(path);
+                        updateOnlyDueToTimeout = false;
+                        break;
+                    }
+                }
+
+                return;
+            }
+
+            var targetPos = target.transform.position;
             // We do not care if enemy is above or below us, the move straight/strife movement should be
             // parallel to the floor.
             targetPos.y = currentPos.y;
-
             SetMoveDestinationWhenEnemyCanBeSeen(currentPos, targetPos);
         }
 
@@ -107,11 +139,11 @@ namespace AI.Behaviours.Actions
             var movementDirectionDueToStrife = GetMovementDirectionDueToStrife(direction);
 
             var totalMovement = movementDirectionDueToStrife + movementDirectionDueToGun * 3f;
-            var newPos = currentPos + totalMovement;
+            var newPos = currentPos + totalMovement.normalized * navSystem.Speed * UPDATE_PERIOD;
 
             Debug.DrawLine(currentPos, newPos, Color.yellow, 1, false);
             // Debug.DrawLine(newPos, targetPos, Color.red, 1, false);
-            
+
             if (!Physics.Linecast(newPos, targetPos, lineCastLayerMask))
             {
                 // I can see the enemy from the new position.
@@ -125,7 +157,10 @@ namespace AI.Behaviours.Actions
                     MoveToLocationWithEnemyInSight(currentPos, targetPos);
                 }
                 else
+                {
+                    updateOnlyDueToTimeout = false;
                     navSystem.SetPath(path);
+                }
             }
             else
             {
@@ -133,12 +168,12 @@ namespace AI.Behaviours.Actions
             }
         }
 
-        
+
         private void MoveToLocationWithEnemyInSight(Vector3 currentPos, Vector3 targetPos)
         {
             // We cannot see the enemy from where we are, try to find a position from where it is visible.
             // How? For now, random selection (even if this breaks the movement capabilities of the bot)
-            
+
             // TODO Move towards enemy visible with probability depending on recklessness
 
             var probabilityToMoveWhereSeeEnemy = recklessness switch
@@ -162,10 +197,10 @@ namespace AI.Behaviours.Actions
                     if (!Physics.Linecast(newPos, targetPos, lineCastLayerMask))
                     {
                         // Can see enemy from here, found new position!
-
                         var path = navSystem.CalculatePath(newPos);
                         if (path.IsComplete())
                         {
+                            updateOnlyDueToTimeout = false;
                             navSystem.SetPath(path);
                             return;
                         }
@@ -183,41 +218,36 @@ namespace AI.Behaviours.Actions
             var enemyDirection = targetPos - currentPos;
             var distance = enemyDirection.magnitude;
             enemyDirection.Normalize();
-            var movementDirectionDueToGun = GetMoveDirectionDueToGun(distance, enemyDirection);
+            var movementDirectionDueToGun = GetMoveDirectionDueToGun(distance, enemyDirection).normalized;
 
-            var path2 = navSystem.CalculatePath(currentPos + movementDirectionDueToGun);
+            var path2 = navSystem.CalculatePath(
+                currentPos + movementDirectionDueToGun * navSystem.Speed * UPDATE_PERIOD);
             if (path2.IsValid())
+            {
+                nextUpdateTime = Time.time + UPDATE_PERIOD;
+                updateOnlyDueToTimeout = true;
                 navSystem.SetPath(path2);
+            }
         }
 
 
         private Vector3 GetMovementDirectionDueToStrife(Vector3 direction)
         {
-            if (skill < FightingMovementSkill.CircleStrife)
-            {
-                // Too n00b to strife
-                return Vector3.zero;
-            }
-
             var movementDirectionDueToStrife = Vector3.zero;
             var enemyLookDirection = target.transform.forward;
             var lookAngleRelativeToDirection = Vector3.SignedAngle(enemyLookDirection, direction, Vector3.up);
-            if (Mathf.Abs(lookAngleRelativeToDirection) > 90)
-            {
-                // Only strife if enemy is looking
-                movementDirectionDueToStrife = Vector3.Cross(direction, transform.up);
-                if (skill == FightingMovementSkill.CircleStrifeChangeDirection)
-                {
-                    remainingStrafes--;
-                    if (remainingStrafes < 0)
-                    {
-                        remainingStrafes = Random.Range(MIN_STRAFE_LENGTH, MAX_STRAFE_LENGTH);
-                        strifeRight = !strifeRight;
-                    }
-                }
+            if (Mathf.Abs(lookAngleRelativeToDirection) <= 90) return movementDirectionDueToStrife;
 
-                if (!strifeRight) movementDirectionDueToStrife = -movementDirectionDueToStrife;
+            // Only strife if enemy is looking us
+            movementDirectionDueToStrife = Vector3.Cross(direction, transform.up);
+            remainingStrafes--;
+            if (remainingStrafes < 0)
+            {
+                remainingStrafes = Random.Range(MIN_STRAFE_LENGTH, MAX_STRAFE_LENGTH);
+                strifeRight = !strifeRight;
             }
+
+            if (!strifeRight) movementDirectionDueToStrife = -movementDirectionDueToStrife;
 
             return movementDirectionDueToStrife;
         }
