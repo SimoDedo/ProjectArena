@@ -33,8 +33,8 @@ namespace AI.Layers.SensingLayer
         {
             get
             {
-                var timeDiff = Time.time - LastTimeHeardShot;
-                return timeDiff >= recentNoiseDelay && timeDiff < recentNoiseTimeout;
+                var timeDiff = Time.time - LastTimeHeardShot - recentNoiseDelay;
+                return timeDiff >= 0 && timeDiff < recentNoiseTimeout;
             }
         }
 

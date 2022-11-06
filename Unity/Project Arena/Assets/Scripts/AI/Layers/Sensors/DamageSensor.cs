@@ -10,7 +10,7 @@ namespace AI.Layers.SensingLayer
     public class DamageSensor
     {
         /// <summary>
-        /// Timeout after taking damage for considering the entity as "recently damaged".
+        /// Timeout after which the entity forgets about having took damage.
         /// </summary>
         private readonly float recentTimeout;
 
@@ -19,7 +19,7 @@ namespace AI.Layers.SensingLayer
         /// </summary>
         private readonly float reactionDelay;
 
-        public DamageSensor(float recentTimeout, float reactionDelay)
+        public DamageSensor(float reactionDelay, float recentTimeout)
         {
             this.recentTimeout = recentTimeout;
             this.reactionDelay = reactionDelay;
@@ -37,8 +37,8 @@ namespace AI.Layers.SensingLayer
         {
             get
             {
-                var timeDiff = Time.time - LastTimeDamaged;
-                return timeDiff >= reactionDelay && timeDiff < recentTimeout;
+                var timeDiff = Time.time - LastTimeDamaged - reactionDelay;
+                return timeDiff >= 0 && timeDiff < recentTimeout;
             }
         }
 
