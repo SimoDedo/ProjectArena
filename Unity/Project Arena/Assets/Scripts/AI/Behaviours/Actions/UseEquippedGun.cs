@@ -36,13 +36,17 @@ namespace AI.Behaviours.Actions
         private TargetKnowledgeBase _targetKnowledgeBase;
         private float targetReflexDelay;
         private NormalDistribution distribution;
-        
+        private float aimingDispersionMaxAngle;
+
+        private float aimingDispersionFirstAngle;
+        private float aimingDispersionSecondAngle;
         public override void OnAwake()
         {
             entity = GetComponent<AIEntity>();
             gunManager = entity.GunManager;
             _targetKnowledgeBase = entity.TargetKnowledgeBase;
             sightController = entity.SightController;
+            aimingDispersionMaxAngle = entity.AimingDispersionAngle;
             enemy = entity.GetEnemy();
             enemyPositionTracker = enemy.GetComponent<PositionTracker>();
 
@@ -51,6 +55,8 @@ namespace AI.Behaviours.Actions
 
             distribution = new NormalDistribution(mean, stdDev);
             targetReflexDelay = (float) distribution.Generate();
+            aimingDispersionFirstAngle = Random.Range(0, aimingDispersionMaxAngle);
+            aimingDispersionSecondAngle = Random.Range(-Mathf.PI, -Mathf.PI);
         }
 
         public override void OnEnd()
@@ -81,6 +87,9 @@ namespace AI.Behaviours.Actions
                 targetReflexDelay = (float) distribution.Generate();
                 // Debug.Log("Computed new delay for " + entity.name + ": " + targetReflexDelay +", mean is " + entity.AimDelayAverage);
                 nextDelayRecalculation = Time.time + AIM_UPDATE_INTERVAL;
+
+                aimingDispersionFirstAngle = Random.Range(0, aimingDispersionMaxAngle);
+                aimingDispersionSecondAngle = Random.Range(-Mathf.PI, -Mathf.PI);
             }
 
             var (estimatedPosition, estimatedVelocity) = ComputeAimPositionAndVelocity(lastSightedDelay, lastSightedTime);
@@ -168,6 +177,14 @@ namespace AI.Behaviours.Actions
                 }
             }
 
+            var aimingError = GetDeviatedDirection(chosenPoint - ourStartingPoint);
+            if (gunManager.IsCurrentGunAiming())
+            {
+                aimingError *= 0.3f;
+            }
+
+            chosenPoint = ourStartingPoint + aimingError;
+            
             // Only shoot if we found a nice position, otherwise keep the shot for another time
             if (float.IsPositiveInfinity(record)) return;
 
@@ -184,8 +201,10 @@ namespace AI.Behaviours.Actions
         // In case the weapon is a blast weapon, aims at the floor.
         private void AimRaycastWeapon(Vector3 enemyPosition, float lastSightedTime)
         {
+            var ourPosition = sightController.GetHeadPosition();
+            var aimingPoint = ourPosition + GetDeviatedDirection(enemyPosition - ourPosition);
             // TODO Do not shoot if outside of gun range
-            var angle = sightController.LookAtPoint(enemyPosition);
+            var angle = sightController.LookAtPoint(aimingPoint);
             if (lastSightedTime != Time.time && !gunManager.IsGunBlastWeapon(gunManager.CurrentGunIndex))
             {
                 // We don't see the enemy and we are not using a blast weapon, do not shoot.
@@ -193,10 +212,10 @@ namespace AI.Behaviours.Actions
             }
 
             var currentPosition = sightController.GetHeadPosition();
-            TryAimIfRecommended((currentPosition - enemyPosition).magnitude, angle);
+            TryAimIfRecommended((currentPosition - aimingPoint).magnitude, angle);
 
             if (!(angle < 0.5) || !gunManager.CanCurrentGunShoot() ||
-                !ShouldShootWeapon(enemyPosition, gunManager.IsCurrentGunBlastWeapon())) return;
+                !ShouldShootWeapon(aimingPoint, gunManager.IsCurrentGunBlastWeapon())) return;
             gunManager.ShootCurrentGun();
         }
 
@@ -247,22 +266,25 @@ namespace AI.Behaviours.Actions
             var canShoot = !hitSomething || hit.distance > blastRadius;
             return canShoot;
         }
-    }
 
-    internal class UniformDistribution
-    {
-        private readonly float mean;
-        private readonly float halfRange;
-
-        public UniformDistribution(float mean, float halfRange)
+        private Vector3 GetDeviatedDirection(Vector3 initialDirection)
         {
-            this.mean = mean;
-            this.halfRange = halfRange;
-        }
+            initialDirection.Normalize();
+            Vector3 axis;
+            // We need an orthogonal vector, we do this by using the cross product of
+            // direction and 'up' but if direction is up we have a problem so check
+            if (initialDirection == Vector3.up) // whatever DX calls up
+                axis = Vector3.right; // whatever DX calls right
+            else
+                axis = Vector3.Cross(initialDirection, Vector3.up);
 
-        public double Generate()
-        {
-            return mean + (Random.value * 2f - 1f) * halfRange;
+            // Apply first rotation,
+            Quaternion rotation = Quaternion.AngleAxis(aimingDispersionFirstAngle, axis);
+            Vector3 result = rotation * initialDirection;
+            rotation = Quaternion.AngleAxis(aimingDispersionSecondAngle, initialDirection);
+            // Apply second rotation
+            result = rotation * result;
+            return result;
         }
     }
 
