@@ -53,6 +53,7 @@ namespace AI.Behaviours.Actions
 
         private List<float> angles;
         private List<float> scores;
+        private Transform _transform;
 
         public override void OnAwake()
         {
@@ -77,6 +78,7 @@ namespace AI.Behaviours.Actions
             scores = new List<float>(myValidAngles.Count);
             
             rayCastLayerMask = ~LayerMask.GetMask("Ignore Raycast", "Entity", "Projectile");
+            _transform = transform;
         }
         
         public override TaskStatus OnUpdate()
@@ -84,25 +86,24 @@ namespace AI.Behaviours.Actions
             var realForward = GetMovementDirection();
             // For some reason we spawn moving up, causing weird issues with look direction
             if (realForward == Vector3.up || realForward == Vector3.zero)
-                realForward = transform.forward;
+                realForward = _transform.forward;
             
             angles.Clear();
             scores.Clear();
             
+            var up = _transform.up;
             if (MustUpdate())
             {
                 var angleX = 0f;
                 UpdateNextUpdateTime();
 
                 // Score formula: max(0, 10 + distanceScore * 40 + forwardScore * 30)
-
-                var up = transform.up;
-
+                
                 foreach (var angleScore in myValidAngles)
                 {
                     var direction = Quaternion.AngleAxis(angleScore.angle, up) * realForward;
                     var distance =
-                        Physics.Raycast(transform.position, direction, out var hit, 50)
+                        Physics.Raycast(_transform.position, direction, out var hit, 50)
                             ? hit.distance
                             : 50;
                     distance = Mathf.Clamp(distance, 0, 50);
@@ -131,12 +132,12 @@ namespace AI.Behaviours.Actions
                 }
 
                 lookAngle = angleX;
-                // var newDirection = Quaternion.AngleAxis(angleX, transform.up) * realForward;
+                // var newDirection = Quaternion.AngleAxis(angleX, _transform.up) * realForward;
                 // In order to not look down, I should be looking at a point far in the horizon, hence the x100
-                // lookPoint = transform.position + newDirection * 100;
+                // lookPoint = _transform.position + newDirection * 100;
             }
 
-            var lookPoint = transform.position + Quaternion.AngleAxis(lookAngle, transform.up) * realForward;
+            var lookPoint = _transform.position + Quaternion.AngleAxis(lookAngle, up) * realForward;
             sightController.LookAtPoint(lookPoint);
             return TaskStatus.Running;
         }
@@ -154,7 +155,7 @@ namespace AI.Behaviours.Actions
                 return true;
             }
             
-            var position = transform.position;
+            var position = _transform.position;
             var lookDirection =  sightController.GetHeadForward();
             if (Physics.Raycast(position, lookDirection,  THRESHOLD, rayCastLayerMask))
             {
