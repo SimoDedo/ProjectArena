@@ -49,6 +49,7 @@ namespace AI.Behaviours.Actions
         private float nextUpdateTime;
         private float nextWallUpdateTime;
         private SightController sightController;
+        private int rayCastLayerMask; 
 
         private List<float> angles;
         private List<float> scores;
@@ -74,6 +75,8 @@ namespace AI.Behaviours.Actions
             
             angles = new List<float>(myValidAngles.Count);
             scores = new List<float>(myValidAngles.Count);
+            
+            rayCastLayerMask = ~LayerMask.GetMask("Ignore Raycast", "Entity", "Projectile");
         }
         
         public override TaskStatus OnUpdate()
@@ -153,7 +156,7 @@ namespace AI.Behaviours.Actions
             
             var position = transform.position;
             var lookDirection =  sightController.GetHeadForward();
-            if (Physics.Raycast(position, lookDirection,  out var hit, THRESHOLD))
+            if (Physics.Raycast(position, lookDirection,  THRESHOLD, rayCastLayerMask))
             {
                 totalInvalidLookTime += Time.deltaTime;
             }
