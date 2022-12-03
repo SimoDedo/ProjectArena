@@ -11,6 +11,7 @@ namespace AI.Layers.Actuators
         private const float LOOK_STRAIGHT_DISTANCE = 10f;
         private readonly Transform bodyTransform;
         private readonly GameObject head;
+        private readonly Transform headTransform;
         private readonly float maxAcceleration;
         private readonly float maxSpeed;
 
@@ -25,6 +26,7 @@ namespace AI.Layers.Actuators
         {
             bodyTransform = entity.transform;
             this.head = head;
+            headTransform = head.transform;
             this.maxSpeed = maxSpeed;
             this.maxAcceleration = maxAcceleration;
         }
@@ -40,7 +42,6 @@ namespace AI.Layers.Actuators
         /// <returns>The angle between the new look direction and the target.</returns>
         public float LookAtPoint(Vector3 target, bool forceLookStraightWhenClose = true)
         {
-            var headTransform = head.transform;
             var position = headTransform.position;
             if (forceLookStraightWhenClose && (target - position).magnitude < LOOK_STRAIGHT_DISTANCE)
                 target.y = position.y;
@@ -112,13 +113,13 @@ namespace AI.Layers.Actuators
         // Returns the head position in global space.
         public Vector3 GetHeadPosition()
         {
-            return head.transform.position;
+            return headTransform.position;
         }
 
         // Returns the current look direction of the head.
         public Vector3 GetHeadForward()
         {
-            return head.transform.forward;
+            return headTransform.forward;
         }
     }
 }
