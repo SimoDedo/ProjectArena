@@ -55,8 +55,9 @@ namespace Entity
             }
 
             var interpolatedPos = tracked[0].position;
+            var trackedCount = tracked.Count;
             // Get interpolated position based on stored information
-            for (var i = 0; i < tracked.Count - 1; i++)
+            for (var i = 0; i < trackedCount - 1; i++)
             {
                 if (tracked[i + 1].time >= time)
                 {
@@ -79,8 +80,8 @@ namespace Entity
             const float WEIGHT = 60;
 
             var weighedVelocity = Vector3.zero;
-
-            for (var i = 0; i < tracked.Count - 1; i++)
+            var trackedCount = tracked.Count;
+            for (var i = 0; i < trackedCount - 1; i++)
             {
                 var intervalEndTime = tracked[i + 1].time;
                 if (intervalEndTime <= startTime) continue;
@@ -151,7 +152,8 @@ namespace Entity
 
             var interpolatedPos = tracked[0].position;
             // Get interpolated position based on stored information
-            for (var i = 0; i < tracked.Count - 1; i++)
+            var trackedCount = tracked.Count;
+            for (var i = 0; i < trackedCount - 1; i++)
             {
                 if (tracked[i + 1].time >= endTime)
                 {
@@ -167,7 +169,7 @@ namespace Entity
 
             var weighedVelocity = Vector3.zero;
 
-            for (var i = 0; i < tracked.Count - 1; i++)
+            for (var i = 0; i < trackedCount - 1; i++)
             {
                 var (endPosition, intervalEndTime) = tracked[i + 1];
                 if (intervalEndTime <= startTime) continue;
