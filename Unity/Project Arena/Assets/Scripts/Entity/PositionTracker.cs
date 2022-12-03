@@ -57,13 +57,16 @@ namespace Entity
             var interpolatedPos = tracked[0].position;
             var trackedCount = tracked.Count;
             // Get interpolated position based on stored information
+            var next = tracked[0];
             for (var i = 0; i < trackedCount - 1; i++)
             {
-                if (tracked[i + 1].time >= time)
+                var current = next;
+                next = tracked[i + 1];
+                if (next.time >= time)
                 {
                     // The next element starts after the requested time, interpolate the position between the two
-                    var fraction = (time - tracked[i].time) / (tracked[i + 1].time - tracked[i].time);
-                    interpolatedPos = Vector3.Lerp(tracked[i].position,tracked[i + 1].position, fraction);
+                    var fraction = (time - current.time) / (next.time - current.time);
+                    interpolatedPos = Vector3.Lerp(current.position,next.position, fraction);
                     break;
                 }
             }
@@ -81,14 +84,19 @@ namespace Entity
 
             var weighedVelocity = Vector3.zero;
             var trackedCount = tracked.Count;
+
+            var next = tracked[0];
             for (var i = 0; i < trackedCount - 1; i++)
             {
-                var intervalEndTime = tracked[i + 1].time;
+                var current = next;
+                next = tracked[i * 1];
+                var intervalEndTime = next.time;
                 if (intervalEndTime <= startTime) continue;
-                var intervalStartTime = tracked[i].time;
+                
+                var intervalStartTime = current.time;
                 if (intervalStartTime > endTime) break;
 
-                var velocity = SpeedBetween(tracked[i], tracked[i+1]);
+                var velocity = SpeedBetween(current, next);
 
                 if (intervalStartTime < startTime)
                 {
@@ -153,13 +161,17 @@ namespace Entity
             var interpolatedPos = tracked[0].position;
             // Get interpolated position based on stored information
             var trackedCount = tracked.Count;
+
+            var next = tracked[0];
             for (var i = 0; i < trackedCount - 1; i++)
             {
-                if (tracked[i + 1].time >= endTime)
+                var current = next;
+                next = tracked[i + 1];
+                if (next.time >= endTime)
                 {
                     // The next element starts after the requested time, interpolate the position between the two
-                    var fraction = (endTime - tracked[i].time) / (tracked[i + 1].time - tracked[i].time);
-                    interpolatedPos = Vector3.Lerp(tracked[i].position, tracked[i + 1].position, fraction);
+                    var fraction = (endTime - current.time) / (next.time - current.time);
+                    interpolatedPos = Vector3.Lerp(current.position, next.position, fraction);
                     break;
                 }
             }
@@ -168,12 +180,13 @@ namespace Entity
             const float WEIGHT = 60;
 
             var weighedVelocity = Vector3.zero;
-
+            var (endPosition, intervalEndTime) = tracked[0];
             for (var i = 0; i < trackedCount - 1; i++)
             {
-                var (endPosition, intervalEndTime) = tracked[i + 1];
+                var startPosition = endPosition;
+                var intervalStartTime  = intervalEndTime;
+                (endPosition, intervalEndTime) = tracked[i+1];
                 if (intervalEndTime <= startTime) continue;
-                var (startPosition, intervalStartTime) = tracked[i];
                 if (intervalStartTime > endTime) break;
 
                 var velocity = (endPosition - startPosition) / (intervalEndTime - intervalStartTime);
