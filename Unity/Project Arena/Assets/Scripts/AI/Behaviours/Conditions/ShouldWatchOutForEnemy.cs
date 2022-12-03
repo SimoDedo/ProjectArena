@@ -2,6 +2,7 @@ using System;
 using AI.Layers.SensingLayer;
 using BehaviorDesigner.Runtime.Tasks;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace AI.Behaviours.Conditions
 {
@@ -13,20 +14,40 @@ namespace AI.Behaviours.Conditions
     {
         private DamageSensor damageSensor;
         private SoundSensor soundSensor;
+        private const float TIMEOUT_CHANGE_IDEA = 0.5f; 
+        private float timestampChangeIdeaAllowed; 
+        private float probabilityFightBack;
 
+        private string nameToRemove;
         public override void OnAwake()
         {
             var entity = GetComponent<AIEntity>();
             damageSensor = entity.DamageSensor;
             soundSensor = entity.SoundSensor;
+            probabilityFightBack = entity.FightBackWhenCollectingPickup;
+
+            nameToRemove = entity.name;
         }
 
         public override TaskStatus OnUpdate()
         {
-            // TODO add possibility to not watch out depending on some parameters (Recklessness?)
-            return damageSensor.WasDamagedRecently || soundSensor.HeardShotRecently
-                ? TaskStatus.Success
-                : TaskStatus.Failure;
+            if (!damageSensor.WasDamagedRecently && !soundSensor.HeardShotRecently) return TaskStatus.Failure;
+            if (Time.time < timestampChangeIdeaAllowed)
+            {
+                // I won't change my decision for now, do not fight
+                return TaskStatus.Failure;
+            }
+
+            if (Random.value > probabilityFightBack)
+            {
+                Debug.Log(nameToRemove + ": I feel the enemy, but I'm not cutting it...");
+                // Not feeling enough confident to look around.
+                // timestampChangeIdeaAllowed = Time.time + TIMEOUT_CHANGE_IDEA;
+                return TaskStatus.Failure;
+            }
+
+            // Debug.Log(nameToRemove + ": I feel the enemy, searching...");
+            return TaskStatus.Success;
         }
     }
 }

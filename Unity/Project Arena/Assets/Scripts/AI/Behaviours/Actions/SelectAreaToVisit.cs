@@ -3,6 +3,7 @@ using AI.Behaviours.Variables;
 using AI.Layers.KnowledgeBase;
 using AI.Layers.Memory;
 using AI.Layers.Planners;
+using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
 using Others;
 using UnityEngine;
@@ -16,23 +17,18 @@ namespace AI.Behaviours.Actions
     [Serializable]
     public class SelectAreaToVisit : Action
     {
-        [SerializeField] private SharedSelectedPathInfo pathChosen;
+        [SerializeField] private SharedSelectedArea areaChosen;
         private MapWanderPlanner wanderPlanner;
-        private NavigationSystem navSystem;
 
         public override void OnAwake()
         {
             var entity = GetComponent<AIEntity>();
             wanderPlanner = entity.MapWanderPlanner;
-            navSystem = entity.NavigationSystem;
         }
 
         public override TaskStatus OnUpdate()
         {
-            var destination = wanderPlanner.GetRecommendedDestination();
-            var path = navSystem.CalculatePath(destination);
-            if (!path.IsComplete()) return TaskStatus.Running;
-            pathChosen.Value = path;
+            areaChosen.Value = wanderPlanner.GetRecommendedArea();
             return TaskStatus.Success;
         }
     }

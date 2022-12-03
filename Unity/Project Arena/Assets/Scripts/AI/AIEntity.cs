@@ -191,6 +191,7 @@ namespace AI
 
         public float StandStillInFightProbability => botParams.StandStillInFightProbability;
         public float RandomlyMoveInFightProbability => botParams.RandomlyMoveInFightProbability;
+        public float FightBackWhenCollectingPickup => botParams.FightBackWhenCollectingPickup;
         public float DodgeRocketProbability => botParams.DodgeRocketProbability;
         
         public float CanSelectCoverProbability => botParams.CanSelectCoverProbability;

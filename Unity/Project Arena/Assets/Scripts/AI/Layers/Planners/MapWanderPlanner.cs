@@ -47,6 +47,40 @@ namespace AI.Layers.Planners
 
         /// <summary>
         /// Returns a possible wander destination by selecting an area which hasn't been visited recently.
+        /// </summary>
+        //  TODO add a bit of randomness?
+        public Area GetRecommendedArea()
+        {
+            if (!CanBeUsed)
+                throw new InvalidOperationException(
+                    "Cannot use map knowledge destination recommender, no area info available"
+                );
+
+            var leastKnownArea = 0;
+            var earliestVisitedAreaTime = float.MaxValue;
+            for (var i = 0; i < _mapMemory.areas.Length; i++)
+            {
+                if (_mapMemory.areas[i].isCorridor) continue;
+                var areaScore = _mapMemory.areasLastVisitTime[i];
+                if (areaScore < earliestVisitedAreaTime)
+                {
+                    earliestVisitedAreaTime = areaScore;
+                    leastKnownArea = i;
+                }
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                else if (areaScore == earliestVisitedAreaTime && Random.value < 0.3f)
+                {
+                    earliestVisitedAreaTime = areaScore;
+                    leastKnownArea = i;
+                }
+            }
+
+            var selectedArea = _mapMemory.areas[leastKnownArea];
+            return selectedArea;
+        }
+
+        /// <summary>
+        /// Returns a possible wander destination by selecting an area which hasn't been visited recently.
         /// Can be used only is CanBeUsed returns true.
         /// </summary>
         public Vector3 GetRecommendedDestination()

@@ -75,6 +75,7 @@ namespace AI
         }
         public float StandStillInFightProbability => Interpolate(MIN_STAND_STILL_IN_FIGHT, MAX_STAND_STILL_IN_FIGHT, 1.0f - ScaleScore(generalSkill, c.movementSkill));
         public float RandomlyMoveInFightProbability => Interpolate(MIN_RANDOM_MOVE_IN_FIGHT, MAX_RANDOM_MOVE_IN_FIGHT, 1.0f - ScaleScore(generalSkill, c.movementSkill));
+        public float FightBackWhenCollectingPickup => Interpolate(MIN_FIGHT_BACK_WHEN_PICKUP, MAX_FIGHT_BACK_WHEN_PICKUP, ScaleScore(generalSkill, c.movementSkill));
         public float DodgeRocketProbability => Interpolate(MIN_DODGE_ROCKET_PROBABILITY, MAX_DODGE_ROCKET_PROBABILITY, ScaleScore(generalSkill, c.movementSkill));
         public float CanSelectCoverProbability => Interpolate(MIN_CAN_SELECT_COVER_PROBABILITY, MAX_CAN_SELECT_COVER_PROBABILITY, ScaleScore(generalSkill, c.movementSkill));
 
@@ -125,6 +126,8 @@ namespace AI
         private const float MAX_STAND_STILL_IN_FIGHT = 1.0f;
         private const float MIN_RANDOM_MOVE_IN_FIGHT = -0.0f;
         private const float MAX_RANDOM_MOVE_IN_FIGHT = 1.0f;
+        private const float MIN_FIGHT_BACK_WHEN_PICKUP = -0.5f;
+        private const float MAX_FIGHT_BACK_WHEN_PICKUP = 1.5f;
         private const float MIN_DODGE_ROCKET_PROBABILITY = 0.2f;
         private const float MAX_DODGE_ROCKET_PROBABILITY = 1.3f;
         private const float MIN_CAN_SELECT_COVER_PROBABILITY = -0.3f;

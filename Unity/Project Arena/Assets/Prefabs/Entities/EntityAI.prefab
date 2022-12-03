@@ -594,21 +594,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   totalHealth: 0
   head: {fileID: 1523818027142824}
-  botParams:
-    speed: 0
-    movementSkill: 0
-    fov: 0
-    maxCameraSpeed: 0
-    maxCameraAcceleration: 0
-    maxRange: 0
-    memoryWindow: 0
-    detectionWindow: 2
-    timeBeforeCanReact: 0
-    curiosity: 0
-    predictionSkill: 0
-    aimingSkill: 0
-    recentDamageTimeout: 0
-    recklessness: 1
   botState:
     health: 0
   enemy: {fileID: 0}
@@ -1002,14 +987,14 @@ MonoBehaviour:
   headCamera: {fileID: 20788917190633434}
   muzzleFlash: {fileID: 1172488531380796}
   damage: 75
-  normalDispersion: 10
+  normalDispersion: 4
   aimingDispersion: 0
   projectilesPerShot: 1
   infinteAmmo: 1
   chargerSize: 5
   maximumAmmo: 20
   reloadTime: 1
-  cooldownTime: 1.1
+  cooldownTime: 0.9
   isBlastWeapon: 0
   muzzleFlashDuration: 0.1
   recoil: 0.2
@@ -1953,7 +1938,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4612946497701454
 Transform:
   m_ObjectHideFlags: 0
@@ -3596,10 +3581,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   headCamera: {fileID: 20788917190633434}
   muzzleFlash: {fileID: 1478163250820970}
-  damage: 18
-  normalDispersion: 8
-  aimingDispersion: 8
-  projectilesPerShot: 6
+  damage: 9
+  normalDispersion: 5
+  aimingDispersion: 5
+  projectilesPerShot: 5
   infinteAmmo: 1
   chargerSize: 4
   maximumAmmo: 20
@@ -3636,8 +3621,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c8f11410b65469bb5e6162f2edb125b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minRangeBest: 3
-  maxRangeBest: 8
+  minRangeBest: 8
+  maxRangeBest: 15
   controlPoints:
   - distance: 15
     score: 1
