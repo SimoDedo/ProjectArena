@@ -135,8 +135,7 @@ namespace Maps.Genomes
                 }
             }
 
-            var cellTreeNumbers = new int[numRows, numColumns];
-            var bestTreeNumber = VisitForest(cellTreeNumbers);
+            var visitedRooms = FindClosestConnectedComponent();
 
             // Start placing the Areas for Rooms
             for (var r = 0; r < numRows; r++)
@@ -145,7 +144,7 @@ namespace Maps.Genomes
                 {
                     var room = rooms[r, c];
                     if (!room.isReal) continue;
-                    if (cellTreeNumbers[r, c] != bestTreeNumber) continue;
+                    if (!visitedRooms[r, c]) continue;
                     var area = new Area(
                         c * cellsWidth + room.leftColumn,
                         r * cellsHeight + room.bottomRow,
@@ -163,7 +162,7 @@ namespace Maps.Genomes
             {
                 for (var c = 0; c < numColumns; c++)
                 {
-                    if (cellTreeNumbers[r, c] != bestTreeNumber) continue;
+                    if (!visitedRooms[r, c]) continue;
                     PlaceVerticalConnectionsIfNeeded(areas, r, c);
                 }
             }
@@ -172,7 +171,7 @@ namespace Maps.Genomes
             {
                 for (var r = 0; r < numRows; r++)
                 {
-                    if (cellTreeNumbers[r, c] != bestTreeNumber) continue;
+                    if (!visitedRooms[r, c]) continue;
                     PlaceHorizontalConnectionsIfNeeded(areas, r, c);
                 }
             }
@@ -185,69 +184,72 @@ namespace Maps.Genomes
             return areas.Select(it => ScaleArea(it, squareSize)).ToArray();
         }
 
-        private int VisitForest(int[,] cellTreeNumber)
+        private bool[,] FindClosestConnectedComponent()
         {
             var rows = rooms.GetLength(0);
             var columns = rooms.GetLength(1);
 
-            var visitNumber = 1;
-            var biggestTree = 0;
-            var biggestTreeSize = 0;
+            var visitedRooms = new bool[rows, columns];
+
+            var closestRow = 0;
+            var closestColumn = 0;
+            var closestDistance = int.MaxValue;
+
+            var centerRow = (rows - 1) / 2;
+            var centerCol = (columns - 1) / 2;
 
             for (var r = 0; r < rows; r++)
             {
                 for (var c = 0; c < columns; c++)
                 {
-                    if (cellTreeNumber[r, c] == 0)
-                    {
-                        var size = VisitTree(cellTreeNumber, visitNumber, r, c);
-                        if (size > biggestTreeSize)
-                        {
-                            biggestTree = visitNumber;
-                            biggestTreeSize = size;
-                        }
-
-                        visitNumber++;
-                    }
+                    if (!rooms[r, c].isReal) continue;
+                    
+                    var roomScore = Math.Floor( (float) Math.Abs(centerRow - r)) +
+                                    Math.Floor( (float) Math.Abs(centerCol - c));
+                    
+                    if (!(roomScore < closestDistance)) continue;
+                    
+                    closestColumn = c;
+                    closestRow = r;
+                    closestDistance = (int) roomScore;
                 }
             }
 
-            return biggestTree;
-        }
+            VisitTree2(closestRow, closestColumn, visitedRooms);
 
-        private int VisitTree(int[,] cellTreeNumber, int visitNumber, int r, int c)
+            return visitedRooms;
+        }
+        
+        private void VisitTree2(int r, int c, bool[,] visited)
         {
-            if (cellTreeNumber[r, c] != 0)
+            if (visited[r, c])
             {
                 // cell already visited.
-                return 0;
+                return;
             }
 
-            cellTreeNumber[r, c] = visitNumber;
-            if (!rooms[r, c].isReal) return 0;
+            if (!rooms[r, c].isReal) return;
+            visited[r, c] = true;
 
-            var totalSize = 1;
             if (r > 0 && verticalCorridors[r - 1, c])
             {
-                totalSize += VisitTree(cellTreeNumber, visitNumber, r - 1, c);
+                VisitTree2(r - 1, c, visited);
             }
 
             if (r < rooms.GetLength(0) - 1 && verticalCorridors[r, c])
             {
-                totalSize += VisitTree(cellTreeNumber, visitNumber, r + 1, c);
+                VisitTree2( r + 1, c, visited);
             }
 
             if (c > 0 && horizontalCorridors[r, c - 1])
             {
-                totalSize += VisitTree(cellTreeNumber, visitNumber, r, c - 1);
+                VisitTree2( r, c - 1, visited);
             }
 
             if (c < rooms.GetLength(1) - 1 && horizontalCorridors[r, c])
             {
-                totalSize += VisitTree(cellTreeNumber, visitNumber, r, c + 1);
+                VisitTree2( r, c + 1, visited);
             }
-
-            return totalSize;
         }
 
         private static Area ScaleArea(Area area, int scale)
