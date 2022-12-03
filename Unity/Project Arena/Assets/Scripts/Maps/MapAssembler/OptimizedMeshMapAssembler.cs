@@ -81,19 +81,19 @@ namespace Maps.MapAssembler
 
             if (biggestSize < 200)
             {
-                navMesh.voxelSize = 2f/30f;
+                navMesh.voxelSize = 4f/30f;
             }
             else if (biggestSize < 400)
             {
-                navMesh.voxelSize = 4f/30f;
+                navMesh.voxelSize = 6f/30f;
             }
             else if (biggestSize < 600)
             {
-                navMesh.voxelSize = 6f/30f;
+                navMesh.voxelSize = 8f/30f;
             }
             else
             {
-                navMesh.voxelSize = 8f/30f;
+                navMesh.voxelSize = 10f/30f;
             }
             
             navMesh.BuildNavMesh();
@@ -230,10 +230,10 @@ namespace Maps.MapAssembler
                 wall.transform.parent = parentObject;
                 wall.AddComponent<MeshFilter>().mesh = mesh;
                 wall.AddComponent<MeshRenderer>().material = wallMaterial;
-                var meshCollider = wall.AddComponent<MeshCollider>();
-                meshCollider.sharedMesh = mesh;
-                meshCollider.convex = true;
-
+                
+                var boxCollider = wall.AddComponent<BoxCollider>();
+                boxCollider.size = new Vector3(rowWall.endingColumn - rowWall.startingColumn, wallHeight, 0.5f * mapScale);
+                
                 wall.isStatic = true;
             }
             
@@ -261,8 +261,9 @@ namespace Maps.MapAssembler
                 wall.transform.parent = parentObject;
                 wall.AddComponent<MeshFilter>().mesh = mesh;
                 wall.AddComponent<MeshRenderer>().material = wallMaterial;
-                var meshCollider = wall.AddComponent<MeshCollider>();
-                meshCollider.sharedMesh = mesh;
+
+                var boxCollider = wall.AddComponent<BoxCollider>();
+                boxCollider.size = new Vector3(0.5f * mapScale, wallHeight, columnWall.startingRow - columnWall.endingRow);
 
                 wall.isStatic = true;
             }
