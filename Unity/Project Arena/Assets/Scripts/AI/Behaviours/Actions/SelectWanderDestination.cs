@@ -22,7 +22,7 @@ namespace AI.Behaviours.Actions
         private const float UNRESTRICTED_TRAVEL_COOLDOWN = 20;
 
         private const float LOOK_AHEAD = 10f;
-        [SerializeField] private SharedInt maxRetries = 10;
+        [SerializeField] private SharedInt maxRetries = 4;
         [SerializeField] private SharedFloat wanderRate = 1;
         [SerializeField] private SharedFloat minWanderDistance = 20;
         [SerializeField] private SharedFloat maxWanderDistance = 20;
@@ -55,7 +55,7 @@ namespace AI.Behaviours.Actions
                 // We didn't got a result, apply short travel for now...
                 result = SelectShortWanderDestination();
 
-            return result ? TaskStatus.Success : TaskStatus.Failure;
+            return result ? TaskStatus.Success : TaskStatus.Running;
         }
 
         private bool SelectLongWanderDestination()
@@ -94,29 +94,29 @@ namespace AI.Behaviours.Actions
                 var path = navSystem.CalculatePath(destination);
                 if (path.IsComplete())
                 {
-                    // Check that the path doesn't lead in front of a wall...
-                    var corners = path.corners;
-                    var onGroundDestination = corners.Last();
-                    var validPointsFound = 0;
-
-                    var penultimatePoint = corners.Length < 2 ? transform.position : corners[^2];
-
-                    var forwardDirectionAtArrival = (onGroundDestination - penultimatePoint).normalized;
-
-                    for (var i = -4; i <= 4; i++)
-                    {
-                        var angle = i * 90f / 4;
-
-                        var currentLookDirection = Quaternion.AngleAxis(angle, Vector3.up) * forwardDirectionAtArrival;
-
-                        if (!Physics.Raycast(onGroundDestination, currentLookDirection, LOOK_AHEAD)) validPointsFound++;
-                    }
-
-                    if (validPointsFound > 3)
-                    {
+                    // // Check that the path doesn't lead in front of a wall...
+                    // var corners = path.corners;
+                    // var onGroundDestination = corners.Last();
+                    // var validPointsFound = 0;
+                    //
+                    // var penultimatePoint = corners.Length < 2 ? transform.position : corners[^2];
+                    //
+                    // var forwardDirectionAtArrival = (onGroundDestination - penultimatePoint).normalized;
+                    //
+                    // for (var i = -4; i <= 4; i++)
+                    // {
+                    //     var angle = i * 90f / 4;
+                    //
+                    //     var currentLookDirection = Quaternion.AngleAxis(angle, Vector3.up) * forwardDirectionAtArrival;
+                    //
+                    //     if (!Physics.Raycast(onGroundDestination, currentLookDirection, LOOK_AHEAD)) validPointsFound++;
+                    // }
+                    //
+                    // if (validPointsFound > 3)
+                    // {
                         pathChosen.Value = path;
                         return true;
-                    }
+                    // }
                 }
             }
 

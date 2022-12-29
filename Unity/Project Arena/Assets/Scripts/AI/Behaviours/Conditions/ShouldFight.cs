@@ -15,9 +15,10 @@ namespace AI.Behaviours.Conditions
     {
         private AIEntity entity;
         private TargetKnowledgeBase _targetKnowledgeBase;
-        private const float TIMEOUT_CHANGE_IDEA = 0.5f; 
+        private const float TIMEOUT_CHANGE_IDEA = 1.5f; 
         private float timestampChangeIdeaAllowed; 
-        private float probabilityFightBack; 
+        private float probabilityFightBack;
+        private bool hasDecidedToFight;
 
         public override void OnAwake()
         {
@@ -26,28 +27,33 @@ namespace AI.Behaviours.Conditions
             probabilityFightBack = entity.FightBackWhenCollectingPickup;
         }
 
+        public override void OnStart()
+        {
+            hasDecidedToFight = false;
+        }
+
+        // TODO if you start fighting, never change idea, even when you lose sight let timeout decide
         public override TaskStatus OnUpdate()
         {
+            if (Time.time < timestampChangeIdeaAllowed)
+            {
+                // I won't change my decision for now.
+                return hasDecidedToFight ? TaskStatus.Success : TaskStatus.Failure;
+            }
+
+            hasDecidedToFight = false;
             if (_targetKnowledgeBase.HasSeenTarget())
             {
-                if (Time.time < timestampChangeIdeaAllowed)
-                {
-                    // I won't change my decision for now, do not fight
-                    FocusingOnEnemyGameEvent.Instance.Raise(new FocusOnEnemyInfo {entityID = entity.GetID(), isFocusing = false});
-                    return TaskStatus.Failure;
-                }
-
+                timestampChangeIdeaAllowed = Time.time + TIMEOUT_CHANGE_IDEA;
                 if (Random.value > probabilityFightBack)
                 {
                     // Not feeling enough confident to fight back.
-                    // Debug.Log(entity.name + ": I see the enemy, but I'm not feeling it...");
-                    timestampChangeIdeaAllowed = Time.time + TIMEOUT_CHANGE_IDEA;
                     FocusingOnEnemyGameEvent.Instance.Raise(new FocusOnEnemyInfo {entityID = entity.GetID(), isFocusing = false});
                     return TaskStatus.Failure;
                 }
                 
-                // Debug.Log(entity.name + ": I see the enemy, engaging");
                 FocusingOnEnemyGameEvent.Instance.Raise(new FocusOnEnemyInfo {entityID = entity.GetID(), isFocusing = true});
+                hasDecidedToFight = true;
                 return TaskStatus.Success;
             }
             FocusingOnEnemyGameEvent.Instance.Raise(new FocusOnEnemyInfo {entityID = entity.GetID(), isFocusing = false});

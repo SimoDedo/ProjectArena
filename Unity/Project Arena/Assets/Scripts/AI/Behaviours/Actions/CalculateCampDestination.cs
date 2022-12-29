@@ -31,7 +31,7 @@ namespace AI.Behaviours.Actions
 
         public override void OnAwake()
         {
-            layerMask = ~LayerMask.GetMask("Entity", "Ignore Raycast");
+            layerMask = LayerMask.GetMask("Wall", "Floor", "Default");
             navSystem = GetComponent<AIEntity>().NavigationSystem;
             startVertex = Random.Range(0, maxNumVertices);
         }

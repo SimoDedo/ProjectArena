@@ -37,11 +37,11 @@ namespace AI.Behaviours.Actions
         private Entity.Entity target;
         private const int maxAttempts = 10;
 
-        private int lineCastLayerMask;
+        private int layerMask;
 
         public override void OnAwake()
         {
-            lineCastLayerMask = ~LayerMask.GetMask("Ignore Raycast", "Entity", "Projectile");
+            layerMask = LayerMask.GetMask("Default", "Wall");
         }
 
         public override void OnStart()
@@ -71,15 +71,8 @@ namespace AI.Behaviours.Actions
             // navSystem.CancelPath();
             if (updateOnlyDueToTimeout && Time.time >= nextUpdateTime || !updateOnlyDueToTimeout && navSystem.HasArrivedToDestination())
             {
-                // Debug.Log("AAAA entity + " + entity.name + " reset True, has arrived to destination? " +
-                          // navSystem.HasArrivedToDestination());
                 TrySelectDestination();
             }
-            // else
-            // {
-                // Debug.Log("AAAA entity + " + entity.name + "reset false, has arrived to destination? " +
-                          // navSystem.HasArrivedToDestination());
-            // }
 
             navSystem.MoveAlongPath();
             return TaskStatus.Running;
@@ -110,15 +103,11 @@ namespace AI.Behaviours.Actions
                 {
                     var finalPosition = currentPos + randomDirection * navSystem.Speed * UPDATE_PERIOD;
                     var path = navSystem.CalculatePath(finalPosition);
-                    // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
-                    if (path.IsValid())
-                    {
-                        navSystem.SetPath(path);
-                        updateOnlyDueToTimeout = false;
-                        break;
-                    }
+                    if (!path.IsValid()) continue;
+                    navSystem.SetPath(path);
+                    updateOnlyDueToTimeout = false;
+                    break;
                 }
-
                 return;
             }
 
@@ -138,13 +127,13 @@ namespace AI.Behaviours.Actions
             var movementDirectionDueToGun = GetMoveDirectionDueToGun(distance, direction);
             var movementDirectionDueToStrife = GetMovementDirectionDueToStrife(direction);
 
-            var totalMovement = movementDirectionDueToStrife + movementDirectionDueToGun * 3f;
-            var newPos = currentPos + totalMovement.normalized * navSystem.Speed * UPDATE_PERIOD;
+            var totalMovement = movementDirectionDueToStrife + movementDirectionDueToGun;
+            var newPos = currentPos + totalMovement * navSystem.Speed * 0.2f;
 
             Debug.DrawLine(currentPos, newPos, Color.yellow, 1, false);
             // Debug.DrawLine(newPos, targetPos, Color.red, 1, false);
 
-            if (!Physics.Linecast(newPos, targetPos, lineCastLayerMask))
+            if (!Physics.Linecast(newPos, targetPos, layerMask))
             {
                 // I can see the enemy from the new position.
                 var path = navSystem.CalculatePath(newPos);
@@ -194,7 +183,7 @@ namespace AI.Behaviours.Actions
                     newPos.x += randomDir.x;
                     newPos.z += randomDir.y;
 
-                    if (!Physics.Linecast(newPos, targetPos, lineCastLayerMask))
+                    if (!Physics.Linecast(newPos, targetPos, layerMask))
                     {
                         // Can see enemy from here, found new position!
                         var path = navSystem.CalculatePath(newPos);
@@ -254,17 +243,29 @@ namespace AI.Behaviours.Actions
 
         private Vector3 GetMoveDirectionDueToGun(float distance, Vector3 direction)
         {
+            // TODO avoid overshooting! Move just the right distance to get to the desired distance, not more than that.
             Vector3 movementDirectionDueToGun;
             // Get current gun optimal range
             var (closeRange, farRange) = gunManager.GetCurrentGunOptimalRange();
-            if (distance < closeRange)
-                movementDirectionDueToGun = -direction;
-            else if (distance > farRange)
-                movementDirectionDueToGun = direction;
+            var rangeSize = farRange - closeRange;
+
+            var skillAdjustedCloseRange = closeRange + rangeSize * entity.GunMovementCorrectness / 100; 
+            var skillAdjustedFarRange = farRange + rangeSize * entity.GunMovementCorrectness / 100;
+
+            if (distance < skillAdjustedCloseRange)
+            {
+                var adjustment = Math.Min(1.0f, skillAdjustedCloseRange - distance);
+                movementDirectionDueToGun = -(direction * adjustment);
+            }
+            else if (distance > skillAdjustedFarRange)
+            {
+                var adjustment = Math.Min(1.0f, distance - skillAdjustedFarRange);
+                movementDirectionDueToGun = direction * adjustment;
+            }
             else
                 // Randomly move through the optimal range of the gun, but not too much
                 // TODO Perhaps have a flag like strife to avoid oscillating too much
-                movementDirectionDueToGun = direction * (Random.value > 0.5f ? -0.1f : 0.1f);
+                movementDirectionDueToGun = direction * (Random.value > 0.5f ? -0.01f : 0.01f);
             return movementDirectionDueToGun;
         }
     }

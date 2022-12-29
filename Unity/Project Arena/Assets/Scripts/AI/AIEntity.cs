@@ -191,6 +191,7 @@ namespace AI
 
         public float StandStillInFightProbability => botParams.StandStillInFightProbability;
         public float RandomlyMoveInFightProbability => botParams.RandomlyMoveInFightProbability;
+        public float GunMovementCorrectness => botParams.GunMovementCorrectness;
         public float FightBackWhenCollectingPickup => botParams.FightBackWhenCollectingPickup;
         public float DodgeRocketProbability => botParams.DodgeRocketProbability;
         
@@ -218,9 +219,11 @@ namespace AI
             if (inGame)
             {
                 if (!enemy.IsAlive)
-                    // Bug fix: forget enemy position, because if it dies and respawns before I lose track of the last
-                    //   position occupied, I will shoot at that point as soon as the enemy respawns 
+                {
                     TargetMemory.Reset();
+                    SoundSensor.Reset();
+                    DamageSensor.Reset();
+                }
                 else
                 {
                     TargetMemory.Update();

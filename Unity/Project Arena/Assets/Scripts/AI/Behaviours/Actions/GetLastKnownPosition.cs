@@ -25,6 +25,7 @@ namespace AI.Behaviours.Actions
         private AIEntity entity;
         private TargetKnowledgeBase _targetKnowledgeBase;
         private NavigationSystem navSystem;
+        private int layerMask;
 
         public override void OnAwake()
         {
@@ -35,6 +36,7 @@ namespace AI.Behaviours.Actions
             damageSensor = entity.DamageSensor;
             soundSensor = entity.SoundSensor;
             enemyTracker = enemy.GetComponent<PositionTracker>();
+            layerMask = LayerMask.GetMask("Default", "Entity", "Wall");
         }
 
         public override TaskStatus OnUpdate()
@@ -96,7 +98,7 @@ namespace AI.Behaviours.Actions
             var myPosition = transform.position;
             var direction = enemyPos - myPosition;
             var distance = direction.magnitude * 2f;
-            if (Physics.Raycast(myPosition, direction, out var hit, distance))
+            if (Physics.Raycast(myPosition, direction, out var hit, distance, layerMask))
             {
                 distance = hit.distance;
             }

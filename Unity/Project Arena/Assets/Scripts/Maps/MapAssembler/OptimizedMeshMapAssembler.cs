@@ -57,6 +57,7 @@ namespace Maps.MapAssembler
             childObject.AddComponent<MeshRenderer>();
             childObject.GetComponent<MeshRenderer>().material = floorMaterial;
             childObject.isStatic = true;
+            childObject.layer = LayerMask.NameToLayer("Floor");
             SetReady(true);
 
             navMeshObject = new GameObject("NavMeshSurface");
@@ -75,6 +76,7 @@ namespace Maps.MapAssembler
 
             var navMesh = navMeshObject.AddComponent<NavMeshSurface>();
             navMesh.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+            navMesh.layerMask = LayerMask.GetMask("Wall", "Floor");
             navMesh.overrideVoxelSize = true;
 
             var biggestSize = Mathf.Max(map.GetLength(0), map.GetLength(1)) * mapScale;
@@ -235,6 +237,7 @@ namespace Maps.MapAssembler
                 boxCollider.size = new Vector3(rowWall.endingColumn - rowWall.startingColumn, wallHeight, 0.5f * mapScale);
                 
                 wall.isStatic = true;
+                wall.layer = LayerMask.NameToLayer("Wall");
             }
             
             foreach (var columnWall in columnWalls)
@@ -266,6 +269,7 @@ namespace Maps.MapAssembler
                 boxCollider.size = new Vector3(0.5f * mapScale, wallHeight, columnWall.startingRow - columnWall.endingRow);
 
                 wall.isStatic = true;
+                wall.layer = LayerMask.NameToLayer("Wall");
             }
 
             walls.isStatic = true;

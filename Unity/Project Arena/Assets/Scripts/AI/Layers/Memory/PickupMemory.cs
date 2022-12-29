@@ -33,11 +33,13 @@ namespace AI.Layers.Memory
 
         private readonly AIEntity me;
         private SightSensor sightSensor;
+        private readonly int layerMask;
 
         public PickupMemory(AIEntity me)
         {
             this.me = me;
             DetectPickups();
+            layerMask = LayerMask.GetMask("Default", "Wall", "Pickable");
         }
 
         /// <summary>
@@ -71,7 +73,7 @@ namespace AI.Layers.Memory
                 // know its status. This is because it would be very easy for a human to turn around and check, 
                 // but complex (to implement) in the AI of the bot.
                 if ((position - me.transform.position).sqrMagnitude > 4 &&
-                    !sightSensor.CanSeeObject(pickable.transform, Physics.AllLayers))
+                    !sightSensor.CanSeeObject(pickable.transform, layerMask))
                 {
                     continue;
                 }

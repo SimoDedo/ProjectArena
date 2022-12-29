@@ -13,7 +13,7 @@ namespace AI.GoalMachine.Goal
     /// </summary>
     public class Fight : IGoal
     {
-        private const float LOW_HEALTH_PENALTY = 0.6f;
+        private const float LOW_HEALTH_PENALTY = 0.4f;
         private readonly BehaviorTree behaviorTree;
         private readonly AIEntity entity;
         private readonly ExternalBehaviorTree externalBt;

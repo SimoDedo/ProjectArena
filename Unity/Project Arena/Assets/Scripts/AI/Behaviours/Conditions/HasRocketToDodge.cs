@@ -23,7 +23,6 @@ namespace AI.Behaviours.Conditions
         private int layerMask;
         private FightingMovementSkill movementSkill;
         private int myID;
-
         private SightSensor sightSensor;
 
         public override void OnAwake()
@@ -33,7 +32,7 @@ namespace AI.Behaviours.Conditions
             // movementSkill = entity.MovementSkill;
             sightSensor = entity.SightSensor;
 
-            layerMask = 1 << LayerMask.NameToLayer("Projectile");
+            layerMask = LayerMask.GetMask("Default", "Projectile", "Wall");
         }
 
         public override TaskStatus OnUpdate()

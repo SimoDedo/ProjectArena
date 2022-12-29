@@ -17,7 +17,7 @@ namespace AI.GoalMachine.Goal
         private readonly BehaviorTree behaviorTree;
         private readonly ExternalBehaviorTree externalBt;
         private readonly PickupPlanner pickupPlanner;
-        private readonly float scoreMultiplier = 1.0f;
+        private readonly float scoreMultiplier = 0.7f;
         private Pickable currentPickable;
         private Pickable nextPickable;
 

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311992, g: 0.38074034, b: 0.35872716, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311918, g: 0.38073987, b: 0.35872698, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -356,7 +356,11 @@ MonoBehaviour:
   wallChar: 119
   mapObjects:
   - objectChar: 115
-    numObjPerMap: 100
+    numObjPerMap: 6
+    placeAnywhere: 0
+    positioningMethod: 1
+  - objectChar: 104
+    numObjPerMap: 0
     placeAnywhere: 0
     positioningMethod: 1
   createTextFile: 0
@@ -439,6 +443,7 @@ Transform:
   - {fileID: 1083789688}
   - {fileID: 1535827197}
   - {fileID: 323647565}
+  - {fileID: 758494085}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -492,6 +497,56 @@ MonoBehaviour:
   loadMapFromFile: 0
   textFilePath: 
   spawnPointCategory: Spawn Points
+--- !u!1 &758494084
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 758494085}
+  - component: {fileID: 758494086}
+  m_Layer: 0
+  m_Name: Mesh Map Assembler (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &758494085
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 758494084}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 373435884}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &758494086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 758494084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 495bfaf683b1425fb1d94ee001240efd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wallHeight: 30
+  mapScale: 1
+  hasCeiling: 1
+  topMaterial: {fileID: 2100000, guid: c0613303af609ef4e9a058dbd6a9e117, type: 2}
+  wallMaterial: {fileID: 2100000, guid: fb414c8d4e64f1d47926c89b9dd84470, type: 2}
+  floorMaterial: {fileID: 2100000, guid: c0613303af609ef4e9a058dbd6a9e117, type: 2}
 --- !u!1 &1083789687
 GameObject:
   m_ObjectHideFlags: 0
@@ -533,12 +588,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1083789687}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e733af4eeeb7a0c4787a8541a2f72994, type: 3}
+  m_Script: {fileID: 11500000, guid: 495bfaf683b1425fb1d94ee001240efd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   wallHeight: 30
-  squareSize: 1
-  isSkyVisibile: 1
+  mapScale: 1
+  hasCeiling: 1
   topMaterial: {fileID: 2100000, guid: c0613303af609ef4e9a058dbd6a9e117, type: 2}
   wallMaterial: {fileID: 2100000, guid: fb414c8d4e64f1d47926c89b9dd84470, type: 2}
   floorMaterial: {fileID: 2100000, guid: c0613303af609ef4e9a058dbd6a9e117, type: 2}
@@ -572,17 +627,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   botPrefab: {fileID: 1128226087601874, guid: 87c5267e1886311258a6f48dac81a1ca, type: 3}
-  genomeName: corridors2.json
-  bot1ParamsFilenamePrefix: rifle_
-  bot2ParamsFilenamePrefix: sniper_
+  genomeName: 14_21.json
+  bot1ParamsFilenamePrefix: sniper_
+  bot1SkillLevel: 1
+  bot2ParamsFilenamePrefix: assault_
+  bot2SkillLevel: 1
   mapManager: {fileID: 516550950}
   genomeMapGenerator: {fileID: 296767516}
+  mapAssembler: {fileID: 1083789689}
   spawnPointManager: {fileID: 323647566}
   numExperiments: 100
+  folderName: 
   experimentName: experiment
   gameLength: 600
   saveMap: 0
   logPositions: 0
+  logKillDistances: 0
+  logDeathPositions: 0
 --- !u!4 &1406895419
 Transform:
   m_ObjectHideFlags: 0

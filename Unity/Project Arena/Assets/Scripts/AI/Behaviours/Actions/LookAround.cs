@@ -49,11 +49,11 @@ namespace AI.Behaviours.Actions
         private float nextUpdateTime;
         private float nextWallUpdateTime;
         private SightController sightController;
-        private int rayCastLayerMask; 
 
         private List<float> angles;
         private List<float> scores;
         private Transform _transform;
+        private int layerMask = LayerMask.GetMask("Default", "Wall");
 
         public override void OnAwake()
         {
@@ -77,7 +77,6 @@ namespace AI.Behaviours.Actions
             angles = new List<float>(myValidAngles.Count);
             scores = new List<float>(myValidAngles.Count);
             
-            rayCastLayerMask = ~LayerMask.GetMask("Ignore Raycast", "Entity", "Projectile");
             _transform = transform;
         }
         
@@ -103,7 +102,7 @@ namespace AI.Behaviours.Actions
                 {
                     var direction = Quaternion.AngleAxis(angleScore.angle, up) * realForward;
                     var distance =
-                        Physics.Raycast(_transform.position, direction, out var hit, 50)
+                        Physics.Raycast(_transform.position, direction, out var hit, 50, layerMask)
                             ? hit.distance
                             : 50;
                     distance = Mathf.Clamp(distance, 0, 50);
@@ -157,7 +156,7 @@ namespace AI.Behaviours.Actions
             
             var position = _transform.position;
             var lookDirection =  sightController.GetHeadForward();
-            if (Physics.Raycast(position, lookDirection,  THRESHOLD, rayCastLayerMask))
+            if (Physics.Raycast(position, lookDirection,  THRESHOLD, layerMask))
             {
                 totalInvalidLookTime += Time.deltaTime;
             }

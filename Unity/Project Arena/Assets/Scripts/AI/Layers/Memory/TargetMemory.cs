@@ -59,6 +59,7 @@ namespace AI.Layers.Memory
         /// The sensor used to detect the target presence
         private SightSensor sensor;
 
+        private readonly int layerMask;
         public TargetMemory(
             AIEntity me,
             Entity.Entity target,
@@ -68,6 +69,7 @@ namespace AI.Layers.Memory
             this.target = target;
             this.memoryWindowLength = memoryWindowLength;
             this.me = me;
+            layerMask = LayerMask.GetMask("Default", "Wall", "Entity");
         }
         
         // Finishes preparing the component.
@@ -83,7 +85,7 @@ namespace AI.Layers.Memory
         {
             var targetTransform = target.transform;
             var targetDistance = (targetTransform.position - me.transform.position).magnitude;
-            var result = sensor.CanSeeObject(targetTransform);
+            var result = sensor.CanSeeObject(targetTransform, layerMask);
 
             results.Add(new EnemyInfo(result, targetDistance,  Time.time - Time.deltaTime, Time.time));
             ForgetOldData();

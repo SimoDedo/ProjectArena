@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -43,6 +44,8 @@ namespace Entity
             UpdateList();
         }
 
+        // TODO unless the time is far away in the past, you should loop from the end of the list (newest elems) towards
+        // the beginning (old elements). 
         public Vector3 GetPositionAtTime(float time)
         {
             UpdateList();
@@ -54,24 +57,44 @@ namespace Entity
                 throw new InvalidOperationException("No information known that far away in the past");
             }
 
-            var interpolatedPos = tracked[0].position;
-            var trackedCount = tracked.Count;
             // Get interpolated position based on stored information
-            var next = tracked[0];
-            for (var i = 0; i < trackedCount - 1; i++)
+            var index = FindFirstIndex(info => info.time.CompareTo(time));
+
+            var (currentPos, currentTime) = tracked[index];
+            var (nextPosition, nextTime) = tracked[index + 1];
+            var fraction = (time - currentTime) / (nextTime - currentTime);
+            var interpolatedPos = Vector3.Lerp(currentPos,nextPosition, fraction);
+
+            return interpolatedPos;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private int FindFirstIndex(Func<PositionInfo, int> checker)
+        {
+            var begin = 0;
+            var end = tracked.Count - 1;
+            var biggestSmallerThan = -1;
+            while (begin <= end)
             {
-                var current = next;
-                next = tracked[i + 1];
-                if (next.time >= time)
+                var mid = (begin + end) / 2;
+
+                var compare = checker.Invoke(tracked[mid]);
+                if (compare < 0)
                 {
-                    // The next element starts after the requested time, interpolate the position between the two
-                    var fraction = (time - current.time) / (next.time - current.time);
-                    interpolatedPos = Vector3.Lerp(current.position,next.position, fraction);
-                    break;
+                    biggestSmallerThan = mid;
+                    begin = mid + 1;
+                }
+                else if (compare > 0)
+                {
+                    end = mid - 1;
+                }
+                else
+                {
+                    return mid;
                 }
             }
 
-            return interpolatedPos;
+            return biggestSmallerThan;
         }
 
         public Vector3 GetAverageVelocity(float intervalDuration)
@@ -157,25 +180,10 @@ namespace Entity
                 // In which situation is this possible? It shouldn't be possible...
                 throw new InvalidOperationException("No information known that far away in the past");
             }
+            
+            var interpolatedPos = GetPositionAtTime(endTime);
 
-            var interpolatedPos = tracked[0].position;
-            // Get interpolated position based on stored information
             var trackedCount = tracked.Count;
-
-            var next = tracked[0];
-            for (var i = 0; i < trackedCount - 1; i++)
-            {
-                var current = next;
-                next = tracked[i + 1];
-                if (next.time >= endTime)
-                {
-                    // The next element starts after the requested time, interpolate the position between the two
-                    var fraction = (endTime - current.time) / (next.time - current.time);
-                    interpolatedPos = Vector3.Lerp(current.position, next.position, fraction);
-                    break;
-                }
-            }
-
             // Estimate velocity in the interval            
             const float WEIGHT = 60;
 

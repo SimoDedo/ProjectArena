@@ -41,6 +41,7 @@ namespace AI.Behaviours.Actions
 
         private float aimingDispersionFirstAngle;
         private float aimingDispersionSecondAngle;
+        private int layerMask = LayerMask.GetMask("Default", "Wall", "Entity");
         public override void OnAwake()
         {
             entity = GetComponent<AIEntity>();
@@ -203,9 +204,11 @@ namespace AI.Behaviours.Actions
         // In case the weapon is a blast weapon, aims at the floor.
         private void AimRaycastWeapon(Vector3 enemyPosition, float lastSightedTime)
         {
+            // TODO deviated direction doesn't decrease when aiming
             var ourPosition = sightController.GetHeadPosition();
-            var aimingPoint = ourPosition + GetDeviatedDirection(enemyPosition - ourPosition);
-            // TODO Do not shoot if outside of gun range
+            var aimingDirection = enemyPosition - ourPosition;
+            var aimingPoint = ourPosition + aimingDirection + GetDeviatedDirection(aimingDirection);
+
             var angle = sightController.LookAtPoint(aimingPoint);
             if (lastSightedTime != Time.time && !gunManager.IsGunBlastWeapon(gunManager.CurrentGunIndex))
             {
@@ -252,7 +255,7 @@ namespace AI.Behaviours.Actions
             // Check that we do not hurt ourselves by shooting this weapon
             var headForward = sightController.GetHeadForward();
 
-            var hitSomething = Physics.Raycast(startingPos, headForward, out var hit, weaponRange);
+            var hitSomething = Physics.Raycast(startingPos, headForward, out var hit, weaponRange, layerMask);
             if (hitSomething && hit.collider.gameObject != enemy.gameObject && hit.distance <= distance * 0.9f)
                 // Looks like there is an obstacle between me and the point I wanted to shoot. Avoid shooting
                 return false;

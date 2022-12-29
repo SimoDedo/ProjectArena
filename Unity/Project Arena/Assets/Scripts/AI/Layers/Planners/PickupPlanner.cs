@@ -35,11 +35,11 @@ namespace AI.Layers.Planners
 
         // Curve used to calculate the multiplier due to the time to collect.
         private static readonly AnimationCurve TimeToCollectValueCurve = new AnimationCurve(
-            new Keyframe(0, 1.0f),
-            new Keyframe(3f, 0.8f),
-            new Keyframe(10f, 0.4f),
-            new Keyframe(20f, 0.2f),
-            new Keyframe(100f, 0.1666f)
+            new Keyframe(0, 5.0f),
+            new Keyframe(2f, 2.0f),
+            new Keyframe(10f, 0.2f),
+            new Keyframe(20f, 0.1f),
+            new Keyframe(100f, 0.005f)
         );
 
         // Curve used to calculate the multiplier due to the uncertainty time.
@@ -65,12 +65,13 @@ namespace AI.Layers.Planners
 
         private float nextUpdateTime;
         private SightSensor sightSensor;
-
+        private readonly int layerMask;
 
         public PickupPlanner(AIEntity entity)
         {
             me = entity;
             nextUpdateTime = float.MinValue;
+            layerMask = LayerMask.GetMask("Default", "Entity", "Pickable");
         }
 
         // Finish preparing this component
@@ -187,8 +188,7 @@ namespace AI.Layers.Planners
             else
             {
                 totalTime = pathTime;
-                // Use all layers since the crates are in ignore layer
-                if (sightSensor.CanSeeObject(pickup.transform, Physics.AllLayers))
+                if (sightSensor.CanSeeObject(pickup.transform, layerMask))
                     // I can see the object for now, so there is no uncertainty, the object is there!
                     timeUncertainty = 0;
                 else

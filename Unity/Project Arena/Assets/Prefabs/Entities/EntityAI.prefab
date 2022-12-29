@@ -994,7 +994,7 @@ MonoBehaviour:
   chargerSize: 5
   maximumAmmo: 20
   reloadTime: 1
-  cooldownTime: 0.9
+  cooldownTime: 1.2
   isBlastWeapon: 0
   muzzleFlashDuration: 0.1
   recoil: 0.2
@@ -1011,9 +1011,6 @@ MonoBehaviour:
   sparkPrefab: {fileID: 1267919001785460, guid: 0bf9b404556a5e74b8b2438fd337397c,
     type: 3}
   sparkDuration: 0.05
-  ignoredLayers:
-    serializedVersion: 2
-    m_Bits: 516
 --- !u!114 &3455471732554073194
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2102,9 +2099,6 @@ MonoBehaviour:
   sparkPrefab: {fileID: 1898888085525940, guid: f32340268f5f82147a7b25d160d8f0ee,
     type: 3}
   sparkDuration: 0.05
-  ignoredLayers:
-    serializedVersion: 2
-    m_Bits: 516
 --- !u!114 &449096392693712555
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3606,9 +3600,6 @@ MonoBehaviour:
   sparkPrefab: {fileID: 1370238009886188, guid: 8e38765ee5c99e14588ef9c70a666350,
     type: 3}
   sparkDuration: 0.05
-  ignoredLayers:
-    serializedVersion: 2
-    m_Bits: 516
 --- !u!114 &3844986804408395285
 MonoBehaviour:
   m_ObjectHideFlags: 0

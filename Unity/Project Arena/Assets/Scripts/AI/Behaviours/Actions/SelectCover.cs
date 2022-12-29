@@ -23,7 +23,7 @@ namespace AI.Behaviours.Actions
         private Entity.Entity enemy;
 
         private NavigationSystem navSystem;
-        private int lineCastLayerMask;
+        private int layerMask;
 
 
         public override void OnAwake()
@@ -31,12 +31,12 @@ namespace AI.Behaviours.Actions
             var entity = gameObject.GetComponent<AIEntity>();
             navSystem = entity.NavigationSystem;
             enemy = entity.GetEnemy();
-            lineCastLayerMask = ~LayerMask.GetMask("Entity", "Projectile", "Ignore Raycast");
+            layerMask = LayerMask.GetMask("Default", "Wall");
         }
 
         public override TaskStatus OnUpdate()
         {
-            if (Physics.Linecast(transform.position, enemy.transform.position, lineCastLayerMask))
+            if (Physics.Linecast(transform.position, enemy.transform.position, layerMask))
             {
                 // Current position is already covered!
                 pathInfo.Value = navSystem.CalculatePath(transform.position);
@@ -60,7 +60,7 @@ namespace AI.Behaviours.Actions
                     // Path invalid or too long!
                     continue;
 
-                if (!Physics.Linecast(finalPos, enemy.transform.position, lineCastLayerMask))
+                if (!Physics.Linecast(finalPos, enemy.transform.position, layerMask))
                     // We can still see the enemy from that position, no good! 
                     continue;
 

@@ -30,9 +30,9 @@ namespace Tester
         [SerializeField] private GameObject botPrefab;
         [SerializeField] private string genomeName;
         [SerializeField] private string bot1ParamsFilenamePrefix;
-        [SerializeField] private float bot1SkillLevel = 0.5f;
+        [SerializeField] private float bot1SkillLevel = 1.0f;
         [SerializeField] private string bot2ParamsFilenamePrefix;
-        [SerializeField] private float bot2SkillLevel = 0.5f;
+        [SerializeField] private float bot2SkillLevel = 1.0f;
         [SerializeField] private SLMapManager mapManager;
         [SerializeField] private GenomeV2MapGenerator genomeMapGenerator;
         [SerializeField] private MapAssembler mapAssembler;

@@ -1,5 +1,6 @@
 using AI.GoalMachine.Goal;
 using BehaviorDesigner.Runtime;
+using UnityEngine;
 
 namespace AI.GoalMachine
 {
@@ -12,6 +13,8 @@ namespace AI.GoalMachine
         private int currentGoalIndex;
         private bool isIdle = true;
 
+        private int id;
+
         public EntityGoalMachine(AIEntity entity)
         {
             Behavior.CreateBehaviorManager();
@@ -23,6 +26,8 @@ namespace AI.GoalMachine
             };
             currentGoalIndex = 0;
             CurrentGoal.Enter();
+
+            id = entity.GetID();
         }
 
         private IGoal CurrentGoal => goals[currentGoalIndex];
@@ -45,8 +50,11 @@ namespace AI.GoalMachine
             if (currentGoalIndex != bestIndex)
             {
                 CurrentGoal.Exit();
+                var exitStatus = CurrentGoal.GetType().FullName;
                 currentGoalIndex = bestIndex;
                 CurrentGoal.Enter();
+                var enterStatus = CurrentGoal.GetType().FullName;
+                Debug.LogError("Entity " + id + " switched from " + exitStatus + " to " + enterStatus);
             }
 
             CurrentGoal.Update();

@@ -20,7 +20,7 @@ namespace Guns
         [SerializeField] private float range = 100f;
         [SerializeField] private GameObject sparkPrefab;
         [SerializeField] private float sparkDuration = 0.01f;
-        [SerializeField] private LayerMask ignoredLayers;
+        private int layerMask;
 
         private readonly Queue<GameObject> sparkList = new Queue<GameObject>();
         private GameObject sparks;
@@ -34,7 +34,7 @@ namespace Guns
             t = transform;
             if (!limitRange) range = Mathf.Infinity;
 
-            ignoredLayers = ~ignoredLayers;
+            layerMask = LayerMask.GetMask("Default", "Wall", "Floor", "Entity");
 
             var transform1 = transform;
             sparks = new GameObject("Sparks - " + transform1.gameObject.name);
@@ -92,8 +92,7 @@ namespace Guns
 
                 Debug.DrawRay(headCamera.transform.position, direction * 100, Color.blue, 5, false);
                 
-                if (Physics.Raycast(headCamera.transform.position, direction, out hit, range,
-                    ignoredLayers))
+                if (Physics.Raycast(headCamera.transform.position, direction, out hit, range, layerMask))
                 {
                     #if !UNITY_SERVER || UNITY_EDITOR
                     StartCoroutine(ShowSpark(hit));

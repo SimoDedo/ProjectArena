@@ -75,6 +75,8 @@ namespace AI
         }
         public float StandStillInFightProbability => Interpolate(MIN_STAND_STILL_IN_FIGHT, MAX_STAND_STILL_IN_FIGHT, 1.0f - ScaleScore(generalSkill, c.movementSkill));
         public float RandomlyMoveInFightProbability => Interpolate(MIN_RANDOM_MOVE_IN_FIGHT, MAX_RANDOM_MOVE_IN_FIGHT, 1.0f - ScaleScore(generalSkill, c.movementSkill));
+        public float GunMovementCorrectness => Interpolate(MIN_DEVIATION_FROM_OPTIMAL_RANGE, MAX_DEVIATION_FROM_OPTIMAL_RANGE, 1.0f - ScaleScore(generalSkill, c.movementSkill));
+
         public float FightBackWhenCollectingPickup => Interpolate(MIN_FIGHT_BACK_WHEN_PICKUP, MAX_FIGHT_BACK_WHEN_PICKUP, ScaleScore(generalSkill, c.movementSkill));
         public float DodgeRocketProbability => Interpolate(MIN_DODGE_ROCKET_PROBABILITY, MAX_DODGE_ROCKET_PROBABILITY, ScaleScore(generalSkill, c.movementSkill));
         public float CanSelectCoverProbability => Interpolate(MIN_CAN_SELECT_COVER_PROBABILITY, MAX_CAN_SELECT_COVER_PROBABILITY, ScaleScore(generalSkill, c.movementSkill));
@@ -122,10 +124,12 @@ namespace AI
         private const float MAX_TIME_BEFORE_REACTION = 0.5f;
         private const float MIN_PREDICTION = 0.1f;
         private const float MAX_PREDICTION = 0.8f;
-        private const float MIN_STAND_STILL_IN_FIGHT = 0.1f;
-        private const float MAX_STAND_STILL_IN_FIGHT = 1.0f;
+        private const float MIN_STAND_STILL_IN_FIGHT = -1.0f;
+        private const float MAX_STAND_STILL_IN_FIGHT = 0.6f;
         private const float MIN_RANDOM_MOVE_IN_FIGHT = -0.0f;
-        private const float MAX_RANDOM_MOVE_IN_FIGHT = 1.0f;
+        private const float MAX_RANDOM_MOVE_IN_FIGHT = 0.5f;
+        private const float MIN_DEVIATION_FROM_OPTIMAL_RANGE = 5.0f;
+        private const float MAX_DEVIATION_FROM_OPTIMAL_RANGE = 20.0f;
         private const float MIN_FIGHT_BACK_WHEN_PICKUP = -0.5f;
         private const float MAX_FIGHT_BACK_WHEN_PICKUP = 1.5f;
         private const float MIN_DODGE_ROCKET_PROBABILITY = 0.2f;
@@ -141,8 +145,8 @@ namespace AI
         private const float MAX_AIM_DELAY_AVERAGE = 0.05f;
         private const float AIM_DELAY_STD_DEV = 0.06f;
 
-        private const float MIN_AIM_DISPERSION_ANGLE = 2f;
-        private const float MAX_AIM_DISPERSION_ANGLE = 30f;
+        private const float MIN_AIM_DISPERSION_ANGLE = 0.3f;
+        private const float MAX_AIM_DISPERSION_ANGLE = 15f;
         private const float MIN_ACCEPTABLE_SHOOTING_ANGLE = 0.5f;
         private const float MAX_ACCEPTABLE_SHOOTING_ANGLE = 4f;
 
