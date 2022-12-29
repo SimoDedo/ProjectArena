@@ -195,8 +195,8 @@ namespace Maps.Genomes
             var closestColumn = 0;
             var closestDistance = int.MaxValue;
 
-            var centerRow = (rows - 1) / 2;
-            var centerCol = (columns - 1) / 2;
+            var centerRow = (rows - 1) / 2f;
+            var centerCol = (columns - 1) / 2f;
 
             for (var r = 0; r < rows; r++)
             {
@@ -204,10 +204,10 @@ namespace Maps.Genomes
                 {
                     if (!rooms[r, c].isReal) continue;
                     
-                    var roomScore = Math.Floor( (float) Math.Abs(centerRow - r)) +
-                                    Math.Floor( (float) Math.Abs(centerCol - c));
+                    var roomScore = Math.Floor( Math.Abs(centerRow - r)) +
+                                    Math.Floor( Math.Abs(centerCol - c));
                     
-                    if (!(roomScore < closestDistance)) continue;
+                    if (roomScore > closestDistance) continue;
                     
                     closestColumn = c;
                     closestRow = r;
