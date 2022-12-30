@@ -50,11 +50,8 @@ namespace AI.GoalMachine
             if (currentGoalIndex != bestIndex)
             {
                 CurrentGoal.Exit();
-                var exitStatus = CurrentGoal.GetType().FullName;
                 currentGoalIndex = bestIndex;
                 CurrentGoal.Enter();
-                var enterStatus = CurrentGoal.GetType().FullName;
-                Debug.LogError("Entity " + id + " switched from " + exitStatus + " to " + enterStatus);
             }
 
             CurrentGoal.Update();

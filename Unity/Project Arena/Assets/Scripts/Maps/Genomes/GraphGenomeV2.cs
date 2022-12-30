@@ -204,8 +204,7 @@ namespace Maps.Genomes
                 {
                     if (!rooms[r, c].isReal) continue;
                     
-                    var roomScore = Math.Floor( Math.Abs(centerRow - r)) +
-                                    Math.Floor( Math.Abs(centerCol - c));
+                    var roomScore = Math.Abs(centerRow - r) + Math.Abs(centerCol - c);
                     
                     if (roomScore > closestDistance) continue;
                     

@@ -627,7 +627,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   botPrefab: {fileID: 1128226087601874, guid: 87c5267e1886311258a6f48dac81a1ca, type: 3}
-  genomeName: 14_21.json
+  genomeName: 1_47.json
   bot1ParamsFilenamePrefix: sniper_
   bot1SkillLevel: 1
   bot2ParamsFilenamePrefix: assault_
