@@ -85,18 +85,18 @@ namespace Maps.MapAssembler
             {
                 navMesh.voxelSize = 4f/30f;
             }
-            else if (biggestSize < 400)
+            else // if (biggestSize < 400)
             {
                 navMesh.voxelSize = 6f/30f;
             }
-            else if (biggestSize < 600)
-            {
-                navMesh.voxelSize = 8f/30f;
-            }
-            else
-            {
-                navMesh.voxelSize = 10f/30f;
-            }
+            // else if (biggestSize < 600)
+            // {
+                // navMesh.voxelSize = 8f/30f;
+            // }
+            // else
+            // {
+                // navMesh.voxelSize = 10f/30f;
+            // }
             
             navMesh.BuildNavMesh();
         }
