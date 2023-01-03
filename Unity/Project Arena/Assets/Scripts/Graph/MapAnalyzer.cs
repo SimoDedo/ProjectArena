@@ -185,8 +185,7 @@ namespace Graph
                     new Tuple<string, object>(TOP_ROW, current.topRow),
                     new Tuple<string, object>(RIGHT_COLUMN, current.rightColumn),
                     new Tuple<string, object>(BOTTOM_ROW, current.bottomRow),
-                    new Tuple<string, object>(IS_CORRIDOR, current.isCorridor),
-                    new Tuple<string, object>(IS_DUMMY, current.isDummyRoom)
+                    new Tuple<string, object>(IS_CORRIDOR, current.isCorridor)
                 );
             }
 
@@ -250,7 +249,7 @@ namespace Graph
                 }
             }
 
-            var discardDummies = areas.Any(it => !it.isCorridor && !it.isDummyRoom);
+            var discardDummies = areas.Any(it => !it.isCorridor);
             if (discardDummies)
                 foreach (var node in nodes)
                 {
@@ -899,7 +898,6 @@ namespace Graph
     {
         public readonly int bottomRow;
         public readonly bool isCorridor;
-        public readonly bool isDummyRoom;
         public readonly int leftColumn;
         public readonly int rightColumn;
         public readonly int topRow;
@@ -909,8 +907,7 @@ namespace Graph
             int bottomRow,
             int rightColumn,
             int topRow,
-            bool isCorridor = false,
-            bool isDummyRoom = false
+            bool isCorridor = false
         )
         {
             this.leftColumn = leftColumn;
@@ -918,7 +915,6 @@ namespace Graph
             this.rightColumn = rightColumn;
             this.topRow = topRow;
             this.isCorridor = isCorridor;
-            this.isDummyRoom = isDummyRoom;
         }
     }
 

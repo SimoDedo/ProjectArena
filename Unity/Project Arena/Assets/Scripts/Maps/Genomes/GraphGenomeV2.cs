@@ -258,8 +258,8 @@ namespace Maps.Genomes
                 scale * area.bottomRow,
                 scale * area.rightColumn,
                 scale * area.topRow,
-                area.isCorridor,
-                area.isDummyRoom);
+                area.isCorridor
+                );
         }
 
         private void PlaceVerticalConnectionsIfNeeded(List<Area> areas, int r, int c)

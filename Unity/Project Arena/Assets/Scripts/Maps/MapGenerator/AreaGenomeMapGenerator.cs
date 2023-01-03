@@ -7,36 +7,35 @@ namespace Maps.MapGenerator
 {
     // TODO Since width and height are not used for this map, maybe clean the hierarchy to have them not required in
     // this class.
-    public class GenomeV2MapGenerator : MapGenerator
+    public class AreaGenomeMapGenerator : MapGenerator
     {
-        private GraphGenomeV2 genome;
-        private Area[] areas = new Area[0];
+        private AreasGenome initialAreas;
+        private Area[] displacedAreas;
 
-        public void SetGenome(GraphGenomeV2 genome)
+        public void SetGenome(AreasGenome areas)
         {
-            this.genome = genome;
+            initialAreas = areas;
             InitializePseudoRandomGenerator();
             SetReady(true);
         }
         
         public override char[,] GenerateMap()
         {
-            // TODO create area map, apply scaling based on genome, apply offsets, create map.
-            areas = genome.ConvertToAreas();
-            areas = areas.Select(it => DisplaceArea(it, borderSize)).ToArray();
+            displacedAreas = initialAreas.areas.Select(it => DisplaceArea(it, borderSize)).ToArray();
             
-            width = genome.GetWidth() + borderSize * 2;
-            height = genome.GetHeight() + borderSize * 2;
+            // TODO Compute width? How?
+            width = initialAreas.width + borderSize * 2;
+            height = initialAreas.height + borderSize * 2;
             
             map = new char[height, width];
             MapEdit.FillMap(map, wallChar);
             
-            FillMap(areas, map);
+            FillMap(displacedAreas, map);
             
             // Compute map excluding corridors, since we do not want to place anything there
             var noCorridorsMap = new char[height, width];
             MapEdit.FillMap(noCorridorsMap, wallChar);
-            FillMap(areas, noCorridorsMap, true);
+            FillMap(displacedAreas, noCorridorsMap, true);
             
             PopulateMap(noCorridorsMap);
 
@@ -78,7 +77,7 @@ namespace Maps.MapGenerator
 
         public override Area[] ConvertMapToAreas()
         {
-            return areas;
+            return displacedAreas;
         }
     }
 }
