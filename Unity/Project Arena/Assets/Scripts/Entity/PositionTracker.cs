@@ -60,6 +60,11 @@ namespace Entity
             // Get interpolated position based on stored information
             var index = FindFirstIndex(info => info.time.CompareTo(time));
 
+            if (index == tracked.Count - 1)
+            {
+                return tracked[index].position;
+            }
+            
             var (currentPos, currentTime) = tracked[index];
             var (nextPosition, nextTime) = tracked[index + 1];
             var fraction = (time - currentTime) / (nextTime - currentTime);
