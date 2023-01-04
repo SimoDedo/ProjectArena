@@ -6,7 +6,6 @@ namespace AI.Layers.SensingLayer
     /// This AI component is able to keep track on when the entity has been damaged and whether or not the entity
     /// was recently damaged.
     /// </summary>
-    ///  TODO Extract detection of damage and keeping track of whether the entity should react to it or not.
     public class DamageSensor
     {
         /// <summary>
@@ -19,8 +18,14 @@ namespace AI.Layers.SensingLayer
         /// </summary>
         private readonly float reactionDelay;
 
+        private const int MAX_BACKLOG_DAMAGES = 16;
+        private readonly float[] lastDamagedTimes = new float[MAX_BACKLOG_DAMAGES];
+        private int latestDamageTimeIndex;
+
+        
         public DamageSensor(float reactionDelay, float recentTimeout)
         {
+            Reset();
             this.recentTimeout = recentTimeout;
             this.reactionDelay = reactionDelay;
         }
@@ -28,7 +33,7 @@ namespace AI.Layers.SensingLayer
         /// <summary>
         /// Get the last time the entity was damaged.
         /// </summary>
-        public float LastTimeDamaged { get; private set; } = float.MinValue;
+        public float LastTimeDamaged => lastDamagedTimes[latestDamageTimeIndex];
 
         /// <summary>
         /// Returns whether the entity was "recently damaged" and can react to the event.
@@ -37,8 +42,14 @@ namespace AI.Layers.SensingLayer
         {
             get
             {
-                var timeDiff = Time.time - LastTimeDamaged - reactionDelay;
-                return timeDiff >= 0 && timeDiff < recentTimeout;
+                var foundInterval = false;
+                for (var i = 0; i < MAX_BACKLOG_DAMAGES && !foundInterval; i++)
+                {
+                    var timeDiff = Time.time - lastDamagedTimes[i] - reactionDelay;
+                    foundInterval = timeDiff >= 0 && timeDiff < recentTimeout;
+                }
+
+                return foundInterval;
             }
         }
 
@@ -47,7 +58,8 @@ namespace AI.Layers.SensingLayer
         /// </summary>
         public void GotDamaged()
         {
-            LastTimeDamaged = Time.time;
+            latestDamageTimeIndex = (latestDamageTimeIndex + 1) % MAX_BACKLOG_DAMAGES;
+            lastDamagedTimes[latestDamageTimeIndex] = Time.time;
         }
 
         /// <summary>
@@ -55,7 +67,12 @@ namespace AI.Layers.SensingLayer
         /// </summary>
         public void Reset()
         {
-            LastTimeDamaged = float.MinValue;
+            latestDamageTimeIndex = 0;
+            for (var i = 0; i < MAX_BACKLOG_DAMAGES; i++)
+            {
+                lastDamagedTimes[i] = float.MinValue;
+            }
+
         }
     }
 }
