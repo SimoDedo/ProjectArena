@@ -15,14 +15,15 @@ namespace AI.GoalMachine.Goal
     public class SearchEnemy : IGoal
     {
         private const float NO_TIME = -1;
+        private readonly TargetKnowledgeBase _targetKnowledgeBase;
         private readonly BehaviorTree behaviorTree;
         private readonly DamageSensor damageSensor;
-        private readonly SoundSensor soundSensor;
         private readonly AIEntity entity;
         private readonly ExternalBehaviorTree externalBt;
-        private readonly TargetKnowledgeBase _targetKnowledgeBase;
-        private float startSearchTime = NO_TIME;
+        private readonly SoundSensor soundSensor;
         private Recklessness _recklessness;
+        private bool resetInUpdate;
+        private float startSearchTime = NO_TIME;
 
         public SearchEnemy(AIEntity entity)
         {
@@ -50,9 +51,23 @@ namespace AI.GoalMachine.Goal
             if (startSearchTime != NO_TIME)
             {
                 // We are already searching the enemy, slowly decrease will to search based on how much time has elapsed
+                var lastEventTime = Mathf.Max(
+                    damageSensor.WasDamagedRecently ? damageSensor.LastTimeDamaged : float.MinValue,
+                    soundSensor.HeardShotRecently ? soundSensor.LastTimeHeardShot : float.MinValue
+                    );
+                if (lastEventTime > startSearchTime)
+                {
+                    // We get damaged or heard noise again, reset score.
+                    resetInUpdate = true;
+                    return 0.7f;
+                }
+                resetInUpdate = false;
                 return 1f - (Time.time - startSearchTime) / 10f;
             }
-            
+
+            resetInUpdate = false;
+
+            // TODO set triggering event here
             var searchDueToLoss = _targetKnowledgeBase.HasLostTarget();
             if (searchDueToLoss)
             {
@@ -81,6 +96,11 @@ namespace AI.GoalMachine.Goal
 
         public void Update()
         {
+            if (resetInUpdate)
+            {
+                Exit();
+                Enter();
+            }
             BehaviorManager.instance.Tick(behaviorTree);
         }
 
