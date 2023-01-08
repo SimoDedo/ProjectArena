@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using Graph;
 using Maps;
+using Maps.MapGenerator;
 
 namespace Managers.Map
 {

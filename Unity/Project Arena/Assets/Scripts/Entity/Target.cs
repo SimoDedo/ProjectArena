@@ -167,7 +167,6 @@ namespace Entity
         {
         }
 
-        // TODO new entity type which doesn't have ammo
         public override bool CanBeSupplied(bool[] suppliedGuns)
         {
             return false;

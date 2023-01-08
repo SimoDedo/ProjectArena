@@ -32,7 +32,6 @@ namespace AI.Behaviours.Conditions
             hasDecidedToFight = false;
         }
 
-        // TODO if you start fighting, never change idea, even when you lose sight let timeout decide
         public override TaskStatus OnUpdate()
         {
             if (Time.time < timestampChangeIdeaAllowed)

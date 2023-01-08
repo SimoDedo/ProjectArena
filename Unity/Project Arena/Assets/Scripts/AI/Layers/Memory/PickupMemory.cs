@@ -6,7 +6,6 @@ using Utils;
 
 namespace AI.Layers.Memory
 {
-    // TODO Move estimation of activation time to knowledge base component
     /// <summary>
     /// This component deals with keeping track of the activation times of all the pickups in the map.
     /// </summary>
@@ -26,9 +25,7 @@ namespace AI.Layers.Memory
             }
         }
 
-        // TODO is questionable if this should be here or in the pickup planner
-        private readonly Dictionary<Pickable, PickupInfo> pickupInfos =
-            new Dictionary<Pickable, PickupInfo>(new MonoBehaviourEqualityComparer<Pickable>());
+        private readonly Dictionary<Pickable, PickupInfo> pickupInfos = new(new MonoBehaviourEqualityComparer<Pickable>());
 
         private readonly AIEntity me;
         private SightSensor sightSensor;
@@ -38,7 +35,7 @@ namespace AI.Layers.Memory
         {
             this.me = me;
             DetectPickups();
-            layerMask = LayerMask.GetMask("Default", "Wall", "Pickable");
+            layerMask = LayerMask.GetMask("Default", "Wall", "Pickable", "Floor");
         }
 
         /// <summary>

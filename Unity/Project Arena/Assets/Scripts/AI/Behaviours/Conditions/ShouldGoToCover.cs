@@ -96,7 +96,6 @@ namespace AI.Behaviours.Conditions
                 return TaskStatus.Failure;
             }
 
-            // TODO Make this a bot parameter? Tendency to cover?
             if (!isGoingToCover.Value && Random.value < avoidCoverProbability)
             {
                 nextCoverAttempt = Time.time + TIMEOUT;

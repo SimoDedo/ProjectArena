@@ -7,8 +7,6 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-// TODO add type (blast vs non-blast)
-
 namespace Guns
 {
     /// <summary>

@@ -206,7 +206,7 @@ namespace AI.Behaviours.Actions
             }
             else
                 // Randomly move through the optimal range of the gun, but not too much
-                // TODO Perhaps have a flag like strife to avoid oscillating too much
+                // TODO Perhaps have a flag like strafe to avoid oscillating too much
                 movementDirectionDueToGun = direction * (Random.value > 0.5f ? -0.3f : 0.3f);
 
             return movementDirectionDueToGun;

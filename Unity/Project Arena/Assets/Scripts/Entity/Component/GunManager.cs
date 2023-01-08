@@ -9,8 +9,8 @@ using UnityEngine;
 
 namespace Entity.Component
 {
-    // TODO Do not allow direct usage of Gun, create interface or new GunHandlingComponent
-    // TODO expose view of GunView instead of all the methods to query stuff 
+    // TODO Do not allow direct usage of Gun, create interface or new GunHandlingComponent?
+    // TODO expose view of GunView instead of all the methods to query stuff?
     public class GunManager
     {
         private const float switchWait = 0.05f;

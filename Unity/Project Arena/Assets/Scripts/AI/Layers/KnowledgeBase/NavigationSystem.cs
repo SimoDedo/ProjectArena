@@ -107,12 +107,12 @@ namespace AI.Layers.KnowledgeBase
             // Check that I didn't have a path already
             if (!agent.SetPath(path))
             {
-                // Bug fix: Sometimes the agent gets stuck in a position from where it is unable to set a path.
+                // Sometimes the agent gets stuck in a position from where it is unable to set a path.
                 // When that happens, warping helps.
                 agent.Warp(agent.transform.position);
                 if (!agent.SetPath(path))
                 {
-                    Debug.LogError("It was impossible to fix the problem!");
+                    Debug.LogError("Cannot set path to entity: unknown problem!");
                 }
             }
         }

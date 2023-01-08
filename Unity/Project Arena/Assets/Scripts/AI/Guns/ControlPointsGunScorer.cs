@@ -35,7 +35,6 @@ namespace AI.Guns
 
             var score = scoreCurve.Evaluate(distance);
 
-            // TODO Check that I haven't broken anything.
             if (gun.GetLoadedAmmo() == 0 || fakeEmptyCharger)
                 score *= 0.7f;
 

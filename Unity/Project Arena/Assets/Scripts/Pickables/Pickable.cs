@@ -14,7 +14,6 @@ namespace Pickables
             MEDKIT,
 
             AMMO
-            // WEAPON TODO
         }
 
         private const float CHECK_WAIT = 0.1f;

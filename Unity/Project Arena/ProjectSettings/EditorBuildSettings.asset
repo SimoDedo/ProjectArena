@@ -9,9 +9,6 @@ EditorBuildSettings:
     path: Assets/Scenes/AITesting/Start.unity
     guid: 1054ceefdb3a378d5a12793681f0176c
   - enabled: 1
-    path: Assets/Scenes/AITesting/AITester.unity
-    guid: 95bfb270c799104158be33379f6aa73b
-  - enabled: 1
     path: Assets/Scenes/AITesting/GenomeTester.unity
     guid: d2755bdbd00a248808217ff4efef6679
   - enabled: 1

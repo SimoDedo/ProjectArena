@@ -141,7 +141,6 @@ namespace AI.Layers.Planners
 
             foreach (var entry in pickables)
             {
-                // TODO Find nice way to estimate score
                 var score = ScorePickup(entry.Key, entry.Value);
                 if (score == 0) continue;
                 if (score > bestPickupScore)

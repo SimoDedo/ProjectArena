@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Graph;
 using Maps;
+using Maps.MapGenerator;
 using UnityEngine;
 
 namespace Managers.Map
@@ -98,7 +98,7 @@ namespace Managers.Map
 
         public override Area[] GetAreas()
         {
-            return new Area[0];
+            return Array.Empty<Area>();
         }
 
         // Converts the map from a list of lines to a list of matrices.

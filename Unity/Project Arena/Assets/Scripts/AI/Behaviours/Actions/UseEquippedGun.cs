@@ -117,9 +117,6 @@ namespace AI.Behaviours.Actions
             // - Correctable delay: This delay is constant and can, depending on how predictable the enemy
             //   movement is, it can be corrected or can further worsen the estimated position
 
-            // TODO If the enemy is far away, decrease precision?
-            // var realEnemyPos = enemy.transform.position;
-            
             var aimTargetProgress = Mathf.Min(
                 (Time.time - nextDelayRecalculation + AIM_UPDATE_INTERVAL) / AIM_UPDATE_INTERVAL * AIM_COMMUTE_SPEED,
                     1f
@@ -253,9 +250,6 @@ namespace AI.Behaviours.Actions
             if (weaponRange < distance)
                 // Outside of weapon range...
                 return false;
-
-            // TODO try to raycast from my position forward. If the distance I hit is not too smaller than the distance
-            // of the target, than you can shoot.
 
             // Check that we do not hurt ourselves by shooting this weapon
             var headForward = sightController.GetHeadForward();

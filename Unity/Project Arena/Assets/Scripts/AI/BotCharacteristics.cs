@@ -30,7 +30,7 @@ namespace AI
 
         [DataMember] [Range(30f, 90f)] public readonly float fov = 60f;
 
-        [DataMember] public readonly float maxRange = 100f; //TODO maybe this can slightly increase/decrease depending on skill?
+        [DataMember] public readonly float maxRange = 100f; 
 
         // Amount of time, measured from the first moment we can react to an enemy event (e.g. heard sound, got damaged),
         //  after which we "forget" about the event
@@ -93,7 +93,13 @@ namespace AI
             }
         }
         public Recklessness Recklessness => c.recklessness;
-        public float MaxRange => c.maxRange;
+        public float MaxRange        {
+            get
+            {
+                var percentage = (generalSkill - 0.5f) / 5; // +- 10%
+                return c.maxRange + c.maxRange * percentage;
+            }
+        }
         public float EventReactionTimeout => c.eventReactionTimeout;
         public float SoundThreshold => Interpolate(MIN_SOUND_THRESHOLD, MAX_SOUND_THRESHOLD, 1.0f - generalSkill);
 

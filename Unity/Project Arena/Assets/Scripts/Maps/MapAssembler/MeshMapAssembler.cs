@@ -229,7 +229,6 @@ namespace Maps.MapAssembler
             return mesh;
         }
 
-        // TODO Create a square wall. 
         // Depending on the configuration of a Square I create the rigth mesh.
         private void TriangulateSquare(Square square)
         {

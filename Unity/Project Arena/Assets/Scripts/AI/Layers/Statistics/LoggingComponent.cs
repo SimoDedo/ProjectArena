@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace AI.Layers.Statistics
 {
+    /// <summary>
+    /// Takes care of logging information about Entity-relavant events (such as spotting an enemy) in order to
+    /// facilitate compiling this information for logging purposes.
+    /// </summary>
     public class LoggingComponent
     {
-        // Di cosa devo mettermi in ascolto qui?
-        // Entrata e uscita da fight di mia entity
-        // Respawn 
-
         private readonly AIEntity entity;
 
         private bool loggedFirstRespawn;

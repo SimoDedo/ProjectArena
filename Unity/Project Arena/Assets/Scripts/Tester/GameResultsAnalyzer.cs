@@ -13,44 +13,33 @@ namespace Tester
     {
         private readonly int bot1ID;
         private readonly int bot2ID;
-        private readonly Dictionary<int, int> currentKillStreak = new Dictionary<int, int>();
-        private readonly Dictionary<int, int> killStreakMax = new Dictionary<int, int>();
-        private readonly Dictionary<int, int> killStreaksSum = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> currentKillStreak = new();
+        private readonly Dictionary<int, int> killStreakMax = new();
+        private readonly Dictionary<int, int> killStreaksSum = new();
 
-        private readonly Dictionary<int, int> nonZeroKillStreaksCount = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> nonZeroKillStreaksCount = new();
 
-        // DONE!
-        private readonly Dictionary<int, int> numberOfFights = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> numberOfFights = new();
 
-        // DONE!
-        private readonly Dictionary<int, int> numberOfSights = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> numberOfSights = new();
 
-        // DONE!
-        private readonly Dictionary<int, int> numberOfFrags = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> numberOfFrags = new();
 
-        // DONE!
-        private readonly Dictionary<int, int> numberOfHits = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> numberOfHits = new();
 
-        // DONE!
-        private readonly Dictionary<int, int> numberOfRetreats = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> numberOfRetreats = new();
 
-        // DONE!
-        private readonly Dictionary<int, int> numberOfShots = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> numberOfShots = new();
 
-        // TODO!
-        private readonly Dictionary<int, int> numberOfSuicides = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> numberOfSuicides = new();
 
-        // DONE!
-        private readonly Dictionary<int, float> timeBetweenSights = new Dictionary<int, float>();
+        private readonly Dictionary<int, float> timeBetweenSights = new();
 
-        // DONE!
-        private readonly Dictionary<int, float> timeInFight = new Dictionary<int, float>();
+        private readonly Dictionary<int, float> timeInFight = new();
 
-        // DONE!
-        private readonly Dictionary<int, float> timeToEngage = new Dictionary<int, float>();
+        private readonly Dictionary<int, float> timeToEngage = new();
 
-        // DONE!
-        private readonly Dictionary<int, float> timeToSurrender = new Dictionary<int, float>();
+        private readonly Dictionary<int, float> timeToSurrender = new();
 
         public GameResultsAnalyzer(int bot1ID, int bot2ID)
         {
@@ -162,8 +151,7 @@ namespace Tester
 
         public Dictionary<string, object> CompileResults(float gameLength)
         {
-            // TODO Is everything done by the end of the game?
-            // e.g. killstreaks are closed, searches are over, ...
+            // TODO Is everything done by the end of the game? e.g. killstreaks are closed, searches are over, ...
 
             // Compile accuracy data
             var totalKeys = new HashSet<int>(numberOfShots.Keys);

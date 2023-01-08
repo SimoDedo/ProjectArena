@@ -17,7 +17,6 @@ namespace AI.Behaviours.Actions
     [Serializable]
     public class SelectWanderDestination : Action
     {
-        // TODO Cooldown should be only after 
         private const float UNRESTRICTED_TRAVEL_COOLDOWN = 20;
 
         private const float LOOK_AHEAD = 10f;

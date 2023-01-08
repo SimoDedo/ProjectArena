@@ -19,7 +19,6 @@ namespace Entity
         protected bool inGame = false;
         protected int originalLayer;
 
-        // TODO Move to subclasses, no reason for this to be public
         public virtual int Health { get; protected set; }
 
         // Returns whether the entity is in game or not

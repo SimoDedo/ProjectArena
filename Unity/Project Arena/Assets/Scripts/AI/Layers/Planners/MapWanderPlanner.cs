@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using AI.Layers.Memory;
-using Graph;
+using Maps.MapGenerator;
 using UnityEngine;
 using Random = UnityEngine.Random;
 

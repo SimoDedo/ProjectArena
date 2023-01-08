@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using Graph;
 using Logging;
 
 namespace Maps.MapGenerator
@@ -23,7 +22,6 @@ namespace Maps.MapGenerator
         {
             displacedAreas = initialAreas.areas.Select(it => DisplaceArea(it, borderSize)).ToArray();
             
-            // TODO Compute width? How?
             width = initialAreas.width + borderSize * 2;
             height = initialAreas.height + borderSize * 2;
             
@@ -58,7 +56,7 @@ namespace Maps.MapGenerator
 
         private void FillMap(Area[] areas, char[,] map, bool ignoreCorridors = false)
         {
-            // TODO Areas are flipped vertically. Understand why
+            // Note: Areas are flipped vertically for some reason.
             foreach (var area in areas)
             {
                 if (ignoreCorridors && area.isCorridor) continue;

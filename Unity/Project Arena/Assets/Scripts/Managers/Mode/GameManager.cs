@@ -1,7 +1,7 @@
 ﻿using System.Collections;
-using Graph;
 using Logging;
 using Managers.Map;
+using Maps.MapGenerator;
 using Others;
 using UnityEngine;
 using UnityEngine.SceneManagement;

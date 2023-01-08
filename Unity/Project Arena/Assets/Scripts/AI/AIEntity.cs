@@ -143,7 +143,7 @@ namespace AI
                 botCharacteristics.TimeBeforeReaction
             );
             DamageSensor = new DamageSensor(botCharacteristics.TimeBeforeReaction, botCharacteristics.EventReactionTimeout);
-            SoundSensor = new SoundSensor(botCharacteristics.TimeBeforeReaction, botCharacteristics.EventReactionTimeout, GetID(), head.transform, botCharacteristics.SoundThreshold); // TODO params
+            SoundSensor = new SoundSensor(botCharacteristics.TimeBeforeReaction, botCharacteristics.EventReactionTimeout, GetID(), head.transform, botCharacteristics.SoundThreshold);
             PickupMemory = new PickupMemory(this);
             PickupKnowledgeBase = new PickupActivationEstimator(this);
             NavigationSystem = new NavigationSystem(this);

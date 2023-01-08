@@ -50,9 +50,9 @@ namespace AI.GoalMachine.Goal
         public float GetScore()
         {
             if (!gunManager.HasAmmo()) return 0;
-            // TODO maybe we see enemy, but we want to run away?
             var canSee = _targetKnowledgeBase.HasSeenTarget() && entity.GetEnemy().IsAlive;
             var inverseHealthPercentage = 1f - (float) entity.Health / entity.MaxHealth;
+            // Scale score based on our health. Maybe we want to run away instead of fighting.
             return canSee ? scoreMultiplier * (1.0f - inverseHealthPercentage * LOW_HEALTH_PENALTY) : 0.0f;
         }
 

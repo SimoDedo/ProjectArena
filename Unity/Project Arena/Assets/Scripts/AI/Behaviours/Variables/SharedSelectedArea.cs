@@ -1,6 +1,6 @@
 using System;
 using BehaviorDesigner.Runtime;
-using Graph;
+using Maps.MapGenerator;
 
 namespace AI.Behaviours.Variables
 {

@@ -48,8 +48,6 @@ namespace Tester
                 return;
             }
 
-            // TODO Must adjust position according to map scale
-
             deathPositions[receivedInfo.killedEntityID].Add(new Vector2(receivedInfo.killedX, receivedInfo.killedZ));
         }
 

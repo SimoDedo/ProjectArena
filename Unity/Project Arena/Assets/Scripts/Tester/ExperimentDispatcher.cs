@@ -13,8 +13,6 @@ namespace Tester
     {
         private const string EXPERIMENT_PARAM = "-experimentType=";
 
-        private const string AI_TESTER_TEST_NAME = "AI_TESTER";
-        private const string AI_TESTER_TEST_SCENE = "AITester";
         private const string GENOME_TESTER_TEST_NAME = "BOT_GENOME_TESTER";
         private const string GENOME_TESTER_TEST_SCENE = "GenomeTester";
 
@@ -37,9 +35,6 @@ namespace Tester
 
             switch (experimentType)
             {
-                case AI_TESTER_TEST_NAME:
-                    SceneManager.LoadScene(AI_TESTER_TEST_SCENE);
-                    break;
                 case GENOME_TESTER_TEST_NAME:
                     SceneManager.LoadScene(GENOME_TESTER_TEST_SCENE);
                     break;

@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
-using Graph;
 using Managers.Mode;
+using Maps.MapGenerator;
 using UnityEngine;
 
 namespace AI.Layers.Memory

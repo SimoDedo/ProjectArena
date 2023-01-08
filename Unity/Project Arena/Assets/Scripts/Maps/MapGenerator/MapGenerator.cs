@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using Graph;
 using Others;
 using UnityEngine;
 using Random = System.Random;
@@ -284,7 +283,7 @@ namespace Maps.MapGenerator
         // TODO extract this to a new subclass, instead of having it as a virtual method implemented by nobody
         public virtual Area[] ConvertMapToAreas()
         {
-            return new Area[0];
+            return Array.Empty<Area>();
         }
 
         // Returns a new void map and saves its size.
