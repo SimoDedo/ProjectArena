@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Others;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Maps.MapAssembler
 {

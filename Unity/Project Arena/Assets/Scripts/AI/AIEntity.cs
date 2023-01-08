@@ -1,4 +1,3 @@
-using System;
 using AI.GoalMachine;
 using AI.Layers.Actuators;
 using AI.Layers.KnowledgeBase;
@@ -12,7 +11,6 @@ using Managers.Mode;
 using Others;
 using Pickables;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Utils;
 
 namespace AI

@@ -1,6 +1,5 @@
 using AI.GoalMachine.Goal;
 using BehaviorDesigner.Runtime;
-using UnityEngine;
 
 namespace AI.GoalMachine
 {

@@ -1,11 +1,9 @@
 using System;
 using AI.Behaviours.Variables;
 using AI.Layers.KnowledgeBase;
-using AI.Layers.Memory;
 using BehaviorDesigner.Runtime.Tasks;
 using Others;
 using UnityEngine;
-using UnityEngine.AI;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
 using Random = UnityEngine.Random;
 

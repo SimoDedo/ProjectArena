@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 // TODO Maybe remove this. Let the target knowledge base keep track of the last known enemy positions instead.
 namespace Entity

@@ -3,8 +3,6 @@ using System.Collections;
 using AI;
 using Logging;
 using Managers.Map;
-using Maps;
-using Maps.MapGenerator;
 using UnityEngine;
 
 namespace Managers.Mode

@@ -1,16 +1,12 @@
 using System;
-using System.Linq;
-using System.Numerics;
 using AI.Layers.KnowledgeBase;
 using BehaviorDesigner.Runtime.Tasks;
 using Entity.Component;
 using Others;
-using Entity;
 using UnityEngine;
 using UnityEngine.AI;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
 using Random = UnityEngine.Random;
-using Vector3 = UnityEngine.Vector3;
 
 namespace AI.Behaviours.Actions
 {

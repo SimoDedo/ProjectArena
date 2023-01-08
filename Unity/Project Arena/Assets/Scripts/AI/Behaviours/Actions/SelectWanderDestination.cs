@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using AI.Behaviours.Variables;
 using AI.Layers.Actuators;
 using AI.Layers.KnowledgeBase;

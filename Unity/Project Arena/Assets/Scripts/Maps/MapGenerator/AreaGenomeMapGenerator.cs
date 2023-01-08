@@ -1,7 +1,7 @@
+using System;
 using System.Linq;
 using Graph;
 using Logging;
-using Maps.Genomes;
 
 namespace Maps.MapGenerator
 {
@@ -72,7 +72,7 @@ namespace Maps.MapGenerator
 
         public override string ConvertMapToAB(bool exportObjects = true)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override Area[] ConvertMapToAreas()

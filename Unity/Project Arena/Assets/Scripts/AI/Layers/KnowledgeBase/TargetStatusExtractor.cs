@@ -1,6 +1,5 @@
 using System;
 using AI.Layers.Memory;
-using ScriptableObjectArchitecture;
 using UnityEngine;
 
 namespace AI.Layers.KnowledgeBase
