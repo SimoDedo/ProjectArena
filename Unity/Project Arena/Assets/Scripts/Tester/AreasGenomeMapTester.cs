@@ -140,14 +140,14 @@ namespace Tester
         {
             analyzer.Reset();
             
-            var bot1JsonParams = ReadFromFile<JSonBotCharacteristics>(botsPath + bot1ParamsFilenamePrefix + "params.json");
+            var bot1JsonParams = ReadFromFile<JSonBotCharacteristics>(botsPath + bot1ParamsFilenamePrefix + "_params.json");
             var bot1Params = new BotCharacteristics(bot1SkillLevel, bot1JsonParams);
             
-            var bot2JsonParams = ReadFromFile<JSonBotCharacteristics>(botsPath + bot2ParamsFilenamePrefix + "params.json");
+            var bot2JsonParams = ReadFromFile<JSonBotCharacteristics>(botsPath + bot2ParamsFilenamePrefix + "_params.json");
             var bot2Params = new BotCharacteristics(bot2SkillLevel, bot2JsonParams);
 
-            var activeGunsBot1 = ReadFromFile<bool[]>(botsPath + bot1ParamsFilenamePrefix + "guns.json");
-            var activeGunsBot2 = ReadFromFile<bool[]>(botsPath + bot2ParamsFilenamePrefix + "guns.json");
+            var activeGunsBot1 = ReadFromFile<bool[]>(botsPath + bot1ParamsFilenamePrefix + "_guns.json");
+            var activeGunsBot2 = ReadFromFile<bool[]>(botsPath + bot2ParamsFilenamePrefix + "_guns.json");
 
             var genome = ReadFromFile<AreasGenome>(genomesPath + folderName + genomeName);
             genomeMapGenerator.SetGenome(genome);
