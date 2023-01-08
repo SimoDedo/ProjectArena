@@ -52,7 +52,7 @@ namespace AI.Behaviours.Actions
             target = entity.GetEnemy();
             targetTransform = target.transform;
 
-            skill = entity.FightingSkill;
+            skill = entity.Characteristics.FightingSkill;
             strifeMovementWeight = 0.5f * skill * 0.5f;
             isStrafing = Random.value < skill;
             isStrafingRight = Random.value < 0.5f;
@@ -193,8 +193,10 @@ namespace AI.Behaviours.Actions
             var (closeRange, farRange) = gunManager.GetCurrentGunOptimalRange();
             var rangeSize = farRange - closeRange;
 
-            var skillAdjustedCloseRange = closeRange + rangeSize * entity.GunMovementCorrectness / 100;
-            var skillAdjustedFarRange = farRange + rangeSize * entity.GunMovementCorrectness / 100;
+            var skillAdjustedCloseRange = closeRange + rangeSize * 
+                entity.Characteristics.GunMovementCorrectness / 100;
+            var skillAdjustedFarRange = farRange + rangeSize * 
+                entity.Characteristics.GunMovementCorrectness / 100;
 
             if (distance < skillAdjustedCloseRange)
             {

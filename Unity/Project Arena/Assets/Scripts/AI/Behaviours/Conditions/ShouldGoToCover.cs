@@ -32,10 +32,10 @@ namespace AI.Behaviours.Conditions
         public override void OnAwake()
         {
             entity = gameObject.GetComponent<AIEntity>();
-            canSelectCoverProbability = entity.CanSelectCoverProbability;
+            canSelectCoverProbability = entity.Characteristics.CanSelectCoverProbability;
             enemy = entity.GetEnemy();
             gunManager = entity.GunManager;
-            var recklessness = entity.Recklessness;
+            var recklessness = entity.Characteristics.Recklessness;
             switch (recklessness)
             {
                 case Recklessness.High:

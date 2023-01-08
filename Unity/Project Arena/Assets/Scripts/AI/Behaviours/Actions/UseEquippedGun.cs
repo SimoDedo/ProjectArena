@@ -51,15 +51,15 @@ namespace AI.Behaviours.Actions
             gunManager = entity.GunManager;
             _targetKnowledgeBase = entity.TargetKnowledgeBase;
             sightController = entity.SightController;
-            aimingDispersionMaxAngle = entity.AimingDispersionAngle;
-            acceptableShootingAngle = entity.AcceptableShootingAngle;
+            aimingDispersionMaxAngle = entity.Characteristics.AimingDispersionAngle;
+            acceptableShootingAngle = entity.Characteristics.AcceptableShootingAngle;
             enemy = entity.GetEnemy();
             enemyPositionTracker = enemy.GetComponent<PositionTracker>();
 
-            var mean = entity.UncorrectableAimDelayAverage;
+            var mean = entity.Characteristics.UncorrectableAimDelayAverage;
             const float stdDev = 0.06f;
 
-            correctableAimDelay = entity.CorrectableAimDelay;
+            correctableAimDelay = entity.Characteristics.CorrectableAimDelay;
             
             distribution = new NormalDistribution(mean, stdDev);
             targetReflexDelay = (float) distribution.Generate();

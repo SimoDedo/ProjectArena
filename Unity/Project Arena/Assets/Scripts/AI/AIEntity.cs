@@ -12,6 +12,7 @@ using Managers.Mode;
 using Others;
 using Pickables;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Utils;
 
 namespace AI
@@ -23,7 +24,7 @@ namespace AI
     {
         [SerializeField] private GameObject head;
 
-        [SerializeField] private BotCharacteristics botParams = BotCharacteristics.Default;
+        [SerializeField] private BotCharacteristics botCharacteristics = BotCharacteristics.Default;
         
         [SerializeField] private Entity.Entity enemy;
 
@@ -41,6 +42,7 @@ namespace AI
         private bool mustProcessDeath;
         public override int Health => health;
         public int MaxHealth => totalHealth;
+        public override bool IsAlive => isActiveAndEnabled && (health > 0 || mustProcessDeath);
         public TargetMemory TargetMemory { get; private set; }
 
         public TargetKnowledgeBase TargetKnowledgeBase { get; private set; }
@@ -68,22 +70,8 @@ namespace AI
         public MapMemory MapMemory { get; private set; }
 
         public MapWanderPlanner MapWanderPlanner { get; private set; }
-
-
-        public override bool IsAlive => isActiveAndEnabled && (health > 0 || mustProcessDeath);
-        public float FightingSkill => botParams.FightingSkill;
-        public float GunMovementCorrectness => botParams.GunMovementCorrectness;
-        public float FightBackWhenCollectingPickup => botParams.FightBackWhenCollectingPickup;
-        public float DodgeRocketProbability => botParams.DodgeRocketProbability;
+        public BotCharacteristics Characteristics => botCharacteristics;
         
-        public float CanSelectCoverProbability => botParams.CanSelectCoverProbability;
-
-        public float UncorrectableAimDelayAverage => botParams.UncorrectableAimDelayAverage;
-        public float CorrectableAimDelay => botParams.CorrectableAimDelay;
-        public float AimingDispersionAngle => botParams.AimingDispersionAngle; 
-        public float AcceptableShootingAngle => botParams.AcceptableShootingAngle; 
-        public Recklessness Recklessness => botParams.Recklessness;
-
         private LoggingComponent loggingComponent;
 
         private void Update()
@@ -139,25 +127,25 @@ namespace AI
         // Prepares all the AI components
         private void PrepareComponents(GameManager gms, bool[] ag)
         {
-            MovementController = new MovementController(this, botParams.Speed);
+            MovementController = new MovementController(this, botCharacteristics.Speed);
             SightController =
-                new SightController(this, head, botParams.CameraSpeed, botParams.CameraAcceleration);
-            SightSensor = new SightSensor(head, botParams.MaxRange, botParams.FOV);
+                new SightController(this, head, botCharacteristics.CameraSpeed, botCharacteristics.CameraAcceleration);
+            SightSensor = new SightSensor(head, botCharacteristics.MaxRange, botCharacteristics.FOV);
             MapMemory = new MapMemory(this, gms);
             MapWanderPlanner = new MapWanderPlanner(this);
             TargetMemory = new TargetMemory(
                 this,
                 enemy,
-                botParams.MemoryWindow
+                botCharacteristics.MemoryWindow
             );
             TargetKnowledgeBase = new TargetKnowledgeBase(
                 this,
                 enemy,
-                botParams.DetectionWindow,
-                botParams.TimeBeforeReaction
+                botCharacteristics.DetectionWindow,
+                botCharacteristics.TimeBeforeReaction
             );
-            DamageSensor = new DamageSensor(botParams.TimeBeforeReaction, botParams.EventReactionTimeout);
-            SoundSensor = new SoundSensor(botParams.TimeBeforeReaction, botParams.EventReactionTimeout, GetID(), head.transform, botParams.SoundThreshold); // TODO params
+            DamageSensor = new DamageSensor(botCharacteristics.TimeBeforeReaction, botCharacteristics.EventReactionTimeout);
+            SoundSensor = new SoundSensor(botCharacteristics.TimeBeforeReaction, botCharacteristics.EventReactionTimeout, GetID(), head.transform, botCharacteristics.SoundThreshold); // TODO params
             PickupMemory = new PickupMemory(this);
             PickupKnowledgeBase = new PickupActivationEstimator(this);
             NavigationSystem = new NavigationSystem(this);
@@ -322,7 +310,7 @@ namespace AI
         /// </summary>
         public CuriosityLevel GetCuriosity()
         {
-            return botParams.Curiosity;
+            return botCharacteristics.Curiosity;
         }
 
         /// <summary>
@@ -330,7 +318,7 @@ namespace AI
         /// </summary>
         public float GetPredictionSkill()
         {
-            return botParams.Prediction;
+            return botCharacteristics.Prediction;
         }
 
         /// <summary>
@@ -354,7 +342,7 @@ namespace AI
         /// </summary>
         public void SetCharacteristics(BotCharacteristics botParams)
         {
-            this.botParams = botParams;
+            this.botCharacteristics = botParams;
         }
 
         private void OnDestroy()

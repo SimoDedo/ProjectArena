@@ -25,7 +25,7 @@ namespace AI.Behaviours.Conditions
             var entity = GetComponent<AIEntity>();
             damageSensor = entity.DamageSensor;
             soundSensor = entity.SoundSensor;
-            probabilityFightBack = entity.FightBackWhenCollectingPickup;
+            probabilityFightBack = entity.Characteristics.FightBackWhenCollectingPickup;
 
             nameToRemove = entity.name;
         }

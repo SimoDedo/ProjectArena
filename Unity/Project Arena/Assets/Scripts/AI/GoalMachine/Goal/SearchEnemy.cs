@@ -30,7 +30,7 @@ namespace AI.GoalMachine.Goal
         {
             this.entity = entity;
             _targetKnowledgeBase = entity.TargetKnowledgeBase;
-            _recklessness = entity.Recklessness;
+            _recklessness = entity.Characteristics.Recklessness;
             damageSensor = entity.DamageSensor;
             soundSensor = entity.SoundSensor;
             externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/SearchEnemy");

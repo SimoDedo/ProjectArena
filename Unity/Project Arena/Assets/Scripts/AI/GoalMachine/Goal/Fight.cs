@@ -25,7 +25,7 @@ namespace AI.GoalMachine.Goal
         {
             this.entity = entity;
             _targetKnowledgeBase = entity.TargetKnowledgeBase;
-            var recklessness = entity.Recklessness;
+            var recklessness = entity.Characteristics.Recklessness;
             switch (recklessness)
             {
                 case Recklessness.Low:

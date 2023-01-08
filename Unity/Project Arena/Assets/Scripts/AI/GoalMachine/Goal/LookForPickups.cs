@@ -24,7 +24,7 @@ namespace AI.GoalMachine.Goal
         public LookForPickups(AIEntity entity)
         {
             pickupPlanner = entity.PickupPlanner;
-            var recklessness = entity.Recklessness;
+            var recklessness = entity.Characteristics.Recklessness;
             switch (recklessness)
             {
                 case Recklessness.Low:

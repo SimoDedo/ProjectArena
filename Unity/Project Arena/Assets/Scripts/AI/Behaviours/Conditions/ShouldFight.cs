@@ -24,7 +24,7 @@ namespace AI.Behaviours.Conditions
         {
             entity = GetComponent<AIEntity>();
             _targetKnowledgeBase = entity.TargetKnowledgeBase;
-            probabilityFightBack = entity.FightBackWhenCollectingPickup;
+            probabilityFightBack = entity.Characteristics.FightBackWhenCollectingPickup;
         }
 
         public override void OnStart()
