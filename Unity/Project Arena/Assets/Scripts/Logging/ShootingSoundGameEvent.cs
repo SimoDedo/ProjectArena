@@ -1,4 +1,4 @@
-using ScriptableObjectArchitecture;
+using Events;
 using UnityEngine;
 
 namespace Logging
@@ -19,7 +19,7 @@ namespace Logging
     {
     }
 
-    public class ShootingSoundGameEvent : ScriptableObjectSingleton<BaseShootingSoundGameEvent>
+    public class ShootingSoundGameEvent : ClassSingleton<BaseShootingSoundGameEvent>
     {
     }
 }

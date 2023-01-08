@@ -1,4 +1,4 @@
-using ScriptableObjectArchitecture;
+using Events;
 
 namespace Logging
 {
@@ -17,7 +17,7 @@ namespace Logging
     {
     }
 
-    public sealed class HitInfoGameEvent : ScriptableObjectSingleton<BaseHitInfoGameEvent>
+    public sealed class HitInfoGameEvent : ClassSingleton<BaseHitInfoGameEvent>
     {
     }
 }

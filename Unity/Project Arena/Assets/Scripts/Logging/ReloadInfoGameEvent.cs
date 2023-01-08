@@ -1,4 +1,4 @@
-using ScriptableObjectArchitecture;
+using Events;
 
 namespace Logging
 {
@@ -15,7 +15,7 @@ namespace Logging
     {
     }
 
-    public sealed class ReloadInfoGameEvent : ScriptableObjectSingleton<BaseReloadInfoGameEvent>
+    public sealed class ReloadInfoGameEvent : ClassSingleton<BaseReloadInfoGameEvent>
     {
     }
 }

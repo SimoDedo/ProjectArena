@@ -1,4 +1,4 @@
-using ScriptableObjectArchitecture;
+using Events;
 
 namespace Logging
 {
@@ -25,7 +25,7 @@ namespace Logging
     {
     }
 
-    public class EntityGameMetricsGameEvent : ScriptableObjectSingleton<BaseEntityGameMetricsGameEvent>
+    public class EntityGameMetricsGameEvent : ClassSingleton<BaseEntityGameMetricsGameEvent>
     {
     }
 }

@@ -1,4 +1,4 @@
-using ScriptableObjectArchitecture;
+using Events;
 
 namespace Logging
 {
@@ -13,7 +13,7 @@ namespace Logging
         
     }
 
-    public class FocusingOnEnemyGameEvent : ScriptableObjectSingleton<BaseFocusingOnEnemyGameEvent>
+    public class FocusingOnEnemyGameEvent : ClassSingleton<BaseFocusingOnEnemyGameEvent>
     {
         
     }

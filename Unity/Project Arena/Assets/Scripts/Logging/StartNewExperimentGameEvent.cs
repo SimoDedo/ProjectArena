@@ -1,4 +1,4 @@
-using ScriptableObjectArchitecture;
+using Events;
 
 namespace Logging
 {
@@ -6,7 +6,7 @@ namespace Logging
     {
     }
 
-    public sealed class StartNewExperimentGameEvent : ScriptableObjectSingleton<BaseStartNewExperimentGameEvent>
+    public sealed class StartNewExperimentGameEvent : ClassSingleton<BaseStartNewExperimentGameEvent>
     {
     }
 }

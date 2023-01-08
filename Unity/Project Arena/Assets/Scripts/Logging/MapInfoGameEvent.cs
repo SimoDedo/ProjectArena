@@ -1,4 +1,4 @@
-using ScriptableObjectArchitecture;
+using Events;
 
 namespace Logging
 {
@@ -14,7 +14,7 @@ namespace Logging
     {
     }
 
-    public sealed class MapInfoGameEvent : ScriptableObjectSingleton<BaseMapInfoGameEvent>
+    public sealed class MapInfoGameEvent : ClassSingleton<BaseMapInfoGameEvent>
     {
     }
 }

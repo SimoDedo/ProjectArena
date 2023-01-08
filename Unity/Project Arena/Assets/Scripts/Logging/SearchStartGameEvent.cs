@@ -1,4 +1,4 @@
-using ScriptableObjectArchitecture;
+using Events;
 
 namespace Logging
 {
@@ -10,7 +10,7 @@ namespace Logging
     {
     }
 
-    public sealed class SearchStartGameEvent : ScriptableObjectSingleton<BaseSearchStartGameEvent>
+    public sealed class SearchStartGameEvent : ClassSingleton<BaseSearchStartGameEvent>
     {
     }
 }

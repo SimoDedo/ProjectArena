@@ -1,4 +1,4 @@
-using ScriptableObjectArchitecture;
+using Events;
 
 namespace Logging
 {
@@ -10,7 +10,7 @@ namespace Logging
     {
     }
 
-    public sealed class EnemyInSightGameEvent : ScriptableObjectSingleton<BaseEnemyInSightGameEvent>
+    public sealed class EnemyInSightGameEvent : ClassSingleton<BaseEnemyInSightGameEvent>
     {
     }
 }

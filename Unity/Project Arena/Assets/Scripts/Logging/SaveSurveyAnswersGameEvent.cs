@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using Events;
 using Logging.Logging.Survey;
-using ScriptableObjectArchitecture;
 
 namespace Logging
 {
@@ -8,7 +8,7 @@ namespace Logging
     {
     }
 
-    public sealed class SaveSurveyAnswersGameEvent : ScriptableObjectSingleton<BaseSaveSurveyAnswersGameEvent>
+    public sealed class SaveSurveyAnswersGameEvent : ClassSingleton<BaseSaveSurveyAnswersGameEvent>
     {
     }
 }
