@@ -987,11 +987,11 @@ MonoBehaviour:
   headCamera: {fileID: 20788917190633434}
   muzzleFlash: {fileID: 1172488531380796}
   damage: 75
-  normalDispersion: 4
+  normalDispersion: 6
   aimingDispersion: 0
   projectilesPerShot: 1
   infinteAmmo: 1
-  chargerSize: 5
+  chargerSize: 6
   maximumAmmo: 20
   reloadTime: 1
   cooldownTime: 1.2
@@ -3578,9 +3578,9 @@ MonoBehaviour:
   damage: 9
   normalDispersion: 5
   aimingDispersion: 5
-  projectilesPerShot: 5
+  projectilesPerShot: 8
   infinteAmmo: 1
-  chargerSize: 4
+  chargerSize: 6
   maximumAmmo: 20
   reloadTime: 1
   cooldownTime: 0.75
@@ -3612,8 +3612,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c8f11410b65469bb5e6162f2edb125b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minRangeBest: 8
-  maxRangeBest: 15
+  minRangeBest: 10
+  maxRangeBest: 18
   controlPoints:
   - distance: 15
     score: 1

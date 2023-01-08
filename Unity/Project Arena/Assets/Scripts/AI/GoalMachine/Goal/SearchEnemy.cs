@@ -23,7 +23,8 @@ namespace AI.GoalMachine.Goal
         private readonly SoundSensor soundSensor;
         private Recklessness _recklessness;
         private bool resetInUpdate;
-        private float startSearchTime = NO_TIME;
+
+        private float searchTriggeringEventTime = NO_TIME;
 
         public SearchEnemy(AIEntity entity)
         {
@@ -38,60 +39,54 @@ namespace AI.GoalMachine.Goal
             behaviorTree.RestartWhenComplete = true;
             behaviorTree.ExternalBehavior = externalBt;
         }
-
+        
         public float GetScore()
         {
-            if (!entity.GetEnemy().IsAlive)
+            if (!entity.GetEnemy().IsAlive || _targetKnowledgeBase.HasSeenTarget())
             {
-                // Nothing to search
                 return 0f;
             }
 
-            // ReSharper disable once CompareOfFloatsByEqualityOperator
-            if (startSearchTime != NO_TIME)
-            {
-                // We are already searching the enemy, slowly decrease will to search based on how much time has elapsed
-                var lastEventTime = Mathf.Max(
-                    damageSensor.WasDamagedRecently ? damageSensor.LastTimeDamaged : float.MinValue,
-                    soundSensor.HeardShotRecently ? soundSensor.LastTimeHeardShot : float.MinValue
-                    );
-                if (lastEventTime > startSearchTime)
-                {
-                    // We get damaged or heard noise again, reset score.
-                    resetInUpdate = true;
-                    return 0.7f;
-                }
-                resetInUpdate = false;
-                return 1f - (Time.time - startSearchTime) / 10f;
-            }
+            var mostRecentEvent = MostRecentEventTimeOrNoTime();
 
-            resetInUpdate = false;
-
-            // TODO set triggering event here
-            var searchDueToLoss = _targetKnowledgeBase.HasLostTarget();
-            if (searchDueToLoss)
+            if (mostRecentEvent == NO_TIME)
             {
-                return _recklessness switch
-                {
-                    Recklessness.Low => 0.3f,
-                    Recklessness.Neutral => 0.6f,
-                    Recklessness.High => 0.9f,
-                    _ => throw new ArgumentOutOfRangeException()
-                };
+                return 0f;
             }
             
-            var searchDueToSuspectedEnemy = !_targetKnowledgeBase.HasSeenTarget() && 
-                                            (damageSensor.WasDamagedRecently || soundSensor.HeardShotRecently);
-            return searchDueToSuspectedEnemy ? 0.7f : 0.0f;
+            var maxScore = _recklessness switch
+            {
+                Recklessness.Low => 0.6f,
+                Recklessness.Neutral => 0.85f,
+                Recklessness.High => 1.0f,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            var score = Mathf.Max(maxScore - (Time.time - mostRecentEvent) / 10f, 0f);
+
+            if (searchTriggeringEventTime != NO_TIME && searchTriggeringEventTime != mostRecentEvent)
+            {
+                // I'm already searching but I received a new event. Forcibly cause update
+                searchTriggeringEventTime = mostRecentEvent;
+                resetInUpdate = true;
+            }
+            else
+            {
+                resetInUpdate = false;
+            }
+
+            return score;
         }
 
         public void Enter()
         {
-            FocusingOnEnemyGameEvent.Instance.Raise(new FocusOnEnemyInfo {entityID = entity.GetID(), isFocusing = true});
+            FocusingOnEnemyGameEvent.Instance.Raise(new FocusOnEnemyInfo
+                {entityID = entity.GetID(), isFocusing = true}
+            );
             behaviorTree.EnableBehavior();
             BehaviorManager.instance.RestartBehavior(behaviorTree);
-            // TODO searchStartTime should be replaced by last time enemy detected / last time took damage
-            startSearchTime = Time.time;
+
+            searchTriggeringEventTime = MostRecentEventTimeOrNoTime();
         }
 
         public void Update()
@@ -101,14 +96,40 @@ namespace AI.GoalMachine.Goal
                 Exit();
                 Enter();
             }
+
             BehaviorManager.instance.Tick(behaviorTree);
         }
 
         public void Exit()
         {
-            startSearchTime = NO_TIME;
-            FocusingOnEnemyGameEvent.Instance.Raise(new FocusOnEnemyInfo {entityID = entity.GetID(), isFocusing = false});
+            searchTriggeringEventTime = NO_TIME;
+            FocusingOnEnemyGameEvent.Instance.Raise(
+                new FocusOnEnemyInfo {entityID = entity.GetID(), isFocusing = false});
             behaviorTree.DisableBehavior();
+        }
+
+        private float RecentLossTimeOrNoTime()
+        {
+            return _targetKnowledgeBase.HasLostTarget() ? _targetKnowledgeBase.LastTimeDetected : NO_TIME;
+        }
+
+        private float LastRecentDamageTimeOrNoTime()
+        {
+            return damageSensor.WasDamagedRecently ? damageSensor.LastTimeDamaged : NO_TIME;
+        }
+
+        private float LastRecentNoiseTimeOrNoTime()
+        {
+            return soundSensor.HeardShotRecently ? soundSensor.LastTimeHeardShot : NO_TIME;
+        }
+
+        private float MostRecentEventTimeOrNoTime()
+        {
+            var timeNoise = LastRecentNoiseTimeOrNoTime();
+            var timeDamage = LastRecentDamageTimeOrNoTime();
+            var timeLost = RecentLossTimeOrNoTime();
+
+            return Mathf.Max(timeNoise, Mathf.Max(timeDamage, timeLost));
         }
     }
 }

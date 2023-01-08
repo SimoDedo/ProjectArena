@@ -360,8 +360,8 @@ MonoBehaviour:
     placeAnywhere: 0
     positioningMethod: 1
   - objectChar: 115
-    numObjPerMap: 6
-    placeAnywhere: 1
+    numObjPerMap: 100
+    placeAnywhere: 0
     positioningMethod: 1
   createTextFile: 0
   textFilePath: 
@@ -592,10 +592,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   botPrefab: {fileID: 1128226087601874, guid: 87c5267e1886311258a6f48dac81a1ca, type: 3}
   genomeName: heatmap.json
-  bot1ParamsFilenamePrefix: sniper_
-  bot1SkillLevel: 1
+  bot1ParamsFilenamePrefix: assault_
+  bot1SkillLevel: 0
   bot2ParamsFilenamePrefix: assault_
-  bot2SkillLevel: 1
+  bot2SkillLevel: 0.6
   mapManager: {fileID: 516550950}
   genomeMapGenerator: {fileID: 296767516}
   mapAssembler: {fileID: 1083789689}

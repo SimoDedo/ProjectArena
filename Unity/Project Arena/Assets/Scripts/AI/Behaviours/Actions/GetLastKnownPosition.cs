@@ -97,6 +97,7 @@ namespace AI.Behaviours.Actions
 
             var myPosition = transform.position;
             var direction = enemyPos - myPosition;
+            // We multiply x2 here in order to not use the exact enemy location
             var distance = direction.magnitude * 2f;
             if (Physics.Raycast(myPosition, direction, out var hit, distance, layerMask))
             {
@@ -109,7 +110,7 @@ namespace AI.Behaviours.Actions
                 var pointOnLine = myPosition + chosenDistance * direction.normalized;
 
                 // size of radius is 1/3 of the distance, so we avoid looking behind us
-                var radiusSize = hit.distance * Random.value * 0.3f;
+                var radiusSize = distance * Random.value * 0.3f;
                 var circle = Random.insideUnitCircle * radiusSize;
                 var chosenPos = pointOnLine;
                 chosenPos.x += circle.x;

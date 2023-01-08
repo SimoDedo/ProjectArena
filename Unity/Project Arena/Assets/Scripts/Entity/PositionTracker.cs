@@ -5,8 +5,6 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-// TODO the circularQueue is dependent on the FPS of the game. Bad refresh rate will cause the positions
-// to go even more in the past
 // TODO Maybe remove this. Let the target knowledge base keep track of the last known enemy positions instead.
 namespace Entity
 {

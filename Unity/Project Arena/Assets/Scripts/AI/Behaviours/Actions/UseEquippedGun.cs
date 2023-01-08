@@ -41,6 +41,9 @@ namespace AI.Behaviours.Actions
 
         private float aimingDispersionFirstAngle;
         private float aimingDispersionSecondAngle;
+
+        private float correctableAimDelay;
+        
         private int layerMask = LayerMask.GetMask("Default", "Wall", "Entity");
         public override void OnAwake()
         {
@@ -53,9 +56,11 @@ namespace AI.Behaviours.Actions
             enemy = entity.GetEnemy();
             enemyPositionTracker = enemy.GetComponent<PositionTracker>();
 
-            var mean = entity.AimDelayAverage;
+            var mean = entity.UncorrectableAimDelayAverage;
             const float stdDev = 0.06f;
 
+            correctableAimDelay = entity.CorrectableAimDelay;
+            
             distribution = new NormalDistribution(mean, stdDev);
             targetReflexDelay = (float) distribution.Generate();
             aimingDispersionFirstAngle = Random.Range(0, aimingDispersionMaxAngle);
@@ -125,11 +130,11 @@ namespace AI.Behaviours.Actions
                 previousReflexDelay + (targetReflexDelay - previousReflexDelay) * aimTargetProgress
             );
             
-            const float correctableDelay = 0.2f;
-            var totalDelay = uncorrectableDelay + correctableDelay;
+            
+            var totalDelay = uncorrectableDelay + correctableAimDelay;
             
             Vector3 enemyPosition;
-            var estimatedVelocity = enemyPositionTracker.GetAverageVelocity(0.5f);
+            var estimatedVelocity = enemyPositionTracker.GetAverageVelocity(correctableAimDelay);
 
             if (!float.IsNaN(lastSightedDelay) && lastSightedDelay > totalDelay)
                 // We don't know the exact position of the enemy currentDelay ago, so just consider
@@ -138,7 +143,7 @@ namespace AI.Behaviours.Actions
             else
             {
                 enemyPosition = enemyPositionTracker.GetPositionAtTime(Time.time - totalDelay) + 
-                                correctableDelay * estimatedVelocity;
+                                correctableAimDelay * estimatedVelocity;
             }
 
             return new Tuple<Vector3, Vector3>(enemyPosition, estimatedVelocity);

@@ -23,7 +23,7 @@ namespace AI.Layers.KnowledgeBase
         {
             this.me = me;
             transform = me.transform;
-            acceleration = 100;
+            acceleration = 10000;
             angularSpeed = 1000000;
         }
 

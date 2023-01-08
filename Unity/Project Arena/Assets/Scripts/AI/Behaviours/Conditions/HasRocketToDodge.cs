@@ -21,7 +21,6 @@ namespace AI.Behaviours.Conditions
         private static readonly Collider[] RocketTestCollider = new Collider[4];
         [SerializeField] private SharedTransform rocketToDodge;
         private int layerMask;
-        private FightingMovementSkill movementSkill;
         private int myID;
         private SightSensor sightSensor;
 

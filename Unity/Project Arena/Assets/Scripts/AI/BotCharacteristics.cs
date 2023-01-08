@@ -21,7 +21,7 @@ namespace AI
         
         [DataMember] [Range(0.5f, 1.5f)] public readonly float movementSkill = 0.5f;
 
-        [DataMember] [Range(0.5f, 1.5f)] public readonly float curiosity = 0.5f;// TODO understand if we can turn this into something continuous
+        [DataMember] [Range(0.5f, 1.5f)] public readonly float curiosity = 0.5f;
         
         // Parameters not influenced by general skill
         [DataMember] public readonly float speed = 16f;
@@ -52,15 +52,14 @@ namespace AI
         }
 
         // Abilities directly usable by bot
-        // TODO Define max and min depending on bot generalSkill and specific ability to help you 
-        // better control the influence of the ability scores.
         public float CameraSpeed => Interpolate(MIN_EYE_SPEED, MAX_EYE_SPEED, ScaleScore(generalSkill,c.eyeSpeed));
         public float CameraAcceleration => Interpolate(MIN_EYE_SPEED, MAX_EYE_SPEED, ScaleScore(generalSkill,c.eyeSpeed));
         public float MemoryWindow => Interpolate(MIN_MEMORY_WINDOW, MAX_MEMORY_WINDOW, ScaleScore(generalSkill,c.reflex));
         public float DetectionWindow => Interpolate(MIN_DETECTION_WINDOW, MAX_DETECTION_WINDOW, ScaleScore(generalSkill,c.reflex));
         public float TimeBeforeReaction => Interpolate(MIN_TIME_BEFORE_REACTION, MAX_TIME_BEFORE_REACTION, 1.0f - ScaleScore(generalSkill,c.reflex));
         public float Prediction => Interpolate(MIN_PREDICTION, MAX_PREDICTION, ScaleScore(generalSkill, c.prediction));
-        public float AimDelayAverage => Interpolate(MIN_AIM_DELAY_AVERAGE, MAX_AIM_DELAY_AVERAGE, 1.0f - ScaleScore(generalSkill, c.aiming));
+        public float UncorrectableAimDelayAverage => Interpolate(MIN_UNCORRECTABLE_AIM_DELAY_AVERAGE, MAX_UNCORRECTABLE_AIM_DELAY_AVERAGE, 1.0f - ScaleScore(generalSkill, c.aiming));
+        public float CorrectableAimDelay => Interpolate(MIN_CORRECTABLE_AIM_DELAY, MAX_CORRECTABLE_AIM_DELAY, 1.0f - ScaleScore(generalSkill, c.aiming));
         public float AimingDispersionAngle => Interpolate(MIN_AIM_DISPERSION_ANGLE, MAX_AIM_DISPERSION_ANGLE, 1.0f - ScaleScore(generalSkill, c.aiming));
         public float AcceptableShootingAngle => Interpolate(MIN_ACCEPTABLE_SHOOTING_ANGLE, MAX_ACCEPTABLE_SHOOTING_ANGLE, 1.0f - ScaleScore(generalSkill, c.aiming));
         public float Speed => c.speed;
@@ -73,30 +72,25 @@ namespace AI
                 return c.fov + c.fov * percentage;
             }
         }
-        public float StandStillInFightProbability => Interpolate(MIN_STAND_STILL_IN_FIGHT, MAX_STAND_STILL_IN_FIGHT, 1.0f - ScaleScore(generalSkill, c.movementSkill));
-        public float RandomlyMoveInFightProbability => Interpolate(MIN_RANDOM_MOVE_IN_FIGHT, MAX_RANDOM_MOVE_IN_FIGHT, 1.0f - ScaleScore(generalSkill, c.movementSkill));
-        public float GunMovementCorrectness => Interpolate(MIN_DEVIATION_FROM_OPTIMAL_RANGE, MAX_DEVIATION_FROM_OPTIMAL_RANGE, 1.0f - ScaleScore(generalSkill, c.movementSkill));
 
+        public float FightingSkill => ScaleScore(generalSkill, c.movementSkill);
+        public float GunMovementCorrectness => Interpolate(MIN_DEVIATION_FROM_OPTIMAL_RANGE, MAX_DEVIATION_FROM_OPTIMAL_RANGE, 1.0f - ScaleScore(generalSkill, c.movementSkill));
         public float FightBackWhenCollectingPickup => Interpolate(MIN_FIGHT_BACK_WHEN_PICKUP, MAX_FIGHT_BACK_WHEN_PICKUP, ScaleScore(generalSkill, c.movementSkill));
         public float DodgeRocketProbability => Interpolate(MIN_DODGE_ROCKET_PROBABILITY, MAX_DODGE_ROCKET_PROBABILITY, ScaleScore(generalSkill, c.movementSkill));
         public float CanSelectCoverProbability => Interpolate(MIN_CAN_SELECT_COVER_PROBABILITY, MAX_CAN_SELECT_COVER_PROBABILITY, ScaleScore(generalSkill, c.movementSkill));
 
+        // TODO understand if we can turn this into something continuous.
         public CuriosityLevel Curiosity
         {
             get
             {
                 var score = ScaleScore(generalSkill, c.curiosity);
-                if (score < 0.3f)
+                return score switch
                 {
-                    return CuriosityLevel.Low;
-                }
-
-                if (score < 0.7f)
-                {
-                    return CuriosityLevel.Medium;
-                }
-
-                return CuriosityLevel.High;
+                    < 0.3f => CuriosityLevel.Low,
+                    < 0.7f => CuriosityLevel.Medium,
+                    _ => CuriosityLevel.High
+                };
             }
         }
         public Recklessness Recklessness => c.recklessness;
@@ -124,10 +118,6 @@ namespace AI
         private const float MAX_TIME_BEFORE_REACTION = 0.5f;
         private const float MIN_PREDICTION = 0.1f;
         private const float MAX_PREDICTION = 0.8f;
-        private const float MIN_STAND_STILL_IN_FIGHT = -1.0f;
-        private const float MAX_STAND_STILL_IN_FIGHT = 0.6f;
-        private const float MIN_RANDOM_MOVE_IN_FIGHT = -0.0f;
-        private const float MAX_RANDOM_MOVE_IN_FIGHT = 0.5f;
         private const float MIN_DEVIATION_FROM_OPTIMAL_RANGE = 5.0f;
         private const float MAX_DEVIATION_FROM_OPTIMAL_RANGE = 20.0f;
         private const float MIN_FIGHT_BACK_WHEN_PICKUP = -0.5f;
@@ -141,14 +131,17 @@ namespace AI
         // worst ~5% of the times. 
         // Check from (example) WolframAlpha: 
         // integrate 1/(sqrt(2*pi)*s)*e^(-(x-m)^2/(2*s^2)) from -infinity to 0 with s = 0.06 and m = <mean>
-        private const float MIN_AIM_DELAY_AVERAGE = -0.025f;
-        private const float MAX_AIM_DELAY_AVERAGE = 0.05f;
-        private const float AIM_DELAY_STD_DEV = 0.06f;
+        private const float MIN_UNCORRECTABLE_AIM_DELAY_AVERAGE = -0.025f;
+        private const float MAX_UNCORRECTABLE_AIM_DELAY_AVERAGE = 0.05f;
+        private const float UNCORRECTABLE_AIM_DELAY_STD_DEV = 0.06f;
 
+        private const float MIN_CORRECTABLE_AIM_DELAY = 0.05f;
+        private const float MAX_CORRECTABLE_AIM_DELAY = 0.2f;
+        
         private const float MIN_AIM_DISPERSION_ANGLE = 0.3f;
-        private const float MAX_AIM_DISPERSION_ANGLE = 15f;
+        private const float MAX_AIM_DISPERSION_ANGLE = 30f;
         private const float MIN_ACCEPTABLE_SHOOTING_ANGLE = 0.5f;
-        private const float MAX_ACCEPTABLE_SHOOTING_ANGLE = 4f;
+        private const float MAX_ACCEPTABLE_SHOOTING_ANGLE = 7f;
 
         private const float MIN_SOUND_THRESHOLD = 0.2f;
         private const float MAX_SOUND_THRESHOLD = 3f;
@@ -172,17 +165,6 @@ namespace AI
             return JsonConvert.SerializeObject(this);
         }
     }
-    
-    /// <summary>
-    /// Determines how the bot is able to move when fighting an enemy.
-    /// </summary>
-    public enum FightingMovementSkill
-    {
-        StandStill, // Cannot move and aim at the same time.
-        MoveStraight, // Can move, but only toward / away from the target in a straight line.
-        CircleStrife, // Can strife around the target, but only in one direction.
-        CircleStrifeChangeDirection // Can strife around the target, changing direction if necessary.
-    }
 
     /// <summary>
     /// Determines how much the bot tends to look around when moving.
@@ -199,7 +181,7 @@ namespace AI
     /// </summary>
     public enum Recklessness
     {
-        Low, // The bot prefers avoiding fights, so it will look for cover and pickup more.
+        Low, // The bot prefers avoiding fights, so it will look for cover and pickups more.
         Neutral, // The bot is not overly cautious or reckless.
         High // The bot prefers to fight head on, hardly using cover or retreating for pickups.
     }
