@@ -24,11 +24,10 @@ namespace AI
         [SerializeField] private GameObject head;
 
         [SerializeField] private BotCharacteristics botParams = BotCharacteristics.Default;
-
-        [SerializeField] private BotState botState;
-
+        
         [SerializeField] private Entity.Entity enemy;
 
+        [SerializeField] private int health;
 
         private IGoalMachine goalMachine;
         private int killerId;
@@ -40,21 +39,8 @@ namespace AI
         // Do I have to log?
         private bool loggingGame;
         private bool mustProcessDeath;
-
-        private BotState BotState
-        {
-            get => botState;
-            set => botState = value;
-        }
-
-        public override int Health
-        {
-            get => BotState.Health;
-            protected set => BotState.Health = value;
-        }
-
+        public override int Health => health;
         public int MaxHealth => totalHealth;
-
         public TargetMemory TargetMemory { get; private set; }
 
         public TargetKnowledgeBase TargetKnowledgeBase { get; private set; }
@@ -84,7 +70,7 @@ namespace AI
         public MapWanderPlanner MapWanderPlanner { get; private set; }
 
 
-        public override bool IsAlive => isActiveAndEnabled && (Health > 0 || mustProcessDeath);
+        public override bool IsAlive => isActiveAndEnabled && (health > 0 || mustProcessDeath);
         public float FightingSkill => botParams.FightingSkill;
         public float GunMovementCorrectness => botParams.GunMovementCorrectness;
         public float FightBackWhenCollectingPickup => botParams.FightBackWhenCollectingPickup;
@@ -178,7 +164,6 @@ namespace AI
             GunManager = new GunManager(this);
             PickupPlanner = new PickupPlanner(this);
             goalMachine = new EntityGoalMachine(this);
-            BotState = new BotState();
 
             NavigationSystem.Prepare();
             GunManager.Prepare(gms, this, null, ag);
@@ -196,7 +181,7 @@ namespace AI
             entityID = id;
             PrepareComponents(gms, ag);
             totalHealth = th;
-            Health = th;
+            health = th;
             gameManagerScript = gms;
             GunManager.TryEquipGun(GunManager.FindLowestActiveGun());
             var position = transform.position;
@@ -208,7 +193,7 @@ namespace AI
         public override void TakeDamage(int damage, int killerID)
         {
             if (!inGame) return;
-            Health -= damage;
+            health -= damage;
             var position = transform.position;
             HitInfoGameEvent.Instance.Raise(
                 new HitInfo
@@ -226,7 +211,7 @@ namespace AI
                 // We just got damaged and it was not self-inflicted, we might need to search the enemy.
                 DamageSensor.GotDamaged();
 
-            if (Health <= 0 && !mustProcessDeath)
+            if (health <= 0 && !mustProcessDeath)
             {
                 mustProcessDeath = true;
                 killerId = killerID;
@@ -271,7 +256,7 @@ namespace AI
             SpawnInfoGameEvent.Instance.Raise(
                 new SpawnInfo {x = position.x, z = position.z, entityId = entityID, spawnEntity = gameObject.name}
             );
-            Health = totalHealth;
+            health = totalHealth;
             GunManager.ResetAmmo();
             // ActivateLowestGun();
 
@@ -287,15 +272,15 @@ namespace AI
 
         public override void HealFromMedkit(MedkitPickable medkit)
         {
-            if (Health + medkit.RestoredHealth > totalHealth)
-                Health = totalHealth;
+            if (health + medkit.RestoredHealth > totalHealth)
+                health = totalHealth;
             else
-                Health += medkit.RestoredHealth;
+                health += medkit.RestoredHealth;
 
             if (mustProcessDeath)
             {
                 Debug.LogWarning("An entity recovered health in the same turn it died!");
-                if (Health > 0)
+                if (health > 0)
                 {
                     Debug.LogWarning("Additionally, it should no longer die");
                     mustProcessDeath = false;
@@ -375,19 +360,6 @@ namespace AI
         private void OnDestroy()
         {
             SoundSensor.Release();
-        }
-    }
-
-    // TODO Define BotState contents (health, ammo, current target, timeouts for stuff, ...) or remove this...
-    [Serializable]
-    public class BotState
-    {
-        [SerializeField] private int health;
-
-        public int Health
-        {
-            get => health;
-            set => health = value;
         }
     }
 }
