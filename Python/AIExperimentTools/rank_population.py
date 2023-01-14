@@ -74,15 +74,15 @@ def load_checkpoint(name):
 
 def __rank_population(num_checkpoints, num_individuals_per_criteria):
     individuals = []
-    known_fenotypes = set()
+    known_phenotypes = set()
     for checkpoint in range(int(num_checkpoints) + 1):
         (population, epoch) = load_checkpoint("Data/checkpoints/checkpoint_epoch_" + str(checkpoint) + ".pkl")
         for individual in population:
-            fenotype = individual.phenotype()
-            if fenotype in known_fenotypes:
+            phenotype = individual.phenotype()
+            if phenotype in known_phenotypes:
                 continue
             individuals.append(individual)
-            known_fenotypes.add(fenotype)
+            known_phenotypes.add(phenotype)
 
     sorted_by_fitness = sorted(individuals, key=lambda it: fitness_value(it), reverse=True)
     for i in range(0, num_individuals_per_criteria):

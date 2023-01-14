@@ -9,9 +9,7 @@ from deap import algorithms
 from internals.constants import EVOLVER_MATE_PROBABILITY, EVOLVER_MUTATE_PROBABILITY
 from internals.toolbox import prepare_toolbox
 
-# TODO rename fenotype to phenotype, dum dum
-
-known_fenotypes = dict()
+known_phenotypes = dict()
 
 
 def penalize_repeated_phenotypes(individuals):
@@ -66,11 +64,11 @@ def evolve_population(num_epochs, population_size, bot1_data, bot2_data, checkpo
                 population.append(individual)
                 individual.fitness.values = tuple([entropy, pace, 0.0, small_phenotype_penalization(individual)])
             else:
-                known_fenotypes.pop(individual.phenotype())
+                known_phenotypes.pop(individual.phenotype())
                 print("Invalid genome detected! Creating a new random one!")
 
         checkpoint_data = dict(population=population, epoch=epoch, random_state=random.getstate(),
-                               known_fenotypes=known_fenotypes)
+                               known_phenotypes=known_phenotypes)
         with open("Data/checkpoints/checkpoint_epoch_0.pkl", "wb") as cp_file:
             pickle.dump(checkpoint_data, cp_file)
             print("Persisted generation zero")
@@ -79,7 +77,7 @@ def evolve_population(num_epochs, population_size, bot1_data, bot2_data, checkpo
     while epoch < num_epochs:
         # A new generation
         epoch = epoch + 1
-        known_fenotypes.clear()
+        known_phenotypes.clear()
         print("-- Generation %i --" % epoch)
 
         # Select the next generation individuals
@@ -99,13 +97,13 @@ def evolve_population(num_epochs, population_size, bot1_data, bot2_data, checkpo
         population[:] = offspring
 
         checkpoint_data = dict(population=population, epoch=epoch, random_state=random.getstate(),
-                               known_fenotypes=known_fenotypes)
+                               known_phenotypes=known_phenotypes)
 
         with open("Data/checkpoints/checkpoint_epoch_" + str(epoch) + ".pkl", "wb") as cp_file:
             pickle.dump(checkpoint_data, cp_file)
             print("Persisted generation for epoch " + str(epoch))
 
-    cp = dict(population=population, epoch=epoch, random_state=random.getstate(), known_fenotypes=known_fenotypes)
+    cp = dict(population=population, epoch=epoch, random_state=random.getstate(), known_phenotypes=known_phenotypes)
     with open("Data/checkpoints/checkpoint_final.pkl", "wb") as cp_file:
         pickle.dump(cp, cp_file)
         print("Persisted generation for final epoch")
@@ -114,16 +112,16 @@ def evolve_population(num_epochs, population_size, bot1_data, bot2_data, checkpo
 def print_info_and_evaluate(toolbox, individual, epoch, individual_number, bot1_data, bot2_data):
     print("Calculating fitness of individual num " + str(individual_number) + " for epoch " + str(epoch))
     phenotype = individual.phenotype()
-    if phenotype in known_fenotypes:
+    if phenotype in known_phenotypes:
         print("Used cached fitness value for " + str(epoch) + "_" + str(individual_number))
-        cached_value = known_fenotypes.get(phenotype)
+        cached_value = known_phenotypes.get(phenotype)
         individual.epoch = cached_value[1]
         individual.number_in_epoch = cached_value[2]
         return cached_value[0]
     individual.epoch = epoch
     individual.number_in_epoch = individual_number
     result = toolbox.evaluate(phenotype, epoch, individual_number, bot1_data, bot2_data)
-    known_fenotypes[phenotype] = [result, epoch, individual_number]
+    known_phenotypes[phenotype] = [result, epoch, individual_number]
     return result
 
 

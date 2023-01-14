@@ -81,7 +81,7 @@ def __export_checkpoint_results(num_checkpoints, positions_heatmaps, death_heatm
         epoch_fitnesses = []
         (population, epoch) = load_checkpoint("Data/checkpoints/checkpoint_epoch_" + str(checkpoint) + ".pkl")
         index = 0
-        epoch_fenotypes = set()
+        epoch_phenotypes = set()
         for individual in population:
             experiment_name = str(individual.epoch) + "_" + str(individual.number_in_epoch)
             individual_path = "Data/Analysis/" + str(epoch) + "_" + str(index)
@@ -90,11 +90,11 @@ def __export_checkpoint_results(num_checkpoints, positions_heatmaps, death_heatm
             if positions_heatmaps == False and death_heatmaps == False:
                 continue
 
-            fenotype = individual.phenotype()
-            if fenotype in epoch_fenotypes:
+            phenotype = individual.phenotype()
+            if phenotype in epoch_phenotypes:
                 continue
 
-            epoch_fenotypes.add(fenotype)
+            epoch_phenotypes.add(phenotype)
             if not os.path.exists(individual_path):
                 os.mkdir(individual_path)
 
