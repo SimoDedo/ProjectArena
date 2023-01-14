@@ -24,6 +24,7 @@ namespace Tester
         private const int BOT1_ID = 1;
         private const int BOT2_ID = 2;
 
+        [SerializeField] private string baseDataFolderPath;
         [SerializeField] private GameObject botPrefab;
         [SerializeField] private string genomeName;
         [SerializeField] private string bot1ParamsFilenamePrefix;
@@ -68,6 +69,7 @@ namespace Tester
             var args = Environment.GetCommandLineArgs();
             foreach (var arg in args)
             {
+                if (arg.StartsWith("-dataFolderPath=")) baseDataFolderPath = arg.Substring(16);
                 if (arg.StartsWith("-bot1file=")) bot1ParamsFilenamePrefix = arg.Substring(10);
                 if (arg.StartsWith("-bot1skill=")) bot1SkillLevel = float.Parse(arg.Substring(11));
                 if (arg.StartsWith("-bot2file=")) bot2ParamsFilenamePrefix = arg.Substring(10);
@@ -83,13 +85,11 @@ namespace Tester
                 if (arg.StartsWith("-logDeathPositions")) logDeathPositions = true;
             }
 
-            #if !UNITY_EDITOR
-            var basePath = Directory.GetCurrentDirectory() + "/Data";
-            #else
-            var basePath = Application.persistentDataPath;
-            #endif
-            
-            importPath = basePath + "/Import/";
+            if (string.IsNullOrEmpty(baseDataFolderPath))
+            {
+                baseDataFolderPath = Application.persistentDataPath;
+            }
+            importPath = baseDataFolderPath + "Import/";
             genomesPath = importPath + "Genomes/";
             botsPath = importPath + "Bots/";
 
@@ -132,7 +132,7 @@ namespace Tester
         
         private void SaveMap(string map)
         {
-            ExportResults(map, folderName + "map_" + experimentName, ".txt");
+            ExportResults(baseDataFolderPath, map, folderName + "map_" + experimentName, ".txt");
             SaveMapTextGameEvent.Instance.RemoveListener(SaveMap);
         }
 
@@ -185,24 +185,24 @@ namespace Tester
                 if (logKillDistances)
                 {
                     var (positions1, positions2) = killDistanceAnalyzer.CompileResultsAsCSV();
-                    ExportResults(positions1, folderName + "kill_distances_" + experimentName + "_bot1", ".csv");
-                    ExportResults(positions2, folderName + "kill_distances_" + experimentName + "_bot2", ".csv");
+                    ExportResults(baseDataFolderPath, positions1, folderName + "kill_distances_" + experimentName + "_bot1", ".csv");
+                    ExportResults(baseDataFolderPath, positions2, folderName + "kill_distances_" + experimentName + "_bot2", ".csv");
                 }
                 if (logDeathPositions)
                 {
                     var (positions1, positions2) = deathPositionAnalyzer.CompileResultsAsCSV();
-                    ExportResults(positions1, folderName + "death_positions_" + experimentName + "_bot1", ".csv");
-                    ExportResults(positions2, folderName + "death_positions_" + experimentName + "_bot2", ".csv");
+                    ExportResults(baseDataFolderPath, positions1, folderName + "death_positions_" + experimentName + "_bot1", ".csv");
+                    ExportResults(baseDataFolderPath, positions2, folderName + "death_positions_" + experimentName + "_bot2", ".csv");
                 }
 
                 if (logPositions)
                 {
                     var (positions1, positions2) = positionAnalyzer.CompileResultsAsCSV();
-                    ExportResults(positions1, folderName + "position_" + experimentName + "_bot1", ".csv");
-                    ExportResults(positions2, folderName + "position_" + experimentName + "_bot2", ".csv");
+                    ExportResults(baseDataFolderPath, positions1, folderName + "position_" + experimentName + "_bot1", ".csv");
+                    ExportResults(baseDataFolderPath, positions2, folderName + "position_" + experimentName + "_bot2", ".csv");
                 }
 
-                ExportResults(JsonConvert.SerializeObject(results), folderName + "final_results_" + experimentName);
+                ExportResults(baseDataFolderPath, JsonConvert.SerializeObject(results), folderName + "final_results_" + experimentName);
                 Application.Quit();
             }
             else
@@ -214,14 +214,9 @@ namespace Tester
             }
         }
 
-        private static void ExportResults(string compileResults, string experimentName, string extension = ".json")
+        private static void ExportResults(string folder, string compileResults, string experimentName, string extension = ".json")
         {
-
-            #if UNITY_EDITOR
-            var exportPath = Application.persistentDataPath + "Export/" + experimentName;
-            #else
-            var exportPath = Directory.GetCurrentDirectory() + "/Data/Export/" + experimentName;
-            #endif
+            var exportPath = folder + "Export/" + experimentName;
             
             var filePath = exportPath + extension;
             try

@@ -590,11 +590,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ca3689596fa4748b2e4a6a067ed51e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  baseDataFolderPath: 
   botPrefab: {fileID: 1128226087601874, guid: 87c5267e1886311258a6f48dac81a1ca, type: 3}
   genomeName: heatmap.json
-  bot1ParamsFilenamePrefix: assault_
+  bot1ParamsFilenamePrefix: assault
   bot1SkillLevel: 0
-  bot2ParamsFilenamePrefix: assault_
+  bot2ParamsFilenamePrefix: assault
   bot2SkillLevel: 0.6
   mapManager: {fileID: 516550950}
   genomeMapGenerator: {fileID: 296767516}
