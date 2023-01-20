@@ -101,6 +101,8 @@ namespace Entity
 
         public Vector3 GetAverageVelocity(float intervalDuration)
         {
+            UpdateList();
+
             var startTime = Time.time - Math.Min(MEMORY_WINDOW, intervalDuration);
             var endTime = Time.time;
             
@@ -114,7 +116,7 @@ namespace Entity
             for (var i = 0; i < trackedCount - 1; i++)
             {
                 var current = next;
-                next = tracked[i * 1];
+                next = tracked[i + 1];
                 var intervalEndTime = next.time;
                 if (intervalEndTime <= startTime) continue;
                 
