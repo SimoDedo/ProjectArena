@@ -14,6 +14,7 @@ def extract_match_data(folder_name, experiment_name, num_simulations=NUM_PARALLE
 
     dataset = pandas.concat(frames)
     ratios = []
+    killDiff = []
 
     for i in zip(dataset["numberOfFrags1"], dataset["numberOfFrags2"]):
         print("Frags data: " + str(i[0]) + ", " + str(i[1]))
@@ -21,8 +22,10 @@ def extract_match_data(folder_name, experiment_name, num_simulations=NUM_PARALLE
             ratios.append(i[0])
         else:
             ratios.append(i[0] / i[1])
+        killDiff.append(i[0] - i[1])
 
     dataset["ratio"] = ratios
+    dataset["killDiff"] = killDiff
     return dataset
 
 
