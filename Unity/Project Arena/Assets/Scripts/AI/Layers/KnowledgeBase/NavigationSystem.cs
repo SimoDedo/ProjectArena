@@ -54,7 +54,7 @@ namespace AI.Layers.KnowledgeBase
         /// path calculated is not complete.</param>
         public NavMeshPath CalculatePath(Vector3 destination, bool throwIfNotComplete = false)
         {
-            agent.speed = Speed;
+            // agent.speed = Speed;
             var rtn = new NavMeshPath();
             agent.CalculatePath(destination, rtn);
             if (throwIfNotComplete && !rtn.IsComplete())
@@ -71,7 +71,7 @@ namespace AI.Layers.KnowledgeBase
         /// path calculated is not complete.</param>
         public NavMeshPath CalculatePath(Vector3 origin, Vector3 destination, bool throwIfNotComplete = false)
         {
-            agent.speed = Speed;
+            // agent.speed = Speed;
             var rtn = new NavMeshPath();
             NavMesh.CalculatePath(origin, destination, agent.areaMask, rtn);
             if (throwIfNotComplete && !rtn.IsComplete())
@@ -84,10 +84,22 @@ namespace AI.Layers.KnowledgeBase
         /// </summary>
         public void MoveAlongPath()
         {
-            var position = transform.position;
-            Debug.DrawLine(position, agent.destination, Color.green, 0, false);
-            Debug.DrawLine(position, agent.nextPosition, Color.red, 0.4f);
+            // Debug.Log("AAAA movement for " + me.GetID() + " is moving from " + transform.position + " to " + agent.nextPosition);
+            // var position = transform.position;
+            // Debug.DrawLine(position, agent.destination, Color.green, 0, false);
+            // Debug.DrawLine(position, agent.nextPosition, Color.red, 0.4f);
             mover.MoveToPosition(agent.nextPosition);
+            // Debug.Log("AAAA movement for " + me.GetID() + ", end of movement is " + transform.position);
+        }
+
+        public void MoveTo(Vector3 destination)
+        {
+            if ((transform.position - destination).magnitude > agent.speed * 1.1)
+            {
+                throw new Exception("Movement too long");
+            }
+            mover.MoveToPosition(destination);
+            agent.nextPosition = destination;
         }
 
         /// <summary>
@@ -103,7 +115,7 @@ namespace AI.Layers.KnowledgeBase
         /// </summary>
         public void SetPath(NavMeshPath path)
         {
-            agent.speed = Speed;
+            // agent.speed = Speed;
             // Check that I didn't have a path already
             if (!agent.SetPath(path))
             {

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using AI.Layers.KnowledgeBase;
 using BehaviorDesigner.Runtime.Tasks;
 using Entity.Component;
@@ -26,7 +27,6 @@ namespace AI.Behaviours.Actions
         private NavigationSystem navSystem;
 
         private float skill;
-        private float strifeMovementWeight;
         private Entity.Entity target;
         private Transform targetTransform;
 
@@ -49,8 +49,6 @@ namespace AI.Behaviours.Actions
             targetTransform = target.transform;
 
             skill = entity.Characteristics.FightingSkill;
-            strifeMovementWeight = 0.5f * skill * 0.5f;
-            isStrafing = Random.value < skill;
             isStrafingRight = Random.value < 0.5f;
             UpdateStrafeIfNeeded(true);
             navSystem.CancelPath();
@@ -69,7 +67,7 @@ namespace AI.Behaviours.Actions
             {
                 if (TacticalMovement(currentPos, targetPos))
                 {
-                    navSystem.MoveAlongPath();
+                    // navSystem.MoveAlongPath();
                     return TaskStatus.Running;
                 }
             }
@@ -78,7 +76,7 @@ namespace AI.Behaviours.Actions
             // Try random positions, hoping to find a suitable location.
             FallbackMovement(currentPos, targetPos);
 
-            navSystem.MoveAlongPath();
+            // navSystem.MoveAlongPath();
             return TaskStatus.Running;
         }
 
@@ -92,25 +90,39 @@ namespace AI.Behaviours.Actions
             var unNormalizedDirection = sameHeightEnemyPos - currentPos;
             var distance = unNormalizedDirection.magnitude;
             var direction = unNormalizedDirection.normalized;
-
+            
             var movementDirectionDueToGun = GetMoveDirectionDueToGun(distance, direction);
-            var movementDirectionDueToStrife = GetMovementDirectionDueToStrafe(direction);
+            var movementDirectionDueToStrafe = GetMovementDirectionDueToStrafe(direction);
 
-            // x5 multiplier to avoid entity moving too slowly
-            var totalMovement = (movementDirectionDueToGun + strifeMovementWeight * movementDirectionDueToStrife) *
-                                Time.deltaTime * navSystem.Speed * 5f; 
+            var totalWeight = 1.0f + skill * movementDirectionDueToStrafe.magnitude;
             
+            var movementDirectionDueToGunWeight = movementDirectionDueToGun.magnitude;
+            
+            var movementDirectionDueToStrafeWeight = 
+                skill * (2.0f - movementDirectionDueToGunWeight);
+
+            var totalMovement = (
+                    movementDirectionDueToGun +
+                    movementDirectionDueToStrafe * movementDirectionDueToStrafeWeight
+                    ) / Mathf.Sqrt(totalWeight) * Time.deltaTime * navSystem.Speed;
+            
+            // Debug.Log("AAAA movement for " + entity.GetID() + " is speed " + (Time.deltaTime * navSystem.Speed));
+            // Debug.Log("AAAA movement for " + entity.GetID() + ", magn: " + totalMovement.magnitude);
+            //
             var positionAfterMovement = currentPos + totalMovement;
-            
+            // Debug.Log("AAAA movement for " + entity.GetID() + ", position after: " + positionAfterMovement);
+
             Debug.DrawLine(currentPos, positionAfterMovement, Color.yellow, 0, false);
 
             if (!Physics.Linecast(positionAfterMovement, targetPos, layerMask))
             {
                 // I can see the position, try to compute path!
                 path = navSystem.CalculatePath(positionAfterMovement);
-                if (path.IsValid())
+                if (path.IsComplete())
                 {
-                    navSystem.SetPath(path);
+                    // Debug.Log("AAAA movement for " + entity.GetID() + ", setting path as: " + path.corners.Last());
+                    // navSystem.SetPath(path);
+                    navSystem.MoveTo(positionAfterMovement);
                     return true;
                 }
 
@@ -119,24 +131,26 @@ namespace AI.Behaviours.Actions
                 // MoveToLocationWithEnemyInSight(currentPos, targetPos);
             }
 
+            isStrafingRight = !isStrafingRight;
+
             // Enemy cannot be seen from new position or new position is invalid. Ignore strife
-            positionAfterMovement = movementDirectionDueToGun * Time.deltaTime * navSystem.Speed;
+            positionAfterMovement = currentPos + movementDirectionDueToGun * Time.deltaTime * navSystem.Speed;
 
             // It wouldn't make sense for me to be unable to see the enemy from this new position, given that I moved
             // along the line connecting me and the enemy, so I'll not check
             path = navSystem.CalculatePath(positionAfterMovement);
 
-            if (!path.IsValid()) return false; // Cannot move to new position at all. Try something else.
-            navSystem.SetPath(path);
+            if (!path.IsComplete()) return false; // Cannot move to new position at all. Try something else.
+            // navSystem.SetPath(path);
+            navSystem.MoveTo(positionAfterMovement);
             return true;
         }
 
         private void FallbackMovement(Vector3 currentPos, Vector3 targetPos)
         {
-            NavMeshPath validPath = null;
+            Vector3 validPos = Vector3.zero;
 
             // We cannot see the enemy from where we are, try to find a position from where it is visible.
-
             UpdateStrafeIfNeeded(true);
             for (var i = 0; i < maxAttempts; i++)
             {
@@ -150,18 +164,19 @@ namespace AI.Behaviours.Actions
                 
                 // Let's store one of the paths tried; in case the enemy is not visible from any position,
                 // at least we have somewhere to move.
-                validPath = path;
+                validPos = newPos;
                     
                 if (Physics.Linecast(newPos, targetPos, layerMask)) continue;
                     
                 // Can see enemy from here, found new position!
-                navSystem.SetPath(path);
+                // navSystem.SetPath(path);
+                navSystem.MoveTo(newPos);
                 return;
             }
 
-            if (validPath != null)
+            if (validPos != Vector3.zero)
             {
-                navSystem.SetPath(validPath);
+                navSystem.MoveTo(validPos);
             }
         }
 
@@ -214,12 +229,11 @@ namespace AI.Behaviours.Actions
 
         private void UpdateStrafeIfNeeded(bool force = false)
         {
-            if (force || nextStrafeChangeTime <= Time.time)
-            {
-                nextStrafeChangeTime = Time.time + Random.Range(0.3f, 0.5f);
-                isStrafing = Random.value < (skill * 0.8f);
-                isStrafingRight = isStrafing ^ (Random.value < 0.1f);
-            }        
+            if (!force && !(nextStrafeChangeTime <= Time.time)) return;
+            nextStrafeChangeTime = Time.time + Random.Range(0.3f, 0.5f);
+            // isStrafing = Random.value < skill;
+            isStrafing = true;
+            isStrafingRight ^= (Random.value < 0.1f);
         }
     }
 }
