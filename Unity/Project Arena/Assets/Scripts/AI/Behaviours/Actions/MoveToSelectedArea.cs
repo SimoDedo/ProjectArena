@@ -65,7 +65,7 @@ namespace AI.Behaviours.Actions
             var height = (area.topRow - area.bottomRow) * mapScale;
             var diagonal = Mathf.Sqrt(width * width + height * height);
             var walkTime = diagonal / navSystem.Speed;
-            return walkTime * 0.1f;
+            return walkTime * Random.value / 1.5f;
         }
 
         public override TaskStatus OnUpdate()
@@ -76,18 +76,9 @@ namespace AI.Behaviours.Actions
                 return TaskStatus.Success;
             }
 
-            if (IsInArea())
-            {
-                timeInArea += Time.deltaTime;
-                if (timeInArea >= overstayTime)
-                {
-                    return TaskStatus.Success;
-                }
-
-                return TaskStatus.Running;
-            }
-
-            return TaskStatus.Running;
+            if (!IsInArea()) return TaskStatus.Running;
+            timeInArea += Time.deltaTime;
+            return timeInArea >= overstayTime ? TaskStatus.Success : TaskStatus.Running;
         }
 
         private bool IsInArea()
