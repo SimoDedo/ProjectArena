@@ -206,7 +206,6 @@ namespace AI
 
         protected override void Die(int id)
         {
-            // TODO Reset the various states
             var position = transform.position;
             var enemyPos = enemy.transform.position;
             KillInfoGameEvent.Instance.Raise(
@@ -218,9 +217,8 @@ namespace AI
                     killerEntityID = id,
                     killedX = position.x,
                     killedZ = position.z,
-                    // TODO what about suicide?
-                    killerX = enemyPos.x,
-                    killerZ = enemyPos.z,
+                    killerX = id == entityID ? position.x : enemyPos.x,
+                    killerZ = id == entityID ? position.z : enemyPos.z,
                 }
             );
             gameManagerScript.AddScore(id, entityID);
