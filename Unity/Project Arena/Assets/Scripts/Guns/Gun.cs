@@ -278,7 +278,7 @@ namespace Guns
             {
                 gunOwnerId = ownerEntityScript.GetID(),
                 gunLoudness = shotNoise,
-                gunPosition = transform.position
+                gunPosition = transform.position,
             });
         }
 
@@ -302,7 +302,7 @@ namespace Guns
         {
             if (isAiming)
             {
-                ownerEntityScript.SlowEntity(0.8f);
+                ownerEntityScript.SlowEntity(0.4f);
                 transform.localPosition = Vector3.Lerp(transform.localPosition, aimPosition,
                     (Time.time - aimStart) * 3f);
             }
