@@ -21,7 +21,7 @@ namespace AI.Behaviours.Actions
         private const float MIN_UPDATE_TIME = 1.5f;
         private const float MAX_UPDATE_TIME = 2.5f;
 
-        private static readonly ReadOnlyCollection<AngleScore> AngleScores = new ReadOnlyCollection<AngleScore>(new[]
+        private static readonly ReadOnlyCollection<AngleScore> AngleScores = new(new[]
         {
             new AngleScore {angle = 0, score = 100, minLevel = CuriosityLevel.Low, allowedIfFocused = true},
             new AngleScore
@@ -36,8 +36,6 @@ namespace AI.Behaviours.Actions
                 {angle = -90, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false},
             new AngleScore
                 {angle = +90, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false},
-            new AngleScore
-                {angle = +180, score = 10, minLevel = CuriosityLevel.High, allowedIfFocused = false}
         });
 
         [SerializeField] private bool focused;
@@ -45,7 +43,7 @@ namespace AI.Behaviours.Actions
         private float lookAngle;
         private float maxAngle;
         private MovementController movementController;
-        private List<AngleScore> myValidAngles = new List<AngleScore>();
+        private List<AngleScore> myValidAngles = new();
         private float nextUpdateTime;
         private float nextWallUpdateTime;
         private SightController sightController;
