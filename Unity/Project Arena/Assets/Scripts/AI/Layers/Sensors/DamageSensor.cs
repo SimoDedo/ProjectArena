@@ -58,6 +58,8 @@ namespace AI.Layers.SensingLayer
         /// </summary>
         public void GotDamaged()
         {
+            // Avoid storing multiple events in case we get damaged more than once in the same frame.
+            if (lastDamagedTimes[latestDamageTimeIndex] == Time.time) return;  
             latestDamageTimeIndex = (latestDamageTimeIndex + 1) % MAX_BACKLOG_DAMAGES;
             lastDamagedTimes[latestDamageTimeIndex] = Time.time;
         }
