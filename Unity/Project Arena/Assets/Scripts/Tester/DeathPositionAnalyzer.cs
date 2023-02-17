@@ -13,14 +13,14 @@ namespace Tester
     {
         private readonly int bot1ID;
         private readonly int bot2ID;
-        private readonly Dictionary<int, List<Vector2>> deathPositions = new Dictionary<int, List<Vector2>>();
+        private readonly Dictionary<int, List<Vector4>> deathAndKillPositions = new();
         
         public DeathPositionAnalyzer(int bot1ID, int bot2ID)
         {
             this.bot1ID = bot1ID;
             this.bot2ID = bot2ID;
-            deathPositions.Add(bot1ID, new List<Vector2>());
-            deathPositions.Add(bot2ID, new List<Vector2>());
+            deathAndKillPositions.Add(bot1ID, new List<Vector4>());
+            deathAndKillPositions.Add(bot2ID, new List<Vector4>());
         }
 
         public void Setup()
@@ -35,9 +35,9 @@ namespace Tester
 
         public void Reset()
         {    
-            deathPositions.Clear();
-            deathPositions.Add(bot1ID, new List<Vector2>());
-            deathPositions.Add(bot2ID, new List<Vector2>());
+            deathAndKillPositions.Clear();
+            deathAndKillPositions.Add(bot1ID, new List<Vector4>());
+            deathAndKillPositions.Add(bot2ID, new List<Vector4>());
         }
 
         private void LogDeathPosition(KillInfo receivedInfo)
@@ -48,18 +48,20 @@ namespace Tester
                 return;
             }
 
-            deathPositions[receivedInfo.killedEntityID].Add(new Vector2(receivedInfo.killedX, receivedInfo.killedZ));
+            deathAndKillPositions[receivedInfo.killedEntityID].Add(
+                new Vector4(receivedInfo.killedX, receivedInfo.killedZ, receivedInfo.killerX, receivedInfo.killerZ)
+                );
         }
 
         public Tuple<string,string> CompileResultsAsCSV()
         {
-            var positions1 = deathPositions[bot1ID];
-            var positions2 = deathPositions[bot2ID];
+            var positions1 = deathAndKillPositions[bot1ID];
+            var positions2 = deathAndKillPositions[bot2ID];
             
             return new Tuple<string, string>(GetCSV(positions1), GetCSV(positions2));
         }
 
-        private string GetCSV(List<Vector2> positions)
+        private string GetCSV(List<Vector4> positions)
         {
             var csvBuilder = new StringBuilder();
             foreach (var position in positions)
@@ -67,6 +69,10 @@ namespace Tester
                 csvBuilder.Append(position.x);
                 csvBuilder.Append(',');
                 csvBuilder.Append(position.y);
+                csvBuilder.Append(',');
+                csvBuilder.Append(position.z);
+                csvBuilder.Append(',');
+                csvBuilder.Append(position.w);
                 csvBuilder.AppendLine();
             }
 
