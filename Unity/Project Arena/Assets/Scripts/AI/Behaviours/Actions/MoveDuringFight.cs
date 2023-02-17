@@ -34,6 +34,9 @@ namespace AI.Behaviours.Actions
         private bool isStrafingRight;
         private float nextStrafeChangeTime;
 
+        private float timeStuckInCorner = 0;
+        private bool isGettingUnstuck = false;
+        
         public override void OnAwake()
         {
             layerMask = LayerMask.GetMask("Default", "Wall", "Floor");
@@ -61,6 +64,13 @@ namespace AI.Behaviours.Actions
 
         public override TaskStatus OnUpdate()
         {
+            if (isGettingUnstuck)
+            {
+                navSystem.MoveAlongPath();
+                isGettingUnstuck = !navSystem.HasArrivedToDestination();
+                return TaskStatus.Running;
+            }
+            
             var currentPos = entityTransform.position;
             var targetPos = targetTransform.position;
             if (!Physics.Linecast(currentPos, targetPos, layerMask))
@@ -68,7 +78,31 @@ namespace AI.Behaviours.Actions
                 if (TacticalMovement(currentPos, targetPos))
                 {
                     // navSystem.MoveAlongPath();
+                    timeStuckInCorner = Math.Max(0, timeStuckInCorner - Time.deltaTime * 0.1f);
                     return TaskStatus.Running;
+                }
+                
+                if ((currentPos - targetPos).magnitude < 10f)
+                {
+                    // We failed the tactical movement and we are very close to the enemy. Likely we are stuck in a corner.
+                    timeStuckInCorner += Time.deltaTime;
+                    if (timeStuckInCorner > 0.15)
+                    {
+                        for (var i = 0; i < 10; i++)
+                        {
+                            // Compute path 
+                            var randomCircle = Random.insideUnitCircle;
+                            var randomDisplacementVector = new Vector3(randomCircle.x, randomCircle.y) * 15f;
+                            var newDestination = currentPos + randomDisplacementVector;
+                            var path = navSystem.CalculatePath(newDestination);
+                            if (!path.IsValid()) continue;
+                            isGettingUnstuck = true;
+                            timeStuckInCorner = 0;
+                            navSystem.SetPath(path);
+                            navSystem.MoveAlongPath();
+                            return TaskStatus.Running;
+                        }
+                    }
                 }
             }
 
@@ -79,7 +113,7 @@ namespace AI.Behaviours.Actions
             // navSystem.MoveAlongPath();
             return TaskStatus.Running;
         }
-
+        
         private bool TacticalMovement(Vector3 currentPos, Vector3 targetPos)
         {
             NavMeshPath path;
