@@ -87,7 +87,7 @@ namespace Tester
 
             if (string.IsNullOrEmpty(baseDataFolderPath))
             {
-                baseDataFolderPath = Application.persistentDataPath;
+                baseDataFolderPath = Application.persistentDataPath + "/";
             }
             importPath = baseDataFolderPath + "Import/";
             genomesPath = importPath + "Genomes/";
