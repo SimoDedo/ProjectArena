@@ -58,6 +58,14 @@ namespace AI.Layers.Planners
 
             var leastKnownArea = 0;
             var earliestVisitedAreaTime = float.MaxValue;
+
+            if (Random.value < 0.1)
+            {
+                // Select random destination to avoid getting stuck following the same path
+                var areaIndex = Random.Range(0, _mapMemory.areas.Length);
+                return _mapMemory.areas[areaIndex];
+            }
+
             for (var i = 0; i < _mapMemory.areas.Length; i++)
             {
                 if (_mapMemory.areas[i].isCorridor) continue;
@@ -75,8 +83,7 @@ namespace AI.Layers.Planners
                 }
             }
 
-            var selectedArea = _mapMemory.areas[leastKnownArea];
-            return selectedArea;
+            return _mapMemory.areas[leastKnownArea];
         }
 
         /// <summary>
