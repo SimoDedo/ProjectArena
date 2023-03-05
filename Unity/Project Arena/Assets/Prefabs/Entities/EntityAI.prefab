@@ -42,7 +42,7 @@ Transform:
   - {fileID: 4320713818748542}
   - {fileID: 4153350640318580}
   m_Father: {fileID: 4656231824012272}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1 &1044812738245204
 GameObject:
@@ -594,9 +594,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   totalHealth: 0
   head: {fileID: 1523818027142824}
-  botState:
-    health: 0
   enemy: {fileID: 0}
+  health: 0
 --- !u!114 &5647456198230708602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -635,7 +634,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.2
+  m_Radius: 0.25
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
@@ -755,7 +754,7 @@ Transform:
   - {fileID: 4203785321918852}
   - {fileID: 4234367712866914}
   m_Father: {fileID: 4656231824012272}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1 &1174516433243792
 GameObject:
@@ -954,8 +953,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4433738170038784}
   - {fileID: 4695068751231754}
+  - {fileID: 4433738170038784}
   m_Father: {fileID: 4069616298759954}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -987,14 +986,14 @@ MonoBehaviour:
   headCamera: {fileID: 20788917190633434}
   muzzleFlash: {fileID: 1172488531380796}
   damage: 75
-  normalDispersion: 6
+  normalDispersion: 3
   aimingDispersion: 0
   projectilesPerShot: 1
   infinteAmmo: 1
   chargerSize: 6
   maximumAmmo: 20
   reloadTime: 1
-  cooldownTime: 1.2
+  cooldownTime: 1
   isBlastWeapon: 0
   muzzleFlashDuration: 0.1
   recoil: 0.2
@@ -1023,8 +1022,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c8f11410b65469bb5e6162f2edb125b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minRangeBest: 50
-  maxRangeBest: 80
+  minRangeBest: 80
+  maxRangeBest: 100
   controlPoints:
   - distance: 25
     score: 0.1
@@ -2074,12 +2073,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   headCamera: {fileID: 20788917190633434}
   muzzleFlash: {fileID: 1869087715720208}
-  damage: 13
-  normalDispersion: 2.8
-  aimingDispersion: 2.8
+  damage: 12
+  normalDispersion: 2.2
+  aimingDispersion: 2.2
   projectilesPerShot: 1
   infinteAmmo: 1
-  chargerSize: 20
+  chargerSize: 15
   maximumAmmo: 80
   reloadTime: 1
   cooldownTime: 0.1
@@ -2111,8 +2110,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c8f11410b65469bb5e6162f2edb125b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minRangeBest: 15
-  maxRangeBest: 50
+  minRangeBest: 25
+  maxRangeBest: 60
   controlPoints:
   - distance: 0
     score: 0.25
@@ -3575,10 +3574,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   headCamera: {fileID: 20788917190633434}
   muzzleFlash: {fileID: 1478163250820970}
-  damage: 9
-  normalDispersion: 5
-  aimingDispersion: 5
-  projectilesPerShot: 8
+  damage: 11
+  normalDispersion: 3.4
+  aimingDispersion: 3.4
+  projectilesPerShot: 9
   infinteAmmo: 1
   chargerSize: 6
   maximumAmmo: 20
@@ -3612,8 +3611,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c8f11410b65469bb5e6162f2edb125b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minRangeBest: 10
-  maxRangeBest: 18
+  minRangeBest: 11
+  maxRangeBest: 13
   controlPoints:
   - distance: 15
     score: 1
