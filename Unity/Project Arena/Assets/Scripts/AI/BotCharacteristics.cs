@@ -57,6 +57,7 @@ namespace AI
         public float DetectionWindow => Interpolate(MIN_DETECTION_WINDOW, MAX_DETECTION_WINDOW, ScaleScore(generalSkill,c.reflex));
         public float TimeBeforeReaction => Interpolate(MIN_TIME_BEFORE_REACTION, MAX_TIME_BEFORE_REACTION, 1.0f - ScaleScore(generalSkill,c.reflex));
         public float Prediction => Interpolate(MIN_PREDICTION, MAX_PREDICTION, ScaleScore(generalSkill, c.prediction));
+        public float SpawnPointPrediction => Interpolate(MIN_SPAWN_PREDICTION, MAX_SPAWN_PREDICTION, ScaleScore(generalSkill, c.prediction));
         public float UncorrectableAimDelayAverage => Interpolate(MIN_UNCORRECTABLE_AIM_DELAY_AVERAGE, MAX_UNCORRECTABLE_AIM_DELAY_AVERAGE, 1.0f - ScaleScore(generalSkill, c.aiming));
         public float CorrectableAimDelay => Interpolate(MIN_CORRECTABLE_AIM_DELAY, MAX_CORRECTABLE_AIM_DELAY, 1.0f - ScaleScore(generalSkill, c.aiming));
         public float AimingDispersionAngle => Interpolate(MIN_AIM_DISPERSION_ANGLE, MAX_AIM_DISPERSION_ANGLE, 1.0f - ScaleScore(generalSkill, c.aiming));
@@ -123,6 +124,8 @@ namespace AI
         private const float MAX_TIME_BEFORE_REACTION = 0.5f;
         private const float MIN_PREDICTION = 0.1f;
         private const float MAX_PREDICTION = 0.8f;
+        private const float MIN_SPAWN_PREDICTION = -0.1f;
+        private const float MAX_SPAWN_PREDICTION = 0.4f;
         private const float MIN_DEVIATION_FROM_OPTIMAL_RANGE = 5.0f;
         private const float MAX_DEVIATION_FROM_OPTIMAL_RANGE = 20.0f;
         private const float MIN_FIGHT_BACK_WHEN_PICKUP = -0.5f;

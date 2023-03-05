@@ -1,6 +1,7 @@
 using System;
 using AI.Layers.KnowledgeBase;
 using AI.Layers.SensingLayer;
+using AI.Layers.Sensors;
 using BehaviorDesigner.Runtime;
 using Logging;
 using UnityEngine;
@@ -21,6 +22,7 @@ namespace AI.GoalMachine.Goal
         private readonly AIEntity entity;
         private readonly ExternalBehaviorTree externalBt;
         private readonly SoundSensor soundSensor;
+        private readonly RespawnSensor respawnSensor;
         private Recklessness _recklessness;
         private bool resetInUpdate;
 
@@ -33,6 +35,7 @@ namespace AI.GoalMachine.Goal
             _recklessness = entity.Characteristics.Recklessness;
             damageSensor = entity.DamageSensor;
             soundSensor = entity.SoundSensor;
+            respawnSensor = entity.RespawnSensor;
             externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/SearchEnemy");
             behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
             behaviorTree.StartWhenEnabled = false;
@@ -42,8 +45,9 @@ namespace AI.GoalMachine.Goal
         
         public float GetScore()
         {
-            if (!entity.GetEnemy().IsAlive || _targetKnowledgeBase.HasSeenTarget())
+            if (!entity.GetEnemy().IsAlive || _targetKnowledgeBase.HasDetectedTarget())
             {
+                // Debug.Log("Entity " + entity.GetID() + " Search score is 0 (dead or seen)");
                 return 0f;
             }
 
@@ -51,9 +55,10 @@ namespace AI.GoalMachine.Goal
 
             if (mostRecentEvent == NO_TIME)
             {
+                // Debug.Log("Entity " + entity.GetID() + " Search score is 0 (no events)");
                 return 0f;
             }
-            
+
             var maxScore = _recklessness switch
             {
                 Recklessness.Low => 0.6f,
@@ -62,12 +67,12 @@ namespace AI.GoalMachine.Goal
                 _ => throw new ArgumentOutOfRangeException()
             };
 
+
             var score = Mathf.Max(maxScore - (Time.time - mostRecentEvent) / 10f, 0f);
 
             if (searchTriggeringEventTime != NO_TIME && searchTriggeringEventTime != mostRecentEvent)
             {
                 // I'm already searching but I received a new event. Forcibly cause update
-                searchTriggeringEventTime = mostRecentEvent;
                 resetInUpdate = true;
             }
             else
@@ -75,6 +80,7 @@ namespace AI.GoalMachine.Goal
                 resetInUpdate = false;
             }
 
+            // Debug.Log("Entity " + entity.GetID() + " Search score is " + score);
             return score;
         }
 
@@ -123,13 +129,21 @@ namespace AI.GoalMachine.Goal
             return soundSensor.HeardShotRecently ? soundSensor.LastTimeHeardShot : NO_TIME;
         }
 
+        private float RecentRespawnTimeOrNoTime()
+        {
+            return respawnSensor.DetectedRespawnRecently ? respawnSensor.LastRespawnTime : NO_TIME;
+        }
+
         private float MostRecentEventTimeOrNoTime()
         {
             var timeNoise = LastRecentNoiseTimeOrNoTime();
             var timeDamage = LastRecentDamageTimeOrNoTime();
             var timeLost = RecentLossTimeOrNoTime();
-
-            return Mathf.Max(timeNoise, Mathf.Max(timeDamage, timeLost));
+            var timeRespawn = RecentRespawnTimeOrNoTime(); 
+            return Mathf.Max(
+                Mathf.Max(searchTriggeringEventTime, timeNoise), 
+                Mathf.Max(timeDamage, Mathf.Max(timeLost, timeRespawn))
+            );
         }
     }
 }

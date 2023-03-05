@@ -2,6 +2,7 @@ using System;
 using AI.Behaviours.Variables;
 using AI.Layers.KnowledgeBase;
 using AI.Layers.SensingLayer;
+using AI.Layers.Sensors;
 using BehaviorDesigner.Runtime.Tasks;
 using Entity;
 using Others;
@@ -20,6 +21,7 @@ namespace AI.Behaviours.Actions
         [SerializeField] private SharedSelectedPathInfo lastKnownPositionPath;
         private DamageSensor damageSensor;
         private SoundSensor soundSensor;
+        private RespawnSensor respawnSensor;
         private Entity.Entity enemy;
         private PositionTracker enemyTracker;
         private AIEntity entity;
@@ -35,6 +37,7 @@ namespace AI.Behaviours.Actions
             navSystem = entity.NavigationSystem;
             damageSensor = entity.DamageSensor;
             soundSensor = entity.SoundSensor;
+            respawnSensor = entity.RespawnSensor;
             enemyTracker = enemy.GetComponent<PositionTracker>();
             layerMask = LayerMask.GetMask("Default", "Entity", "Wall");
         }
@@ -49,7 +52,11 @@ namespace AI.Behaviours.Actions
                 ? soundSensor.LastTimeHeardShot
                 : float.MinValue;
 
-            var triggeringEventTime = Mathf.Max(damageTime, noiseTime);
+            var respawnTime = respawnSensor.DetectedRespawnRecently
+                ? respawnSensor.LastRespawnTime
+                : float.MinValue;
+
+            var triggeringEventTime = Mathf.Max(damageTime, Mathf.Max(noiseTime, respawnTime));
             
             var lossTime = _targetKnowledgeBase.LastTimeDetected;
             
@@ -72,6 +79,7 @@ namespace AI.Behaviours.Actions
             if (pathToEstimatedPos.IsComplete())
             {
                 lastKnownPositionPath.Value = pathToEstimatedPos;
+                Debug.DrawLine(entity.transform.position, estimatedPosition, Color.yellow, 4, false);
                 return TaskStatus.Success;
             }
 
@@ -79,6 +87,7 @@ namespace AI.Behaviours.Actions
             var pathToDelayedPosition = navSystem.CalculatePath(delayedPosition);
             if (pathToDelayedPosition.IsComplete())
             {
+                Debug.DrawLine(entity.transform.position, estimatedPosition, Color.yellow, 4, false);
                 lastKnownPositionPath.Value = pathToDelayedPosition;
                 return TaskStatus.Success;
             }
@@ -93,7 +102,7 @@ namespace AI.Behaviours.Actions
             // in such line (maybe in the second half of the line, otherwise we seek too close). Draw a circle
             // around that point and pick one point inside of it. That's the enemy estimated position.
 
-            var (enemyPos, _) = enemyTracker.GetPositionAndVelocityForRange(time - 0.5f, time);
+            var enemyPos = enemyTracker.GetPositionAtTime(time);
 
             var myPosition = transform.position;
             var direction = enemyPos - myPosition;
@@ -119,6 +128,7 @@ namespace AI.Behaviours.Actions
                 var path = navSystem.CalculatePath(chosenPos);
                 if (path.IsComplete())
                 {
+                    Debug.DrawLine(entity.transform.position, chosenPos, Color.yellow, 4, false);
                     lastKnownPositionPath.Value = path;
                     return TaskStatus.Success;
                 }
@@ -137,6 +147,7 @@ namespace AI.Behaviours.Actions
             var path3 = navSystem.CalculatePath(enemyPos);
             if (path3.IsComplete())
             {
+                Debug.DrawLine(entity.transform.position, enemyPos, Color.yellow, 4, false);
                 lastKnownPositionPath.Value = path3;
                 return TaskStatus.Success;
             }

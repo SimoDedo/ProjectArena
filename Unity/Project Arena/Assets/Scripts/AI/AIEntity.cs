@@ -4,6 +4,7 @@ using AI.Layers.KnowledgeBase;
 using AI.Layers.Memory;
 using AI.Layers.Planners;
 using AI.Layers.SensingLayer;
+using AI.Layers.Sensors;
 using AI.Layers.Statistics;
 using Entity.Component;
 using Logging;
@@ -44,9 +45,8 @@ namespace AI
         public TargetMemory TargetMemory { get; private set; }
 
         public TargetKnowledgeBase TargetKnowledgeBase { get; private set; }
-
         public DamageSensor DamageSensor { get; private set; }
-
+        public RespawnSensor RespawnSensor { get; private set; }
         public SoundSensor SoundSensor { get; private set; }
 
         public MovementController MovementController { get; private set; }
@@ -142,6 +142,7 @@ namespace AI
                 botCharacteristics.DetectionWindow,
                 botCharacteristics.TimeBeforeReaction
             );
+            RespawnSensor = new RespawnSensor(botCharacteristics.EventReactionTimeout, botCharacteristics.SpawnPointPrediction, GetEnemy().GetID());
             DamageSensor = new DamageSensor(botCharacteristics.TimeBeforeReaction, botCharacteristics.EventReactionTimeout);
             SoundSensor = new SoundSensor(botCharacteristics.TimeBeforeReaction, botCharacteristics.EventReactionTimeout, GetID(), head.transform, botCharacteristics.SoundThreshold);
             PickupMemory = new PickupMemory(this);
@@ -237,14 +238,15 @@ namespace AI
         public override void Respawn()
         {
             var position = transform.position;
-            SpawnInfoGameEvent.Instance.Raise(
-                new SpawnInfo {x = position.x, z = position.z, entityId = entityID, spawnEntity = gameObject.name}
-            );
             health = totalHealth;
             GunManager.ResetAmmo();
             // ActivateLowestGun();
 
             SetInGame(true);
+
+            SpawnInfoGameEvent.Instance.Raise(
+                new SpawnInfo {x = position.x, z = position.z, entityId = entityID, spawnEntity = gameObject.name}
+            );
         }
 
 
