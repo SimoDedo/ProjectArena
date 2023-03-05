@@ -234,7 +234,7 @@ namespace Maps.MapAssembler
                 wall.AddComponent<MeshRenderer>().material = wallMaterial;
                 
                 var boxCollider = wall.AddComponent<BoxCollider>();
-                boxCollider.size = new Vector3(rowWall.endingColumn - rowWall.startingColumn, wallHeight, 0.5f * mapScale);
+                boxCollider.size = new Vector3(rowWall.endingColumn - rowWall.startingColumn, wallHeight, 0.1f * mapScale);
                 
                 wall.isStatic = true;
                 wall.layer = LayerMask.NameToLayer("Wall");
@@ -266,7 +266,7 @@ namespace Maps.MapAssembler
                 wall.AddComponent<MeshRenderer>().material = wallMaterial;
 
                 var boxCollider = wall.AddComponent<BoxCollider>();
-                boxCollider.size = new Vector3(0.5f * mapScale, wallHeight, columnWall.startingRow - columnWall.endingRow);
+                boxCollider.size = new Vector3(0.1f * mapScale, wallHeight, columnWall.startingRow - columnWall.endingRow);
 
                 wall.isStatic = true;
                 wall.layer = LayerMask.NameToLayer("Wall");
