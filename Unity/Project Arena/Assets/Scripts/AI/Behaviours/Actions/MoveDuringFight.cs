@@ -82,7 +82,7 @@ namespace AI.Behaviours.Actions
                     return TaskStatus.Running;
                 }
                 
-                if ((currentPos - targetPos).magnitude < 10f)
+                if ((currentPos - targetPos).magnitude < 14f)
                 {
                     // We failed the tactical movement and we are very close to the enemy. Likely we are stuck in a corner.
                     timeStuckInCorner += Time.deltaTime;
@@ -124,25 +124,44 @@ namespace AI.Behaviours.Actions
             var unNormalizedDirection = sameHeightEnemyPos - currentPos;
             var distance = unNormalizedDirection.magnitude;
             var direction = unNormalizedDirection.normalized;
-            
-            var movementDirectionDueToGun = GetMoveDirectionDueToGun(distance, direction);
-            var movementDirectionDueToStrafe = GetMovementDirectionDueToStrafe(direction);
 
-            var totalWeight = 1.0f + skill * movementDirectionDueToStrafe.magnitude;
+            // For gun MM of 1, I want 100% movement to be for the gun for skill = 0 and 80% for skill = 1
+            // For gun MM of 0.3, I want 100% movement to be for the gun for skill = 0 and 10% for skill = 1
+            // Desired gun movement weight = 1 - skill * ( - 1 * gun magnitude + 1.2)
+            // Strafe magnitude must be sqrt( (GM - GW)^2 - GW^2)
             
-            var movementDirectionDueToGunWeight = movementDirectionDueToGun.magnitude;
-            
-            var movementDirectionDueToStrafeWeight = 
-                skill * (2.0f - movementDirectionDueToGunWeight);
+            // TODO if I don't strafe, the entity moves slower.
+            var gunMovement = GetMoveDirectionDueToGunRange(distance, direction);
+            var strafeMovement = GetMovementDirectionDueToStrafe(direction);
 
-            var totalMovement = (
-                    movementDirectionDueToGun +
-                    movementDirectionDueToStrafe * movementDirectionDueToStrafeWeight
-                    ) / Mathf.Sqrt(totalWeight) * Time.deltaTime * navSystem.Speed;
+            Vector3 movementVector;
+            if (strafeMovement != Vector3.zero)
+            {
+                var gunMagnitude = gunMovement.magnitude;
+                var gunPercentage = Mathf.Pow(1 - skill * (-6 / 7f * gunMagnitude + 0.04f + 6 / 7f), 2);
+                var strafeMagnitude = Mathf.Sqrt(
+                    Mathf.Pow(gunMagnitude / gunPercentage, 2) - Mathf.Pow(gunPercentage, 2)
+                );
+                movementVector = gunMovement + strafeMovement * strafeMagnitude;
+            }
+            else
+            {
+                movementVector = gunMovement;
+            }
+            
+            // Debug.Log("AAA gun movement for " + entity.GetID() + " is " + 
+            //           (gunMovement.magnitude / movementVector.magnitude) + ", " +
+            //           Mathf.Pow(gunMovement.magnitude / movementVector.magnitude, 2) + 
+            //           "of total, while strafe is " + 
+            //           (strafeMovement.magnitude / movementVector.magnitude) + ", " + 
+            //           Mathf.Pow(strafeMovement.magnitude / movementVector.magnitude, 2)
+            // );
+
+            var totalMovement = movementVector.normalized * Time.deltaTime * navSystem.Speed;
             
             // Debug.Log("AAAA movement for " + entity.GetID() + " is speed " + (Time.deltaTime * navSystem.Speed));
             // Debug.Log("AAAA movement for " + entity.GetID() + ", magn: " + totalMovement.magnitude);
-            //
+            
             var positionAfterMovement = currentPos + totalMovement;
             // Debug.Log("AAAA movement for " + entity.GetID() + ", position after: " + positionAfterMovement);
 
@@ -165,10 +184,11 @@ namespace AI.Behaviours.Actions
                 // MoveToLocationWithEnemyInSight(currentPos, targetPos);
             }
 
-            isStrafingRight = !isStrafingRight;
+            UpdateStrafeIfNeeded(true);
+            // isStrafingRight = !isStrafingRight;
 
             // Enemy cannot be seen from new position or new position is invalid. Ignore strife
-            positionAfterMovement = currentPos + movementDirectionDueToGun * Time.deltaTime * navSystem.Speed;
+            positionAfterMovement = currentPos + gunMovement * Time.deltaTime * navSystem.Speed;
 
             // It wouldn't make sense for me to be unable to see the enemy from this new position, given that I moved
             // along the line connecting me and the enemy, so I'll not check
@@ -231,7 +251,7 @@ namespace AI.Behaviours.Actions
                 Vector3.Cross(direction, -entityTransform.up);
         }
 
-        private Vector3 GetMoveDirectionDueToGun(float distance, Vector3 direction)
+        private Vector3 GetMoveDirectionDueToGunRange(float distance, Vector3 direction)
         {
             Vector3 movementDirectionDueToGun;
             // Get current gun optimal range
@@ -265,9 +285,8 @@ namespace AI.Behaviours.Actions
         {
             if (!force && !(nextStrafeChangeTime <= Time.time)) return;
             nextStrafeChangeTime = Time.time + Random.Range(0.3f, 0.5f);
-            // isStrafing = Random.value < skill;
-            isStrafing = true;
-            isStrafingRight ^= (Random.value < 0.1f);
+            isStrafing = Random.value < skill;
+            isStrafingRight ^= (Random.value < 0.8f);
         }
     }
 }
