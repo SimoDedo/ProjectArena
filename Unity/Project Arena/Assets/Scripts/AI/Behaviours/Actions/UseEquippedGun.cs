@@ -32,17 +32,18 @@ namespace AI.Behaviours.Actions
         private GunManager gunManager;
         private float nextDelayRecalculation = float.MinValue;
         private float previousReflexDelay;
+        private float previousCorrectableDelay;
         private SightController sightController;
         private TargetKnowledgeBase _targetKnowledgeBase;
         private float targetReflexDelay;
-        private NormalDistribution distribution;
+        private float targetCorrectableDelay;
+        private NormalDistribution uncorrectableDelayDistribution;
+        private NormalDistribution correctableDelayDistribution;
         private float aimingDispersionMaxAngle;
         private float acceptableShootingAngle;
 
         private float aimingDispersionFirstAngle;
         private float aimingDispersionSecondAngle;
-
-        private float correctableAimDelay;
         
         private int layerMask = LayerMask.GetMask("Default", "Wall", "Entity");
         public override void OnAwake()
@@ -56,13 +57,13 @@ namespace AI.Behaviours.Actions
             enemy = entity.GetEnemy();
             enemyPositionTracker = enemy.GetComponent<PositionTracker>();
 
-            var mean = entity.Characteristics.UncorrectableAimDelayAverage;
-            const float stdDev = 0.06f;
-
-            correctableAimDelay = entity.Characteristics.CorrectableAimDelay;
+            correctableDelayDistribution = 
+                new NormalDistribution(entity.Characteristics.CorrectableAimDelayAverage, 0.1f);
             
-            distribution = new NormalDistribution(mean, stdDev);
-            targetReflexDelay = (float) distribution.Generate();
+            uncorrectableDelayDistribution = 
+                new NormalDistribution(entity.Characteristics.UncorrectableAimDelayAverage, 0.06f);
+            targetReflexDelay = (float) uncorrectableDelayDistribution.Generate();
+            targetCorrectableDelay = (float) correctableDelayDistribution.Generate();
             aimingDispersionFirstAngle = Random.Range(0, aimingDispersionMaxAngle);
             aimingDispersionSecondAngle = Random.Range(-Mathf.PI, -Mathf.PI);
         }
@@ -92,7 +93,8 @@ namespace AI.Behaviours.Actions
             if (nextDelayRecalculation <= Time.time)
             {
                 previousReflexDelay = targetReflexDelay;
-                targetReflexDelay = (float) distribution.Generate();
+                targetReflexDelay = (float) uncorrectableDelayDistribution.Generate();
+                targetCorrectableDelay = (float) correctableDelayDistribution.Generate();
                 // Debug.Log("Computed new delay for " + entity.name + ": " + targetReflexDelay +", mean is " + entity.AimDelayAverage);
                 nextDelayRecalculation = Time.time + AIM_UPDATE_INTERVAL;
 
@@ -122,11 +124,13 @@ namespace AI.Behaviours.Actions
                     1f
             );
             
-            var uncorrectableDelay = Math.Max(
-                0,
+            var uncorrectableDelay = Mathf.Max(0f, 
                 previousReflexDelay + (targetReflexDelay - previousReflexDelay) * aimTargetProgress
-            );
-            
+                );
+
+            var correctableAimDelay = Mathf.Max(0f, 
+                previousCorrectableDelay + (targetCorrectableDelay - previousCorrectableDelay) * aimTargetProgress
+                );
             
             var totalDelay = uncorrectableDelay + correctableAimDelay;
             
@@ -185,7 +189,7 @@ namespace AI.Behaviours.Actions
             var aimingError = GetDeviatedDirection(chosenPoint - ourStartingPoint);
             if (gunManager.IsCurrentGunAiming())
             {
-                aimingError *= 0.3f;
+                aimingError *= 0.8f;
             }
 
             chosenPoint = ourStartingPoint + aimingError;
@@ -206,10 +210,14 @@ namespace AI.Behaviours.Actions
         // In case the weapon is a blast weapon, aims at the floor.
         private void AimRaycastWeapon(Vector3 enemyPosition, float lastSightedTime)
         {
-            // TODO deviated direction doesn't decrease when aiming
             var ourPosition = sightController.GetHeadPosition();
             var aimingDirection = enemyPosition - ourPosition;
-            var aimingPoint = ourPosition + aimingDirection + GetDeviatedDirection(aimingDirection);
+            var aimingError = GetDeviatedDirection(aimingDirection);
+            if (gunManager.IsCurrentGunAiming())
+            {
+                aimingError *= 0.8f;
+            }
+            var aimingPoint = ourPosition + aimingDirection + aimingError;
 
             var angle = sightController.LookAtPoint(aimingPoint);
             if (lastSightedTime != Time.time && !gunManager.IsGunBlastWeapon(gunManager.CurrentGunIndex))
@@ -228,7 +236,7 @@ namespace AI.Behaviours.Actions
 
         private void TryAimIfRecommended(float enemyDistance, float angle)
         {
-            if (!gunManager.IsCurrentGunReloading() && gunManager.CanCurrentGunAim() && angle < 10 && enemyDistance > 10)
+            if (!gunManager.IsCurrentGunReloading() && gunManager.CanCurrentGunAim() && angle < 15 && enemyDistance > 30)
             {
                 if (!gunManager.IsCurrentGunAiming())
                     gunManager.SetCurrentGunAim(true);

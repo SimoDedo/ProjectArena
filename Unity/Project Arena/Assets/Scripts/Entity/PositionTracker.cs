@@ -107,7 +107,7 @@ namespace Entity
             var endTime = Time.time;
             
             // Estimate velocity in the interval            
-            const float WEIGHT = 60;
+            const float WEIGHT = 6f;
 
             var weighedVelocity = Vector3.zero;
             var trackedCount = tracked.Count;
@@ -189,7 +189,7 @@ namespace Entity
 
             var trackedCount = tracked.Count;
             // Estimate velocity in the interval            
-            const float WEIGHT = 60;
+            const float WEIGHT = 6;
 
             var weighedVelocity = Vector3.zero;
             var (endPosition, intervalEndTime) = tracked[0];

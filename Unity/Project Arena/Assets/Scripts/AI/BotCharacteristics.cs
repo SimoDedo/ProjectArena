@@ -59,7 +59,7 @@ namespace AI
         public float Prediction => Interpolate(MIN_PREDICTION, MAX_PREDICTION, ScaleScore(generalSkill, c.prediction));
         public float SpawnPointPrediction => Interpolate(MIN_SPAWN_PREDICTION, MAX_SPAWN_PREDICTION, ScaleScore(generalSkill, c.prediction));
         public float UncorrectableAimDelayAverage => Interpolate(MIN_UNCORRECTABLE_AIM_DELAY_AVERAGE, MAX_UNCORRECTABLE_AIM_DELAY_AVERAGE, 1.0f - ScaleScore(generalSkill, c.aiming));
-        public float CorrectableAimDelay => Interpolate(MIN_CORRECTABLE_AIM_DELAY, MAX_CORRECTABLE_AIM_DELAY, 1.0f - ScaleScore(generalSkill, c.aiming));
+        public float CorrectableAimDelayAverage => Interpolate(MIN_CORRECTABLE_AIM_DELAY_AVERAGE, MAX_CORRECTABLE_AIM_DELAY_AVERAGE, 1.0f - ScaleScore(generalSkill, c.aiming));
         public float AimingDispersionAngle => Interpolate(MIN_AIM_DISPERSION_ANGLE, MAX_AIM_DISPERSION_ANGLE, 1.0f - ScaleScore(generalSkill, c.aiming));
         public float AcceptableShootingAngle => Interpolate(MIN_ACCEPTABLE_SHOOTING_ANGLE, MAX_ACCEPTABLE_SHOOTING_ANGLE, 1.0f - ScaleScore(generalSkill, c.aiming));
         public float Speed => c.speed;
@@ -94,10 +94,10 @@ namespace AI
             }
         }
         public Recklessness Recklessness => c.recklessness;
-        public float MaxRange        {
+        public float MaxRange {
             get
             {
-                var percentage = (generalSkill - 0.5f) / 5; // +- 10%
+                var percentage = (generalSkill - 0.5f) * 3 / 5; // +- 30%
                 return c.maxRange + c.maxRange * percentage;
             }
         }
@@ -107,21 +107,20 @@ namespace AI
         /// <summary>
         /// Default characteristics of a bot. Average abilities all around.
         /// </summary>
-        public static BotCharacteristics Default =>
-            new BotCharacteristics(
-                0.5f,
-                new JSonBotCharacteristics()
-            );
+        public static BotCharacteristics Default => new (
+            0.5f,
+            new JSonBotCharacteristics()
+                );
 
 
-        private const float MIN_EYE_SPEED = 500f;
-        private const float MAX_EYE_SPEED = 5000f;
+        private const float MIN_EYE_SPEED = 800f;
+        private const float MAX_EYE_SPEED = 3000f;
         private const float MIN_MEMORY_WINDOW = 2f;
         private const float MAX_MEMORY_WINDOW = 5f;
         private const float MIN_DETECTION_WINDOW = 1f;
         private const float MAX_DETECTION_WINDOW = 3f;
         private const float MIN_TIME_BEFORE_REACTION = 0.05f;
-        private const float MAX_TIME_BEFORE_REACTION = 0.5f;
+        private const float MAX_TIME_BEFORE_REACTION = 0.3f;
         private const float MIN_PREDICTION = 0.1f;
         private const float MAX_PREDICTION = 0.8f;
         private const float MIN_SPAWN_PREDICTION = -0.1f;
@@ -133,26 +132,27 @@ namespace AI
         private const float MIN_DODGE_ROCKET_PROBABILITY = 0.2f;
         private const float MAX_DODGE_ROCKET_PROBABILITY = 1.3f;
         private const float MIN_CAN_SELECT_COVER_PROBABILITY = -0.3f;
-        private const float MAX_CAN_SELECT_COVER_PROBABILITY = 1.0f;
+        private const float MAX_CAN_SELECT_COVER_PROBABILITY = -0.3f;
 
-        // With these params, at best an entity will aim at the enemy position ~80% of the times, at
-        // worst ~5% of the times. 
-        // Check from (example) WolframAlpha: 
-        // integrate 1/(sqrt(2*pi)*s)*e^(-(x-m)^2/(2*s^2)) from -infinity to 0 with s = 0.06 and m = <mean>
-        private const float MIN_UNCORRECTABLE_AIM_DELAY_AVERAGE = -0.025f;
-        private const float MAX_UNCORRECTABLE_AIM_DELAY_AVERAGE = 0.05f;
-        private const float UNCORRECTABLE_AIM_DELAY_STD_DEV = 0.06f;
+        private const float MIN_UNCORRECTABLE_AIM_DELAY_AVERAGE = -0.005f;
+        private const float MAX_UNCORRECTABLE_AIM_DELAY_AVERAGE = 0.025f;
+        private const float UNCORRECTABLE_AIM_DELAY_STD_DEV = 0.03f;
 
-        private const float MIN_CORRECTABLE_AIM_DELAY = 0.05f;
-        private const float MAX_CORRECTABLE_AIM_DELAY = 0.2f;
+        // private const float MIN_UNCORRECTABLE_AIM_DELAY_AVERAGE = -0.015f;
+        // private const float MAX_UNCORRECTABLE_AIM_DELAY_AVERAGE = 0.06f;
+        // private const float UNCORRECTABLE_AIM_DELAY_STD_DEV = 0.06f;
+
+        private const float MIN_CORRECTABLE_AIM_DELAY_AVERAGE = 0.3f;
+        private const float MAX_CORRECTABLE_AIM_DELAY_AVERAGE = 0.5f;
+        private const float CORRECTABLE_AIM_DELAY_STD_DEV = 0.1f;
         
-        private const float MIN_AIM_DISPERSION_ANGLE = 0.3f;
-        private const float MAX_AIM_DISPERSION_ANGLE = 30f;
-        private const float MIN_ACCEPTABLE_SHOOTING_ANGLE = 0.5f;
-        private const float MAX_ACCEPTABLE_SHOOTING_ANGLE = 7f;
+        private const float MIN_AIM_DISPERSION_ANGLE = 4f;
+        private const float MAX_AIM_DISPERSION_ANGLE = 20f;
+        private const float MIN_ACCEPTABLE_SHOOTING_ANGLE = 0.1f;
+        private const float MAX_ACCEPTABLE_SHOOTING_ANGLE = 5f;
 
-        private const float MIN_SOUND_THRESHOLD = 0.2f;
-        private const float MAX_SOUND_THRESHOLD = 3f;
+        private const float MIN_SOUND_THRESHOLD = 0.075f;
+        private const float MAX_SOUND_THRESHOLD = 0.2f;
         
         
         private static float ScaleScore(float general, float specific)
