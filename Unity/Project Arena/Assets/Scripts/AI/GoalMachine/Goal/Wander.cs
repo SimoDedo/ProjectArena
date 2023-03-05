@@ -24,7 +24,7 @@ namespace AI.GoalMachine.Goal
 
         public float GetScore()
         {
-            return 0.2f;
+            return 0.05f;
         }
 
         public void Enter()
