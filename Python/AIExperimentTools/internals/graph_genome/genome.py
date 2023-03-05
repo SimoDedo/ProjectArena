@@ -2,7 +2,7 @@ from internals.area import Area, scale_area
 from internals.constants import GENOME_NUM_ROWS, GENOME_NUM_COLUMNS, GENOME_SQUARE_SIZE, GENOME_MAX_ROOM_WIDTH, \
     GENOME_MAX_ROOM_HEIGHT
 from internals.phenotype import Phenotype
-from internals.room import Room
+from internals.graph_genome.room import Room
 
 
 class Genome:
@@ -77,6 +77,13 @@ class Genome:
             self.cellsHeight * GENOME_NUM_ROWS * self.squareSize,
             self.mapScale,
             [scale_area(area, self.squareSize) for area in areas],
+        )
+
+    @staticmethod
+    def unscaled_area(phenotype):
+        return sum([
+            (x.rightColumn - x.leftColumn) * (x.topRow - x.bottomRow) for x in phenotype.areas
+        ]
         )
 
     def find_closest_connected_component(self):
@@ -160,7 +167,7 @@ class Genome:
         if max_of_min_x < min_of_max_x:
             # We can place a straight corridor.
             # start_x = c * cells_width + random.randrange(max_of_min_x, min_of_max_x)
-            start_x = c * GENOME_MAX_ROOM_WIDTH + (max_of_min_x + min_of_max_x) // 2
+            start_x = c * GENOME_MAX_ROOM_WIDTH + int((max_of_min_x + min_of_max_x) // 2)
             areas.append(Area(
                 start_x,
                 bottom_y,
@@ -171,11 +178,11 @@ class Genome:
 
         # We cannot place a straight corridor. Place an twisted one.
         # Find X1 and X2 of the corridor.
-        middle_x_top_room = c * GENOME_MAX_ROOM_WIDTH + (top_room.leftColumn + top_room.rightColumn) / 2
-        middle_x_bottom_room = c * GENOME_MAX_ROOM_WIDTH + (bottom_room.leftColumn + bottom_room.rightColumn) / 2
+        middle_x_top_room = c * GENOME_MAX_ROOM_WIDTH + (top_room.leftColumn + top_room.rightColumn) // 2
+        middle_x_bottom_room = c * GENOME_MAX_ROOM_WIDTH + (bottom_room.leftColumn + bottom_room.rightColumn) // 2
 
         # var corridorY = Random.Range(bottomY, topY);
-        corridor_y = (bottom_y + top_y) / 2
+        corridor_y = (bottom_y + top_y) // 2
 
         if bottom_y != corridor_y:
             # Vertical corridor from bottom room
@@ -305,5 +312,3 @@ class Genome:
             old_room.bottomRow,
             old_room.topRow,
         )
-
-

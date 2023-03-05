@@ -1,10 +1,10 @@
 import numpy
 
 
-def get_statistics(array, decimals=8):
-    min_var = round(numpy.min(array),decimals)
-    max_var = round(numpy.max(array),decimals)
-    mean = round(numpy.mean(array),decimals)
-    std_dev = round(numpy.std(array),decimals)
-    return min_var, max_var, mean, std_dev
+def get_statistics(values, decimals=8):
+    min_value = round(numpy.min(values), decimals)
+    max_value = round(numpy.max(values), decimals)
+    mean_value = round(numpy.mean(values), decimals)
+    std_dev = round(numpy.std(values), decimals)
+    return min_value, max_value, mean_value, std_dev
 

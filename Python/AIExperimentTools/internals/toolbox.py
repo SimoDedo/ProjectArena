@@ -1,24 +1,33 @@
 from deap import base, creator, tools
 
-from internals import generation, evaluation, mutation, crossover, genome
+from internals import evaluation
+# from internals.ab_genome.ab_genome import ABGenome
+# from internals.ab_genome.crossover import crossover
+# from internals.ab_genome.generation import create_random_genome
+# from internals.ab_genome.mutation import mutate
+
+from internals.graph_genome.genome import Genome
+from internals.graph_genome.crossover import crossover
+from internals.graph_genome.mutation import mutate
+from internals.graph_genome.generation import create_random_genome
+
+__TEST_AB = False
 
 
 def prepare_toolbox():
     creator.create("FitnessMulti", base.Fitness, weights=(
         1,  # Entropy
-        0.6,  # Pace
-        -1.0,  # Penalization for repeated phenotypes
-        -0.5,  # Penalization for small phenotypes (too few rooms)
+        1,  # Pace
     ))
-    creator.create("Individual", genome.Genome, fitness=creator.FitnessMulti)
 
+    creator.create("Individual", Genome, fitness=creator.FitnessMulti)
+    # creator.create("Individual", ABGenome, fitness=creator.FitnessMulti)
     toolbox = base.Toolbox()
+    toolbox.register("mutate", mutate)
+    toolbox.register("mate", crossover)
+    toolbox.register("individual", create_random_genome, creator.Individual)
 
-    toolbox.register("individual", generation.create_random_genome, creator.Individual)
-
-    toolbox.register("evaluate", evaluation.evaluate_fitness)
-    toolbox.register("mutate", mutation.mutate)
-    toolbox.register("mate", crossover.crossover)
-    toolbox.register("select", tools.selTournament, tournsize=3)
+    toolbox.register("select", tools.selNSGA2)
+    toolbox.register("evaluate", evaluation.evaluate)
 
     return toolbox

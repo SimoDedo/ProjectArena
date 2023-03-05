@@ -1,11 +1,11 @@
 import random
 
-from .constants import GENOME_NUM_ROWS, GENOME_NUM_COLUMNS, GENOME_MAX_ROOM_HEIGHT, GENOME_MAX_ROOM_WIDTH, \
-    GENOME_MIN_ROOM_HEIGHT, GENOME_MIN_ROOM_WIDTH
+from internals.constants import GENOME_NUM_ROWS, GENOME_NUM_COLUMNS, GENOME_MAX_ROOM_HEIGHT, GENOME_MAX_ROOM_WIDTH, \
+    GENOME_MIN_ROOM_HEIGHT, GENOME_MIN_ROOM_WIDTH, GENOME_MAP_SCALE
 from .room import Room
 
 FAKE_ROOM_PROBABILITY = 0.2
-MAX_ROOM_SIZE_PROBABILITY = 0.3
+MAX_ROOM_SIZE_PROBABILITY = 0.08
 NO_CORRIDOR_PROBABILITY = 0.3
 
 
@@ -34,7 +34,7 @@ def create_random_genome(individual_init):
     rooms = __create_rooms()
     vertical_corridors = __create_corridors(GENOME_NUM_ROWS - 1, GENOME_NUM_COLUMNS, NO_CORRIDOR_PROBABILITY)
     horizontal_corridors = __create_corridors(GENOME_NUM_ROWS, GENOME_NUM_COLUMNS - 1, NO_CORRIDOR_PROBABILITY)
-    map_scale = 2.0
+    map_scale = GENOME_MAP_SCALE
     return individual_init(rooms, vertical_corridors, horizontal_corridors, map_scale)
 
 
@@ -58,13 +58,32 @@ def create_room():
             width = random.randint(GENOME_MIN_ROOM_WIDTH, GENOME_MAX_ROOM_WIDTH)
             height = random.randint(GENOME_MIN_ROOM_HEIGHT, GENOME_MAX_ROOM_HEIGHT)
 
-        left_col = random.randint(0, GENOME_MAX_ROOM_WIDTH - width)
-        bottom_row = random.randint(0, GENOME_MAX_ROOM_HEIGHT - height)
+    left_col = random.randint(0, GENOME_MAX_ROOM_WIDTH - width)
+    bottom_row = random.randint(0, GENOME_MAX_ROOM_HEIGHT - height)
 
-        right_col = left_col + width
-        top_row = bottom_row + height
+    right_col = left_col + width
+    top_row = bottom_row + height
 
-        return Room(left_col, right_col, bottom_row, top_row)
+    return Room(left_col, right_col, bottom_row, top_row)
+
+# def create_room():
+#     if random.random() < FAKE_ROOM_PROBABILITY:
+#         return Room()
+#     else:
+#         if random.random() < MAX_ROOM_SIZE_PROBABILITY:
+#             width = GENOME_MAX_ROOM_WIDTH
+#             height = GENOME_MAX_ROOM_HEIGHT
+#         else:
+#             width = random.randint(GENOME_MIN_ROOM_WIDTH, GENOME_MAX_ROOM_WIDTH)
+#             height = random.randint(GENOME_MIN_ROOM_HEIGHT, GENOME_MAX_ROOM_HEIGHT)
+#
+#         left_col = random.randint(0, GENOME_MAX_ROOM_WIDTH - width)
+#         bottom_row = random.randint(0, GENOME_MAX_ROOM_HEIGHT - height)
+#
+#         right_col = left_col + width
+#         top_row = bottom_row + height
+#
+#         return Room(left_col, right_col, bottom_row, top_row)
 
 
 def __create_corridors(rows, columns, probability):
