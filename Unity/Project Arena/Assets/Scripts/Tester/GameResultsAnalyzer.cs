@@ -31,6 +31,8 @@ namespace Tester
 
         private readonly Dictionary<int, int> numberOfShots = new();
 
+        private readonly Dictionary<int, int> numberOfProjectiles = new();
+
         private readonly Dictionary<int, int> numberOfSuicides = new();
 
         private readonly Dictionary<int, float> timeBetweenSights = new();
@@ -75,6 +77,7 @@ namespace Tester
             numberOfFrags.Clear();
             numberOfSuicides.Clear();
             numberOfShots.Clear();
+            numberOfProjectiles.Clear();
             numberOfHits.Clear();
             numberOfSights.Clear();
             killStreakMax.Clear();
@@ -102,6 +105,7 @@ namespace Tester
         private void LogShot(ShotInfo receivedInfo)
         {
             numberOfShots.AddToKey(receivedInfo.ownerId, 1);
+            numberOfProjectiles.AddToKey(receivedInfo.ownerId, receivedInfo.projectilesPerShot);
         }
 
         private void LogKill(KillInfo receivedInfo)
@@ -160,12 +164,12 @@ namespace Tester
             var accuracy = new Dictionary<int, float>();
             foreach (var key in totalKeys)
             {
-                numberOfShots.TryGetValue(key, out var shots);
+                numberOfProjectiles.TryGetValue(key, out var projectiles);
                 numberOfHits.TryGetValue(key, out var hits);
                 if (hits == 0)
                     accuracy.Add(key, 0);
                 else
-                    accuracy.Add(key, hits / (float) shots);
+                    accuracy.Add(key, hits / (float) projectiles);
             }
 
             var killStreakAverage = new Dictionary<int, float>();

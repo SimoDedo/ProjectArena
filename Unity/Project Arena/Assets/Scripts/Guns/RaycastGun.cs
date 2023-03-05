@@ -69,6 +69,7 @@ namespace Guns
                 {
                     x = position.x,
                     z = position.z,
+                    projectilesPerShot = projectilesPerShot,
                     ammoInCharger = ammoInCharger,
                     direction = root.eulerAngles.y,
                     ownerId = ownerEntityScript.GetID(),
@@ -89,7 +90,7 @@ namespace Guns
                 else
                     direction = headCamera.transform.forward;
 
-                Debug.DrawRay(headCamera.transform.position, direction * 100, Color.blue, 5, false);
+                // Debug.DrawRay(headCamera.transform.position, direction * 100, Color.blue, 5, false);
                 
                 if (Physics.Raycast(headCamera.transform.position, direction, out hit, range, layerMask))
                 {

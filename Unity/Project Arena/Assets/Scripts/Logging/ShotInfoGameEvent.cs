@@ -7,6 +7,7 @@ namespace Logging
         public float x;
         public float z;
         public float direction;
+        public int projectilesPerShot;
         public int ownerId;
         public int gunID;
         public int ammoInCharger;

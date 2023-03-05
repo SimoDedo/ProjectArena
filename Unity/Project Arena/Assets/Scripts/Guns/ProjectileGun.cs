@@ -62,10 +62,11 @@ namespace Guns
                     x = position.x,
                     z = position.z,
                     ammoInCharger = ammoInCharger,
+                    projectilesPerShot = projectilesPerShot,
                     direction = root.eulerAngles.y,
                     ownerId = ownerEntityScript.GetID(),
                     gunID = gunId,
-                    ammoNotInCharger = ammoNotInCharger
+                    ammoNotInCharger = ammoNotInCharger,
                 });
             }
 
