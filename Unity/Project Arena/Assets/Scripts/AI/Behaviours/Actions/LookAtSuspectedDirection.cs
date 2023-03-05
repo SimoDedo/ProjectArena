@@ -31,8 +31,8 @@ namespace AI.Behaviours.Actions
         {
             var enemy = entity.GetEnemy();
             var enemyTracker = enemy.GetComponent<PositionTracker>();
-            var delay = Mathf.Max(damageSensor.LastTimeDamaged, soundSensor.LastTimeHeardShot);
-            (lookPosition, _) = enemyTracker.GetPositionAndVelocityForRange(delay, delay);
+            var eventTime = Mathf.Max(damageSensor.LastTimeDamaged, soundSensor.LastTimeHeardShot);
+            lookPosition = enemyTracker.GetPositionAtTime(eventTime);
         }
 
         public override TaskStatus OnUpdate()

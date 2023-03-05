@@ -8,10 +8,9 @@ namespace AI.Layers.KnowledgeBase
     {
         // Used to react slower for distant enemies.
         private static readonly AnimationCurve DistanceScore = new AnimationCurve(
-            new Keyframe(0f, 6.0f),
-            new Keyframe(10f, 2.0f),
+            new Keyframe(0f, 1.6f),
             new Keyframe(20f, 1.0f),
-            new Keyframe(60f, 0.6f)
+            new Keyframe(60f, 0.8f)
         );
 
         // The entity this component belongs to.
@@ -57,7 +56,7 @@ namespace AI.Layers.KnowledgeBase
 
         public void Update()
         {
-            if (InternalHasSeenTarget())
+            if (InternalHasDetectedTarget())
             {
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (FirstTimeDetectedInEvent == float.MinValue)
@@ -75,7 +74,7 @@ namespace AI.Layers.KnowledgeBase
         /// <summary>
         /// Returns whether we consider the target as detected.
         /// </summary>
-        public bool HasSeenTarget()
+        public bool HasDetectedTarget()
         {
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             return LastTimeDetected == Time.time;
@@ -87,13 +86,13 @@ namespace AI.Layers.KnowledgeBase
         public bool HasLostTarget()
         {
             if (!target.IsAlive) return false;
-            return !HasSeenTarget() && TestDetection(0, Time.time - detectionWindowLenght);
+            return !HasDetectedTarget() && TestDetection(0, Time.time - detectionWindowLenght);
         }
 
         /// <summary>
         /// Calculates whether we consider the target as detected.
         /// </summary>
-        private bool InternalHasSeenTarget()
+        private bool InternalHasDetectedTarget()
         {
             if (!target.IsAlive)
                 // If the enemy is not alive, immediately stop considering it as detected.

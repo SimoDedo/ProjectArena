@@ -41,7 +41,7 @@ namespace AI.Behaviours.Conditions
             }
 
             hasDecidedToFight = false;
-            if (_targetKnowledgeBase.HasSeenTarget())
+            if (_targetKnowledgeBase.HasDetectedTarget())
             {
                 timestampChangeIdeaAllowed = Time.time + TIMEOUT_CHANGE_IDEA;
                 if (Random.value > probabilityFightBack)
