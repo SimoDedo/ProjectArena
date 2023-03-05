@@ -62,7 +62,7 @@ namespace AI.Layers.KnowledgeBase
                     // ReSharper disable once CompareOfFloatsByEqualityOperator
                     if (lastTimeActive == pickupInfo.lastTimeCollected)
                     {
-                        // Last time the object was picked up by us, so we now exactly the new activation time
+                        // Last time the object was picked up by us, so we know exactly the new activation time
                         estimatedActivationTime[pickable] = lastTimeActive + pickable.Cooldown;
                     }
                     else
