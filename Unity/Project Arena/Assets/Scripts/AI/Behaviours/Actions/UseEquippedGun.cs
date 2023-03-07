@@ -93,6 +93,7 @@ namespace AI.Behaviours.Actions
             if (nextDelayRecalculation <= Time.time)
             {
                 previousReflexDelay = targetReflexDelay;
+                previousCorrectableDelay = targetCorrectableDelay;
                 targetReflexDelay = (float) uncorrectableDelayDistribution.Generate();
                 targetCorrectableDelay = (float) correctableDelayDistribution.Generate();
                 // Debug.Log("Computed new delay for " + entity.name + ": " + targetReflexDelay +", mean is " + entity.AimDelayAverage);
