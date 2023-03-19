@@ -190,10 +190,10 @@ namespace AI.Behaviours.Actions
             var aimingError = GetDeviatedDirection(chosenPoint - ourStartingPoint);
             if (gunManager.IsCurrentGunAiming())
             {
-                aimingError *= 0.8f;
+                aimingError *= 0.4f;
             }
 
-            chosenPoint = ourStartingPoint + aimingError;
+            chosenPoint += aimingError;
             
             // Only shoot if we found a nice position, otherwise keep the shot for another time
             if (float.IsPositiveInfinity(record)) return;
@@ -216,7 +216,7 @@ namespace AI.Behaviours.Actions
             var aimingError = GetDeviatedDirection(aimingDirection);
             if (gunManager.IsCurrentGunAiming())
             {
-                aimingError *= 0.8f;
+                aimingError *= 0.4f;
             }
             var aimingPoint = ourPosition + aimingDirection + aimingError;
 
