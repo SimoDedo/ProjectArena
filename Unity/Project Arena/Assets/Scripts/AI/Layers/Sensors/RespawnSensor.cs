@@ -67,10 +67,8 @@ namespace AI.Layers.Sensors
             if (obj.entityId == myId) return;
             if (Random.value > detectionProbability)
             {
-                Debug.Log("AAA received spawn event for entity " + obj.entityId);
                 return;
             }
-            Debug.Log("AAA reacting to for entity " + obj.entityId);
             latestRespawnTimeIndex = (latestRespawnTimeIndex + 1) % MAX_BACKLOG_RESPAWNS;
             lastRespawnTimes[latestRespawnTimeIndex] = Time.time;
         }
