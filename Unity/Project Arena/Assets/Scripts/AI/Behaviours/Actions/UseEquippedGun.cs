@@ -173,7 +173,7 @@ namespace AI.Behaviours.Actions
 
                 Debug.DrawLine(ourStartingPoint, newPos);
                 if (Physics.Linecast(ourStartingPoint, newPos, out var hit) && hit.point != newPos)
-                    // Looks like there is an obstacle from out head to that position...
+                    // Looks like there is an obstacle from our head to that position...
                     continue;
 
                 var timeBeforeProjectileReachesNewPos = (ourStartingPoint - newPos).magnitude / projectileSpeed;
