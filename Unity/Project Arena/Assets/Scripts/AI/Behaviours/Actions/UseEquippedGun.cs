@@ -195,7 +195,7 @@ namespace AI.Behaviours.Actions
             // Only shoot if we found a nice position, otherwise keep the shot for another time
             if (float.IsPositiveInfinity(record)) return;
 
-            var angle = sightController.LookAtPoint(chosenPoint);
+            var angle = sightController.LookAtPoint(chosenPoint, false);
             TryAimIfRecommended((ourStartingPoint - chosenPoint).magnitude, angle);
             if (angle >= acceptableShootingAngle || !gunManager.CanCurrentGunShoot() || !ShouldShootWeapon(chosenPoint, isGunBlast))
                 return;
