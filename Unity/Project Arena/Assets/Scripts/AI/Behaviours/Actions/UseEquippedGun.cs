@@ -179,11 +179,9 @@ namespace AI.Behaviours.Actions
                 var timeBeforeProjectileReachesNewPos = (ourStartingPoint - newPos).magnitude / projectileSpeed;
                 var timeError = Mathf.Abs(timeBeforeProjectileReachesNewPos - i * lookAheadTimeStep);
 
-                if (timeError < record)
-                {
-                    record = timeError;
-                    chosenPoint = newPos;
-                }
+                if (timeError >= record) continue;
+                record = timeError;
+                chosenPoint = newPos;
             }
 
             var aimingError = GetDeviatedDirection(chosenPoint - ourStartingPoint);
