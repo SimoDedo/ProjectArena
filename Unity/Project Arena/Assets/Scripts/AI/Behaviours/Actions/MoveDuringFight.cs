@@ -184,7 +184,7 @@ namespace AI.Behaviours.Actions
                 // MoveToLocationWithEnemyInSight(currentPos, targetPos);
             }
 
-            UpdateStrafeIfNeeded(true);
+            // UpdateStrafeIfNeeded(true);
             // isStrafingRight = !isStrafingRight;
 
             // Enemy cannot be seen from new position or new position is invalid. Ignore strife
@@ -205,7 +205,7 @@ namespace AI.Behaviours.Actions
             Vector3 validPos = Vector3.zero;
 
             // We cannot see the enemy from where we are, try to find a position from where it is visible.
-            UpdateStrafeIfNeeded(true);
+            // UpdateStrafeIfNeeded(true);
             for (var i = 0; i < maxAttempts; i++)
             {
                 var randomDir = Random.insideUnitCircle;
@@ -284,7 +284,7 @@ namespace AI.Behaviours.Actions
         private void UpdateStrafeIfNeeded(bool force = false)
         {
             if (!force && !(nextStrafeChangeTime <= Time.time)) return;
-            nextStrafeChangeTime = Time.time + Random.Range(0.3f, 0.5f);
+            nextStrafeChangeTime = Time.time + Random.Range(0.7f, 1.1f);
             isStrafing = Random.value < skill;
             isStrafingRight ^= (Random.value < 0.8f);
         }
