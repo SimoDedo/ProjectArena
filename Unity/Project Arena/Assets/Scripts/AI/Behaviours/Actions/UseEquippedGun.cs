@@ -124,28 +124,27 @@ namespace AI.Behaviours.Actions
                 (Time.time - nextDelayRecalculation + AIM_UPDATE_INTERVAL) / AIM_UPDATE_INTERVAL * AIM_COMMUTE_SPEED,
                     1f
             );
-            
-            var uncorrectableDelay = Mathf.Max(0f, 
-                previousReflexDelay + (targetReflexDelay - previousReflexDelay) * aimTargetProgress
-                );
 
-            var correctableAimDelay = Mathf.Max(0f, 
-                previousCorrectableDelay + (targetCorrectableDelay - previousCorrectableDelay) * aimTargetProgress
-                );
+            var unpredictability = enemyPositionTracker.GetUnpredictability();
             
-            var totalDelay = uncorrectableDelay + correctableAimDelay;
+            var reflexDelay = previousReflexDelay + (targetReflexDelay - previousReflexDelay) * aimTargetProgress;
+
+            var unpredictabilityDelay = 0.16f * unpredictability - 0.08f;
             
+            var totalDelay = Mathf.Max(0f, reflexDelay + unpredictabilityDelay);
+
             Vector3 enemyPosition;
-            var estimatedVelocity = enemyPositionTracker.GetAverageVelocity(correctableAimDelay);
+            var estimatedVelocity = enemyPositionTracker.GetAverageVelocity(Time.time - totalDelay, Time.time);
 
             if (!float.IsNaN(lastSightedDelay) && lastSightedDelay > totalDelay)
+            {
                 // We don't know the exact position of the enemy currentDelay ago, so just consider
                 // its last know position (with velocity zero, so that we won't correct the shooting position)
                 enemyPosition = enemyPositionTracker.GetPositionAtTime(lastSightedTime);
+            } 
             else
             {
-                enemyPosition = enemyPositionTracker.GetPositionAtTime(Time.time - totalDelay) + 
-                                correctableAimDelay * estimatedVelocity;
+                enemyPosition = enemyPositionTracker.GetPositionAtTime(Time.time - totalDelay);
             }
 
             return new Tuple<Vector3, Vector3>(enemyPosition, estimatedVelocity);
