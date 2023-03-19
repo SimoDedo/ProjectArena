@@ -148,8 +148,8 @@ namespace AI
         
         private const float MIN_AIM_DISPERSION_ANGLE = 4f;
         private const float MAX_AIM_DISPERSION_ANGLE = 20f;
-        private const float MIN_ACCEPTABLE_SHOOTING_ANGLE = 0.1f;
-        private const float MAX_ACCEPTABLE_SHOOTING_ANGLE = 5f;
+        private const float MIN_ACCEPTABLE_SHOOTING_ANGLE = 0.01f;
+        private const float MAX_ACCEPTABLE_SHOOTING_ANGLE = 0.3f;
 
         private const float MIN_SOUND_THRESHOLD = 0.075f;
         private const float MAX_SOUND_THRESHOLD = 0.2f;
