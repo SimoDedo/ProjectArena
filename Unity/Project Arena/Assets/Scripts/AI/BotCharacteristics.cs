@@ -113,8 +113,8 @@ namespace AI
                 );
 
 
-        private const float MIN_EYE_SPEED = 800f;
-        private const float MAX_EYE_SPEED = 3000f;
+        private const float MIN_EYE_SPEED = 1200f;
+        private const float MAX_EYE_SPEED = 3500f;
         private const float MIN_MEMORY_WINDOW = 2f;
         private const float MAX_MEMORY_WINDOW = 5f;
         private const float MIN_DETECTION_WINDOW = 1f;
