@@ -72,7 +72,7 @@ namespace AI
         
         private LoggingComponent loggingComponent;
 
-        private void Update()
+        private void FixedUpdate()
         {
             if (loggingGame && Time.time > lastPositionLog + 0.5)
             {

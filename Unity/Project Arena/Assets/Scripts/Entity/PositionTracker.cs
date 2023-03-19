@@ -36,7 +36,7 @@ namespace Entity
             t = transform;
         }
 
-        private void LateUpdate()
+        private void FixedUpdate()
         {
             UpdateList();
         }
