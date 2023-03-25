@@ -96,7 +96,7 @@ namespace AI.Layers.Statistics
                     else
                     {
                         // Enemy sight reestablished
-                        totalTimeBetweenSights = Time.time - Math.Max(currentFightStartTime, enemySightLossTime);
+                        totalTimeBetweenSights += Time.time - Math.Max(currentFightStartTime, enemySightLossTime);
                         numberOfSights++;
                     }
                 }
