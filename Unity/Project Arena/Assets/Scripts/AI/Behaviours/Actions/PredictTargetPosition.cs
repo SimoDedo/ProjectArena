@@ -28,7 +28,7 @@ namespace AI.Behaviours.Actions
             entity = GetComponent<AIEntity>();
             navSystem = entity.NavigationSystem;
             enemy = entity.GetEnemy();
-            predictionSkill = entity.GetPredictionSkill();
+            predictionSkill = entity.Characteristics.Prediction;
         }
 
         public override TaskStatus OnUpdate()

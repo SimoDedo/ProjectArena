@@ -59,7 +59,7 @@ namespace AI.Behaviours.Actions
             sightController = entity.SightController;
 
             movementController = entity.MovementController;
-            curiosity = entity.GetCuriosity();
+            curiosity = entity.Characteristics.Curiosity;
 
             nextUpdateTime = float.MinValue;
 

@@ -304,22 +304,6 @@ namespace AI
         }
 
         /// <summary>
-        /// Returns the curiosity level of the entity.
-        /// </summary>
-        public CuriosityLevel GetCuriosity()
-        {
-            return botCharacteristics.Curiosity;
-        }
-
-        /// <summary>
-        /// Returns the prediction skill of the entity.
-        /// </summary>
-        public float GetPredictionSkill()
-        {
-            return botCharacteristics.Prediction;
-        }
-
-        /// <summary>
         /// Returns the enemy of this entity.
         /// </summary>
         public Entity.Entity GetEnemy()
