@@ -7,34 +7,35 @@ import jsonpickle
 import matplotlib.pyplot as plt
 import numpy
 from matplotlib import colors
+from matplotlib.colors import LinearSegmentedColormap
 
 from internals import evaluation, stats
 from internals.constants import GAME_DATA_FOLDER
 from internals.phenotype import Phenotype
 
 
-def plot(data, file_name, plot_name, bot1_name, bot2_name, normalization):
+def plot(data, file_name, plot_name, bot1_name, bot2_name, cmap):
 
     with open(GAME_DATA_FOLDER + file_name + "_heatmap_matrix.pkl", "wb") as cp_file:
         pickle.dump(data, cp_file)
 
     # with open(GAME_DATA_FOLDER + file_name + "_heatmap_matrix.pkl", "rb") as cp_file:
-        # data = pickle.load(cp_file)
+    # data = pickle.load(cp_file)
 
     fig, axs = plt.subplots(figsize=(2 + 2, 3), constrained_layout=True, squeeze=False)
     ax = axs[0, 0]
-    # psm = ax.contourf(
-    #     data,
-    #     cmap='jet',
-    #     levels=50,
-    # )
-    psm = ax.pcolormesh(
+    psm = ax.contourf(
         data,
-        cmap='jet',
-        rasterized=True,
-        norm=normalization,
-        shading='gouraud',
+        cmap=cmap,
+        levels=100,
     )
+#     psm = ax.pcolormesh(
+#         data,
+#         cmap='jet',
+#         rasterized=True,
+#         norm=normalization,
+# #        shading='gouraud',
+#     )
     fig.colorbar(psm, ax=ax)
     ax.set_xlabel(bot2_name)
     ax.set_xticks([0, 10, 20, 30, 40])
@@ -71,7 +72,7 @@ def heatmap(bot1_file, bot2_file, resolution, heatmap_file):
         for y in range(0, resolution):
             if y < x and bot1_file == bot2_file:
                 log_ratio_info[x][y] = -log_ratio_info[y][x]
-                kill_diff_info[x][y] = -kill_diff_info[y][x]
+                kill_diff_info[x][y] = kill_diff_info[y][x]
                 continue
 
             bot1_data["skill"] = str(x / (resolution - 1))
@@ -101,8 +102,8 @@ def heatmap(bot1_file, bot2_file, resolution, heatmap_file):
             log_ratio_info[x][y] = math.log2(mean_ratio)
             kill_diff_info[x][y] = abs(mean_kill_diff)
 
-    plot(log_ratio_info, "heatmap_ratio", "Kill log ratio", bot1_file, bot2_file, colors.CenteredNorm())
-    plot(kill_diff_info, "heatmap_kill_diff", "Kill difference", bot1_file, bot2_file, colors.Normalize(vmin=0))
+    plot(log_ratio_info, "heatmap_ratio", "Kill log ratio", bot1_file, bot2_file, 'jet')
+    plot(kill_diff_info, "heatmap_kill_diff", "Kill difference", bot1_file, bot2_file, 'jet')
 
 
 if __name__ == "__main__":
@@ -116,3 +117,7 @@ if __name__ == "__main__":
 
     heatmap(args.bot1_file, args.bot2_file, args.resolution, args.heatmap_file)
 
+    ratio_cmap = LinearSegmentedColormap.from_list('ratio', ['#0000FF', '#00FFFF', '#00FF00', '#FFFF00', '#FF0000'])
+
+    # plot([], "heatmap_ratio", "Kill log ratio", args.bot1_file, args.bot2_file, 'jet')
+    # plot([], "heatmap_kill_diff", "Kill difference", args.bot1_file, args.bot2_file, 'jet')

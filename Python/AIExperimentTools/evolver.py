@@ -15,8 +15,8 @@ from deap import tools
 
 def __evolve_population(num_epochs, population_size, bot1_data, bot2_data, checkpoint):
     toolbox = prepare_toolbox()
-    pareto = tools.ParetoFront()
     all_fitnesses = []
+    known_phenotypes = dict()
 
     if checkpoint is not None:
         with open(checkpoint, "rb") as cp_file:
@@ -24,7 +24,6 @@ def __evolve_population(num_epochs, population_size, bot1_data, bot2_data, check
             pop = checkpoint_data["population"]
             starting_epoch = checkpoint_data["epoch"]
             all_fitnesses = checkpoint_data["data"]
-            pareto = checkpoint_data["pareto_front"]
             random.setstate(checkpoint_data['random_state'])
     else:
         starting_epoch = 0
@@ -32,11 +31,10 @@ def __evolve_population(num_epochs, population_size, bot1_data, bot2_data, check
         print("Using seed " + str(seed))
         random.seed(seed)
         pop = []
-        epoch_phenotypes = dict()
         while len(pop) < population_size:
             individual = toolbox.individual()
             fitness = __print_info_and_evaluate(toolbox, individual, 0, len(pop), bot1_data, bot2_data,
-                                                epoch_phenotypes)
+                                                known_phenotypes)
             if fitness[0] < 0.9 and fitness[0] != 0:
                 individual.fitness.values = fitness
                 pop.append(individual)
@@ -51,11 +49,9 @@ def __evolve_population(num_epochs, population_size, bot1_data, bot2_data, check
         # This is just to assign the crowding distance to the individuals
         # no actual selection is done
         pop = toolbox.select(pop, len(pop))
-        pareto.update(pop)
-        __save_checkpoint(all_fitnesses, 0, pareto, pop)
+        __save_checkpoint(all_fitnesses, 0, pop)
 
     for epoch in range(starting_epoch + 1, num_epochs + 1):
-        epoch_phenotypes = dict()
         print("-- Generation %i --" % epoch)
 
         # Vary the population
@@ -77,7 +73,7 @@ def __evolve_population(num_epochs, population_size, bot1_data, bot2_data, check
         print("Recalculate fitness for " + str(len(invalid_ind)) + " individuals")
 
         fitnesses = [
-            __print_info_and_evaluate(toolbox, v, epoch, i, bot1_data, bot2_data, epoch_phenotypes)
+            __print_info_and_evaluate(toolbox, v, epoch, i, bot1_data, bot2_data, known_phenotypes)
             for i, v in enumerate(invalid_ind)
         ]
 
@@ -88,19 +84,17 @@ def __evolve_population(num_epochs, population_size, bot1_data, bot2_data, check
 
         # Select the next generation population
         pop = toolbox.select(pop + offspring, population_size)
-        pareto.update(pop)
-        __save_checkpoint(all_fitnesses, epoch, pareto, pop)
+        __save_checkpoint(all_fitnesses, epoch, pop)
 
-    return pop, pareto, all_fitnesses
+    return pop, all_fitnesses
 
 
-def __save_checkpoint(all_fitnesses, epoch, pareto_front, pop):
+def __save_checkpoint(all_fitnesses, epoch, pop):
     checkpoint_data = dict(
         population=pop,
         epoch=epoch,
         random_state=random.getstate(),
         data=all_fitnesses,
-        pareto_front=pareto_front,
     )
     with open(GAME_DATA_FOLDER + "checkpoints/checkpoint_epoch_" + str(epoch) + ".pkl", "wb") as cp_file:
         pickle.dump(checkpoint_data, cp_file)
@@ -124,9 +118,11 @@ def __print_info_and_evaluate(toolbox, individual, epoch, individual_number, bot
         print("AAA small phenotype!")
         known_phenotypes[phenotype] = [(0, 0), epoch, individual_number, pandas.DataFrame().to_dict()]
         return 0, 0
-    dataset = toolbox.evaluate(phenotype, epoch, individual_number, bot1_data, bot2_data).to_dict()
+    dataset = toolbox.evaluate(phenotype, epoch, individual_number, bot1_data, bot2_data).to_dict(orient="list")
     __print_dataset_info(dataset)
-    fitness = numpy.mean(dataset["entropy"]), numpy.mean(dataset["pace"])
+    # average_streak = max(numpy.mean(dataset["killStreakAverage1"]), numpy.mean(dataset["killStreakAverage2"]))
+    # fitness = numpy.mean(dataset["entropy"]), average_streak
+    fitness = round(numpy.mean(dataset["entropy"]), 3), round(numpy.mean(dataset["pace"]), 3)
     individual.dataset = dataset
     known_phenotypes[phenotype] = [fitness, epoch, individual_number, dataset]
     return fitness
@@ -137,6 +133,8 @@ def __print_dataset_info(dataset):
     __print_stats(dataset, "entropy")
     __print_stats(dataset, "ratio")
     __print_stats(dataset, "pace")
+    # __print_stats(dataset, "killStreakAverage1")
+    # __print_stats(dataset, "killStreakAverage2")
 
 
 def __print_stats(dataset, key):
