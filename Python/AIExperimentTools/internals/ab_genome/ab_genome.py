@@ -55,6 +55,15 @@ class ABGenome:
         areas = [x.to_area() for x in areas_in_phenotype]
         return Phenotype(AB_MAX_MAP_WIDTH, AB_MAX_MAP_HEIGHT, self.mapScale, areas)
 
+    def map_matrix(self):
+        areas = self.phenotype().areas
+        map_matrix = numpy.zeros([AB_MAX_MAP_HEIGHT, AB_MAX_MAP_WIDTH], dtype=numpy.int8)
+        for area in areas:
+            for row in range(area.bottomRow, area.topRow):
+                for col in range(area.leftColumn, area.rightColumn):
+                    map_matrix[row][col] = 1
+        return tuple(map_matrix.tobytes())
+
     @staticmethod
     def unscaled_area(phenotype):
         tiles = numpy.zeros([AB_MAX_MAP_HEIGHT, AB_MAX_MAP_WIDTH])
