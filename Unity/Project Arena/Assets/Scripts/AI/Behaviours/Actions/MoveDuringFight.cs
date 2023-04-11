@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using AI.Layers.KnowledgeBase;
 using BehaviorDesigner.Runtime.Tasks;
 using Entity.Component;
@@ -127,44 +126,32 @@ namespace AI.Behaviours.Actions
 
             // For gun MM of 1, I want 100% movement to be for the gun for skill = 0 and 80% for skill = 1
             // For gun MM of 0.3, I want 100% movement to be for the gun for skill = 0 and 10% for skill = 1
-            // Desired gun movement weight = 1 - skill * ( - 1 * gun magnitude + 1.2)
-            // Strafe magnitude must be sqrt( (GM - GW)^2 - GW^2)
-            
-            // TODO if I don't strafe, the entity moves slower.
+            // Formula used, where X represents magnitude of gun MM and Y strafe MM:
+            // Y^2 / (X^2 + Y^2) = 0.2 * X^2 + 0.77 * skill * (1 - X^2)
             var gunMovement = GetMoveDirectionDueToGunRange(distance, direction);
             var strafeMovement = GetMovementDirectionDueToStrafe(direction);
 
             Vector3 movementVector;
             if (strafeMovement != Vector3.zero)
             {
-                var gunMagnitude = gunMovement.magnitude;
-                var gunPercentage = Mathf.Pow(1 - skill * (-6 / 7f * gunMagnitude + 0.04f + 6 / 7f), 2);
-                var strafeMagnitude = Mathf.Sqrt(
-                    Mathf.Pow(gunMagnitude / gunPercentage, 2) - Mathf.Pow(gunPercentage, 2)
+                var gunMagnitude = gunMovement.sqrMagnitude;
+
+                var strafeMagnitude = Mathf.Sqrt( 
+                    Mathf.Max(
+                        skill * gunMagnitude * (97f - 77f*gunMagnitude) / (skill * (77f * gunMagnitude - 97f) + 100f)
+                    )
                 );
-                movementVector = gunMovement + strafeMovement * strafeMagnitude;
+                strafeMovement *= strafeMagnitude;
+                movementVector = gunMovement + strafeMovement;
+                movementVector.Normalize();
             }
             else
             {
                 movementVector = gunMovement;
             }
-            
-            // Debug.Log("AAA gun movement for " + entity.GetID() + " is " + 
-            //           (gunMovement.magnitude / movementVector.magnitude) + ", " +
-            //           Mathf.Pow(gunMovement.magnitude / movementVector.magnitude, 2) + 
-            //           "of total, while strafe is " + 
-            //           (strafeMovement.magnitude / movementVector.magnitude) + ", " + 
-            //           Mathf.Pow(strafeMovement.magnitude / movementVector.magnitude, 2)
-            // );
 
-            var totalMovement = movementVector.normalized * Time.deltaTime * navSystem.Speed;
-            
-            // Debug.Log("AAAA movement for " + entity.GetID() + " is speed " + (Time.deltaTime * navSystem.Speed));
-            // Debug.Log("AAAA movement for " + entity.GetID() + ", magn: " + totalMovement.magnitude);
-            
+            var totalMovement = movementVector * Time.deltaTime * navSystem.Speed;
             var positionAfterMovement = currentPos + totalMovement;
-            // Debug.Log("AAAA movement for " + entity.GetID() + ", position after: " + positionAfterMovement);
-
             Debug.DrawLine(currentPos, positionAfterMovement, Color.yellow, 0, false);
 
             if (!Physics.Linecast(positionAfterMovement, targetPos, layerMask))
