@@ -99,14 +99,11 @@ namespace Entity
             return biggestSmallerThan;
         }
 
-        // TODO WIP
-        public float GetUnpredictability()
+        public float GetUnpredictability(float oldEventsWeight)
         {
-            const float WEIGHT = 0.5f;
             var speedsKnown = tracked.Count - 1;
-            var numIntervals = Mathf.Min(speedsKnown - 1, 10);
+            var numIntervals = Mathf.Min(speedsKnown - 1, 25);
             var unpredictability = 0f;
-            var totalWeight = 0f;
 
             if (numIntervals < 2)
             {
@@ -122,19 +119,16 @@ namespace Entity
                 pos_i_1 = pos_i_2;
                 pos_i_2 = tracked[speedsKnown - numIntervals + i + 1];
 
-                var weight = Mathf.Pow(1f / (numIntervals - i), WEIGHT);
-                totalWeight += weight;
+                var weight = Mathf.Pow(1f / (numIntervals - i), oldEventsWeight);
 
                 var speed1 = SpeedBetween(pos_i_0, pos_i_1);
                 var speed2 = SpeedBetween(pos_i_1, pos_i_2);
-
-                var angle = Vector3.Angle(speed1, speed2);
-
-                var currentUnpredictability = Mathf.Pow(angle / 180f, 0.3f);
-
+                
+                // TODO avoid hardcode speed
+                var currentUnpredictability = -(Vector3.Dot(speed1, speed2) - speed1.magnitude * speed2.magnitude) / 400;
                 unpredictability += currentUnpredictability * weight;
             }
-            // unpredictability /= totalWeight;
+
             return Mathf.Min(unpredictability, 1.0f);
         }
         
