@@ -78,7 +78,8 @@ namespace AI
         public float FightBackWhenCollectingPickup => Interpolate(MIN_FIGHT_BACK_WHEN_PICKUP, MAX_FIGHT_BACK_WHEN_PICKUP, ScaleScore(generalSkill, c.movementSkill));
         public float DodgeRocketProbability => Interpolate(MIN_DODGE_ROCKET_PROBABILITY, MAX_DODGE_ROCKET_PROBABILITY, ScaleScore(generalSkill, c.movementSkill));
         public float CanSelectCoverProbability => Interpolate(MIN_CAN_SELECT_COVER_PROBABILITY, MAX_CAN_SELECT_COVER_PROBABILITY, ScaleScore(generalSkill, c.movementSkill));
-
+        public float UnpredictabilityHistoryWeight => Interpolate(WORST_UNPREDICTABLE_DELAY_WEIGHT, BEST_UNPREDICTABLE_DELAY_WEIGHT, ScaleScore(generalSkill, c.aiming));
+        
         // TODO understand if we can turn this into something continuous.
         public CuriosityLevel Curiosity
         {
@@ -119,8 +120,8 @@ namespace AI
         private const float MAX_MEMORY_WINDOW = 5f;
         private const float MIN_DETECTION_WINDOW = 1f;
         private const float MAX_DETECTION_WINDOW = 3f;
-        private const float MIN_TIME_BEFORE_REACTION = 0.05f;
-        private const float MAX_TIME_BEFORE_REACTION = 0.3f;
+        private const float MIN_TIME_BEFORE_REACTION = 0.125f;
+        private const float MAX_TIME_BEFORE_REACTION = 0.450f;
         private const float MIN_PREDICTION = 0.1f;
         private const float MAX_PREDICTION = 0.8f;
         private const float MIN_SPAWN_PREDICTION = -0.1f;
@@ -132,11 +133,12 @@ namespace AI
         private const float MIN_DODGE_ROCKET_PROBABILITY = 0.2f;
         private const float MAX_DODGE_ROCKET_PROBABILITY = 1.3f;
         private const float MIN_CAN_SELECT_COVER_PROBABILITY = -0.3f;
-        private const float MAX_CAN_SELECT_COVER_PROBABILITY = -0.3f;
+        private const float MAX_CAN_SELECT_COVER_PROBABILITY = 0.6f;
 
-        private const float MIN_UNCORRECTABLE_AIM_DELAY_AVERAGE = -0.005f;
-        private const float MAX_UNCORRECTABLE_AIM_DELAY_AVERAGE = 0.025f;
+        private const float MIN_UNCORRECTABLE_AIM_DELAY_AVERAGE = 0.001f;
+        private const float MAX_UNCORRECTABLE_AIM_DELAY_AVERAGE = 0.070f;
         private const float UNCORRECTABLE_AIM_DELAY_STD_DEV = 0.03f;
+        // private const float UNCORRECTABLE_AIM_DELAY_STD_DEV = 0.06f;
 
         // private const float MIN_UNCORRECTABLE_AIM_DELAY_AVERAGE = -0.015f;
         // private const float MAX_UNCORRECTABLE_AIM_DELAY_AVERAGE = 0.06f;
@@ -144,7 +146,9 @@ namespace AI
 
         private const float MIN_CORRECTABLE_AIM_DELAY_AVERAGE = 0.3f;
         private const float MAX_CORRECTABLE_AIM_DELAY_AVERAGE = 0.5f;
-        private const float CORRECTABLE_AIM_DELAY_STD_DEV = 0.1f;
+
+        private const float WORST_UNPREDICTABLE_DELAY_WEIGHT = 0.15f;
+        private const float BEST_UNPREDICTABLE_DELAY_WEIGHT = 0.5f;
         
         private const float MIN_AIM_DISPERSION_ANGLE = 4f;
         private const float MAX_AIM_DISPERSION_ANGLE = 20f;

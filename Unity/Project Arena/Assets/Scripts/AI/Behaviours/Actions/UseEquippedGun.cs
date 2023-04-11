@@ -18,9 +18,9 @@ namespace AI.Behaviours.Actions
     public class UseEquippedGun : Action
     {
         // Time (in seconds) after which recalculating the aim delay.
-        private const float AIM_UPDATE_INTERVAL = 0.5f;
-        // Time (in seconds) to smoothly switch between the previous delay and the new one.
-        private const float AIM_COMMUTE_SPEED = 3f;
+        private const float AIM_UPDATE_INTERVAL = 0.2f;
+        // Speed to smoothly switch between the previous delay and the new one.
+        private const float AIM_COMMUTE_SPEED = 2.0f;
         [SerializeField] private int lookBackFrames = -3;
         [SerializeField] private int lookAheadFrames = 3;
         [SerializeField] private float lookAheadTimeStep = 0.3f;
@@ -41,6 +41,7 @@ namespace AI.Behaviours.Actions
         private NormalDistribution correctableDelayDistribution;
         private float aimingDispersionMaxAngle;
         private float acceptableShootingAngle;
+        private float unpredictabilityWeight;
 
         private float aimingDispersionFirstAngle;
         private float aimingDispersionSecondAngle;
@@ -61,11 +62,12 @@ namespace AI.Behaviours.Actions
                 new NormalDistribution(entity.Characteristics.CorrectableAimDelayAverage, 0.1f);
             
             uncorrectableDelayDistribution = 
-                new NormalDistribution(entity.Characteristics.UncorrectableAimDelayAverage, 0.06f);
+                new NormalDistribution(entity.Characteristics.UncorrectableAimDelayAverage, 0.01f);
             targetReflexDelay = (float) uncorrectableDelayDistribution.Generate();
             targetCorrectableDelay = (float) correctableDelayDistribution.Generate();
             aimingDispersionFirstAngle = Random.Range(0, aimingDispersionMaxAngle);
             aimingDispersionSecondAngle = Random.Range(-Mathf.PI, -Mathf.PI);
+            unpredictabilityWeight = entity.Characteristics.UnpredictabilityHistoryWeight;
         }
 
         public override void OnEnd()
@@ -125,11 +127,11 @@ namespace AI.Behaviours.Actions
                     1f
             );
 
-            var unpredictability = enemyPositionTracker.GetUnpredictability();
+            var unpredictability = enemyPositionTracker.GetUnpredictability(unpredictabilityWeight);
             
             var reflexDelay = previousReflexDelay + (targetReflexDelay - previousReflexDelay) * aimTargetProgress;
 
-            var unpredictabilityDelay = 0.16f * unpredictability - 0.08f;
+            var unpredictabilityDelay = 0.225f * unpredictability - 0.075f;
             
             var totalDelay = Mathf.Max(0f, reflexDelay + unpredictabilityDelay);
 
