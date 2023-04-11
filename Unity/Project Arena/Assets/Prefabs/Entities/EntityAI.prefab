@@ -623,7 +623,7 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 90
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!136 &1272100895109282999
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -986,7 +986,7 @@ MonoBehaviour:
   headCamera: {fileID: 20788917190633434}
   muzzleFlash: {fileID: 1172488531380796}
   damage: 75
-  normalDispersion: 3
+  normalDispersion: 2
   aimingDispersion: 0
   projectilesPerShot: 1
   infinteAmmo: 1
@@ -2073,12 +2073,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   headCamera: {fileID: 20788917190633434}
   muzzleFlash: {fileID: 1869087715720208}
-  damage: 12
-  normalDispersion: 2.2
-  aimingDispersion: 2.2
+  damage: 11
+  normalDispersion: 1.2
+  aimingDispersion: 1.2
   projectilesPerShot: 1
   infinteAmmo: 1
-  chargerSize: 15
+  chargerSize: 12
   maximumAmmo: 80
   reloadTime: 1
   cooldownTime: 0.1
@@ -3575,14 +3575,14 @@ MonoBehaviour:
   headCamera: {fileID: 20788917190633434}
   muzzleFlash: {fileID: 1478163250820970}
   damage: 11
-  normalDispersion: 3.4
-  aimingDispersion: 3.4
-  projectilesPerShot: 9
+  normalDispersion: 3
+  aimingDispersion: 3
+  projectilesPerShot: 10
   infinteAmmo: 1
   chargerSize: 6
   maximumAmmo: 20
   reloadTime: 1
-  cooldownTime: 0.75
+  cooldownTime: 0.9
   isBlastWeapon: 0
   muzzleFlashDuration: 0.1
   recoil: 0.05
