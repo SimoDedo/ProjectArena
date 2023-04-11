@@ -349,8 +349,8 @@ MonoBehaviour:
   seed: 
   width: 600
   height: 600
-  objectToObjectDistance: 5
-  objectToWallDistance: 2
+  objectToObjectDistance: 2
+  objectToWallDistance: 0
   borderSize: 5
   roomChar: 114
   wallChar: 119
