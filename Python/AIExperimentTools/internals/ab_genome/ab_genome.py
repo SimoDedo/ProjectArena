@@ -5,15 +5,17 @@ import numpy
 from internals.area import Area
 from internals.phenotype import Phenotype
 
-AB_NUM_ROOMS = 5
-AB_NUM_CORRIDORS = 30
-AB_MIN_ROOM_SIZE = 5
-AB_MAX_ROOM_SIZE = 20
-AB_MAX_CORRIDOR_LENGTH = 20
+AB_SQUARE_SIZE = 1
+AB_NUM_ROOMS = 15
+AB_NUM_CORRIDORS = 50
+AB_MIN_ROOM_SIZE = 3
+AB_MAX_ROOM_SIZE = 12
+AB_MIN_CORRIDOR_LENGTH = 5
+AB_MAX_CORRIDOR_LENGTH = 18
 AB_MAX_MAP_WIDTH = 64
 AB_MAX_MAP_HEIGHT = 64
 AB_CORRIDOR_WIDTH = 3
-AB_MAP_SCALE = 3
+AB_MAP_SCALE = 2
 
 
 class ABGenome:
@@ -52,21 +54,17 @@ class ABGenome:
                 if any(intersect(corridor, aaa) for aaa in areas_in_phenotype):
                     areas_in_phenotype.append(corridor)
 
-        areas = [x.to_area() for x in areas_in_phenotype]
-        return Phenotype(AB_MAX_MAP_WIDTH, AB_MAX_MAP_HEIGHT, self.mapScale, areas)
-
-    def map_matrix(self):
-        areas = self.phenotype().areas
-        map_matrix = numpy.zeros([AB_MAX_MAP_HEIGHT, AB_MAX_MAP_WIDTH], dtype=numpy.int8)
-        for area in areas:
-            for row in range(area.bottomRow, area.topRow):
-                for col in range(area.leftColumn, area.rightColumn):
-                    map_matrix[row][col] = 1
-        return tuple(map_matrix.tobytes())
+        areas = [scale_area(x.to_area(), AB_SQUARE_SIZE) for x in areas_in_phenotype]
+        return Phenotype(
+            AB_MAX_MAP_WIDTH * AB_SQUARE_SIZE,
+            AB_MAX_MAP_HEIGHT * AB_SQUARE_SIZE,
+            self.mapScale,
+            areas,
+        )
 
     @staticmethod
     def unscaled_area(phenotype):
-        tiles = numpy.zeros([AB_MAX_MAP_HEIGHT, AB_MAX_MAP_WIDTH])
+        tiles = numpy.zeros([AB_MAX_MAP_HEIGHT * AB_SQUARE_SIZE, AB_MAX_MAP_WIDTH * AB_SQUARE_SIZE])
 
         for area in phenotype.areas:
             for row in range(area.bottomRow, area.topRow):
@@ -156,3 +154,13 @@ def intersect(area_a, area_b):
 
     # No intersection
     return False
+
+
+def scale_area(area, scale):
+    return Area(
+        scale * area.leftColumn,
+        scale * area.bottomRow,
+        scale * area.rightColumn,
+        scale * area.topRow,
+        area.isCorridor,
+    )

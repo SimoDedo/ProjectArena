@@ -1,4 +1,5 @@
 import jsonpickle
+import numpy
 
 
 class Phenotype:
@@ -27,3 +28,11 @@ class Phenotype:
             )
             genome_json = jsonpickle.encode(cp, unpicklable=False)
             f.write(genome_json)
+
+    def map_matrix(self):
+        map_matrix = numpy.zeros([self.mapHeight, self.mapWidth], dtype=numpy.int8)
+        for area in self.areas:
+            for row in range(area.bottomRow, area.topRow):
+                for col in range(area.leftColumn, area.rightColumn):
+                    map_matrix[row][col] = 1
+        return tuple(map_matrix.tobytes())

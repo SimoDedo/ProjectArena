@@ -1,8 +1,15 @@
 from internals.area import Area, scale_area
-from internals.constants import GENOME_NUM_ROWS, GENOME_NUM_COLUMNS, GENOME_SQUARE_SIZE, GENOME_MAX_ROOM_WIDTH, \
-    GENOME_MAX_ROOM_HEIGHT
 from internals.phenotype import Phenotype
 from internals.graph_genome.room import Room
+
+GG_SQUARE_SIZE = 3
+GG_MAP_SCALE = 2
+GG_NUM_ROWS = 3
+GG_NUM_COLUMNS = 6
+GG_MIN_ROOM_WIDTH = 1
+GG_MIN_ROOM_HEIGHT = 1
+GG_MAX_ROOM_WIDTH = 8
+GG_MAX_ROOM_HEIGHT = 8
 
 
 class Genome:
@@ -12,10 +19,11 @@ class Genome:
         self.verticalCorridors = vertical_corridors
         self.horizontalCorridors = horizontal_corridors
 
-        # TODO remove these three
-        self.squareSize = GENOME_SQUARE_SIZE
-        self.cellsWidth = GENOME_MAX_ROOM_WIDTH
-        self.cellsHeight = GENOME_MAX_ROOM_HEIGHT
+        self.squareSize = GG_SQUARE_SIZE
+        self.cellsWidth = GG_MAX_ROOM_WIDTH
+        self.cellsHeight = GG_MAX_ROOM_HEIGHT
+        self.numColumns = GG_NUM_COLUMNS
+        self.numRows = GG_NUM_ROWS
 
     def __eq__(self, other):
         if type(other) is type(self):
@@ -30,21 +38,21 @@ class Genome:
         # order to prevent them from touching. This is needed because thin walls are not supported in the char map.
         # At the same time, if I have two adjacent rooms but they don't really touch each other, I need to separate
         # them just a little.
-        for c in range(GENOME_NUM_COLUMNS):
-            for r in range(GENOME_NUM_ROWS - 1, 0, -1):
+        for c in range(self.numColumns):
+            for r in range(self.numRows - 1, 0, -1):
                 self.shrink_vertically_if_needed(r, c)
 
-        for r in range(GENOME_NUM_ROWS):
-            for c in range(GENOME_NUM_COLUMNS - 1, 0, -1):
+        for r in range(self.numRows):
+            for c in range(self.numColumns - 1, 0, -1):
                 self.shrink_horizontally_if_needed(r, c)
 
         visited_rooms = self.find_closest_connected_component()
 
         # Start placing the Areas for Rooms
-        for r in range(GENOME_NUM_ROWS):
-            for c in range(GENOME_NUM_COLUMNS):
+        for r in range(self.numRows):
+            for c in range(self.numColumns):
                 room = self.rooms[r][c]
-                if not room.isReal:
+                if room is None:
                     continue
                 if not visited_rooms[r][c]:
                     continue
@@ -57,14 +65,14 @@ class Genome:
                 areas.append(area)
 
         # Place corridors
-        for r in range(1, GENOME_NUM_ROWS):
-            for c in range(GENOME_NUM_COLUMNS):
+        for r in range(1, self.numRows):
+            for c in range(self.numColumns):
                 if not visited_rooms[r][c]:
                     continue
                 self.place_vertical_connections_if_needed(areas, r, c)
 
-        for c in range(1, GENOME_NUM_COLUMNS):
-            for r in range(GENOME_NUM_ROWS):
+        for c in range(1, self.numColumns):
+            for r in range(self.numRows):
                 if not visited_rooms[r][c]:
                     continue
                 self.place_horizontal_connections_if_needed(areas, r, c)
@@ -73,8 +81,8 @@ class Genome:
             print("There is an invalid area!")
 
         return Phenotype(
-            self.cellsWidth * GENOME_NUM_COLUMNS * self.squareSize,
-            self.cellsHeight * GENOME_NUM_ROWS * self.squareSize,
+            self.cellsWidth * self.numColumns * self.squareSize,
+            self.cellsHeight * self.numRows * self.squareSize,
             self.mapScale,
             [scale_area(area, self.squareSize) for area in areas],
         )
@@ -101,7 +109,7 @@ class Genome:
 
         for r in range(rows):
             for c in range(columns):
-                if not self.rooms[r][c].isReal:
+                if self.rooms[r][c] is None:
                     continue
 
                 room_score = abs(center_row - r) + abs(center_col - c)
@@ -122,7 +130,7 @@ class Genome:
             # cell already visited.
             return
 
-        if not self.rooms[r][c].isReal:
+        if self.rooms[r][c] is None:
             return
         visited[r][c] = True
 
@@ -142,7 +150,7 @@ class Genome:
         top_room = self.rooms[r][c]
         bottom_room = self.rooms[r - 1][c]
 
-        if not top_room.isReal or not bottom_room.isReal:
+        if top_room is None or bottom_room is None:
             # Rooms are not real
             return
 
@@ -150,7 +158,7 @@ class Genome:
             # Rooms are not connected, nothing to do.
             return
 
-        spaced_vertically = bottom_room.topRow != GENOME_MAX_ROOM_HEIGHT or top_room.bottomRow != 0
+        spaced_vertically = bottom_room.topRow != GG_MAX_ROOM_HEIGHT or top_room.bottomRow != 0
         intersect_horizontally = bottom_room.leftColumn < top_room.rightColumn and \
                                  top_room.leftColumn < bottom_room.rightColumn
 
@@ -158,8 +166,8 @@ class Genome:
             # Rooms are touching, nothing to do
             return
 
-        top_y = r * GENOME_MAX_ROOM_HEIGHT + top_room.bottomRow
-        bottom_y = (r - 1) * GENOME_MAX_ROOM_HEIGHT + bottom_room.topRow
+        top_y = r * GG_MAX_ROOM_HEIGHT + top_room.bottomRow
+        bottom_y = (r - 1) * GG_MAX_ROOM_HEIGHT + bottom_room.topRow
 
         max_of_min_x = max(bottom_room.leftColumn, top_room.leftColumn)
         min_of_max_x = min(bottom_room.rightColumn, top_room.rightColumn)
@@ -167,7 +175,7 @@ class Genome:
         if max_of_min_x < min_of_max_x:
             # We can place a straight corridor.
             # start_x = c * cells_width + random.randrange(max_of_min_x, min_of_max_x)
-            start_x = c * GENOME_MAX_ROOM_WIDTH + int((max_of_min_x + min_of_max_x) // 2)
+            start_x = c * GG_MAX_ROOM_WIDTH + int((max_of_min_x + min_of_max_x) // 2)
             areas.append(Area(
                 start_x,
                 bottom_y,
@@ -178,8 +186,8 @@ class Genome:
 
         # We cannot place a straight corridor. Place an twisted one.
         # Find X1 and X2 of the corridor.
-        middle_x_top_room = c * GENOME_MAX_ROOM_WIDTH + (top_room.leftColumn + top_room.rightColumn) // 2
-        middle_x_bottom_room = c * GENOME_MAX_ROOM_WIDTH + (bottom_room.leftColumn + bottom_room.rightColumn) // 2
+        middle_x_top_room = c * GG_MAX_ROOM_WIDTH + (top_room.leftColumn + top_room.rightColumn) // 2
+        middle_x_bottom_room = c * GG_MAX_ROOM_WIDTH + (bottom_room.leftColumn + bottom_room.rightColumn) // 2
 
         # var corridorY = Random.Range(bottomY, topY);
         corridor_y = (bottom_y + top_y) // 2
@@ -201,7 +209,7 @@ class Genome:
         left_room = self.rooms[r][c - 1]
         right_room = self.rooms[r][c]
 
-        if not right_room.isReal or not left_room.isReal:
+        if right_room is None or left_room is None:
             # Rooms are not real
             return
 
@@ -209,29 +217,29 @@ class Genome:
             # Rooms are not connected, nothing to do.
             return
 
-        spaced_horizontally = left_room.rightColumn != GENOME_MAX_ROOM_WIDTH or right_room.leftColumn != 0
+        spaced_horizontally = left_room.rightColumn != GG_MAX_ROOM_WIDTH or right_room.leftColumn != 0
         intersect_vertically = left_room.bottomRow < right_room.topRow and right_room.bottomRow < left_room.topRow
 
         if not spaced_horizontally and intersect_vertically:
             # Rooms are touching, nothing to do
             return
 
-        right_x = c * GENOME_MAX_ROOM_WIDTH + right_room.leftColumn
-        left_x = (c - 1) * GENOME_MAX_ROOM_WIDTH + left_room.rightColumn
+        right_x = c * GG_MAX_ROOM_WIDTH + right_room.leftColumn
+        left_x = (c - 1) * GG_MAX_ROOM_WIDTH + left_room.rightColumn
 
         max_of_min_y = max(left_room.bottomRow, right_room.bottomRow)
         min_of_max_y = min(left_room.topRow, right_room.topRow)
 
         if max_of_min_y < min_of_max_y:
             # We can place a straight corridor.
-            start_y = r * GENOME_MAX_ROOM_HEIGHT + (max_of_min_y + min_of_max_y) // 2
+            start_y = r * GG_MAX_ROOM_HEIGHT + (max_of_min_y + min_of_max_y) // 2
             areas.append(Area(left_x, start_y, right_x, start_y + 1, True))
             return
 
         # We cannot place a straight corridor. Place an twisted one.
         # Find Y1 and Y2 of the corridor.
-        middle_y_right_room = r * GENOME_MAX_ROOM_HEIGHT + (right_room.bottomRow + right_room.topRow) // 2
-        middle_y_left_room = r * GENOME_MAX_ROOM_HEIGHT + (left_room.bottomRow + left_room.topRow) // 2
+        middle_y_right_room = r * GG_MAX_ROOM_HEIGHT + (right_room.bottomRow + right_room.topRow) // 2
+        middle_y_left_room = r * GG_MAX_ROOM_HEIGHT + (left_room.bottomRow + left_room.topRow) // 2
 
         corridor_x = (left_x + right_x) // 2
         # Vertical corridor from bottom room
@@ -250,11 +258,11 @@ class Genome:
     def shrink_vertically_if_needed(self, r, c):
         bottom_room = self.rooms[r - 1][c]
         top_room = self.rooms[r][c]
-        if not bottom_room.isReal or not top_room.isReal:
+        if bottom_room is None or top_room is None:
             # A Room is not real
             return
 
-        spaced_vertically = bottom_room.topRow != GENOME_MAX_ROOM_HEIGHT or top_room.bottomRow != 0
+        spaced_vertically = bottom_room.topRow != GG_MAX_ROOM_HEIGHT or top_room.bottomRow != 0
         if spaced_vertically:
             # There is space for a corridor or to keep the rooms separated.
             return
@@ -284,11 +292,12 @@ class Genome:
     def shrink_horizontally_if_needed(self, r, c):
         left_room = self.rooms[r][c - 1]
         right_room = self.rooms[r][c]
-        if not left_room.isReal or not right_room.isReal:
+
+        if left_room is None or right_room is None:
             # A Room is not real
             return
 
-        spaced_horizontally = left_room.rightColumn != GENOME_MAX_ROOM_WIDTH or right_room.leftColumn != 0
+        spaced_horizontally = left_room.rightColumn != GG_MAX_ROOM_WIDTH or right_room.leftColumn != 0
         if spaced_horizontally:
             # There is space for a corridor or to keep the rooms separated.
             return

@@ -5,14 +5,12 @@ from math import log2
 import numpy
 import pandas
 
-from internals import stats
 from internals.constants import GAME_DATA_FOLDER, NUM_PARALLEL_SIMULATIONS, NUM_MATCHES_PER_SIMULATION, \
     EXPERIMENT_RUNNER_PATH, EXPERIMENT_RUNNER_FILE
 from internals.result_extractor import extract_match_data
 
 
 def evaluate(phenotype, epoch, individual_number, bot1_data, bot2_data, game_length=1200):
-    # return __random_dataset()
     folder_name = 'genome_evolution/'
     experiment_name = str(epoch) + '_' + str(individual_number)
     complete_name = folder_name + experiment_name

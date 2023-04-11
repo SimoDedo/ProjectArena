@@ -3,20 +3,23 @@ import pickle
 import random
 import sys
 import time
+from concurrent.futures.thread import ThreadPoolExecutor
+from multiprocessing import Lock
 
 import numpy
-import pandas
 
-from internals import stats
-from internals.constants import EVOLVER_MATE_PROBABILITY, EVOLVER_MUTATE_PROBABILITY, GAME_DATA_FOLDER
+from internals.constants import EVOLVER_MATE_PROBABILITY, EVOLVER_MUTATE_PROBABILITY, GAME_DATA_FOLDER, NUM_PARALLEL_FITNESS_CALCULATION
 from internals.toolbox import prepare_toolbox
 from deap import tools
+
+
+__known_maps = dict()
+__known_maps_lock = Lock()
 
 
 def __evolve_population(num_epochs, population_size, bot1_data, bot2_data, checkpoint):
     toolbox = prepare_toolbox()
     all_fitnesses = []
-    known_phenotypes = dict()
 
     if checkpoint is not None:
         with open(checkpoint, "rb") as cp_file:
@@ -31,15 +34,19 @@ def __evolve_population(num_epochs, population_size, bot1_data, bot2_data, check
         print("Using seed " + str(seed))
         random.seed(seed)
         pop = []
+        current_cycle = 0
         while len(pop) < population_size:
-            individual = toolbox.individual()
-            fitness = __print_info_and_evaluate(toolbox, individual, 0, len(pop), bot1_data, bot2_data,
-                                                known_phenotypes)
-            if fitness[0] < 0.9 and fitness[0] != 0:
-                individual.fitness.values = fitness
-                pop.append(individual)
-            else:
-                print("Drop individual due to invalid fitness")
+            remaining_individuals = population_size - len(pop)
+            print("Remaining " + str(remaining_individuals) + " to test!")
+            individuals_to_test = [toolbox.individual() for _ in range(remaining_individuals)]
+            __add_epoch_data(individuals_to_test, 0, current_cycle * population_size)
+            fitness = __parallel_execute(bot1_data, bot2_data, individuals_to_test, toolbox)
+            for x in range(len(fitness)):
+                if fitness[x][0] != 0:
+                    individuals_to_test[x].fitness.values = fitness[x]
+                    pop.append(individuals_to_test[x])
+                else:
+                    print("Drop individual " + str(x) + " due to invalid fitness")
 
         fitnesses = [i.fitness.values for i in pop]
         all_fitnesses.extend(fitnesses)
@@ -68,18 +75,15 @@ def __evolve_population(num_epochs, population_size, bot1_data, bot2_data, check
                 toolbox.mutate(mutant)
                 del mutant.fitness.values
 
-        invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
+        invalid_individuals = [ind for ind in offspring if not ind.fitness.valid]
+        __add_epoch_data(invalid_individuals, epoch)
+        print("Recalculate fitness for " + str(len(invalid_individuals)) + " individuals")
 
-        print("Recalculate fitness for " + str(len(invalid_ind)) + " individuals")
-
-        fitnesses = [
-            __print_info_and_evaluate(toolbox, v, epoch, i, bot1_data, bot2_data, known_phenotypes)
-            for i, v in enumerate(invalid_ind)
-        ]
+        fitnesses = __parallel_execute(bot1_data, bot2_data, invalid_individuals, toolbox)
 
         all_fitnesses.extend(fitnesses)
 
-        for ind, fit in zip(invalid_ind, fitnesses):
+        for ind, fit in zip(invalid_individuals, fitnesses):
             ind.fitness.values = fit
 
         # Select the next generation population
@@ -87,6 +91,27 @@ def __evolve_population(num_epochs, population_size, bot1_data, bot2_data, check
         __save_checkpoint(all_fitnesses, epoch, pop)
 
     return pop, all_fitnesses
+
+
+def __add_epoch_data(invalid_individuals, epoch, starting_idx=0):
+    for idx, invalid_ind in enumerate(invalid_individuals):
+        invalid_ind.epoch = epoch
+        invalid_ind.number_in_epoch = starting_idx + idx
+
+
+def __parallel_execute(bot1_data, bot2_data, individuals, toolbox):
+    with ThreadPoolExecutor(NUM_PARALLEL_FITNESS_CALCULATION) as executor:
+        fitnesses = []
+        futures = []
+        for i in range(len(individuals)):
+            futures.append(
+                executor.submit(
+                    __print_info_and_evaluate, toolbox, individuals[i], bot1_data, bot2_data,
+                )
+            )
+        for future in futures:
+            fitnesses.append(future.result())
+    return fitnesses
 
 
 def __save_checkpoint(all_fitnesses, epoch, pop):
@@ -101,31 +126,27 @@ def __save_checkpoint(all_fitnesses, epoch, pop):
         print("Persisted generation for epoch " + str(epoch))
 
 
-def __print_info_and_evaluate(toolbox, individual, epoch, individual_number, bot1_data, bot2_data, known_phenotypes):
-    print("Calculating fitness of individual num " + str(individual_number) + " for epoch " + str(epoch))
+def __print_info_and_evaluate(toolbox, individual, bot1_data, bot2_data):
+    print("Calculating fitness of individual num " + str(individual.number_in_epoch) + " for epoch " + str(individual.epoch))
     phenotype = individual.phenotype()
-    if phenotype in known_phenotypes:
-        print("Used cached fitness value for " + str(epoch) + "_" + str(individual_number))
-        cached_value = known_phenotypes.get(phenotype)
-        individual.epoch = cached_value[1]
-        individual.number_in_epoch = cached_value[2]
-        individual.dataset = cached_value[3]
-        return cached_value[0]
-    individual.epoch = epoch
-    individual.number_in_epoch = individual_number
-    if individual.unscaled_area(phenotype) < 300:
-        # penalize small phenotypes
-        print("AAA small phenotype!")
-        known_phenotypes[phenotype] = [(0, 0), epoch, individual_number, pandas.DataFrame().to_dict()]
-        return 0, 0
-    dataset = toolbox.evaluate(phenotype, epoch, individual_number, bot1_data, bot2_data).to_dict(orient="list")
+    map_matrix = phenotype.map_matrix()
+    with __known_maps_lock:
+        if map_matrix in __known_maps:
+            print("Used cached fitness value for " + str(individual.epoch) + "_" + str(individual.number_in_epoch))
+            cached_value = __known_maps.get(map_matrix)
+            individual.epoch = cached_value[1]
+            individual.number_in_epoch = cached_value[2]
+            individual.dataset = cached_value[3]
+            return cached_value[0]
+
+    dataset = toolbox.evaluate(phenotype, individual.epoch, individual.number_in_epoch, bot1_data, bot2_data).to_dict(orient="list")
     __print_dataset_info(dataset)
-    # average_streak = max(numpy.mean(dataset["killStreakAverage1"]), numpy.mean(dataset["killStreakAverage2"]))
-    # fitness = numpy.mean(dataset["entropy"]), average_streak
     fitness = round(numpy.mean(dataset["entropy"]), 3), round(numpy.mean(dataset["pace"]), 3)
     individual.dataset = dataset
-    known_phenotypes[phenotype] = [fitness, epoch, individual_number, dataset]
-    return fitness
+
+    with __known_maps_lock:
+        __known_maps[map_matrix] = [fitness, individual.epoch, individual.number_in_epoch, dataset]
+        return fitness
 
 
 def __print_dataset_info(dataset):

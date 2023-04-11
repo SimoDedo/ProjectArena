@@ -1,54 +1,30 @@
 {
-	"width": 105,
-	"height": 105,
-	"mapScale": 1.0,
+	"width": 96,
+	"height": 48,
+	"mapScale": 3.0,
 	"areas": [{
 		"bottomRow": 0,
+		"topRow": 12,
+		"leftColumn": 0,
+		"rightColumn": 12,
+		"isCorridor": false
+	}, {
+		"bottomRow": 8,
 		"topRow": 20,
 		"leftColumn": 0,
-		"rightColumn": 20,
-		"isCorridor": false
-	}, {
-		"bottomRow": 25,
-		"topRow": 45,
-		"leftColumn": 0,
-		"rightColumn": 20,
-		"isCorridor": false
-	}, {
-		"bottomRow": 25,
-		"topRow": 45,
-		"leftColumn": 25,
-		"rightColumn": 45,
+		"rightColumn": 12,
 		"isCorridor": false
 	}, {
 		"bottomRow": 0,
-		"topRow": 20,
-		"leftColumn": 25,
-		"rightColumn": 45,
+		"topRow": 12,
+		"leftColumn": 8,
+		"rightColumn": 20,
 		"isCorridor": false
 	}, {
-		"bottomRow": 20,
-		"topRow": 25,
-		"leftColumn": 8,
-		"rightColumn": 12,
-		"isCorridor": true
-	}, {
-		"bottomRow": 20,
-		"topRow": 25,
-		"leftColumn": 33,
-		"rightColumn": 37,
-		"isCorridor": true
-	}, {
 		"bottomRow": 8,
-		"topRow": 12,
-		"leftColumn": 20,
-		"rightColumn": 25,
-		"isCorridor": true
-	}, {
-		"bottomRow": 33,
-		"topRow": 37,
-		"leftColumn": 20,
-		"rightColumn": 25,
-		"isCorridor": true
+		"topRow": 20,
+		"leftColumn": 8,
+		"rightColumn": 20,
+		"isCorridor": false
 	}]
 }
