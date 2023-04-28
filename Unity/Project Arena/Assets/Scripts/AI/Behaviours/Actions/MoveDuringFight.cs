@@ -63,10 +63,9 @@ namespace AI.Behaviours.Actions
 
         public override TaskStatus OnUpdate()
         {
-            if (isGettingUnstuck)
+            if (navSystem.HasPath() && !navSystem.HasArrivedToDestination())
             {
                 navSystem.MoveAlongPath();
-                isGettingUnstuck = !navSystem.HasArrivedToDestination();
                 return TaskStatus.Running;
             }
             
@@ -76,7 +75,7 @@ namespace AI.Behaviours.Actions
             {
                 if (TacticalMovement(currentPos, targetPos))
                 {
-                    // navSystem.MoveAlongPath();
+                    navSystem.MoveAlongPath();
                     timeStuckInCorner = Math.Max(0, timeStuckInCorner - Time.deltaTime * 0.1f);
                     return TaskStatus.Running;
                 }
@@ -150,7 +149,7 @@ namespace AI.Behaviours.Actions
                 movementVector = gunMovement;
             }
 
-            var totalMovement = movementVector * Time.deltaTime * navSystem.Speed;
+            var totalMovement = movementVector * 0.3f * navSystem.Speed;
             var positionAfterMovement = currentPos + totalMovement;
             Debug.DrawLine(currentPos, positionAfterMovement, Color.yellow, 0, false);
 
@@ -158,11 +157,11 @@ namespace AI.Behaviours.Actions
             {
                 // I can see the position, try to compute path!
                 path = navSystem.CalculatePath(positionAfterMovement);
-                if (path.IsComplete())
+                if (path.IsValid())
                 {
                     // Debug.Log("AAAA movement for " + entity.GetID() + ", setting path as: " + path.corners.Last());
-                    // navSystem.SetPath(path);
-                    navSystem.MoveTo(positionAfterMovement);
+                    navSystem.SetPath(path);
+                    // navSystem.MoveTo(positionAfterMovement);
                     return true;
                 }
 
@@ -175,24 +174,23 @@ namespace AI.Behaviours.Actions
             // isStrafingRight = !isStrafingRight;
 
             // Enemy cannot be seen from new position or new position is invalid. Ignore strife
-            positionAfterMovement = currentPos + gunMovement * Time.deltaTime * navSystem.Speed;
+            positionAfterMovement = currentPos + gunMovement * 0.3f * navSystem.Speed;
 
             // It wouldn't make sense for me to be unable to see the enemy from this new position, given that I moved
             // along the line connecting me and the enemy, so I'll not check
             path = navSystem.CalculatePath(positionAfterMovement);
 
-            if (!path.IsComplete()) return false; // Cannot move to new position at all. Try something else.
-            // navSystem.SetPath(path);
-            navSystem.MoveTo(positionAfterMovement);
+            if (!path.IsValid()) return false; // Cannot move to new position at all. Try something else.
+            navSystem.SetPath(path);
+            // navSystem.MoveTo(positionAfterMovement);
             return true;
         }
 
         private void FallbackMovement(Vector3 currentPos, Vector3 targetPos)
         {
-            Vector3 validPos = Vector3.zero;
-
             // We cannot see the enemy from where we are, try to find a position from where it is visible.
             // UpdateStrafeIfNeeded(true);
+            NavMeshPath path;
             for (var i = 0; i < maxAttempts; i++)
             {
                 var randomDir = Random.insideUnitCircle;
@@ -200,25 +198,42 @@ namespace AI.Behaviours.Actions
                 newPos.x += randomDir.x;
                 newPos.z += randomDir.y;
 
-                var path = navSystem.CalculatePath(newPos);
-                if (!path.IsComplete()) continue;
-                
-                // Let's store one of the paths tried; in case the enemy is not visible from any position,
-                // at least we have somewhere to move.
-                validPos = newPos;
-                    
+                path = navSystem.CalculatePath(newPos);
+                if (!path.IsValid()) continue;
+
                 if (Physics.Linecast(newPos, targetPos, layerMask)) continue;
-                    
+
                 // Can see enemy from here, found new position!
-                // navSystem.SetPath(path);
-                navSystem.MoveTo(newPos);
+                navSystem.SetPath(path);
+                navSystem.MoveAlongPath();
                 return;
             }
 
-            if (validPos != Vector3.zero)
+            var distance = (targetPos - currentPos).magnitude;
+            var (minDistance, _) = gunManager.GetCurrentGunOptimalRange();
+            if (distance <= minDistance) return;
+
+            // We can try to move closer to the enemy
+            path = navSystem.CalculatePath(targetPos);
+            if (!path.IsValid())
             {
-                navSystem.MoveTo(validPos);
+                throw new Exception("AAA");
             }
+
+            var currentPosition = currentPos;
+            var totalDistance = 0f;
+            foreach (var corner in path.corners)
+            {
+                totalDistance += (corner - currentPosition).magnitude;
+                currentPosition = corner;
+                // If we move less than two seconds, extend path
+                if (totalDistance / 20 < 2) continue;
+                navSystem.CalculatePath(corner);
+                navSystem.MoveAlongPath();
+                return;
+            }
+            navSystem.SetPath(path);
+            navSystem.MoveAlongPath();
         }
 
         private Vector3 GetMovementDirectionDueToStrafe(Vector3 direction)
