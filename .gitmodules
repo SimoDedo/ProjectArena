@@ -1,0 +1,3 @@
+[submodule "Unity/Project Arena/Assets/Bonsai/BonsaiBehaviourTree"]
+	path = Unity/Project Arena/Assets/Bonsai/BonsaiBehaviourTree
+	url = https://github.com/SimoneBari/BonsaiBehaviourTree
