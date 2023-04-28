@@ -426,7 +426,7 @@ namespace Guns
 
         public int GetCurrentAmmo()
         {
-            return infinteAmmo ? maximumAmmo : (ammoNotInCharger + ammoInCharger);
+            return infinteAmmo ? maximumAmmo : ammoNotInCharger;
         }
 
         public int GetMaxAmmo()
