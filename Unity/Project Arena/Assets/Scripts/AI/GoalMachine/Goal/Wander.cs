@@ -1,4 +1,5 @@
 using BehaviorDesigner.Runtime;
+using Bonsai.Core;
 using UnityEngine;
 
 namespace AI.GoalMachine.Goal
@@ -10,16 +11,17 @@ namespace AI.GoalMachine.Goal
     /// </summary>
     public class Wander : IGoal
     {
-        private readonly BehaviorTree behaviorTree;
-        private readonly ExternalBehaviorTree externalBt;
+        private readonly AIEntity entity;
+        private BonsaiTreeComponent bonsaiBehaviorTree;
+        private readonly BehaviourTree blueprint;
 
         public Wander(AIEntity entity)
         {
-            externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/Wander");
-            behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
-            behaviorTree.StartWhenEnabled = false;
-            behaviorTree.RestartWhenComplete = true;
-            behaviorTree.ExternalBehavior = externalBt;
+            this.entity = entity;
+            blueprint = Resources.Load<BehaviourTree>("Behaviors/BonsaiWander");
+            // behaviorTree.StartWhenEnabled = false;
+            // behaviorTree.RestartWhenComplete = true;
+            // behaviorTree.ExternalBehavior = externalBt;
         }
 
         public float GetScore()
@@ -29,18 +31,22 @@ namespace AI.GoalMachine.Goal
 
         public void Enter()
         {
-            behaviorTree.EnableBehavior();
-            BehaviorManager.instance.RestartBehavior(behaviorTree);
+            if (bonsaiBehaviorTree != null)
+            {
+                Object.Destroy(bonsaiBehaviorTree);
+            }
+            
+            bonsaiBehaviorTree = entity.gameObject.AddComponent<BonsaiTreeComponent>();
+            bonsaiBehaviorTree.SetBlueprint(blueprint);
         }
 
         public void Update()
         {
-            BehaviorManager.instance.Tick(behaviorTree);
+            bonsaiBehaviorTree.Tick();
         }
 
         public void Exit()
         {
-            behaviorTree.DisableBehavior();
         }
     }
 }
