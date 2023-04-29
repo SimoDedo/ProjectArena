@@ -1,11 +1,6 @@
-using System;
-using AI.Behaviours.Variables;
 using AI.Layers.KnowledgeBase;
-using BehaviorDesigner.Runtime.Tasks;
 using Bonsai;
-using UnityEngine;
 using UnityEngine.AI;
-using Action = BehaviorDesigner.Runtime.Tasks.Action;
 using Task = Bonsai.Core.Task;
 
 namespace AI.BonsaiBehaviours.Actions
@@ -18,6 +13,8 @@ namespace AI.BonsaiBehaviours.Actions
     public class ApplyPathToAgent : Task
     {
         private NavigationSystem navSystem;
+        public string pathChosenKey;
+        private NavMeshPath PathChosen => Blackboard.Get<NavMeshPath>(pathChosenKey);
 
         public override void OnStart()
         {
@@ -26,8 +23,7 @@ namespace AI.BonsaiBehaviours.Actions
 
         public override void OnEnter()
         {
-            var path = Blackboard.Get("pathChosen") as NavMeshPath;
-            navSystem.SetPath(path);
+            navSystem.SetPath(PathChosen);
         }
 
         public override void OnExit()

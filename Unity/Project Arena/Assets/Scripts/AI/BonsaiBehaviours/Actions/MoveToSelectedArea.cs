@@ -16,7 +16,8 @@ namespace AI.BonsaiBehaviours.Actions
     [BonsaiNode("Tasks/")]
     public class MoveToSelectedArea : Task
     {
-        private Area selectedArea;
+        public string chosenAreaKey;
+        private Area SelectedArea => Blackboard.Get<Area>(chosenAreaKey);
         private NavigationSystem navSystem;
         private Transform t;
         private float mapScale;
@@ -33,7 +34,7 @@ namespace AI.BonsaiBehaviours.Actions
 
         public override void OnEnter()
         {
-            selectedArea = Blackboard.Get("areaChosen") as Area;
+            var selectedArea = SelectedArea;
             var hasPath = false;
             while (!hasPath)
             {
@@ -60,7 +61,7 @@ namespace AI.BonsaiBehaviours.Actions
 
         private float SelectedAreaOverstayTime()
         {
-            var area = selectedArea;
+            var area = SelectedArea;
             var width = (area.rightColumn - area.leftColumn) * mapScale;
             var height = (area.topRow - area.bottomRow) * mapScale;
             var diagonal = Mathf.Sqrt(width * width + height * height);
@@ -84,7 +85,7 @@ namespace AI.BonsaiBehaviours.Actions
         private bool IsInArea()
         {
             var position = t.position / mapScale;
-            var area = selectedArea;
+            var area = SelectedArea;
             if (position.x < area.leftColumn) return false;
             if (position.x > area.rightColumn) return false;
             if (position.z < area.bottomRow) return false;

@@ -4,6 +4,7 @@ using AI.Layers.KnowledgeBase;
 using Bonsai;
 using Others;
 using UnityEngine;
+using UnityEngine.AI;
 using Task = Bonsai.Core.Task;
 
 namespace AI.BonsaiBehaviours.Actions
@@ -15,11 +16,15 @@ namespace AI.BonsaiBehaviours.Actions
     [BonsaiNode("Tasks/")]
     public class CalculatePathToEnemy : Task
     {
-        // [SerializeField] private SharedSelectedPathInfo pathChosen;
         private Entity.Entity enemy;
         private AIEntity entity;
         private NavigationSystem navSystem;
-
+        public string enemyPathKey;
+        private NavMeshPath EnemyPath
+        {
+            set => Blackboard.Set(enemyPathKey, value);
+        }
+        
         public override void OnStart()
         {
             entity = Actor.GetComponent<AIEntity>();
@@ -36,7 +41,7 @@ namespace AI.BonsaiBehaviours.Actions
             var path = navSystem.CalculatePath(enemy.transform.position);
             if (path.IsComplete())
             {
-                Blackboard.Set("pathChosen", path);
+                EnemyPath = path;
                 return Status.Success;
             }
 

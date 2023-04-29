@@ -1,6 +1,7 @@
 using System;
 using AI.Layers.KnowledgeBase;
 using BehaviorDesigner.Runtime;
+using Bonsai.Core;
 using Entity.Component;
 using Logging;
 using UnityEngine;
@@ -14,9 +15,9 @@ namespace AI.GoalMachine.Goal
     public class Fight : IGoal
     {
         private const float LOW_HEALTH_PENALTY = 0.4f;
-        private readonly BehaviorTree behaviorTree;
         private readonly AIEntity entity;
-        private readonly ExternalBehaviorTree externalBt;
+        private BonsaiTreeComponent bonsaiBehaviorTree;
+        private readonly BehaviourTree blueprint;
         private readonly GunManager gunManager;
         private readonly TargetKnowledgeBase _targetKnowledgeBase;
         private readonly float scoreMultiplier = 1.0f;
@@ -40,11 +41,9 @@ namespace AI.GoalMachine.Goal
                     throw new ArgumentOutOfRangeException();
             }
             gunManager = entity.GunManager;
-            externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/NewFight");
-            behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
-            behaviorTree.StartWhenEnabled = false;
-            behaviorTree.RestartWhenComplete = true;
-            behaviorTree.ExternalBehavior = externalBt;
+            blueprint = Resources.Load<BehaviourTree>("Behaviors/BonsaiFight");
+            bonsaiBehaviorTree = entity.gameObject.AddComponent<BonsaiTreeComponent>();
+            bonsaiBehaviorTree.SetBlueprint(blueprint);
         }
 
         public float GetScore()
@@ -60,20 +59,18 @@ namespace AI.GoalMachine.Goal
         public void Enter()
         {
             FocusingOnEnemyGameEvent.Instance.Raise(new FocusOnEnemyInfo {entityID = entity.GetID(), isFocusing = true});
-            behaviorTree.EnableBehavior();
-            BehaviorManager.instance.RestartBehavior(behaviorTree);
         }
 
         public void Update()
         {
             // FocusingOnEnemyGameEvent.Instance.Raise(new FocusOnEnemyInfo {entityID = entity.GetID(), isFocusing = true});
-            BehaviorManager.instance.Tick(behaviorTree);
+            bonsaiBehaviorTree.Tick();
         }
 
         public void Exit()
         {
             FocusingOnEnemyGameEvent.Instance.Raise(new FocusOnEnemyInfo {entityID = entity.GetID(), isFocusing = false});
-            behaviorTree.DisableBehavior();
+            bonsaiBehaviorTree.Reset();
             // Resources.UnloadAsset(externalBt);
             // Object.Destroy(behaviorTree);
         }

@@ -29,8 +29,14 @@ namespace AI.BonsaiBehaviours.Actions
         
         private MovementController movementController;
         private NavigationSystem navSystem;
-        
-        private NavMeshPath pathChosen;
+
+        public string pathChosenKey;
+
+        private NavMeshPath PathChosen
+        {
+            get => Blackboard.Get<NavMeshPath>(pathChosenKey);
+            set => Blackboard.Set(pathChosenKey, value);
+        }
         
         public override void OnStart()
         {
@@ -48,7 +54,7 @@ namespace AI.BonsaiBehaviours.Actions
 
             if (result)
                 // We got a valid destination! Apply cooldown
-                nextUnrestrictedTravelTime = Time.time + navSystem.EstimatePathDuration(pathChosen) +
+                nextUnrestrictedTravelTime = Time.time + navSystem.EstimatePathDuration(PathChosen) +
                                              UNRESTRICTED_TRAVEL_COOLDOWN;
             else
                 // We didn't got a result, apply short travel for now...
@@ -69,8 +75,7 @@ namespace AI.BonsaiBehaviours.Actions
 
                 var path = navSystem.CalculatePath(chosenDestination);
                 if (!path.IsComplete()) continue;
-                pathChosen = path;
-                Blackboard.Set("pathChosen", path);
+                PathChosen = path;
                 return true;
             }
 
@@ -112,8 +117,7 @@ namespace AI.BonsaiBehaviours.Actions
                     //
                     // if (validPointsFound > 3)
                     // {
-                        pathChosen = path;
-                        Blackboard.Set("pathChosen", path);
+                        PathChosen = path;
                         return true;
                     // }
                 }

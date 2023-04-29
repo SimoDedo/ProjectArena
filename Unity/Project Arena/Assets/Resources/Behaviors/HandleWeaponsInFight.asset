@@ -25,7 +25,7 @@ MonoBehaviour:
         usage branch).\n"},"ID":1,"Name":"Parallel","Instant":true,"AbortTypeabortType":"None","Children":[{"Type":"AI.Behaviours.Actions.NewChooseWeapon","NodeData":{"Offset":"(-140.000092,160)","Comment":"Select
         the best weapon due to the situation and the score. \nIf I cannot see the
         enemy, prefer blast weapons, so that I can hit it even if behind corners.\nOtherwise,
-        prefer based on the normal scoring"},"ID":2,"Name":"New Choose Weapon","Instant":true},{"Type":"AI.Behaviours.Actions.UseEquippedGun","NodeData":{"Offset":"(130,160)"},"ID":3,"Name":"Use
+        prefer based on the normal scoring"},"ID":2,"Name":"New Choose Weapon","Instant":true},{"Type":"AI.Behaviours.Actions.UseEquippedGun","NodeData":{"Offset":"(130,161.219513)"},"ID":3,"Name":"Use
         Equipped Gun","Instant":true,"Int32lookBackFrames":-3,"Int32lookAheadFrames":3,"SinglelookAheadTimeStep":0.3,"SharedBoolisGoingForCover":{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":"IsGoingForCover","IsShared":true,"BooleanmValue":false}}]},"Variables":[{"Type":"BehaviorDesigner.Runtime.SharedBool","Name":"IsGoingForCover","IsShared":true,"BooleanmValue":false}]}'
       fieldSerializationData:
         typeName: []

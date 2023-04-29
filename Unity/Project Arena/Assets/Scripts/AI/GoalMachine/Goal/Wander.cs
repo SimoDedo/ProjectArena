@@ -19,9 +19,8 @@ namespace AI.GoalMachine.Goal
         {
             this.entity = entity;
             blueprint = Resources.Load<BehaviourTree>("Behaviors/BonsaiWander");
-            // behaviorTree.StartWhenEnabled = false;
-            // behaviorTree.RestartWhenComplete = true;
-            // behaviorTree.ExternalBehavior = externalBt;
+            bonsaiBehaviorTree = entity.gameObject.AddComponent<BonsaiTreeComponent>();
+            bonsaiBehaviorTree.SetBlueprint(blueprint);
         }
 
         public float GetScore()
@@ -31,13 +30,6 @@ namespace AI.GoalMachine.Goal
 
         public void Enter()
         {
-            if (bonsaiBehaviorTree != null)
-            {
-                Object.Destroy(bonsaiBehaviorTree);
-            }
-            
-            bonsaiBehaviorTree = entity.gameObject.AddComponent<BonsaiTreeComponent>();
-            bonsaiBehaviorTree.SetBlueprint(blueprint);
         }
 
         public void Update()
@@ -47,6 +39,7 @@ namespace AI.GoalMachine.Goal
 
         public void Exit()
         {
+            bonsaiBehaviorTree.Reset();
         }
     }
 }

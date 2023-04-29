@@ -4,6 +4,7 @@ using AI.Layers.Memory;
 using AI.Layers.Planners;
 using BehaviorDesigner.Runtime.Tasks;
 using Bonsai;
+using Maps.MapGenerator;
 using UnityEngine;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;
 using Task = Bonsai.Core.Task;
@@ -17,6 +18,12 @@ namespace AI.BonsaiBehaviours.Actions
     public class SelectAreaToVisit : Task
     {
         private MapWanderPlanner wanderPlanner;
+        public string areaChosenKey;
+
+        private Area AreaChosen
+        {
+            set => Blackboard.Set(areaChosenKey, value);
+        }
 
         public override void OnStart()
         {
@@ -26,7 +33,7 @@ namespace AI.BonsaiBehaviours.Actions
 
         public override Status Run()
         {
-            Blackboard.Set("areaChosen", wanderPlanner.GetRecommendedArea());
+            AreaChosen = wanderPlanner.GetRecommendedArea();
             return Status.Success;
         }
     }

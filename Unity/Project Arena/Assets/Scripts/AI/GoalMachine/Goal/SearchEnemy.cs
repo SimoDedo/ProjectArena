@@ -3,6 +3,7 @@ using AI.Layers.KnowledgeBase;
 using AI.Layers.SensingLayer;
 using AI.Layers.Sensors;
 using BehaviorDesigner.Runtime;
+using Bonsai.Core;
 using Logging;
 using UnityEngine;
 
@@ -17,15 +18,16 @@ namespace AI.GoalMachine.Goal
     {
         private const float NO_TIME = -1;
         private readonly TargetKnowledgeBase _targetKnowledgeBase;
-        private readonly BehaviorTree behaviorTree;
         private readonly DamageSensor damageSensor;
-        private readonly AIEntity entity;
-        private readonly ExternalBehaviorTree externalBt;
+        private readonly AIEntity entity; 
         private readonly SoundSensor soundSensor;
         private readonly RespawnSensor respawnSensor;
         private Recklessness _recklessness;
         private bool resetInUpdate;
 
+        private BonsaiTreeComponent bonsaiBehaviorTree;
+        private readonly BehaviourTree blueprint;
+        
         private float searchTriggeringEventTime = NO_TIME;
 
         public SearchEnemy(AIEntity entity)
@@ -36,11 +38,9 @@ namespace AI.GoalMachine.Goal
             damageSensor = entity.DamageSensor;
             soundSensor = entity.SoundSensor;
             respawnSensor = entity.RespawnSensor;
-            externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/SearchEnemy");
-            behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
-            behaviorTree.StartWhenEnabled = false;
-            behaviorTree.RestartWhenComplete = true;
-            behaviorTree.ExternalBehavior = externalBt;
+            blueprint = Resources.Load<BehaviourTree>("Behaviors/BonsaiSearchEnemy");
+            bonsaiBehaviorTree = entity.gameObject.AddComponent<BonsaiTreeComponent>();
+            bonsaiBehaviorTree.SetBlueprint(blueprint);
         }
         
         public float GetScore()
@@ -89,9 +89,6 @@ namespace AI.GoalMachine.Goal
             FocusingOnEnemyGameEvent.Instance.Raise(new FocusOnEnemyInfo
                 {entityID = entity.GetID(), isFocusing = true}
             );
-            behaviorTree.EnableBehavior();
-            BehaviorManager.instance.RestartBehavior(behaviorTree);
-
             searchTriggeringEventTime = MostRecentEventTimeOrNoTime();
         }
 
@@ -103,7 +100,7 @@ namespace AI.GoalMachine.Goal
                 Enter();
             }
 
-            BehaviorManager.instance.Tick(behaviorTree);
+            bonsaiBehaviorTree.Tick();
         }
 
         public void Exit()
@@ -111,7 +108,8 @@ namespace AI.GoalMachine.Goal
             searchTriggeringEventTime = NO_TIME;
             FocusingOnEnemyGameEvent.Instance.Raise(
                 new FocusOnEnemyInfo {entityID = entity.GetID(), isFocusing = false});
-            behaviorTree.DisableBehavior();
+            bonsaiBehaviorTree.Reset();
+
         }
 
         private float RecentLossTimeOrNoTime()

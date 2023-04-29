@@ -1,9 +1,9 @@
 using System;
 using AI.Layers.Planners;
-using BehaviorDesigner.Runtime;
-using BehaviorDesigner.Runtime.Tasks;
+using Bonsai.Core;
 using Pickables;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace AI.GoalMachine.Goal
 {
@@ -14,8 +14,10 @@ namespace AI.GoalMachine.Goal
     /// </summary>
     public class LookForPickups : IGoal
     {
-        private readonly BehaviorTree behaviorTree;
-        private readonly ExternalBehaviorTree externalBt;
+        private readonly AIEntity entity;
+        private BonsaiTreeComponent bonsaiBehaviorTree;
+        private readonly BehaviourTree blueprint;
+        
         private readonly PickupPlanner pickupPlanner;
         private readonly float scoreMultiplier = 0.7f;
         private Pickable currentPickable;
@@ -23,6 +25,7 @@ namespace AI.GoalMachine.Goal
 
         public LookForPickups(AIEntity entity)
         {
+            this.entity = entity;
             pickupPlanner = entity.PickupPlanner;
             var recklessness = entity.Characteristics.Recklessness;
             switch (recklessness)
@@ -38,12 +41,10 @@ namespace AI.GoalMachine.Goal
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            
-            externalBt = Resources.Load<ExternalBehaviorTree>("Behaviors/NewPickup");
-            behaviorTree = entity.gameObject.AddComponent<BehaviorTree>();
-            behaviorTree.StartWhenEnabled = false;
-            behaviorTree.ResetValuesOnRestart = true;
-            behaviorTree.ExternalBehavior = externalBt;
+
+            blueprint = Resources.Load<BehaviourTree>("Behaviors/BonsaiPickup");
+            bonsaiBehaviorTree = entity.gameObject.AddComponent<BonsaiTreeComponent>();
+            bonsaiBehaviorTree.SetBlueprint(blueprint);
         }
 
         public float GetScore()
@@ -63,40 +64,16 @@ namespace AI.GoalMachine.Goal
         {
             if (currentPickable != nextPickable)
             {
-                behaviorTree.DisableBehavior();
-                behaviorTree.EnableBehavior();
-                BehaviorManager.instance.RestartBehavior(behaviorTree);
-
-                // var pickupInfo = new SelectedPickupInfo
-                // {
-                //     pickup = nextPickable,
-                //     estimatedActivationTime = nextPickableActivationTime
-                // };
-                // behaviorTree.SetVariableValue("ChosenPickup", pickupInfo);
-                // behaviorTree.SetVariableValue("ChosenPickupPosition", nextPickable.transform.position);
-                // behaviorTree.SetVariableValue("ChosenPath", newPath);
-
+                bonsaiBehaviorTree.Reset();
                 currentPickable = nextPickable;
             }
 
-            BehaviorManager.instance.Tick(behaviorTree);
-
-            if (behaviorTree.ExecutionStatus != TaskStatus.Running)
-            {
-                // The tree finished execution. We must have picked up the pickable or maybe our activation time
-                // estimate was wrong. Force update of the planner?
-                // Must first force update of the knowledge base? The knowledge base automatically knows the status
-                // of the pickup if we are close (even when not looking).
-                pickupPlanner.ForceUpdate();
-                behaviorTree.DisableBehavior();
-                behaviorTree.EnableBehavior();
-                BehaviorManager.instance.RestartBehavior(behaviorTree);
-            }
+            bonsaiBehaviorTree.Tick();
         }
 
         public void Exit()
         {
-            behaviorTree.DisableBehavior();
+            bonsaiBehaviorTree.Reset();
         }
     }
 }
