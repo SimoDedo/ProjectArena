@@ -1,0 +1,542 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-9009747046339518318
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ba134dfc50752547a552564711bee84, type: 3}
+  m_Name: Include
+  m_EditorClassIdentifier: 
+  preOrderIndex: 10
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: -18.5, y: 250.5}
+  subtreeAsset: {fileID: 11400000, guid: 0942fe9df89d7c84dab718e480cdc6bc, type: 2}
+--- !u!114 &-8689003777563549025
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b4d95aae8c1c7b478fe06adf233ef0c, type: 3}
+  m_Name: Selector
+  m_EditorClassIdentifier: 
+  preOrderIndex: 9
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: 481, y: 94.5}
+  children:
+  - {fileID: -9009747046339518318}
+  - {fileID: 2649281940062480612}
+--- !u!114 &-8604784055903108965
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 954fae3efb2d4261a27ca35a10d4ba4b, type: 3}
+  m_Name: ApplyPathToAgent
+  m_EditorClassIdentifier: 
+  preOrderIndex: 13
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: 412.5, y: 394.5}
+  pathChosenKey: PickupPath
+--- !u!114 &-7584363549423764521
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eba632f0bcc24019b29c173d1467fc6f, type: 3}
+  m_Name: ParallelComplete
+  m_EditorClassIdentifier: 
+  preOrderIndex: 0
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: -104.5, y: -49.5}
+  children:
+  - {fileID: 6395138359761800350}
+  - {fileID: -8689003777563549025}
+--- !u!114 &-5689775547323643049
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c788303fff3800a49977633ae4b0c0a, type: 3}
+  m_Name: ShouldFight
+  m_EditorClassIdentifier: 
+  preOrderIndex: 2
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: -937.5, y: 250.5}
+  child: {fileID: -2720116608947071406}
+  abortType: 3
+--- !u!114 &-3327779363037189452
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 954fae3efb2d4261a27ca35a10d4ba4b, type: 3}
+  m_Name: ApplyPathToAgent
+  m_EditorClassIdentifier: 
+  preOrderIndex: 21
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: 1216.5, y: 1066.5}
+  pathChosenKey: CampPath
+--- !u!114 &-2886151663939267012
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 954fae3efb2d4261a27ca35a10d4ba4b, type: 3}
+  m_Name: ApplyPathToAgent
+  m_EditorClassIdentifier: 
+  preOrderIndex: 23
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: 1744.5, y: 394.5}
+  pathChosenKey: PickupPath
+--- !u!114 &-2720116608947071406
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ba134dfc50752547a552564711bee84, type: 3}
+  m_Name: Include
+  m_EditorClassIdentifier: 
+  preOrderIndex: 3
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: -918.5, y: 370.5}
+  subtreeAsset: {fileID: 11400000, guid: a5c0b62cae97ccb918dbb01d47e373d2, type: 2}
+--- !u!114 &-1940890674696983842
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93f98b186e071c69ab15d6b55ae9a42c, type: 3}
+  m_Name: LookAtSuspectedDirection
+  m_EditorClassIdentifier: 
+  preOrderIndex: 5
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: -744.5, y: 466.5}
+--- !u!114 &-1681480161038649785
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5f074b71c70c04e886dfb695dc0158b, type: 3}
+  m_Name: CalculateCampDestination
+  m_EditorClassIdentifier: 
+  preOrderIndex: 20
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: 914, y: 1066.5}
+  minRadius: 1
+  maxRadius: 20
+  maxNumVertices: 20
+  maxRadiusAttempts: 3
+  campLocationKey: PickupPosition
+  pathChosenKey: CampPath
+--- !u!114 &-1490916434110046515
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b5e4c7bb706ee14eae9c07a7644a37a, type: 3}
+  m_Name: Repeater
+  m_EditorClassIdentifier: 
+  preOrderIndex: 18
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: 1114.5, y: 790.5}
+  child: {fileID: 1296652978092289203}
+  loopCount: 1
+  infiniteLoop: 0
+--- !u!114 &-1428326193355168814
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09a07908f6a5fd44e906d041ac135bfc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  keys: []
+--- !u!114 &-1368273836236380569
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28e45fb0cab126d4780d7513a3a3a31b, type: 3}
+  m_Name: Success
+  m_EditorClassIdentifier: 
+  preOrderIndex: 14
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: 913, y: 394.5}
+  child: {fileID: 5572756515368530365}
+--- !u!114 &-191361857420720101
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eba632f0bcc24019b29c173d1467fc6f, type: 3}
+  m_Name: ParallelComplete
+  m_EditorClassIdentifier: 
+  preOrderIndex: 0
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: -104.5, y: -193.5}
+  children: []
+--- !u!114 &-139211326545719564
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f98e42124d794d24baddf03f67db4d0b, type: 3}
+  m_Name: Sequence
+  m_EditorClassIdentifier: 
+  preOrderIndex: 16
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: 907.5, y: 646.5}
+  children:
+  - {fileID: 448242396043672893}
+  - {fileID: -1490916434110046515}
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e327cacc628d65b4faa51b0a82bf63c2, type: 3}
+  m_Name: BonsaiPickup
+  m_EditorClassIdentifier: 
+  allNodes:
+  - {fileID: -7584363549423764521}
+  - {fileID: 6395138359761800350}
+  - {fileID: -5689775547323643049}
+  - {fileID: -2720116608947071406}
+  - {fileID: 2891445856752111246}
+  - {fileID: -1940890674696983842}
+  - {fileID: 306202215584146111}
+  - {fileID: 4715433771642262235}
+  - {fileID: 475537234540125591}
+  - {fileID: -8689003777563549025}
+  - {fileID: -9009747046339518318}
+  - {fileID: 2649281940062480612}
+  - {fileID: 3860085911639745054}
+  - {fileID: -8604784055903108965}
+  - {fileID: -1368273836236380569}
+  - {fileID: 5572756515368530365}
+  - {fileID: -139211326545719564}
+  - {fileID: 448242396043672893}
+  - {fileID: -1490916434110046515}
+  - {fileID: 1296652978092289203}
+  - {fileID: -1681480161038649785}
+  - {fileID: -3327779363037189452}
+  - {fileID: 4475698351295924947}
+  - {fileID: -2886151663939267012}
+  blackboard: {fileID: -1428326193355168814}
+  actor: {fileID: 0}
+  panPosition: {x: 640, y: -410}
+  zoomPosition: {x: 1.5925252, y: 1.5925252}
+  unusedNodes: []
+--- !u!114 &306202215584146111
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ffd532fcd28735448b5f84b50925241, type: 3}
+  m_Name: Parallel
+  m_EditorClassIdentifier: 
+  preOrderIndex: 6
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: -319.5, y: 250.5}
+  children:
+  - {fileID: 4715433771642262235}
+  - {fileID: 475537234540125591}
+--- !u!114 &448242396043672893
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2fd86cf2ea925268a3741cf7cf6df17, type: 3}
+  m_Name: GetPickupPosition
+  m_EditorClassIdentifier: 
+  preOrderIndex: 17
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: 668.5, y: 790.5}
+  pickupPositionKey: PickupPosition
+--- !u!114 &475537234540125591
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 514feeb72b9f41cfbf37644448dc2005, type: 3}
+  m_Name: ReloadWeapons
+  m_EditorClassIdentifier: 
+  preOrderIndex: 8
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: -245, y: 394.5}
+--- !u!114 &1296652978092289203
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f98e42124d794d24baddf03f67db4d0b, type: 3}
+  m_Name: Sequence
+  m_EditorClassIdentifier: 
+  preOrderIndex: 19
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: 1111.5, y: 922.5}
+  children:
+  - {fileID: -1681480161038649785}
+  - {fileID: -3327779363037189452}
+--- !u!114 &2649281940062480612
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f98e42124d794d24baddf03f67db4d0b, type: 3}
+  m_Name: Sequence
+  m_EditorClassIdentifier: 
+  preOrderIndex: 11
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: 991.5, y: 250.5}
+  children:
+  - {fileID: 3860085911639745054}
+  - {fileID: -8604784055903108965}
+  - {fileID: -1368273836236380569}
+  - {fileID: 4475698351295924947}
+  - {fileID: -2886151663939267012}
+--- !u!114 &2698338979796156370
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d920075c22928cd4c85854a38593d7c0, type: 3}
+  m_Name: RandomSequence
+  m_EditorClassIdentifier: 
+  preOrderIndex: 0
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: -108, y: -229.5}
+  children: []
+--- !u!114 &2891445856752111246
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c6b96ecc9df49128879798a1f7b5364, type: 3}
+  m_Name: ShouldWatchOutForEnemy
+  m_EditorClassIdentifier: 
+  preOrderIndex: 4
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: -747, y: 250.5}
+  child: {fileID: -1940890674696983842}
+  abortType: 3
+--- !u!114 &3035837613420501087
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9ed9224681fd2e4b81a6a1f1f647031, type: 3}
+  m_Name: ParallelSelector
+  m_EditorClassIdentifier: 
+  preOrderIndex: 0
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: -172.5, y: -145.5}
+  children: []
+--- !u!114 &3860085911639745054
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e79df2bf5dbf99f78bd6ef7163cf9f72, type: 3}
+  m_Name: CalculatePathToPickup
+  m_EditorClassIdentifier: 
+  preOrderIndex: 12
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: 131.5, y: 394.5}
+  chosenPathKey: PickupPath
+--- !u!114 &4475698351295924947
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e79df2bf5dbf99f78bd6ef7163cf9f72, type: 3}
+  m_Name: CalculatePathToPickup
+  m_EditorClassIdentifier: 
+  preOrderIndex: 22
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: 1463.5, y: 394.5}
+  chosenPathKey: PickupPath
+--- !u!114 &4715433771642262235
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c255b8c3b014fde9003988c51082753, type: 3}
+  m_Name: LookAround
+  m_EditorClassIdentifier: 
+  preOrderIndex: 7
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: -434, y: 394.5}
+  focused: 0
+--- !u!114 &5572756515368530365
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82c5dbdd7d8f4d84284fa2ed2d9e209f, type: 3}
+  m_Name: ShouldGoToPickup
+  m_EditorClassIdentifier: 
+  preOrderIndex: 15
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: 868.5, y: 526.5}
+  child: {fileID: -139211326545719564}
+  abortType: 0
+--- !u!114 &6395138359761800350
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b4d95aae8c1c7b478fe06adf233ef0c, type: 3}
+  m_Name: Selector
+  m_EditorClassIdentifier: 
+  preOrderIndex: 1
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: -623, y: 94.5}
+  children:
+  - {fileID: -5689775547323643049}
+  - {fileID: 2891445856752111246}
+  - {fileID: 306202215584146111}
