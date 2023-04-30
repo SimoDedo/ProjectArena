@@ -105,7 +105,11 @@ namespace AI
                 PickupPlanner.Update();
                 goalMachine.Update();
             }
-            loggingComponent.Update();
+
+            if (loggingGame)
+            {
+                loggingComponent.Update();
+            }
         }
 
         private void LateUpdate()
