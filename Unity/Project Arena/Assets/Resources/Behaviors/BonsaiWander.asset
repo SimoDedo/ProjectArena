@@ -17,6 +17,25 @@ MonoBehaviour:
   comment: 
   bonsaiNodePosition: {x: -590, y: 94.5}
   focused: 0
+--- !u!114 &-8353840749182129996
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d2b6863467b4bb4ae7f5c5c7f71018d, type: 3}
+  m_Name: CustomSelector
+  m_EditorClassIdentifier: 
+  preOrderIndex: 4
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: 433, y: 226}
+  children:
+  - {fileID: 425981461539731613}
+  - {fileID: 1581010550246883021}
 --- !u!114 &-7488813227421466416
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -33,7 +52,7 @@ MonoBehaviour:
   title: 
   comment: 
   bonsaiNodePosition: {x: -176, y: 526.5}
-  chance: 0.05
+  chance: 0
 --- !u!114 &-7384567052297120074
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -54,6 +73,25 @@ MonoBehaviour:
   - {fileID: -8548131196441012100}
   - {fileID: -370549227772639541}
   - {fileID: -6197221846641490430}
+--- !u!114 &-7310060266148813214
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15c8b9ba47ea4e6fad032821ca7c98d4, type: 3}
+  m_Name: CustomSequence
+  m_EditorClassIdentifier: 
+  preOrderIndex: 14
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: 1340, y: 694}
+  children:
+  - {fileID: 1541763378165670482}
+  - {fileID: 3844527795068255296}
 --- !u!114 &-6197221846641490430
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -70,28 +108,9 @@ MonoBehaviour:
   title: 
   comment: 
   bonsaiNodePosition: {x: 430.5, y: 94.5}
-  child: {fileID: -4360275429034285229}
+  child: {fileID: -8353840749182129996}
   loopCount: 1
   infiniteLoop: 1
---- !u!114 &-5289145975159738479
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f98e42124d794d24baddf03f67db4d0b, type: 3}
-  m_Name: Sequence
-  m_EditorClassIdentifier: 
-  preOrderIndex: 14
-  title: 
-  comment: 
-  bonsaiNodePosition: {x: 1339.5, y: 694.5}
-  children:
-  - {fileID: 1541763378165670482}
-  - {fileID: 3844527795068255296}
 --- !u!114 &-5206675857256410113
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -105,25 +124,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   keys: []
---- !u!114 &-4360275429034285229
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5b4d95aae8c1c7b478fe06adf233ef0c, type: 3}
-  m_Name: Selector
-  m_EditorClassIdentifier: 
-  preOrderIndex: 4
-  title: 
-  comment: 
-  bonsaiNodePosition: {x: 433, y: 226.5}
-  children:
-  - {fileID: 9210990506610667463}
-  - {fileID: 2947293724301533683}
 --- !u!114 &-4339817530899365291
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -139,8 +139,27 @@ MonoBehaviour:
   preOrderIndex: 12
   title: 
   comment: 
-  bonsaiNodePosition: {x: 367, y: 958.5}
+  bonsaiNodePosition: {x: 367, y: 994.5}
   areaChosenKey: AreaChosen
+--- !u!114 &-2505285914208166244
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15c8b9ba47ea4e6fad032821ca7c98d4, type: 3}
+  m_Name: CustomSequence
+  m_EditorClassIdentifier: 
+  preOrderIndex: 11
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: 661.5, y: 850.5}
+  children:
+  - {fileID: -4339817530899365291}
+  - {fileID: 448963430809708205}
 --- !u!114 &-370549227772639541
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -174,24 +193,44 @@ MonoBehaviour:
   - {fileID: -8548131196441012100}
   - {fileID: -370549227772639541}
   - {fileID: -6197221846641490430}
-  - {fileID: -4360275429034285229}
-  - {fileID: 9210990506610667463}
+  - {fileID: -8353840749182129996}
+  - {fileID: 425981461539731613}
   - {fileID: -7488813227421466416}
   - {fileID: 6838174881934026628}
   - {fileID: 2876172375374889078}
-  - {fileID: 2947293724301533683}
+  - {fileID: 1581010550246883021}
   - {fileID: 6730364320040533770}
-  - {fileID: 7887922224883394185}
+  - {fileID: -2505285914208166244}
   - {fileID: -4339817530899365291}
   - {fileID: 448963430809708205}
-  - {fileID: -5289145975159738479}
+  - {fileID: -7310060266148813214}
   - {fileID: 1541763378165670482}
   - {fileID: 3844527795068255296}
   blackboard: {fileID: -5206675857256410113}
   actor: {fileID: 0}
   panPosition: {x: -1197, y: -958}
-  zoomPosition: {x: 2.3960397, y: 2.3960397}
+  zoomPosition: {x: 3.1018455, y: 3.1018455}
   unusedNodes: []
+--- !u!114 &425981461539731613
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15c8b9ba47ea4e6fad032821ca7c98d4, type: 3}
+  m_Name: CustomSequence
+  m_EditorClassIdentifier: 
+  preOrderIndex: 5
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: 56, y: 370}
+  children:
+  - {fileID: -7488813227421466416}
+  - {fileID: 6838174881934026628}
+  - {fileID: 2876172375374889078}
 --- !u!114 &448963430809708205
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -207,7 +246,7 @@ MonoBehaviour:
   preOrderIndex: 13
   title: 
   comment: 
-  bonsaiNodePosition: {x: 858, y: 958.5}
+  bonsaiNodePosition: {x: 858, y: 994.5}
   chosenAreaKey: AreaChosen
 --- !u!114 &1541763378165670482
 MonoBehaviour:
@@ -231,6 +270,25 @@ MonoBehaviour:
   maxWanderDistance: 20
   nextUnrestrictedTravelTime: 0
   pathChosenKey: PathChosen
+--- !u!114 &1581010550246883021
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d2b6863467b4bb4ae7f5c5c7f71018d, type: 3}
+  m_Name: CustomSelector
+  m_EditorClassIdentifier: 
+  preOrderIndex: 9
+  title: 
+  comment: 
+  bonsaiNodePosition: {x: 805, y: 370}
+  children:
+  - {fileID: 6730364320040533770}
+  - {fileID: -7310060266148813214}
 --- !u!114 &2876172375374889078
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -248,25 +306,6 @@ MonoBehaviour:
   comment: 
   bonsaiNodePosition: {x: 256.5, y: 526.5}
   pathChosenKey: EnemyPath
---- !u!114 &2947293724301533683
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5b4d95aae8c1c7b478fe06adf233ef0c, type: 3}
-  m_Name: Selector
-  m_EditorClassIdentifier: 
-  preOrderIndex: 9
-  title: 
-  comment: 
-  bonsaiNodePosition: {x: 805, y: 370.5}
-  children:
-  - {fileID: 6730364320040533770}
-  - {fileID: -5289145975159738479}
 --- !u!114 &3844527795068255296
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -316,8 +355,8 @@ MonoBehaviour:
   preOrderIndex: 10
   title: 
   comment: 
-  bonsaiNodePosition: {x: 616, y: 622.5}
-  child: {fileID: 7887922224883394185}
+  bonsaiNodePosition: {x: 616, y: 658.5}
+  child: {fileID: -2505285914208166244}
   abortType: 0
 --- !u!114 &6838174881934026628
 MonoBehaviour:
@@ -357,42 +396,3 @@ MonoBehaviour:
   timer:
     interval: 1
     deviation: 0
---- !u!114 &7887922224883394185
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f98e42124d794d24baddf03f67db4d0b, type: 3}
-  m_Name: Sequence
-  m_EditorClassIdentifier: 
-  preOrderIndex: 11
-  title: 
-  comment: 
-  bonsaiNodePosition: {x: 643.5, y: 814.5}
-  children:
-  - {fileID: -4339817530899365291}
-  - {fileID: 448963430809708205}
---- !u!114 &9210990506610667463
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f98e42124d794d24baddf03f67db4d0b, type: 3}
-  m_Name: Sequence
-  m_EditorClassIdentifier: 
-  preOrderIndex: 5
-  title: 
-  comment: 
-  bonsaiNodePosition: {x: 55.5, y: 370.5}
-  children:
-  - {fileID: -7488813227421466416}
-  - {fileID: 6838174881934026628}
-  - {fileID: 2876172375374889078}
