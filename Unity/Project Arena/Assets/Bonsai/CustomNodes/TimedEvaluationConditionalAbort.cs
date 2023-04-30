@@ -6,11 +6,11 @@ using Timer = Bonsai.Utility.Timer;
 
 namespace Bonsai.CustomNodes
 {
-    public abstract class AutoConditionalAbort: ConditionalAbort
+    public abstract class TimedEvaluationConditionalAbort: ConditionalAbort
     {
         private readonly Timer timer;
 
-        protected AutoConditionalAbort(float timeOut = 0.0001f)
+        protected TimedEvaluationConditionalAbort(float timeOut = 0.0001f)
         {
             timer = new Timer
             {
