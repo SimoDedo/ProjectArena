@@ -16,7 +16,7 @@ namespace AI.BonsaiBehaviours.Conditions
     /// Failure otherwise.
     /// </summary>
     [BonsaiNode("Conditional/")]
-    public class HasRocketToDodge : AutoConditionalAbort
+    public class HasRocketToDodge : TimedEvaluationConditionalAbort
     {
         private const float ROCKET_DETECTION_RADIUS = 40f;
 

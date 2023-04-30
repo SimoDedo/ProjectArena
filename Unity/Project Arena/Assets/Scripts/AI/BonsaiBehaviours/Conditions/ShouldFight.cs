@@ -12,7 +12,7 @@ namespace AI.BonsaiBehaviours.Conditions
     /// Returns Success if we should fight the enemy, Failure otherwise.
     /// </summary>
     [BonsaiNode("Conditional/")]
-    public class ShouldFight : AutoConditionalAbort
+    public class ShouldFight : TimedEvaluationConditionalAbort
     {
         private AIEntity entity;
         private TargetKnowledgeBase _targetKnowledgeBase;

@@ -15,7 +15,7 @@ namespace AI.BonsaiBehaviours.Conditions
     /// Failure otherwise.
     /// </summary>
     [BonsaiNode("Conditional/")]
-    public class IsCoverStillValid : AutoConditionalAbort
+    public class IsCoverStillValid : TimedEvaluationConditionalAbort
     {
         public string pathInfoString;
         private NavMeshPath PathInfo => Blackboard.Get<NavMeshPath>(pathInfoString);

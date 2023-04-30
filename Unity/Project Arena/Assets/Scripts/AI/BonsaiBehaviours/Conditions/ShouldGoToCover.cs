@@ -4,7 +4,6 @@ using BehaviorDesigner.Runtime.Tasks;
 using Bonsai;
 using Bonsai.CustomNodes;
 using Entity.Component;
-using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace AI.BonsaiBehaviours.Conditions
@@ -13,12 +12,16 @@ namespace AI.BonsaiBehaviours.Conditions
     /// Return Success if we are better of searching for cover, Failure otherwise.
     /// </summary>
     [BonsaiNode("Conditional/")]
-    public class ShouldGoToCover : AutoConditionalAbort
+    public class ShouldGoToCover : TimedEvaluationConditionalAbort
     {
         private const float TIMEOUT = 1.5f;
-
         private const float CHARGER_PERCENTAGE = 0.4f;
 
+        public ShouldGoToCover() : base(TIMEOUT)
+        {
+            
+        }
+        
         // If true, we must now consider the random failure probability until we find out that we no longer need to
         // cover
 
@@ -34,8 +37,6 @@ namespace AI.BonsaiBehaviours.Conditions
         private float canSelectCoverProbability;
         private GunManager gunManager;
         private float avoidCoverProbability = 0.3f;
-
-        private float nextCoverAttempt;
 
         public override void OnStart()
         {
@@ -64,13 +65,8 @@ namespace AI.BonsaiBehaviours.Conditions
             if (Random.value > canSelectCoverProbability)
             {
                 // Too noob to consider cover.
-                nextCoverAttempt = Time.time + TIMEOUT;
                 return false;
             }
-
-            if (nextCoverAttempt >= Time.time)
-                // We were able to cover some time ago but decided not to. Do not change our mind too soon
-                return false;
 
             var currentGun = gunManager.CurrentGunIndex;
             // TODO Do not evaluate by percentage but by speed of depletion of ammo
@@ -106,7 +102,6 @@ namespace AI.BonsaiBehaviours.Conditions
 
             if (!IsGoingToCover && Random.value < avoidCoverProbability)
             {
-                nextCoverAttempt = Time.time + TIMEOUT;
                 // Avoid always rushing towards a cover point to not be predictable
                 return false;
             }

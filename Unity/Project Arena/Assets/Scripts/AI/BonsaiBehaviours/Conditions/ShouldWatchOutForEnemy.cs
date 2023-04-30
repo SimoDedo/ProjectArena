@@ -12,7 +12,7 @@ namespace AI.BonsaiBehaviours.Conditions
     /// Returns Success if we have taken damage recently and should react about it, Failure otherwise.
     /// </summary>
     [BonsaiNode("Conditional/")]
-    public class ShouldWatchOutForEnemy : AutoConditionalAbort
+    public class ShouldWatchOutForEnemy : TimedEvaluationConditionalAbort
     {
         private DamageSensor damageSensor;
         private SoundSensor soundSensor;

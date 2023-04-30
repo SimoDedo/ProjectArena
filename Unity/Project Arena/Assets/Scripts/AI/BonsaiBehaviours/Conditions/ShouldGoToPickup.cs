@@ -11,7 +11,7 @@ namespace AI.BonsaiBehaviours.Conditions
     /// Returns Success if we should go to the pickup, Running otherwise
     /// </summary>
     [BonsaiNode("Conditional/")]
-    public class ShouldGoToPickup : AutoConditionalAbort
+    public class ShouldGoToPickup : TimedEvaluationConditionalAbort
     {
         private PickupPlanner pickupPlanner;
 
