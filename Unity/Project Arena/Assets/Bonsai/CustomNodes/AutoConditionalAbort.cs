@@ -1,35 +1,35 @@
+using System.Threading;
+using BehaviorDesigner.Runtime;
 using Bonsai.Core;
-using Bonsai.Utility;
 using UnityEngine;
+using Timer = Bonsai.Utility.Timer;
 
 namespace Bonsai.CustomNodes
 {
     public abstract class AutoConditionalAbort: ConditionalAbort
     {
-        private readonly Timer timer = new()
-        {
-            interval = 0.0001f
-        };
+        private readonly Timer timer;
 
-        public override void OnStart()
+        protected AutoConditionalAbort(float timeOut = 0.0001f)
         {
-            base.OnStart();
-            timer.Start();
-            timer.OnTimeout += TimerOnOnTimeout;
+            timer = new Timer
+            {
+                interval = timeOut,
+                AutoRestart = true
+            };
         }
+
 
         private void TimerOnOnTimeout()
         {
-            timer.interval = 0.001f;
-            timer.Start();
             Evaluate();
         }
 
         protected override void OnObserverBegin()
         {
             base.OnObserverBegin();
-            timer.interval = 0.0001f;
             timer.Start();
+            timer.OnTimeout += TimerOnOnTimeout;
             Tree.AddTimer(timer);
         }
 
@@ -37,6 +37,7 @@ namespace Bonsai.CustomNodes
         {
             base.OnObserverEnd();
             Tree.RemoveTimer(timer);
+            timer.OnTimeout -= TimerOnOnTimeout;
         }
 
     }
