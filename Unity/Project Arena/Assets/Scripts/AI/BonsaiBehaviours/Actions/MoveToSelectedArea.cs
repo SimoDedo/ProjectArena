@@ -1,3 +1,4 @@
+using AI.Layers.Actuators;
 using AI.Layers.KnowledgeBase;
 using Bonsai;
 using Maps.MapGenerator;
@@ -18,6 +19,7 @@ namespace AI.BonsaiBehaviours.Actions
         public string chosenAreaKey;
         private Area SelectedArea => Blackboard.Get<Area>(chosenAreaKey);
         private NavigationSystem navSystem;
+        private MovementController mover;
         private Transform t;
         private float mapScale;
         private float timeInArea;
@@ -29,6 +31,7 @@ namespace AI.BonsaiBehaviours.Actions
             t = entity.transform;
             mapScale = entity.MapMemory.gridScale;
             navSystem = entity.NavigationSystem;
+            mover = entity.MovementController;        
         }
 
         public override void OnEnter()
@@ -70,7 +73,7 @@ namespace AI.BonsaiBehaviours.Actions
 
         public override Status Run()
         {
-            navSystem.MoveAlongPath();
+            mover.MoveToPosition(navSystem.GetNextPosition());
             if (navSystem.HasArrivedToDestination())
             {
                 return Status.Success;

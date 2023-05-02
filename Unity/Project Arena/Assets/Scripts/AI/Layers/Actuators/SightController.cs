@@ -105,7 +105,7 @@ namespace AI.Layers.Actuators
 
 
         // Sets slowdown of view
-        public void SetInputPenalty(float inputPenalty)
+        public void SetSpeedMultiplier(float inputPenalty)
         {
             this.inputPenalty = inputPenalty;
         }

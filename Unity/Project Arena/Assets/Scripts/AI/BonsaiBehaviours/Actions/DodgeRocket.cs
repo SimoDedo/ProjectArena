@@ -1,3 +1,4 @@
+using AI.Layers.Actuators;
 using AI.Layers.KnowledgeBase;
 using Bonsai;
 using Bonsai.Core;
@@ -16,11 +17,13 @@ namespace AI.BonsaiBehaviours.Actions
         private Transform rocketToDodge;
         private Transform entityTransform;
         private NavigationSystem navSystem;
+        private MovementController mover;
 
         public override void OnStart()
         {
             var entity = Actor.GetComponent<AIEntity>();
             navSystem = entity.NavigationSystem;
+            mover = entity.MovementController;           
             entityTransform = entity.transform;
         }
 
@@ -38,7 +41,7 @@ namespace AI.BonsaiBehaviours.Actions
         {
             if (navSystem.HasPath() && !navSystem.HasArrivedToDestination())
             {
-                navSystem.MoveAlongPath();
+                mover.MoveToPosition(navSystem.GetNextPosition());
                 return Status.Running;
             }
 

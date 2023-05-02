@@ -1,3 +1,4 @@
+using AI.Layers.Actuators;
 using AI.Layers.KnowledgeBase;
 using Bonsai;
 using UnityEngine.AI;
@@ -13,12 +14,15 @@ namespace AI.BonsaiBehaviours.Actions
     public class ApplyPathToAgent : Task
     {
         private NavigationSystem navSystem;
+        private MovementController mover;
         public string pathChosenKey;
         private NavMeshPath PathChosen => Blackboard.Get<NavMeshPath>(pathChosenKey);
 
         public override void OnStart()
         {
-            navSystem = Actor.GetComponent<AIEntity>().NavigationSystem;
+            var entity = Actor.GetComponent<AIEntity>();
+            navSystem = entity.NavigationSystem;
+            mover = entity.MovementController;
         }
 
         public override void OnEnter()
@@ -35,7 +39,7 @@ namespace AI.BonsaiBehaviours.Actions
         {
             if (navSystem.HasArrivedToDestination())
                 return Status.Success;
-            navSystem.MoveAlongPath();
+            mover.MoveToPosition(navSystem.GetNextPosition());
             return Status.Running;
         }
     }

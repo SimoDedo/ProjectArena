@@ -127,7 +127,7 @@ namespace AI
         // Prepares all the AI components
         private void PrepareComponents(GameManager gms, bool[] ag)
         {
-            MovementController = new MovementController(this, botCharacteristics.Speed);
+            MovementController = new MovementController(this);
             SightController =
                 new SightController(this, head, botCharacteristics.CameraSpeed, botCharacteristics.CameraAcceleration);
             SightSensor = new SightSensor(head, botCharacteristics.MaxRange, botCharacteristics.FOV);
@@ -149,7 +149,7 @@ namespace AI
             SoundSensor = new SoundSensor(botCharacteristics.TimeBeforeReaction, botCharacteristics.EventReactionTimeout, GetID(), head.transform, botCharacteristics.SoundThreshold);
             PickupMemory = new PickupMemory(this);
             PickupKnowledgeBase = new PickupActivationEstimator(this);
-            NavigationSystem = new NavigationSystem(this);
+            NavigationSystem = new NavigationSystem(this, botCharacteristics.Speed);
             GunManager = new GunManager(this);
             PickupPlanner = new PickupPlanner(this);
             goalMachine = new EntityGoalMachine(this);
@@ -254,8 +254,8 @@ namespace AI
 
         public override void SlowEntity(float penalty)
         {
-            SightController.SetInputPenalty(penalty);
-            MovementController.SetInputPenalty(penalty);
+            SightController.SetSpeedMultiplier(penalty);
+            NavigationSystem.SetMovementMultiplier(penalty);
         }
 
         public override void HealFromMedkit(MedkitPickable medkit)

@@ -1,5 +1,4 @@
 using System;
-using AI.Layers.Actuators;
 using Others;
 using UnityEngine;
 using UnityEngine.AI;
@@ -17,21 +16,23 @@ namespace AI.Layers.KnowledgeBase
         private readonly Transform transform;
 
         private NavMeshAgent agent;
-        private MovementController mover;
 
-        public NavigationSystem(AIEntity me)
+        public NavigationSystem(AIEntity me, float speed)
         {
             this.me = me;
             transform = me.transform;
+            baseSpeed = speed;
             acceleration = 10000;
             angularSpeed = 1000000;
+            speedMultiplier = 1f;
         }
 
-        public float Speed => mover.Speed;
+        private readonly float baseSpeed;
+        private float speedMultiplier;
+        public float Speed => baseSpeed * speedMultiplier;
 
         public void Prepare()
         {
-            mover = me.MovementController;
             agent = me.gameObject.AddComponent<NavMeshAgent>();
             var agentSettings = NavMesh.GetSettingsByIndex(0);
             agent.radius = agentSettings.agentRadius;
@@ -79,27 +80,9 @@ namespace AI.Layers.KnowledgeBase
             return rtn;
         }
 
-        /// <summary>
-        /// Makes the entity move along the previously specified path, if any.
-        /// </summary>
-        public void MoveAlongPath()
+        public Vector3 GetNextPosition()
         {
-            // Debug.Log("AAAA movement for " + me.GetID() + " is moving from " + transform.position + " to " + agent.nextPosition);
-            // var position = transform.position;
-            // Debug.DrawLine(position, agent.destination, Color.green, 0, false);
-            // Debug.DrawLine(position, agent.nextPosition, Color.red, 0.4f);
-            mover.MoveToPosition(agent.nextPosition);
-            // Debug.Log("AAAA movement for " + me.GetID() + ", end of movement is " + transform.position);
-        }
-
-        public void MoveTo(Vector3 destination)
-        {
-            if ((transform.position - destination).magnitude > agent.speed * 1.1)
-            {
-                throw new Exception("Movement too long");
-            }
-            mover.MoveToPosition(destination);
-            agent.nextPosition = destination;
+            return agent.nextPosition;
         }
 
         /// <summary>
@@ -160,6 +143,12 @@ namespace AI.Layers.KnowledgeBase
         public bool HasPath()
         {
             return agent.hasPath;
+        }
+
+        public void SetMovementMultiplier(float multiplier)
+        {
+            speedMultiplier = multiplier;
+            agent.speed = Speed;
         }
     }
 }

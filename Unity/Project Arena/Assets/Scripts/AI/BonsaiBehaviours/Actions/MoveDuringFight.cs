@@ -1,4 +1,5 @@
 using System;
+using AI.Layers.Actuators;
 using AI.Layers.KnowledgeBase;
 using Bonsai;
 using Bonsai.Core;
@@ -24,6 +25,7 @@ namespace AI.BonsaiBehaviours.Actions
 
         private int layerMask;
         private NavigationSystem navSystem;
+        private MovementController mover;
 
         private float skill;
         private Entity.Entity target;
@@ -38,19 +40,20 @@ namespace AI.BonsaiBehaviours.Actions
         public override void OnStart()
         {
             layerMask = LayerMask.GetMask("Default", "Wall", "Floor");
-        }
-
-        public override void OnEnter()
-        {
             entity = Actor.GetComponent<AIEntity>();
             entityTransform = entity.transform;
             navSystem = entity.NavigationSystem;
+            mover = entity.MovementController;            
             gunManager = entity.GunManager;
             target = entity.GetEnemy();
             targetTransform = target.transform;
 
             skill = entity.Characteristics.FightingSkill;
             isStrafingRight = Random.value < 0.5f;
+        }
+
+        public override void OnEnter()
+        {
             UpdateStrafeIfNeeded(true);
             navSystem.CancelPath();
         }
@@ -64,7 +67,7 @@ namespace AI.BonsaiBehaviours.Actions
         {
             if (navSystem.HasPath() && !navSystem.HasArrivedToDestination())
             {
-                navSystem.MoveAlongPath();
+                mover.MoveToPosition(navSystem.GetNextPosition());
                 return Status.Running;
             }
             
@@ -74,7 +77,7 @@ namespace AI.BonsaiBehaviours.Actions
             {
                 if (TacticalMovement(currentPos, targetPos))
                 {
-                    navSystem.MoveAlongPath();
+                    mover.MoveToPosition(navSystem.GetNextPosition());
                     timeStuckInCorner = Math.Max(0, timeStuckInCorner - Time.deltaTime * 0.1f);
                     return Status.Running;
                 }
@@ -95,7 +98,7 @@ namespace AI.BonsaiBehaviours.Actions
                             if (!path.IsValid()) continue;
                             timeStuckInCorner = 0;
                             navSystem.SetPath(path);
-                            navSystem.MoveAlongPath();
+                            mover.MoveToPosition(navSystem.GetNextPosition());
                             return Status.Running;
                         }
                     }
@@ -106,7 +109,7 @@ namespace AI.BonsaiBehaviours.Actions
             // Try random positions, hoping to find a suitable location.
             FallbackMovement(currentPos, targetPos);
 
-            // navSystem.MoveAlongPath();
+            // mover.MoveToPosition(navSystem.GetNextPosition());
             return Status.Running;
         }
         
@@ -203,7 +206,7 @@ namespace AI.BonsaiBehaviours.Actions
 
                 // Can see enemy from here, found new position!
                 navSystem.SetPath(path);
-                navSystem.MoveAlongPath();
+                mover.MoveToPosition(navSystem.GetNextPosition());
                 return;
             }
 
@@ -227,11 +230,11 @@ namespace AI.BonsaiBehaviours.Actions
                 // If we move less than two seconds, extend path
                 if (totalDistance / 20 < 2) continue;
                 navSystem.CalculatePath(corner);
-                navSystem.MoveAlongPath();
+                mover.MoveToPosition(navSystem.GetNextPosition());
                 return;
             }
             navSystem.SetPath(path);
-            navSystem.MoveAlongPath();
+            mover.MoveToPosition(navSystem.GetNextPosition());
         }
 
         private Vector3 GetMovementDirectionDueToStrafe(Vector3 direction)

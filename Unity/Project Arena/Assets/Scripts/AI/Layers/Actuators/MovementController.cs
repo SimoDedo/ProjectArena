@@ -9,13 +9,10 @@ namespace AI.Layers.Actuators
     {
         private readonly Transform transform;
         private Vector3 previousPosition;
-        private readonly float speed;
-        private float inputPenalty = 1f;
-
-        public MovementController(AIEntity entity, float speed)
+        
+        public MovementController(AIEntity entity)
         {
             transform = entity.transform;
-            this.speed = speed;
         }
 
         // Prepares the component
@@ -29,7 +26,6 @@ namespace AI.Layers.Actuators
         /// </summary>
         public void MoveToPosition(Vector3 position)
         {
-            // TODO Control movement for this frame, prevent moving too fast
             previousPosition = transform.position;
             transform.position = position;
         }
@@ -41,12 +37,5 @@ namespace AI.Layers.Actuators
         {
             return (transform.position - previousPosition) / Time.deltaTime;
         }
-
-        public void SetInputPenalty(float penalty)
-        {
-            inputPenalty = penalty;
-        }
-
-        public float Speed => speed * inputPenalty;
     }
 }
