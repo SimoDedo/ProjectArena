@@ -30,6 +30,7 @@ namespace AI.GoalMachine.Goal
 
         public void Enter()
         {
+            bonsaiBehaviorTree.StartTree();
         }
 
         public void Update()

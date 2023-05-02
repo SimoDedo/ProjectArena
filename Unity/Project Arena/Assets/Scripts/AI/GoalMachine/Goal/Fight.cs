@@ -58,6 +58,7 @@ namespace AI.GoalMachine.Goal
 
         public void Enter()
         {
+            bonsaiBehaviorTree.StartTree();
             FocusingOnEnemyGameEvent.Instance.Raise(new FocusOnEnemyInfo {entityID = entity.GetID(), isFocusing = true});
         }
 

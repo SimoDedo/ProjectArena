@@ -64,11 +64,24 @@ namespace AI.GoalMachine.Goal
         {
             if (currentPickable != nextPickable)
             {
-                bonsaiBehaviorTree.Reset();
+                if (currentPickable != null)
+                {
+                    bonsaiBehaviorTree.Reset();
+                }
+
+                bonsaiBehaviorTree.StartTree();
                 currentPickable = nextPickable;
             }
 
             bonsaiBehaviorTree.Tick();
+
+            if (!bonsaiBehaviorTree.IsRunning())
+            {
+                pickupPlanner.ForceUpdate();
+                bonsaiBehaviorTree.Reset();
+                currentPickable = null;
+            }
+            
         }
 
         public void Exit()
