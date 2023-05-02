@@ -1,5 +1,4 @@
 using AI.GoalMachine.Goal;
-using BehaviorDesigner.Runtime;
 
 namespace AI.GoalMachine
 {
@@ -16,8 +15,6 @@ namespace AI.GoalMachine
 
         public EntityGoalMachine(AIEntity entity)
         {
-            Behavior.CreateBehaviorManager();
-            BehaviorManager.instance.UpdateInterval = UpdateIntervalType.Manual;
             goals = new IGoal[]
             {
                 new NoGoal(), new Wander(entity), new Fight(entity), new SearchEnemy(entity),

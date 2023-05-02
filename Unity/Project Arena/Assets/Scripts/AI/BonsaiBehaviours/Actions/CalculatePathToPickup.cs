@@ -1,9 +1,6 @@
-using System;
-using AI.Behaviours.Variables;
 using AI.Layers.KnowledgeBase;
 using Bonsai;
 using Bonsai.Core;
-using UnityEngine;
 using UnityEngine.AI;
 
 namespace AI.BonsaiBehaviours.Actions

@@ -1,6 +1,4 @@
-using System;
 using AI.Layers.SensingLayer;
-using BehaviorDesigner.Runtime.Tasks;
 using Bonsai;
 using Bonsai.CustomNodes;
 using UnityEngine;

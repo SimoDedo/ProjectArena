@@ -1,4 +1,3 @@
-using System;
 using AI.Layers.KnowledgeBase;
 using Bonsai;
 using Maps.MapGenerator;

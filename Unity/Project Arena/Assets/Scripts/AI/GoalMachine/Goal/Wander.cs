@@ -1,4 +1,3 @@
-using BehaviorDesigner.Runtime;
 using Bonsai.Core;
 using UnityEngine;
 

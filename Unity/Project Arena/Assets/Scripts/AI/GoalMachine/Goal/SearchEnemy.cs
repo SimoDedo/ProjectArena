@@ -2,7 +2,6 @@ using System;
 using AI.Layers.KnowledgeBase;
 using AI.Layers.SensingLayer;
 using AI.Layers.Sensors;
-using BehaviorDesigner.Runtime;
 using Bonsai.Core;
 using Logging;
 using UnityEngine;

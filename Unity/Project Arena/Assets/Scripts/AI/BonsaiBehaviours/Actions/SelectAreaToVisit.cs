@@ -1,11 +1,6 @@
-using System;
-using AI.Behaviours.Variables;
 using AI.Layers.KnowledgeBase;
-using BehaviorDesigner.Runtime.Tasks;
 using Bonsai;
 using Maps.MapGenerator;
-using UnityEngine;
-using Action = BehaviorDesigner.Runtime.Tasks.Action;
 using Task = Bonsai.Core.Task;
 
 namespace AI.BonsaiBehaviours.Actions

@@ -1,4 +1,3 @@
-using System;
 using AI.Layers.Actuators;
 using AI.Layers.SensingLayer;
 using Bonsai;

@@ -1,7 +1,4 @@
-using System;
 using AI.Layers.SensingLayer;
-using BehaviorDesigner.Runtime;
-using BehaviorDesigner.Runtime.Tasks;
 using Bonsai;
 using Bonsai.CustomNodes;
 using Guns;

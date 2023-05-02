@@ -1,7 +1,5 @@
-using System;
 using AI.Layers.Actuators;
 using AI.Layers.KnowledgeBase;
-using BehaviorDesigner.Runtime;
 using Bonsai;
 using Others;
 using UnityEngine;

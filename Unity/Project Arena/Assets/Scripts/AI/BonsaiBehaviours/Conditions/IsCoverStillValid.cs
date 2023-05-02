@@ -1,9 +1,5 @@
-using System;
 using System.Linq;
-using AI.Behaviours.Variables;
-using BehaviorDesigner.Runtime.Tasks;
 using Bonsai;
-using Bonsai.Core;
 using Bonsai.CustomNodes;
 using UnityEngine;
 using UnityEngine.AI;

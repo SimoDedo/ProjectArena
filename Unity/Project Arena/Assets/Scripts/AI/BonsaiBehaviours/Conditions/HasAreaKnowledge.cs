@@ -1,7 +1,5 @@
-    using System;
-    using AI.Layers.KnowledgeBase;
-    using BehaviorDesigner.Runtime.Tasks;
-    using Bonsai;
+using AI.Layers.KnowledgeBase;
+using Bonsai;
     using Bonsai.Core;
 
     namespace AI.BonsaiBehaviours.Conditions

@@ -1,5 +1,3 @@
-using System;
-using AI.Behaviours.Variables;
 using AI.Layers.KnowledgeBase;
 using Bonsai;
 using Others;
