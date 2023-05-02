@@ -3,7 +3,6 @@ using AI.Layers.KnowledgeBase;
 using Bonsai.Core;
 using Pickables;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace AI.GoalMachine.Goal
 {
