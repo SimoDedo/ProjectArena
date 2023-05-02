@@ -1,11 +1,10 @@
 using System;
 using System.Runtime.CompilerServices;
-using AI.Layers.Memory;
 using Maps.MapGenerator;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace AI.Layers.Planners
+namespace AI.Layers.KnowledgeBase
 {
     /// <summary>
     /// This component represents the entity knowledge of the map. It requires support from the map itself, which

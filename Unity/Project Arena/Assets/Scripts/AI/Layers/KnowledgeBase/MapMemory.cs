@@ -3,7 +3,7 @@ using Managers.Mode;
 using Maps.MapGenerator;
 using UnityEngine;
 
-namespace AI.Layers.Memory
+namespace AI.Layers.KnowledgeBase
 {
     /// <summary>
     /// This component represents the entity knowledge of the map. It requires support from the map itself, which

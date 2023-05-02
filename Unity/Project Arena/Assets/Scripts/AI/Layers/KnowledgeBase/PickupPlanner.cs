@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using AI.Layers.KnowledgeBase;
 using AI.Layers.SensingLayer;
 using Entity.Component;
 using Others;
@@ -8,7 +7,7 @@ using Pickables;
 using UnityEngine;
 using Utils;
 
-namespace AI.Layers.Planners
+namespace AI.Layers.KnowledgeBase
 {
     /// <summary>
     /// This components is able to select which pickup, if any, should the entity try to collect.

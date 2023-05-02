@@ -1,7 +1,6 @@
 using System;
 using AI.Behaviours.Variables;
 using AI.Layers.KnowledgeBase;
-using AI.Layers.Planners;
 using BehaviorDesigner.Runtime.Tasks;
 using UnityEngine;
 using Action = BehaviorDesigner.Runtime.Tasks.Action;

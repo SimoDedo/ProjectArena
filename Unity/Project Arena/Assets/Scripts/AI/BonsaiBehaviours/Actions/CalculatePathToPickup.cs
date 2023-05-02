@@ -1,7 +1,6 @@
 using System;
 using AI.Behaviours.Variables;
 using AI.Layers.KnowledgeBase;
-using AI.Layers.Planners;
 using Bonsai;
 using Bonsai.Core;
 using UnityEngine;

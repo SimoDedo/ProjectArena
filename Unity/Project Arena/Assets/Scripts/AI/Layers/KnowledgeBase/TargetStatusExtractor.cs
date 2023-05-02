@@ -1,5 +1,4 @@
 using System;
-using AI.Layers.Memory;
 using UnityEngine;
 
 namespace AI.Layers.KnowledgeBase

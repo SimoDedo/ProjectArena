@@ -1,8 +1,6 @@
 using AI.GoalMachine;
 using AI.Layers.Actuators;
 using AI.Layers.KnowledgeBase;
-using AI.Layers.Memory;
-using AI.Layers.Planners;
 using AI.Layers.SensingLayer;
 using AI.Layers.Sensors;
 using AI.Layers.Statistics;

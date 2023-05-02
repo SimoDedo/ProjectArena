@@ -4,7 +4,7 @@ using Pickables;
 using UnityEngine;
 using Utils;
 
-namespace AI.Layers.Memory
+namespace AI.Layers.KnowledgeBase
 {
     /// <summary>
     /// This component deals with keeping track of the activation times of all the pickups in the map.

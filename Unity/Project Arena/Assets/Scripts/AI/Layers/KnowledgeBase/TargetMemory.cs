@@ -3,7 +3,7 @@ using System.Linq;
 using AI.Layers.SensingLayer;
 using UnityEngine;
 
-namespace AI.Layers.Memory
+namespace AI.Layers.KnowledgeBase
 {
     /// <summary>
     /// This component keeps track of when the provided target was visibile and when we should consider they
