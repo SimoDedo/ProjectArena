@@ -34,15 +34,15 @@ namespace AI.Layers.Planners
         
         private void PrintArea(Area area, Color color)
         {
-            var topLeft = ConvertToActualMapCoordinate(new Vector3(area.leftColumn, 0, area.topRow));
-            var bottomLeft = ConvertToActualMapCoordinate(new Vector3(area.leftColumn, 0, area.bottomRow));
-            var topRight = ConvertToActualMapCoordinate(new Vector3(area.rightColumn, 0, area.topRow));
-            var bottomRight = ConvertToActualMapCoordinate(new Vector3(area.rightColumn, 0, area.bottomRow));
-
-            Debug.DrawLine(topLeft, bottomLeft, color, 2, false);
-            Debug.DrawLine(bottomLeft, bottomRight, color, 2, false);
-            Debug.DrawLine(bottomRight, topRight, color, 2, false);
-            Debug.DrawLine(topRight, topLeft, color, 2, false);
+            // var topLeft = ConvertToActualMapCoordinate(new Vector3(area.leftColumn, 0, area.topRow));
+            // var bottomLeft = ConvertToActualMapCoordinate(new Vector3(area.leftColumn, 0, area.bottomRow));
+            // var topRight = ConvertToActualMapCoordinate(new Vector3(area.rightColumn, 0, area.topRow));
+            // var bottomRight = ConvertToActualMapCoordinate(new Vector3(area.rightColumn, 0, area.bottomRow));
+            //
+            // Debug.DrawLine(topLeft, bottomLeft, color, 2, false);
+            // Debug.DrawLine(bottomLeft, bottomRight, color, 2, false);
+            // Debug.DrawLine(bottomRight, topRight, color, 2, false);
+            // Debug.DrawLine(topRight, topLeft, color, 2, false);
         }
 
         /// <summary>

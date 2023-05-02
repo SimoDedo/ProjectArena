@@ -79,7 +79,7 @@ namespace AI.Behaviours.Actions
             if (pathToEstimatedPos.IsComplete())
             {
                 lastKnownPositionPath.Value = pathToEstimatedPos;
-                Debug.DrawLine(entity.transform.position, estimatedPosition, Color.yellow, 4, false);
+                // Debug.DrawLine(entity.transform.position, estimatedPosition, Color.yellow, 4, false);
                 return TaskStatus.Success;
             }
 
@@ -87,7 +87,7 @@ namespace AI.Behaviours.Actions
             var pathToDelayedPosition = navSystem.CalculatePath(delayedPosition);
             if (pathToDelayedPosition.IsComplete())
             {
-                Debug.DrawLine(entity.transform.position, estimatedPosition, Color.yellow, 4, false);
+                // Debug.DrawLine(entity.transform.position, estimatedPosition, Color.yellow, 4, false);
                 lastKnownPositionPath.Value = pathToDelayedPosition;
                 return TaskStatus.Success;
             }
@@ -128,7 +128,7 @@ namespace AI.Behaviours.Actions
                 var path = navSystem.CalculatePath(chosenPos);
                 if (path.IsComplete())
                 {
-                    Debug.DrawLine(entity.transform.position, chosenPos, Color.yellow, 4, false);
+                    // Debug.DrawLine(entity.transform.position, chosenPos, Color.yellow, 4, false);
                     lastKnownPositionPath.Value = path;
                     return TaskStatus.Success;
                 }
@@ -147,7 +147,7 @@ namespace AI.Behaviours.Actions
             var path3 = navSystem.CalculatePath(enemyPos);
             if (path3.IsComplete())
             {
-                Debug.DrawLine(entity.transform.position, enemyPos, Color.yellow, 4, false);
+                // Debug.DrawLine(entity.transform.position, enemyPos, Color.yellow, 4, false);
                 lastKnownPositionPath.Value = path3;
                 return TaskStatus.Success;
             }

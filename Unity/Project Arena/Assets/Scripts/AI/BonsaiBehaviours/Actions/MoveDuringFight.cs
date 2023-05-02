@@ -149,7 +149,7 @@ namespace AI.BonsaiBehaviours.Actions
 
             var totalMovement = movementVector * (0.3f * navSystem.Speed);
             var positionAfterMovement = currentPos + totalMovement;
-            Debug.DrawLine(currentPos, positionAfterMovement, Color.yellow, 0, false);
+            // Debug.DrawLine(currentPos, positionAfterMovement, Color.yellow, 0, false);
 
             if (!Physics.Linecast(positionAfterMovement, targetPos, layerMask))
             {
