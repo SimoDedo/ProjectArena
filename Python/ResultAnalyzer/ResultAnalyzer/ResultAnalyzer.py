@@ -26,7 +26,7 @@ def getData(inputDir):
             print("File found.")
             inputAcquired = True
             # Parse the data.
-            with open(inputDir + "/" + fileName) as csvfile:
+            with open(os.path.join(inputDir, fileName)) as csvfile:
                 reader = csv.reader(csvfile, delimiter = ';', quotechar = '|')
                 data = list(reader)
         else:
@@ -286,7 +286,7 @@ def difficultyHeatmap():
 
 def positionHeatmap(dataset):
     # Extract the data.
-    with open(inputDir + "/" + dataset) as csvfile:
+    with open(os.path.join(inputDir, dataset)) as csvfile:
         reader = csv.reader(csvfile, delimiter = ';', quotechar = '|')
         positions = list(reader)
         x = getArrayFromData(positions, 0, 1)

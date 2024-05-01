@@ -1,0 +1,13 @@
+{
+  "eyeSpeed": 0.8,
+  "reflex": 1.3,
+  "prediction": 0.7,
+  "aiming": 1.2,
+  "speed": 20.0,
+  "movementSkill": 0.6,
+  "curiosity": 1.5,
+  "recklessness": "Low",
+  "fov": 80.0,
+  "maxRange": 200.0,
+  "damageTimeout": 0.5
+}
