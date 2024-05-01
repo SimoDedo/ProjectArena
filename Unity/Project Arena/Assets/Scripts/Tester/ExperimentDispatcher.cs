@@ -26,7 +26,7 @@ namespace Tester
 
             if (experimentType == null)
             {
-                // Debug.LogError("You must supply the type of experiment to run with " + EXPERIMENT_PARAM);
+                 Debug.LogError("You must supply the type of experiment to run with " + EXPERIMENT_PARAM);
                 // This doesn't work...
 
                 QuitWithError("You must supply the type of experiment to run with " + EXPERIMENT_PARAM);
@@ -36,6 +36,7 @@ namespace Tester
             switch (experimentType)
             {
                 case GENOME_TESTER_TEST_NAME:
+                    Debug.Log("Loading");
                     SceneManager.LoadScene(GENOME_TESTER_TEST_SCENE);
                     break;
 

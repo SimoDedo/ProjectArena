@@ -87,11 +87,11 @@ namespace Tester
 
             if (string.IsNullOrEmpty(baseDataFolderPath))
             {
-                baseDataFolderPath = Application.persistentDataPath + "/";
+                baseDataFolderPath = Application.persistentDataPath;
             }
-            importPath = baseDataFolderPath + "Import/";
-            genomesPath = importPath + "Genomes/";
-            botsPath = importPath + "Bots/";
+            importPath = Path.Combine(baseDataFolderPath, "Import");
+            genomesPath = Path.Combine(importPath, "Genomes");
+            botsPath = Path.Combine(importPath, "Bots");
 
             if (!Directory.Exists(genomesPath)) Directory.CreateDirectory(genomesPath);
             if (!Directory.Exists(botsPath)) Directory.CreateDirectory(botsPath);
@@ -132,7 +132,7 @@ namespace Tester
         
         private void SaveMap(string map)
         {
-            ExportResults(baseDataFolderPath, map, folderName + "map_" + experimentName, ".txt");
+            ExportResults(baseDataFolderPath, map, folderName, "map_" + experimentName, ".txt");
             SaveMapTextGameEvent.Instance.RemoveListener(SaveMap);
         }
 
@@ -140,16 +140,16 @@ namespace Tester
         {
             analyzer.Reset();
             
-            var bot1JsonParams = ReadFromFile<JSonBotCharacteristics>(botsPath + bot1ParamsFilenamePrefix + "_params.json");
+            var bot1JsonParams = ReadFromFile<JSonBotCharacteristics>(Path.Combine(botsPath, bot1ParamsFilenamePrefix + "_params.json"));
             var bot1Params = new BotCharacteristics(bot1SkillLevel, bot1JsonParams);
             
-            var bot2JsonParams = ReadFromFile<JSonBotCharacteristics>(botsPath + bot2ParamsFilenamePrefix + "_params.json");
+            var bot2JsonParams = ReadFromFile<JSonBotCharacteristics>(Path.Combine(botsPath, bot2ParamsFilenamePrefix + "_params.json"));
             var bot2Params = new BotCharacteristics(bot2SkillLevel, bot2JsonParams);
 
-            var activeGunsBot1 = ReadFromFile<bool[]>(botsPath + bot1ParamsFilenamePrefix + "_guns.json");
-            var activeGunsBot2 = ReadFromFile<bool[]>(botsPath + bot2ParamsFilenamePrefix + "_guns.json");
+            var activeGunsBot1 = ReadFromFile<bool[]>(Path.Combine(botsPath, bot1ParamsFilenamePrefix + "_guns.json"));
+            var activeGunsBot2 = ReadFromFile<bool[]>(Path.Combine(botsPath, bot2ParamsFilenamePrefix + "_guns.json"));
 
-            var genome = ReadFromFile<AreasGenome>(genomesPath + folderName + genomeName);
+            var genome = ReadFromFile<AreasGenome>(Path.Combine(genomesPath, folderName, genomeName));
             genomeMapGenerator.SetGenome(genome);
             mapAssembler.SetMapScale(genome.mapScale);
             
@@ -185,24 +185,24 @@ namespace Tester
                 if (logKillDistances)
                 {
                     var (positions1, positions2) = killDistanceAnalyzer.CompileResultsAsCSV();
-                    ExportResults(baseDataFolderPath, positions1, folderName + "kill_distances_" + experimentName + "_bot1", ".csv");
-                    ExportResults(baseDataFolderPath, positions2, folderName + "kill_distances_" + experimentName + "_bot2", ".csv");
+                    ExportResults(baseDataFolderPath, positions1, folderName, "kill_distances_" + experimentName + "_bot1", ".csv");
+                    ExportResults(baseDataFolderPath, positions2, folderName, "kill_distances_" + experimentName + "_bot2", ".csv");
                 }
                 if (logDeathPositions)
                 {
                     var (positions1, positions2) = deathPositionAnalyzer.CompileResultsAsCSV();
-                    ExportResults(baseDataFolderPath, positions1, folderName + "death_positions_" + experimentName + "_bot1", ".csv");
-                    ExportResults(baseDataFolderPath, positions2, folderName + "death_positions_" + experimentName + "_bot2", ".csv");
+                    ExportResults(baseDataFolderPath, positions1, folderName, "death_positions_" + experimentName + "_bot1", ".csv");
+                    ExportResults(baseDataFolderPath, positions2, folderName, "death_positions_" + experimentName + "_bot2", ".csv");
                 }
 
                 if (logPositions)
                 {
                     var (positions1, positions2) = positionAnalyzer.CompileResultsAsCSV();
-                    ExportResults(baseDataFolderPath, positions1, folderName + "position_" + experimentName + "_bot1", ".csv");
-                    ExportResults(baseDataFolderPath, positions2, folderName + "position_" + experimentName + "_bot2", ".csv");
+                    ExportResults(baseDataFolderPath, positions1, folderName, "position_" + experimentName + "_bot1", ".csv");
+                    ExportResults(baseDataFolderPath, positions2, folderName, "position_" + experimentName + "_bot2", ".csv");
                 }
 
-                ExportResults(baseDataFolderPath, JsonConvert.SerializeObject(results), folderName + "final_results_" + experimentName);
+                ExportResults(baseDataFolderPath, JsonConvert.SerializeObject(results), folderName, "final_results_" + experimentName);
                 Application.Quit();
             }
             else
@@ -214,9 +214,9 @@ namespace Tester
             }
         }
 
-        private static void ExportResults(string folder, string compileResults, string experimentName, string extension = ".json")
+        private static void ExportResults(string folderPath, string compileResults, string folderName, string experimentName, string extension = ".json")
         {
-            var exportPath = folder + "Export/" + experimentName;
+            var exportPath = Path.Combine(folderPath, "Export", folderName, experimentName);
             
             var filePath = exportPath + extension;
             try
@@ -251,7 +251,7 @@ namespace Tester
 
         private static Tuple<BotCharacteristics, bool[]> LoadBotCharacteristics(string botsPath, string botFilename)
         {
-            var paramsFile = botsPath + botFilename + "params.json";
+            var paramsFile = Path.Combine(botsPath, botFilename + "_params.json");
             var botParams = BotCharacteristics.Default;
             try
             {

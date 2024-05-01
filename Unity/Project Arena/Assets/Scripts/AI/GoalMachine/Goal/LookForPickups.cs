@@ -68,7 +68,7 @@ namespace AI.GoalMachine.Goal
                     bonsaiBehaviorTree.Reset();
                 }
 
-                bonsaiBehaviorTree.StartTree();
+                //bonsaiBehaviorTree.StartTree();
                 currentPickable = nextPickable;
             }
 
