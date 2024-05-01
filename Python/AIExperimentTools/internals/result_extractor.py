@@ -24,6 +24,7 @@ def extract_match_data(partial_file_name, num_simulations=NUM_PARALLEL_SIMULATIO
 
     dataset["ratio"] = ratios
     dataset["killDiff"] = killDiff
+
     return dataset
 
 

@@ -1,5 +1,6 @@
 import argparse
 import math
+import os
 import pickle
 import sys
 from concurrent.futures.thread import ThreadPoolExecutor
@@ -19,7 +20,7 @@ __ratio_cmap = LinearSegmentedColormap.from_list('ratio', ['#00FF00', '#FFFF00',
 
 def plot(data, file_name, plot_name, bot1_name, bot2_name, norm, cmap='jet'):
 
-    with open(GAME_DATA_FOLDER + file_name + "_heatmap_matrix.pkl", "wb") as cp_file:
+    with open(os.path.join(GAME_DATA_FOLDER, file_name + "_heatmap_matrix.pkl"), "wb") as cp_file:
         pickle.dump(data, cp_file)
 
     fig, axs = plt.subplots(figsize=(2 + 2, 3), constrained_layout=True, squeeze=False)
@@ -72,7 +73,7 @@ def __run_heatmap(x, y, bot1_file, bot2_file, phenotype, resolution):
     rel_std_dev = round(std_dev / mean_ratio * 100, 2)
     print("kill_diff mean: " + str(mean_kill_diff) + ", stdDev: " + str(std_dev) + ", relStdDev: " + str(rel_std_dev) + ", min: " + str(min_kill_diff) + ", max: " + str(max_kill_diff))
 
-    return math.log2(mean_ratio), abs(mean_kill_diff)
+    return mean_ratio, abs(mean_kill_diff)
 
 
 def __heatmap(bot1_file, bot2_file, resolution, heatmap_file):

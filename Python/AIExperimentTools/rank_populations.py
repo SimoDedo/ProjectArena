@@ -66,7 +66,7 @@ def __plot_epoch_paretos_total(num_epochs, num_populations):
         epoch_areas = []
         for population_idx in range(num_populations):
             (_, population, all_fitnesses) = __load_checkpoint(
-                GAME_DATA_FOLDER + str(population_idx) + "/checkpoints/checkpoint_epoch_" + str(checkpoint_idx) + ".pkl")
+                os.path.join(GAME_DATA_FOLDER, str(population_idx), "checkpoints", "checkpoint_epoch_" + str(checkpoint_idx) + ".pkl"))
             populations_individuals.extend(population)
             populations_fitnesses.extend(all_fitnesses)
             population_pareto = tools.ParetoFront(__fitness_similarity)
@@ -101,7 +101,7 @@ def __plot_epoch_paretos_single(num_epochs, population_idx):
     populations_fitnesses = []
     for checkpoint_idx in range(num_epochs + 1):
         (_, population, all_fitnesses) = __load_checkpoint(
-            GAME_DATA_FOLDER + str(population_idx) + "/checkpoints/checkpoint_epoch_" + str(checkpoint_idx) + ".pkl")
+            os.path.join(GAME_DATA_FOLDER, str(population_idx), "checkpoints", "checkpoint_epoch_" + str(checkpoint_idx) + ".pkl"))
         populations_individuals.extend(population)
         populations_fitnesses.extend(all_fitnesses)
     pareto = tools.ParetoFront(__fitness_similarity)
@@ -130,7 +130,7 @@ def __compute_stats(num_epochs, num_populations, fitness_eval):
     for checkpoint_idx in range(num_epochs + 1):
         for population_idx in range(num_populations):
             (_, population, _) = __load_checkpoint(
-                GAME_DATA_FOLDER + str(population_idx) + "/checkpoints/checkpoint_epoch_" + str(checkpoint_idx) + ".pkl")
+                os.path.join(GAME_DATA_FOLDER, str(population_idx), "checkpoints", "checkpoint_epoch_" + str(checkpoint_idx) + ".pkl"))
             epoch_values = []
             for individual in population:
                 epoch_values.append(fitness_eval(individual))
@@ -147,7 +147,7 @@ def __plot_stats_entropy_relation(num_epochs, num_populations):
     for checkpoint_idx in range(num_epochs + 1):
         for population_idx in range(num_populations):
             (_, population, _) = __load_checkpoint(
-                GAME_DATA_FOLDER + str(population_idx) + "/checkpoints/checkpoint_epoch_" + str( checkpoint_idx) + ".pkl")
+                os.path.join(GAME_DATA_FOLDER, str(population_idx), "checkpoints", "checkpoint_epoch_" + str( checkpoint_idx) + ".pkl"))
             total_population.extend(population)
 
     # Group by entropy
@@ -308,7 +308,7 @@ def __rank_population_total(num_epochs, num_populations):
     pareto = tools.ParetoFront(__fitness_similarity)
     for population_idx in range(num_populations):
         (_, population, _) = __load_checkpoint(
-            GAME_DATA_FOLDER + str(population_idx) + "/checkpoints/checkpoint_epoch_" + str(num_epochs) + ".pkl"
+                os.path.join(GAME_DATA_FOLDER, str(population_idx), "checkpoints", "checkpoint_epoch_" + str(num_epochs) + ".pkl")
         )
         for pop in population:
             pop.population = population_idx
@@ -333,7 +333,7 @@ def __rank_population_single(num_epochs, population_idx):
     individuals = []
     pareto = tools.ParetoFront(__fitness_similarity)
     (_, population, _) = __load_checkpoint(
-        GAME_DATA_FOLDER + str(population_idx) + "/checkpoints/checkpoint_epoch_" + str(num_epochs) + ".pkl"
+        os.path.join(GAME_DATA_FOLDER, str(population_idx), "checkpoints", "checkpoint_epoch_" + str(num_epochs) + ".pkl")
     )
     for pop in population:
         pop.population = population_idx
@@ -355,8 +355,8 @@ def __rank_population_single(num_epochs, population_idx):
 
 def __read_map(individual):
     experiment_name = str(individual.epoch) + "_" + str(individual.number_in_epoch)
-    with open(GAME_DATA_FOLDER + str(individual.population) + "/Export/genome_evolution/map_" + experiment_name +
-              "_0.txt", "r") as map_file:
+    with open(os.path.join(GAME_DATA_FOLDER, str(individual.population), "Export", "genome_evolution", "map_" + experiment_name +
+              "_0.txt"), "r") as map_file:
         map_contents = map_file.readlines()
     map_height = len(map_contents)
     map_width = len(map_contents[0]) - 1  # Drop newline

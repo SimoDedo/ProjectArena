@@ -1,8 +1,8 @@
 import os
 
-EXPERIMENT_RUNNER_FILE = "AIExperiments_fast.x86_64"
-EXPERIMENT_RUNNER_PATH = os.getcwd() + "/"
-GAME_DATA_FOLDER = os.getcwd() + "/Data/"
+EXPERIMENT_RUNNER_FILE = "Project Arena.exe"
+EXPERIMENT_RUNNER_PATH = os.path.join (os.getcwd(), "AIExperiment_Build")
+GAME_DATA_FOLDER = os.path.join (os.getcwd(), "Data")
 
 # Number of experiments launched in parallel
 NUM_PARALLEL_FITNESS_CALCULATION = 8

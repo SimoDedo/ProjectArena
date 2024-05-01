@@ -1,3 +1,4 @@
+import os
 import random
 import subprocess
 from math import log2
@@ -10,13 +11,13 @@ from internals.constants import GAME_DATA_FOLDER, NUM_PARALLEL_SIMULATIONS, NUM_
 from internals.result_extractor import extract_match_data
 
 
-def evaluate(phenotype, epoch, individual_number, bot1_data, bot2_data, game_length=1200):
-    folder_name = 'genome_evolution/'
+def evaluate(phenotype, epoch, individual_number, bot1_data, bot2_data, game_length=600):
+    folder_name = 'genome_evolution'
     experiment_name = str(epoch) + '_' + str(individual_number)
-    complete_name = folder_name + experiment_name
+    complete_name = os.path.join(folder_name, experiment_name)
 
     # Export genome to file
-    phenotype.write_to_file(GAME_DATA_FOLDER + 'Import/Genomes/' + complete_name + '.json')
+    phenotype.write_to_file(os.path.join(GAME_DATA_FOLDER, 'Import', 'Genomes', complete_name + '.json'))
 
     rel_std_dev_entropy = 100
     dataset = None
@@ -41,7 +42,7 @@ def evaluate(phenotype, epoch, individual_number, bot1_data, bot2_data, game_len
         repeat_count = repeat_count + 1
 
         dataset = extract_match_data(
-            GAME_DATA_FOLDER + 'Export/' + folder_name + 'final_results_' + experiment_name + '_',
+            os.path.join(GAME_DATA_FOLDER, 'Export', folder_name, 'final_results_' + experiment_name + '_'),
             repeat_count * NUM_PARALLEL_SIMULATIONS
         )
         mean_value = round(numpy.mean(dataset["entropy"]), 2)
@@ -51,7 +52,7 @@ def evaluate(phenotype, epoch, individual_number, bot1_data, bot2_data, game_len
 
 
 def __run_simulation(folder_name, experiment_name, map_genome_name, game_length, experiment_part, num_simulations, bot1_data, bot2_data, log=False, save_map=False):
-    cmd = [EXPERIMENT_RUNNER_PATH + EXPERIMENT_RUNNER_FILE,
+    cmd = [os.path.join(EXPERIMENT_RUNNER_PATH, EXPERIMENT_RUNNER_FILE),
            "-experimentType=BOT_GENOME_TESTER",
            "-batchmode",
            "-nographics",
@@ -74,7 +75,7 @@ def __run_simulation(folder_name, experiment_name, map_genome_name, game_length,
     if log:
         cmd.append("-logFile")
         cmd.append(
-            GAME_DATA_FOLDER + "Log/" + folder_name + experiment_name + "_" + str(experiment_part) + ".txt")
+            os.path.join(GAME_DATA_FOLDER, "Log", folder_name, experiment_name + "_" + str(experiment_part) + ".txt"))
     else:
         cmd.append("-nolog")
 

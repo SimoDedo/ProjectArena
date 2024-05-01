@@ -1,4 +1,5 @@
 import argparse
+import os
 import pickle
 import random
 import sys
@@ -121,7 +122,7 @@ def __save_checkpoint(all_fitnesses, epoch, pop):
         random_state=random.getstate(),
         data=all_fitnesses,
     )
-    with open(GAME_DATA_FOLDER + "checkpoints/checkpoint_epoch_" + str(epoch) + ".pkl", "wb") as cp_file:
+    with open(os.path.join(GAME_DATA_FOLDER, "checkpoints", "checkpoint_epoch_" + str(epoch) + ".pkl"), "wb") as cp_file:
         pickle.dump(checkpoint_data, cp_file)
         print("Persisted generation for epoch " + str(epoch))
 

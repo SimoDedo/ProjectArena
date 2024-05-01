@@ -23,8 +23,8 @@ def getFiles(inputDir):
     while inputAcquired == False:
         mapFileName = text + ".map.txt"
         ABFileName = text + ".AB.txt"
-        mapFilePath = inputDir + "/" + mapFileName
-        ABFilePath = inputDir + "/" + ABFileName
+        mapFilePath = os.path.join(inputDir, mapFileName)
+        ABFilePath = os.path.join(inputDir, ABFileName)
         if os.path.isfile(mapFilePath) and os.path.isfile(ABFilePath):
             print("Files found.\n")
             inputAcquired = True
