@@ -66,7 +66,7 @@ namespace Tester
             var csvBuilder = new StringBuilder();
             foreach (var position in positions)
             {
-                csvBuilder.Append(position.x);
+                csvBuilder.Append(position.x.ToString());
                 csvBuilder.Append(',');
                 csvBuilder.Append(position.y);
                 csvBuilder.Append(',');

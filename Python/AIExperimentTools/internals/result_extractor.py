@@ -1,3 +1,4 @@
+import os
 import pandas
 
 from internals.constants import GAME_DATA_FOLDER, NUM_PARALLEL_SIMULATIONS
@@ -67,7 +68,7 @@ def extract_bot_positions(initial_path, experiment_name, bot_num, num_simulation
     positions_y = []
     for i in range(num_simulations):
         temp = pandas.read_csv(
-            initial_path + "position_" + experiment_name + "_" + str(i) + "_bot" + str(bot_num+1) + ".csv",
+            os.path.join(initial_path, "position_" + experiment_name + "_" + str(i) + "_bot" + str(bot_num+1) + ".csv"),
             header=None,
         )
         positions_x.extend(temp[0])

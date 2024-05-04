@@ -128,7 +128,9 @@ if __name__ == "__main__":
 
     parser.add_argument("--workers", default=8, type=int, dest="workers")
 
+    # Argument used to get the results from the export folder. must be less than the number of iterations in the map-elites run.
     parser.add_argument("--max_iterations", default=30, type=int, dest="max_iterations")
+    
     parser.add_argument("--frequency", default=5, type=int, dest="frequency")
     parser.add_argument("--num_games", default=10, type=int, dest="num_games")
 

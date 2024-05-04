@@ -12,12 +12,13 @@ import time
 
 from internals.graph_genome.genome import GraphGenome
 from internals.pyribs_ext.ab_genome_emitter import AbGenomeEmitter
-import internals.constants as c
-from internals.constants import AB_STANDARD_MUTATION_CHANCE, ALL_BLACK_EMITTER_NAME, ALL_BLACK_NAME, CMA_ME_SIGMA0, GAME_DATA_FOLDER, MAP_ELITES_OUTPUT_FOLDER
+import internals.constants as constants
+import internals.config as conf
+from internals.constants import ALL_BLACK_EMITTER_NAME, ALL_BLACK_NAME, GAME_DATA_FOLDER, MAP_ELITES_OUTPUT_FOLDER
 from internals.ab_genome.ab_genome import AB_MAX_CORRIDOR_LENGTH, AB_MAX_MAP_HEIGHT, AB_MAX_MAP_WIDTH, AB_MAX_ROOM_SIZE, AB_MIN_CORRIDOR_LENGTH, AB_MIN_ROOM_SIZE, AB_NUM_CORRIDORS, AB_NUM_ROOMS, ABGenome
 import internals.ab_genome.generation as ab_generation
 import internals.graph_genome.generation as graph_generation
-from internals.evaluation import evaluate
+import internals.evaluation as eval
 import gymnasium as gym
 import matplotlib.pyplot as plt
 import numpy as np
@@ -38,10 +39,11 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
     """
     archive = GridArchive(
         solution_dim=AB_NUM_ROOMS * 3 + AB_NUM_CORRIDORS * 3,
-        dims=[20, 20], 
-        ranges=[(0, 1), (0, 1)],
+        dims=conf.MEASURES_BINS_NUMBER, 
+        ranges=conf.MEASURES_RANGES,
         seed=seed,
         qd_score_offset=0,
+        extra_fields={"iterations": ((), np.float32), "individual_numbers": ((), np.float32)}
     )
 
     # If we create the emitters with identical seeds, they will all output the
@@ -55,32 +57,32 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
     x0 = []
     initial_solutions = []
     match representation:
-        case c.ALL_BLACK_NAME:
-            x0, initial_solutions = initialize_solutions(representation, ab_generation.create_random_genome, c.NUMBER_OF_INITAL_SOLUTIONS)
-        case c.GRID_GRAPH_NAME:
-            x0, initial_solutions = initialize_solutions(representation, graph_generation.create_random_genome, c.NUMBER_OF_INITAL_SOLUTIONS)            
+        case constants.ALL_BLACK_NAME:
+            x0, initial_solutions = initialize_solutions(ab_generation.create_random_genome, conf.NUMBER_OF_INITAL_SOLUTIONS)
+        case constants.GRID_GRAPH_NAME:
+            x0, initial_solutions = initialize_solutions(graph_generation.create_random_genome, conf.NUMBER_OF_INITAL_SOLUTIONS)            
     
     emitters = []
     match emitter_type:
-        case c.ALL_BLACK_EMITTER_NAME:
+        case constants.ALL_BLACK_EMITTER_NAME:
             emitters = [
                 AbGenomeEmitter(
                     archive,
-                    x0=x0,
+                    #x0=x0,
                     initial_solutions=initial_solutions,
-                    crossover_probability=AB_STANDARD_MUTATION_CHANCE,
+                    crossover_probability=conf.AB_STANDARD_MUTATION_CHANCE,
                     batch_size=batch_size,
                     seed=s,
                     #bounds=bounds,
                 ) for s in seeds
             ]
             
-        case c.CMA_ME_EMITTER_NAME:
+        case constants.CMA_ME_EMITTER_NAME:
             emitters = [
                 EvolutionStrategyEmitter(
                     archive,
                     x0=x0,
-                    sigma0=CMA_ME_SIGMA0,
+                    sigma0=conf.CMA_ME_SIGMA0,
                     ranker="2imp",
                     batch_size=batch_size,
                     seed=s,
@@ -92,7 +94,7 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
 
 def initialize_solutions(creation_function, n_solutions):
     x0 = []
-    x0 = ab_generation.create_random_genome().to_array()
+    x0 = creation_function().to_array()
     
     solutions = []
     for _ in range(n_solutions):
@@ -102,18 +104,8 @@ def initialize_solutions(creation_function, n_solutions):
 
 
 def run_search(client: Client, scheduler: Scheduler, representation, iterations, log_freq, folder_name, bot1_data, bot2_data, game_length=600):
-    """Runs the QD algorithm for the given number of iterations.
-
-    Args:
-        client (Client): A Dask client providing access to workers.
-        scheduler (Scheduler): pyribs scheduler.
-        env_seed (int): Seed for the environment.
-        iterations (int): Iterations to run.
-        log_freq (int): Number of iterations to wait before recording metrics.
-    Returns:
-        dict: A mapping from various metric names to a list of "x" and "y"
-        values where x is the iteration and y is the value of the metric. Think
-        of each entry as the x's and y's for a matplotlib plot.
+    """
+    #TODO
     """
     print(
         "> Starting search.\n"
@@ -141,20 +133,24 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
         genotypes_sols = scheduler.ask()
         
         match representation:
-            case c.ALL_BLACK_NAME:
+            case constants.ALL_BLACK_NAME:
                 phenotypes = list(map(lambda geno: (ABGenome.array_as_genome(list(map(int, geno.tolist())))).phenotype(), genotypes_sols))
-            case c.GRID_GRAPH_NAME:
+            case constants.GRID_GRAPH_NAME:
                 phenotypes = list(map(lambda geno: (GraphGenome.array_as_genome(list(map(int, geno.tolist())))).phenotype(), genotypes_sols))
 
         # Evaluate the genomes and record the objectives and measures.
         objs, meas = [], []
 
+        # Also remember the iteration and individual number for each solution.
+        itrs, inds = [], []
+
         # Ask the Dask client to distribute the simulations among the Dask
         # workers, then gather the results of the simulations.
         futures = []
-        
         futures = client.map(
-            lambda p: evaluate(
+            lambda p: 
+            #eval.test()
+            eval.evaluate(
                 p, 
                 itr -1, 
                 phenotypes.index(p), 
@@ -162,12 +158,13 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
                 bot2_data,
                 game_length,
                 folder_name=folder_name
-                ), phenotypes
+                )
+            , phenotypes
         )
         results = client.gather(futures)
 
         # Process the results.
-        for dataset in results:
+        for idx, dataset in enumerate(results):
             pace = round(np.mean(dataset["pace"]), 2)
             entropy = round(np.mean(dataset["entropy"]), 2)
             target_loss = round(np.mean(dataset["targetLossRate"]), 2)
@@ -175,9 +172,11 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
 
             objs.append(target_loss)
             meas.append([entropy, pace])
+            itrs.append(itr-1)
+            inds.append(idx)
         
         # Send the results back to the scheduler.
-        scheduler.tell(objs, meas)
+        scheduler.tell(objs, meas, iterations=itrs, individual_numbers=inds)
 
         # Logging.
         if itr % log_freq == 0 or itr == iterations:
@@ -205,10 +204,10 @@ def save_heatmap(archive, filename):
         filename (str): Path to an image file.
     """
     fig, ax = plt.subplots(figsize=(8, 6))
-    grid_archive_heatmap(archive, ax=ax, vmin=0, vmax=1)
+    grid_archive_heatmap(archive, ax=ax, vmin=conf.OBJECTIVE_RANGE[0], vmax=conf.OBJECTIVE_RANGE[1])
     # ax.invert_yaxis()  # Makes more sense if larger velocities are on top.
-    ax.set_xlabel("Entropy")
-    ax.set_ylabel("Pace")
+    ax.set_xlabel(conf.MEASURES_NAMES[0])
+    ax.set_ylabel(conf.MEASURES_NAMES[1])
     fig.savefig(filename)
 
 
@@ -271,21 +270,8 @@ def evolve_maps(
                 seed=None,
                 folder_name="test_directory",
                 ):
-    """Uses CMA-ME to train linear agents in Lunar Lander.
-
-    Args:
-        workers (int): Number of workers to use for simulations.
-        env_seed (int): Environment seed. The default gives the flat terrain
-            from the tutorial.
-        iterations (int): Number of iterations to run the algorithm.
-        log_freq (int): Number of iterations to wait before recording metrics
-            and saving heatmap.
-        n_emitters (int): Number of emitters.
-        batch_size (int): Batch size of each emitter.
-        seed (seed): Random seed for the pyribs components.
-        outdir (str): Directory for Lunar Lander output.
-        run_eval (bool): Pass this flag to run an evaluation of 10 random
-            solutions selected from the archive in the `outdir`.
+    """
+    #TODO
     """
 
     # Create directories.
@@ -308,9 +294,8 @@ def evolve_maps(
     )
     client = Client(cluster)
 
-    # CMA-ME.
-    scheduler = create_scheduler(seed, n_emitters, batch_size)
-    metrics = run_search(client, scheduler, iterations, log_freq, folder_name, bot1_data, bot2_data, game_length)
+    scheduler = create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
+    metrics = run_search(client, scheduler, representation,iterations, log_freq, folder_name, bot1_data, bot2_data, game_length)
 
     # Outputs.
     scheduler.archive.data(return_type="pandas").to_csv(outdir / "archive.csv")
@@ -320,45 +305,26 @@ def evolve_maps(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Evolve population.')
+    parser = argparse.ArgumentParser(description='MAP-Elites.')
 
-    # This is the directory where we will store the results of the experiment, the import data and the export data.
-    # We can also see this as the name of the experiment.
-    parser.add_argument("--folder_name", default="test_directory", type=str, dest="folder_name") 
-
-    # These are the parameters for specifying representation and emitter.
-    parser.add_argument("--representation", default=ALL_BLACK_NAME, type=str, dest="representation")
-    parser.add_argument("--emitter_type", default=ALL_BLACK_EMITTER_NAME, type=str, dest="emitter_type")
-
-    # These are the parameters for the evolution algorithm.
-    parser.add_argument("--iterations", default=50, type=int, dest="iterations")
-    parser.add_argument("--batch_size", default=5, type=int, dest="batch_size")
     parser.add_argument("--workers", default=4, type=int, dest="workers")
-    parser.add_argument("--n_emitters", default=5, type=int, dest="n_emitters")
-
-    # These are the parameters for the game.
-    parser.add_argument("--bot1_file_prefix", required=True, dest="bot1_file")
-    parser.add_argument("--bot1_skill", required=True, dest="bot1_skill")
-    parser.add_argument("--bot2_file_prefix", required=True, dest="bot2_file")
-    parser.add_argument("--bot2_skill", required=True, dest="bot2_skill")
-    parser.add_argument("--game_length", type=int, dest="game_length")
-
+    parser.add_argument("--isTest", default=False, type=bool, dest="isTest")
 
     args = parser.parse_args(sys.argv[1:])
 
-    bot1_data = {"file": args.bot1_file, "skill": args.bot1_skill}
-    bot2_data = {"file": args.bot2_file, "skill": args.bot2_skill}
+    bot1_data = {"file": conf.BOT1_FILE_PREFIX, "skill": conf.BOT1_SKILL}
+    bot2_data = {"file": conf.BOT2_FILE_PREFIX, "skill": conf.BOT2_SKILL}
 
     evolve_maps(
         bot1_data, 
         bot2_data, 
-        representation=args.representation,
-        emitter_type=args.emitter_type,
-        batch_size=args.batch_size, 
-        iterations=args.iterations, 
-        n_emitters=args.n_emitters, 
+        representation=conf.REPRESENTATION_NAME,
+        emitter_type=conf.EMITTER_TYPE_NAME,
+        batch_size=conf.BATCH_SIZE, 
+        iterations=conf.ITERATIONS, 
+        n_emitters=conf.N_EMITTERS, 
         workers=args.workers, 
-        folder_name=args.folder_name,
-        game_length=args.game_length,
+        folder_name=conf.folder_name() if not args.isTest else "test",
+        game_length=conf.GAME_LENGTH,
         )
     

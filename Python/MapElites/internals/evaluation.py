@@ -6,10 +6,12 @@ from math import log2
 
 import numpy
 import pandas
+import tqdm
 
-from internals.constants import GAME_DATA_FOLDER, NUM_PARALLEL_SIMULATIONS, NUM_MATCHES_PER_SIMULATION, \
-    EXPERIMENT_RUNNER_PATH, EXPERIMENT_RUNNER_FILE
+from internals.constants import GAME_DATA_FOLDER,EXPERIMENT_RUNNER_PATH, EXPERIMENT_RUNNER_FILE
+from internals.config import NUM_PARALLEL_SIMULATIONS, NUM_MATCHES_PER_SIMULATION
 from internals.result_extractor import extract_match_data
+
 
 
 def evaluate(phenotype, iteration, individual_batch_num, bot1_data, bot2_data, game_length=120, folder_name='genome_evolution', experiment_name=None):
@@ -29,9 +31,10 @@ def evaluate(phenotype, iteration, individual_batch_num, bot1_data, bot2_data, g
     Returns:
         pandas.DataFrame: The dataset with the results of the simulation
     """
+
     # Check if phenotype is valid
     if not phenotype.is_valid():
-        print(f"Invalid phenotype detected, skipping evaluation.")
+        tqdm.tqdm.write(f"Invalid phenotype detected, skipping evaluation.")
         return __blank_dataset()
 
     if experiment_name is None :
@@ -54,7 +57,7 @@ def __run_evaluation(folder_name, experiment_name, bot1_data, bot2_data, game_le
     repeat_count = 0
     while rel_std_dev_entropy > 10 and repeat_count < 1:  # TODO enable again?
         if dataset is not None:
-            print("Had to repeat experiment because std dev of entropy is " + str(rel_std_dev_entropy))
+            tqdm.tqdm.write("Had to repeat experiment because std dev of entropy is " + str(rel_std_dev_entropy))
         # run the simulation with a proper experiment name (generation_individual)
         processes = []
         received_error = False
@@ -69,7 +72,7 @@ def __run_evaluation(folder_name, experiment_name, bot1_data, bot2_data, game_le
             elem.kill()  
 
         if received_error:
-            print(f"Error in simulation, skipping evaluation.")
+            tqdm.tqdm.write(f"Error in simulation, skipping evaluation.")
             return __blank_dataset()
 
         repeat_count = repeat_count + 1

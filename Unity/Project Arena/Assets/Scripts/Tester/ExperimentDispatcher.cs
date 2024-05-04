@@ -1,4 +1,7 @@
 using System;
+using System.Globalization;
+using System.Text;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
@@ -18,6 +21,7 @@ namespace Tester
 
         private void Awake()
         {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
             var args = Environment.GetCommandLineArgs();
             string experimentType = null;
             foreach (var arg in args)

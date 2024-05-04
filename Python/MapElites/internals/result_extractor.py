@@ -1,6 +1,8 @@
+import os
 import pandas
 
-from internals.constants import GAME_DATA_FOLDER, NUM_PARALLEL_SIMULATIONS
+from internals.constants import GAME_DATA_FOLDER
+from internals.config import NUM_PARALLEL_SIMULATIONS
 
 
 def extract_match_data(partial_file_name, num_simulations=NUM_PARALLEL_SIMULATIONS):
@@ -33,7 +35,7 @@ def extract_kill_positions(initial_path, experiment_name, bot_num, num_simulatio
     for i in range(num_simulations):
         try:
             temp = pandas.read_csv(
-                initial_path + "death_positions_" + experiment_name + "_" + str(i) + "_bot" + str(bot_num+1) + ".csv",
+                os.path.join(initial_path, "death_positions_" + experiment_name + "_" + str(i) + "_bot" + str(bot_num+1) + ".csv"),
                 header=None,
             )
             positions_x.extend(temp[2])
@@ -50,7 +52,7 @@ def extract_death_positions(initial_path, experiment_name, bot_num, num_simulati
     for i in range(num_simulations):
         try:
             temp = pandas.read_csv(
-                initial_path + "death_positions_" + experiment_name + "_" + str(i) + "_bot" + str(bot_num+1) + ".csv",
+                os.path.join(initial_path, "death_positions_" + experiment_name + "_" + str(i) + "_bot" + str(bot_num+1) + ".csv"),
                 header=None,
             )
             positions_x.extend(temp[0])
@@ -66,7 +68,7 @@ def extract_bot_positions(initial_path, experiment_name, bot_num, num_simulation
     positions_y = []
     for i in range(num_simulations):
         temp = pandas.read_csv(
-            initial_path + "position_" + experiment_name + "_" + str(i) + "_bot" + str(bot_num+1) + ".csv",
+            os.path.join(initial_path, "position_" + experiment_name + "_" + str(i) + "_bot" + str(bot_num+1) + ".csv"),
             header=None,
         )
         positions_x.extend(temp[0])

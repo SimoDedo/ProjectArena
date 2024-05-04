@@ -4,7 +4,7 @@ import numpy as np
 
 from ribs.emitters.operators._operator_base import OperatorBase
 
-from internals.constants import AB_STANDARD_MUTATION_CHANCE
+from internals.config import AB_STANDARD_MUTATION_CHANCE
 from internals.ab_genome.mutation import mutate
 from internals.ab_genome.crossover import crossover
 from internals.ab_genome.ab_genome import ABGenome
