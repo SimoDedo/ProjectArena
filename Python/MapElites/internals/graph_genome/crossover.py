@@ -1,6 +1,6 @@
 import random
 
-from .genome import GG_NUM_COLUMNS, GG_NUM_ROWS
+from .gg_genome import GG_NUM_COLUMNS, GG_NUM_ROWS
 
 
 def crossover(ind1, ind2):

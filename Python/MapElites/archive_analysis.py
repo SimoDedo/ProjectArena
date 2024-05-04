@@ -13,7 +13,7 @@ from internals.result_extractor import extract_bot_positions, extract_death_posi
 from internals.constants import ALL_BLACK_EMITTER_NAME, ALL_BLACK_NAME, ARCHIVE_ANALYSIS_OUTPUT_FOLDER, GAME_DATA_FOLDER, MAP_ELITES_OUTPUT_FOLDER
 import internals.constants as constants
 import internals.config as conf
-from internals.graph_genome.genome import GG_MAP_SCALE, GraphGenome
+from Python.MapElites.internals.graph_genome.gg_genome import GG_MAP_SCALE, GraphGenome
 from internals.ab_genome.ab_genome import AB_MAP_SCALE, ABGenome
 import matplotlib.pyplot as plt
 from matplotlib import cm

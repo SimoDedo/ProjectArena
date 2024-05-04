@@ -10,7 +10,7 @@ import time
 
 import time
 
-from internals.graph_genome.genome import GraphGenome
+from Python.MapElites.internals.graph_genome.gg_genome import GraphGenome
 from internals.pyribs_ext.ab_genome_emitter import AbGenomeEmitter
 import internals.constants as constants
 import internals.config as conf

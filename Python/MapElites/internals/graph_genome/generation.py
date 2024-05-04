@@ -1,6 +1,6 @@
 import random
 
-from .genome import GG_NUM_ROWS, GG_NUM_COLUMNS, GG_MAX_ROOM_HEIGHT, GG_MAX_ROOM_WIDTH, \
+from .gg_genome import GG_NUM_ROWS, GG_NUM_COLUMNS, GG_MAX_ROOM_HEIGHT, GG_MAX_ROOM_WIDTH, \
     GG_MIN_ROOM_HEIGHT, GG_MIN_ROOM_WIDTH, GG_MAP_SCALE, GraphGenome
 from .room import Room
 
