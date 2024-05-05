@@ -1,15 +1,9 @@
 from internals.area import Area, scale_area
 from internals.phenotype import Phenotype
 from internals.graph_genome.room import Room
-
-GG_SQUARE_SIZE = 3
-GG_MAP_SCALE = 2
-GG_NUM_ROWS = 3
-GG_NUM_COLUMNS = 6
-GG_MIN_ROOM_WIDTH = 1
-GG_MIN_ROOM_HEIGHT = 1
-GG_MAX_ROOM_WIDTH = 8
-GG_MAX_ROOM_HEIGHT = 8
+from internals.graph_genome import mutation, crossover, generation, constants
+from internals.graph_genome.constants import GG_NUM_COLUMNS, GG_NUM_ROWS, GG_MAX_ROOM_WIDTH, GG_MAX_ROOM_HEIGHT, \
+    GG_SQUARE_SIZE, GG_MAP_SCALE
 
 
 class GraphGenome:
@@ -30,6 +24,79 @@ class GraphGenome:
             return self.__dict__ == other.__dict__
         else:
             return False
+        
+    # --- Generation methods ---
+
+    @staticmethod
+    def create_random_genome():
+        return generation.create_random_genome()
+    
+    # --- Genetic operators ---
+
+    @staticmethod
+    def mutate(genome):
+        return mutation.mutate(genome)
+    
+    @staticmethod
+    def crossover(genome1, genome2):
+        return crossover.crossover(genome1, genome2)
+
+    # --- Conversion methods ---
+
+    def to_array(self):
+        array = []
+        for row in self.rooms:
+            for room in row:
+                if room is None:
+                    array.append(0)
+                    array.append(0)
+                    array.append(0)
+                    array.append(0)
+                else:
+                    array.append(room.leftColumn)
+                    array.append(room.rightColumn)
+                    array.append(room.bottomRow)
+                    array.append(room.topRow)
+        for row in self.verticalCorridors:
+            for corridor in row:
+                array.append(1 if corridor else 0)
+        for row in self.horizontalCorridors:
+            for corridor in row:
+                array.append(1 if corridor else 0)
+        return array
+    
+    @staticmethod
+    def array_as_genome(array):
+        rooms = []
+        vertical_corridors = []
+        horizontal_corridors = []
+        index = 0
+        for _ in range(GG_NUM_ROWS):
+            rooms.append([])
+            for _ in range(GG_NUM_COLUMNS):
+                left_col = array[index]
+                index += 1
+                right_col = array[index]
+                index += 1
+                bottom_row = array[index]
+                index += 1
+                top_row = array[index]
+                index += 1
+                if left_col == 0 and right_col == 0 and bottom_row == 0 and top_row == 0:
+                    rooms[-1].append(None)
+                else:
+                    rooms[-1].append(Room(left_col, right_col, bottom_row, top_row))
+        for _ in range(GG_NUM_ROWS - 1):
+            vertical_corridors.append([])
+            for _ in range(GG_NUM_COLUMNS):
+                vertical_corridors[-1].append(array[index] == 1)
+                index += 1
+        for _ in range(GG_NUM_ROWS):
+            horizontal_corridors.append([])
+            for _ in range(GG_NUM_COLUMNS - 1):
+                horizontal_corridors[-1].append(array[index] == 1)
+                index += 1
+        return GraphGenome(rooms, vertical_corridors, horizontal_corridors, GG_MAP_SCALE)
 
     def phenotype(self):
         areas = []
@@ -86,6 +153,8 @@ class GraphGenome:
             self.mapScale,
             [scale_area(area, self.squareSize) for area in areas],
         )
+
+    # --- Utils ---
 
     @staticmethod
     def unscaled_area(phenotype):

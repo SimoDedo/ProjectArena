@@ -5,10 +5,10 @@ from ribs._utils import check_batch_shape, check_shape
 from ribs.emitters._emitter_base import EmitterBase
 from ribs.emitters.operators import GaussianOperator
 
-from internals.pyribs_ext.ab_mutation_operator import ABMutationOperator
+from .genome_operator import GenomeOperator
 
 
-class AbGenomeEmitter(EmitterBase):
+class GenomeEmitter(EmitterBase):
     """Emits solutions by adding randomly mutating with crossover existing archive solutions.
 
     If the archive is empty and ``self._initial_solutions`` is set, a call to
@@ -44,6 +44,7 @@ class AbGenomeEmitter(EmitterBase):
     def __init__(self,
                  archive,
                  *,
+                 genome_type,
                  crossover_probability,
                  x0=None,
                  initial_solutions=None,
@@ -56,7 +57,8 @@ class AbGenomeEmitter(EmitterBase):
         self._initial_solutions = None
 
         if x0 is None and initial_solutions is None:
-            raise ValueError("Either x0 or initial_solutions must be provided.")
+            raise ValueError(
+                "Either x0 or initial_solutions must be provided.")
         if x0 is not None and initial_solutions is not None:
             raise ValueError(
                 "x0 and initial_solutions cannot both be provided.")
@@ -77,10 +79,12 @@ class AbGenomeEmitter(EmitterBase):
             solution_dim=archive.solution_dim,
             bounds=bounds,
         )
-        self._operator = ABMutationOperator(crossover_probability=self._crossover_probability,
-                                          lower_bounds=self._lower_bounds,
-                                          upper_bounds=self._upper_bounds,
-                                          seed=seed)
+        self._operator = GenomeOperator(
+            genome_type=genome_type,
+            crossover_probability=self._crossover_probability,
+            lower_bounds=self._lower_bounds,
+            upper_bounds=self._upper_bounds,
+            seed=seed)
 
     @property
     def x0(self):
@@ -126,7 +130,8 @@ class AbGenomeEmitter(EmitterBase):
             if self._initial_solutions is not None:
                 return np.clip(self._initial_solutions, self.lower_bounds,
                                self.upper_bounds)
-            parents = np.repeat(self.x0[None], repeats=self._batch_size, axis=0)
+            parents = np.repeat(
+                self.x0[None], repeats=self._batch_size, axis=0)
         else:
             parents = self.archive.sample_elites(self._batch_size)["solution"]
 

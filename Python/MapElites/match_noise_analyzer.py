@@ -13,7 +13,7 @@ import time
 from pathlib import Path
 
 import fire
-from internals.pyribs_ext.ab_genome_emitter import AbGenomeEmitter
+from Python.MapElites.internals.pyribs_ext.genome_emitter import GenomeEmitter
 from internals.constants import GAME_DATA_FOLDER, MAP_ELITES_OUTPUT_FOLDER, NOISE_ANALYSIS_OUTPUT_FOLDER
 from internals.ab_genome.ab_genome import AB_MAX_CORRIDOR_LENGTH, AB_MAX_MAP_HEIGHT, AB_MAX_MAP_WIDTH, AB_MAX_ROOM_SIZE, AB_MIN_CORRIDOR_LENGTH, AB_MIN_ROOM_SIZE, AB_NUM_CORRIDORS, AB_NUM_ROOMS, ABGenome
 from internals.ab_genome.generation import create_random_genome

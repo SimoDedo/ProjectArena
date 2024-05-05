@@ -33,10 +33,10 @@ class Phenotype:
         # if len(self.areas) <=2:
         #     print("Not enough areas")
         #     return False
-        for area in self.areas:
-            if area.leftColumn <= 0 or area.rightColumn >= self.mapWidth or area.bottomRow <= 0 or area.topRow >= self.mapHeight:
-                print("OOB")
-                return False
+        #for area in self.areas:
+        #    if area.leftColumn < 0 or area.rightColumn >= self.mapWidth or area.bottomRow < 0 or area.topRow >= self.mapHeight:
+        #        print("Area out of bounds: ", area.leftColumn, area.rightColumn, area.bottomRow, area.topRow)
+        #        return True
         return True
 
     def map_matrix(self):

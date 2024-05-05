@@ -1,11 +1,13 @@
 import random
 
-from internals.ab_genome.ab_genome import AB_NUM_ROOMS, AB_NUM_CORRIDORS
+import tqdm
+
+from internals.ab_genome.constants import AB_NUM_ROOMS, AB_NUM_CORRIDORS
 
 
 def crossover(ind1, ind2):
     if ind1.phenotype() == ind2.phenotype():
-        print("Breed individuals impossible, they are the same!")
+        tqdm.tqdm.write("Breed individuals impossible, they are the same!")
         return ind1, ind2
 
     # Two point crossover

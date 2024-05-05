@@ -1,7 +1,7 @@
 import random
 
-from .gg_genome import GG_NUM_COLUMNS, GG_NUM_ROWS, GG_MIN_ROOM_WIDTH, GG_MAX_ROOM_WIDTH, \
-    GG_MAX_ROOM_HEIGHT, GG_MIN_ROOM_HEIGHT
+from internals.graph_genome.constants import GG_NUM_COLUMNS, GG_NUM_ROWS, GG_MAX_ROOM_WIDTH, GG_MAX_ROOM_HEIGHT, \
+    GG_SQUARE_SIZE, GG_MAP_SCALE, GG_MIN_ROOM_WIDTH, GG_MIN_ROOM_HEIGHT
 from .room import Room
 
 __MUTATE_ROOM_PROBABILITY = 0.3
@@ -39,7 +39,7 @@ def mutate(individual):
             if random.random() < __MUTATE_COLUMN_PROBABILITY:
                 individual.horizontalCorridors[row][col] = not individual.horizontalCorridors[row][col]
 
-    return individual,
+    return individual
 
 # # select switch start point
     # start_row = random.randint(0, GENOME_NUM_ROWS - 2)

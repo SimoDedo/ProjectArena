@@ -1,7 +1,8 @@
 import random
 
-from .gg_genome import GG_NUM_ROWS, GG_NUM_COLUMNS, GG_MAX_ROOM_HEIGHT, GG_MAX_ROOM_WIDTH, \
-    GG_MIN_ROOM_HEIGHT, GG_MIN_ROOM_WIDTH, GG_MAP_SCALE, GraphGenome
+from .constants import GG_NUM_ROWS, GG_NUM_COLUMNS, GG_MAX_ROOM_HEIGHT, GG_MAX_ROOM_WIDTH, \
+    GG_MIN_ROOM_HEIGHT, GG_MIN_ROOM_WIDTH, GG_MAP_SCALE
+import internals.graph_genome.gg_genome as graph_genome
 from .room import Room
 
 NO_ROOM_PROBABILITY = 0.3
@@ -27,7 +28,7 @@ def create_empty_genome():
     vertical_corridors = __create_corridors(GG_NUM_ROWS - 1, GG_NUM_COLUMNS, 0)
     horizontal_corridors = __create_corridors(GG_NUM_ROWS, GG_NUM_COLUMNS - 1, 0)
     map_scale = 3.0
-    return GraphGenome(rooms, vertical_corridors, horizontal_corridors, map_scale)
+    return graph_genome.GraphGenome(rooms, vertical_corridors, horizontal_corridors, map_scale)
 
 
 def create_random_genome():
@@ -35,7 +36,7 @@ def create_random_genome():
     vertical_corridors = __create_corridors(GG_NUM_ROWS - 1, GG_NUM_COLUMNS, NO_CORRIDOR_PROBABILITY)
     horizontal_corridors = __create_corridors(GG_NUM_ROWS, GG_NUM_COLUMNS - 1, NO_CORRIDOR_PROBABILITY)
     map_scale = GG_MAP_SCALE
-    return GraphGenome(rooms, vertical_corridors, horizontal_corridors, map_scale)
+    return graph_genome.GraphGenome(rooms, vertical_corridors, horizontal_corridors, map_scale)
 
 
 def __create_rooms():

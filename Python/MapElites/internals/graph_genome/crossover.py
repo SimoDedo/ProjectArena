@@ -1,11 +1,13 @@
 import random
 
-from .gg_genome import GG_NUM_COLUMNS, GG_NUM_ROWS
+import tqdm
+
+from .constants import GG_NUM_COLUMNS, GG_NUM_ROWS
 
 
 def crossover(ind1, ind2):
     if ind1.phenotype() == ind2.phenotype():
-        print("Breed individuals impossible, they are the same!")
+        tqdm.tqdm.write("Breed individuals impossible, they are the same!")
         return ind1, ind2
 
     mid_point_row = random.randint(0, GG_NUM_ROWS - 2)

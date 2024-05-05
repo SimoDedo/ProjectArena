@@ -4,25 +4,29 @@ import numpy
 
 from internals.area import Area
 from internals.phenotype import Phenotype
-
-AB_SQUARE_SIZE = 1
-AB_NUM_ROOMS = 15
-AB_NUM_CORRIDORS = 50
-AB_MIN_ROOM_SIZE = 3
-AB_MAX_ROOM_SIZE = 12
-AB_MIN_CORRIDOR_LENGTH = 5
-AB_MAX_CORRIDOR_LENGTH = 18
-AB_MAX_MAP_WIDTH = 64
-AB_MAX_MAP_HEIGHT = 64
-AB_CORRIDOR_WIDTH = 3
-AB_MAP_SCALE = 2
-
+from internals.ab_genome import mutation, crossover, generation, constants
+from internals.ab_genome.constants import AB_SQUARE_SIZE, AB_NUM_ROOMS, AB_NUM_CORRIDORS, AB_MAX_MAP_WIDTH, AB_MAX_MAP_HEIGHT, \
+    AB_CORRIDOR_WIDTH, AB_MAP_SCALE
 
 class ABGenome:
     def __init__(self, rooms, corridors):
         self.rooms = rooms
         self.corridors = corridors
         self.mapScale = AB_MAP_SCALE
+    
+    # --- Generation methods ---
+    
+    @staticmethod
+    def create_random_genome():
+        return generation.create_random_genome()
+
+    @staticmethod
+    def mutate(genome):
+        return mutation.mutate(genome)
+    
+    @staticmethod
+    def crossover(genome1, genome2):
+        return crossover.crossover(genome1, genome2)
 
     def to_array(self):
         array = []
@@ -50,6 +54,7 @@ class ABGenome:
             corridors.append(ABCorridor(array[i], array[i + 1], array[i + 2]))
             
         return ABGenome(rooms, corridors)
+
 
     def phenotype(self):
         # Step 1: iterate through all rooms and find the one closest to center

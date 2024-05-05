@@ -146,6 +146,7 @@ def __blank_dataset():
     dataset["fightTime"] = [0]
     dataset["pursueTime"] = [0]
     dataset["numberOfRetreats1"] = [0]
+    dataset["targetLossRate"] = [0]
     return dataset
 
 # debug use only, in case you need to simulate evolution fast

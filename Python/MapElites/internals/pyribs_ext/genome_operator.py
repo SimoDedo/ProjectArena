@@ -4,13 +4,7 @@ import numpy as np
 
 from ribs.emitters.operators._operator_base import OperatorBase
 
-from internals.config import AB_STANDARD_MUTATION_CHANCE
-from internals.ab_genome.mutation import mutate
-from internals.ab_genome.crossover import crossover
-from internals.ab_genome.ab_genome import ABGenome
-
-
-class ABMutationOperator(OperatorBase):
+class GenomeOperator(OperatorBase):
     """Adds Gaussian noise to solutions.
 
     Args:
@@ -25,7 +19,8 @@ class ABMutationOperator(OperatorBase):
             avoid a fixed seed.
     """
 
-    def __init__(self, crossover_probability, lower_bounds, upper_bounds, seed=None):
+    def __init__(self, genome_type, crossover_probability, lower_bounds, upper_bounds, seed=None):
+        self._genome_type = genome_type
         self._crossover_probability = crossover_probability
         self._lower_bounds = lower_bounds
         self._upper_bounds = upper_bounds
@@ -52,13 +47,13 @@ class ABMutationOperator(OperatorBase):
 
         for sol1, sol2 in zip(parents[::2], parents[1::2]):
             if random.random() <= self._crossover_probability:
-                mut1, mut2 = crossover(ABGenome.array_as_genome(sol1), ABGenome.array_as_genome(sol2))
+                mut1, mut2 = self._genome_type.crossover(self._genome_type.array_as_genome(sol1), self._genome_type.array_as_genome(sol2))
                 index_sol1 = np.where(parents == sol1)[0][0]
                 index_sol2 = np.where(parents == sol1)[0][0]
                 parents[index_sol1] = mut1.to_array()
                 parents[index_sol2] = mut2.to_array()
 
         # Get the ABGenome from the array, mutate it and then store the array representation
-        mutated_solutions = [mutate(ABGenome.array_as_genome(sol)).to_array() for sol in parents]
+        mutated_solutions = [self._genome_type.mutate(self._genome_type.array_as_genome(sol)).to_array() for sol in parents]
 
         return np.clip(mutated_solutions, self._lower_bounds, self._upper_bounds)

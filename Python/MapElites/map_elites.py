@@ -10,13 +10,14 @@ import time
 
 import time
 
-from Python.MapElites.internals.graph_genome.gg_genome import GraphGenome
-from internals.pyribs_ext.ab_genome_emitter import AbGenomeEmitter
+from internals.pyribs_ext.genome_emitter import GenomeEmitter
+from internals.graph_genome.constants import GG_NUM_ROWS, GG_NUM_COLUMNS
+from internals.graph_genome.gg_genome import GraphGenome
 import internals.constants as constants
 import internals.config as conf
-from internals.constants import ALL_BLACK_EMITTER_NAME, ALL_BLACK_NAME, GAME_DATA_FOLDER, MAP_ELITES_OUTPUT_FOLDER
-from internals.ab_genome.ab_genome import AB_MAX_CORRIDOR_LENGTH, AB_MAX_MAP_HEIGHT, AB_MAX_MAP_WIDTH, AB_MAX_ROOM_SIZE, AB_MIN_CORRIDOR_LENGTH, AB_MIN_ROOM_SIZE, AB_NUM_CORRIDORS, AB_NUM_ROOMS, ABGenome
-import internals.ab_genome.generation as ab_generation
+from internals.constants import GAME_DATA_FOLDER, MAP_ELITES_OUTPUT_FOLDER
+from internals.ab_genome.constants import AB_NUM_CORRIDORS, AB_NUM_ROOMS
+from internals.ab_genome.ab_genome import ABGenome
 import internals.graph_genome.generation as graph_generation
 import internals.evaluation as eval
 import gymnasium as gym
@@ -37,8 +38,15 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
     Returns:
         A pyribs scheduler.
     """
+    solution_dim = 0
+    match representation:
+        case constants.ALL_BLACK_NAME:
+            solution_dim = AB_NUM_ROOMS * 3 + AB_NUM_CORRIDORS * 3
+        case constants.GRID_GRAPH_NAME:
+            solution_dim = GG_NUM_ROWS * GG_NUM_COLUMNS * 4 + (GG_NUM_ROWS - 1) * GG_NUM_COLUMNS + GG_NUM_ROWS * (GG_NUM_COLUMNS - 1)
+    
     archive = GridArchive(
-        solution_dim=AB_NUM_ROOMS * 3 + AB_NUM_CORRIDORS * 3,
+        solution_dim=solution_dim,
         dims=conf.MEASURES_BINS_NUMBER, 
         ranges=conf.MEASURES_RANGES,
         seed=seed,
@@ -58,19 +66,33 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
     initial_solutions = []
     match representation:
         case constants.ALL_BLACK_NAME:
-            x0, initial_solutions = initialize_solutions(ab_generation.create_random_genome, conf.NUMBER_OF_INITAL_SOLUTIONS)
+            x0, initial_solutions = initialize_solutions(ABGenome.create_random_genome, conf.NUMBER_OF_INITAL_SOLUTIONS)
         case constants.GRID_GRAPH_NAME:
-            x0, initial_solutions = initialize_solutions(graph_generation.create_random_genome, conf.NUMBER_OF_INITAL_SOLUTIONS)            
+            x0, initial_solutions = initialize_solutions(GraphGenome.create_random_genome, conf.NUMBER_OF_INITAL_SOLUTIONS)            
     
     emitters = []
     match emitter_type:
         case constants.ALL_BLACK_EMITTER_NAME:
             emitters = [
-                AbGenomeEmitter(
+                GenomeEmitter(
                     archive,
+                    genome_type=ABGenome,
                     #x0=x0,
                     initial_solutions=initial_solutions,
-                    crossover_probability=conf.AB_STANDARD_MUTATION_CHANCE,
+                    crossover_probability=conf.AB_STANDARD_CROSSOVER_CHANCE,
+                    batch_size=batch_size,
+                    seed=s,
+                    #bounds=bounds,
+                ) for s in seeds
+            ]
+        case constants.GRID_GRAPH_EMITTER_NAME:
+            emitters = [
+                GenomeEmitter(
+                    archive,
+                    genome_type=GraphGenome,
+                    #x0=x0,
+                    initial_solutions=initial_solutions,
+                    crossover_probability=conf.GG_STANDARD_CROSSOVER_CHANCE,
                     batch_size=batch_size,
                     seed=s,
                     #bounds=bounds,
@@ -170,8 +192,8 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
             target_loss = round(np.mean(dataset["targetLossRate"]), 2)
             pursue_time = round(np.mean(dataset["pursueTime"]), 2)
 
-            objs.append(target_loss)
-            meas.append([entropy, pace])
+            objs.append(entropy)
+            meas.append([target_loss, pace])
             itrs.append(itr-1)
             inds.append(idx)
         
@@ -274,6 +296,12 @@ def evolve_maps(
     #TODO
     """
 
+    genome = graph_generation.create_random_genome()
+    arr = genome.to_array()
+    genome2 = GraphGenome.array_as_genome(arr)
+    if genome.phenotype() != genome2.phenotype():
+        print("Error")
+    
     # Create directories.
     outdir = Path(os.path.join(MAP_ELITES_OUTPUT_FOLDER, folder_name))
     importdir = Path(os.path.join(GAME_DATA_FOLDER, "Import", "Genomes", folder_name))
@@ -324,7 +352,7 @@ if __name__ == "__main__":
         iterations=conf.ITERATIONS, 
         n_emitters=conf.N_EMITTERS, 
         workers=args.workers, 
-        folder_name=conf.folder_name() if not args.isTest else "test",
+        folder_name=conf.folder_name(args.isTest),
         game_length=conf.GAME_LENGTH,
         )
     
