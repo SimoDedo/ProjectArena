@@ -9,7 +9,7 @@ import sys
 
 from matplotlib.colors import LinearSegmentedColormap
 
-from internals.result_extractor import extract_bot_positions, extract_death_positions, extract_kill_positions
+from internals.result_extractor import extract_bot_positions, extract_death_positions, extract_kill_positions, read_map
 from internals.constants import ALL_BLACK_EMITTER_NAME, ALL_BLACK_NAME, ARCHIVE_ANALYSIS_OUTPUT_FOLDER, GAME_DATA_FOLDER, MAP_ELITES_OUTPUT_FOLDER
 import internals.constants as constants
 import internals.config as conf
@@ -44,27 +44,6 @@ def get_phenotype_from_solution(solution, representation):
         case constants.GRID_GRAPH_NAME:
             return GraphGenome.array_as_genome(list(map(int, solution.tolist()))).phenotype()
 
-
-def __read_map(iteration, individual_number, folder_name):
-    experiment_name = str(int(iteration)) + "_" + str(int(individual_number))
-    path = os.path.join(GAME_DATA_FOLDER, "Export", folder_name, "map_" + experiment_name +
-                        "_0.txt")
-
-    with open(path, "r") as map_file:
-        map_contents = map_file.readlines()
-    map_height = len(map_contents)
-    map_width = len(map_contents[0]) - 1  # Drop newline
-    map_matrix = []
-    for row in reversed(range(map_height)):
-        map_row = []
-        for col in range(map_width):
-            if map_contents[row][col] == 'w':
-                map_row.append(1)
-            else:
-                map_row.append(0)
-        map_matrix.append(map_row)
-    return map_matrix
-
 # --- SAVE GRAPHS/IMAGES --- #
 
 
@@ -98,6 +77,8 @@ def __save_heatmap(x, y, path, map_matrix, note=None):
     plt.imshow(mask, cmap='binary_r', zorder=1)
 
     # plt.show()
+    
+    plt.axis('on')  #DEBUG: Add this line to show the axes
     plt.annotate(note, xy=(0, 0), xytext=(0, -1), fontsize=12, color='black')
     plt.savefig(path, bbox_inches='tight')
     plt.clf()
@@ -243,9 +224,9 @@ def analyze_archive(
     # Analyze each solution
     for idx in tqdm.trange(0, len(solutions)):
         sol = solutions[idx]
-        phenotype = get_phenotype_from_solution(sol, representation)
-        sol_map_matrix = __read_map(
-            iterations[idx], individual_numbers[idx], folder_name)
+        #phenotype = get_phenotype_from_solution(sol, representation)
+        sol_map_matrix = read_map(
+            str(int(iterations[idx])) + "_" + str(int(individual_numbers[idx])), folder_name)
         map_scale = get_map_scale(representation)
 
         save_image_map(mapsDir, sol_map_matrix,

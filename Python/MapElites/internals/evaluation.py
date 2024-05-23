@@ -35,7 +35,7 @@ def evaluate(phenotype, iteration, individual_batch_num, bot1_data, bot2_data, g
     # Check if phenotype is valid
     if not phenotype.is_valid():
         tqdm.tqdm.write(f"Invalid phenotype detected, skipping evaluation.")
-        return __blank_dataset()
+        return __blank_dataset(), True
 
     if experiment_name is None :
         experiment_name = str(iteration) + '_' + str(individual_batch_num)
@@ -44,14 +44,15 @@ def evaluate(phenotype, iteration, individual_batch_num, bot1_data, bot2_data, g
     # Export genome to file
     phenotype.write_to_file(os.path.join(GAME_DATA_FOLDER, 'Import', 'Genomes', complete_name + '.json'))
 
-    return __run_evaluation(folder_name, experiment_name, bot1_data, bot2_data, game_length)
+    return __run_evaluation(phenotype, folder_name, experiment_name, bot1_data, bot2_data, game_length)
 
 
+#TODO: fix
 def evaluate_from_file(folder_name, file_prefix, bot1_data, bot2_data, game_length, num_parallel_simulations = NUM_PARALLEL_SIMULATIONS):
     return __run_evaluation(folder_name, file_prefix, bot1_data, bot2_data, game_length, num_parallel_simulations)
 
 
-def __run_evaluation(folder_name, experiment_name, bot1_data, bot2_data, game_length, num_parallel_simulations = NUM_PARALLEL_SIMULATIONS):
+def __run_evaluation(phenotype, folder_name, experiment_name, bot1_data, bot2_data, game_length, num_parallel_simulations = NUM_PARALLEL_SIMULATIONS):
     rel_std_dev_entropy = 100
     dataset = None
     repeat_count = 0
@@ -78,13 +79,16 @@ def __run_evaluation(folder_name, experiment_name, bot1_data, bot2_data, game_le
         repeat_count = repeat_count + 1
 
         dataset = extract_match_data(
-            os.path.join(GAME_DATA_FOLDER, 'Export', folder_name, 'final_results_' + experiment_name + '_'),
+            phenotype,
+            folder_name,
+            experiment_name,
             repeat_count * num_parallel_simulations
         )
         mean_value = round(numpy.mean(dataset["entropy"]), 2)
         std_dev = round(numpy.std(dataset["entropy"]), 2)
         rel_std_dev_entropy = round(std_dev / mean_value * 100, 2)
-    return dataset
+    
+    return dataset, False
 
 
 def __run_simulation(folder_name, experiment_name, map_genome_name, game_length, experiment_part, num_simulations, bot1_data, bot2_data, log=False, save_map=False):
@@ -140,13 +144,6 @@ def __blank_dataset():
     """Create a blank dataset with all values set to 0"""
 
     dataset = pandas.DataFrame()
-    dataset["entropy"] = [0]
-    dataset["pace"] = [0]
-    dataset["ratio"] = [0]
-    dataset["fightTime"] = [0]
-    dataset["pursueTime"] = [0]
-    dataset["numberOfRetreats1"] = [0]
-    dataset["targetLossRate"] = [0]
     return dataset
 
 # debug use only, in case you need to simulate evolution fast

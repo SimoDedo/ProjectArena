@@ -186,16 +186,31 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
         results = client.gather(futures)
 
         # Process the results.
-        for idx, dataset in enumerate(results):
-            pace = round(np.mean(dataset["pace"]), 2)
-            entropy = round(np.mean(dataset["entropy"]), 2)
-            target_loss = round(np.mean(dataset["targetLossRate"]), 2)
-            pursue_time = round(np.mean(dataset["pursueTime"]), 2)
+        for idx, (dataset, failed) in enumerate(results):
+            if not failed:
+                pace = round(np.mean(dataset["pace"]), 2)
+                entropy = round(np.mean(dataset["entropy"]), 2)
+                target_loss = round(np.mean(dataset["targetLossRate"]), 2)
+                pursue_time = round(np.mean(dataset["pursueTime"]), 2)
+                quantile25 = round(np.mean(dataset["quantile25Position"]), 2)
+                coverageAdj = round(np.mean(dataset["coveragePosition"])  * np.ceil(np.mean(dataset["area"]) - 0.03), 2)
+                coverageAllAdj = round(((np.mean(dataset["coveragePosition"]) + np.mean(dataset["coverageKill"]) + np.mean(dataset["coverageDeath"]))/3) * np.ceil(np.mean(dataset["area"]) - 0.03), 2)
+                # Discard maps smaller than 3% of area.
+                localMaxKills = round(np.mean(dataset["localMaximaNumberKill"]), 2)
+                localMaxKillsAvgDist = round(np.mean(dataset["localMaximaAverageDistanceKill"]), 2)
+                localMaxKillsTopDist = round(np.mean(dataset["localMaximaTopDistanceKill"]), 2)
+                averageTraces = round(np.mean(dataset["averageTraces"]), 2)
+                
 
-            objs.append(entropy)
-            meas.append([target_loss, pace])
-            itrs.append(itr-1)
-            inds.append(idx)
+                objs.append(coverageAdj)
+                meas.append([localMaxKillsAvgDist, averageTraces])
+                itrs.append(itr-1)
+                inds.append(idx)
+            else:
+                objs.append(0 if conf.OBJECTIVE_RANGE[0] == None else conf.OBJECTIVE_RANGE[0])
+                meas.append([0, 0])
+                itrs.append(itr-1)
+                inds.append(idx)
         
         # Send the results back to the scheduler.
         scheduler.tell(objs, meas, iterations=itrs, individual_numbers=inds)
@@ -285,7 +300,7 @@ def evolve_maps(
                 emitter_type,
                 workers=4,
                 iterations=500,
-                log_freq=25,
+                log_freq=5,
                 n_emitters=5,
                 batch_size=30,
                 game_length=600,
@@ -336,7 +351,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='MAP-Elites.')
 
     parser.add_argument("--workers", default=4, type=int, dest="workers")
-    parser.add_argument("--isTest", default=False, type=bool, dest="isTest")
+    parser.add_argument("--is_test", default=False, type=bool, dest="is_test")
 
     args = parser.parse_args(sys.argv[1:])
 
@@ -352,7 +367,7 @@ if __name__ == "__main__":
         iterations=conf.ITERATIONS, 
         n_emitters=conf.N_EMITTERS, 
         workers=args.workers, 
-        folder_name=conf.folder_name(args.isTest),
+        folder_name=conf.folder_name(args.is_test),
         game_length=conf.GAME_LENGTH,
         )
     
