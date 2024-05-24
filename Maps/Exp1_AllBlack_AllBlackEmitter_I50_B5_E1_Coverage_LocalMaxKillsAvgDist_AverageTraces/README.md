@@ -1,6 +1,6 @@
-Here we optimized the coverage of the map while exploring the average distance between local maxima in Kills perfomed by the bots, and the average length of the kills traces.
+Here we optimized the coverage of the map while exploring the average distance between local maxima of Kills perfomed by the bots, and the average length of the kills traces.
 
-From the heatmap we see that kills traces never go beyond 12, and the average distance never beyond 50, but as of now it is unclear if its the exploration that fails or if it's the maximum feasible length that we can hope for. As discussed, I plan on looking into that and adding sliding boundaries to avoid this problem. I do suspect that the exploration is somewhat not as efficient as it could be, since maps with higher distance are possible, but only few were found.
+From the heatmap we see that kills traces never go beyond 12, and the average distance never goes beyond 50, but as of now it is unclear if its the exploration that fails or if it's the maximum feasible length that we can hope for. As discussed, I plan on looking into that and adding sliding boundaries to avoid this problem. I do suspect that the exploration is somewhat not as efficient as it could be, since maps with higher distance are possible, but only few were found.
 Black squares are map too little to be of any interest, so despite having 100% surface coverage their fitness is set to zero.
 
 Regarding the maps itself, at lower x and y maps are very bland, small and mostly "boxes"
