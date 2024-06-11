@@ -20,17 +20,16 @@ from internals.ab_genome.constants import AB_NUM_CORRIDORS, AB_NUM_ROOMS
 from internals.ab_genome.ab_genome import ABGenome
 import internals.graph_genome.generation as graph_generation
 import internals.evaluation as eval
-import gymnasium as gym
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import tqdm
 from dask.distributed import Client, LocalCluster
 
-from ribs.archives import ArchiveDataFrame, GridArchive
+from ribs.archives import ArchiveDataFrame, GridArchive, SlidingBoundariesArchive
 from ribs.emitters import EvolutionStrategyEmitter
 from ribs.schedulers import Scheduler
-from ribs.visualize import grid_archive_heatmap
+from ribs.visualize import grid_archive_heatmap, sliding_boundaries_archive_heatmap
 
 def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size):
     """Creates the Scheduler based on given configurations.
@@ -44,8 +43,28 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
             solution_dim = AB_NUM_ROOMS * 3 + AB_NUM_CORRIDORS * 3
         case constants.GRID_GRAPH_NAME:
             solution_dim = GG_NUM_ROWS * GG_NUM_COLUMNS * 4 + (GG_NUM_ROWS - 1) * GG_NUM_COLUMNS + GG_NUM_ROWS * (GG_NUM_COLUMNS - 1)
-    
-    archive = GridArchive(
+    archive = None
+    match conf.ARCHIVE_TYPE:
+        case constants.GRID_ARCHIVE_NAME:
+            archive = GridArchive(
+                solution_dim=solution_dim,
+                dims=conf.MEASURES_BINS_NUMBER, 
+                ranges=conf.MEASURES_RANGES,
+                seed=seed,
+                qd_score_offset=0,
+                extra_fields={"iterations": ((), np.float32), "individual_numbers": ((), np.float32)}
+            )
+        case constants.SLIDING_BOUNDARIES_ARCHIVE_NAME:
+            archive = SlidingBoundariesArchive(
+                solution_dim=solution_dim,
+                dims=conf.MEASURES_BINS_NUMBER, 
+                ranges=conf.MEASURES_RANGES,
+                seed=seed,
+                qd_score_offset=0,
+                extra_fields={"iterations": ((), np.float32), "individual_numbers": ((), np.float32)}
+            )
+
+    archive = SlidingBoundariesArchive(
         solution_dim=solution_dim,
         dims=conf.MEASURES_BINS_NUMBER, 
         ranges=conf.MEASURES_RANGES,
@@ -53,6 +72,7 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
         qd_score_offset=0,
         extra_fields={"iterations": ((), np.float32), "individual_numbers": ((), np.float32)}
     )
+
 
     # If we create the emitters with identical seeds, they will all output the
     # same initial solutions. The algorithm should still work -- eventually, the
@@ -192,6 +212,7 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
                 entropy = round(np.mean(dataset["entropy"]), 2)
                 target_loss = round(np.mean(dataset["targetLossRate"]), 2)
                 pursue_time = round(np.mean(dataset["pursueTime"]), 2)
+                sight_loss_rate = round(np.mean(dataset["sightLossRate"]), 2)
                 quantile25 = round(np.mean(dataset["quantile25Position"]), 2)
                 coverageAdj = round(np.mean(dataset["coveragePosition"])  * np.ceil(np.mean(dataset["area"]) - 0.03), 2)
                 coverageAllAdj = round(((np.mean(dataset["coveragePosition"]) + np.mean(dataset["coverageKill"]) + np.mean(dataset["coverageDeath"]))/3) * np.ceil(np.mean(dataset["area"]) - 0.03), 2)
@@ -199,11 +220,16 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
                 localMaxKills = round(np.mean(dataset["localMaximaNumberKill"]), 2)
                 localMaxKillsAvgDist = round(np.mean(dataset["localMaximaAverageDistanceKill"]), 2)
                 localMaxKillsTopDist = round(np.mean(dataset["localMaximaTopDistanceKill"]), 2)
+                quantile75Kills = round(np.mean(dataset["quantile75Kill"]), 2)
+                coverageKill = round(np.mean(dataset["coverageKill"]), 2)
                 averageTraces = round(np.mean(dataset["averageTraces"]), 2)
                 
-
-                objs.append(coverageAdj)
-                meas.append([localMaxKillsAvgDist, averageTraces])
+                if conf.MANUALLY_CHOOSE_FEATURES:
+                    objs.append(coverageAdj)
+                    meas.append([localMaxKillsAvgDist, averageTraces])
+                else:
+                    objs.append(round(np.mean(dataset[conf.OBJECTIVE_NAME]), 2))
+                    meas.append([round(np.mean(dataset[conf.MEASURES_NAMES[0]]), 2), round(np.mean(dataset[conf.MEASURES_NAMES[1]]), 2)])
                 itrs.append(itr-1)
                 inds.append(idx)
             else:
@@ -241,7 +267,11 @@ def save_heatmap(archive, filename):
         filename (str): Path to an image file.
     """
     fig, ax = plt.subplots(figsize=(8, 6))
-    grid_archive_heatmap(archive, ax=ax, vmin=conf.OBJECTIVE_RANGE[0], vmax=conf.OBJECTIVE_RANGE[1])
+    match conf.ARCHIVE_TYPE:
+        case constants.GRID_ARCHIVE_NAME:
+            grid_archive_heatmap(archive, ax=ax, vmin=conf.OBJECTIVE_RANGE[0], vmax=conf.OBJECTIVE_RANGE[1])
+        case constants.SLIDING_BOUNDARIES_ARCHIVE_NAME:
+            sliding_boundaries_archive_heatmap(archive, ax=ax, vmin=conf.OBJECTIVE_RANGE[0], vmax=conf.OBJECTIVE_RANGE[1])
     # ax.invert_yaxis()  # Makes more sense if larger velocities are on top.
     ax.set_xlabel(conf.MEASURES_NAMES[0])
     ax.set_ylabel(conf.MEASURES_NAMES[1])
