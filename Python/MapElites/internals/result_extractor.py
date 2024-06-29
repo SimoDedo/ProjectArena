@@ -12,6 +12,7 @@ from internals.config import NUM_PARALLEL_SIMULATIONS
 BOT_NUM = 2
 
 def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=NUM_PARALLEL_SIMULATIONS):
+    # Read the match results from the files
     frames = []
     for i in range(num_simulations):
         file_name = os.path.join(GAME_DATA_FOLDER, 'Export', folder_name, 'final_results_' + experiment_name + '_' + str(i) + '.json')
@@ -55,6 +56,9 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
 
     # Analyze kill traces
     dataset = __analyze_traces(dataset, kills_x, kills_y, deaths_x, deaths_y, BOT_NUM)
+
+    # Rewrite the dataset to include the new columns
+    dataset.to_json(os.path.join(GAME_DATA_FOLDER, 'Export', folder_name, 'final_results_' + experiment_name + '.json'))
 
     return dataset
 

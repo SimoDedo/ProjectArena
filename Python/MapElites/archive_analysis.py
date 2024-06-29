@@ -111,19 +111,19 @@ def __save_traces(start_positions, end_positions, path, map_matrix, note=None):
 # --- ANALYSIS --- #
 
 
-def save_image_map(outdir, sol_map_matrix, index, obj, meas_0, meas_1):
+def save_image_map(outdir, experiment_name, sol_map_matrix, index, obj, meas_0, meas_1):
     __save_map(
         outdir /
         f"map_{int(index/conf.MEASURES_BINS_NUMBER[0])}_{int(index%conf.MEASURES_BINS_NUMBER[1])}.png",
         map_matrix=sol_map_matrix,
-        note=f"{conf.OBJECTIVE_NAME}: {obj:.2f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.2f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.2f}")
+        note=f"Name: {experiment_name}\n {conf.OBJECTIVE_NAME}: {obj:.2f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.2f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.2f}")
 
 
-def save_bot_positions_heatmap(positionsdir, outdir, map_matrix, index, obj, meas_0, meas_1, iteration, individual_number, map_scale):
+def save_bot_positions_heatmap(positionsdir, outdir, experiment_name, map_matrix, index, obj, meas_0, meas_1, map_scale):
     for bot_n in range(0, 2):
         (positions_x, positions_y) = extract_bot_positions(
             positionsdir,
-            str(int(iteration)) + "_" + str(int(individual_number)),
+            experiment_name,
             bot_n,
         )
         positions_x = [x / map_scale for x in positions_x]
@@ -135,13 +135,12 @@ def save_bot_positions_heatmap(positionsdir, outdir, map_matrix, index, obj, mea
             outdir /
             f"map_{int(index/conf.MEASURES_BINS_NUMBER[0])}_{int(index%conf.MEASURES_BINS_NUMBER[1])}_positions_bot_{str(bot_n)}.png",
             map_matrix,
-            note=f"{conf.OBJECTIVE_NAME}: {obj:.2f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.2f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.2f}"
+            note=f"Name: {experiment_name}\n {conf.OBJECTIVE_NAME}: {obj:.2f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.2f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.2f}"
         )
 
 
-def save_deaths_and_kills_map(deathsdir, outdir, map_matrix, index, obj, meas_0, meas_1, iteration, individual_number, map_scale):
-    experiment_name = str(int(iteration)) + "_" + str(int(individual_number))
-    note=f"{conf.OBJECTIVE_NAME}: {obj:.2f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.2f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.2f}"
+def save_deaths_and_kills_map(deathsdir, outdir, experiment_name, map_matrix, index, obj, meas_0, meas_1, map_scale):
+    note=f"Name: {experiment_name}\n {conf.OBJECTIVE_NAME}: {obj:.2f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.2f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.2f}"
     for bot_n in range(0, 2):
         (deaths_x, deaths_y) = extract_death_positions(
             deathsdir,
@@ -220,21 +219,23 @@ def analyze_archive(
     meas_1 = df.get_field("measures_1")
     iterations = df.get_field("iterations")
     individual_numbers = df.get_field("individual_numbers")
+    
 
     # Analyze each solution
     for idx in tqdm.trange(0, len(solutions)):
         sol = solutions[idx]
+        experiment_name = str(int(iterations[idx])) + "_" + str(int(individual_numbers[idx]))
         #phenotype = get_phenotype_from_solution(sol, representation)
         sol_map_matrix = read_map(
             str(int(iterations[idx])) + "_" + str(int(individual_numbers[idx])), folder_name)
         map_scale = get_map_scale(representation)
 
-        save_image_map(mapsDir, sol_map_matrix,
+        save_image_map(mapsDir, experiment_name, sol_map_matrix,
                        indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
-        save_bot_positions_heatmap(exportDir, positionDir, sol_map_matrix,
-                                   indexes[idx], obj[idx], meas_0[idx], meas_1[idx], iterations[idx], individual_numbers[idx], map_scale)
-        save_deaths_and_kills_map(exportDir, deathsDir, sol_map_matrix,
-                                    indexes[idx], obj[idx], meas_0[idx], meas_1[idx], iterations[idx], individual_numbers[idx], map_scale)
+        save_bot_positions_heatmap(exportDir, positionDir, experiment_name, sol_map_matrix,
+                                   indexes[idx], obj[idx], meas_0[idx], meas_1[idx], map_scale)
+        save_deaths_and_kills_map(exportDir, deathsDir, experiment_name, sol_map_matrix,
+                                    indexes[idx], obj[idx], meas_0[idx], meas_1[idx], map_scale)
 
     return
 

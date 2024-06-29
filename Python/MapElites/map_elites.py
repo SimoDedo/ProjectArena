@@ -225,6 +225,7 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
                 averageTraces = round(np.mean(dataset["averageTraces"]), 2)
                 
                 if conf.MANUALLY_CHOOSE_FEATURES:
+                    # Modify here to use a different/combination of features.
                     objs.append(coverageAdj)
                     meas.append([localMaxKillsAvgDist, averageTraces])
                 else:

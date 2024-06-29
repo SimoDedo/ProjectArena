@@ -1,3 +1,4 @@
+import internals.constants as constants
 """ Evaluation variables """
 
 # Number of parallel launches of the same experiment
@@ -18,26 +19,26 @@ BOT2_SKILL = "0.85"
 
 """ MAP-Elites configuration variables """
 # Archive type used in the experiment. See constants.py for possible values
-ARCHIVE_TYPE ="SB"
+ARCHIVE_TYPE = constants.SLIDING_BOUNDARIES_ARCHIVE_NAME
 # Map representation used in the experiment. See constants.py for possible values
-REPRESENTATION_NAME = "AB"
+REPRESENTATION_NAME = constants.ALL_BLACK_NAME
 # Emitter type used in the experiment. See constants.py for possible values
-EMITTER_TYPE_NAME = "ABEmitter"
+EMITTER_TYPE_NAME = constants.ALL_BLACK_EMITTER_NAME
 
-ITERATIONS = 1250
+ITERATIONS = 750
 BATCH_SIZE = 1
 N_EMITTERS = 10
 
 NUMBER_OF_INITAL_SOLUTIONS = 10
 
-MEASURES_BINS_NUMBER = [20,20]
+MEASURES_BINS_NUMBER = [10,10]
 MEASURES_RANGES = [(10,80),(0,15)]
 
-OBJECTIVE_RANGE = (0,1) # None if unkwnown
+OBJECTIVE_RANGE = (None,None) # (None, None) if unkwnown
 
 # These names are used to generate the folder name and the image captions
-OBJECTIVE_NAME = "pace"
-MEASURES_NAMES = ["fightTime", "averageTraces"]
+OBJECTIVE_NAME = "sightLossRate"
+MEASURES_NAMES = ["localMaximaAverageDistancePosition", "localMaximaAverageDistanceKill"]
 # If set to False, the names above are used to get the categories from the dataset. 
 # If set to True, the user is expected to manually choose the features in map_elites.py.
 # This is useful to combine different features without saving each one. 
