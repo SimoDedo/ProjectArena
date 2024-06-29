@@ -26,3 +26,41 @@ def scale_area(area, scale):
         scale * area.topRow,
         area.isCorridor,
     )
+
+def contains_area(area1, area2):
+    return (
+        area1.leftColumn <= area2.leftColumn
+        and area1.rightColumn >= area2.rightColumn
+        and area1.topRow >= area2.topRow
+        and area1.bottomRow <= area2.bottomRow
+    )
+
+def overlap_area(area1, area2):
+    # First check if the corners touch, that case is not considered an overlap
+    if (
+        (area1.leftColumn == area2.rightColumn
+        and area1.rightColumn > area2.leftColumn
+        and area1.topRow == area2.bottomRow
+        and area1.bottomRow < area2.topRow)
+        or
+        (area1.leftColumn == area2.rightColumn
+        and area1.rightColumn > area2.leftColumn
+        and area1.topRow > area2.bottomRow
+        and area1.bottomRow == area2.topRow)
+        or
+        (area1.leftColumn < area2.rightColumn
+        and area1.rightColumn == area2.leftColumn
+        and area1.topRow > area2.bottomRow
+        and area1.bottomRow == area2.topRow)
+        or
+        (area1.leftColumn < area2.rightColumn
+        and area1.rightColumn == area2.leftColumn
+        and area1.topRow == area2.bottomRow
+        and area1.bottomRow < area2.topRow)
+    ):
+        return False
+    else:
+        return (area1.leftColumn <= area2.rightColumn 
+                and area1.rightColumn >= area2.leftColumn 
+                and area1.topRow >= area2.bottomRow 
+                and area1.bottomRow <= area2.topRow)
