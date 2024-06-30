@@ -9,9 +9,13 @@ from skimage.feature import peak_local_max
 from internals.constants import GAME_DATA_FOLDER
 from internals.config import NUM_PARALLEL_SIMULATIONS
 
+import warnings
+warnings.simplefilter(action='ignore', category=pandas.errors.PerformanceWarning)
+
 BOT_NUM = 2
 
 def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=NUM_PARALLEL_SIMULATIONS):
+    # MATCH RESULT READING
     # Read the match results from the files
     frames = []
     for i in range(num_simulations):
@@ -35,7 +39,9 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
 
     dataset["ratio"] = ratios
     dataset["killDiff"] = killDiff
-    
+
+    # MATCH RESULT ANALYSIS
+
     # Read resulting map
     map_matrix = read_map(experiment_name, folder_name)
     mask = np.matrix(map_matrix)
@@ -56,6 +62,59 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
 
     # Analyze kill traces
     dataset = __analyze_traces(dataset, kills_x, kills_y, deaths_x, deaths_y, BOT_NUM)
+
+    # GRAPH ANALYSIS
+
+    graph, _ = phenotype.to_graph()
+    rooms = graph.vs.select(isCorridor_eq=False)
+
+    # Rooms distance
+    distances = [0]
+    if len(rooms) > 1:
+        distances = graph.distances(source=rooms[0], target=[rooms[i] for i in range(len(rooms)) if i != 0], weights=graph.es['weight']) 
+    dataset["averageRoomMinDistance"] = np.mean(distances) if len(distances) > 0 else 0
+    dataset["stdRoomMinDistance"] = np.std(distances) if len(distances) > 0 else 0
+
+    # Roooms betweenness
+    betweenness = graph.betweenness(vertices=rooms, weights=graph.es['weight'])
+    dataset["averageRoomBetweenness"] = np.mean(betweenness) if len(betweenness) > 0 else 0
+    dataset["stdRoomBetweenness"] = np.std(betweenness) if len(betweenness) > 0 else 0
+
+    # Rooms closeness
+    closeness = graph.closeness(vertices=rooms, weights=graph.es['weight'])
+    dataset["averageRoomCloseness"] = np.mean(closeness) if len(closeness) > 0 else 0
+    dataset["stdRoomCloseness"] = np.std(closeness) if len(closeness) > 0 else 0
+
+    # Mincut
+    mincut = [len(graph.mincut(source=i, target=j, capacity=None).cut) for i in range(len(rooms)) for j in range(i+1, len(rooms))]
+    dataset["averageMincut"] = np.mean(mincut) if len(mincut) > 0 else 0
+    dataset["stdMincut"] = np.std(mincut) if len(mincut) > 0 else 0
+    dataset["maxMincut"] = max(mincut) if len(mincut) > 0 else 0
+    dataset["minMincut"] = min(mincut) if len(mincut) > 0 else 0
+
+    # Fundamental cycles. We consider cycles with at least one room and at least two rooms
+    cycles = graph.fundamental_cycles()
+    vertices_in_cycles = []
+    for cycle in cycles:
+        vertices_in_cycles.append([])
+        for i in cycle:
+            if graph.es[i].source not in vertices_in_cycles[-1] and (not graph.vs[graph.es[i].source]['isCorridor']):
+                vertices_in_cycles[-1].append(graph.es[i].source)
+            if graph.es[i].target not in vertices_in_cycles[-1] and (not graph.vs[graph.es[i].target]['isCorridor']):
+                vertices_in_cycles[-1].append(graph.es[i].target)
+    cycles_one_room = [cycles[i] for i in range(len(cycles)) if len(vertices_in_cycles[i]) > 0]
+    cor_length = [sum([graph.es[i]['weight'] for i in range(len(cycle))]) for cycle in cycles_one_room]
+    cycles_two_rooms = [cycles[i] for i in range(len(cycles)) if len(vertices_in_cycles[i]) > 0]
+    ctr_length = [sum([graph.es[i]['weight'] for i in range(len(cycle))]) for cycle in cycles_two_rooms]
+
+    dataset["numberCyclesOneRoom"] = len(cycles_one_room)
+    dataset["averageLengthCyclesOneRoom"] = np.mean(cor_length) if len(cor_length) > 0 else 0
+    dataset["stdLengthCyclesOneRoom"] = np.std(cor_length) if len(cor_length) > 0 else 0
+    dataset["numberCyclesTwoRooms"] = len(cycles_two_rooms)
+    dataset["averageLengthCyclesTwoRooms"] = np.mean(ctr_length) if len(ctr_length) > 0 else 0
+    dataset["stdLengthCyclesTwoRooms"] = np.std(ctr_length) if len(ctr_length) > 0 else 0
+
+    # TODO: Add graph analysis based on match data.
 
     # Rewrite the dataset to include the new columns
     dataset.to_json(os.path.join(GAME_DATA_FOLDER, 'Export', folder_name, 'final_results_' + experiment_name + '.json'))

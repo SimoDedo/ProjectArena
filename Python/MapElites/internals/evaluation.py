@@ -32,11 +32,6 @@ def evaluate(phenotype, iteration, individual_batch_num, bot1_data, bot2_data, g
         pandas.DataFrame: The dataset with the results of the simulation
     """
 
-    # Check if phenotype is valid
-    if not phenotype.is_valid():
-        tqdm.tqdm.write(f"Invalid phenotype detected, skipping evaluation.")
-        return __blank_dataset(), True
-
     if experiment_name is None :
         experiment_name = str(iteration) + '_' + str(individual_batch_num)
     complete_name = os.path.join(folder_name, experiment_name)

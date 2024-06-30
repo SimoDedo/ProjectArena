@@ -25,7 +25,7 @@ REPRESENTATION_NAME = constants.ALL_BLACK_NAME
 # Emitter type used in the experiment. See constants.py for possible values
 EMITTER_TYPE_NAME = constants.ALL_BLACK_EMITTER_NAME
 
-ITERATIONS = 750
+ITERATIONS = 100
 BATCH_SIZE = 1
 N_EMITTERS = 10
 
