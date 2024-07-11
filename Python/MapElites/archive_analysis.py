@@ -15,19 +15,22 @@ import internals.constants as constants
 import internals.config as conf
 from internals.ab_genome.constants import AB_MAP_SCALE
 from internals.graph_genome.constants import GG_MAP_SCALE
+from internals.smt_genome.constants import SMT_MAP_SCALE
 from internals.ab_genome.ab_genome import ABGenome
 from internals.graph_genome.gg_genome import GraphGenome
+from internals.smt_genome.smt_genome import SMTGenome
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import pandas as pd
 import numpy as np
 from scipy.ndimage import gaussian_filter
 import tqdm
+import igraph as ig
+import pickle
 
 from ribs.archives import ArchiveDataFrame
 
 # --- UTILS --- #
-
 
 def get_map_scale(representation):
     match representation:
@@ -35,6 +38,8 @@ def get_map_scale(representation):
             return AB_MAP_SCALE
         case constants.GRID_GRAPH_NAME:
             return GG_MAP_SCALE
+        case constants.SMT_NAME:
+            return SMT_MAP_SCALE
 
 
 def get_phenotype_from_solution(solution, representation):
@@ -43,6 +48,8 @@ def get_phenotype_from_solution(solution, representation):
             return ABGenome.array_as_genome(list(map(int, solution.tolist()))).phenotype()
         case constants.GRID_GRAPH_NAME:
             return GraphGenome.array_as_genome(list(map(int, solution.tolist()))).phenotype()
+        case constants.SMT_NAME:
+            return SMTGenome.array_as_genome(list(map(int, solution.tolist()))).phenotype()
 
 # --- SAVE GRAPHS/IMAGES --- #
 
@@ -55,6 +62,24 @@ def __save_map(path, map_matrix, note=None):
     plt.clf()
     plt.close()
 
+def __save_map_lines(path, phenotype, lines, note=None):
+    #plt.imshow(map_matrix, cmap=cm.Greys, alpha=1.0)
+    fig, ax = plt.subplots()
+    for area in phenotype.areas:
+        if area.isCorridor:
+            ax.add_patch(plt.Rectangle((area.leftColumn, area.topRow), area.rightColumn-area.leftColumn, area.bottomRow-area.topRow, fill='b', edgecolor='b'))
+        else:
+            ax.add_patch(plt.Rectangle((area.leftColumn, area.topRow), area.rightColumn-area.leftColumn, area.bottomRow-area.topRow, fill=None, edgecolor='r'))
+    for line in lines:
+        if line is not None:
+            x1, y1 = [line.start[0], line.end[0]], [line.start[1], line.end[1]]
+            plt.plot(x1, y1, 'ro-')
+    ax.set_xlim(0, phenotype.mapWidth)
+    ax.set_ylim(0, phenotype.mapHeight)
+    plt.annotate(note, xy=(0, 0), xytext=(0, -1), fontsize=12, color='black')
+    plt.gca().invert_yaxis()
+    plt.savefig(path, bbox_inches='tight')
+    plt.close()
 
 def __save_heatmap(x, y, path, map_matrix, note=None):
     heatmap, xedges, yedges = np.histogram2d(
@@ -103,11 +128,33 @@ def __save_traces(start_positions, end_positions, path, map_matrix, note=None):
                     facecolors='none', edgecolors=color, s=12)
 
     plt.imshow(map_matrix, cmap='binary_r', alpha=1.0)
-    plt.annotate(note, xy=(0, 0), xytext=(0, -1), fontsize=12, color='black')
+    plt.annotate(note, xy=(0, 0), xytext=(0, -1), fontsize=10, color='black')
     plt.savefig(path,
                 dpi=110, bbox_inches='tight')
     plt.close()
 
+def __save_graph(graph, path, note=None):
+    layout = ig.Layout(coords=graph.vs['coords'], dim=2)
+    fig, ax = plt.subplots()
+    ig.plot(graph, vertex_size=25, layout=layout, vertex_label_color="white",  target=ax)
+    plt.annotate(note, xy=(0, 0), xytext=(0, -1), fontsize=12, color='black')
+    plt.gca().invert_yaxis()
+    plt.savefig(path, bbox_inches='tight')
+    plt.close()
+
+def __save_graph_map(phenotype, path, note=None):
+    fig, ax = plt.subplots()
+    for area in phenotype.areas:
+        if area.isCorridor:
+            ax.add_patch(plt.Rectangle((area.leftColumn, area.topRow), area.rightColumn-area.leftColumn, area.bottomRow-area.topRow, fill='b', edgecolor='b'))
+        else:
+            ax.add_patch(plt.Rectangle((area.leftColumn, area.topRow), area.rightColumn-area.leftColumn, area.bottomRow-area.topRow, fill=None, edgecolor='r'))
+    ax.set_xlim(0, phenotype.mapWidth)
+    ax.set_ylim(0, phenotype.mapHeight)
+    plt.annotate(note, xy=(0, 0), xytext=(0, -1), fontsize=12, color='black')
+    plt.gca().invert_yaxis()
+    plt.savefig(path, bbox_inches='tight')
+    plt.close()
 # --- ANALYSIS --- #
 
 
@@ -116,8 +163,15 @@ def save_image_map(outdir, experiment_name, sol_map_matrix, index, obj, meas_0, 
         outdir /
         f"map_{int(index/conf.MEASURES_BINS_NUMBER[0])}_{int(index%conf.MEASURES_BINS_NUMBER[1])}.png",
         map_matrix=sol_map_matrix,
-        note=f"Name: {experiment_name}\n {conf.OBJECTIVE_NAME}: {obj:.2f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.2f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.2f}")
+        note=f"Name: {experiment_name}\n {conf.OBJECTIVE_NAME}: {obj:.4f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.4f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.4f}")
 
+def save_image_map_lines(outdir, experiment_name, phenotype, lines, index, obj, meas_0, meas_1):
+    __save_map_lines(
+        outdir /
+        f"map_lines_{int(index/conf.MEASURES_BINS_NUMBER[0])}_{int(index%conf.MEASURES_BINS_NUMBER[1])}.png",
+        phenotype=phenotype,
+        lines=lines,
+        note=f"Name: {experiment_name}\n {conf.OBJECTIVE_NAME}: {obj:.4f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.4f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.4f}")
 
 def save_bot_positions_heatmap(positionsdir, outdir, experiment_name, map_matrix, index, obj, meas_0, meas_1, map_scale):
     for bot_n in range(0, 2):
@@ -135,12 +189,12 @@ def save_bot_positions_heatmap(positionsdir, outdir, experiment_name, map_matrix
             outdir /
             f"map_{int(index/conf.MEASURES_BINS_NUMBER[0])}_{int(index%conf.MEASURES_BINS_NUMBER[1])}_positions_bot_{str(bot_n)}.png",
             map_matrix,
-            note=f"Name: {experiment_name}\n {conf.OBJECTIVE_NAME}: {obj:.2f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.2f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.2f}"
+            note=f"Name: {experiment_name}\n {conf.OBJECTIVE_NAME}: {obj:.4f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.4f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.4f}"
         )
 
 
 def save_deaths_and_kills_map(deathsdir, outdir, experiment_name, map_matrix, index, obj, meas_0, meas_1, map_scale):
-    note=f"Name: {experiment_name}\n {conf.OBJECTIVE_NAME}: {obj:.2f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.2f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.2f}"
+    note=f"Name: {experiment_name}\n {conf.OBJECTIVE_NAME}: {obj:.4f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.4f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.4f}"
     for bot_n in range(0, 2):
         (deaths_x, deaths_y) = extract_death_positions(
             deathsdir,
@@ -183,6 +237,22 @@ def save_deaths_and_kills_map(deathsdir, outdir, experiment_name, map_matrix, in
             map_matrix,
             note=note
             )
+        
+def save_graphs(graphdir, experiment_name, phenotype, index, obj, meas_0, meas_1):
+    graph, _ = phenotype.to_graph()
+    graph.vs['label'] = [str(i) for i in range(len(graph.vs))]
+
+    __save_graph(
+        graph, 
+        graphdir / f"graph_{int(index/conf.MEASURES_BINS_NUMBER[0])}_{int(index%conf.MEASURES_BINS_NUMBER[1])}.png", 
+        note=f"Name: {experiment_name}\n {conf.OBJECTIVE_NAME}: {obj:.4f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.4f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.4f}"
+    )
+    __save_graph_map(
+        phenotype,
+        graphdir / f"graph_{int(index/conf.MEASURES_BINS_NUMBER[0])}_{int(index%conf.MEASURES_BINS_NUMBER[1])}_map.png",
+        note=f"Name: {experiment_name}\n {conf.OBJECTIVE_NAME}: {obj:.4f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.4f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.4f}"
+    )
+
 
 # --- MAIN --- #
 
@@ -206,6 +276,8 @@ def analyze_archive(
     positionDir.mkdir(exist_ok=True)
     deathsDir = Path(os.path.join(outdir, "Deaths_Kills_Heatmaps"))
     deathsDir.mkdir(exist_ok=True)
+    graphsDir = Path(os.path.join(outdir, "Graphs"))
+    graphsDir.mkdir(exist_ok=True)
 
     # Load archive data
     df = ArchiveDataFrame(pd.read_csv(archivedir / "archive.csv"))
@@ -225,23 +297,32 @@ def analyze_archive(
     for idx in tqdm.trange(0, len(solutions)):
         sol = solutions[idx]
         experiment_name = str(int(iterations[idx])) + "_" + str(int(individual_numbers[idx]))
-        #phenotype = get_phenotype_from_solution(sol, representation)
+        if representation == constants.SMT_NAME:
+            phenotype_file = open(os.path.join(exportDir, 'phenotype_' + experiment_name + '.pkl'), 'rb')
+            phenotype = pickle.load(phenotype_file)
+            phenotype_file.close()
+        else:
+            phenotype = get_phenotype_from_solution(sol, representation)
         sol_map_matrix = read_map(
             str(int(iterations[idx])) + "_" + str(int(individual_numbers[idx])), folder_name)
         map_scale = get_map_scale(representation)
 
         save_image_map(mapsDir, experiment_name, sol_map_matrix,
                        indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
+        if representation == constants.SMT_NAME:
+            genotype = SMTGenome.array_as_genome(list(map(int, sol.tolist())))
+            save_image_map_lines(mapsDir, experiment_name, phenotype, genotype.lines,
+                                 indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
         save_bot_positions_heatmap(exportDir, positionDir, experiment_name, sol_map_matrix,
                                    indexes[idx], obj[idx], meas_0[idx], meas_1[idx], map_scale)
         save_deaths_and_kills_map(exportDir, deathsDir, experiment_name, sol_map_matrix,
                                     indexes[idx], obj[idx], meas_0[idx], meas_1[idx], map_scale)
-
+        save_graphs(graphsDir, experiment_name, phenotype, indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
     return
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Evolve population.')
+    parser = argparse.ArgumentParser(description='Analyze archive.')
 
     parser.add_argument("--workers", default=4, type=int, dest="workers")
 

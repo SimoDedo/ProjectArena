@@ -9,6 +9,8 @@ from skimage.feature import peak_local_max
 from internals.constants import GAME_DATA_FOLDER
 from internals.config import NUM_PARALLEL_SIMULATIONS
 
+import pickle
+
 import warnings
 warnings.simplefilter(action='ignore', category=pandas.errors.PerformanceWarning)
 
@@ -71,22 +73,26 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
     # Rooms distance
     distances = [0]
     if len(rooms) > 1:
-        distances = graph.distances(source=rooms[0], target=[rooms[i] for i in range(len(rooms)) if i != 0], weights=graph.es['weight']) 
+        distances = graph.distances(source=rooms[0], target=[rooms[i] for i in range(len(rooms)) if i != 0], weights=graph.es['weight'])[0]
+    distances = [distances[i] if np.isfinite(distances[i]) else 0 for i in range(len(distances))]
     dataset["averageRoomMinDistance"] = np.mean(distances) if len(distances) > 0 else 0
     dataset["stdRoomMinDistance"] = np.std(distances) if len(distances) > 0 else 0
 
     # Roooms betweenness
     betweenness = graph.betweenness(vertices=rooms, weights=graph.es['weight'])
+    betweenness = [betweenness[i] if np.isfinite(betweenness[i]) else 0 for i in range(len(betweenness))]
     dataset["averageRoomBetweenness"] = np.mean(betweenness) if len(betweenness) > 0 else 0
     dataset["stdRoomBetweenness"] = np.std(betweenness) if len(betweenness) > 0 else 0
 
     # Rooms closeness
     closeness = graph.closeness(vertices=rooms, weights=graph.es['weight'])
+    closeness = [closeness[i] if np.isfinite(closeness[i]) else 0 for i in range(len(closeness))]
     dataset["averageRoomCloseness"] = np.mean(closeness) if len(closeness) > 0 else 0
     dataset["stdRoomCloseness"] = np.std(closeness) if len(closeness) > 0 else 0
 
     # Mincut
-    mincut = [len(graph.mincut(source=i, target=j, capacity=None).cut) for i in range(len(rooms)) for j in range(i+1, len(rooms))]
+    mincut = [len(graph.mincut(source=rooms[i].index, target=rooms[j].index, capacity=None).cut) for i in range(len(rooms)) for j in range(i+1, len(rooms))]
+    mincut = [mincut[i] if np.isfinite(mincut[i]) else 0 for i in range(len(mincut))]
     dataset["averageMincut"] = np.mean(mincut) if len(mincut) > 0 else 0
     dataset["stdMincut"] = np.std(mincut) if len(mincut) > 0 else 0
     dataset["maxMincut"] = max(mincut) if len(mincut) > 0 else 0
@@ -104,7 +110,7 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
                 vertices_in_cycles[-1].append(graph.es[i].target)
     cycles_one_room = [cycles[i] for i in range(len(cycles)) if len(vertices_in_cycles[i]) > 0]
     cor_length = [sum([graph.es[i]['weight'] for i in range(len(cycle))]) for cycle in cycles_one_room]
-    cycles_two_rooms = [cycles[i] for i in range(len(cycles)) if len(vertices_in_cycles[i]) > 0]
+    cycles_two_rooms = [cycles[i] for i in range(len(cycles)) if len(vertices_in_cycles[i]) > 1]
     ctr_length = [sum([graph.es[i]['weight'] for i in range(len(cycle))]) for cycle in cycles_two_rooms]
 
     dataset["numberCyclesOneRoom"] = len(cycles_one_room)
@@ -114,10 +120,14 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
     dataset["averageLengthCyclesTwoRooms"] = np.mean(ctr_length) if len(ctr_length) > 0 else 0
     dataset["stdLengthCyclesTwoRooms"] = np.std(ctr_length) if len(ctr_length) > 0 else 0
 
-    # TODO: Add graph analysis based on match data.
+    # TODO: Add graph analysis based on match data?
 
     # Rewrite the dataset to include the new columns
     dataset.to_json(os.path.join(GAME_DATA_FOLDER, 'Export', folder_name, 'final_results_' + experiment_name + '.json'))
+
+    phenotype_file = open(os.path.join(GAME_DATA_FOLDER, 'Export', folder_name, 'phenotype_' + experiment_name + '.pkl'), 'wb')
+    pickle.dump(phenotype, phenotype_file)
+    phenotype_file.close()
 
     return dataset
 
