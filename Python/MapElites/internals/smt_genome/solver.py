@@ -1,6 +1,6 @@
 from z3 import *
 from internals.smt_genome.constants import SMT_ROOMS_NUMBER, SMT_MAX_MAP_WIDTH, SMT_MAX_MAP_HEIGHT, SMT_MAX_ROOM_HEIGHT, SMT_MIN_ROOM_HEIGHT, SMT_LINES_NUMBER \
-    , SMT_MAX_ROOM_WIDTH, SMT_MIN_ROOM_WIDTH, GENOME_SCALE_FOR_SMT_SOLVER
+    , SMT_MAX_ROOM_WIDTH, SMT_MIN_ROOM_WIDTH, SMT_SOLVER_GENOME_SCALE, SMT_SOLVER_LINE_WIDTH, SMT_SOLVER_SCALE_FACTOR
 import time
 from scipy.spatial import Delaunay
 from scipy.sparse.csgraph import minimum_spanning_tree
@@ -14,18 +14,13 @@ timing_info = {}
 accumulated_timing_info = {}
 timing_per_run = {}
 
-SCALE_FACTOR = 1
+SCALE_FACTOR = SMT_SOLVER_SCALE_FACTOR
 
-ROOM_WIDTH_MIN = SMT_MIN_ROOM_WIDTH * GENOME_SCALE_FOR_SMT_SOLVER
-ROOM_WIDTH_MAX = SMT_MAX_ROOM_WIDTH * GENOME_SCALE_FOR_SMT_SOLVER
-ROOM_HEIGHT_MIN = SMT_MIN_ROOM_HEIGHT * GENOME_SCALE_FOR_SMT_SOLVER * SCALE_FACTOR
-ROOM_HEIGHT_MAX = SMT_MAX_ROOM_HEIGHT * GENOME_SCALE_FOR_SMT_SOLVER* SCALE_FACTOR
-
-CANVAS_WIDTH = SMT_MAX_MAP_WIDTH * GENOME_SCALE_FOR_SMT_SOLVER
-CANVAS_HEIGHT = SMT_MAX_MAP_HEIGHT * GENOME_SCALE_FOR_SMT_SOLVER
+CANVAS_WIDTH = SMT_MAX_MAP_WIDTH * SMT_SOLVER_GENOME_SCALE
+CANVAS_HEIGHT = SMT_MAX_MAP_HEIGHT * SMT_SOLVER_GENOME_SCALE
 
 BORDER = 0
-LINEWIDTH = 10  
+LINEWIDTH = SMT_SOLVER_LINE_WIDTH  
 LINEWIDTH_Y = LINEWIDTH * SCALE_FACTOR
 
 SEPARATION = 1
@@ -52,7 +47,7 @@ def init_rooms(genome_rooms):
             r = {'x': Int('room_{}_x'.format(i)), 'y': Int('room_{}_y'.format(i)),
                  'width': None, 'height': None, 'quad': None}
             r['width'] = genome_rooms[i].width
-            r['height'] = genome_rooms[i].height
+            r['height'] = genome_rooms[i].height * SCALE_FACTOR
             r['quad'] = 1
             rooms.append(r)
     actual_number_of_rooms = len(rooms)

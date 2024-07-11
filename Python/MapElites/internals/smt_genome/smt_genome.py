@@ -6,7 +6,7 @@ from internals.area import Area
 from internals.phenotype import Phenotype
 from internals.smt_genome import mutation, crossover, generation, constants
 from internals.smt_genome.constants import SMT_SQUARE_SIZE, SMT_ROOMS_NUMBER, SMT_MAX_MAP_WIDTH, SMT_MAX_MAP_HEIGHT, \
-    SMT_CORRIDOR_WIDTH, SMT_MAP_SCALE, SMT_LINES_NUMBER, GENOME_SCALE_FOR_SMT_SOLVER, SMT_CORRIDOR_WIDTH
+    SMT_CORRIDOR_WIDTH, SMT_MAP_SCALE, SMT_LINES_NUMBER, SMT_SOLVER_GENOME_SCALE, SMT_CORRIDOR_WIDTH
 from internals.smt_genome.solver import solve
 import bisect
 
@@ -79,7 +79,7 @@ class SMTGenome:
     def phenotype(self):
         # Place rooms accordin to the SMT solver and get the minimum spanning tree connecting them
         rooms_pos ,mst = solve(self)
-        rooms_pos = [(int(x/GENOME_SCALE_FOR_SMT_SOLVER), int(y/GENOME_SCALE_FOR_SMT_SOLVER)) for x, y in rooms_pos]
+        rooms_pos = [(int(x/SMT_SOLVER_GENOME_SCALE), int(y/SMT_SOLVER_GENOME_SCALE)) for x, y in rooms_pos]
         zipped_mst = list(zip(*mst.nonzero()))
         zipped_mst = [(int(i), int(j)) for i, j in zipped_mst]
 
