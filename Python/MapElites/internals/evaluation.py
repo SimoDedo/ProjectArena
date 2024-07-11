@@ -32,12 +32,16 @@ def evaluate(phenotype, iteration, individual_batch_num, bot1_data, bot2_data, g
         pandas.DataFrame: The dataset with the results of the simulation
     """
 
+    if phenotype is None:
+        return __blank_dataset(), True
+
     if experiment_name is None :
         experiment_name = str(iteration) + '_' + str(individual_batch_num)
     complete_name = os.path.join(folder_name, experiment_name)
 
     # Export genome to file
     phenotype.write_to_file(os.path.join(GAME_DATA_FOLDER, 'Import', 'Genomes', complete_name + '.json'))
+
 
     return __run_evaluation(phenotype, folder_name, experiment_name, bot1_data, bot2_data, game_length)
 

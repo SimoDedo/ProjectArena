@@ -18,8 +18,14 @@ import internals.config as conf
 from internals.constants import GAME_DATA_FOLDER, MAP_ELITES_OUTPUT_FOLDER
 from internals.ab_genome.constants import AB_NUM_CORRIDORS, AB_NUM_ROOMS
 from internals.ab_genome.ab_genome import ABGenome
+from internals.smt_genome.smt_genome import SMTGenome
+from internals.smt_genome.constants import SMT_ROOMS_NUMBER, SMT_LINES_NUMBER
+import internals.smt_genome.mutation as smt_mutation
+import internals.smt_genome.generation as smt_generation
 import internals.graph_genome.generation as graph_generation
 import internals.evaluation as eval
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -43,6 +49,8 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
             solution_dim = AB_NUM_ROOMS * 3 + AB_NUM_CORRIDORS * 3
         case constants.GRID_GRAPH_NAME:
             solution_dim = GG_NUM_ROWS * GG_NUM_COLUMNS * 4 + (GG_NUM_ROWS - 1) * GG_NUM_COLUMNS + GG_NUM_ROWS * (GG_NUM_COLUMNS - 1)
+        case constants.SMT_NAME:
+            solution_dim = SMT_ROOMS_NUMBER * 2 + SMT_LINES_NUMBER * 4 + 1
     archive = None
     match conf.ARCHIVE_TYPE:
         case constants.GRID_ARCHIVE_NAME:
@@ -88,7 +96,9 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
         case constants.ALL_BLACK_NAME:
             x0, initial_solutions = initialize_solutions(ABGenome.create_random_genome, conf.NUMBER_OF_INITAL_SOLUTIONS)
         case constants.GRID_GRAPH_NAME:
-            x0, initial_solutions = initialize_solutions(GraphGenome.create_random_genome, conf.NUMBER_OF_INITAL_SOLUTIONS)            
+            x0, initial_solutions = initialize_solutions(GraphGenome.create_random_genome, conf.NUMBER_OF_INITAL_SOLUTIONS)
+        case constants.SMT_NAME:
+            x0, initial_solutions = initialize_solutions(SMTGenome.create_random_genome, conf.NUMBER_OF_INITAL_SOLUTIONS)
     
     emitters = []
     match emitter_type:
@@ -113,6 +123,20 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
                     #x0=x0,
                     initial_solutions=initial_solutions,
                     crossover_probability=conf.GG_STANDARD_CROSSOVER_CHANCE,
+                    batch_size=batch_size,
+                    seed=s,
+                    #bounds=bounds,
+                ) for s in seeds
+            ]
+        
+        case constants.SMT_EMITTER_NAME:
+            emitters = [
+                GenomeEmitter(
+                    archive,
+                    genome_type=SMTGenome,
+                    #x0=x0,
+                    initial_solutions=initial_solutions,
+                    crossover_probability=conf.SMT_STANDARD_CROSSOVER_CHANCE,
                     batch_size=batch_size,
                     seed=s,
                     #bounds=bounds,
@@ -153,6 +177,7 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
         "> Starting search.\n"
         "  - Open Dask's dashboard at http://localhost:8787 to monitor workers."
     )
+    outdir = Path(os.path.join(MAP_ELITES_OUTPUT_FOLDER, folder_name))
 
     metrics = {
         "Max Score": {
@@ -167,7 +192,12 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
             "x": [0],
             "y": [0],
         },
+        "Failed": {
+            "x": [0],
+            "y": [0],
+        },
     }
+    num_failed = 0
 
     start_time = time.time()
     for itr in tqdm.trange(1, iterations + 1):
@@ -179,6 +209,22 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
                 phenotypes = list(map(lambda geno: (ABGenome.array_as_genome(list(map(int, geno.tolist())))).phenotype(), genotypes_sols))
             case constants.GRID_GRAPH_NAME:
                 phenotypes = list(map(lambda geno: (GraphGenome.array_as_genome(list(map(int, geno.tolist())))).phenotype(), genotypes_sols))
+            case constants.SMT_NAME:
+                genotypes = list(map(lambda geno: SMTGenome.array_as_genome(list(map(int, geno.tolist()))), genotypes_sols))
+                phenotypes = []
+                to_skip = []
+                for geno in genotypes:
+                    try:
+                        phenotypes.append(geno.phenotype())
+                        found = True
+                        to_skip.append(False)
+                        #tqdm.tqdm.write("Phenotype created")
+                    except Exception as e:
+                        #tqdm.tqdm.write(str(e))
+                        phenotypes.append(None)
+                        to_skip.append(True)
+
+        #tqdm.tqdm.write("Finished creating phenotypes")
 
         # Evaluate the genomes and record the objectives and measures.
         objs, meas = [], []
@@ -229,11 +275,12 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
                     objs.append(coverageAdj)
                     meas.append([localMaxKillsAvgDist, averageTraces])
                 else:
-                    objs.append(round(np.mean(dataset[conf.OBJECTIVE_NAME]), 2))
-                    meas.append([round(np.mean(dataset[conf.MEASURES_NAMES[0]]), 2), round(np.mean(dataset[conf.MEASURES_NAMES[1]]), 2)])
+                    objs.append(round(np.mean(dataset[conf.OBJECTIVE_NAME]), 4))
+                    meas.append([round(np.mean(dataset[conf.MEASURES_NAMES[0]]), 4), round(np.mean(dataset[conf.MEASURES_NAMES[1]]), 4)])
                 itrs.append(itr-1)
                 inds.append(idx)
             else:
+                num_failed += 1
                 objs.append(0 if conf.OBJECTIVE_RANGE[0] == None else conf.OBJECTIVE_RANGE[0])
                 meas.append([0, 0])
                 itrs.append(itr-1)
@@ -251,11 +298,19 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
             metrics["Archive Size"]["y"].append(len(scheduler.archive))
             metrics["QD Score"]["x"].append(itr)
             metrics["QD Score"]["y"].append(scheduler.archive.stats.qd_score)
+            metrics["Failed"]["x"].append(itr)
+            metrics["Failed"]["y"].append(num_failed)
             tqdm.tqdm.write(
                 f"> {itr} itrs completed after {elapsed_time:.2f} s\n"
                 f"  - Max Score: {metrics['Max Score']['y'][-1]}\n"
                 f"  - Archive Size: {metrics['Archive Size']['y'][-1]}\n"
-                f"  - QD Score: {metrics['QD Score']['y'][-1]}")
+                f"  - QD Score: {metrics['QD Score']['y'][-1]}\n"
+                f"  - Failed: {metrics['Failed']['y'][-1]}")
+            #scheduler.archive.data(return_type="pandas").to_csv(outdir / "archive.csv")
+            #save_ccdf(scheduler.archive, str(outdir / "archive_ccdf.png"))
+            #save_heatmap(scheduler.archive, str(outdir / "heatmap.png"))
+            #save_metrics(outdir, metrics)
+            #plt.close('all')
 
     return metrics
 
@@ -331,7 +386,7 @@ def evolve_maps(
                 emitter_type,
                 workers=4,
                 iterations=500,
-                log_freq=5,
+                log_freq=25,
                 n_emitters=5,
                 batch_size=30,
                 game_length=600,

@@ -113,7 +113,7 @@ class Phenotype:
         #Filter out cliques of rooms
         cliques = [1]
         while len(cliques) > 0:
-            cliques = graph.cliques(min=2)
+            cliques = graph.cliques(min=3)
             to_skip = [i for i in range(len(cliques)) if any(graph.vs[cliques[i]]['isCorridor'])]
             cliques = [cliques[i] for i in range(len(cliques)) if not i in to_skip]
             
