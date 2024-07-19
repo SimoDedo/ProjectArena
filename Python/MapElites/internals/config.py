@@ -7,7 +7,7 @@ NUM_MATCHES_PER_SIMULATION = 1
 
 """ Experiment names """
 # This  is used as the basis of the folder name where the results of the experiment will be stored.
-EXPERIMENT_NAME = "TestSMT"
+EXPERIMENT_NAME = "GraphVornoi"
 
 """ Game variables """
 GAME_LENGTH = 600
@@ -21,9 +21,9 @@ BOT2_SKILL = "0.85"
 # Archive type used in the experiment. See constants.py for possible values
 ARCHIVE_TYPE = constants.SLIDING_BOUNDARIES_ARCHIVE_NAME
 # Map representation used in the experiment. See constants.py for possible values
-REPRESENTATION_NAME = constants.SMT_NAME
+REPRESENTATION_NAME = constants.ALL_BLACK_NAME
 # Emitter type used in the experiment. See constants.py for possible values
-EMITTER_TYPE_NAME = constants.SMT_EMITTER_NAME
+EMITTER_TYPE_NAME = constants.ALL_BLACK_EMITTER_NAME
 
 ITERATIONS = 750
 BATCH_SIZE = 1
@@ -32,7 +32,7 @@ N_EMITTERS = 10
 NUMBER_OF_INITAL_SOLUTIONS = 10
 
 MEASURES_BINS_NUMBER = [10,10]
-MEASURES_RANGES = [(10,80),(0,15)]
+MEASURES_RANGES = [(0,1),(0,1)]
 
 OBJECTIVE_RANGE = (None,None) # (None, None) if unkwnown
 
@@ -49,6 +49,9 @@ AB_STANDARD_CROSSOVER_CHANCE = 0.3
 GG_STANDARD_CROSSOVER_CHANCE = 0.3
 SMT_STANDARD_CROSSOVER_CHANCE = 0.3
 CMA_ME_SIGMA0 = 0.01
+
+""" Miscellaneous variables """
+SAVE_INTERMEDIATE_RESULTS = True
 
 def folder_name(test = False):
     if test:

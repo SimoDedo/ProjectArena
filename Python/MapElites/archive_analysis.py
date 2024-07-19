@@ -155,6 +155,47 @@ def __save_graph_map(phenotype, path, note=None):
     plt.gca().invert_yaxis()
     plt.savefig(path, bbox_inches='tight')
     plt.close()
+
+def __save_graph_vornoi(outer_shell, obstacles, graph, x_limit, y_limit, path, note=None):
+    fig, ax = plt.subplots()
+
+    # Plot the outer wall
+    x,y = outer_shell.exterior.xy
+    plt.plot(x,y)
+
+
+    # Plot the obstacles
+    for obstacle in obstacles:
+        x,y = obstacle.exterior.xy
+        plt.plot(x,y, color='darkred')
+
+    # Plot the graph
+    #graph.vs['label'] = [str(i) for i in range(len(graph.vs))]
+    vertex_attr_names = graph.vertex_attributes()
+    color = []
+    for i in range(len(graph.vs)):
+        if 'chokepoint' in vertex_attr_names and graph.vs[i]['chokepoint']:
+            color.append('yellow')
+        elif 'dead_end' in vertex_attr_names and graph.vs[i]['dead_end']:
+            color.append('green')
+        elif graph.vs[i]['region']:
+            color.append('red')
+        else:
+            color.append('blue')
+    graph.vs['color'] = color
+
+    layout = ig.Layout(coords=graph.vs['coords'], dim=2)
+    ig.plot(graph, vertex_size=5, layout=layout, vertex_label_color="black",  target=ax)
+    plt.gca().invert_yaxis()
+
+    ax.set_xlim(0, x_limit)
+    ax.set_ylim(0, y_limit)
+    plt.gca().invert_yaxis()
+
+    plt.annotate(note, xy=(0, 0), xytext=(0, -1), fontsize=12, color='black')
+    plt.savefig(path, bbox_inches='tight')
+    plt.close()
+
 # --- ANALYSIS --- #
 
 
@@ -239,7 +280,7 @@ def save_deaths_and_kills_map(deathsdir, outdir, experiment_name, map_matrix, in
             )
         
 def save_graphs(graphdir, experiment_name, phenotype, index, obj, meas_0, meas_1):
-    graph, _ = phenotype.to_graph()
+    graph, _ = phenotype.to_graph_naive()
     graph.vs['label'] = [str(i) for i in range(len(graph.vs))]
 
     __save_graph(
@@ -253,6 +294,18 @@ def save_graphs(graphdir, experiment_name, phenotype, index, obj, meas_0, meas_1
         note=f"Name: {experiment_name}\n {conf.OBJECTIVE_NAME}: {obj:.4f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.4f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.4f}"
     )
 
+def save_graphs_vornoi(graphdir, experiment_name, phenotype, index, obj, meas_0, meas_1):
+    graph, outer_shell, obstacles = phenotype.to_graph_vornoi()
+
+    __save_graph_vornoi(
+        outer_shell,
+        obstacles,
+        graph,
+        phenotype.mapWidth,
+        phenotype.mapHeight,
+        graphdir / f"graph_vornoi_{int(index/conf.MEASURES_BINS_NUMBER[0])}_{int(index%conf.MEASURES_BINS_NUMBER[1])}.png",
+        note=f"Name: {experiment_name}\n {conf.OBJECTIVE_NAME}: {obj:.4f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.4f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.4f}"
+    )
 
 # --- MAIN --- #
 
@@ -278,6 +331,8 @@ def analyze_archive(
     deathsDir.mkdir(exist_ok=True)
     graphsDir = Path(os.path.join(outdir, "Graphs"))
     graphsDir.mkdir(exist_ok=True)
+    graphsVornoiDir = Path(os.path.join(outdir, "GraphsVornoi"))
+    graphsVornoiDir.mkdir(exist_ok=True)
 
     # Load archive data
     df = ArchiveDataFrame(pd.read_csv(archivedir / "archive.csv"))
@@ -295,29 +350,36 @@ def analyze_archive(
 
     # Analyze each solution
     for idx in tqdm.trange(0, len(solutions)):
+        skip = False
         sol = solutions[idx]
         experiment_name = str(int(iterations[idx])) + "_" + str(int(individual_numbers[idx]))
         if representation == constants.SMT_NAME:
-            phenotype_file = open(os.path.join(exportDir, 'phenotype_' + experiment_name + '.pkl'), 'rb')
-            phenotype = pickle.load(phenotype_file)
-            phenotype_file.close()
+            try:
+                phenotype_file = open(os.path.join(exportDir, 'phenotype_' + experiment_name + '.pkl'), 'rb')
+                phenotype = pickle.load(phenotype_file)
+                phenotype_file.close()
+            except:
+                skip = True
         else:
             phenotype = get_phenotype_from_solution(sol, representation)
-        sol_map_matrix = read_map(
-            str(int(iterations[idx])) + "_" + str(int(individual_numbers[idx])), folder_name)
-        map_scale = get_map_scale(representation)
 
-        save_image_map(mapsDir, experiment_name, sol_map_matrix,
-                       indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
-        if representation == constants.SMT_NAME:
-            genotype = SMTGenome.array_as_genome(list(map(int, sol.tolist())))
-            save_image_map_lines(mapsDir, experiment_name, phenotype, genotype.lines,
-                                 indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
-        save_bot_positions_heatmap(exportDir, positionDir, experiment_name, sol_map_matrix,
-                                   indexes[idx], obj[idx], meas_0[idx], meas_1[idx], map_scale)
-        save_deaths_and_kills_map(exportDir, deathsDir, experiment_name, sol_map_matrix,
-                                    indexes[idx], obj[idx], meas_0[idx], meas_1[idx], map_scale)
-        save_graphs(graphsDir, experiment_name, phenotype, indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
+        if not skip:
+            sol_map_matrix = read_map(
+                str(int(iterations[idx])) + "_" + str(int(individual_numbers[idx])), folder_name)
+            map_scale = get_map_scale(representation)
+            
+            save_image_map(mapsDir, experiment_name, sol_map_matrix,
+                           indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
+            if representation == constants.SMT_NAME:
+                genotype = SMTGenome.array_as_genome(list(map(int, sol.tolist())))
+                save_image_map_lines(mapsDir, experiment_name, phenotype, genotype.lines,
+                                     indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
+            save_bot_positions_heatmap(exportDir, positionDir, experiment_name, sol_map_matrix,
+                                       indexes[idx], obj[idx], meas_0[idx], meas_1[idx], map_scale)
+            save_deaths_and_kills_map(exportDir, deathsDir, experiment_name, sol_map_matrix,
+                                        indexes[idx], obj[idx], meas_0[idx], meas_1[idx], map_scale)
+            save_graphs(graphsDir, experiment_name, phenotype, indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
+            save_graphs_vornoi(graphsVornoiDir, experiment_name, phenotype, indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
     return
 
 

@@ -3,6 +3,8 @@ from internals.graph_genome.gg_genome import GraphGenome
 import matplotlib.pyplot as plt
 import numpy as np
 import igraph as ig
+import pyvoronoi
+from matplotlib import collections  as mc
 
 if __name__ == "__main__":
     # Create random ABGenome
@@ -19,10 +21,10 @@ if __name__ == "__main__":
     ax.set_xlim(0, phenotype.mapWidth)
     ax.set_ylim(0, phenotype.mapHeight)
 
-    graph, layout = phenotype.to_graph()
+    graph, layout = phenotype.to_graph_naive()
     graph.vs['label'] = [str(i) for i in range(len(graph.vs))]
 
-    rooms = graph.vs.select(isCorridor_eq=False)
+    #rooms = graph.vs.select(isCorridor_eq=False)
     
     #print(graph.distances(source=rooms, target=rooms, weights=graph.es['weight'])) 
         
@@ -36,10 +38,10 @@ if __name__ == "__main__":
     #print(betweenness)
     #graph.vs['label'] = betweenness
 
-    closeness = graph.closeness(vertices=rooms, weights=graph.es['weight'])
-    closeness = [np.round(closeness[i], 3) if np.isfinite(closeness[i]) else 0 for i in range(len(closeness))]
-    print(closeness)
-    graph.vs['label'] = closeness    
+    #closeness = graph.closeness(vertices=rooms, weights=graph.es['weight'])
+    #closeness = [np.round(closeness[i], 3) if np.isfinite(closeness[i]) else 0 for i in range(len(closeness))]
+    #print(closeness)
+    #graph.vs['label'] = closeness    
 
     #mincut = [len(graph.mincut(source=i, target=j, capacity=None).cut) for i in range(len(rooms)) for j in range(i+1, len(rooms))]
     #print(mincut)
@@ -66,4 +68,6 @@ if __name__ == "__main__":
     layout = ig.Layout(coords=graph.vs['coords'], dim=2)
     fig, ax = plt.subplots()
     ig.plot(graph, vertex_size=45, layout=layout, vertex_label_color="white", edge_label=[str(i) for i in range(len(graph.es))],  target=ax)
+
+
     plt.show()
