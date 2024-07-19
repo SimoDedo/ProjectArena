@@ -306,11 +306,12 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
                 f"  - Archive Size: {metrics['Archive Size']['y'][-1]}\n"
                 f"  - QD Score: {metrics['QD Score']['y'][-1]}\n"
                 f"  - Failed: {metrics['Failed']['y'][-1]}")
-            #scheduler.archive.data(return_type="pandas").to_csv(outdir / "archive.csv")
-            #save_ccdf(scheduler.archive, str(outdir / "archive_ccdf.png"))
-            #save_heatmap(scheduler.archive, str(outdir / "heatmap.png"))
-            #save_metrics(outdir, metrics)
-            #plt.close('all')
+            if conf.SAVE_INTERMEDIATE_RESULTS:
+                scheduler.archive.data(return_type="pandas").to_csv(outdir / "archive.csv")
+                save_ccdf(scheduler.archive, str(outdir / "archive_ccdf.png"))
+                save_heatmap(scheduler.archive, str(outdir / "heatmap.png"))
+                save_metrics(outdir, metrics)
+                plt.close('all')
 
     return metrics
 
