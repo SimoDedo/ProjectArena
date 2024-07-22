@@ -21,9 +21,9 @@ BOT2_SKILL = "0.85"
 # Archive type used in the experiment. See constants.py for possible values
 ARCHIVE_TYPE = constants.SLIDING_BOUNDARIES_ARCHIVE_NAME
 # Map representation used in the experiment. See constants.py for possible values
-REPRESENTATION_NAME = constants.ALL_BLACK_NAME
+REPRESENTATION_NAME = constants.GRID_GRAPH_NAME
 # Emitter type used in the experiment. See constants.py for possible values
-EMITTER_TYPE_NAME = constants.ALL_BLACK_EMITTER_NAME
+EMITTER_TYPE_NAME = constants.GRID_GRAPH_EMITTER_NAME
 
 ITERATIONS = 750
 BATCH_SIZE = 1

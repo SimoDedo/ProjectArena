@@ -7,7 +7,7 @@ RADIUS_REGION_THRESHOLD = 4.0
 RADIUS_DEAD_END_THRESHOLD = 3.0
 SMALLER_REGION_MERGE_COEFFICIENT = 0.9
 LARGER_REGION_MERGE_COEFFICIENT = 0.85
-REGION_TWO_CHOKEPOINTS_MERGE_COEFFICIENT = 0.8
+REGION_TWO_CHOKEPOINTS_MERGE_COEFFICIENT = 0.7
 
 
 
@@ -320,12 +320,11 @@ def create_2d_segment_vornoi_diagram(outer_shell, obstacles, map_matrix):
     pv.Construct()
     return pv
 
-def create_graph_from_voronoi_diagram(pv, outer_shell, obstacles):
+def filter_vornoi_edges(pv, outer_shell, obstacles):
     edges = pv.GetEdges()
     vertices = pv.GetVertices()
 
     # Filter out edges that are not primary, or that are not inside the outer wall, or that are inside an obstacle (within a small epsilon of it)
-    edges_lines = []
     actual_edges = []
     epsilon = 1e-15
     for edge in edges:
@@ -336,7 +335,6 @@ def create_graph_from_voronoi_diagram(pv, outer_shell, obstacles):
             outer_shell.contains(Point(vertices[edge.end].X, vertices[edge.end].Y)) and\
             not any(Point(vertices[edge.start].X, vertices[edge.start].Y).distance(obstacle) < epsilon or Point(vertices[edge.end].X, vertices[edge.end].Y).distance(obstacle) < epsilon for obstacle in obstacles):
                 actual_edges.append(edge)
-                edges_lines.append([(vertices[edge.start].X, vertices[edge.start].Y), (vertices[edge.end].X, vertices[edge.end].Y)])
 
     
     # Create the graph from the edges
@@ -346,6 +344,10 @@ def create_graph_from_voronoi_diagram(pv, outer_shell, obstacles):
 
     # Create edges that use the vertices position in the actual vertices, instead of their index
     actual_edges = [(actual_vertices_idxs.index(edge.start), actual_vertices_idxs.index(edge.end)) for edge in actual_edges]
+
+    return actual_vertices_idxs, actual_edges
+
+def create_graph_from_voronoi_diagram(vertices, actual_vertices_idxs, actual_edges):
 
     # Create the graph
     graph = ig.Graph(n=len(actual_vertices_idxs), edges=actual_edges, directed=False)
@@ -620,7 +622,8 @@ def to_graph_vornoi(phenotype):
     pv = create_2d_segment_vornoi_diagram(outer_shell, obstacles, map_matrix_upscaled)
 
     # Create the graph from the voronoi diagram
-    graph = create_graph_from_voronoi_diagram(pv, outer_shell, obstacles)
+    actual_vertices_idxs, actual_edges = filter_vornoi_edges(pv, outer_shell, obstacles)
+    graph = create_graph_from_voronoi_diagram(pv.GetVertices(), actual_vertices_idxs, actual_edges)
 
     # Calculate the radius of each vertex
     graph.vs['radius'] = [min([distance(Point(v['coords'][0], v['coords'][1]), p) for p in all_polygons]) for v in graph.vs]

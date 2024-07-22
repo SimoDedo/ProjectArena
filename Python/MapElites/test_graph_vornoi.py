@@ -196,12 +196,11 @@ def create_2d_segment_vornoi_diagram(outer_shell, obstacles, map_matrix):
     pv.Construct()
     return pv
 
-def create_graph_from_voronoi_diagram(pv, outer_shell, obstacles):
+def filter_vornoi_edges(pv, outer_shell, obstacles):
     edges = pv.GetEdges()
     vertices = pv.GetVertices()
 
     # Filter out edges that are not primary, or that are not inside the outer wall, or that are inside an obstacle (within a small epsilon of it)
-    edges_lines = []
     actual_edges = []
     epsilon = 1e-15
     for edge in edges:
@@ -212,7 +211,6 @@ def create_graph_from_voronoi_diagram(pv, outer_shell, obstacles):
             outer_shell.contains(Point(vertices[edge.end].X, vertices[edge.end].Y)) and\
             not any(Point(vertices[edge.start].X, vertices[edge.start].Y).distance(obstacle) < epsilon or Point(vertices[edge.end].X, vertices[edge.end].Y).distance(obstacle) < epsilon for obstacle in obstacles):
                 actual_edges.append(edge)
-                edges_lines.append([(vertices[edge.start].X, vertices[edge.start].Y), (vertices[edge.end].X, vertices[edge.end].Y)])
 
     
     # Create the graph from the edges
@@ -222,6 +220,10 @@ def create_graph_from_voronoi_diagram(pv, outer_shell, obstacles):
 
     # Create edges that use the vertices position in the actual vertices, instead of their index
     actual_edges = [(actual_vertices_idxs.index(edge.start), actual_vertices_idxs.index(edge.end)) for edge in actual_edges]
+
+    return actual_vertices_idxs, actual_edges
+
+def create_graph_from_voronoi_diagram(vertices, actual_vertices_idxs, actual_edges):
 
     # Create the graph
     graph = ig.Graph(n=len(actual_vertices_idxs), edges=actual_edges, directed=False)
@@ -455,6 +457,25 @@ def plot_map(map_matrix):
     plt.imshow(map_matrix, cmap=cm.Greys, alpha=1.0)
     #plt.axis('off')
 
+def plot_vornoi_diagram(outer_shell, obstacles, pv, actual_vertices_idx, actual_edges):
+    fig, ax = plt.subplots()
+
+    # Plot the outer wall
+    x,y = outer_shell.exterior.xy
+    plt.plot(x,y)
+
+    # Plot the obstacles
+    for obstacle in obstacles:
+        x,y = obstacle.exterior.xy
+        plt.plot(x,y, color='darkred')
+
+    # Plot the voronoi diagram
+    lines = [[(pv.GetVertices()[actual_vertices_idx[edge[0]]].X, pv.GetVertices()[actual_vertices_idx[edge[0]]].Y), (pv.GetVertices()[actual_vertices_idx[edge[1]]].X, pv.GetVertices()[actual_vertices_idx[edge[1]]].Y)] for edge in actual_edges]
+    lc = mc.LineCollection(lines, colors='blue', linewidths=1)
+    ax.add_collection(lc)
+
+    plt.gca().invert_yaxis()
+
 def plot_vornoi_graph(outer_shell, obstacles, graph, x_limit, y_limit):
     fig, ax = plt.subplots()
 
@@ -476,7 +497,7 @@ def plot_vornoi_graph(outer_shell, obstacles, graph, x_limit, y_limit):
         if 'chokepoint' in vertex_attr_names and graph.vs[i]['chokepoint']:
             color.append('yellow')
         elif 'dead_end' in vertex_attr_names and graph.vs[i]['dead_end']:
-            color.append('red')
+            color.append('green')
         elif graph.vs[i]['region']:
             color.append('red')
         else:
@@ -485,8 +506,6 @@ def plot_vornoi_graph(outer_shell, obstacles, graph, x_limit, y_limit):
 
     layout = ig.Layout(coords=graph.vs['coords'], dim=2)
     ig.plot(graph, vertex_size=5, layout=layout, vertex_label_color="black",  target=ax)
-    plt.gca().invert_yaxis()
-
     ax.set_xlim(0, x_limit)
     ax.set_ylim(0, y_limit)
     plt.gca().invert_yaxis()
@@ -535,7 +554,10 @@ if __name__ == "__main__":
     pv = create_2d_segment_vornoi_diagram(outer_shell, obstacles, map_matrix_upscaled)
 
     # Create the graph from the voronoi diagram
-    graph = create_graph_from_voronoi_diagram(pv, outer_shell, obstacles)
+    actual_vertices_idxs, actual_edges = filter_vornoi_edges(pv, outer_shell, obstacles)
+    graph = create_graph_from_voronoi_diagram(pv.GetVertices(), actual_vertices_idxs, actual_edges)
+
+    #plot_vornoi_diagram(outer_shell, obstacles, pv, actual_vertices_idxs, actual_edges)
 
     # Calculate the radius of each vertex
     graph.vs['radius'] = [min([distance(Point(v['coords'][0], v['coords'][1]), p) for p in all_polygons]) for v in graph.vs]
@@ -547,7 +569,7 @@ if __name__ == "__main__":
     RADIUS_REGION_THRESHOLD = 4.0
     identify_regions(graph, RADIUS_REGION_THRESHOLD)
     
-    plot_vornoi_graph(outer_shell, obstacles, graph, len(map_matrix_upscaled[0]), len(map_matrix_upscaled))
+    #plot_vornoi_graph(outer_shell, obstacles, graph, len(map_matrix_upscaled[0]), len(map_matrix_upscaled))
 
     # Identify chokepoints nodes (and optionally simplify the graph)
     identify_chokepoints(graph)
@@ -555,15 +577,14 @@ if __name__ == "__main__":
     # Merge adjacent regions
     merge_adjacent_regions_no_chokepoint(graph)
     merge_adjacent_regions_first_criterion(graph,0.9,0.85)
-    merge_adjacent_regions_second_criterion(graph,0.8)
+    merge_adjacent_regions_second_criterion(graph,0.7)
+
 
     # Recognize dead ends and add them to the vertices
     RADIUS_DEAD_END_THRESHOLD = 3.0
     identify_dead_ends(graph, RADIUS_DEAD_END_THRESHOLD)
 
-
     #PLOT
-    plot_vornoi_graph(outer_shell, obstacles, graph, len(map_matrix_upscaled[0]), len(map_matrix_upscaled))
 
     # Restore coordinates and radiuses to the original scale
     outer_shell, obstacles = restore_scale_polygons(outer_shell, obstacles)
