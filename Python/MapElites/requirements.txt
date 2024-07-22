@@ -11,3 +11,5 @@ tqdm==4.66.4
 distributed
 shapely
 igraph
+pyvoronoi
+z3-solver
