@@ -4,10 +4,8 @@ from internals.smt_genome.smt_genome import SMTGenome
 import matplotlib.pyplot as plt
 import numpy as np
 import igraph as ig
-import pyvoronoi
 from matplotlib import cm
 from matplotlib import collections  as mc
-from shapely import Polygon, Point, distance, transform
 from skimage import graph as skg
 from skimage import filters, color
 from skimage.io import imshow
@@ -349,23 +347,6 @@ if __name__ == "__main__":
         plt.plot(x,y, color='darkred')
     ig.plot(room_graph, vertex_size=5, layout=layout, vertex_label_color="black",  target=ax)
     plt.gca().invert_yaxis()
-    # Generate an initial image with two overlapping circles
-    #x, y = np.indices((80, 80))
-    #x1, y1, x2, y2 = 28, 28, 44, 52
-    #r1, r2 = 16, 20
-    #mask_circle1 = (x - x1) ** 2 + (y - y1) ** 2 < r1**2
-    #mask_circle2 = (x - x2) ** 2 + (y - y2) ** 2 < r2**2
-    #image = np.logical_or(mask_circle1, mask_circle2)
-    #image = map_matrix
-    # Now we want to separate the two objects in image
-    # Generate the markers as local maxima of the distance to the background
-    #distance = ndi.distance_transform_edt(image)
-    #coords = peak_local_max(distance, labels=image)
-    #mask = np.zeros(distance.shape, dtype=bool)
-    #mask[tuple(coords.T)] = True
-    #markers, _ = ndi.label(mask)
-    #labels = watershed(-distance, markers, mask=image)
-    #print(labels)
 
     image = map_matrix
     labels = roommap

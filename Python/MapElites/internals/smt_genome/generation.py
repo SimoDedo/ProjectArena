@@ -1,7 +1,8 @@
 import random
+import numpy as np
 
 from internals.smt_genome.constants import SMT_ROOMS_NUMBER, SMT_MAX_MAP_WIDTH, SMT_MAX_MAP_HEIGHT, SMT_MAX_ROOM_HEIGHT, SMT_MIN_ROOM_HEIGHT, SMT_LINES_NUMBER \
-    , SMT_MAX_ROOM_WIDTH, SMT_MIN_ROOM_WIDTH, SMT_MIN_SEPARATION, SMT_MAX_SEPARATION 
+    , SMT_MAX_ROOM_WIDTH, SMT_MIN_ROOM_WIDTH, SMT_MIN_SEPARATION, SMT_MAX_SEPARATION, SMT_MIN_LINES_LENGTH
 import internals.smt_genome.smt_genome as smt_genome
 
 NO_ROOM_PROBABILITY = 0.3
@@ -32,6 +33,9 @@ def create_line():
     if random.random() < NO_LINE_PROBABILITY:
         return None
     else:
-        start = (random.randint(0, SMT_MAX_MAP_WIDTH), random.randint(0, SMT_MAX_MAP_HEIGHT))
-        end = (random.randint(0, SMT_MAX_MAP_WIDTH), random.randint(0, SMT_MAX_MAP_HEIGHT))
-        return smt_genome.SMTLine(start=start, end=end)
+        start = np.array([0,0])
+        end = np.array([0,0])
+        while np.linalg.norm(end - start) < SMT_MIN_LINES_LENGTH:
+            start = np.array([random.randint(0, SMT_MAX_MAP_WIDTH), random.randint(0, SMT_MAX_MAP_HEIGHT)])
+            end = np.array([random.randint(0, SMT_MAX_MAP_WIDTH), random.randint(0, SMT_MAX_MAP_HEIGHT)])
+        return smt_genome.SMTLine(start=(start[0], start[1]), end=(end[0], end[1]))

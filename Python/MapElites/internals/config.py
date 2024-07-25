@@ -7,7 +7,7 @@ NUM_MATCHES_PER_SIMULATION = 1
 
 """ Experiment names """
 # This  is used as the basis of the folder name where the results of the experiment will be stored.
-EXPERIMENT_NAME = "GraphVornoi"
+EXPERIMENT_NAME = "Test_SMT_MinLine_2"
 
 """ Game variables """
 GAME_LENGTH = 600
@@ -21,9 +21,9 @@ BOT2_SKILL = "0.85"
 # Archive type used in the experiment. See constants.py for possible values
 ARCHIVE_TYPE = constants.SLIDING_BOUNDARIES_ARCHIVE_NAME
 # Map representation used in the experiment. See constants.py for possible values
-REPRESENTATION_NAME = constants.GRID_GRAPH_NAME
+REPRESENTATION_NAME = constants.SMT_NAME
 # Emitter type used in the experiment. See constants.py for possible values
-EMITTER_TYPE_NAME = constants.GRID_GRAPH_EMITTER_NAME
+EMITTER_TYPE_NAME = constants.SMT_EMITTER_NAME
 
 ITERATIONS = 750
 BATCH_SIZE = 1
