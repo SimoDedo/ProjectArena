@@ -7,7 +7,7 @@ NUM_MATCHES_PER_SIMULATION = 1
 
 """ Experiment names """
 # This  is used as the basis of the folder name where the results of the experiment will be stored.
-EXPERIMENT_NAME = "Test_SMT_MinLine_2"
+EXPERIMENT_NAME = "T"
 
 """ Game variables """
 GAME_LENGTH = 600
@@ -21,9 +21,9 @@ BOT2_SKILL = "0.85"
 # Archive type used in the experiment. See constants.py for possible values
 ARCHIVE_TYPE = constants.SLIDING_BOUNDARIES_ARCHIVE_NAME
 # Map representation used in the experiment. See constants.py for possible values
-REPRESENTATION_NAME = constants.SMT_NAME
+REPRESENTATION_NAME = constants.ALL_BLACK_NAME
 # Emitter type used in the experiment. See constants.py for possible values
-EMITTER_TYPE_NAME = constants.SMT_EMITTER_NAME
+EMITTER_TYPE_NAME = constants.ALL_BLACK_EMITTER_NAME
 
 ITERATIONS = 750
 BATCH_SIZE = 1
@@ -38,7 +38,7 @@ OBJECTIVE_RANGE = (None,None) # (None, None) if unkwnown
 
 # These names are used to generate the folder name and the image captions
 OBJECTIVE_NAME = "averageMincut"
-MEASURES_NAMES = ["averageLengthCyclesTwoRooms", "stdRoomBetweenness"]
+MEASURES_NAMES = ["periphery", "averageEccentricity"]
 # If set to False, the names above are used to get the categories from the dataset. 
 # If set to True, the user is expected to manually choose the features in map_elites.py.
 # This is useful to combine different features without saving each one. 

@@ -592,6 +592,9 @@ if __name__ == "__main__":
 
     plot_vornoi_graph(outer_shell, obstacles, graph, len(map_matrix[0]), len(map_matrix))
 
+    density = graph.density(loops=True)
+    print("Density of the graph: " + str(density))
+
     plt.show()
 
 

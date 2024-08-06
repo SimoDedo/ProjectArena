@@ -243,6 +243,25 @@ def __graph_analysis(graph, rooms, dataset):
     dataset["maxMincut"] = max(mincut) if len(mincut) > 0 else 0
     dataset["minMincut"] = min(mincut) if len(mincut) > 0 else 0
 
+    # Connectivity
+    dataset["vertexConnectivity"] = graph.vertex_connectivity()
+
+    # Ecceentricity, diameter and radius
+    eccentricities = graph.eccentricity(vertices=rooms)
+    dataset["averageEccentricity"] = np.mean(eccentricities) if len(rooms) > 0 else 0
+    dataset["stdEccentricity"] = np.std(eccentricities) if len(rooms) > 0 else 0
+    diameter =  max(eccentricities) if len(eccentricities) > 0 else 0
+    dataset["diameter"] = diameter
+    radius = min(eccentricities) if len(eccentricities) > 0 else 0
+    dataset["radius"] = radius
+    periphery = [rooms[i] for i in range(len(rooms)) if eccentricities[i] == diameter]
+    dataset["periphery"] = len(periphery)
+    center = [rooms[i] for i in range(len(rooms)) if eccentricities[i] == radius]
+    dataset["center"] = len(center)
+
+    # Density
+    dataset["density"] = graph.density(loops=True)
+
     # Fundamental cycles. We consider cycles with at least one room and at least two rooms
     cycles = graph.fundamental_cycles()
     vertices_in_cycles = []
