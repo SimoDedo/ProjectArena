@@ -20,6 +20,8 @@ from internals.ab_genome.constants import AB_NUM_CORRIDORS, AB_NUM_ROOMS
 from internals.ab_genome.ab_genome import ABGenome
 from internals.smt_genome.smt_genome import SMTGenome
 from internals.smt_genome.constants import SMT_ROOMS_NUMBER, SMT_LINES_NUMBER
+from internals.point_genome.point_genome import PointGenome
+from internals.point_genome.constants import POINT_NUM_POINT_COUPLES, POINT_NUM_ROOMS
 import internals.smt_genome.mutation as smt_mutation
 import internals.smt_genome.generation as smt_generation
 import internals.graph_genome.generation as graph_generation
@@ -51,6 +53,8 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
             solution_dim = GG_NUM_ROWS * GG_NUM_COLUMNS * 4 + (GG_NUM_ROWS - 1) * GG_NUM_COLUMNS + GG_NUM_ROWS * (GG_NUM_COLUMNS - 1)
         case constants.SMT_NAME:
             solution_dim = SMT_ROOMS_NUMBER * 2 + SMT_LINES_NUMBER * 4 + 1
+        case constants.POINT_NAME:
+            solution_dim =  POINT_NUM_POINT_COUPLES * 5 + POINT_NUM_ROOMS * 3
     archive = None
     match conf.ARCHIVE_TYPE:
         case constants.GRID_ARCHIVE_NAME:
@@ -99,6 +103,8 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
             x0, initial_solutions = initialize_solutions(GraphGenome.create_random_genome, conf.NUMBER_OF_INITAL_SOLUTIONS)
         case constants.SMT_NAME:
             x0, initial_solutions = initialize_solutions(SMTGenome.create_random_genome, conf.NUMBER_OF_INITAL_SOLUTIONS)
+        case constants.POINT_NAME:
+            x0, initial_solutions = initialize_solutions(PointGenome.create_random_genome, conf.NUMBER_OF_INITAL_SOLUTIONS)
     
     emitters = []
     match emitter_type:
@@ -137,6 +143,20 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
                     #x0=x0,
                     initial_solutions=initial_solutions,
                     crossover_probability=conf.SMT_STANDARD_CROSSOVER_CHANCE,
+                    batch_size=batch_size,
+                    seed=s,
+                    #bounds=bounds,
+                ) for s in seeds
+            ]
+
+        case constants.POINT_EMITTER_NAME:
+            emitters = [
+                GenomeEmitter(
+                    archive,
+                    genome_type=PointGenome,
+                    #x0=x0,
+                    initial_solutions=initial_solutions,
+                    crossover_probability=conf.POINT_STANDARD_CROSSOVER_CHANCE,
                     batch_size=batch_size,
                     seed=s,
                     #bounds=bounds,
@@ -223,6 +243,8 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
                         #tqdm.tqdm.write(str(e))
                         phenotypes.append(None)
                         to_skip.append(True)
+            case constants.POINT_NAME:
+                phenotypes = list(map(lambda geno: (PointGenome.array_as_genome(list(map(int, geno.tolist())))).phenotype(), genotypes_sols))
 
         #tqdm.tqdm.write("Finished creating phenotypes")
 

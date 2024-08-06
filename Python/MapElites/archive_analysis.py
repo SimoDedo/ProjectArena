@@ -16,9 +16,11 @@ import internals.config as conf
 from internals.ab_genome.constants import AB_MAP_SCALE
 from internals.graph_genome.constants import GG_MAP_SCALE
 from internals.smt_genome.constants import SMT_MAP_SCALE
+from internals.point_genome.constants import POINT_MAP_SCALE
 from internals.ab_genome.ab_genome import ABGenome
 from internals.graph_genome.gg_genome import GraphGenome
 from internals.smt_genome.smt_genome import SMTGenome
+from internals.point_genome.point_genome import PointGenome
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import pandas as pd
@@ -40,6 +42,9 @@ def get_map_scale(representation):
             return GG_MAP_SCALE
         case constants.SMT_NAME:
             return SMT_MAP_SCALE
+        case constants.POINT_NAME:
+            return POINT_MAP_SCALE
+
 
 
 def get_phenotype_from_solution(solution, representation):
@@ -50,6 +55,8 @@ def get_phenotype_from_solution(solution, representation):
             return GraphGenome.array_as_genome(list(map(int, solution.tolist()))).phenotype()
         case constants.SMT_NAME:
             return SMTGenome.array_as_genome(list(map(int, solution.tolist()))).phenotype()
+        case constants.POINT_NAME:
+            return PointGenome.array_as_genome(list(map(int, solution.tolist()))).phenotype()
 
 # --- SAVE GRAPHS/IMAGES --- #
 
