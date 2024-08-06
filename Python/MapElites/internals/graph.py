@@ -458,6 +458,7 @@ def merge_adjacent_regions_no_chokepoint(graph):
     graph.delete_vertices(nodes_to_delete)
     graph.simplify()
 
+# TODO: Unmergiable regions sometimes happpen, they actually could be merged, but require a more complex algorithm for a rare case.
 def merge_adjacent_regions_first_criterion(graph, r_smaller_coeff, r_bigger_coeff):
     #First, two regions are merged if the radius of the choke point connecting them is larger 
     # than 90% of the radius of the smaller region node, or larger than 85% of the radius of the larger region node
@@ -472,18 +473,31 @@ def merge_adjacent_regions_first_criterion(graph, r_smaller_coeff, r_bigger_coef
         chokepoint_nodes = sorted(chokepoint_nodes, key=lambda x: x['radius'], reverse=True)
         chokepoint_nodes = [v.index for v in chokepoint_nodes]
         for c in chokepoint_nodes:
+            unmergiable = False
             path = [c]
             neighbors = [v.index for v in graph.vs[c].neighbors()]
             n1 = neighbors[0]
-            while not graph.vs[n1]['region']:
+            while not graph.vs[n1]['region'] and not unmergiable:
                 path.append(n1)
-                n1 = [v.index for v in graph.vs[n1].neighbors() if v.index not in path][0]
+                n1_list = [v.index for v in graph.vs[n1].neighbors() if v.index not in path]
+                if len(n1_list) == 0:
+                    unmergiable = True
+                else:
+                    n1 = n1_list[0]
             r1 = n1
+
             n2 = neighbors[1]
-            while not graph.vs[n2]['region']:
+            while not graph.vs[n2]['region'] and not unmergiable:
                 path.append(n2)
-                n2 = [v.index for v in graph.vs[n2].neighbors() if v.index not in path][0]
+                n2_list = [v.index for v in graph.vs[n2].neighbors() if v.index not in path]
+                if len(n2_list) == 0:
+                    unmergiable = True
+                else:
+                    n2 = n2_list[0]
             r2 = n2
+
+            if unmergiable:
+                continue
 
             r_greater = r1 if graph.vs[r1]['radius'] > graph.vs[r2]['radius'] else r2
             r_smaller = r1 if graph.vs[r1]['radius'] <= graph.vs[r2]['radius'] else r2
@@ -523,7 +537,7 @@ def merge_adjacent_regions_second_criterion(graph, coeff):
             
             n1 = neighbors[0]
             path1 = []
-            while not graph.vs[n1]['region']:
+            while not graph.vs[n1]['region'] and not unmergiable:
                 path1.append(n1)
                 if graph.vs[n1]['chokepoint']:
                     c1 = n1
@@ -537,7 +551,7 @@ def merge_adjacent_regions_second_criterion(graph, coeff):
 
             n2 = neighbors[1]
             path2 = []
-            while not graph.vs[n2]['region']:
+            while not graph.vs[n2]['region'] and not unmergiable:
                 path2.append(n2)
                 if graph.vs[n2]['chokepoint']:
                     c2 = n2
