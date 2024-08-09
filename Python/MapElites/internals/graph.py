@@ -22,7 +22,7 @@ class EdgeType(Enum):
     CORRIDOR_TO_CORRIDOR = 'blue'
     ROOM_TO_CORRIDOR = 'purple'
 
-def to_graph_naive(phenotype):
+def to_topology_graph_naive(phenotype):
     vertices = []
     isCorridor = []
     v_color = []
@@ -606,7 +606,7 @@ def restore_scale_graph(graph):
 
 
 
-def to_graph_vornoi(phenotype):
+def to_topology_graph_vornoi(phenotype):
     map_matrix = phenotype.map_matrix()
     map_matrix = np.array(map_matrix)
 

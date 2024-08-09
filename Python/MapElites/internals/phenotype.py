@@ -3,7 +3,8 @@ import numpy
 from internals import area
 from internals.area import contains_area
 import matplotlib.pyplot as plt
-from internals.graph import to_graph_naive, to_graph_vornoi
+from internals.graph import to_topology_graph_naive, to_topology_graph_vornoi
+from internals.visibility import create_visibility_graph, create_visibility_matrix
 
 
 class Phenotype:
@@ -50,11 +51,18 @@ class Phenotype:
         # Remove the areas that are contained in another area
         self.areas = tuple([self.areas[i] for i in range(len(self.areas)) if not i in to_be_removed])
 
-    def to_graph_naive(self):
-        return to_graph_naive(self)
+    def to_topology_graph_naive(self):
+        return to_topology_graph_naive(self)
     
-    def to_graph_vornoi(self):
-        return to_graph_vornoi(self)
+    def to_topology_graph_vornoi(self):
+        return to_topology_graph_vornoi(self)
+    
+    # Returns both a graph and a convenient matrix form
+    def to_visibility_graph(self):
+        map_matrix = self.map_matrix()
+        graph = create_visibility_graph(map_matrix)
+        matrix = create_visibility_matrix(graph, map_matrix)
+        return graph, matrix
             
 
 

@@ -22,7 +22,7 @@ import numpy as np
 from scipy.stats import entropy, describe
 from skimage.feature import corner_harris, corner_peaks
 import warnings
-from internals.graph import to_graph_vornoi
+from internals.graph import to_topology_graph_vornoi
 
 def _plot_room(rooms, node):
     from skimage.draw import line
@@ -313,7 +313,7 @@ if __name__ == "__main__":
 
 
     fig, ax = plt.subplots()
-    graph, outer_shell, obstacles = to_graph_vornoi(phenotype)
+    graph, outer_shell, obstacles = to_topology_graph_vornoi(phenotype)
     vertex_attr_names = graph.vertex_attributes()
     color = []
     for i in range(len(graph.vs)):

@@ -73,6 +73,10 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
     rooms = [v for v in graph.vs if v['region']]
     __graph_analysis(graph, rooms, dataset)
 
+    # VISIBILITY GRAPH
+    visibility_graph, visibility_matrix = phenotype.to_visibility_graph()
+
+    __analyze_visibility(visibility_graph, visibility_matrix, map_matrix, dataset)
 
     # TODO: Add graph analysis based on match data?
 
@@ -107,6 +111,7 @@ def __analyze_heatmap(dataset, p_x, p_y, feature_name, bot_num, map_matrix):
 
         max_value = np.max(masked_heatmap.compressed())
         local_maxima = __get_heatmap_local_maxima(masked_heatmap)
+        local_maxima_values = [masked_heatmap[local_max[0], local_max[1]] for local_max in local_maxima]
         distances = __get_local_maxima_distances(masked_heatmap, local_maxima)
         q25, q50, q75 = __get_heatmap_quantiles(masked_heatmap)
         coverage = __get_heatmap_coverage(masked_heatmap, map_matrix, 0.1)
@@ -115,6 +120,8 @@ def __analyze_heatmap(dataset, p_x, p_y, feature_name, bot_num, map_matrix):
         dataset["localMaximaNumber" + feature_name + "Bot" + str(bot_n)] = len(local_maxima)
         dataset["localMaximaTopDistance" + feature_name + "Bot" + str(bot_n)] = distances[0]
         dataset["localMaximaAverageDistance" + feature_name + "Bot" + str(bot_n)] = np.mean(distances)
+        dataset["averageLocalMaximaValue" + feature_name + "Bot" + str(bot_n)] = np.mean(local_maxima_values) if len(local_maxima) > 0 else 0
+        dataset["stdLocalMaximaValue" + feature_name + "Bot" + str(bot_n)] = np.std(local_maxima_values) if len(local_maxima) > 0 else 0
         dataset["quantile25" + feature_name + "Bot" + str(bot_n)] = q25 / max_value
         dataset["quantile50" + feature_name + "Bot" + str(bot_n)] = q50 / max_value
         dataset["quantile75" + feature_name + "Bot" + str(bot_n)] = q75 / max_value
@@ -125,6 +132,8 @@ def __analyze_heatmap(dataset, p_x, p_y, feature_name, bot_num, map_matrix):
     dataset["localMaximaNumber" + feature_name] = sum([dataset["localMaximaNumber" + feature_name + "Bot" + str(i)] for i in range(bot_num)]) / bot_num
     dataset["localMaximaTopDistance" + feature_name] = sum([dataset["localMaximaTopDistance" + feature_name + "Bot" + str(i)] for i in range(bot_num)]) / bot_num
     dataset["localMaximaAverageDistance" + feature_name] = sum([dataset["localMaximaAverageDistance" + feature_name + "Bot" + str(i)] for i in range(bot_num)]) / bot_num
+    dataset["averageLocalMaximaValue" + feature_name] = sum([dataset["averageLocalMaximaValue" + feature_name + "Bot" + str(i)] for i in range(bot_num)]) / bot_num
+    dataset["stdLocalMaximaValue" + feature_name] = sum([dataset["stdLocalMaximaValue" + feature_name + "Bot" + str(i)] for i in range(bot_num)]) / bot_num
     dataset["quantile25" + feature_name] = sum([dataset["quantile25" + feature_name + "Bot" + str(i)] for i in range(bot_num)]) / bot_num
     dataset["quantile50" + feature_name] = sum([dataset["quantile50" + feature_name + "Bot" + str(i)] for i in range(bot_num)]) / bot_num
     dataset["quantile75" + feature_name] = sum([dataset["quantile75" + feature_name + "Bot" + str(i)] for i in range(bot_num)]) / bot_num
@@ -175,18 +184,21 @@ def __get_heatmap(x, y, map_matrix):
     )
     return heatmap.T # Transpose to match map_matrix shape
 
-def __mask_heatmap(heatmap, map_matrix):
+def __mask_heatmap(heatmap, map_matrix, invert=True):
     # Multiply the heatmap by the inverted map_matrix to mask the walls
     mask = np.matrix(map_matrix)
-    inverted_mask = np.where(mask == 0, 1, 0)
-    heatmap_zeroed_walls = np.multiply(heatmap, inverted_mask)
-    return np.ma.masked_where(inverted_mask == 0, heatmap_zeroed_walls)
+    if invert:
+        mask = np.where(mask == 0, 1, 0)
+    else:
+        mask = np.where(mask == 0, 0, 1)
+    heatmap_zeroed_walls = np.multiply(heatmap, mask)
+    return np.ma.masked_where(mask == 0, heatmap_zeroed_walls)
 
 def __get_heatmap_max_index(heatmap):
     return np.unravel_index(np.argmax(heatmap), heatmap.shape)
 
 def __get_heatmap_local_maxima(heatmap):
-    return peak_local_max(heatmap, min_distance=1)
+    return peak_local_max(heatmap, min_distance=5)
 
 def __get_local_maxima_distances(heatmap, local_maxima):
     if(len(local_maxima) < 2):
@@ -283,6 +295,29 @@ def __graph_analysis(graph, rooms, dataset):
     dataset["numberCyclesTwoRooms"] = len(cycles_two_rooms)
     dataset["averageLengthCyclesTwoRooms"] = np.mean(ctr_length) if len(ctr_length) > 0 else 0
     dataset["stdLengthCyclesTwoRooms"] = np.std(ctr_length) if len(ctr_length) > 0 else 0
+
+def __analyze_visibility(visibility_graph, visibility_matrix, map_matrix, dataset):
+    num_tiles = len(visibility_matrix.vs)
+
+    masked_heatmap = __mask_heatmap(visibility_graph, map_matrix)
+
+    max_value = np.max(masked_heatmap.compressed())
+    local_maxima = __get_heatmap_local_maxima(masked_heatmap)
+    distances = __get_local_maxima_distances(masked_heatmap, local_maxima)
+    q25, q50, q75 = __get_heatmap_quantiles(masked_heatmap)
+    #coverage = __get_heatmap_coverage(masked_heatmap, map_matrix, 0.1) always 1, useless
+
+    dataset["maxValueVisibility"] = max_value
+    dataset["maxValuePercentVisibility"] = max_value / num_tiles
+    dataset["localMaximaNumberVisibility"] = len(local_maxima)
+    dataset["localMaximaTopDistanceVisibility"] = distances[0]
+    dataset["localMaximaAverageDistanceVisibility"] = np.mean(distances)
+    averageLocalMaximaValue = [masked_heatmap[local_max[0], local_max[1]] for local_max in local_maxima]
+    dataset["averageLocalMaximaValueVisibility"] = np.mean(averageLocalMaximaValue) if len(local_maxima) > 0 else 0
+    dataset["stdLocalMaximaValueVisibility"] = np.std(averageLocalMaximaValue) if len(local_maxima) > 0 else 0
+    dataset["quantile25Visibility"] = q25 / max_value
+    dataset["quantile50Visibility"] = q50 / max_value
+    dataset["quantile75Visibility"] = q75 / max_value
 
 # --- Extracting data from files ---
 

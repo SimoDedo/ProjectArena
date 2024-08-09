@@ -21,7 +21,7 @@ if __name__ == "__main__":
     ax.set_xlim(0, phenotype.mapWidth)
     ax.set_ylim(0, phenotype.mapHeight)
 
-    graph, layout = phenotype.to_graph_naive()
+    graph, layout = phenotype.to_topology_graph_naive()
     graph.vs['label'] = [str(i) for i in range(len(graph.vs))]
 
     #rooms = graph.vs.select(isCorridor_eq=False)
