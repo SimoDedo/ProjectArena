@@ -29,6 +29,7 @@ from scipy.ndimage import gaussian_filter
 import tqdm
 import igraph as ig
 import pickle
+from internals.visibility import WALL_TILE, SPACE_TILE
 
 from ribs.archives import ArchiveDataFrame
 
@@ -203,6 +204,13 @@ def __save_graph_vornoi(outer_shell, obstacles, graph, x_limit, y_limit, path, n
     plt.savefig(path, bbox_inches='tight')
     plt.close()
 
+def __save_visibility_map(visibility_matrix, map_matrix, path, note=None):
+    plt.imshow(visibility_matrix, cmap='inferno', interpolation='nearest', zorder=0)
+    mask = np.matrix(map_matrix)
+    mask = np.ma.masked_where(mask == SPACE_TILE, mask)
+    plt.imshow(mask, cmap='binary', zorder=1)
+    plt.gca().invert_yaxis()
+
 # --- ANALYSIS --- #
 
 
@@ -314,6 +322,16 @@ def save_graphs_vornoi(graphdir, experiment_name, phenotype, index, obj, meas_0,
         note=f"Name: {experiment_name}\n {conf.OBJECTIVE_NAME}: {obj:.4f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.4f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.4f}"
     )
 
+def save_visibility_maps(visibilitydir, experiment_name, phenotype, index, obj, meas_0, meas_1):
+    graph, matrix = phenotype.to_visibility_graph()
+
+    __save_visibility_map(
+        matrix,
+        phenotype.map_matrix(),
+        visibilitydir / f"visibility_map_{int(index/conf.MEASURES_BINS_NUMBER[0])}_{int(index%conf.MEASURES_BINS_NUMBER[1])}.png",
+        note=f"Name: {experiment_name}\n {conf.OBJECTIVE_NAME}: {obj:.4f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.4f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.4f}"
+    )
+
 # --- MAIN --- #
 
 
@@ -340,6 +358,8 @@ def analyze_archive(
     graphsDir.mkdir(exist_ok=True)
     graphsVornoiDir = Path(os.path.join(outdir, "GraphsVornoi"))
     graphsVornoiDir.mkdir(exist_ok=True)
+    visibilityDir = Path(os.path.join(outdir, "Visibility"))
+    visibilityDir.mkdir(exist_ok=True)
 
     # Load archive data
     df = ArchiveDataFrame(pd.read_csv(archivedir / "archive.csv"))
@@ -387,6 +407,7 @@ def analyze_archive(
                                         indexes[idx], obj[idx], meas_0[idx], meas_1[idx], map_scale)
             save_graphs(graphsDir, experiment_name, phenotype, indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
             save_graphs_vornoi(graphsVornoiDir, experiment_name, phenotype, indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
+            save_visibility_maps(visibilityDir, experiment_name, phenotype, indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
     return
 
 
