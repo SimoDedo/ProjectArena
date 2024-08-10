@@ -34,12 +34,13 @@ class Phenotype:
             genome_json = jsonpickle.encode(cp, unpicklable=False)
             f.write(genome_json)
 
-    def map_matrix(self):
+    def map_matrix(self, inverted=False):
+        value = 0 if inverted else 1
         map_matrix = numpy.zeros([self.mapHeight, self.mapWidth], dtype=numpy.int8)
         for area in self.areas:
             for row in range(area.bottomRow, area.topRow):
                 for col in range(area.leftColumn, area.rightColumn):
-                    map_matrix[row][col] = 1
+                    map_matrix[row][col] = value
         return map_matrix
 
     def simplify(self):

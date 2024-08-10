@@ -40,8 +40,8 @@ POINT_STANDARD_CROSSOVER_CHANCE = 0.3
 CMA_ME_SIGMA0 = 0.01
 
 # These names are used to generate the folder name and the image captions
-OBJECTIVE_NAME = "averageMincut"
-MEASURES_NAMES = ["averageLengthCyclesTwoRooms", "stdRoomBetweenness"]
+OBJECTIVE_NAME = "averageLocalMaximaValuePercentVisibility"
+MEASURES_NAMES = ["localMaximaAverageDistanceVisibility", "localMaximaNumberKill"]
 # If set to False, the names above are used to get the categories from the dataset. 
 # If set to True, the user is expected to manually choose the features in map_elites.py.
 # This is useful to combine different features without saving each one. 
@@ -49,7 +49,7 @@ MANUALLY_CHOOSE_FEATURES = False
 
 """ Experiment names """
 # This  is used as the basis of the folder name where the results of the experiment will be stored.
-EXPERIMENT_NAME = "GraphVornoi"
+EXPERIMENT_NAME = "TestVisibility"
 
 """ Miscellaneous variables """
 SAVE_INTERMEDIATE_RESULTS = True
