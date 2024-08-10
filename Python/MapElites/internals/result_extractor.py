@@ -69,14 +69,14 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
 
     #graph, _ = phenotype.to_graph_naive()
     #rooms = [v for v in graph.vs if not v['isCorridor']]
-    graph, _, _ = phenotype.to_graph_vornoi()
+    graph, _, _ = phenotype.to_topology_graph_vornoi()
     rooms = [v for v in graph.vs if v['region']]
     __graph_analysis(graph, rooms, dataset)
 
     # VISIBILITY GRAPH
     visibility_graph, visibility_matrix = phenotype.to_visibility_graph()
-
-    __analyze_visibility(visibility_graph, visibility_matrix, map_matrix, dataset)
+    # To avoid different sizes from the map read, we use the map matrix from the phenotype
+    __analyze_visibility(visibility_graph, visibility_matrix, phenotype.map_matrix(inverted=True), dataset)
 
     # TODO: Add graph analysis based on match data?
 
@@ -297,9 +297,9 @@ def __graph_analysis(graph, rooms, dataset):
     dataset["stdLengthCyclesTwoRooms"] = np.std(ctr_length) if len(ctr_length) > 0 else 0
 
 def __analyze_visibility(visibility_graph, visibility_matrix, map_matrix, dataset):
-    num_tiles = len(visibility_matrix.vs)
+    num_tiles = len(visibility_graph.vs)
 
-    masked_heatmap = __mask_heatmap(visibility_graph, map_matrix)
+    masked_heatmap = __mask_heatmap(visibility_matrix, map_matrix)
 
     max_value = np.max(masked_heatmap.compressed())
     local_maxima = __get_heatmap_local_maxima(masked_heatmap)
@@ -313,8 +313,9 @@ def __analyze_visibility(visibility_graph, visibility_matrix, map_matrix, datase
     dataset["localMaximaTopDistanceVisibility"] = distances[0]
     dataset["localMaximaAverageDistanceVisibility"] = np.mean(distances)
     averageLocalMaximaValue = [masked_heatmap[local_max[0], local_max[1]] for local_max in local_maxima]
-    dataset["averageLocalMaximaValueVisibility"] = np.mean(averageLocalMaximaValue) if len(local_maxima) > 0 else 0
-    dataset["stdLocalMaximaValueVisibility"] = np.std(averageLocalMaximaValue) if len(local_maxima) > 0 else 0
+    averageLocalMaximaValuePercent = [v/num_tiles for v in averageLocalMaximaValue]
+    dataset["averageLocalMaximaValuePercentVisibility"] = np.mean(averageLocalMaximaValuePercent) if len(local_maxima) > 0 else 0
+    dataset["stdLocalMaximaValuePercentVisibility"] = np.std(averageLocalMaximaValuePercent) if len(local_maxima) > 0 else 0
     dataset["quantile25Visibility"] = q25 / max_value
     dataset["quantile50Visibility"] = q50 / max_value
     dataset["quantile75Visibility"] = q75 / max_value
