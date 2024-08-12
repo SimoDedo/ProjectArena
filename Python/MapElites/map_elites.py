@@ -276,29 +276,27 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
         # Process the results.
         for idx, (dataset, failed) in enumerate(results):
             if not failed:
-                pace = round(np.mean(dataset["pace"]), 2)
-                entropy = round(np.mean(dataset["entropy"]), 2)
-                target_loss = round(np.mean(dataset["targetLossRate"]), 2)
-                pursue_time = round(np.mean(dataset["pursueTime"]), 2)
-                sight_loss_rate = round(np.mean(dataset["sightLossRate"]), 2)
-                quantile25 = round(np.mean(dataset["quantile25Position"]), 2)
-                coverageAdj = round(np.mean(dataset["coveragePosition"])  * np.ceil(np.mean(dataset["area"]) - 0.03), 2)
-                coverageAllAdj = round(((np.mean(dataset["coveragePosition"]) + np.mean(dataset["coverageKill"]) + np.mean(dataset["coverageDeath"]))/3) * np.ceil(np.mean(dataset["area"]) - 0.03), 2)
-                # Discard maps smaller than 3% of area.
-                localMaxKills = round(np.mean(dataset["localMaximaNumberKill"]), 2)
-                localMaxKillsAvgDist = round(np.mean(dataset["localMaximaAverageDistanceKill"]), 2)
-                localMaxKillsTopDist = round(np.mean(dataset["localMaximaTopDistanceKill"]), 2)
-                quantile75Kills = round(np.mean(dataset["quantile75Kill"]), 2)
-                coverageKill = round(np.mean(dataset["coverageKill"]), 2)
-                averageTraces = round(np.mean(dataset["averageTraces"]), 2)
-                
+
                 if conf.MANUALLY_CHOOSE_FEATURES:
                     # Modify here to use a different/combination of features.
-                    objs.append(coverageAdj)
-                    meas.append([localMaxKillsAvgDist, averageTraces])
+                    aLMVPVisibility = round(np.mean(dataset["averageLocalMaximaValuePercentVisibility"]), 5)
+                    localMaximaNumberVisibility = round(np.mean(dataset["localMaximaNumberVisibility"]), 5)
+                    averageMincut = round(np.mean(dataset["averageMincut"]), 5)
+                    entropy = round(np.mean(dataset["entropy"]), 5)
+                    pace = round(np.mean(dataset["pace"]), 5)
+                    averageTraces = round(np.mean(dataset["averageTraces"]), 5)
+                    numberCyclesOneRoom = round(np.mean(dataset["numberCyclesOneRoom"]), 5)
+
+                    visibilityFactor = np.clip(localMaximaNumberVisibility / 5, 0, 1)
+                    explorationFactor = np.clip(averageMincut / 1.7, 0, 1) 
+                    explorationPlusVisibility = explorationFactor + visibilityFactor * aLMVPVisibility
+
+                    objs.append(explorationPlusVisibility)
+                    meas.append([averageTraces, numberCyclesOneRoom])
                 else:
-                    objs.append(round(np.mean(dataset[conf.OBJECTIVE_NAME]), 4))
-                    meas.append([round(np.mean(dataset[conf.MEASURES_NAMES[0]]), 4), round(np.mean(dataset[conf.MEASURES_NAMES[1]]), 4)])
+                    objs.append(round(np.mean(dataset[conf.OBJECTIVE_NAME]), 5))
+                    meas.append([round(np.mean(dataset[conf.MEASURES_NAMES[0]]), 5), round(np.mean(dataset[conf.MEASURES_NAMES[1]]), 5)])
+
                 itrs.append(itr-1)
                 inds.append(idx)
             else:

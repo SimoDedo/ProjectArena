@@ -40,12 +40,12 @@ POINT_STANDARD_CROSSOVER_CHANCE = 0.3
 CMA_ME_SIGMA0 = 0.01
 
 # These names are used to generate the folder name and the image captions
-OBJECTIVE_NAME = "averageLocalMaximaValuePercentVisibility"
-MEASURES_NAMES = ["localMaximaAverageDistanceVisibility", "localMaximaNumberKill"]
+OBJECTIVE_NAME = "explorationPlusVisibility2"
+MEASURES_NAMES = ["averageTraces", "numberCyclesOneRoom"]
 # If set to False, the names above are used to get the categories from the dataset. 
 # If set to True, the user is expected to manually choose the features in map_elites.py.
 # This is useful to combine different features without saving each one. 
-MANUALLY_CHOOSE_FEATURES = False
+MANUALLY_CHOOSE_FEATURES = True
 
 """ Experiment names """
 # This  is used as the basis of the folder name where the results of the experiment will be stored.

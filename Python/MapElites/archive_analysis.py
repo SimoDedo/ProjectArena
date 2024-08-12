@@ -211,6 +211,10 @@ def __save_visibility_map(visibility_matrix, map_matrix, path, note=None):
     plt.imshow(mask, cmap='binary', zorder=1)
     plt.gca().invert_yaxis()
 
+    plt.annotate(note, xy=(0, 0), xytext=(0, -1), fontsize=12, color='black')
+    plt.savefig(path, bbox_inches='tight')
+    plt.close()
+
 # --- ANALYSIS --- #
 
 
@@ -295,7 +299,7 @@ def save_deaths_and_kills_map(deathsdir, outdir, experiment_name, map_matrix, in
             )
         
 def save_graphs(graphdir, experiment_name, phenotype, index, obj, meas_0, meas_1):
-    graph, _ = phenotype.to_graph_naive()
+    graph, _ = phenotype.to_topology_graph_naive()
     graph.vs['label'] = [str(i) for i in range(len(graph.vs))]
 
     __save_graph(
@@ -310,7 +314,7 @@ def save_graphs(graphdir, experiment_name, phenotype, index, obj, meas_0, meas_1
     )
 
 def save_graphs_vornoi(graphdir, experiment_name, phenotype, index, obj, meas_0, meas_1):
-    graph, outer_shell, obstacles = phenotype.to_graph_vornoi()
+    graph, outer_shell, obstacles = phenotype.to_topology_graph_vornoi()
 
     __save_graph_vornoi(
         outer_shell,
