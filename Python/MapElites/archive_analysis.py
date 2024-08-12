@@ -336,6 +336,11 @@ def save_visibility_maps(visibilitydir, experiment_name, phenotype, index, obj, 
         note=f"Name: {experiment_name}\n {conf.OBJECTIVE_NAME}: {obj:.4f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.4f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.4f}"
     )
 
+def move_results(resultsDir, exportDir, iteration, individual_number):
+    name = f"final_results_{iteration}_{individual_number}.json"
+    dataset = pd.read_json(os.path.join(exportDir, name))
+    dataset.to_csv(os.path.join(resultsDir, name))
+
 # --- MAIN --- #
 
 
@@ -364,6 +369,8 @@ def analyze_archive(
     graphsVornoiDir.mkdir(exist_ok=True)
     visibilityDir = Path(os.path.join(outdir, "Visibility"))
     visibilityDir.mkdir(exist_ok=True)
+    resultsDir = Path(os.path.join(outdir, "Results"))
+    resultsDir.mkdir(exist_ok=True)
 
     # Load archive data
     df = ArchiveDataFrame(pd.read_csv(archivedir / "archive.csv"))
