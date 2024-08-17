@@ -209,7 +209,7 @@ def __save_visibility_map(visibility_matrix, map_matrix, path, note=None):
     mask = np.matrix(map_matrix)
     mask = np.ma.masked_where(mask == SPACE_TILE, mask)
     plt.imshow(mask, cmap='binary', zorder=1)
-    plt.gca().invert_yaxis()
+    #plt.gca().invert_yaxis()
 
     plt.annotate(note, xy=(0, 0), xytext=(0, -1), fontsize=12, color='black')
     plt.savefig(path, bbox_inches='tight')
@@ -336,10 +336,15 @@ def save_visibility_maps(visibilitydir, experiment_name, phenotype, index, obj, 
         note=f"Name: {experiment_name}\n {conf.OBJECTIVE_NAME}: {obj:.4f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.4f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.4f}"
     )
 
-def move_results(resultsDir, exportDir, iteration, individual_number):
-    name = f"final_results_{iteration}_{individual_number}.json"
-    dataset = pd.read_json(os.path.join(exportDir, name))
-    dataset.to_csv(os.path.join(resultsDir, name))
+def save_results(resultsDir, exportDir, iteration, individual_number, cumulative_dataset):
+    name = f"final_results_{iteration}_{individual_number}"
+    dataset = pd.read_json(os.path.join(exportDir, name + ".json"))
+    dataset.to_json(os.path.join(resultsDir, name + ".json"), orient='records', indent=4)
+
+    if cumulative_dataset is None:
+        return dataset
+    else:
+        return pd.concat([cumulative_dataset, dataset], ignore_index=True)
 
 # --- MAIN --- #
 
@@ -385,6 +390,7 @@ def analyze_archive(
     iterations = df.get_field("iterations")
     individual_numbers = df.get_field("individual_numbers")
     
+    cumulative_dataset = None
 
     # Analyze each solution
     for idx in tqdm.trange(0, len(solutions)):
@@ -419,6 +425,14 @@ def analyze_archive(
             save_graphs(graphsDir, experiment_name, phenotype, indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
             save_graphs_vornoi(graphsVornoiDir, experiment_name, phenotype, indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
             save_visibility_maps(visibilityDir, experiment_name, phenotype, indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
+            cumulative_dataset = save_results(resultsDir, exportDir, int(iterations[idx]), int(individual_numbers[idx]), cumulative_dataset)
+    
+    cumulative_dataset.to_json(os.path.join(resultsDir, "_final_results.json"), orient='columns', indent=4)
+    aggregate_dataset = pd.DataFrame()
+    for column in cumulative_dataset.columns:
+        aggregate_dataset[f"mean_{column}"] = [cumulative_dataset[column].mean()]
+        aggregate_dataset[f"std_{column}"] = [cumulative_dataset[column].std()]
+    aggregate_dataset.to_json(os.path.join(resultsDir, "_final_results_aggregate.json"), orient='records', indent=4)
     return
 
 
