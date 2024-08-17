@@ -74,9 +74,18 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
     __graph_analysis(graph, rooms, dataset)
 
     # VISIBILITY GRAPH
+    # Remove border from the map
+    border = 5
+    no_border_map_matrix = map_matrix[border:-border]
+    no_border_map_matrix = [row[border:-border] for row in no_border_map_matrix]
+
     visibility_graph, visibility_matrix = phenotype.to_visibility_graph()
-    # To avoid different sizes from the map read, we use the map matrix from the phenotype
-    __analyze_visibility(visibility_graph, visibility_matrix, phenotype.map_matrix(inverted=True), dataset)
+
+    dataset = __analyze_visibility(visibility_graph, visibility_matrix, no_border_map_matrix, dataset)
+
+    # SYMMETRY
+    dataset = __analyze_symmetry(no_border_map_matrix, dataset)
+
 
     # TODO: Add graph analysis based on match data?
 
@@ -324,6 +333,56 @@ def __analyze_visibility(visibility_graph, visibility_matrix, map_matrix, datase
     dataset["quantile25PercentVisibility"] = q25 / num_tiles
     dataset["quantile50PercentVisibility"] = q50 / num_tiles
     dataset["quantile75PercentVisibility"] = q75 / num_tiles
+
+    return dataset
+
+def __analyze_symmetry(map_matrix, dataset):
+    x_len = len(map_matrix)
+    y_len = len(map_matrix[0])
+
+    # Get minimum and maximum coordinates that hold 1
+    min_x, max_x, min_y, max_y = x_len, 0, x_len, 0
+    for x in range(len(map_matrix)):
+        for y in range(len(map_matrix[0])):
+            if map_matrix[x][y] == 1:
+                min_x = min(min_x, x)
+                max_x = max(max_x, x)
+                min_y = min(min_y, y)
+                max_y = max(max_y, y)
+    x_len = max_x - min_x
+    y_len = max_y - min_y
+
+    total_tiles = np.count_nonzero(map_matrix)
+
+    x_symmetry = 0
+    y_mid_point = int(np.floor(y_len/2))
+    for x in range(min_x, max_x + 1):
+        for y in range(min_y, min_y + y_mid_point + 1):
+            opposite_y = max_y - (y - min_y)
+            if map_matrix[x][y] == map_matrix[x][opposite_y]:
+                if map_matrix[x][y] != 0:
+                    x_symmetry += 2 if y != opposite_y else 1
+
+    y_symmetry = 0
+    x_mid_point = int(np.floor(x_len/2))
+    for y in range(min_y, max_y + 1):
+        for x in range(min_x, min_x + x_mid_point + 1):
+            opposite_x = max_x - (x - min_x)
+            if map_matrix[x][y] == map_matrix[opposite_x][y]:
+                if map_matrix[x][y] != 0:
+                    y_symmetry += 2 if x != opposite_x else 1
+
+    x_symmetry /= total_tiles
+    y_symmetry /= total_tiles
+    max_symmetry = max(x_symmetry, y_symmetry)
+    dataset["xSymmetry"] = x_symmetry
+    dataset["ySymmetry"] = y_symmetry
+    dataset["maxSymmetry"] = max_symmetry
+
+    return dataset
+
+
+
 
 # --- Extracting data from files ---
 

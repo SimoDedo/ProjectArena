@@ -35,8 +35,8 @@ class Phenotype:
             f.write(genome_json)
 
     def map_matrix(self, inverted=False):
-        value = 0 if inverted else 1
-        map_matrix = numpy.zeros([self.mapHeight, self.mapWidth], dtype=numpy.int8)
+        value = 1 if not inverted else 0
+        map_matrix = numpy.full([self.mapHeight, self.mapWidth], dtype=numpy.int8, fill_value=abs(value-1))
         for area in self.areas:
             for row in range(area.bottomRow, area.topRow):
                 for col in range(area.leftColumn, area.rightColumn):
