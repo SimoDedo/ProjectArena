@@ -226,6 +226,8 @@ def __get_heatmap_coverage(heatmap, map_matrix, threshold=0.1):
     return walked_spaces / walkable_spaces
 
 def __graph_analysis(graph, rooms, dataset):
+    # Rooms number
+    dataset["roomNumber"] = len(rooms)
 
     # Rooms distance
     distances = [0]
@@ -305,10 +307,13 @@ def __analyze_visibility(visibility_graph, visibility_matrix, map_matrix, datase
     local_maxima = __get_heatmap_local_maxima(masked_heatmap)
     distances = __get_local_maxima_distances(masked_heatmap, local_maxima)
     q25, q50, q75 = __get_heatmap_quantiles(masked_heatmap)
+    masked_heatmap_percent = masked_heatmap / num_tiles
     #coverage = __get_heatmap_coverage(masked_heatmap, map_matrix, 0.1) always 1, useless
 
     dataset["maxValueVisibility"] = max_value
     dataset["maxValuePercentVisibility"] = max_value / num_tiles
+    dataset["averageValuePercentVisibility"] = np.mean(masked_heatmap_percent.compressed())
+    dataset["stdValuePercentVisibility"] = np.std(masked_heatmap_percent.compressed())
     dataset["localMaximaNumberVisibility"] = len(local_maxima)
     dataset["localMaximaTopDistanceVisibility"] = distances[0]
     dataset["localMaximaAverageDistanceVisibility"] = np.mean(distances)
@@ -316,9 +321,9 @@ def __analyze_visibility(visibility_graph, visibility_matrix, map_matrix, datase
     averageLocalMaximaValuePercent = [v/num_tiles for v in averageLocalMaximaValue]
     dataset["averageLocalMaximaValuePercentVisibility"] = np.mean(averageLocalMaximaValuePercent) if len(local_maxima) > 0 else 0
     dataset["stdLocalMaximaValuePercentVisibility"] = np.std(averageLocalMaximaValuePercent) if len(local_maxima) > 0 else 0
-    dataset["quantile25Visibility"] = q25 / max_value
-    dataset["quantile50Visibility"] = q50 / max_value
-    dataset["quantile75Visibility"] = q75 / max_value
+    dataset["quantile25PercentVisibility"] = q25 / num_tiles
+    dataset["quantile50PercentVisibility"] = q50 / num_tiles
+    dataset["quantile75PercentVisibility"] = q75 / num_tiles
 
 # --- Extracting data from files ---
 

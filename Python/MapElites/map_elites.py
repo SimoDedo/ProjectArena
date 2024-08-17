@@ -236,7 +236,6 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
                 for geno in genotypes:
                     try:
                         phenotypes.append(geno.phenotype())
-                        found = True
                         to_skip.append(False)
                         #tqdm.tqdm.write("Phenotype created")
                     except Exception as e:
@@ -279,20 +278,24 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
 
                 if conf.MANUALLY_CHOOSE_FEATURES:
                     # Modify here to use a different/combination of features.
-                    aLMVPVisibility = round(np.mean(dataset["averageLocalMaximaValuePercentVisibility"]), 5)
+                    averageLocalMaximaValuePercentVisibility = round(np.mean(dataset["averageLocalMaximaValuePercentVisibility"]), 5)
+                    averageValuePercentVisibility = round(np.mean(dataset["averageValuePercentVisibility"]), 5)
                     localMaximaNumberVisibility = round(np.mean(dataset["localMaximaNumberVisibility"]), 5)
                     averageMincut = round(np.mean(dataset["averageMincut"]), 5)
                     entropy = round(np.mean(dataset["entropy"]), 5)
                     pace = round(np.mean(dataset["pace"]), 5)
                     averageTraces = round(np.mean(dataset["averageTraces"]), 5)
                     numberCyclesOneRoom = round(np.mean(dataset["numberCyclesOneRoom"]), 5)
+                    roomNumber = round(np.mean(dataset["roomNumber"]), 5)
+                    averageRoomMinDistance = round(np.mean(dataset["averageRoomMinDistance"]), 5)
 
                     visibilityFactor = np.clip(localMaximaNumberVisibility / 5, 0, 1)
                     explorationFactor = np.clip(averageMincut / 1.7, 0, 1) 
-                    explorationPlusVisibility = explorationFactor + visibilityFactor * aLMVPVisibility
+                    explorationPlusVisibility2 = explorationFactor + visibilityFactor * averageLocalMaximaValuePercentVisibility
+                    explorationPlusVisibility3 = explorationFactor + visibilityFactor * averageValuePercentVisibility
 
-                    objs.append(explorationPlusVisibility)
-                    meas.append([averageTraces, numberCyclesOneRoom])
+                    objs.append(explorationPlusVisibility3)
+                    meas.append([averageRoomMinDistance, numberCyclesOneRoom + roomNumber])
                 else:
                     objs.append(round(np.mean(dataset[conf.OBJECTIVE_NAME]), 5))
                     meas.append([round(np.mean(dataset[conf.MEASURES_NAMES[0]]), 5), round(np.mean(dataset[conf.MEASURES_NAMES[1]]), 5)])
