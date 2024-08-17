@@ -4,8 +4,8 @@ from internals.point_genome.constants import POINT_NUM_POINT_COUPLES, POINT_NUM_
     POINT_MAX_MAP_WIDTH, POINT_MAX_MAP_HEIGHT, POINT_CORRIDOR_WIDTH
 import internals.point_genome.point_genome as point_genome
 
-NO_POINT_COUPLE_PROBABILITY = 0.4
-NO_ROOM_PROBABILITY = 0
+NO_POINT_COUPLE_PROBABILITY = 0.6
+NO_ROOM_PROBABILITY = 0.2
 
 def create_random_genome():
     point_couples = []
