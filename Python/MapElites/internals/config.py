@@ -18,9 +18,9 @@ BOT2_SKILL = "0.85"
 # Archive type used in the experiment. See constants.py for possible values
 ARCHIVE_TYPE = constants.SLIDING_BOUNDARIES_ARCHIVE_NAME
 # Map representation used in the experiment. See constants.py for possible values
-REPRESENTATION_NAME = constants.ALL_BLACK_NAME
+REPRESENTATION_NAME = constants.POINT_AD_NAME
 # Emitter type used in the experiment. See constants.py for possible values
-EMITTER_TYPE_NAME = constants.ALL_BLACK_EMITTER_NAME
+EMITTER_TYPE_NAME = constants.POINT_AD_EMITTER_NAME
 
 ITERATIONS = 750
 BATCH_SIZE = 1
@@ -37,7 +37,8 @@ AB_STANDARD_CROSSOVER_CHANCE = 0.3
 GG_STANDARD_CROSSOVER_CHANCE = 0.3
 SMT_STANDARD_CROSSOVER_CHANCE = 0.3
 POINT_STANDARD_CROSSOVER_CHANCE = 0.3
-CMA_ME_SIGMA0 = 0.1
+POINT_AD_STANDARD_CROSSOVER_CHANCE = 0.3
+CMA_ME_SIGMA0 = 0.01
 
 # These names are used to generate the folder name and the image captions
 OBJECTIVE_NAME = "explorationPlusVisibility"

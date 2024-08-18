@@ -22,6 +22,8 @@ from internals.smt_genome.smt_genome import SMTGenome
 from internals.smt_genome.constants import SMT_ROOMS_NUMBER, SMT_LINES_NUMBER
 from internals.point_genome.point_genome import PointGenome
 from internals.point_genome.constants import POINT_NUM_POINT_COUPLES, POINT_NUM_ROOMS
+from internals.point_ad_genome.point_ad_genome import PointAdGenome
+from internals.point_ad_genome.constants import POINT_AD_NUM_POINT_COUPLES
 import internals.smt_genome.mutation as smt_mutation
 import internals.smt_genome.generation as smt_generation
 import internals.graph_genome.generation as graph_generation
@@ -55,6 +57,8 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
             solution_dim = SMT_ROOMS_NUMBER * 2 + SMT_LINES_NUMBER * 4 + 1
         case constants.POINT_NAME:
             solution_dim =  POINT_NUM_POINT_COUPLES * 5 + POINT_NUM_ROOMS * 3
+        case constants.POINT_AD_NAME:
+            solution_dim =  POINT_AD_NUM_POINT_COUPLES * 7
     archive = None
     match conf.ARCHIVE_TYPE:
         case constants.GRID_ARCHIVE_NAME:
@@ -105,7 +109,8 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
             x0, initial_solutions = initialize_solutions(SMTGenome.create_random_genome, conf.NUMBER_OF_INITAL_SOLUTIONS)
         case constants.POINT_NAME:
             x0, initial_solutions = initialize_solutions(PointGenome.create_random_genome, conf.NUMBER_OF_INITAL_SOLUTIONS)
-    
+        case constants.POINT_AD_NAME:
+            x0, initial_solutions = initialize_solutions(PointAdGenome.create_random_genome, conf.NUMBER_OF_INITAL_SOLUTIONS)
     emitters = []
     match emitter_type:
         case constants.ALL_BLACK_EMITTER_NAME:
@@ -162,7 +167,21 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
                     #bounds=bounds,
                 ) for s in seeds
             ]
-            
+        
+        case constants.POINT_AD_EMITTER_NAME:
+            emitters = [
+                GenomeEmitter(
+                    archive,
+                    genome_type=PointAdGenome,
+                    #x0=x0,
+                    initial_solutions=initial_solutions,
+                    crossover_probability=conf.POINT_AD_STANDARD_CROSSOVER_CHANCE,
+                    batch_size=batch_size,
+                    seed=s,
+                    #bounds=bounds,
+                ) for s in seeds
+            ]
+
         case constants.CMA_ME_EMITTER_NAME:
             emitters = [
                 EvolutionStrategyEmitter(
@@ -244,7 +263,8 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
                         to_skip.append(True)
             case constants.POINT_NAME:
                 phenotypes = list(map(lambda geno: (PointGenome.array_as_genome(list(map(int, geno.tolist())))).phenotype(), genotypes_sols))
-
+            case constants.POINT_AD_NAME:
+                phenotypes = list(map(lambda geno: (PointAdGenome.array_as_genome(list(map(int, geno.tolist())))).phenotype(), genotypes_sols))
         #tqdm.tqdm.write("Finished creating phenotypes")
 
         # Evaluate the genomes and record the objectives and measures.

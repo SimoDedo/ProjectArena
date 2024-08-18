@@ -3,6 +3,7 @@ from internals.ab_genome.ab_genome import ABGenome
 from internals.graph_genome.gg_genome import GraphGenome
 from internals.smt_genome.smt_genome import SMTGenome
 from internals.point_genome.point_genome import PointGenome
+from internals.point_ad_genome.point_ad_genome import PointAdGenome
 import matplotlib.pyplot as plt
 import numpy as np
 import igraph as ig
@@ -10,7 +11,7 @@ from matplotlib import cm
 
 if __name__ == "__main__":
     # Create random SMTGenome
-    genome = PointGenome.create_random_genome()
+    genome = PointAdGenome.create_random_genome()
     phenotype = genome.phenotype()
     map_matrix = phenotype.map_matrix()
 
