@@ -9,11 +9,11 @@ MUTATE_PROBABILITY_ROOM = 0.2
 
 def mutate(individual):
     for x in range(POINT_NUM_ROOMS):
-        if random.random() < MUTATE_PROBABILITY_POINT_COUPLE:
+        if random.random() < MUTATE_PROBABILITY_ROOM:
             individual.rooms[x] = generation.create_room()
 
     for x in range(POINT_NUM_POINT_COUPLES):
-        if random.random() < MUTATE_PROBABILITY_ROOM:
+        if random.random() < MUTATE_PROBABILITY_POINT_COUPLE:
             individual.point_couples[x] = generation.create_point_couple()
 
     return individual
