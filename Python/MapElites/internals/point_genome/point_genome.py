@@ -85,7 +85,7 @@ class PointGenome:
 
     def phenotype(self):
         # Step 1: iterate through all rooms and find the one closest to center
-        rooms = [room.to_area() for room in self.rooms if room is not None]
+        rooms = [room for room in self.rooms if room is not None]
         corridors = []
         for point in self.point_couples:
             if point is not None:
@@ -237,15 +237,15 @@ class PointCorridor:
         
     def center_row(self):
         if self.is_vertical():
-            return (self.bottom_row - self.length) / 2
+            return self.bottom_row - self.length / 2
         else:
-            return (self.bottom_row + POINT_CORRIDOR_WIDTH) / 2
+            return self.bottom_row + POINT_CORRIDOR_WIDTH / 2
         
     def center_col(self):
         if self.is_vertical():
-            return (self.left_col + POINT_CORRIDOR_WIDTH) / 2
+            return self.left_col + POINT_CORRIDOR_WIDTH / 2
         else:
-            return (self.left_col + self.length) / 2
+            return self.left_col + self.length / 2
 
     def to_area(self):
         return Area(self.left_col, self.bottom_row, self.right_col(), self.top_row(), True)

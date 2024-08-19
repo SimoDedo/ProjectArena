@@ -235,15 +235,15 @@ class PointCorridor:
         
     def center_row(self):
         if self.is_vertical():
-            return (self.bottom_row - self.length) / 2
+            return self.bottom_row - self.length / 2
         else:
-            return (self.bottom_row + POINT_AD_CORRIDOR_WIDTH) / 2
+            return self.bottom_row + POINT_AD_CORRIDOR_WIDTH / 2
     
     def center_col(self):
         if self.is_vertical():
-            return (self.left_col + POINT_AD_CORRIDOR_WIDTH) / 2
+            return self.left_col + POINT_AD_CORRIDOR_WIDTH / 2
         else:
-            return (self.left_col + self.length) / 2
+            return self.left_col + self.length / 2
 
     def to_area(self):
         return Area(self.left_col, self.bottom_row, self.right_col(), self.top_row(), True)
