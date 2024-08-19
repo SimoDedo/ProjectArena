@@ -81,36 +81,40 @@ class PointAdGenome:
     def phenotype(self):
         # Step 1: iterate through all rooms and find the one closest to center
         rooms = [p.room_left for p in self.point_couples if p is not None] + [p.room_right for p in self.point_couples if p is not None]
+        corridors = []
+        for point in self.point_couples:
+            if point is not None:
+                corridors.extend(point.to_corridors())
+        all_areas = rooms + corridors
+
+        if len(all_areas) == 0:
+            return None
         
         closest_room_index = 0
         best_distance = 99999999
         map_center_col = (POINT_AD_MAX_MAP_WIDTH + 1) // 2
         map_center_row = (POINT_AD_MAX_MAP_HEIGHT + 1) // 2
-        for idx, room in enumerate(rooms):
-            if room is None: continue
-            col_distance = map_center_col - room.center_col()
-            row_distance = map_center_row - room.center_row()
+        for idx, area in enumerate(all_areas):
+            if area is None: continue
+            col_distance = map_center_col - area.center_col()
+            row_distance = map_center_row - area.center_row()
             distance = sqrt(col_distance ** 2 + row_distance ** 2)
             if distance < best_distance:
                 best_distance = distance
                 closest_room_index = idx
 
         # Step 2: Loop through everything to compute intersections.
-        areas_in_phenotype = [rooms[closest_room_index]]
+        areas_in_phenotype = [all_areas[closest_room_index]]
         previous_areas = []
 
-        corridors = []
-        for point in self.point_couples:
-            if point is not None:
-                corridors.extend(point.to_corridors())
 
         while previous_areas != tuple(areas_in_phenotype):
             previous_areas = tuple(areas_in_phenotype)
-            for room in rooms:
-                if room in areas_in_phenotype: continue
-                if room is None: continue
-                if any(intersect(room, aaa) for aaa in areas_in_phenotype):
-                    areas_in_phenotype.append(room)
+            for area in rooms:
+                if area in areas_in_phenotype: continue
+                if area is None: continue
+                if any(intersect(area, aaa) for aaa in areas_in_phenotype):
+                    areas_in_phenotype.append(area)
 
             for corridor in corridors:
                 if corridor in areas_in_phenotype: continue
@@ -228,6 +232,18 @@ class PointCorridor:
             return self.bottom_row - self.length
         else:
             return self.bottom_row + POINT_AD_CORRIDOR_WIDTH
+        
+    def center_row(self):
+        if self.is_vertical():
+            return (self.bottom_row - self.length) / 2
+        else:
+            return (self.bottom_row + POINT_AD_CORRIDOR_WIDTH) / 2
+    
+    def center_col(self):
+        if self.is_vertical():
+            return (self.left_col + POINT_AD_CORRIDOR_WIDTH) / 2
+        else:
+            return (self.left_col + self.length) / 2
 
     def to_area(self):
         return Area(self.left_col, self.bottom_row, self.right_col(), self.top_row(), True)

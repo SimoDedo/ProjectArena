@@ -147,6 +147,9 @@ class GraphGenome:
         if any(area.bottomRow == area.topRow or area.leftColumn == area.rightColumn for area in areas):
             print("There is an invalid area!")
 
+        if len(areas) == 0:
+            return None
+
         return Phenotype(
             self.cellsWidth * self.numColumns * self.squareSize,
             self.cellsHeight * self.numRows * self.squareSize,
