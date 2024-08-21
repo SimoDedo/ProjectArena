@@ -68,12 +68,17 @@ def __run_evaluation(phenotype, folder_name, experiment_name, bot1_data, bot2_da
 
         # Wait for a timeout for each process before killing all processes
         for elem in processes:
-            received_error = received_error or (elem.wait(timeout=(game_length+20)) != 0) # TODO: serially waits for each process to finish, want to do it parallely
-            elem.kill()  
+            try:
+                received_error = received_error or (elem.wait(timeout=(game_length+20)) != 0) # TODO: serially waits for each process to finish, want to do it parallely
+                elem.kill()  
+            except subprocess.TimeoutExpired as e:
+                elem.kill()  
+
+
 
         if received_error:
             tqdm.tqdm.write(f"Error in simulation, skipping evaluation.")
-            return __blank_dataset()
+            return __blank_dataset(), True
 
         repeat_count = repeat_count + 1
 
@@ -83,6 +88,8 @@ def __run_evaluation(phenotype, folder_name, experiment_name, bot1_data, bot2_da
             experiment_name,
             repeat_count * num_parallel_simulations
         )
+        if dataset is None:
+            return __blank_dataset(), True
         mean_value = round(numpy.mean(dataset["entropy"]), 2)
         std_dev = round(numpy.std(dataset["entropy"]), 2)
         rel_std_dev_entropy = round(std_dev / mean_value * 100, 2)

@@ -23,8 +23,11 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
     for i in range(num_simulations):
         file_name = os.path.join(GAME_DATA_FOLDER, 'Export', folder_name, 'final_results_' + experiment_name + '_' + str(i) + '.json')
 
-        data = pandas.read_json(file_name)
-        frames.append(data)
+        try :
+            data = pandas.read_json(file_name)
+            frames.append(data)
+        except ValueError:
+            return None
 
     dataset = pandas.concat(frames)
 

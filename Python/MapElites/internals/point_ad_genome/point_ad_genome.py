@@ -81,6 +81,7 @@ class PointAdGenome:
     def phenotype(self):
         # Step 1: iterate through all rooms and find the one closest to center
         rooms = [p.room_left for p in self.point_couples if p is not None] + [p.room_right for p in self.point_couples if p is not None]
+        rooms = [x for x in rooms if x is not None]
         corridors = []
         for point in self.point_couples:
             if point is not None:
