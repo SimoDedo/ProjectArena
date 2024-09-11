@@ -5,6 +5,7 @@ import pandas
 from scipy.signal import argrelextrema
 from scipy.ndimage import gaussian_filter
 from skimage.feature import peak_local_max
+import igraph as ig
 
 from internals.constants import GAME_DATA_FOLDER
 from internals.config import NUM_PARALLEL_SIMULATIONS
@@ -26,7 +27,7 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
         try :
             data = pandas.read_json(file_name)
             frames.append(data)
-        except ValueError:
+        except FileNotFoundError:
             return None
 
     dataset = pandas.concat(frames)
@@ -74,7 +75,8 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
     #rooms = [v for v in graph.vs if not v['isCorridor']]
     graph, _, _ = phenotype.to_topology_graph_vornoi()
     rooms = [v for v in graph.vs if v['region']]
-    __graph_analysis(graph, rooms, dataset)
+    chokepoints = [v for v in graph.vs if v['chokepoint']]
+    __graph_analysis(graph, rooms, dataset, chokepoints)
 
     # VISIBILITY GRAPH
     # Remove border from the map
@@ -237,17 +239,31 @@ def __get_heatmap_coverage(heatmap, map_matrix, threshold=0.1):
     walked_spaces = np.count_nonzero(heatmap.compressed() >= threshold)
     return walked_spaces / walkable_spaces
 
-def __graph_analysis(graph, rooms, dataset):
+def __graph_analysis(graph: ig.Graph, rooms, dataset, chokepoints=None):
     # Rooms number
     dataset["roomNumber"] = len(rooms)
 
     # Rooms distance
-    distances = [0]
-    if len(rooms) > 1:
-        distances = graph.distances(source=rooms[0], target=[rooms[i] for i in range(len(rooms)) if i != 0], weights=graph.es['weight'])[0]
-    distances = [distances[i] if np.isfinite(distances[i]) else 0 for i in range(len(distances))]
-    dataset["averageRoomMinDistance"] = np.mean(distances) if len(distances) > 0 else 0
-    dataset["stdRoomMinDistance"] = np.std(distances) if len(distances) > 0 else 0
+    all_distances = []
+    exclusive_distances = []
+    for i in range(len(rooms)):
+        new_distances = graph.distances(source=rooms[i], target=[rooms[j] for j in range(len(rooms)) if i != j], weights=graph.es['weight'])
+        all_distances.extend(new_distances)
+        exclusive_distances.extend(new_distances[0][i+1:])
+
+    exclusive_distances = [exclusive_distances[i] if np.isfinite(exclusive_distances[i]) else 0 for i in range(len(exclusive_distances))]
+    dataset["averageRoomMinDistance"] = np.mean(exclusive_distances) if len(exclusive_distances) > 0 else 0
+    dataset["stdRoomMinDistance"] = np.std(exclusive_distances) if len(exclusive_distances) > 0 else 0
+
+    # Radius
+    room_radiuses = [r['radius'] for r in rooms]
+    dataset["averageRoomRadius"] = np.mean(room_radiuses) if len(room_radiuses) > 0 else 0
+    dataset["stdRoomRadius"] = np.std(room_radiuses) if len(room_radiuses) > 0 else 0
+    if chokepoints is not None:
+        chokepoint_radiuses = [r['radius'] for r in chokepoints]
+        dataset["averageChokepointRadius"] = np.mean(chokepoint_radiuses) if len(chokepoint_radiuses) > 0 else 0
+        dataset["stdChokepointRadius"] = np.std(chokepoint_radiuses) if len(chokepoint_radiuses) > 0 else 0
+
 
     # Roooms betweenness
     betweenness = graph.betweenness(vertices=rooms, weights=graph.es['weight'])
@@ -273,17 +289,22 @@ def __graph_analysis(graph, rooms, dataset):
     dataset["vertexConnectivity"] = graph.vertex_connectivity()
 
     # Ecceentricity, diameter and radius
-    eccentricities = graph.eccentricity(vertices=rooms)
+    eccentricities = [max(d) if len(d) > 0 else 0 for d in all_distances]
     dataset["averageEccentricity"] = np.mean(eccentricities) if len(rooms) > 0 else 0
     dataset["stdEccentricity"] = np.std(eccentricities) if len(rooms) > 0 else 0
     diameter =  max(eccentricities) if len(eccentricities) > 0 else 0
     dataset["diameter"] = diameter
     radius = min(eccentricities) if len(eccentricities) > 0 else 0
     dataset["radius"] = radius
-    periphery = [rooms[i] for i in range(len(rooms)) if eccentricities[i] == diameter]
+    # Periphery and center should include rooms with the same eccentricity as the diameter and radius,
+    # but we use weights to calculate distances, not the number of edges, so we need a threshold within which we consider the eccentricity the same
+    threshold = 2
+    periphery = [rooms[i] for i in range(len(rooms)) if  np.abs(eccentricities[i] - diameter) < threshold]
     dataset["periphery"] = len(periphery)
-    center = [rooms[i] for i in range(len(rooms)) if eccentricities[i] == radius]
+    dataset["peripheryPercent"] = len(periphery) / len(rooms) if len(rooms) > 0 else 0
+    center = [rooms[i] for i in range(len(rooms)) if np.abs(eccentricities[i] - radius) < threshold]
     dataset["center"] = len(center)
+    dataset["centerPercent"] = len(center) / len(rooms) if len(rooms) > 0 else 0
 
     # Density
     dataset["density"] = graph.density(loops=True)

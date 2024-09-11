@@ -425,7 +425,7 @@ def analyze_archive(
                 save_image_map_lines(mapsDir, experiment_name, phenotype, genotype.lines,
                                      indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
             save_bot_positions_heatmap(exportDir, positionDir, experiment_name, sol_map_matrix,
-                                       indexes[idx], obj[idx], meas_0[idx], meas_1[idx], map_scale)
+                                      indexes[idx], obj[idx], meas_0[idx], meas_1[idx], map_scale)
             save_deaths_and_kills_map(exportDir, deathsDir, experiment_name, sol_map_matrix,
                                         indexes[idx], obj[idx], meas_0[idx], meas_1[idx], map_scale)
             save_graphs(graphsDir, experiment_name, phenotype, indexes[idx], obj[idx], meas_0[idx], meas_1[idx])

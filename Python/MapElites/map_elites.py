@@ -303,19 +303,44 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
                     localMaximaNumberVisibility = round(np.mean(dataset["localMaximaNumberVisibility"]), 5)
                     averageMincut = round(np.mean(dataset["averageMincut"]), 5)
                     entropy = round(np.mean(dataset["entropy"]), 5)
+                    sightLossRate = round(np.mean(dataset["sightLossRate"]), 5)
                     pace = round(np.mean(dataset["pace"]), 5)
                     averageTraces = round(np.mean(dataset["averageTraces"]), 5)
                     numberCyclesOneRoom = round(np.mean(dataset["numberCyclesOneRoom"]), 5)
                     roomNumber = round(np.mean(dataset["roomNumber"]), 5)
                     averageRoomMinDistance = round(np.mean(dataset["averageRoomMinDistance"]), 5)
+                    diameter = round(np.mean(dataset["diameter"]), 5)
+                    maxSymmetry = round(np.mean(dataset["maxSymmetry"]), 5)
+                    averageChokepointRadius = round(np.mean(dataset["averageChokepointRadius"]), 5)
 
                     visibilityFactor = np.clip(localMaximaNumberVisibility / 5, 0, 1)
                     explorationFactor = np.clip(averageMincut / 1.7, 0, 1) 
                     explorationPlusVisibility2 = explorationFactor + visibilityFactor * averageLocalMaximaValuePercentVisibility
                     explorationPlusVisibility3 = explorationFactor + visibilityFactor * averageValuePercentVisibility
+                    messyFactor = sightLossRate + explorationFactor
+
+                    stdRoomMinDistance = round(np.mean(dataset["stdRoomMinDistance"]), 5)
+                    evenlySpaced = 1 - stdRoomMinDistance/30
+                    minMinCut = round(np.mean(dataset["minMincut"]), 5)
+                    explorationFactor2 = np.clip(averageMincut / 2, 0, 1) + np.clip(minMinCut - 1, 0, 1)
+                    numberCyclesTwoRooms = round(np.mean(dataset["numberCyclesTwoRooms"]), 5)
+                    cyclesFactor = np.clip(numberCyclesTwoRooms / 5, 0, 1)
+                    balanceTopology = evenlySpaced + explorationFactor2  + cyclesFactor
+                    localMaximaTopDistanceKill = round(np.mean(dataset["localMaximaTopDistanceKill"]), 5)
+
+                    centerPercent = round(np.mean(dataset["centerPercent"]), 5)
+                    peripheryPercent = round(np.mean(dataset["peripheryPercent"]), 5)
+                    peripheryCenterBalance = centerPercent - peripheryPercent
+                    averageEccentricity = round(np.mean(dataset["averageEccentricity"]), 5)
+
+                    averageRoomRadius = round(np.mean(dataset["averageRoomRadius"]), 5)
+                    averageChokepointRadius = round(np.mean(dataset["averageChokepointRadius"]), 5)
+
+                    coverageKill = round(np.mean(dataset["coverageKill"]), 5)
+
 
                     objs.append(explorationPlusVisibility3)
-                    meas.append([averageRoomMinDistance, numberCyclesOneRoom + roomNumber])
+                    meas.append([balanceTopology, averageRoomRadius])
                 else:
                     objs.append(round(np.mean(dataset[conf.OBJECTIVE_NAME]), 5))
                     meas.append([round(np.mean(dataset[conf.MEASURES_NAMES[0]]), 5), round(np.mean(dataset[conf.MEASURES_NAMES[1]]), 5)])
