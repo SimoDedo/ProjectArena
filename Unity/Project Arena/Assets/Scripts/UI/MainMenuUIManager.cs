@@ -150,8 +150,8 @@ namespace UI
             else
             {
                 allowIO = true;
-                importPath = Application.persistentDataPath + "/Import";
-                exportPath = Application.persistentDataPath + "/Export";
+                importPath =  Path.Combine(Application.persistentDataPath, "Import");
+                exportPath = Path.Combine(Application.persistentDataPath, "Export");
                 // Create the import directory if needed.
                 if (!Directory.Exists(importPath)) Directory.CreateDirectory(importPath);
                 // Create the export directory if needed.
@@ -183,8 +183,8 @@ namespace UI
         // Starts the loading of the rigth scene.
         public void LoadScene()
         {
-            if (currentGeneration == 2) mapDNA = importPath + "/" + mapDNA;
-
+            if (currentGeneration == 2) mapDNA = Path.Combine(importPath, mapDNA);
+            print(mapDNA);
             ParameterManager.Instance.GenerationMode = currentGeneration;
             ParameterManager.Instance.MapDNA = mapDNA;
             ParameterManager.Instance.Export = exportData && allowIO;
