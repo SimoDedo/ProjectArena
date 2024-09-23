@@ -1,20 +1,20 @@
 # Fdb version 4
-["bibtex main"] 1726127341.45501 "main.aux" "main.bbl" "main" 1726127343.4605 0
+["bibtex main"] 1726399360.48605 "main.aux" "main.bbl" "main" 1726399362.33245 0
   "./bibliography.bib" 1726048686 5868 c58148f8c2cf772811e281e1d1210622 ""
   "c:/texlive/2024/texmf-dist/bibtex/bst/base/plain.bst" 1726050271 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "main.aux" 1726127342 7081 7d57cf40fd06db464f1731bfb7587fc4 "pdflatex"
+  "main.aux" 1726399361 7081 7d57cf40fd06db464f1731bfb7587fc4 "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1726127341.72872 "c:/Users/Simone/Desktop/ProjectArena/de Donato/Thesis_article_format/main.tex" "main.pdf" "main" 1726127343.46092 0
+["pdflatex"] 1726399360.73314 "c:/Users/Simone/Desktop/ProjectArena/de Donato/Thesis_article_format/main.tex" "main.pdf" "main" 1726399362.33288 0
   "Configuration_files/config.tex" 1726048686 2731 166faccc0e3029de1a74484c16f237d7 ""
   "Configuration_files/title_page.tex" 1726048686 1441 e023367819b6d30da580b24e967d007a ""
   "Images/logo_polimi_ing_indinf.eps" 1726048686 1016894 50c9d95dbacdb6a7531ebeec13361098 ""
   "Images/logo_polimi_scritta.eps" 1726048686 851182 27b8398cbf2246d7da4579be38265f9b ""
   "Images/logo_polimi_scritta2.eps" 1726048686 754430 5f7256b212f7ca3f6e41c30c75d53940 ""
   "Images/raggiera_polimi.eps" 1726048686 1813066 68b21695bbcbb6d7e09839c06406f8f3 ""
-  "c:/Users/Simone/Desktop/ProjectArena/de Donato/Thesis_article_format/main.tex" 1726048686 18989 af0d69fdda48afb58fecbecfcb049018 ""
+  "c:/Users/Simone/Desktop/ProjectArena/de Donato/Thesis_article_format/main.tex" 1726399356 18989 af0d69fdda48afb58fecbecfcb049018 ""
   "c:/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1726050830 2971 def0b6c1f0b107b3b936def894055589 ""
   "c:/texlive/2024/texmf-dist/fonts/map/fontname/texfonts.map" 1726051957 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "c:/texlive/2024/texmf-dist/fonts/tfm/jknappen/ec/ecbx0800.tfm" 1726051504 3584 269b66e921ba58750c12f7f1c8ea3ebd ""
@@ -252,10 +252,10 @@
   "c:/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1726055850 5543950 2aa73a438b7054b2327b796fbe5f4275 ""
   "c:/texlive/2024/texmf-var/web2c/pdftex/pdflatex.fmt" 1726056221 3326174 0d32659781b09286e2267960842fa908 ""
   "c:/texlive/2024/texmf.cnf" 1726055827 713 e69b156964470283e0530f5060668171 ""
-  "main.aux" 1726127342 7081 7d57cf40fd06db464f1731bfb7587fc4 "pdflatex"
-  "main.bbl" 1726127341 966 97b87a96ffc438c20b11439d5a495396 "bibtex main"
-  "main.out" 1726127342 1641 c78e55a5dd44458a0fea621e64f64c5e "pdflatex"
-  "main.tex" 1726048686 18989 af0d69fdda48afb58fecbecfcb049018 ""
+  "main.aux" 1726399361 7081 7d57cf40fd06db464f1731bfb7587fc4 "pdflatex"
+  "main.bbl" 1726399360 966 97b87a96ffc438c20b11439d5a495396 "bibtex main"
+  "main.out" 1726399361 1641 c78e55a5dd44458a0fea621e64f64c5e "pdflatex"
+  "main.tex" 1726399356 18989 af0d69fdda48afb58fecbecfcb049018 ""
   (generated)
   "main.aux"
   "main.log"

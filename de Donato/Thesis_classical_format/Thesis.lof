@@ -5,5 +5,20 @@
 \contentsline {subfigure}{\numberline {(a)}{\ignorespaces {One PoliMi logo.}}}{5}{subfigure.2.1}%
 \contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Another one PoliMi logo.}}}{5}{subfigure.2.2}%
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Map comparison}}{11}{figure.caption.19}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {"Thunder mountain", a Capture the Flag map in \textit {Team Fortress 2}.}}}{11}{subfigure.1.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {"Dust II", a Bomb Defusal map in \textit {Counter-Strike}.}}}{11}{subfigure.1.2}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces PCG Games}}{13}{figure.caption.20}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {\textit {Minecraft}}}}{13}{subfigure.2.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {\textit {Pokémon Mystery Dungeon: Explorers of Sky}}}}{13}{subfigure.2.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {\textit {Hades}}}}{13}{subfigure.2.3}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Comparison of SB-PCG with constructive and generate-and-test approaches.}}{14}{figure.caption.21}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces \citeauthor {cardamone_evolving_2011} example maps}}{17}{figure.caption.22}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {\textit {All-White}}}}{17}{subfigure.4.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {\textit {All-Black}}}}{17}{subfigure.4.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {\textit {Grid}}}}{17}{subfigure.4.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {\textit {Random-Digger}}}}{17}{subfigure.4.4}%
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Visualization of the MAP-Elites algorithm.}}{20}{figure.caption.23}%
+\addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

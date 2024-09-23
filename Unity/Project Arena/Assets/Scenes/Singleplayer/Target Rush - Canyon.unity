@@ -234,6 +234,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114810593565605670, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
         type: 3}
+      propertyPath: mapScale
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114810593565605670, guid: d7fdd8a3b1e48ad4aaec099b06b133d7,
+        type: 3}
       propertyPath: isSkyVisibile
       value: 1
       objectReference: {fileID: 0}
