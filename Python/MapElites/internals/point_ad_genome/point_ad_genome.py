@@ -92,10 +92,7 @@ class PointAdGenome:
         if len(all_areas) == 0:
             tqdm.tqdm.write("No rooms or corridors in phenotype")
             return None
-        if len(rooms) == 0:
-            tqdm.tqdm.write("No rooms in phenotype")
-            return None
-        
+
         closest_room_index = 0
         best_distance = 99999999
         map_center_col = (POINT_AD_MAX_MAP_WIDTH + 1) // 2
@@ -127,6 +124,11 @@ class PointAdGenome:
                 if corridor is None: continue
                 if any(intersect(corridor, aaa) for aaa in areas_in_phenotype):
                     areas_in_phenotype.append(corridor)
+
+        rooms_in_phenotype = [x for x in areas_in_phenotype if x in rooms]
+        if len(rooms_in_phenotype) == 0:
+            tqdm.tqdm.write("No rooms in phenotype")
+            return None
 
         areas = [scale_area(x.to_area(), POINT_AD_SQUARE_SIZE) for x in areas_in_phenotype]
         return Phenotype(

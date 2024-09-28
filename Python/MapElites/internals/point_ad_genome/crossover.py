@@ -22,6 +22,8 @@ def crossover(ind1, ind2):
             ind1.point_couples[x] = ind2.point_couples[x]
             ind2.point_couples[x] = t
         
+        rooms1 = []
+        rooms2 = []
         rooms1 = [point_couple.room_left for point_couple in ind1.point_couples if point_couple is not None and point_couple.room_left is not None]
         rooms1 += [point_couple.room_right for point_couple in ind1.point_couples if point_couple is not None and point_couple.room_right is not None]
         rooms2 = [point_couple.room_left for point_couple in ind2.point_couples if point_couple is not None and point_couple.room_left is not None]

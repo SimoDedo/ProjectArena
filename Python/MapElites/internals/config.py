@@ -3,7 +3,7 @@ import internals.constants as constants
 
 # Number of parallel launches of the same experiment
 NUM_PARALLEL_SIMULATIONS = 1
-NUM_MATCHES_PER_SIMULATION = 1
+NUM_MATCHES_PER_SIMULATION = 2
 
 
 """ Game variables """
@@ -22,7 +22,7 @@ REPRESENTATION_NAME = constants.POINT_AD_NAME
 # Emitter type used in the experiment. See constants.py for possible values
 EMITTER_TYPE_NAME = constants.POINT_AD_EMITTER_NAME
 
-ITERATIONS = 400
+ITERATIONS = 200
 BATCH_SIZE = 1
 N_EMITTERS = 10
 
@@ -50,7 +50,7 @@ MANUALLY_CHOOSE_FEATURES = True
 
 """ Experiment names """
 # This  is used as the basis of the folder name where the results of the experiment will be stored.
-EXPERIMENT_NAME = "BariInverse"
+EXPERIMENT_NAME = "BariInverse2"
 
 """ Miscellaneous variables """
 SAVE_INTERMEDIATE_RESULTS = True

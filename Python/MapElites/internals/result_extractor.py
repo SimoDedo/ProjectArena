@@ -6,6 +6,7 @@ from scipy.signal import argrelextrema
 from scipy.ndimage import gaussian_filter
 from skimage.feature import peak_local_max
 import igraph as ig
+import tqdm
 
 from internals.constants import GAME_DATA_FOLDER
 from internals.config import NUM_PARALLEL_SIMULATIONS
@@ -28,6 +29,7 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
             data = pandas.read_json(file_name)
             frames.append(data)
         except FileNotFoundError:
+            tqdm.tqdm.write("Results file not found: " + file_name)
             return None
 
     dataset = pandas.concat(frames)
@@ -95,6 +97,30 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
 
 
     # TODO: Add graph analysis based on match data?
+
+    # AGGREGATE FEATURES
+    averageValuePercentVisibility = round(np.mean(dataset["averageValuePercentVisibility"]), 5)
+    averageMincut = round(np.mean(dataset["averageMincut"]), 5)
+    localMaximaNumberVisibility = round(np.mean(dataset["localMaximaNumberVisibility"]), 5)
+    stdRoomMinDistance = round(np.mean(dataset["stdRoomMinDistance"]), 5)
+    minMinCut = round(np.mean(dataset["minMincut"]), 5)
+    numberCyclesTwoRooms = round(np.mean(dataset["numberCyclesTwoRooms"]), 5)
+
+    visibilityFactor = np.clip(localMaximaNumberVisibility / 5, 0, 1)
+    explorationFactor = np.clip(averageMincut / 1.7, 0, 1) 
+    explorationPlusVisibility = explorationFactor + visibilityFactor * averageValuePercentVisibility
+    dataset["explorationPlusVisibility"] = explorationPlusVisibility
+
+    evenlySpaced = 1 - stdRoomMinDistance/30
+    explorationFactor2 = np.clip(averageMincut / 2, 0, 1) + np.clip(minMinCut - 1, 0, 1)
+    cyclesFactor = np.clip(numberCyclesTwoRooms / 5, 0, 1)
+    balanceTopology = evenlySpaced + explorationFactor2  + cyclesFactor
+    dataset["balanceTopology"] = balanceTopology
+
+    centerPercent = round(np.mean(dataset["centerPercent"]), 5)
+    peripheryPercent = round(np.mean(dataset["peripheryPercent"]), 5)
+    peripheryCenterBalance = centerPercent - peripheryPercent
+    dataset["peripheryCenterBalance"] = peripheryCenterBalance
 
     # Rewrite the dataset to include the new columns
     dataset.to_json(os.path.join(GAME_DATA_FOLDER, 'Export', folder_name, 'final_results_' + experiment_name + '.json'))
@@ -174,11 +200,12 @@ def __analyze_traces(dataset, kills_x, kills_y, deaths_x, deaths_y, bot_num):
             traces.append([distance])
         
         traces = np.array(traces)
-        dataset["maxTraces" + "Bot" + str(bot_n)] = np.max(traces)
-        dataset["averageTraces" + "Bot" + str(bot_n)] = np.mean(traces)
-        dataset["quantile25Traces" + "Bot" + str(bot_n)] = np.percentile(traces, 25)
-        dataset["quantile50Traces" + "Bot" + str(bot_n)] = np.percentile(traces, 50)
-        dataset["quantile75Traces" + "Bot" + str(bot_n)] = np.percentile(traces, 75)
+        length = len(traces)
+        dataset["maxTraces" + "Bot" + str(bot_n)] = np.max(traces) if length > 0 else 0
+        dataset["averageTraces" + "Bot" + str(bot_n)] = np.mean(traces) if length > 0 else 0
+        dataset["quantile25Traces" + "Bot" + str(bot_n)] = np.percentile(traces, 25) if length > 0 else 0
+        dataset["quantile50Traces" + "Bot" + str(bot_n)] = np.percentile(traces, 50) if length > 0 else 0
+        dataset["quantile75Traces" + "Bot" + str(bot_n)] = np.percentile(traces, 75) if length > 0 else 0
         
     # Average the values of the bot_num bots
     dataset["maxTraces"] = sum([dataset["maxTraces" + "Bot" + str(i)] for i in range(bot_num)]) / bot_num

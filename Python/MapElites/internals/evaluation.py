@@ -33,6 +33,7 @@ def evaluate(phenotype, iteration, individual_batch_num, bot1_data, bot2_data, g
     """
 
     if phenotype is None:
+        tqdm.tqdm.write("Phenotype is None, skipping evaluation")
         return __blank_dataset(), True
 
     if experiment_name is None :
@@ -69,7 +70,7 @@ def __run_evaluation(phenotype, folder_name, experiment_name, bot1_data, bot2_da
         # Wait for a timeout for each process before killing all processes
         for elem in processes:
             try:
-                received_error = received_error or (elem.wait(timeout=(game_length+20)) != 0) # TODO: serially waits for each process to finish, want to do it parallely
+                received_error = received_error or (elem.wait(timeout=(game_length+10)*NUM_MATCHES_PER_SIMULATION) != 0) # TODO: serially waits for each process to finish, want to do it parallely
                 elem.kill()  
             except subprocess.TimeoutExpired as e:
                 elem.kill()  
