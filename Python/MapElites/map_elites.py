@@ -35,10 +35,12 @@ import numpy as np
 import pandas as pd
 import tqdm
 from dask.distributed import Client, LocalCluster
+import pickle
 
 from ribs.archives import ArchiveDataFrame, GridArchive, SlidingBoundariesArchive
 from ribs.emitters import EvolutionStrategyEmitter
 from ribs.schedulers import Scheduler
+from internals.pyribs_ext.scheduler_lineage import SchedulerLineage
 from ribs.visualize import grid_archive_heatmap, sliding_boundaries_archive_heatmap
 
 def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size):
@@ -79,15 +81,6 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
                 qd_score_offset=0,
                 extra_fields={"iterations": ((), np.float32), "individual_numbers": ((), np.float32)}
             )
-
-    archive = SlidingBoundariesArchive(
-        solution_dim=solution_dim,
-        dims=conf.MEASURES_BINS_NUMBER, 
-        ranges=conf.MEASURES_RANGES,
-        seed=seed,
-        qd_score_offset=0,
-        extra_fields={"iterations": ((), np.float32), "individual_numbers": ((), np.float32)}
-    )
 
 
     # If we create the emitters with identical seeds, they will all output the
@@ -194,7 +187,7 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
                 ) for s in seeds
             ]
 
-    scheduler = Scheduler(archive, emitters)
+    scheduler = SchedulerLineage(archive, emitters)
     return scheduler
 
 def initialize_solutions(creation_function, n_solutions):
@@ -208,7 +201,7 @@ def initialize_solutions(creation_function, n_solutions):
     return x0, solutions
 
 
-def run_search(client: Client, scheduler: Scheduler, representation, iterations, log_freq, folder_name, bot1_data, bot2_data, game_length=600):
+def run_search(client: Client, scheduler: SchedulerLineage, representation, iterations, log_freq, folder_name, bot1_data, bot2_data, game_length=600):
     """
     #TODO
     """
@@ -338,9 +331,12 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
 
                     coverageKill = round(np.mean(dataset["coverageKill"]), 5)
 
+                    fightTime = round(np.mean(dataset["fightTime"]), 5)
+                    pursueTime = round(np.mean(dataset["pursueTime"]), 5)
+                    entropy = round(np.mean(dataset["entropy"]), 5)
 
-                    objs.append(explorationPlusVisibility3)
-                    meas.append([balanceTopology, averageRoomRadius])
+                    objs.append(entropy)
+                    meas.append([balanceTopology, pursueTime])
                 else:
                     objs.append(round(np.mean(dataset[conf.OBJECTIVE_NAME]), 5))
                     meas.append([round(np.mean(dataset[conf.MEASURES_NAMES[0]]), 5), round(np.mean(dataset[conf.MEASURES_NAMES[1]]), 5)])
@@ -380,6 +376,8 @@ def run_search(client: Client, scheduler: Scheduler, representation, iterations,
                 save_heatmap(scheduler.archive, str(outdir / "heatmap.png"))
                 save_metrics(outdir, metrics)
                 plt.close('all')
+                lineage_table_file = open(os.path.join(outdir, 'lineages.pkl'), 'wb')
+                pickle.dump(scheduler.get_lineage_table(), lineage_table_file)
 
     return metrics
 
@@ -455,7 +453,7 @@ def evolve_maps(
                 emitter_type,
                 workers=4,
                 iterations=500,
-                log_freq=25,
+                log_freq=10,
                 n_emitters=5,
                 batch_size=30,
                 game_length=600,

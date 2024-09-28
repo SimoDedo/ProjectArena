@@ -9,10 +9,16 @@ from matplotlib import cm
 from scipy.ndimage import gaussian_filter
 import internals.result_extractor as re
 import time
+from numba import jit
+from numba import types
+from numba.typed import Dict
+
+from test import upscale_matrix
 
 WALL_TILE = 0
 SPACE_TILE = 1
 
+@jit(nopython=True)
 def DDA(x0, y0, x1, y1): 
   
     # find absolute differences 
@@ -90,38 +96,55 @@ def efficient_DDA(x0, y0, x1, y1, matrix, checked, edges_to_add, coords_dict):
     edges_to_add.append((start_idx, end_idx))
     return coorinates, checked, edges_to_add
 
-def bresenham_line(x1,y1,x2,y2):
-    #print(f"Bresenham of points ({x1}, {y1}) and ({x2}, {y2})")
-    x,y = x1,y1
+def bresenham_line(x1, y1, x2, y2):
     dx = abs(x2 - x1)
-    if dx == 0:
-        dx = 0.0001
-    dy = abs(y2 -y1)
-    gradient = dy/float(dx)
+    sx = 1 if x1 < x2 else -1
+    dy = -abs(y2 - y1)
+    sy = 1 if y1 < y2 else -1
+    error = dx + dy
 
-    if gradient > 1:
-        dx, dy = dy, dx
-        x, y = y, x
-        x1, y1 = y1, x1
-        x2, y2 = y2, x2
+    coordinates = []
+    while True:
+        coordinates.append((x1, y1))
+        if (x1 == x2) and (y1 == y2):
+            break
+        e2 = 2 * error
+        if e2 >= dy:
+            if x1 == x2:
+                break
+            error = error + dy
+            x1 = x1 + sx
+        if e2 <= dx:
+            if y1 == y2:
+                break
+            error = error + dx
+            y1 = y1 + sy
+    return coordinates
 
-    p = 2*dy - dx
-    #print(f"x = {x}, y = {y}")
-    # Initialize the plotting points
-    coordinates = [(x, y)]
+@jit(nopython=True)
+def bresenham_line_jit(x1, y1, x2, y2):
+    dx = abs(x2 - x1)
+    sx = 1 if x1 < x2 else -1
+    dy = -abs(y2 - y1)
+    sy = 1 if y1 < y2 else -1
+    error = dx + dy
 
-    for k in range(2, dx + 2):
-        if p > 0:
-            y = y + 1 if y < y2 else y - 1
-            p = p + 2 * (dy - dx)
-        else:
-            p = p + 2 * dy
-
-        x = x + 1 if x < x2 else x - 1
-
-        #print(f"x = {x}, y = {y}")
-        coordinates.append((x, y))
-    
+    coordinates = []
+    while True:
+        coordinates.append((x1, y1))
+        if (x1 == x2) and (y1 == y2):
+            break
+        e2 = 2 * error
+        if e2 >= dy:
+            if x1 == x2:
+                break
+            error = error + dy
+            x1 = x1 + sx
+        if e2 <= dx:
+            if y1 == y2:
+                break
+            error = error + dx
+            y1 = y1 + sy
     return coordinates
 
 def is_line_without_walls(matrix, line):
@@ -182,13 +205,103 @@ def create_visibility_graph(map_matrix, strat, efficient=False):
     graph.add_edges(edges_to_add)
     return graph
 
-
-
 def create_visibility_matrix(graph, matrix, init=0, offset=0):
     visibility_matrix = np.full((len(matrix), len(matrix[0])), init)
     for v in graph.vs:
         x, y = v["coords"]
         visibility_matrix[x][y] = graph.degree(v) + offset
+    return visibility_matrix
+
+# Note that this only works if WALL_TILE = 0 and SPACE_TILE = 1
+@jit(nopython=True)
+def visibility_from_corner(matrix):
+    for x in range(matrix.shape[0]):
+        for y in range(int(x==0), matrix.shape[1]):
+            matrix[x,y] *= (x*matrix[x-1,y] + y*matrix[x,y-1]) / (x + y)
+
+def grid_based_visibility(matrix, x0, y0):
+    # Copy the grid
+    matrix_result = matrix.copy()
+
+
+    # Compute visibility
+    visibility_from_corner(matrix_result[x0:,y0:])
+    visibility_from_corner(matrix_result[x0::-1,y0:])
+    visibility_from_corner(matrix_result[x0::-1,y0::-1])
+    visibility_from_corner(matrix_result[x0:,y0::-1])
+    matrix_result[:] = (matrix_result >= 0.5)
+    return matrix_result
+
+def visibility_within_cone(matrix, u_direction, v_direction):
+    u = np.asarray(u_direction, dtype=int)
+    v = np.asarray(v_direction, dtype=int)
+    origin = np.array([0,0], dtype=int)
+    dims = np.asarray(matrix.shape, dtype=int)
+    m = 0
+    k = 0
+    position = np.array([0,0], dtype=int)
+    while np.all(position < dims):
+        while np.all(position < dims):
+            if not np.all(position == 0):
+                pos = tuple(position)
+                pos_minus_u = tuple(np.maximum(origin, position - u))
+                pos_minus_v = tuple(np.maximum(origin, position - v))
+                matrix[pos] *= (m*matrix[pos_minus_u] + 
+                                k*matrix[pos_minus_v]) / (m + k)
+            k += 1
+            position += v
+        m += 1
+        k = 0
+        position = m*u
+
+def grid_based_visibility_four_cones(matrix, x0, y0):
+    matrix_result = matrix.copy()
+
+    visibility_within_cone(matrix_result[x0:,y0:], [2,1], [1,0])
+    visibility_within_cone(matrix_result[x0::-1,y0:], [2,1], [1,0])
+    visibility_within_cone(matrix_result[x0::-1,y0::-1], [2,1], [1,0])
+    visibility_within_cone(matrix_result[x0:,y0::-1], [2,1], [1,0])
+
+    visibility_within_cone(matrix_result[x0:,y0:], [2,1], [1,1])
+    visibility_within_cone(matrix_result[x0::-1,y0:], [2,1], [1,1])
+    visibility_within_cone(matrix_result[x0::-1,y0::-1], [2,1], [1,1])
+    visibility_within_cone(matrix_result[x0:,y0::-1], [2,1], [1,1])
+
+    visibility_within_cone(matrix_result[x0:,y0:], [1,2], [1,1])
+    visibility_within_cone(matrix_result[x0::-1,y0:], [1,2], [1,1])
+    visibility_within_cone(matrix_result[x0::-1,y0::-1], [1,2], [1,1])
+    visibility_within_cone(matrix_result[x0:,y0::-1], [1,2], [1,1])
+
+    visibility_within_cone(matrix_result[x0:,y0:], [1,2], [0,1])
+    visibility_within_cone(matrix_result[x0::-1,y0:], [1,2], [0,1])
+    visibility_within_cone(matrix_result[x0::-1,y0::-1], [1,2], [0,1])
+    visibility_within_cone(matrix_result[x0:,y0::-1], [1,2], [0,1])
+
+    return matrix_result
+
+def grid_based_visibility_two_cones(matrix, x0, y0):
+    matrix_result = matrix.copy()
+
+    visibility_within_cone(matrix_result[x0:,y0:], [1,1], [1,0])
+    visibility_within_cone(matrix_result[x0::-1,y0:], [1,1], [1,0])
+    visibility_within_cone(matrix_result[x0::-1,y0::-1], [1,1], [1,0])
+    visibility_within_cone(matrix_result[x0:,y0::-1], [1,1], [1,0])
+
+    visibility_within_cone(matrix_result[x0:,y0:], [1,1], [0,1])
+    visibility_within_cone(matrix_result[x0::-1,y0:], [1,1], [0,1])
+    visibility_within_cone(matrix_result[x0::-1,y0::-1], [1,1], [0,1])
+    visibility_within_cone(matrix_result[x0:,y0::-1], [1,1], [0,1])
+    
+    return matrix_result
+
+
+def create_visibility_matrix_grid(map_matrix):
+    # Create matrix of same shape of map matrix initialized to 0
+    visibility_matrix = np.zeros((len(map_matrix), len(map_matrix[0])))
+    for i in range(len(map_matrix)):
+        for j in range(len(map_matrix[0])):
+            if map_matrix[i][j] == SPACE_TILE:
+                visibility_matrix = np.add(visibility_matrix, grid_based_visibility(map_matrix, i, j))
     return visibility_matrix
 
 def show_visibility_matrix(visibility_matrix):
@@ -204,28 +317,45 @@ if __name__ == "__main__":
     phenotype = genome.phenotype()
     map_matrix = phenotype.map_matrix()
 
+    # Create map
+    #nx = 45
+    #ny = 45
+    #map_matrix = np.ones((nx,ny))
+    #wx = nx//10 + 1
+    #wy = ny//10 + 1
+    #map_matrix[int(.3*nx):int(.3*nx)+wx,int(.1*ny):int(.1*ny)+wy] = 0
+    #map_matrix[int(.1*nx):int(.1*nx)+wx,int(.5*ny):int(.5*ny)+wy] = 0
+    #map_matrix[int(.6*nx):int(.6*nx)+wx,int(.6*ny):int(.6*ny)+wy] = 0
+
     #start_time = time.time()
-    #graph = create_visibility_graph(map_matrix, bresenham_line)
+    #graph = create_visibility_graph(map_matrix, bresenham_line_jit)
     #visibility_map = create_visibility_matrix(graph, map_matrix, 0, 0)
-#
+    #print(f"Bresenham Jit in: {time.time() - start_time}")
 #
     #show_visibility_matrix(visibility_map)
-    #print(f"Time elapsed breshnam: {time.time() - start_time}")
 
-    start_time = time.time()
-    graph = create_visibility_graph(map_matrix, DDA)
-    #graph = graph.simplify()
-    visibility_map = create_visibility_matrix(graph, map_matrix, 0, 0)
-    print(f"Old in: {time.time() - start_time}")
-
-    show_visibility_matrix(visibility_map)
+    #start_time = time.time()
+    #graph = create_visibility_graph(map_matrix, DDA)
+    #visibility_map = create_visibility_matrix(graph, map_matrix, 0, 0)
+    #print(f"DDA jit in: {time.time() - start_time}")
+#
+    #show_visibility_matrix(visibility_map)
 
     start_time = time.time()
     graph = create_visibility_graph(map_matrix, DDA, True)
     visibility_map = create_visibility_matrix(graph, map_matrix, 0, 0)
-    print(f"New in: {time.time() - start_time}")
+    print(f"DDA new in: {time.time() - start_time}")
 
     show_visibility_matrix(visibility_map)
+
+    start_time = time.time()
+    map_matrix = map_matrix.astype(float)
+    #map_matrix = upscale_matrix(map_matrix, 2)
+    visibility_map = create_visibility_matrix_grid(map_matrix)
+    print(f"Grid in: {time.time() - start_time}")
+
+    show_visibility_matrix(visibility_map)
+
 
     # Test local maxima
     #masked_heatmap = re.__mask_heatmap(visibility_map, map_matrix, invert = False)

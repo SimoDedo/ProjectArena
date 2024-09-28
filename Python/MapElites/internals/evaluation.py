@@ -77,7 +77,7 @@ def __run_evaluation(phenotype, folder_name, experiment_name, bot1_data, bot2_da
 
 
         if received_error:
-            tqdm.tqdm.write(f"Error in simulation, skipping evaluation.")
+            tqdm.tqdm.write(f"Error in simulation, skipping evaluation of {experiment_name}")
             return __blank_dataset(), True
 
         repeat_count = repeat_count + 1

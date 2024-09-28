@@ -1,5 +1,7 @@
 import random
 
+import tqdm
+
 from internals.point_ad_genome.constants import POINT_AD_NUM_POINT_COUPLES, POINT_AD_MIN_ROOM_RADIUS, POINT_AD_MAX_ROOM_RADIUS, \
     POINT_AD_MAX_MAP_WIDTH, POINT_AD_MAX_MAP_HEIGHT, POINT_AD_CORRIDOR_WIDTH
 import internals.point_ad_genome.point_ad_genome as point_ad_genome
@@ -7,11 +9,18 @@ import internals.point_ad_genome.point_ad_genome as point_ad_genome
 NO_POINT_AD_COUPLE_PROBABILITY = 0.6
 NO_ROOM_PROBABILITY = 0.1
 
+NO_MIN_ROOMS = 1
+
 def create_random_genome():
     point_couples = []
-
-    for x in range(POINT_AD_NUM_POINT_COUPLES):
-        point_couples.append(create_point_couple())
+    rooms = []
+    while len(point_couples) < 1 or len(rooms) < NO_MIN_ROOMS:
+        for x in range(POINT_AD_NUM_POINT_COUPLES):
+            point_couples.append(create_point_couple())
+        rooms = [point_couple.room_left for point_couple in point_couples if point_couple is not None and point_couple.room_left is not None]
+        rooms += [point_couple.room_right for point_couple in point_couples if point_couple is not None and point_couple.room_right is not None]
+        if len(point_couples) < 1 or len(rooms) < NO_MIN_ROOMS:
+            tqdm.tqdm.write("No rooms created at generation, trying again")
 
     return point_ad_genome.PointAdGenome(point_couples)
 

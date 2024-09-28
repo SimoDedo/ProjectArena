@@ -51,7 +51,8 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
     # Read resulting map
     map_matrix = read_map(experiment_name, folder_name)
     mask = np.matrix(map_matrix)
-    dataset["area"] = np.count_nonzero(mask == 0) / (len(map_matrix) * len(map_matrix[0]))
+    num_walkable_tiles = np.count_nonzero(mask == 0)
+    dataset["area"] = num_walkable_tiles / (len(map_matrix) * len(map_matrix[0]))
 
     initial_path = os.path.join(GAME_DATA_FOLDER, "Export", folder_name)
     # Analyze positions
@@ -84,12 +85,13 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
     no_border_map_matrix = map_matrix[border:-border]
     no_border_map_matrix = [row[border:-border] for row in no_border_map_matrix]
 
-    visibility_graph, visibility_matrix = phenotype.to_visibility_graph()
+    #visibility_matrix = phenotype.to_visibility_matrix_DDA()
+    visibility_matrix = phenotype.to_visibility_matrix_grid()
 
-    dataset = __analyze_visibility(visibility_graph, visibility_matrix, no_border_map_matrix, dataset)
+    dataset = __analyze_visibility(visibility_matrix, no_border_map_matrix, num_walkable_tiles, dataset)
 
     # SYMMETRY
-    dataset = __analyze_symmetry(no_border_map_matrix, dataset)
+    dataset = __analyze_symmetry(no_border_map_matrix, num_walkable_tiles, dataset)
 
 
     # TODO: Add graph analysis based on match data?
@@ -331,36 +333,34 @@ def __graph_analysis(graph: ig.Graph, rooms, dataset, chokepoints=None):
     dataset["averageLengthCyclesTwoRooms"] = np.mean(ctr_length) if len(ctr_length) > 0 else 0
     dataset["stdLengthCyclesTwoRooms"] = np.std(ctr_length) if len(ctr_length) > 0 else 0
 
-def __analyze_visibility(visibility_graph, visibility_matrix, map_matrix, dataset):
-    num_tiles = len(visibility_graph.vs)
-
+def __analyze_visibility(visibility_matrix, map_matrix, num_walkable_tiles, dataset):
     masked_heatmap = __mask_heatmap(visibility_matrix, map_matrix)
 
     max_value = np.max(masked_heatmap.compressed())
     local_maxima = __get_heatmap_local_maxima(masked_heatmap)
     distances = __get_local_maxima_distances(masked_heatmap, local_maxima)
     q25, q50, q75 = __get_heatmap_quantiles(masked_heatmap)
-    masked_heatmap_percent = masked_heatmap / num_tiles
+    masked_heatmap_percent = masked_heatmap / num_walkable_tiles
     #coverage = __get_heatmap_coverage(masked_heatmap, map_matrix, 0.1) always 1, useless
 
     dataset["maxValueVisibility"] = max_value
-    dataset["maxValuePercentVisibility"] = max_value / num_tiles
+    dataset["maxValuePercentVisibility"] = max_value / num_walkable_tiles
     dataset["averageValuePercentVisibility"] = np.mean(masked_heatmap_percent.compressed())
     dataset["stdValuePercentVisibility"] = np.std(masked_heatmap_percent.compressed())
     dataset["localMaximaNumberVisibility"] = len(local_maxima)
     dataset["localMaximaTopDistanceVisibility"] = distances[0]
     dataset["localMaximaAverageDistanceVisibility"] = np.mean(distances)
     averageLocalMaximaValue = [masked_heatmap[local_max[0], local_max[1]] for local_max in local_maxima]
-    averageLocalMaximaValuePercent = [v/num_tiles for v in averageLocalMaximaValue]
+    averageLocalMaximaValuePercent = [v/num_walkable_tiles for v in averageLocalMaximaValue]
     dataset["averageLocalMaximaValuePercentVisibility"] = np.mean(averageLocalMaximaValuePercent) if len(local_maxima) > 0 else 0
     dataset["stdLocalMaximaValuePercentVisibility"] = np.std(averageLocalMaximaValuePercent) if len(local_maxima) > 0 else 0
-    dataset["quantile25PercentVisibility"] = q25 / num_tiles
-    dataset["quantile50PercentVisibility"] = q50 / num_tiles
-    dataset["quantile75PercentVisibility"] = q75 / num_tiles
+    dataset["quantile25PercentVisibility"] = q25 / num_walkable_tiles
+    dataset["quantile50PercentVisibility"] = q50 / num_walkable_tiles
+    dataset["quantile75PercentVisibility"] = q75 / num_walkable_tiles
 
     return dataset
 
-def __analyze_symmetry(map_matrix, dataset):
+def __analyze_symmetry(map_matrix, num_walkable_tiles, dataset):
     x_len = len(map_matrix)
     y_len = len(map_matrix[0])
 
@@ -376,7 +376,7 @@ def __analyze_symmetry(map_matrix, dataset):
     x_len = max_x - min_x
     y_len = max_y - min_y
 
-    total_tiles = np.count_nonzero(map_matrix)
+    num_walkable_tiles = np.count_nonzero(map_matrix)
 
     x_symmetry = 0
     y_mid_point = int(np.floor(y_len/2))
@@ -396,8 +396,8 @@ def __analyze_symmetry(map_matrix, dataset):
                 if map_matrix[x][y] != 0:
                     y_symmetry += 2 if x != opposite_x else 1
 
-    x_symmetry /= total_tiles
-    y_symmetry /= total_tiles
+    x_symmetry /= num_walkable_tiles
+    y_symmetry /= num_walkable_tiles
     max_symmetry = max(x_symmetry, y_symmetry)
     dataset["xSymmetry"] = x_symmetry
     dataset["ySymmetry"] = y_symmetry

@@ -4,7 +4,7 @@ from internals import area
 from internals.area import contains_area
 import matplotlib.pyplot as plt
 from internals.graph import to_topology_graph_naive, to_topology_graph_vornoi
-from internals.visibility import create_visibility_graph, create_visibility_matrix
+from internals.visibility import create_visibility_graph_DDA, create_visibility_matrix_grid, create_visibility_matrix_DDA
 
 
 class Phenotype:
@@ -59,13 +59,18 @@ class Phenotype:
         return to_topology_graph_vornoi(self)
     
     # Returns both a graph and a convenient matrix form
-    def to_visibility_graph(self):
+    def to_visibility_matrix_DDA(self, return_graph=False):
         map_matrix = self.map_matrix()
-        graph = create_visibility_graph(map_matrix)
-        matrix = create_visibility_matrix(graph, map_matrix)
-        return graph, matrix
+        graph = create_visibility_graph_DDA(map_matrix)
+        matrix = create_visibility_matrix_DDA(graph, map_matrix)
+        if return_graph:
+            return matrix, graph
+        else:
+            return matrix
             
-
+    def to_visibility_matrix_grid(self):
+        return create_visibility_matrix_grid(self.map_matrix())
+        
 
 
 

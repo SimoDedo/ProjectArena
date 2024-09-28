@@ -1,8 +1,11 @@
 import numpy as np
 import igraph as ig
+from numba import jit
 
 WALL_TILE = 0
 SPACE_TILE = 1
+
+# Use DDA to check if a line between two points is clear for each couple of walkable tiles
 
 def DDA(x0, y0, x1, y1): 
   
@@ -92,7 +95,7 @@ def is_path_clear(matrix, start, end):
             return False, None
     return True, line_points
 
-def create_visibility_graph(map_matrix):
+def create_visibility_graph_DDA(map_matrix):
     coords = []
     coords_dict = {}
     num_spaces = 0
@@ -131,11 +134,40 @@ def create_visibility_graph(map_matrix):
     graph.add_edges(edges_to_add)
     return graph
 
-
-
-def create_visibility_matrix(graph, matrix, init=0, offset=0):
+def create_visibility_matrix_DDA(graph, matrix, init=0, offset=0):
     visibility_matrix = np.full((len(matrix), len(matrix[0])), init)
     for v in graph.vs:
         x, y = v["coords"]
         visibility_matrix[x][y] = graph.degree(v) + offset
+    return visibility_matrix
+
+# Use grid-based visibility to check if a tile can see all other tiles
+
+# Note that this only works if WALL_TILE = 0 and SPACE_TILE = 1
+@jit(nopython=True)
+def visibility_from_corner(matrix):
+    for x in range(matrix.shape[0]):
+        for y in range(int(x==0), matrix.shape[1]):
+            matrix[x,y] *= (x*matrix[x-1,y] + y*matrix[x,y-1]) / (x + y)
+
+def grid_based_visibility(matrix, x0, y0):
+    # Copy the grid
+    visibility_matrix = matrix.copy()
+
+    # Compute visibility
+    visibility_from_corner(visibility_matrix[x0:,y0:])
+    visibility_from_corner(visibility_matrix[x0::-1,y0:])
+    visibility_from_corner(visibility_matrix[x0::-1,y0::-1])
+    visibility_from_corner(visibility_matrix[x0:,y0::-1])
+    visibility_matrix[:] = (visibility_matrix >= 0.5)
+    return visibility_matrix
+
+def create_visibility_matrix_grid(map_matrix):
+    map_matrix = map_matrix.astype(float)
+    # Create matrix of same shape of map matrix initialized to 0
+    visibility_matrix = np.zeros((len(map_matrix), len(map_matrix[0])))
+    for i in range(len(map_matrix)):
+        for j in range(len(map_matrix[0])):
+            if map_matrix[i][j] == SPACE_TILE:
+                visibility_matrix = np.add(visibility_matrix, grid_based_visibility(map_matrix, i, j))
     return visibility_matrix

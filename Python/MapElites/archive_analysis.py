@@ -221,6 +221,28 @@ def __save_visibility_map(visibility_matrix, map_matrix, path, note=None):
     plt.savefig(path, bbox_inches='tight')
     plt.close()
 
+def __save_lineage_map(path, lineage, note=None):
+    # Draw a line between each pair of points, of increasing color intensity
+    fig, ax = plt.subplots()
+    # Set axis limits
+    extra = 0.1
+    ax.set_xlim(-extra, conf.MEASURES_BINS_NUMBER[0] + extra)
+    ax.set_ylim(-extra, conf.MEASURES_BINS_NUMBER[1] + extra)
+
+    cmap = plt.colormaps["inferno"]
+    # Draw first and last point using cmap inferno
+    plt.scatter(lineage[0][0], lineage[0][1], color = "green", s = 20)
+    plt.scatter(lineage[-1][0], lineage[-1][1], color = "red", s = 50)
+    for i in range(len(lineage) - 1):
+        x = [lineage[i][0], lineage[i + 1][0]]
+        y = [lineage[i][1], lineage[i + 1][1]]
+
+        color = cmap((i + 1) / len(lineage))
+        plt.quiver(x[0], y[0], x[1] - x[0], y[1] - y[0], angles='xy', scale_units='xy', scale=1, color=color)
+    plt.annotate(note, xy=(0.5, 1.05), xycoords='axes fraction', ha='center', fontsize=12, color='black')
+    plt.savefig(path, bbox_inches='tight')
+    plt.close()
+
 # --- ANALYSIS --- #
 
 
@@ -333,7 +355,7 @@ def save_graphs_vornoi(graphdir, experiment_name, phenotype, index, obj, meas_0,
     )
 
 def save_visibility_maps(visibilitydir, experiment_name, phenotype, index, obj, meas_0, meas_1):
-    graph, matrix = phenotype.to_visibility_graph()
+    matrix = phenotype.to_visibility_matrix_grid()
 
     __save_visibility_map(
         matrix,
@@ -351,6 +373,18 @@ def save_results(resultsDir, exportDir, iteration, individual_number, cumulative
         return dataset
     else:
         return pd.concat([cumulative_dataset, dataset], ignore_index=True)
+    
+def save_lineage_map(lineageDir, lineage, experiment_name, index, obj, meas_0, meas_1):
+    if len(lineage) == 0:
+        return
+    points = [(int(index/conf.MEASURES_BINS_NUMBER[0]), int(index%conf.MEASURES_BINS_NUMBER[1])) for index in lineage]
+
+    __save_lineage_map(
+        lineageDir / f"lineage_{int(index/conf.MEASURES_BINS_NUMBER[0])}_{int(index%conf.MEASURES_BINS_NUMBER[1])}.png",
+        points,
+        note=f"Name: {experiment_name}\n {conf.OBJECTIVE_NAME}: {obj:.4f}\n{conf.MEASURES_NAMES[0]}: {meas_0:.4f}\n{conf.MEASURES_NAMES[1]}: {meas_1:.4f}"
+    )
+
 
 # --- MAIN --- #
 
@@ -364,7 +398,7 @@ def analyze_archive(
     outdir.mkdir(exist_ok=True)
 
     # Get existing directiories with data to analyze
-    archivedir = Path(os.path.join(MAP_ELITES_OUTPUT_FOLDER, folder_name))
+    archiveDir = Path(os.path.join(MAP_ELITES_OUTPUT_FOLDER, folder_name))
     exportDir = Path(os.path.join(GAME_DATA_FOLDER, "Export", folder_name))
 
     # Make subdirectories for analysis outputs
@@ -382,9 +416,11 @@ def analyze_archive(
     visibilityDir.mkdir(exist_ok=True)
     resultsDir = Path(os.path.join(outdir, "Results"))
     resultsDir.mkdir(exist_ok=True)
+    lineageDir = Path(os.path.join(outdir, "Lineages"))
+    lineageDir.mkdir(exist_ok=True)
 
     # Load archive data
-    df = ArchiveDataFrame(pd.read_csv(archivedir / "archive.csv"))
+    df = ArchiveDataFrame(pd.read_csv(archiveDir / "archive.csv"))
     df.sort_values(by=["index"], ascending=True, inplace=True)
 
     # Extract data from archive
@@ -397,6 +433,10 @@ def analyze_archive(
     individual_numbers = df.get_field("individual_numbers")
     
     cumulative_dataset = None
+
+    # Load lineages
+    lineage_file = open(os.path.join(archiveDir, 'lineages.pkl'), 'rb')
+    lineages = pickle.load(lineage_file)
 
     # Analyze each solution
     for idx in tqdm.trange(0, len(solutions)):
@@ -432,6 +472,8 @@ def analyze_archive(
             save_graphs_vornoi(graphsVornoiDir, experiment_name, phenotype, indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
             save_visibility_maps(visibilityDir, experiment_name, phenotype, indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
             cumulative_dataset = save_results(resultsDir, exportDir, int(iterations[idx]), int(individual_numbers[idx]), cumulative_dataset)
+            save_lineage_map(lineageDir, lineages[idx], experiment_name, indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
+
     
     cumulative_dataset.to_json(os.path.join(resultsDir, "_final_results.json"), orient='columns', indent=4)
     aggregate_dataset = pd.DataFrame()

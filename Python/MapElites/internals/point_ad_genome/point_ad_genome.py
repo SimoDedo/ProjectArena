@@ -1,6 +1,7 @@
 from math import sqrt
 
 import numpy
+import tqdm
 
 from internals.area import Area
 from internals.phenotype import Phenotype
@@ -89,6 +90,10 @@ class PointAdGenome:
         all_areas = rooms + corridors
 
         if len(all_areas) == 0:
+            tqdm.tqdm.write("No rooms or corridors in phenotype")
+            return None
+        if len(rooms) == 0:
+            tqdm.tqdm.write("No rooms in phenotype")
             return None
         
         closest_room_index = 0

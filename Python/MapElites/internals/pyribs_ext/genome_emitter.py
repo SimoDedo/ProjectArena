@@ -4,6 +4,7 @@ import numpy as np
 from ribs._utils import check_batch_shape, check_shape
 from ribs.emitters._emitter_base import EmitterBase
 from ribs.emitters.operators import GaussianOperator
+import tqdm
 
 from .genome_operator import GenomeOperator
 
@@ -55,6 +56,7 @@ class GenomeEmitter(EmitterBase):
         self._crossover_probability = crossover_probability
         self._x0 = None
         self._initial_solutions = None
+        self._last_asked = None
 
         if x0 is None and initial_solutions is None:
             raise ValueError(
@@ -128,11 +130,22 @@ class GenomeEmitter(EmitterBase):
         """
         if self.archive.empty:
             if self._initial_solutions is not None:
+                self._last_asked = None
                 return np.clip(self._initial_solutions, self.lower_bounds,
                                self.upper_bounds)
+            self._last_asked = None
             parents = np.repeat(
                 self.x0[None], repeats=self._batch_size, axis=0)
         else:
-            parents = self.archive.sample_elites(self._batch_size)["solution"]
+            parents = self.archive.sample_elites(self._batch_size)
+            parents_solutions = parents["solution"]
+            self._last_asked = parents
 
-        return self._operator.ask(parents=parents)
+        return self._operator.ask(parents=parents_solutions)
+    
+    def get_last_asked_indexes(self):
+        if self._last_asked is None:
+            return None
+        parents_measures = self._last_asked["measures"]
+        last_indexes = self.archive.index_of(parents_measures)
+        return last_indexes
