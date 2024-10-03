@@ -3,26 +3,26 @@ import internals.constants as constants
 
 # Number of parallel launches of the same experiment
 NUM_PARALLEL_SIMULATIONS = 1
-NUM_MATCHES_PER_SIMULATION = 2
+NUM_MATCHES_PER_SIMULATION = 1
 
 
 """ Game variables """
-GAME_LENGTH = 1200
+GAME_LENGTH = 600
 
 BOT1_FILE_PREFIX = "sniper"
 BOT1_SKILL = "0.85"
 BOT2_FILE_PREFIX = "shotgun"
-BOT2_SKILL = "0.15"
+BOT2_SKILL = "0.85"
 
 """ MAP-Elites configuration variables """
 # Archive type used in the experiment. See constants.py for possible values
 ARCHIVE_TYPE = constants.SLIDING_BOUNDARIES_ARCHIVE_NAME
 # Map representation used in the experiment. See constants.py for possible values
-REPRESENTATION_NAME = constants.POINT_AD_NAME
+REPRESENTATION_NAME = constants.ALL_BLACK_NAME
 # Emitter type used in the experiment. See constants.py for possible values
-EMITTER_TYPE_NAME = constants.POINT_AD_EMITTER_NAME
+EMITTER_TYPE_NAME = constants.ALL_BLACK_EMITTER_NAME
 
-ITERATIONS = 200
+ITERATIONS = 400
 BATCH_SIZE = 1
 N_EMITTERS = 10
 
@@ -46,11 +46,11 @@ MEASURES_NAMES = ["balanceTopology", "pursueTime"]
 # If set to False, the names above are used to get the categories from the dataset. 
 # If set to True, the user is expected to manually choose the features in map_elites.py.
 # This is useful to combine different features without saving each one. 
-MANUALLY_CHOOSE_FEATURES = True
+MANUALLY_CHOOSE_FEATURES = False
 
 """ Experiment names """
 # This  is used as the basis of the folder name where the results of the experiment will be stored.
-EXPERIMENT_NAME = "BariInverse2"
+EXPERIMENT_NAME = "Bari"
 
 """ Miscellaneous variables """
 SAVE_INTERMEDIATE_RESULTS = True

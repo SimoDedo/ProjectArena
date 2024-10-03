@@ -105,6 +105,7 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
     stdRoomMinDistance = round(np.mean(dataset["stdRoomMinDistance"]), 5)
     minMinCut = round(np.mean(dataset["minMincut"]), 5)
     numberCyclesTwoRooms = round(np.mean(dataset["numberCyclesTwoRooms"]), 5)
+    pursueTime = round(np.mean(dataset["pursueTime"]), 5)
 
     visibilityFactor = np.clip(localMaximaNumberVisibility / 5, 0, 1)
     explorationFactor = np.clip(averageMincut / 1.7, 0, 1) 
@@ -116,6 +117,7 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
     cyclesFactor = np.clip(numberCyclesTwoRooms / 5, 0, 1)
     balanceTopology = evenlySpaced + explorationFactor2  + cyclesFactor
     dataset["balanceTopology"] = balanceTopology
+    dataset["balanceTopologyPlusPursueTime"] = (balanceTopology + pursueTime * 3) / 5
 
     centerPercent = round(np.mean(dataset["centerPercent"]), 5)
     peripheryPercent = round(np.mean(dataset["peripheryPercent"]), 5)
