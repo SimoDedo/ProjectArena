@@ -3,57 +3,52 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: Thesis.aux
 The style file: abbrvnat.bst
 Database file #1: Thesis_bibliography.bib
-Warning--I didn't find a database entry for "oetiker1995not"
-Warning--I didn't find a database entry for "kottwitz2015latex"
-Warning--I didn't find a database entry for "knuth74"
-Warning--I didn't find a database entry for "knuth92"
-Warning--I didn't find a database entry for "lamport94"
-Warning--I didn't find a database entry for "bibtex"
 Warning--empty school in ballabio_online_2018
 Warning--empty school in bari_evolutionary-based_2023
 Warning--empty booktitle in cardamone_evolving_2011
+Warning--empty publisher in cazenille_qdpy_2018
 Warning--empty publisher in co_level_2006
 Warning--empty booktitle in lehman_evolving_2011
 Warning--empty booktitle in togelius_search-based_2010
-You've used 30 entries,
+You've used 50 entries,
             2773 wiz_defined-function locations,
-            806 strings with 12156 characters,
-and the built_in function-call counts, 15450 in all, are:
-= -- 1428
-> -- 937
-< -- 23
-+ -- 316
-- -- 285
-* -- 1257
-:= -- 2342
-add.period$ -- 143
-call.type$ -- 30
-change.case$ -- 181
-chr.to.int$ -- 29
-cite$ -- 66
-duplicate$ -- 667
-empty$ -- 1167
-format.name$ -- 329
-if$ -- 3289
+            929 strings with 16661 characters,
+and the built_in function-call counts, 24211 in all, are:
+= -- 2252
+> -- 1360
+< -- 43
++ -- 465
+- -- 414
+* -- 1905
+:= -- 3664
+add.period$ -- 234
+call.type$ -- 50
+change.case$ -- 283
+chr.to.int$ -- 49
+cite$ -- 107
+duplicate$ -- 1067
+empty$ -- 1921
+format.name$ -- 484
+if$ -- 5171
 int.to.chr$ -- 2
 int.to.str$ -- 1
-missing$ -- 18
-newline$ -- 208
-num.names$ -- 122
-pop$ -- 392
+missing$ -- 28
+newline$ -- 337
+num.names$ -- 202
+pop$ -- 628
 preamble$ -- 1
-purify$ -- 154
+purify$ -- 237
 quote$ -- 0
-skip$ -- 554
+skip$ -- 877
 stack$ -- 0
-substring$ -- 406
-swap$ -- 149
-text.length$ -- 11
+substring$ -- 638
+swap$ -- 225
+text.length$ -- 16
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 325
-warning$ -- 6
-while$ -- 128
+type$ -- 540
+warning$ -- 7
+while$ -- 209
 width$ -- 0
-write$ -- 484
-(There were 12 warnings)
+write$ -- 794
+(There were 7 warnings)

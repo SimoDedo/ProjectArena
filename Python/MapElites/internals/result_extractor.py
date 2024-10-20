@@ -108,7 +108,7 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
     pursueTime = round(np.mean(dataset["pursueTime"]), 5)
 
     visibilityFactor = np.clip(localMaximaNumberVisibility / 5, 0, 1)
-    explorationFactor = np.clip(averageMincut / 1.7, 0, 1) 
+    explorationFactor = np.clip(averageMincut / 2, 0, 1) 
     explorationPlusVisibility = explorationFactor + visibilityFactor * averageValuePercentVisibility
     dataset["explorationPlusVisibility"] = explorationPlusVisibility
 

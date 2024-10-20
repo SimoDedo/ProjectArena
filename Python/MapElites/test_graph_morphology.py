@@ -329,9 +329,14 @@ if __name__ == "__main__":
     layout = ig.Layout(coords=graph.vs['coords'])
     x,y = outer_shell.exterior.xy
     plt.plot(x,y)
+    plt.fill([0, 0, map_matrix.shape[1], map_matrix.shape[1]], 
+            [0, map_matrix.shape[0], map_matrix.shape[0], 0], 
+            color='lightgray', zorder=-10)
+    plt.fill(x, y, color='white', zorder=-10)
     for obstacle in obstacles:
         x,y = obstacle.exterior.xy
-        plt.plot(x,y, color='darkred')
+        plt.plot(x,y, color='darkred', zorder=-10)
+        plt.fill(x,y, color='darkred', alpha=0.5, zorder=-10)
     ig.plot(graph, vertex_size=5, layout=layout, vertex_label_color="black",  target=ax)
     plt.gca().invert_yaxis()
 
@@ -342,9 +347,14 @@ if __name__ == "__main__":
     layout = ig.Layout([(int(v['centroid'][1]), int(v['centroid'][0])) for v in room_graph.vs])
     x,y = outer_shell.exterior.xy
     plt.plot(x,y)
+    plt.fill([0, 0, map_matrix.shape[1], map_matrix.shape[1]], 
+            [0, map_matrix.shape[0], map_matrix.shape[0], 0], 
+            color='lightgray', zorder=-10)
+    plt.fill(x, y, color='white', zorder=-10)
     for obstacle in obstacles:
         x,y = obstacle.exterior.xy
-        plt.plot(x,y, color='darkred')
+        plt.plot(x,y, color='darkred', zorder=-10)
+        plt.fill(x,y, color='darkred', alpha=0.5, zorder=-10)
     ig.plot(room_graph, vertex_size=5, layout=layout, vertex_label_color="black",  target=ax)
     plt.gca().invert_yaxis()
 

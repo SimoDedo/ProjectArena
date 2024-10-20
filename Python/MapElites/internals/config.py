@@ -2,15 +2,15 @@ import internals.constants as constants
 """ Evaluation variables """
 
 # Number of parallel launches of the same experiment
-NUM_PARALLEL_SIMULATIONS = 1
-NUM_MATCHES_PER_SIMULATION = 1
+NUM_PARALLEL_SIMULATIONS = 1 # Numer of matches that are parallely started when simulating an individual
+NUM_MATCHES_PER_SIMULATION = 5 # Number of matches that are played in a single simulation. If we start multiple parallel simulation, each is gonna play this many matches
 
 
 """ Game variables """
 GAME_LENGTH = 600
 
 BOT1_FILE_PREFIX = "sniper"
-BOT1_SKILL = "0.85"
+BOT1_SKILL = "0.15"
 BOT2_FILE_PREFIX = "shotgun"
 BOT2_SKILL = "0.85"
 
@@ -42,7 +42,7 @@ CMA_ME_SIGMA0 = 0.01
 
 # These names are used to generate the folder name and the image captions
 OBJECTIVE_NAME = "entropy"
-MEASURES_NAMES = ["balanceTopology", "pursueTime"]
+MEASURES_NAMES = ["pace", "area"]
 # If set to False, the names above are used to get the categories from the dataset. 
 # If set to True, the user is expected to manually choose the features in map_elites.py.
 # This is useful to combine different features without saving each one. 
@@ -50,7 +50,7 @@ MANUALLY_CHOOSE_FEATURES = False
 
 """ Experiment names """
 # This  is used as the basis of the folder name where the results of the experiment will be stored.
-EXPERIMENT_NAME = "Bari"
+EXPERIMENT_NAME = "Cov"
 
 """ Miscellaneous variables """
 SAVE_INTERMEDIATE_RESULTS = True

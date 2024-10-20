@@ -112,7 +112,7 @@
 \fancyhead[RO,RE]{\thepage} %RO=right odd, RE=right even
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}}
-
+\interfootnotelinepenalty=10000
 %----------------------------------------------------------------------------
 %	TITLE PAGE
 %----------------------------------------------------------------------------
@@ -192,309 +192,18 @@ Qui va l'Abstract in lingua italiana della tesi seguito dalla lista di parole ch
 % --------------------------------------------------------------------------
 % NUMBERED CHAPTERS % Regular chapters following
 % --------------------------------------------------------------------------
-\chapter*{Introduction}
-
-This document is intended to be both an example of the Polimi \LaTeX{} template for Master Theses,
-as well as a short introduction to its use. It is not intended to be a general introduction to \LaTeX{} itself,
-and the reader is assumed to be familiar with the basics of creating and compiling \LaTeX{} documents (see \cite{oetiker1995not, kottwitz2015latex}). 
-\\
-The cover page of the thesis must contain all the relevant information:
-title of the thesis, name of the Study Programme and School, name of the author,
-student ID number, name of the supervisor, name(s) of the co-supervisor(s) (if any), academic year.
-The above information are provided by filling all the entries in the command \verb|\puttitle{}|
-in the title page section of this template.
-\\
-Be sure to select a title that is meaningful.
-It should contain important keywords to be identified by indexer.
-Keep the title as concise as possible and comprehensible even to people who are not experts in your field.
-The title has to be chosen at the end of your work so that it accurately captures the main subject of the manuscript. 
-\\
-Since a thesis might be a substantial document, it is convenient to break it into chapters.
-You can create a new chapter as done in this template by simply using the following command
-\begin{verbatim}
-\chapter{Title of the chapter}
-\end{verbatim}
-followed by the body text.
-\\
-Especially for long manuscripts, it is recommended to give each chapter its own file.
-In this case, you write your chapter in a separated \verb|chapter_n.tex| file
-and then include it in the main file with the following command
-\begin{verbatim}
-\input{chapter_n.tex}
-\end{verbatim}
-It is recommended to give a label to each chapter by using the command
-\begin{verbatim}
-\label{ch:chapter_name}%
-\end{verbatim}
-where the argument is just a text string that you'll use to reference that part
-as follows: \textit{Chapter~\ref{ch:chapter_one} contains \sc{an introduction to}  \dots}.\\
-If necessary, an unnumbered chapter can be created by
-\begin{verbatim}
-\chapter*{Title of the unnumbered chapter}
-\end{verbatim}
-
-\chapter{Introduction}
-\label{ch:chapter_one}%
-% The \label{...}% enables to remove the small indentation that is generated, always leave the % symbol.
-
-In this chapter additional useful information are reported.
-
-\section{Sections and subsections}
-\label{sec:section_name}
-Chapters are typically subdivided into sections and subsections, and, optionally,
-subsubsections, paragraphs and subparagraphs.
-All can have a title, but only sections and subsections are numbered.
-A new section is created by the command
-\begin{verbatim}
-\section{Title of the section}
-\end{verbatim}
-The numbering can be turned off by using \verb|\section*{}|.
-\\
-A new subsection is created by the command
-\begin{verbatim}
-\subsection{Title of the subsection}
-\end{verbatim}
-and, similarly, the numbering can be turned off by adding an asterisk as follows 
-\begin{verbatim}
-\subsection*{}
-\end{verbatim}
-
-\section{Equations}
-\label{sec:eqs}
-This section gives some examples of writing mathematical equations in your thesis.
-
-Maxwell's equations read:
-\begin{subequations}
-    \label{eq:maxwell}
-    \begin{align}[left=\empheqlbrace]
-    \nabla\cdot \bm{D} & = \rho, \label{eq:maxwell1} \\
-    \nabla \times \bm{E} +  \frac{\partial \bm{B}}{\partial t} & = \bm{0}, \label{eq:maxwell2} \\
-    \nabla\cdot \bm{B} & = 0, \label{eq:maxwell3} \\
-    \nabla \times \bm{H} - \frac{\partial \bm{D}}{\partial t} &= \bm{J}. \label{eq:maxwell4}
-    \end{align}
-\end{subequations}
-
-Equation~\eqref{eq:maxwell} is automatically labeled by \texttt{cleveref},
-as well as Equation~\eqref{eq:maxwell1} and Equation~\eqref{eq:maxwell3}.
-Thanks to the \verb|cleveref| package, there is no need to use \verb|\eqref|.
-Remember that Equations have to be numbered only if they are referenced in the text.
-
-Equations~\eqref{eq:maxwell_multilabels1}, \eqref{eq:maxwell_multilabels2}, \eqref{eq:maxwell_multilabels3}, and \eqref{eq:maxwell_multilabels4} show again Maxwell's equations without brace:
-\begin{align}
-    \nabla\cdot \bm{D} & = \rho, \label{eq:maxwell_multilabels1} \\
-    \nabla \times \bm{E} +  \frac{\partial \bm{B}}{\partial t} &= \bm{0}, \label{eq:maxwell_multilabels2} \\
-    \nabla\cdot \bm{B} & = 0, \label{eq:maxwell_multilabels3} \\
-    \nabla \times \bm{H} - \frac{\partial \bm{D}}{\partial t} &= \bm{J} \label{eq:maxwell_multilabels4}.
-\end{align}
-
-Equation~\eqref{eq:maxwell_singlelabel} is the same as before,
-but with just one label:
-\begin{equation}
-    \label{eq:maxwell_singlelabel}
-    \left\{
-    \begin{aligned}
-    \nabla\cdot \bm{D} & = \rho, \\
-    \nabla \times \bm{E} +  \frac{\partial \bm{B}}{\partial t} &= \bm{0},\\
-    \nabla\cdot \bm{B} & = 0, \\
-    \nabla \times \bm{H} - \frac{\partial \bm{D}}{\partial t} &= \bm{J}.
-    \end{aligned}
-    \right.
-\end{equation}
-
-\section{Figures, Tables and Algorithms}
-Figures, Tables and Algorithms have to contain a Caption that describe their content, and have to be properly reffered in the text.
-
-\subsection{Figures}
-\label{subsec:figures}
-
-For including pictures in your text you can use \texttt{TikZ} for high-quality hand-made figures,
-or just include them as usual with the command
-\begin{verbatim}
-\includegraphics[options]{filename.xxx}
-\end{verbatim}
-Here xxx is the correct format, e.g. \verb|.png|, \verb|.jpg|, \verb|.eps|, \dots.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.3\textwidth]{logo_polimi_scritta.eps}
-    \caption{Caption of the Figure to appear in the List of Figures.}
-    \label{fig:quadtree}
-\end{figure}
-
-Thanks to the \texttt{\textbackslash subfloat} command, a single figure, such as Figure~\ref{fig:quadtree},
-can contain multiple sub-figures with their own caption and label, e.g. \color{black} Figure~\ref{fig:polimi_logo1} and Figure~\ref{fig:polimi_logo2}. 
-
-\begin{figure}[H]
-    \centering
-    \subfloat[One PoliMi logo.\label{fig:polimi_logo1}]{
-        \includegraphics[scale=0.5]{Images/logo_polimi_scritta.eps}
-    }
-    \quad
-    \subfloat[Another one PoliMi logo.\label{fig:polimi_logo2}]{
-        \includegraphics[scale=0.5]{Images/logo_polimi_scritta2.eps}
-    }
-    \caption[Shorter caption]{This is a very long caption you don't want to appear in the List of Figures.}
-    \label{fig:quadtree2}
-\end{figure}
-
-
-\subsection{Tables}
-\label{subsec:tables}
-
-Within the environments \texttt{table} and  \texttt{tabular} you can create very fancy tables as the one shown in Table~\ref{table:example}.
-\begin{table}[H]
-    \caption*{\textbf{Title of Table (optional)}}
-    \centering 
-    \begin{tabular}{|p{3em} c c c |}
-    \hline
-    \rowcolor{bluepoli!40} % comment this line to remove the color
-     & \textbf{column 1} & \textbf{column 2} & \textbf{column 3} \T\B \\
-    \hline \hline
-    \textbf{row 1} & 1 & 2 & 3 \T\B \\
-    \textbf{row 2} & $\alpha$ & $\beta$ & $\gamma$ \T\B\\
-    \textbf{row 3} & alpha & beta & gamma \B\\
-    \hline
-    \end{tabular}
-    \\[10pt]
-    \caption{Caption of the Table to appear in the List of Tables.}
-    \label{table:example}
-\end{table}
-
-You can also consider to highlight selected columns or rows in order to make tables more readable.
-Moreover, with the use of \texttt{table*} and the option \texttt{bp} it is possible to align them at the bottom of the page. One example is presented in Table~\ref{table:exampleC}. 
-
-\begin{table}[H]
-\centering 
-    \begin{tabular}{|p{3em} | c | c | c | c | c | c|}
-    \hline
-%    \rowcolor{bluepoli!40}
-     & \textbf{column1} & \textbf{column2} & \textbf{column3} & \textbf{column4} & \textbf{column5} & \textbf{column6} \T\B \\
-    \hline \hline
-    \textbf{row1} & 1 & 2 & 3 & 4 & 5 & 6 \T\B\\
-    \textbf{row2} & a & b & c & d & e & f \T\B\\
-    \textbf{row3} & $\alpha$ & $\beta$ & $\gamma$ & $\delta$ & $\phi$ & $\omega$ \T\B\\
-    \textbf{row4} & alpha & beta & gamma & delta & phi & omega \B\\
-    \hline
-    \end{tabular}
-    \\[10pt]
-    \caption{Highlighting the columns}
-    \label{table:exampleC}
-\end{table}
-
-\begin{table}[H]
-\centering 
-    \begin{tabular}{|p{3em} c c c c c c|}
-    \hline
-%    \rowcolor{bluepoli!40}
-     & \textbf{column1} & \textbf{column2} & \textbf{column3} & \textbf{column4} & \textbf{column5} & \textbf{column6} \T\B \\
-    \hline \hline
-    \textbf{row1} & 1 & 2 & 3 & 4 & 5 & 6 \T\B\\
-    \hline
-    \textbf{row2} & a & b & c & d & e & f \T\B\\
-    \hline
-    \textbf{row3} & $\alpha$ & $\beta$ & $\gamma$ & $\delta$ & $\phi$ & $\omega$ \T\B\\
-    \hline
-    \textbf{row4} & alpha & beta & gamma & delta & phi & omega \B\\
-    \hline
-    \end{tabular}
-    \\[10pt]
-    \caption{Highlighting the rows}
-    \label{table:exampleR}
-\end{table}
-
-\subsection{Algorithms}
-\label{subsec:algorithms}
-
-Pseudo-algorithms can be written in \LaTeX{} with the \texttt{algorithm} and \texttt{algorithmic} packages.
-An example is shown in Algorithm~\ref{alg:var}.
-\begin{algorithm}[H]
-    \label{alg:example}
-    \caption{Name of the Algorithm}
-    \label{alg:var}
-    \label{protocol1}
-    \begin{algorithmic}[1]
-    \STATE Initial instructions
-    \FOR{$for-condition$}
-    \STATE{Some instructions}
-    \IF{$if-condition$}
-    \STATE{Some other instructions}
-    \ENDIF
-    \ENDFOR
-    \WHILE{$while-condition$}
-    \STATE{Some further instructions}
-    \ENDWHILE
-    \STATE Final instructions
-    \end{algorithmic}
-\end{algorithm} 
-
-\vspace{5mm}
-
-\section{Theorems, propositions and lists}
-
-\subsection{Theorems}
-Theorems have to be formatted as:
-\begin{theorem}
-\label{a_theorem}
-Write here your theorem. 
-\end{theorem}
-\textit{Proof.} If useful you can report here the proof.
-
-\subsection{Propositions}
-Propositions have to be formatted as:
-\begin{proposition}
-Write here your proposition.
-\end{proposition}
-
-\subsection{Lists}
-How to  insert itemized lists:
-\begin{itemize}
-    \item first item;
-    \item second item.
-\end{itemize}
-How to insert numbered lists:
-\begin{enumerate}
-    \item first item;
-    \item second item.
-\end{enumerate}
-
-\section{Use of copyrighted material}
-
-Each student is responsible for obtaining copyright permissions, if necessary, to include published material in the thesis.
-This applies typically to third-party material published by someone else.
-
-\section{Plagiarism}
-
-You have to be sure to respect the rules on Copyright and avoid an involuntary plagiarism.
-It is allowed to take other persons' ideas only if the author and his original work are clearly mentioned.
-As stated in the Code of Ethics and Conduct, Politecnico di Milano \textit{promotes the integrity of research,
-condemns manipulation and the infringement of intellectual property}, and gives opportunity to all those
-who carry out research activities to have an adequate training on ethical conduct and integrity while doing research.
-To be sure to respect the copyright rules, read the guides on Copyright legislation and citation styles available
-at:
-\begin{verbatim}
-https://www.biblio.polimi.it/en/tools/courses-and-tutorials
-\end{verbatim}
-You can also attend the courses which are periodically organized on "Bibliographic citations and bibliography management".
-
-\section{Bibliography and citations}
-Your thesis must contain a suitable Bibliography which lists all the sources consulted on developing the work.
-The list of references is placed at the end of the manuscript after the chapter containing the conclusions.
-We suggest to use the BibTeX package and save the bibliographic references  in the file \verb|Thesis_bibliography.bib|.
-This is indeed a database containing all the information about the references. To cite in your manuscript, use the \verb|\cite{}| command as follows:
-\\
-\textit{Here is how you cite bibliography entries: \cite{knuth74}, or multiple ones at once: \cite{knuth92,lamport94}}.
-\\
-The bibliography and list of references are generated automatically by running BibTeX \cite{bibtex}.
 
 \chapter{State of the art}
 \label{ch:state_of_the_art}
-In the following chapter we are first going to examine level design from an historical and industry perspective, with a particular focus on First-Person Shooter (FPS) games and academic research on the topic of FPS games.
+In the following chapter we are first going to examine level design from an historical and industry perspective, with a particular focus on First-Person Shooter (FPS) games and academic research on the topic of level design for FPS games.
 
-Then we are going to examine a brief history of commercial games using Procedural Content Generation (PCG) and a taxonomy of approaches used. We then discuss the use of search based PCG and analyze the state of the art in academic research on the topic of PCG in FPS games.
+Then we are going to look at how balancing is defined and what elements of multiplayer games make a game balanced. Specifically, we are also going to examine how maps influence the balance of FPS games.
 
-Finally, we look into Quality Diversity methods, specifically at MAP-Elites, and present how it has been used in the literature to generate videogame content.
+We will also review the history of commercial games utilizing Procedural Content Generation (PCG) and provide a taxonomy of the approaches used, including an examination of Search-Based PCG. Furthermore, we will analyze the state of the art in academic research on PCG for maps in FPS games.
 
-\section{Level design}
+Finally, we will look into Quality Diversity methods, specifically at MAP-Elites, and present how it has been used in the literature to generate videogame content.
+
+\section{Level design in First-Person Shooter games}
 \label{sec:level_design}
 In the field of game design and development, level design can be defined as the discipline of crafting video game levels, places and missions to achieve gameplay that is both fun and balanced, leveraging genre and game-specific mechanics.
 
@@ -502,18 +211,38 @@ In the early days of video game development, game programmers also doubled as le
 
 A number of books have been written on the topic, most of which discuss common practices and describe the tools used by level designers, but don't detail how level design creates gameplay. As an example, in his book \textit{Level Design for Games: Creating Compelling Game Experiences}, \Citeauthor{co_level_2006} explains the process of designing a level for an FPS game in practical detail, starting from a brainstorming phase, through building the level in Unreal Engine\footnote{Game engine developed by Epic Games.}, and to finally testing and improving the level \cite{co_level_2006}, but does not delve in how this process creates gameplay. \cite{hullett_design_2010}
 
-Shorter works have focused on certain aspects of level design: some have focused on gameplay idioms such as correctly pacing the level, creating tension and creating a suitable level of challenge, while others focused on spatial characteristics of the playing environment, such as the spatial configurations or how the player navigates the level. \cite{hullett_design_2010}
+Shorter academic works have focused on certain aspects of level design which are independent of genre: some have focused on gameplay idioms such as correctly pacing the level, creating tension and creating a suitable level of challenge, while others focused on spatial characteristics of the playing environment, such as the spatial configurations or how the player navigates the level. \cite{hullett_design_2010}
 
-In the following paragraph we will present relevant literature on the topic of level design applied to First-Person Shooter (FPS) games, which have been the focus of our research.
+In First-Person Shooters (FPS)\footnote{First-Person Shooters are a genre of video games that are played from the perspective of the player character and that revolve around gun-fighting, such as \textit{Wolfenstein 3D} (id Software, 1992), \textit{Doom} (id Software, 1993) and \textit{Quake} (id Software, 1996).} level design takes the form of designing the level or map that the player is placed in, minding the placement of objects, covers and enemies. There exist many kinds of FPS games, each with different gameplay mechanics (e.g. \textit{Titanfall}\footnote{Respawn Enterteinment, 2014}, which allows the player to run on walls) and level design principles. 
 
-\subsection{Level design in First-Person Shooter games}
-First-person shooters are a genre of video games that are played from the perspective of the player character and that revolve around gun-fighting. \textit{Wolfenstein 3D}\footnote{id Software, 1992} is regarded as the first of its genre, followed closely by \textit{Doom}\footnote{id Software, 1993} and \textit{Quake}\footnote{id Software, 1996}. The genre has since grown to be one of the most popular in the industry, with games like \textit{Counter-Strike}\footnote{Valve Corporation, 2000}, \textit{Call of Duty}\footnote{Infinity Ward, 2003} and \textit{Battlefield 1942}\footnote{dice, 2002} being some of the most popular games. As the genre developed, many kinds of FPS games emerged, with different gameplay mechanics (e.g. \textit{Titanfall}\footnote{Respawn Enterteinment, 2014}, which allows the player to run on walls) and level design principles. 
-
-The most important distinction that can be drawn is between singleplayer and multiplayer FPS games. Singleplayer games usually see the player traversing a level in linear fashion, completing objectives defined by the game designer, such as solving puzzles or defeating enemies, and optionally discovering secrets or uncovering a story, such as in \textit{Half-Life}\footnote{Valve Corporation, 1998}. In multiplayer games like \textit{Call of Duty} players compete to achieve a goal (e.g. capture the flag, kill the enemy team) and the levels are designed to facilitate and balance this competition. Other multiplayer games may instead require players to cooperate to reach a common goal, such as in \textit{Left 4 Dead}\footnote{Valve Corporation, 2008}, where players have to survive a zombie apocalypse together or in \textit{Portal 2}\footnote{Valve Software, 2011}, where players have to solve puzzles together.
+The most important distinction that can be drawn is between singleplayer and multiplayer FPS games. Singleplayer games usually see the player traversing a level in linear fashion, completing objectives defined by the game designer, such as solving puzzles or defeating enemies, and optionally discovering secrets or uncovering a story, such as in \textit{Half-Life}\footnote{Valve Corporation, 1998}. In multiplayer games like \textit{Call of Duty}\footnote{Infinity Ward, 2003} players compete to achieve a goal before their opponent (e.g. capture the flag, kill the enemy team) and the levels are designed to facilitate and balance this competition. Other multiplayer games may instead require players to cooperate to reach a common goal, such as in \textit{Left 4 Dead}\footnote{Valve Corporation, 2008}, where players have to survive a zombie apocalypse together or in \textit{Portal 2}\footnote{Valve Software, 2011}, where players have to solve puzzles together.
 
 The differences between these types of games are reflected in the level design principles that are used. While singleplayer and cooperative games may thrive from having maps that put the player in a position of disadvantage to increase challenge and tension, competitive multiplayer games require maps that are balanced and fair to all players. 
 
-Moreover, what makes a multiplayer map balanced highly depends on the specific game mechanics and the game mode that is being played. In the "capture the flag" game mode\footnote{Popular game mode where two teams face off, and each one has to infiltrate the opposing base to steal a flag and bring it back to their own base.} two teams have to achieve the same objective, so a balanced map can be achieved with a symmetrical layout (Figure \ref{fig:ctf_tf2}). \textit{Counter-Strike} instead has a "Bomb Defusal" game mode\footnote{Game mode where a team, the "Terrorists", has to place and detonate a bomb while the other team, the "Counter-Terrorists", has to defend designated locations.} where a balanced map will probably have an asymmetrical layout, where, for example, the defending will spawn closer to the areas they will have to defend in order to organize themselves, while the attacking team will have multiple attacking routes to the sites (Figure \ref{fig:dust2}).
+Given that FPS games usually also present multiple game modes that naturally require diverse level designs, academic research has either focused on a singular and more universal aspect (such as pace, challenge or tension), or has tried to analyze a specific game (or type of game) to examine a specific feature of its level design.
+
+\Citeauthor*{guttler_spatial_2003} outlined the basic spatial principles of level design in multiplayer First-Person Shooters with special reference to \textit{Counter-Strike} \cite{guttler_spatial_2003}. They argue  that successful level design for multiplayer FPS is based on several factors, such as gameplay, theme, architecture and spatial structure, and that the level designer will greatly benefit from leveraging theoretical tools to develop maps, as such tools would make  eliciting specific gameplay during game sessions easier. By analyzing the gameplay of existing maps and their layouts they deduce the basic spatial principles of \textit{Counter-Strike}'s level design, and elaborate on how to best apply them to create a successful map. 
+
+\Citeauthor{larsen_level_2006} argues the usefulness of patterns in fields ranging from software development to film making, and proposes that they can be used to describe level design practices in the domain of FPS games. He specifically focuses on several competitive multiplayer FPS games (\textit{Unreal Tournament 2004}\footnote{Epic Games, 2004}, \textit{Day of Defeat: Source}\footnote{Valve Corporation, 2005} and \textit{Battlefield 1942}\footnote{DICE, 2002}) and extracts common design patterns by analyzing several levels in search of common ways of solving problematic elements. He defines the patterns of "multiple paths", "local fights", "collision points", "reference points", "defense areas" and "risk incentive". For each identified pattern, he provides a description, examples on how to use the pattern, consequences on gameplay, how it interacts with other patterns and commercial examples of its use. He concludes that recurring patterns should not streamline levels but instead be used as tools to design better levels. \cite{larsen_level_2006}
+
+In a similar vein, \Citeauthor*{hullett_design_2010} adapt how patterns are characterized in the field of software engineering to the domain of single player FPS level design. They use this characterization to identify a set of design patterns commonly used in FPS level design, which can be used as a language for describing design practices in the domain of FPS games. Patterns are divided into "patterns for positional advantage" (sniper locations, gallery, choke point), "patterns for large scale combat" (arena, stronghold), "patterns for alternate gameplay" (turret, vehicle selection) and "pattern for alternate routes" (split-level, hidden area, flanking route). For each, they provide a description, how it can be modified, the gameplay it creates, how it interacts with other patterns and commercial examples of its use. 
+They argue that patterns can help designers generate new ideas by combining them, and can also help solve design problems by providing guidance on what to add or remove to achieve a gameplay goal, since patterns offer a clear cause-effect explanation. They also argue that these patterns can be generalized and reasonably applied to multiplayer games in some situations. \cite{hullett_design_2010}
+
+\section{Balance in competitive multiplayer video games}
+\label{sec:balance}
+A concept that is closely related to level design is \textit{game balance}. Giving a general definition for "game balance" is a harder task than it might seem, as \citeauthor{becker_what_2020} note in their semantic analysis based on other pubblications on the theme of balancing games of various kinds. They conclude that further research would be needed to reach a commonly agreeable definition, given that the authors they analyzed did not have a common central goal, with some focusing on the end goal of "fun", other on "challenge" and others on "flow". \cite{becker_what_2020}
+
+For multiplayer games specifically, \citeauthor{sirlin_balancing_2014} states that a game is balanced if the player can choose between a sufficiently large array of options which are viable, meaning that they are different, meaningful and not dominated by other options. These choices can be made before the game start (fairness) or during the game itself (viable options). \cite{sirlin_balancing_2014}
+
+When players can choose between different sets of options before starting the game we talk about \textit{asymmetric games} (e.g. most FPS games where you can select your weapon, or fighting games with multiple playable characters), while in \textit{symmetric games} players start the game with an identical and static set of options (e.g. games like Tetris\footnote{Aleksej Pažitnov, Vadim Gerasimov, Dmitrij Pavlovskij, 1984}, where players are fed the same pieces during the competition) \cite{sirlin_balancing_2014}. The former are naturally easy to balance, but often games introduce options to stand out and make the game more replayable, deep and fun; a fighting game with only a single character would surely be balanced, but also boring. 
+
+A concpet that \citeauthor{sirlin_balancing_2014} highlights is that of "dominant strategies". In order for a competitive game to be balanced a player should be able to choose at any time between many viable options, but if one of those is too strong it would both make other options meaningless and reduce the strategic value of the game. To allow for a balanced game with deep strategy it can be beneficial to consider the concept of "Yomi"\footnote{A japanese word that can be translated to "Reading". In this context, it is meant as "reading the mind of your opponent".}, which refers to the fact that if a player were to read the opponent's mind, he should then be able to counter the opponent's strategy. A dominant strategy is one so strong that counters may not exist. \cite{sirlin_balancing_2014}
+
+When strictly considering asymmetric games, authors agree that balancing should not be the sole goal \cite{sirlin_balancing_2014} \cite{portwnow_perfect_2012} \cite{brown_how_2019}. These games are designed to allow players to employ various strategies and tactics, so while no one strategy should be strictly better than others, if all strategies were instead perfectly balanced the game may provide un-fun options that feel very similar to each other \cite{sakurai_amplify_2024}. The player's perception of balance is sometimes more important than balance itself to provide players with a fun experience \cite{brown_how_2019}, which makes correctly balancing the game a difficult task that can't be fully understood by merely examining the win rates\footnote{The amount of times a chatacer/strategy wins over a certain number of matches.}. Developers have to also take into account the "pick rate" of certain characters or strategies, the skill level of players, the skill required to employ a given strategy and the \textit{metagame}\footnote{Term that refers to the strategies that are popular at a given time among the playerbase, due to their strength and/or their ease of use.} to correctly balance a game. \cite{brown_how_2019} 
+
+Many competitive games, such as Real Time Strategy (RTS) games, Multiplayer Online Battle Arena (MOBA) and FPS games, are played on certain maps whose design could greatly influence the outcome of the match. Because different players or teams may have different playstles, some may gain an advantage in playing certain maps compared to others, and creating a map fair to every existing style of play may be unfeasible. For this very reason, during official competitions, popular competitive games like \textit{Counter Strike: Global Offensive}\footnote{Valve Corporation, 2012} or \textit{Super Smash Bros. Ultimate}\footnote{Bandai Namco Games, Sora Ltd., 2018} allow competitors to take turns in "banning"\footnote{In this context, a "ban" (often also called "strike") means disallowing the opponent from choosing a specific map for the next match.} a map, so that the final chosen map is one that both players are comfortable playing on.
+
+Moreover, what makes a multiplayer map balanced highly depends on the specific game mechanics and the game mode that is being played. In the "capture the flag" game mode\footnote{Popular game mode where two teams face off, and each one has to infiltrate the opposing base to steal a flag and bring it back to their own base.} two teams have to achieve the same objective, so a balanced map can be achieved with a symmetrical layout, as in Team Fortress 2\footnote{Valve Corporation, 2007} (Figure \ref{fig:ctf_tf2}). \textit{Counter-Strike} instead has a "Bomb Defusal" game mode\footnote{Game mode where a team, the "Terrorists", has to place and detonate a bomb while the other team, the "Counter-Terrorists", has to defend designated locations.} where a balanced map will probably have an asymmetrical layout, where, for example, the defending will spawn closer to the areas they will have to defend in order to organize themselves, while the attacking team will have multiple attacking routes to the sites (Figure \ref{fig:dust2}).
 
 \begin{figure}[H]
     \centering
@@ -528,18 +257,14 @@ Moreover, what makes a multiplayer map balanced highly depends on the specific g
     \label{fig:maps_compare}
 \end{figure}
 
-Even considering a single game mode, such as "deathmatch"\footnote{Game mode where a number of players, optionally divided in teams, compete in order to score the most kills.}, the number of players in a team drastically changes the tactics that are employed, and the level design should account for that. Games that focus on 1v1 comabt will usally have fast movement and dynamic gameplay that rewards reflexes and mechanical skills, so maps will have multiple floors with various escape routes, but will be relatively small and with numerous collision points that make it hard to hide. Instead, games that are mainly played in teams will have bigger maps with few collision points allowing teams to strategially position themselves to gain control of these sections.
+Even considering a single game mode, such as "deathmatch"\footnote{Game mode where a number of players, optionally divided in teams, compete in order to score the most kills.}, the number of players in a team drastically changes the tactics that are employed, and the level design should account for that. Games that focus on 1v1 comabt (e.g. \textit{Unreal Tournament 2004}) will usally have fast movement and dynamic gameplay that rewards reflexes and mechanical skills, so maps will have multiple floors with various escape routes, but will be relatively small and with numerous collision points that make it hard to hide. Instead, games that are mainly played in teams (e.g. \textit{Battlefield 1942}) will have bigger maps with few collision points allowing teams to strategially position themselves to gain control of these sections.
 
-For these reasons, academic research has either focused on a singular and more universal aspect of level design (such as pace, challenge or tension), or has tried to analyze a specific game (or type of game) to examine a specific aspect of its level design.
+The observations made in this section about balancing maps in competitive FPS games may seem like "common sense", however \citeauthor{johnston_common_2003}, author of the popular "Dust II" map in figure \ref{fig:dust2}, argues that the best asset a level designer has is their common sense, and uses practical examples to guide readers on how to create balanced and fun maps \cite{johnston_common_2003}.
 
-\Citeauthor*{guttler_spatial_2003} outlined the basic spatial principles of level design in multiplayer first-person shooters with special reference to \textit{Counter-Strike} \cite{guttler_spatial_2003}. They argue  that successful level design for multiplayer FPS is based on several factors, such as gameplay, theme, architecture and spatial structure, and that the level designer will greatly benefit from leveraging theoretical tools to develop maps, as such tools would make  eliciting specific gameplay during game sessions easier. By analyzing the gameplay of existing maps and their layouts they deduce the basic spatial principles of \textit{Counter-Strike}'s level design, and elaborate on how to best apply them to create a successful map. 
-
-\Citeauthor{larsen_level_2006} argues the usefulness of patterns in fields ranging from software development to film making, and proposes that they can be used to describe level design practices in the domain of FPS games. He specifically focuses on several competitive multiplayer FPS games (\textit{Unreal Tournament 2004}\footnote{Epic Games, 2004}, \textit{Day of Defeat: Source}\footnote{Valve Corporation, 2005} and \textit{Battlefield 1942}) and extracts common design patterns by analyzing several levels in search of common ways of solving problematic elements. He defines the patterns of "multiple paths", "local fights", "collision points", "reference points", "defense areas" and "risk incentive". For each identified pattern, he provides a description, examples on how to use the pattern, consequences on gameplay, how it interacts with other patterns and commercial examples of its use. He concludes that recurring patterns should not streamline levels but instead be used as tools to design better levels. \cite{larsen_level_2006}
-
-In a similar vein, \Citeauthor*{hullett_design_2010} adapt how patterns are characterized in the field of software engineering to the domain of single player FPS level design. They use this characterization to identify a set of design patterns commonly used in FPS level design, which can be used as a language for describing design practices in the domain of FPS games. Patterns are divided into "patterns for positional advantage" (sniper locations, gallery, choke point), "patterns for large scale combat" (arena, stronghold), "patterns for alternate gameplay" (turret, vehicle selection) and "pattern for alternate routes" (split-level, hidden area, flanking route). For each, they provide a description, how it can be modified, the gameplay it creates, how it interacts with other patterns and commercial examples of its use. 
-They argue that patterns can help designers generate new ideas by combining them, and can also help solve design problems by providing guidance on what to add or remove to achieve a gameplay goal, since patterns offer a clear cause-effect explanation. \cite{hullett_design_2010}
+Finally, we note that there is a lack of academic research on the topic of balancing maps in competitive FPS games, which leads to a lack of a clear methodology to follow when designing and balancing a map, having instead to rely on "common sense", trial and error, observation and experience.  
 
 \section{Procedural content generation in games}
+\label{sec:level_design}
 We refer to \textit{Procedural Content Generation} (PCG) as the process of creating game content algorithmically, rather than manually. This can be used to create levels, characters, items, quests, dialogues, and more. 
 
 PCG has been used in games since the early days of the industry, with games like \textit{Rogue}\footnote{A.I. Design, 1980} using procedural generation to create levels, items, and enemies. The technique has helped developers create games that use less storage space and have more replayability. To this day, many successful games that span many genres employ PCG to create content, such as \textit{Minecraft}\footnote{Mojang, 2011}, \textit{No Man's Sky}\footnote{Hello Games, 2016}, the \textit{Mystery Dungeon}\footnote{Chunsoft, 1993} series or \textit{Hades}\footnote{Supergiant Games, 2020}.
@@ -564,11 +289,12 @@ PCG has been used in games since the early days of the industry, with games like
 \end{figure}
 
 
-In the domain of FPS games PCG has mostly been used for single player games or multiplayer collaborative games. The already cited \textit{No Man's Sky} uses PCG to create an entire universe of planets, each with its own flora, fauna, and resources. \textit{Borderlands}\footnote{Gearbox Software, 2009} uses PCG to create weapons with different stats and abilities, while \textit{Deep Rock Galactic}\footnote{Ghost Ship Games, 2018} uses creates levels that are different each time a mission is played. However, there are no critically acclaimed multiplayer competitive games that use PCG to create levels yet.
+In the domain of FPS games PCG has mostly been used for single player games or multiplayer collaborative games. The already cited \textit{No Man's Sky} uses PCG to create an entire universe of planets, each with its own flora, fauna, and resources. \textit{Borderlands}\footnote{Gearbox Software, 2009} uses PCG to create weapons with different stats and abilities, while \textit{Deep Rock Galactic}\footnote{Ghost Ship Games, 2018} creates levels that are different each time a mission is played. However, there are no critically acclaimed multiplayer competitive games that use PCG to create levels yet.
 
-\Citeauthor*{togelius_search-based_2010} offer a taxonomy of PCG approaches used in games by drawing some distinctions between them. First they note the difference between \textit{online} approaches, which generate content as the game is played, and \textit{offline} approaches, which generate content during the development phase. Then they distinguish between \textit{necessary} and \textit{optional}, depending on whether the content generated is mandatory in order to finish the game. Another distinction is between \textit{random seeds} and \textit{parameter vectors}; the former simply takes a single seed to generate content, while the latter uses more parameters. The amount of randomness can classify an approach as \textit{stochastic} or \textit{deterministic}. Finally, they distinguish \textit{constructive} approaches, where the content is generated once while ensuring that it is correct and good during the creation process itself, and \textit{generate-and-test}, where the content is first generated and then tested, and the algorithm is possibly repeated to produce better content. \cite{togelius_search-based_2010}
+\Citeauthor*{togelius_search-based_2010} offer a taxonomy of PCG approaches used in games by drawing some distinctions between them. First they note the difference between \textit{online} approaches, which generate content as the game is played, and \textit{offline} approaches, which generate content during the development phase. Then they distinguish between \textit{necessary} and \textit{optional}, depending on whether the content generated is mandatory in order to finish the game. Another distinction is between \textit{random seeds} and \textit{parameter vectors}; the former simply takes a single seed to generate content, while the latter uses more parameters. The amount of randomness can classify an approach as either \textit{stochastic} or \textit{deterministic} and, finally, they distinguish \textit{constructive} approaches, where the content is generated once, ensuring that it is correct and good during the creation process itself, and \textit{generate-and-test}, where the content is first generated and then tested, and the algorithm is possibly repeated to produce better content. \cite{togelius_search-based_2010}
 
 \subsection{Search based procedural content generation}
+\label{subsec:search_based_pcg}
 Referring to the taxonomy of PCG approaches just defined, \textit{Search Based Procedural Content Generation} (SB-PCG) is a particular case of \textit{generate-and-test} PCG, where the content is first generated, then the candidate is tested and evaluated with a \textit{fitness function}, and the generation of a new candidate depends on the result of this evaluation. \cite{togelius_search-based_2010}
 
 \begin{figure}[H]
@@ -580,17 +306,17 @@ Referring to the taxonomy of PCG approaches just defined, \textit{Search Based P
 
 Among search-based PCG methods, \textit{Evolutionary Algorithms} (EA) make up the majority of them. \cite{togelius_search-based_2010}
 
-An EA is a population-based optimization algorithm that mimics the process of natural selection, borrowing some concepts from biology and genetics. An algorithm of this family proceeds in cycles, often called epochs or generations. The first epoch starts with generating an initial population of candidates, then each candidate in the population is evaluated with a fitness function and the best candidates are selected to reproduce using crossover or mutation, creating new candidates that will replace the worst of the old population, giving rise to a new population that will be the starting point of the next epoch. This process is repeated for a number of generations, and the algorithm ends when a stopping criterion is met, like a reaching certain number of generations or finding an individual with a particularly high fitness. \cite{lones_sean_2011}
+An EA is a population-based optimization algorithm that mimics the process of natural selection, borrowing some concepts from biology and genetics. An algorithm of this family proceeds in cycles, often called epochs or generations. The first epoch starts with generating an initial population of candidates (or individuals), then each candidate in the population is evaluated with a fitness function and the best are selected to reproduce using crossover or mutation, creating new candidates that will replace the worst scoring individuals, giving rise to a new population, which will be the starting point of the next epoch. This process is repeated for a number of generations, and the algorithm ends when a stopping criterion is met, like a reaching certain number of generations or finding an individual with a particularly high fitness. \cite{lones_sean_2011}
 
 An important concept that is loosely taken from biology is that of \textit{genotype} and \textit{phenotype}. EAs usually cannot work directly on the final content they are trying to generate, such as maps or 3D models, and they instead work on a low-level representation that may employ different parameters and data structures to describe the candidate's content. This representation should also allow the algorithm to apply crossover and mutation in a computationally fast and meaningful way. Each genotype is then mapped to a phenotype, which is the final content, that can be evaluated by the fitness function. \cite{togelius_search-based_2010}
 
 Choosing the right genotype and genotype-to-phenotype mapping is crucial to the success of the algorithm, and many factors have to be taken into account. 
 
 Firstly, it is important to choose a genotype representation with the right amount of parameters; an encoding having few parameters may be unable to represent the content or introduce bias in the search space, while having too many parameters may make the search space too large to be effectively explored by the algorithm\footnote{This phenomenon is called the \textit{curse of dimensionality}, referencing how having too many dimensions in a search is often detrimental to the search itself.}.
-A good genotype representation will sport good locality, meaning that a small change in the genotype should result on average in small changes in the phenotype.
+A good genotype representation will also sport good locality, meaning that a small change in the genotype should result on average in small changes in the phenotype.
 A genotype encoding should also be able to represent all interesting solutions, which could be hard to achieve while avoiding the use of too many parameters. \cite{togelius_search-based_2010}
 
-A genotype that is one to one with the phenotype (which is classified as a \textit{direct encoding}) will often lead to a search space that is too large to be effectively searched by most EAs, as we would need too many parameters to describe all the details of the phenotype. Using instead a single parameter, such as a random seed, to generate the phenotype (which is classified as \textit{indirect encoding}, as we need a complex computation to obtain the phenotype from the parameters) may lead to very poor locality, since by definition a good random number generator will sport no correlation between the numbers generated by neighboring seed values. Choosing the correct balance between these two extremes is crucial to the success of the algorithm and requires knowledge of the domain. \cite{togelius_search-based_2010}
+A genotype that is one to one with the phenotype (which is classified as a \textit{direct encoding}) will often lead to a search space that is too large to be effectively searched by most EAs, as we would need too many parameters to describe all the details of the phenotype. Using instead a single parameter, such as a random seed, to generate the phenotype (which is classified as \textit{indirect encoding}, as we need a complex computation to obtain the phenotype from the parameters) may lead to very poor locality, since by definition a good random number generator will show no correlation between the numbers generated by neighboring seed values. Choosing the correct balance between these two extremes is crucial to the success of the algorithm and requires knowledge of the domain. \cite{togelius_search-based_2010}
 
 Another crucial factor of an EA is the fitness function. First, it has to be defined what is the objective of the search, then the fitness function must be formalized. The process of defining the fitness function is complex as it requires domain-specific knowledge and depends on the objective of the search; to define how hard a level is to play we can leverage objective data, such as how many times a player dies or where he died, but formalizing abstract concepts, such as how much fun a level is to play, will surely rely on conflicting assumptions and subjective opinions, which could make our evaluation imprecise and unreliable. \cite{togelius_search-based_2010}
 
@@ -602,7 +328,8 @@ We can classify fitness functions in 3 categories \cite{togelius_search-based_20
 \end{itemize}
 
 
-\subsection{Procedural content generation in competitive FPS games}
+\subsection{Procedural map generation in competitive FPS games}
+\label{subsec:pcg_fps}
 While no acclaimed commercial game uses PCG to create maps for competitive multiplayer games, some academic research has been done on the topic.
 
 \citeauthor{cardamone_evolving_2011} have started research in this field by using search-based techniques to generate playable FPS maps for the "deathmatch" game mode of \textit{Cube 2: Sauerbraten}\footnote{Lee Salzman, Wouter van Oortmerssen, Mike Dysart, Robert Pointon, 2004}. In their work they defined four different genotypes (\textit{All-White}, \textit{All-Black}, \textit{Grid} and \textit{Random-Digger}), and mapped each to a phenotype that can be used to generate a map for Cube 2. The candidate maps are evaluated using a simulation-based fitness function; each map is played for 10 minutes by 4 bots and the fitness is based on the \textit{average fighting time}, that is defined as the amount time passed from the moment in which the player starts to fight an opponent to the moment in which the player is killed. They argue that interesting maps will have features, such as escape routes and well-placed resources, that allow for long fights to happen. \cite{cardamone_evolving_2011}
@@ -631,11 +358,11 @@ Their work both proved the possibility of using an EA to evolve FPS maps and hig
 
 \Citeauthor{lanzi_evolving_2014} have instead focused on evolving maps for \textit{Cube 2: Sauerbraten} that are balanced for a 1-vs-1 "deathmatch" game mode, simulated by agents which have differing skill levels and play styles. Leveraging the \textit{All-Black} genotype defined by \Citeauthor{cardamone_evolving_2011}, they employed a simulation-based fitness function based on \textit{entropy}, a measure of the match's balance based on the number of kills of each player. \cite{lanzi_evolving_2014}
 
-\Citeauthor{olsted_interactive_2015} moved to evolving maps for the game \textit{FPSEvolver} focusing on the "Bomb Defusal" game mode, similar to that of \textit{Counter-Strike}. They argue that this game mode encourages more tactical planning and teamwork and that maps obtained by \Citeauthor{cardamone_evolving_2011} were unsuited, as they contained few dedicated arenas and many dead-ends. To obtain engaging maps they define a set of guidelines (named "\textit{the good engagement}") and a new genotype that by design creates layouts that adhere to these concepts, avoiding dead ends and ensuring arenas. They then employed \textit{iterative evolutionary computation} to evolve maps, requiring real users to play the maps. Users are then required to leave a binary feedback that is used to guide the evolution. \cite{olsted_interactive_2015}
+\Citeauthor{olsted_interactive_2015} moved to evolving maps for the game \textit{FPSEvolver} focusing on the "Bomb Defusal" game mode, similar to that of \textit{Counter-Strike}. They argue that this game mode encourages more tactical planning and teamwork and that maps obtained by \Citeauthor{cardamone_evolving_2011} were unsuitable for this purpose, as they contained few dedicated arenas and many dead-ends. To obtain engaging maps they define a set of guidelines (named "\textit{the good engagement}") and a new genotype that by design creates layouts that adhere to these concepts, avoiding dead ends and ensuring arenas. They then employed \textit{iterative evolutionary computation} to evolve maps, requiring real users to play the maps. Users are then asked to leave a binary feedback that is used to guide the evolution. \cite{olsted_interactive_2015}
 
 \Citeauthor{loiacono_fight_2017} took an approach similar to that of \Citeauthor{cardamone_evolving_2011}, leveraging their \textit{All-Black} representation to evolve maps that foster a fleeing behavior. They evolve maps that optimize a simulation-based fitness calculated using the number of times a bot loses track of an enemy who it is currently fighting. They prove that their method is able to generate map that foster fleeing behavior in bots that are designed to always attack while creating maps that significantly reduce pace. \cite{loiacono_fight_2017}
 
-\citeauthor{bari_evolutionary-based_2023} applied an EA with a multi-objective fitness approach in conjunction with the NSGA-II\footnote{NSGA-II (Non-dominated Sorting Genetic Algorithm II) is a popular multi-objective optimization algorithm that uses a fast non-dominated sorting approach and a crowding distance mechanism to ensure diversity among the solutions.} selection algorithm to optimize maps in both \textit{entropy} and \textit{pace}. \Citeauthor{bari_evolutionary-based_2023} used both the \textit{All-Black} genotype and a new grid based phenotype, \textit{Grid-Graph}, aimed at reducing the noise of the former and improving its locality. Maps were evolved for a 1-vs-1 "deathmatch" game mode in \textit{Project Arena}\footnote{\Citeauthor{ballabio_online_2018}, \citeyear{ballabio_online_2018}}, a research-oriented framework developed by \Citet{ballabio_online_2018}. While results showed successful evolution and proved that \textit{Grid-Graph} performed better in this scenario, concerns remain over the simplistic layouts generated by this representation. \cite{bari_evolutionary-based_2023}
+\citeauthor{bari_evolutionary-based_2023} applied an EA with a multi-objective fitness approach in conjunction with the NSGA-II\footnote{NSGA-II (Non-dominated Sorting Genetic Algorithm II) is a popular multi-objective optimization algorithm that uses a fast non-dominated sorting approach and a crowding distance mechanism to ensure diversity among the solutions.} selection algorithm to optimize maps in both \textit{entropy} and \textit{pace}. \Citeauthor{bari_evolutionary-based_2023} used both the \textit{All-Black} genotype and a new grid based genotype, \textit{Grid-Graph}, aimed at reducing the noise of the former and improving its locality. Maps were evolved for a 1-vs-1 "deathmatch" game mode in \textit{Project Arena}\footnote{\Citeauthor{ballabio_online_2018}, \citeyear{ballabio_online_2018}}, a research-oriented framework developed by \Citet{ballabio_online_2018}. While results showed successful evolution and proved that \textit{Grid-Graph} performed better in this scenario, concerns remain over the simplistic layouts generated by this representation. \cite{bari_evolutionary-based_2023}
 
 \citeauthor{bhojan_arena_2014} instead focused on finding a faster evolution method to evolve maps in an online fashion for a "Capture the Flag" game mode in a game they developed to test their method. 
 To achieve this result, they generate a map by placing tiles that either are an indoor area, an outdoor area or are inaccessible, following a rule of adjacency with pre-existing tiles. 
@@ -645,19 +372,20 @@ The map is then cleaned of artifacts and scanned with a \textit{Flood Fill}\foot
 % [TODO: add cachia?]
 
 \section{Quality diversity and MAP Elites}
+\label{sec:qd}
 The process of natural evolution has served as an inspiration for evolutionary algorithms, but it can be argued that they lag behind with respect to nature's capabilities, so much so that some argued that EAs are \textit{ad-hoc}, unprincipled or less effective than other theoretically based optimization methods. Despite these claims, as far as nature is concerned, evolution stands unmatched in power, having produced artifacts beyond the capability of any subfield of optimization. To fill the gap between the power of evolution in nature and the performance of evolutionary methods in optimization, researchers have observed that \textit{optimization} is not the end goal of evolution, but rather that evolution is simply very good at \textit{something} that isn't \textit{optimization}, and that we may have been trying to exploit evolution in the wrong way. As a matter of fact, in nature, evolution has no unifying objective, and organisms are often rewarded for being diverse, such as when they carve a niche with less competition to increase their likelihood of survival. \cite{pugh_quality_2016}
 
-Starting from these observations about the nature of evolution itself, a new type of search, called \textit{Quality Diversity} (QD), emerged. The goal in QD is not to find the one optimal solution, but instead to find a maximally diverse collection of individuals. When using QD approaches researchers define a \textit{behavior characterization} (BC) by selecting \textit{behavioral features} of interest, thus defining a space of possible behaviors. The underlying idea is that each part of this space is just as important as the next, while traditional optimization methods would instead focus on the most promising part of the space. When compared to other optimization methods that return multiple results, in QD methods \textit{diversity} of individuals is measured solely based on their behavior. \cite{pugh_quality_2016}  
+Starting from these observations about the nature of evolution itself, a new type of search, called \textit{Quality Diversity} (QD), emerged. The goal in QD is not to find the one optimal solution, but instead to find a maximally diverse collection of individuals. When using QD approaches researchers define a \textit{behavior characterization} (BC) by selecting \textit{behavioral features} of interest, thus defining a space of possible behaviors. The underlying idea is that each part of this space is just as important as the next, while traditional optimization methods would instead focus on the most promising part of the space. When compared to other optimization methods that return multiple results, in QD methods the \textit{diversity} of individuals is measured solely based on their behavior. \cite{pugh_quality_2016}  
 
 As a practical example we can imagine the space of possible levels in a video-game. A generic EA, whose only goal is optimization, given a suitable representation (genotype) for the actual levels (phenotype) and a way to map the two (genotype-to-phenotype mapping), would meaure the fitness of each individual and discard low performing ones. A QD algorithm, instead, also defines and measures some \textit{behavioral features} of the levels, such as the level's dimension or the number of enemies, which define the space of possible behaviors. By only focusing on performance, the EA may ignore some parts of this space, such as small levels with few enemies, while the QD algorithm would aim at exploring all possibilities, which may allow it to find stepping stones for evolution.
 
-One of the first works leaning towards QD was done by \citeauthor{lehman_exploiting_2008}, who introduced a new domain-independent algorithm to perform open-ended searches called \textit{Novelty Search} \cite{lehman_exploiting_2008}. This new approach did not place pressure to evolve towards a specific objective, but instead exclusively promoted behavioral diversity. This characteristic allows the method to perform really well in some domains, such as in deceptive problems where the fitness landscape is misleading and the optimal solution is hard to find. While it isn't exactly a QD method, it underlines the potential of diversity-based methods. 
+One of the first works leaning towards QD was done by \citeauthor{lehman_exploiting_2008}, who introduced a new domain-independent algorithm to perform open-ended searches\footnote{Searches where the objective is not to find a single solution, but many diverse solutions. \cite{stanley_why_2019}} called \textit{Novelty Search} \cite{lehman_exploiting_2008}. This new approach did not place pressure to evolve towards a specific objective, but instead exclusively promoted behavioral diversity. This characteristic allows the method to perform really well in some domains, such as in deceptive problems where the fitness landscape is misleading and the optimal solution is hard to find. While it isn't exactly a QD method, it underlines the potential of diversity-based methods. 
 
 \Citeauthor{lehman_evolving_2011} then introduced what can be considered the first QD algorithm, \textit{Novelty Search with Local Competition (NS-LC)} \cite{lehman_evolving_2011}. This approach adds a localized fitness pressure by forcing behavioral neighbors (individuals whose features are similar, placing them close in the behavioral space) to compete, allowing for quality-based rewards to be given without asserting that a given neighborhood is better than another. This ensures that we obtain a broad population comprised of diverse behavioral niches where local competition can take place, while other non-QD approaches would instead have a notion of fitness that is global. 
 
 \Citeauthor{mouret_illuminating_2015} introduce the term \textit{illumination algorithm} to describe algorithms whose goal is not to find the single optimal solution, but instead to find the best-performing solution at each point in the behavioral space. They also describe a new illumination algorithm called \textit{Multi-dimensional Archive of Phenotypic Elites (MAP-Elites)} \cite{mouret_illuminating_2015}. 
 
-The algorithm works by first choosing \textit{N} relevant behavioral features of our individuals, therefore defining the behavior (or feature) space. Each dimension of variation is discretized, creating an \textit{N}-dimensional grid called the \textit{archive}. The search starts by generating a number of random individuals, which are evaluated to determine both their fitness and their behavioral features. Based on the value of these feature, the individual is placed in a cell of the archive. Since the archive is formed by discretizing a finite or possibly infinite space, multiple candidates may fall in the same cell. In this case, MAP-Elites will only keep the individual with the highest fitness for each cell (the \textit{elite}), forcing local competition within niches. Then, until a stopping criterion is met (iteration count, time, etc...) MAP-Elites selects a certain number of elites from the archive, generates new individuals by applying crossover, mutation or both to each elite, evaluates their fitness and measures their features to finally place them in the archive, only keeping the best individual in each cell. When elites are mutated, the new individual may, and should, end up in a different cell of the archive, allowing distant niches to be stepping stones for each other. As a matter of fact, experiments show that the lineage of elites can often be seen traversing long paths through different regions of the map. Some cells may instead remain empty, either because no genome exists with such features or because the search failed to produce one such genome, even if one existed. \cite{mouret_illuminating_2015}
+The algorithm works by first choosing \textit{N} relevant behavioral features of our individuals, therefore defining the behavior (or feature) space. Each dimension of variation is discretized, creating an \textit{N}-dimensional grid called the \textit{archive}. The search starts by generating a number of random individuals, which are evaluated to determine both their fitness and their behavioral features. Based on the value of these feature, the individuals are placed in a cell of the archive. Since the archive is formed by discretizing a finite or possibly infinite space, multiple candidates may fall in the same cell. In this case, MAP-Elites will only keep the individual with the highest fitness for each cell (the \textit{elite}), forcing local competition within niches. Then, until a stopping criterion is met (iteration count, time, etc...) MAP-Elites selects a certain number of elites from the archive, generates new individuals by applying crossover, mutation or both to each elite, evaluates their fitness and measures their features to finally place them in the archive, only keeping the best individual in each cell. When elites are mutated, the new individual may, and should, end up in a different cell of the archive, allowing distant niches to be stepping stones for each other. As a matter of fact, experiments show that the lineage of elites can often be seen traversing long paths through different regions of the map. Some cells may instead remain empty, either because no genome exists with such features or because the search failed to produce one such genome, even if one existed. \cite{mouret_illuminating_2015}
 
 \begin{figure}[H]
     \centering
@@ -668,11 +396,14 @@ The algorithm works by first choosing \textit{N} relevant behavioral features of
 
 \textit{NS-LC} is also an illumination algorithm according to \citeauthor{mouret_illuminating_2015}, but they state that it is harder to understand and implement when compared to \textit{MAP-Elites}. They also show that \textit{MAP-Elites} performs empirically better than \textit{NS-LC}, by virtue of doing away with both the need to calculate the behavioral distance at each step, since it is implied in the archive itself, and with the need to maintain an archive of visited solutions separate from the current population, which NS-LS needs to avoid "cycling", the phenomenon where the population collectively moves back and forth between two regions of the behavior space. \cite{mouret_illuminating_2015}
 
+\textit{MAP-Elites} has been used in a variety of domains and a number of variations have been developed in order to overcome certain limitations and adapt to specific needs. Some examples include \textit{Centroidal Voronoi Tessellations MAP-Elites} (CVT-ME) \cite{vassiliades_using_2017}, which scales the algorithm to high-dimensional spaces, \textit{Covariance Matrix Adaptation MAP-Elites} (CMA-ME) \cite{fontaine_covariance_2020} and \textit{Covariance Matrix Adaptation MAP-Annealing} \cite{fontaine_covariance_2022}, which doubles the perfomance of \textit{MAP-Elites} by combining the self-adaptation techniques of \textit{CMA-ES}\footnote{Covariance Matrix Adaptation Evolution Strategy is an advanced evolutionary optimization algorithm used for solving complex, non-linear, and multi-modal problems. It adapts the covariance matrix of the search distribution, allowing it to efficiently explore the search space by learning and exploiting the underlying structure of the problem.}, and \textit{Multi-Emitter MAP-Elites} \cite{cully_multi-emitter_2021}, which leverage a heterogeneus set of emitters to improve on \textit{Covariance Matrix Adaptation MAP-Elites}. Moreover, \textit{Constrained MAP-Elites} \cite{khalifa_talakat_2018}, \textit{MAP-Elites with Sliding Boundaries} (MESB) \cite{fontaine_mapping_2019} and other alternatives have been developed in the context of procedural content generation in games, which we will examine in the next section.
+
 \subsection{Quality Diversity for procedural content generation in games}
+\label{subsec:qd_pcg}
 Among the many applications of QD methods across disciplines, such as optimization, robotics and machine learning, particularly relevant is their application to procedural content generation in games.
 
 Quality Diversity is an appealing approach to PCG in games for a variety of reasons. 
-QD is able to generate a diverse set of high performing solution, while constructive algorithms and machine learning methods instead produce a single artifact, search based PCG is only concerned with the best-performing solution, and other declerative apporaches, such as generative programming, while fast, lack the ability to control the diversity of the generated content. Moreover, QD considers more than one dimension of interest and leverages local competition instead of global competition, making it capable of exploring the fitness landscape better than other search based methods. This allows QD to avoid deceptive fitness landscapes that may arise from the inherently difficult task of designing a fitness function. QD also generates, as a byproduct, the large set of artifacts needed to perform \textit{Expressivity Analysis}\footnote{The analysis of the output in terms of styles and variety of artifacts generated by the chosen approach, which can highlight biases of the generator towards specific types of content. \cite{gravina_procedural_2019}}, making it possible to run this process online during generation. Finally, QD is especially suited for mixed-initiative content design and offers \textit{explainability}\footnote{Explainable AI for Designers is an important research area that aims to aid the game designer in understanding AI algorithms applied to games. \cite{gravina_procedural_2019}} to the game designer thanks to its capability of showing a soltuion's lineage. \cite{gravina_procedural_2019} 
+While QD is able to generate a diverse set of high performing solution, constructive algorithms and machine learning methods produce instead a single artifact, search-based PCG is only concerned with the best-performing solution, and other declerative apporaches, such as generative programming, while fast, lack the ability to control the diversity of the generated content. Moreover, QD considers more than one dimension of interest and leverages local competition instead of global competition, making it capable of exploring the fitness landscape better than other search based methods. This allows QD to avoid deceptive fitness landscapes that may arise from the inherently difficult task of designing a fitness function. QD also generates, as a byproduct, the large set of artifacts needed to perform \textit{Expressivity Analysis}\footnote{The analysis of the output in terms of styles and variety of artifacts generated by the chosen approach, which can highlight biases of the generator towards specific types of content. \cite{gravina_procedural_2019}}, making it possible to run this process online during generation. Finally, QD is especially well-suited for mixed-initiative content design and offers \textit{explainability}\footnote{Explainable AI for Designers is an important research area that aims to aid the game designer in understanding AI algorithms applied to games. \cite{gravina_procedural_2019}} to the game designer thanks to its capability of showing a soltuion's lineage. \cite{gravina_procedural_2019} 
 
 
 In particular, \textit{MAP-Elites} has been used to generate content for a variety of genres and some variations of the technique have been developed to fit specific needs. 
@@ -680,26 +411,551 @@ In particular, \textit{MAP-Elites} has been used to generate content for a varie
 \citeauthor{khalifa_talakat_2018} have used \textit{MAP-Elites} to generate levels for bullet hell games. To that end, they developed a description language, \textit{Talakat}, capable of describing bullet hell levels, and a new technique called \textit{Constrained MAP-Elites}, which fuses the \textit{MAP-Elites} algorithm with the \textit{Feasible-Infeasible 2-Population} (FI2Pop) genetic algorithm\footnote{Genetic algorithm where two populations are kept, one of feasible and one of infeasible individuals. The feasible population is evolved to better its fitness, while the infeasible one to reduce their constraint violations, allowing the method to find more stepping stones. \cite{kimbrough_feasibleinfeasible_2008}} \cite{kimbrough_feasibleinfeasible_2008}. This new algorithm is able to evolve bullet hell levels described with \textit{Talakat} by keeping in each cell of the archive a population of feasible and infeasible levels, which are those levels that either satisfy a number of constrainsts or don't, and by evolving both populations simultaneously. Keeping two populations allows \textit{Constrained MAP-Elites} to find stepping stones between levels that would have otherwise been discarded immediately. Instead of defining a complex fitness function that describes "good" levels, a number of metrics are chosen as different dimensions of the \textit{Constrained MAP-Elites} and only playability is considered for the fitness function. \cite{khalifa_talakat_2018}
 % TODO: keep last sentence?
 
-A number of works have instead focused on platforming games. \Citeauthor{khalifa_intentional_2019} use \textit{Constrained MAP-Elites} to evolve a variety of playable \textit{Super Mario Bros.} levels which revolve around a specific game mechanic, using and comparing different simulation approaches to generate them \cite{khalifa_intentional_2019}. \Citeauthor{warriar_playmapper_2019} implemented \textit{PlayMapper}, a variation on the MAP-Elites algorithm, that is able to generate \textit{Super Mario Bros.} levels of different sizes and grants a significant amount of control over their genereation, in contrast with popular "blackbox" AI techniques \cite{warriar_playmapper_2019}. \citeauthor{fontaine_illuminating_2021} apply a number of \textit{MAP-Elites} methods to illuminate the latent space of a \textit{Generative Adversarial Network (GAN)} trained on scenes from \textit{Super Mario Bros}. They focus on assessing the performance of QD algorithms on the task of generating scenes for \textit{Super Mario Bros.} with the desidered characteristics \cite{fontaine_illuminating_2021}.
+A number of works have instead focused on platforming games. \Citeauthor{khalifa_intentional_2019} use \textit{Constrained MAP-Elites} to evolve a variety of playable \textit{Super Mario Bros.} levels which revolve around a specific game mechanic, using and comparing different simulation approaches to generate them \cite{khalifa_intentional_2019}. \Citeauthor{warriar_playmapper_2019} implemented \textit{PlayMapper}, a variation on the MAP-Elites algorithm, that is able to generate \textit{Super Mario Bros.} levels of different sizes and grants a significant amount of control over their genereation, in contrast with popular "blackbox" AI techniques \cite{warriar_playmapper_2019}. \citeauthor{fontaine_illuminating_2021} apply a number of \textit{MAP-Elites} methods to illuminate the latent space of a \textit{Generative Adversarial Network (GAN)}\footnote{The latent space of a GAN is the space from which points are taken as input to generate new artifacts, and usually it's a vector. During training, the GAN learns how to map each point to generate an artifact.} trained on scenes from \textit{Super Mario Bros}. They focus on assessing the performance of QD algorithms on the task of generating scenes for \textit{Super Mario Bros.} with some specific characteristics \cite{fontaine_illuminating_2021}.
 
-Another genre that has been the focus of QD research is that of "Zelda-like"\footnote{Games similar to The \textit{Legend of Zelda} (1986), where a player character traverses a world, fights enemies and beats dungeons made up of rooms with locked doors and keys.} adventure games, set in dungeons. 
+Another genre that has been the focus of QD research is that of "Zelda-like"\footnote{Games similar to The \textit{Legend of Zelda} (Nintendo EAD, 1986), where a player character traverses a world, fights enemies and beats dungeons made up of rooms with locked doors and keys.} adventure games, set in dungeons. 
 \citeauthor{alvarez_empowering_2019} have used a new QD algorithm called \textit{Interactive Constrained MAP-Elites} to evolve dungeon rooms in \textit{Evolutionary Dungeon Designer} (EDD), a "mixed-initiative co-creativity"\footnote{The process of creating something by reapeatedly having a human and a machine inspire each other through reciprocal stimuli.} tool. They leverage EDD's fitness and FI2Pop algorithm to develop an interactive version of \textit{Constrained MAP-Elites}, where the user guides the search towards satisfying results by choosing the features to explore and providing feedback on generated rooms \cite{alvarez_empowering_2019}. 
 \citeauthor{charity_mech-elites_2020} searched for levels with specific mechanics in the \textit{GVG-AI Framework}'s games \cite{perez-liebana_general_2019}, which include a "Zelda-like" game \cite{charity_mech-elites_2020}. 
-\Citeauthor{gonzalez-duque_finding_2020} used the \textit{Intelligent Trial-and-Error}\footnote{A form of Bayesian Optimization that uses MAP-Elites to generate the prioris for a Gaussian Process} algorithm to perform \textit{Dynamic Difficulty Adjustment}, successfully producing levels of the desired difficulty for a "Zelda-like" game \cite{gonzalez-duque_finding_2020}. \citeauthor{viana_illuminating_2022} focused on generating entire levels, instead of rooms, along with locked doors missions and enemy placement using MAP-Elites, while maintaining dungeon quality and providing a set of diverse levels \cite{viana_illuminating_2022}.
+\Citeauthor{gonzalez-duque_finding_2020} used the \textit{Intelligent Trial-and-Error}\footnote{A form of Bayesian Optimization that uses MAP-Elites to generate the prioris for a Gaussian Process} algorithm to perform \textit{Dynamic Difficulty Adjustment}, successfully producing levels of the desired difficulty for a "Zelda-like" game \cite{gonzalez-duque_finding_2020}. \citeauthor{viana_illuminating_2022} focused on generating entire levels, instead of single rooms, along with locked doors missions and enemy placement using MAP-Elites, while maintaining dungeon quality and providing a set of diverse levels \cite{viana_illuminating_2022}.
 
-Some research has been done in the realm of puzzle games. \Citeauthor{charity_baba_2020} developed \textit{Baba is Y'all}, a mixed-initiative version of \textit{Baba is You} (2019) where players design levels in collaboration with the machine. The game allows players to edit \textit{Baba is You} levels, similar to \textit{Super Mario Maker}\footnote{Nintendo EPD, 2015}, with the added goal of filling the archive of the underlying MAP-Elites algorithm, where levels are placed based on the combination of mechanics (rules) that are activated to solve them. The system can propose various starting levels for the user to edit based on what is in the archive and what's currently missing to help players fill the archive \cite{charity_baba_2020}. 
+Some research has been done in the realm of puzzle games. \Citeauthor{charity_baba_2020} developed \textit{Baba is Y'all}, a mixed-initiative version of \textit{Baba is You}\footnote{Hempuli, 2019} where players design levels in collaboration with the machine. The game allows players to edit \textit{Baba is You} levels, similar to \textit{Super Mario Maker}\footnote{Nintendo EPD, 2015}, with the added goal of filling the archive of the underlying MAP-Elites algorithm, where levels are placed based on the combination of mechanics (rules) that are activated when solving them. The system can propose various starting levels for the user to edit based on what is already in the archive and what's currently missing to help players fill the archive \cite{charity_baba_2020}. 
 
 MAP-Elites has also been used to generate powerful but diverse decks for \textit{Hearthstone}\footnote{Blizzard Entertainment, 2014}. \citeauthor{fontaine_mapping_2019} noted that \textit{MAP-Elites} uniformly divides the behavior space, however this can lead to a mismatch with the true distribution of the behavior space, which would result in a less effective illumination. Moreover, they argue that knowing \textit{a priori} this distribution can be hard or even impossible. To solve these issues they propose \textit{MAP-Elites with Sliding Boundaries} (MESB), a variation of MAP-Elites where buondaries between cells are not placed uniformly based on the value of the features, but instead are dynamically placed at certain percentage marks of the distribution. A remap frequency is specified, meaning that the boundaries are periodically recalculated, allowing for a good estimation of the distribution of the search space. \cite{fontaine_mapping_2019}
 
-Quality Diversity method have yet to be applied to FPS games, be them singleplayer or multiplayer, which is where our research places itself.
+Quality Diversity methods have yet to be applied to FPS games, be them singleplayer or multiplayer, which is where our research places itself.
 
 \section{Summary}
-In this chapter we have outlined the main concepts of level design in games, focusing on the differences between singleplayer, cooperative and competitive multiplayer games, and how these differences are reflected in the level design principles that are used. We have also discussed the main concepts of Procedural Content Generation in games, focusing on search-based methods and Evolutionary Algorithms in particular. We have then introduced the concept of Quality Diversity and the MAP-Elites algorithm, explaining how they came to be and how they differ from traditional optimization methods. Finally, we have reviewed the main works that have used Quality Diversity methods to generate content for different genres of games, highlighting some relevant MAP-Elites variants such as MAP-Elites with Sliding Boundaries.
+\label{sec:ch1_summary}
+In this chapter we have outlined the main concepts of level design in games, with a specific focus on competitive FPS games and academic research on them. We then explored the definition of "game balance", focusing on competitive games, and discussed the importance of map design in competitive FPS games to achieve balance. Furthermore, we have also discussed the main concepts of Procedural Content Generation in games, focusing on search-based methods and Evolutionary Algorithms in particular, and how they have been used to generate maps for FPS games. We have then introduced the concept of Quality Diversity and the MAP-Elites algorithm, explaining how they came to be and how they differ from traditional optimization methods. Finally, we have reviewed the main works that have used Quality Diversity methods to generate content for different genres of games, highlighting some relevant MAP-Elites variants such as MAP-Elites with Sliding Boundaries.
+
+
+\chapter{Project Arena}
+\label{ch:project_arena}
+
+[TODO: Intro]
+
+\section{Description and motivations}
+\label{sec:pa_description}
+Academic research on the topic of procedural map generation in FPS games has mostly used \textit{Cube 2: Sauerbraten} \cite{cardamone_evolving_2011}\cite{lanzi_evolving_2014}\cite{loiacono_fight_2017}; while undoubtedly a powerful option thanks to its rich map editor, its ability to run in headless mode and its open-source nature, modifying the source code of a game is never an easy task. Moreover, the game was never developed with the explicit intent of being used in academic research, which makes it cumbersome to run tasks such as user studies, with parties involved needing to download the game on their machines, which would often discourage participants.
+
+\textit{Project Arena} \cite{ballabio_online_2018} is a research-oriented framework developed by \citeauthor{ballabio_online_2018} in \textit{Unity}\footnote{A popular game engine developed by Unity Technologies.} with the main goals of being light and modular. Using a game engine lends the framework to being modified more easily, since it is widely known in the industry, and also allows the game to be easily built for WebGL, allowing the game to be run in a browser. 
+
+One issue with the framework, compared to \textit{Cube 2: Sauerbraten}, was the lack of bots, which are essential to perform simulations in search-based PCG methods. To solve this issue, \citeauthor{bari_evolutionary-based_2023} developed bots that can be used in the framework \cite{bari_evolutionary-based_2023}. This way games can be simulated and data can be recorded to be later analyzed or to be used for fitness calculations.
+
+\section{Framework overview}
+\label{sec:pa_overview}
+
+\subsection{Map Representation}
+\label{subsec:map_representation}
+
+Maps can be seen as matrices of orthogonal \textit{tiles}, and are internally represented as matrices of characters. A tile in the map corresponds to a cell in the matrix, and depending on the character in the cell the tile can be a wall, a floor or an object on the floor. Map can also have multiple levels, in which case they are represented as lists of matrices, with each representing a level.
+
+Two different formats can then be supplied to the framework, which are converted to the internal format just described. The first is a textual representation, where each line corresponds to a row of the matrix, and a blank line is used to divide multi-level maps. The second is a modified version of the \textit{All-Black} genotype originally defined by \citeauthor{cardamone_evolving_2011}, where rooms are encoded as triplets with the center's coordinates and size, corridors as triplets with the starting position's coordinates and length and objects as triplets with the object's coordinates and type. Multi-level maps are represented by dividing levels with special characters.
+
+\subsection{Structure}
+\label{subsec:structure}
+The framework is organized in a series of modular "Managers" that handle different aspects of the game, aided by various other modules.
+
+The \textbf{Game Manager} is the main manager and is responsible for the behavior of a game, with different Game Managers being used for different game modes, which include \textit{Duel}, a classic deathmatch, \textit{Target Rush}, where waves of enemies must be eliminated, and \textit{Target Hunt}, where a series of enemies must be eliminiated within a time limit. The Game Manager is responsible for managing the lifecyle of a game, inluding setup, map generation, countdown, play and end.
+
+The \textbf{Map Manager} generates or loads a map, assembles it and displaces objects on the map, relying on other entities to perform these tasks. The Map Manager is further differentiated into the Single-Level Map Manager, which handles single-level maps, the Multi-Level Map Manager, which handles multi-level maps, and the All-Black Map Manager, which handles maps in the multi-level \textit{All-Black} format.
+
+The \textbf{Map Generator} is used to generate maps, with different versions being used to generate different topologies. The \textit{Cellular Generator} employs a parametric cellular automaton to generate a map, the \textit{Divisive Generator} uses instead a binary space partitioning algorithm, the \textit{Digger Generator} uses a random digger algorithm and the \textit{All-Black Generator} parses maps in the \textit{All-Black} format. The \textbf{Stairs Generator} then places or validates stairs for multi-level maps.
+
+The \textbf{Map Assembler} aids the assembly of the map and can either assemble meshes or prefabs.
+
+The \textbf{Object Displacer} is used to place objects, such as spawn ammunitions, on the map based on the characters in the matrix. It also populates a dictionary that is used to decide where to place spawn points, which are stored by the \textbf{Spawn Point Manager}.
+
+The \textbf{Experiment Manager} is a stand-alone module that helps researchers run user-based studies. Experiments are first defined with an optional \textit{tutorial}, with a collection of \textit{studies}, each divided in multiple \textit{cases} containing each a pool of maps, which are to be validated, played on a specific game mode and finally with an optional survey. Once defined, the \textit{Experiment Manager} selects studies and cases in a round-robin fashion to assign players and runs the experiment, either online or offline. During the experiment, information is logged (e.g. the map's information, the game's information) and can be later downloaded from the server.
+
+Besides managers, other relevant components include \textbf{Entities}, which refer to any \textit{agent} that takes part in a match, and include the player, opponents and targets, \textbf{Weapons} (Assault Rifle, Shotgun, Sniper Rifle, Rocket Launcher and Laser Gun) which are highly parametrized, \textbf{Objects} such as decorations and spawners of healt packs and ammunitions. 
+
+\subsection{Bots}
+\label{subsec:bots}
+
+\citeauthor{bari_evolutionary-based_2023} devloped bots for the framework with the aim of creating a modular system that would facilitate maintenance and modifications to the bots. \cite{bari_evolutionary-based_2023}
+
+The architecture of the bots is structured in layers, with the first being the \textbf{Sensing Layer}. This layer receives raw data from the game world so that other layers can process it to determine the bot's behavior. It is responsible for sightings of players, objects and obstacles, hearing sounds and sensing damage received.
+
+The \textbf{Knowledge Base Layer} analyzes the data and provides tactical information, which is then used to make decisions. The layer is divides in modules respnsible for keeping a knowledge base of enemy locations, objects locations and last visited map locations. This information is the used by the \textit{Navigation System} to calculate the path to a given destination. This layer is also responsible for introducing a delay bewtween the bot's sight of an enemy and its actual detection, to simulate human reaction times.
+
+The \textbf{Decision Making Layer} is responsible for choosing the objective to pursue and the action plan to follow in order to achieve it, based on the bot's state and knowledge. In order to allow the bot to be easily understood and modified, the action plans that the bots are graphically defined by behavior trees and are followed to achieve the goal defined by the current state. The possible states are \textit{Wander}, \textit{Fight}, \textit{Collect pickup} and \textit{Search enemy}. 
+
+Finally, the \textbf{Actuator Layer} is responsible for actuating the physical actions of the bot, such as moving and rotating the camera, as a response to the decisions taken.
+
+An important feature of the bots is their parametrization; this allows bots to be used to simulate players with different skillset, playstyles and skill level. In particular, we can modify a general \textit{skill score}, that expresses how skilled a bot is on a scale from 0 to 1, and many \textit{ability scores}, which define how skilled a bot is on a scale from 0 to 1 in a specific characteristic, such as reflexes, aiming skill and speed. These characteristic have been used to define three bot profiles which are the \textit{Shotgun}, an aggressive and agile player focused on close-quarters combat, the \textit{Sniper}, a patient player focused on long-range combat with exceptional aiming skills, and the \textit{Assault}, a balanced player who excels in medium-range combat.
+
+\subsection{Data gathering}
+\label{subsec:pa_data_gathering}
+In order to perform experiments of any kind, data must be able to be gathered from matches. To that end, the framework is able to collect a variety of data which is saved to be later analyzed and enriched outside the framework.
+
+The framework collects the following raw data related to :
+
+\begin{itemize}
+    \item \textit{Time to engage}: The interval from the end of one combat event to the start of the next, or, at the beginning of the match, the time from respawn to the first combat encounter.
+    \item \textit{Time in fight}: The total time a bot spends actively engaged in combat, including the period spent searching for an enemy after losing visual contact.
+    \item \textit{Number of sights}: The total number of combat engagements.
+    \item \textit{Time between sights}: The time elapsed between losing sight of an enemy and detecting it again, measured for each combat event.
+    \item \textit{Number of re-soghts}: The number of times an enemy is re-detected after initially becoming undetected.
+    \item \textit{Time to surrender}: The time taken for a bot to stop searching for an enemy after losing track of it.
+    \item \textit{Number of retreats}: The number of instances where a bot ceases searching for an enemy after losing sight of it.
+\end{itemize}
+
+The framork also records the following data for each entity:
+
+\begin{itemize}
+    \item \textit{Frags}: Number of kills performed. 
+    \item \textit{Deaths}: Number of deaths. 
+    \item \textit{Shots}: Number of bullets fired. 
+    \item \textit{Hits}: Number of times a projectile shot hit an entity (including itself).
+\end{itemize}
+
+Besides raw data, the framework also calculates some metrics that are useful to analyze the design of maps. These include:
+
+\begin{itemize}
+    \item \textit{Entropy}: As defined and used by \citet{lanzi_evolving_2014} and \citet{loiacono_fight_2017}, entropy is a measure used to infer the map's balance, calulcated as follows:
+    \begin{equation}
+        entropy = \sum_{i=1}^{n} - \left(\dfrac{k_i}{k_{tot}}\right) \log_2 \left(\dfrac{k_i}{k_{tot}}\right)
+    \end{equation}
+    Where for each bot $i$ the number of kills $k_i$ is divided by the total number of kills $k_{tot}$ and multiplied by the logarithm of the result. The entropy is then the sum of these values, and is meant to represent how balanced a match on a certain map has been, given that, as we already discussed in \ref{sec:balance}, the map's design could greatly influence the match's result. Possible values range from 0 to 1, with 1 representing a balanced match and 0 meaning a wildly unbalanced match.
+    \item \textit{Pace}: The frequency of combat engagements normalized between 0 and 1, calculated as follows:
+    \begin{equation}
+        pace = 2 * \dfrac{1}{1 + \exp \left(-5 * \dfrac{NumberOfFights}{\sum TimeToEngage}\right)} - 1
+    \end{equation}
+    This sigmoid function computes values close to 0.9 when the average time to engage is 3 seconds.
+
+\end{itemize}
+
+\chapter{Pyribs}
+\label{ch:pyribs}
+
+\section{Description and motivations}
+\label{sec:pyribs_description}
+The \textit{pyribs} library\footnote{\url{https://pyribs.org/}} is a Python library that aids researchers in using state of the art Quality Diversity algorithms and in implementing new algorithms using pyribs's modular conceptual Quality Diversity framework called \textit{RIBS}.
+
+\textit{pyribs} aims at solving two challenges found within the Quality Diversity community: a lack of a conceptual framework applicable to  recently developed QD algorithms that also incorporate evolution strategies, gradient ascent and Bayesian optimization, and a lack of an implementation of said framework in a software that supports many users. \textit{pyribs} attempts to do so by introducing the \textit{RIBS framework}, explained in \ref{sec:ribs}, and by providing a Python implementation of it. \cite{tjanaka_pyribs_2023}
+
+Other libraries exist in the field of Quality Diversity, written in different languages and serving different purposes. \textit{Sferes\textsubscript{v2}} \cite{mouret_sferesv2_2010} is a C++ framework designed for high performance focusing on Evolutionary Algorithms as a whole, including Quality Diversity algorithms. The use of templates makes the library efficient at the cost of accessibility. 
+\textit{QDpy} \cite{cazenille_qdpy_2018} is a Python library focused solely on QD algorithms which offers building blocks that can be composed into different algorithms, but requires the user to supply an evaluation function, limiting its flexibility. 
+\textit{pymap\_elites} \cite{mouret_python3_2019}  is a reference implementation of the MAP-Elites algorithm and of some variants, such as CVT-ME \cite{vassiliades_using_2017}, in Python, but it is not designed to be a general-purpose QD library.
+Finally, \textit{QDax} \cite{lim_accelerated_2022} focuses on implementing QD algorithms, EAs, and Reinformecement Learning algorithms for hardware accelerators\footnote{Hardware accelerators are specialized hardware designed to perform specific tasks more efficiently than general-purpose hardware. Some examples of hardware accelerators include GPUs and TPUs}.
+
+We chose \textit{pyribs} for our research because of its dedicated focus on Quality Diversity algorithms, its comprehensive selection of state-of-the-art methods, its user-friendly interface, its visualization methods and its flexibility for extension and customization. 
+
+\section{RIBS framework}
+\label{sec:ribs}
+
+To solve the challange of a lack of a conceptual framework, \citeauthor{tjanaka_pyribs_2023} introduce the \textit{RIBS} framework, whose goal is to be capable of implementing any QD algorithm, from MAP-Elites to Novelty-Search, and all variations that may use evolutionary strategies, such as  \textit{Covariance Matrix Adaptation MAP-Elites} \cite{fontaine_covariance_2020}, gradient ascent, or Bayesian Optimization.
+
+The framework is made up of three main components: the \textit{Archive}, the \textit{Emitters} and the \textit{Scheduler}.
+
+The \textbf{Archive} is the component responsible for storing solutions. It allows for the addition of new solutions and querying of existing ones. When solutions are added, the archive provides feedback on the insertion, such as whether the new solution improved an existing elite or its novelty score\footnote{The novelty score is typically defined as the average distance in the measure space from the solution to its k-nearest neighbors in the archive}, depending on its type.
+
+The \textbf{Emitters} are responsible for generating new solutions. They can be asked for new solutions and may require to be told the fitness they achieved in order to update their internal algorithm. 
+For example, the basic \textit{MAP-Elites} \cite{mouret_illuminating_2015} algorithm uses one emitter which simply chooses a random elite in the archive and either mutates it or applies crossover to it, and doesn't require to be told anything since it has no internal state to maintain. 
+\textit{CMA-ME} \cite{fontaine_covariance_2020}, instead, uses the \textit{CMA-ES} algorithm to generate new solutions, which requires to be told the fitness of the solution it generated in order to update its internal state.
+
+The \textbf{Scheduler} has two roles: facilitate the interactions between the archive and the emitters and choose which emitter to use between the pool, based on their previous performance.
+A Scheduler implements an "ask-tell" interface; when the "ask" method is called, the scheduler chooses some emitters and asks them for new solutions, which are returned to the user. Later, the user is expected to call the "tell" method of the scheduler, providing the fitness of the solutions, which the scheduler uses to update the emitters' internal state by telling them.
+
+It is worth noting that the framework does not include facilities to evaluate the solutions; this step is left to the user to allow for maximum flexibility. This is useful in the case of Search-Based Procedural Content Generation, where the evaluation of a solution may require running a simulation, as in the case of generating maps for a game. The user can thus ask for new solutions, perform the genotype-to-phenotype mapping, run the simulation using the phenotype, evaluate the solution and tell the results. 
+
+This modular design allows for the implementation of a variety of QD algorithms, many of which are already supported by the library, but also allows for more solutions to be explored. Creating novel QD algorithms is also facilitated by the framework, since the user can rely on existing components and modify only some to create a new algorithm.
+
+\chapter{Placeholder}
+
+\section{Map genomes}
+\label{sec:map_genomes}
+
+\subsection{All-Black}
+\label{subsec:all_black}
+The \textit{All-Black} genome was first introduced by \citet{cardamone_evolving_2011} and later used in more academic researches \cite{lanzi_evolving_2014} \cite{loiacono_fight_2017} \cite{bari_evolutionary-based_2023}. \citeauthor{cardamone_evolving_2011} proposed four different genomes, \textit{All-Black}, \textit{All-White}, \textit{Grid} and \textit{Random-Digger}, and while on average All-White perfomed best, future research has instead focused on All-Black, given its capability of producing maps which more closely resemble topologies of man-made maps by using explicitely the concepts of rooms/arenas and corridors.
+
+In the \textit{All-Black} genome, the map contains only wall tiles initially, and walkable spaces are "carved" in the form of \textbf{rooms} and \textbf{corridors}.
+
+The All-Black genome can be defined as a list of:
+\begin{itemize}
+    \item $NR$ triplets <$x$, $y$, $s$> where each represents a \textbf{room}, with $x$ and $y$ being the coordinates of the lower left corner of the room and $s$ being the size of the room.
+    \item $NC$ triplets <$x$, $y$, $l$> where each represents a \textbf{corridor}, with $x$ and $y$ being the coordinates of the lower left corner of the corridor and $l$ being the length of the corridor. The length can be positive or negative, encoding, respectively, horizontal or vertical corridors.
+\end{itemize}
+The genome is thus encoded by a list of $NR$ + $NC$ triplets, where the first $NR$ encode rooms and the remaining $NC$ encode corridors.
+
+When a genome is created, rooms and corridors are placed at random on the map. This could lead to unconnected regions, which are eliminated when converting the genome to the phenotype as follows: the room closest to the center is chosen and any room or corridor which interects it is added to the phenotype. This process is repeated until no more rooms or corridors intersect with any of the rooms or corridors in the phenotype, ensuring that only rooms that are connected to the center are kept.
+
+The genome supports mutation by randomly replacing \textit{rooms} and \textit{corridors} and crossover by randomly exchanging \textit{rooms} and \textit{corridors} between two genomes.
+
+As already noted by \citeauthor{bari_evolutionary-based_2023}, \textit{All-Black} sports two main problems. The first is a \textit{lack of locality}: the change of a single number of the genome, such as a corridor length's, can lead to a large change in the phenotype's topology. This lack of locality impedes the performance of Evolutionary Algorithms, as discussed in \ref{subsec:search_based_pcg}. The second is \textit{redundancy}: different genomes may result in the same final map; as an example, we could have a genome with a room fully contained in another bigger room, thus a number of different genomes would result in the same final map if the smaller room is moved while still being fully contained in the bigger room. Another problem is that resulting maps are on average very noisy, often having many dead ends and confusing topological features.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{images/ABGenome.png}
+    \caption[All-Black example]{An example of a simple All-Black genome}
+    \label{fig:all_black}
+\end{figure}
+
+\subsection{Grid-Graph}
+\label{subsec:grid_graph}
+\textit{Gird-Graph} was introduced by \citeauthor{bari_evolutionary-based_2023} with the aim of overcoming All-Black's problems.
+
+The genome is similar to \textit{All-Black} in the sense that the map is initially full of walls and \textit{rooms} and \textit{corridors} are then placed on it. Given a map made of $H$ x $W$ tiles, Grid-Graph divides the map into an $R$ x $C$ grid where each cell occupies $r$ x $c$ tiles. 
+
+Each cell can either contain one or no \textbf{room}, which is an axis aligned rectangle, defined by the width of the room $w$ (between 1 and $c$), the height of the room $h$ (between 1 and $r$) and the coordinates of the lower left corner of the room relative to the cell, so an $x$ (bewteen 0 and $c$ - $w$ - 1) and a $y$ (between 0 and $r$ - $h$ - 1). Thus, the genome will contain an $R$ x $C$ matrix of rooms, where a room in cell ($i$, $j$) is defined with the above quartet of values, or a special value \textit{Nil} if no room is present in the cell.
+
+Rooms can be connected by \textbf{corridors} if they are placed in horizontally or vertically adjacent cells. This is encoded in the genome via a single boolean value for each pair of horizontally or vertically adjacent cells, meaning that we have an $R$ x ($C$ - 1) matrix of boolean values for horizontal corridors, where the value in cell ($i$, $j$) indicates whether rooms in cell ($i$, $j$) and ($i$, $j$ + 1) are connected by a horizontal corridor, and a ($R$ - 1) x $C$ matrix of boolean values for vertical corridors, where the value in cell ($i$, $j$) indicates whether rooms in cell ($i$, $j$) and ($i$ + 1, $j$) are connected by a vertical corridor.
+
+Similarly to \textit{All-Black}, the genome is converted to the phenotype by placing rooms and corridors on the map and eliminating unconnected regions, keeping only the portion closest to the center of the map. The genome supports mutation by randomly changing \textit{rooms} and \textit{corridors} and crossover by randomly exchanging \textit{rooms} and \textit{corridors} between two genomes.
+
+\citeauthor{bari_evolutionary-based_2023} argues that \textit{Grid-Graph} overcomes the problems of \textit{All-Black}. The genome is more compact and less redundant, as rooms have no way to overlap. However, locality is still a problem (although in a more controlled way, since connected regions are separated only if their respective corridor is removed) and the resulting maps appear very simple, with the possible amount of layouts being seemingly very limited.
+
+\subsection{Point-Line}
+\label{subsec:point_line}
+
+We introduce in this work the \textit{Point-Line} genome, which takes its inspiration from \citet{olsted_interactive_2015}. The key idea that we borrow is that of defining explicitly the topology of the map by defining couples of point that are connected by L-shaped corridors.
+
+Similarly to All-Black, the map is initially full of walls, and \textit{rooms} and \textit{corridors} are placed in it. 
+
+The genome is defined as a list of $P$ \textbf{point couples}, where each point is defined by its $x$ and $y$ coordinates. Two points will be connected by an L-shaped corridor in the phenotype, and an additional value $c$ defines the orientation of the L-shaped corridor connecting the two: 0 indicates that, from the point that is leftmost and lower of the two, the corridor first extends horizontally and then vertically, while 1 indicates the opposite. Each point also serves as the coordinates for the center of an associated \textbf{room}, which is an axis aligned square of size $s$. The room is thus a square with each side being long $2s$. When the size is 0, no room is associated to the point.
+
+So the genome can be seen as a list of $P$ septets <$x_1$, $y_1$, $x_2$, $y_2$, $s_1$, $s_2$, $c$>, where the first four values are the coordinates of the two points, the next two are the size of the rooms associated to the points and the last is the orientation of the corridor connecting the two points. 
+
+When the genome is converted to the phenotype, rooms are placed on the map and the corridors are drawn to connect the points. 
+
+As already noted for the other representations, the resulting map may not be fully connected, which is similarly solved by keeping only the connected portion of the map that is closest to the center. The genome supports mutation by randomly changing the \textit{point couples}, the \textit{rooms} associated to the points or the orientation of the corridors, and crossover by randomly exchanging \textit{point couples} between two genomes.
+
+We believe this genome to be capable of representing a wider range of topologies when compared to \textit{Grid-Graph}, while still being easily readable to the human player. Locality is improved with respect to \textit{All-Black} since rooms are explicitly connected by corridors, meaning that to remove a connection there needs to be a significant difference between the genomes, and simply moving a room also moves the corridor, keeping them connected. By coupling points and reusing coordinates between corridors and rooms, the genome is also more compact than \textit{All-Black}. We also believe that defining corridors by their start and end gives both long and short corridors an equal chance to appear, allowing \textit{Point-Line} to be more likely to explore different design, while long corridors in \textit{All-Black} are rarely found due to the need of placing a series of corridors to form a longer one.  However, the genome does not solve the problem of redundancy, as rooms can still overlap. This solution thus places itself in a sort of middle ground between \textit{All-Black} and \textit{Grid-Graph}, with the aim of combining the best of both.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{images/PointGenome.png}
+    \caption[Point-Line example]{An example of a simple Point-Line genome where points, L-shaped connections, related corridors and rooms are shown.}
+    \label{fig:point_line}
+\end{figure}
+
+\subsection{SMT-Genome}
+\label{subsec:smt_genome}
+
+We also introduce in this work the \textit{SMT-Genome}, which is inspired by \citet{whitehead_spatial_2020}. In their work, they propose to use a satisfiability modulo theories (SMT) solver\footnote{Satisfiability modulo theories is the field concerned with the satisfiability of mathematical formulas involving real numbers and complex data structures. An SMT solver is a tool that tries to determine said satisfiability.} to place rooms of varying dimension in a 2D map. 
+
+Similarly to all other genomes we have discussed, the map is initially full of walls, and \textit{rooms} and \textit{corridors} are placed in it.
+The genome is defined by a list of $R$ axis-aligned rectangular \textbf{rooms}, where each room is defined only by its width and height, and a list of $L$ \textbf{lines}, which are defined by two points in the 2D maps that are logically connected by a line, forming a segment. Finally, the genome also includes a parameter for minimum seoaration, $s$, which determines the mininum distance between rooms' borders. 
+
+The genome is thus a list of $R$ + $L$ + 1 elements, where the first $R$ elements are couples of values representing rooms, the following $L$ are quadruplets with the coordinates of the two points of the line and the last is the minimum separation.
+
+Differently from the other genomes, rooms are not encoded with their position, as their position is determined by the SMT solver. Thus, when the genome needs to be converted to a phenotype, a position has to be found for each room. This is done following an approach similar to that of \citet{whitehead_spatial_2020}; a number of linear constraints\footnote{Expressions where all the terms are of the first order, thus no exponents, logarithms, etc. appear.} are defined where the terms are the $x$ and $y$ coordinate's of each room's upper left corner. We then used Pythons \textit{Z3}\footnote{\url{https://pypi.org/project/z3-solver/}} library to solve the system of constraints, which returns the coordinates of the upper left corner of each room.
+
+The first class of constrainsts ensures that all rooms are placed inside the maps border. 
+\begin{equation}
+    \begin{split}
+            \forall r_i \in Rooms,\: x_{r_i} >= 0 \land x_{r_i} <= width_{map} - width_{r_i} \\ \land y_{r_i} >= 0 \land y_{r_i} <= height_{map} - height_{r_i}
+    \end{split}
+\end{equation}
+
+The second ensures that no two rooms overlap.
+
+\begin{equation}
+\label{eq:room_overlap}
+    \begin{split}
+        \forall r_i, r_j \in Rooms\, \mid\,  r_i != r_j, \\
+        y_{r_j} <= y_{r_i} - height_{r_j} - s\: \lor \\
+        y_{r_i} <= y_{r_j} - height_{r_i} - s\: \lor \\
+        x_{r_j} <= x_{r_i} - width_{r_j} - s\: \lor \\
+        x_{r_i} <= x_{r_j} - width_{r_i} - s
+    \end{split}
+\end{equation}
+
+The equation \ref{eq:room_overlap} ensures that no two rooms overlap by asserting, in order, that the room $j$ must be located either fully above, below, to the left or to the right of room $i$, at a distance of at least $s$.
+
+The last class of constraints ensures that rooms are placed close to the lines defined by the genome. To achieve this, lines are associated to a static common parameter called $linewidth$ and their $slope$ is calculated. We must note that Z3 requires integer coefficients, so many interesting slopes between 0 and 1 would be truncated; to solve this, the vertical $y$ dimension is scaled up by a factor of 1000, and then de-sscaled at the end. The constraints are defined as follows:
+
+\begin{equation}
+\label{eq:room_line}
+    \begin{split}
+        &\forall l_i \in Lines,\, \forall r_j \in Rooms, \\
+        &y_{r_j} \leq slope_{l_i} * (x_{r_j} - x_{end_{l_i}} + linewidth) + y_{end_{l_i}} \:\land \\
+        &y_{r_j} \geq slope_{l_i} * (x_{r_j} - x_{end_{l_i}} - linewidth + width_{r_j}) + y_{end_{l_i}}
+    \end{split}
+\end{equation}
+
+\textit{Z3} will solve all these constrainsts and return the coordinates of the upper left corner of each room, if one such solution exists.
+
+Once the rooms positions are defined, rooms must be connected with corridors. Similarly to \citeauthor{whitehead_spatial_2020}, first we define connections between two rooms by drawing a Delaunay triangulation\footnote{A type of triangulation (which is the subdivision of a planar object into tirangles) which ensures that, for a set of points, that no circumcircle (circle passing through a triangle's vertices) contains any other point.} with the rooms' positions, obtaining a graph where an edge represents that the two rooms are connected by a corridor. Subsequently, we only keep a subset of connections by drawing a minimum spanning tree (MST)\footnote{A tree that connects all the vertices of a graph with the minimum possible total edge length.} on the triangulation, ensuring that we still keep a connected graph. Rooms that are connected by an edge in the MST are then connected physically by a corridor in the phenotype. Corridors are built following a deterministic procedure, based on the rooms' relative positions, to avoid introducing another layer of randomness. 
+
+We noted that the maps generated via this method were not sufficiently connected; \citeauthor{whitehead_spatial_2020} was interested in dungeon designs, where an SMT could suitably represent a linear layout with a start, an end and some optional rooms and paths, but multiplayer FPS maps require more complex topologies that entail loops, arenas and alternate routes, as discussed in \ref{sec:level_design}. We thus decided to add connections between rooms via a heuristic: given a line, rooms that are intersected by it are connected by a corridor, if they weren't already connected.
+
+\begin{figure}[H]
+    \centering
+    \subfloat[Example of a simple SMT-Genome without added corridors]{\includegraphics[width=0.5\textwidth]{images/SMT_NotAdded.png}}
+    \subfloat[Example of a simple SMT-Genome with added corridors]{\includegraphics[width=0.5\textwidth]{images/SMT_added.png}}
+    \caption[SMT-Genome lines]{An example of how corridors are added between rooms intersected by a line.}
+    \label{fig:smt_genome}
+\end{figure}
+
+The genome supports mutation by randomly changing the rooms and lines and crossover by randomly exchanging rooms and lines between two genomes.
+
+It must be noted that, differently from the other genomes, the SMT-Genome is not deterministic; while we can set a seed in \textit{Z3}, the result of the solving process may still vary when run on the same genome due to the nature of the solver itself. This could be a problem as it could lead to poor locality. Genomes may also have no feasible solution, in which case we are forced to discard it.
+
+\begin{figure}
+    \centering
+    \subfloat{\includegraphics[width=0.5\textwidth]{images/SMT_Added.png}}
+    \subfloat{\includegraphics[width=0.5\textwidth]{images/SMT_Added_2.png}}
+    \caption[SMT-Genome determinism]{Examples of how the same SMT genome may lead to different results.}
+\end{figure}
+
+% TODO: Add a section on the evaluation of the genomes
+
+\subsection{Common Areas-Phenotype}
+All genomes are transformed to a common phenotype, called \textbf{Areas-Phenotype}. This phenotype is then supplied to \textit{Project Arena} where it is transformed in the internal textual representation used to build the actual map.
+
+The \textit{Areas-Phenotype} is an object which contains:
+
+\begin{itemize}
+    \item \textit{MapWidth}: The map's width
+    \item \textit{MapHeight}: The map's height
+    \item \textit{MapScale}: The scale of the map, used by the framework to enlarge or shrink the map's size.
+    \item \textit{Areas}: A list of areas, where each area is a rectangle full of walkable spaces defined by:
+    \begin{itemize}
+        \item \textit{BottomRow}: The $y$ coordinate of the bottom row of the area
+        \item \textit{TopRow}: The $y$ coordinate of the top row of the area
+        \item \textit{LeftCol}: The $x$ coordinate of the left column of the area
+        \item \textit{RightCol}: The $x$ coordinate of the right column of the area
+        \item \textit{IsCorridor}: A boolean value indicating whether the area is a corridor or a room
+    \end{itemize}
+\end{itemize}
+
+\section{Features}
+\label{sec:features}
+To accomplish our goal we tried to define a variety of different features that could describe a map from. We identified two main categories of features:  \textit{emergent} and \textit{topological}.
+
+\subsection{Emergent features}
+\label{subsec:emergent_features}
+We define \textbf{emergent} features those that "emerge" from actual gameplay and that are not directly tied to the map's topological features, such as the number of kills. The map's layout will surely influence the result of the match, but we cannot predict emergent feature solely from the map's topology, and instead we must rely on simulations to gather them.
+
+These features utilize the metrics defined in \ref{subsec:pa_data_gathering} and are defined as follows:
+\begin{itemize}
+    \item \textit{entropy}: A measure used to infer the map's balance, calculated as follows:
+    \begin{equation}
+        entropy = \sum_{i=1}^{n} - \left(\dfrac{k_i}{k_{tot}}\right) \log_2 \left(\dfrac{k_i}{k_{tot}}\right)
+    \end{equation}
+    Where for each bot $i$ the number of kills $k_i$ is divided by the total number of kills $k_{tot}$ and multiplied by the logarithm of the result, and the entropy is then the sum of these values. Possible values range from 0 to 1, with 1 representing a balanced match and 0 meaning a wildly unbalanced match.
+    \item \textit{ratio}: The ratio of the number of kills to the number of deaths.
+    \item \textit{pace}: The frequency of combat engagements normalized between 0 and 1, calculated as follows:
+    \begin{equation}
+        pace = 2 * \dfrac{1}{1 + \exp \left(-5 * \dfrac{NumberOfFights}{\sum TimeToEngage}\right)} - 1
+    \end{equation}
+    This sigmoid function computes values close to 0.9 when the average time to engage is 3 seconds.
+    \item \textit{fightTime}: The average time the bots spend exclusively fighting, calculated as follows for $N$ bots:
+    \begin{equation}
+        fightTime = \dfrac{  \sum_{i}^{N} \left(timeInFight_i - timeBetweenSights_i - timeToSurrender_i\right) }{ N * gameLength}
+    \end{equation}
+    \item \textit{pursueTime}: The average time the bots spend pursuing an enemy, which include the time spent looking for it, calculated as follows for $N$ bots:
+    \begin{equation}
+        pursueTime = \dfrac{  \sum_{i}^{N} \left(timeInFight_i\right) }{ N * gameLength}
+    \end{equation}
+    \item \textit{sightLossRate}: The average time between losing sight of an enemy and detecting it again, calculated as follows for $N$ bots:
+    \begin{equation}
+        sightLossRate = \dfrac{  \sum_{i}^{N} timeBetweenSights_i }{ \sum_{i}^{N} timeInFight_i}
+    \end{equation}
+    \item \textit{targetLossRate}: The number of retreats compared to the number of fights, calculated as follows for $N$ bots:
+    \begin{equation}
+        targetLossRate = \dfrac{  \sum_{i}^{N} numberOfRetreats_i }{ \sum_{i}^{N} numberOfFights_i}
+    \end{equation}
+    \item \textit{killDiff}: The difference between the number of kills and the number of deaths.
+\end{itemize}
+
+Besides these, we also define some features leveraging the data gathered by the framework, particularly the raw data about kill's positions, death's positions and bots' positions (sampled at a fixed interval of 0.5s) during the match. For each bot, we plot each position on a discretized grid representing the map, obtaining a heatmap of the positions of the kills and deaths. We then apply a Gaussian filter to the heatmap to smooth it, and calculate the following features on each of the three heatmaps:
+
+\begin{itemize}
+    \item \textit{maxValue}: The maximum value of the heatmap.
+    \item \textit{averageLocalMaximaValue}: The average of the values of all local maxima of the heatmap.
+    \item \textit{stdLocalMaximaValue}: The standard deviation of the values of all local maxima.
+    \item \textit{quantile25}: The first quartile of the heatmap's values.
+    \item \textit{quantile50}: The second quartile (median) of the heatmap's values.
+    \item \textit{quantile75}: The third quartile of the heatmap's values.
+    \item \textit{localMaximaNumber}: The number of local maxima of the heatmap.
+    \item \textit{localMaximaTopDistance}: The distance between the two local maxima with the highest values.
+    \item \textit{localMaximaAverageDistance}: The average distance between all local maxima.
+    \item \textit{coverage}: The percentage of the walkable map covered by the heatmap, meaning that the value is not 0 in that position.
+\end{itemize}
+
+\begin{figure}[H]
+\label{fig:heatmaps_example}
+    \centering
+    \subfloat{{\includegraphics[width=0.4\textwidth]{images/Deaths_Heat_Example.png} }}
+    \qquad
+    \subfloat{{\includegraphics[width=0.4\textwidth]{images/Kill_Heat_Example.png} }}
+    \caption[Heatmaps example]{An example of a heatmap of the deaths' positions (left) and the kills' positions (right)}
+\end{figure}
+
+We also utilize the kills and deaths' positions to calculate the "kill traces". A kill trace is the path of the bullet that killed a bot, and we can obtain them by connecting the position of the killer to the position of the killed bot. We then calculate the following features on the kill traces:
+
+\begin{itemize}
+    \item \textit{maxTraces}: The longest kill trace.
+    \item \textit{averageTraces}: The average length of the kill traces.
+    \item \textit{quantile25Traces}: The first quartile of the kill traces' lengths.
+    \item \textit{quantile50Traces}: The second quartile (median) of the kill traces' lengths.
+    \item \textit{quantile75Traces}: The third quartile of the kill traces' lengths.
+\end{itemize}
+
+\begin{figure}[H]
+\label{fig:kill_traces_example}
+    \centering
+    \includegraphics[width=0.4\textwidth]{images/Traces_Example.png}
+    \caption[Kill traces example]{An example of kill traces over a match, with killed bot's position marked with a circle and brighter colors indicating longer traces}
+\end{figure}
+
+\subsection{Topological features}
+\label{subsec:topological_features}
+Topological features are those that describe the map's topology, and they can be directly inferred from the map itself without the need of simulations. The simplest example is the following feature: 
+
+\begin{itemize}
+    \item \textit{area}: The number of tiles that are walkable compared to the total number of tiles in the map.
+\end{itemize}
+
+In order to extract interesting topological features it was clear that the map's representations as matrices of tiles would not be directly suitable, so we decided to convert the map to a graph representation with the aim of identifying rooms as nodes and add edges between rooms that are directly connected by a corridor. To achieve this goal, we looked at two methods for room segmentation. 
+
+The first is the "Distance Transform-based Segmentation" approach used in \citep{bormann_room_2016}. First we compute the euclidean distance transform\footnote{\raggedright\url{https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.ndimage.morphology.distance_transform_edt.html}} on the map, which is represented as a grid of tiles that are either walkable or walls, obtaining a map of distances. Then we locate the local maxima that are at least 3 tiles apart. These points serve as the room center coordinates that are used as markers for a Watershed\footnote{\raggedright\url{https://scikit-image.org/docs/stable/api/skimage.segmentation.html\#skimage.segmentation.watershed}} algorithm, using the negative distance map as basin. The identified rooms are then used as nodes to build the graph, where edges are added between rooms with common borders. Figure \ref{fig:dt_segmentation} shows an example of the result.
+
+\begin{figure}[H]
+    \centering
+    \subfloat[The rooms identified by the algorithm]{\includegraphics[height=0.4\textwidth]{images/graph_dist_color.png}}
+    \qquad
+    \subfloat[The graph obtained from the rooms]{\includegraphics[height=0.4\textwidth]{images/graph_dist.png}}
+    \caption[Distance Transform Segmentation example]{An example of the Distance Transform-based Segmentation}
+    \label{fig:dt_segmentation}
+\end{figure}
+
+The second is the approach for region decomposition based on line segment Voronoi diagrams detailed by \citet{perkins_terrain_2010}, which we will describe here briefly. Starting from a map represented by a grid of walkable or wall tiles, we use a flood fill algorithm to identify the external wall (which we ensure is always a single polygon by adding a wall border to the map) and all obstacles (contiguous areas of walls inside a walkable part of the map) and transform them into polygons. Then we create a Voronoi diagram\footnote{\raggedright\url{https://pypi.org/project/pyvoronoi/}} of the line segments of the polygons, removing from the diagram secondary edges and edges inside the obstacles' polygons. The Voronoi diagram is trasformed then into a graph, and for each node we compute a \textit{radius}, defined as the minimum distance from the node to the nearest obstacle. We use this radius to prune the graph by iteratively removing leafs whose radius is smaller than their parent's. Then we identify \textit{regions} (\textit{rooms}, in our case) and \textit{chokepoints} based on the degree of a node and its radius and, to simplify the graph, we merge adjacent rooms using some heuristics. The process and its results are shown in figure \ref{fig:voronoi_region_decomposition}.
+
+\begin{figure}[H]
+    \centering
+    \subfloat[The map as a grid.]{\includegraphics[height=0.3\textwidth]{images/graph_v_1.png}}
+    \qquad
+    \subfloat[The map represented by polygons.]{\includegraphics[height=0.3\textwidth]{images/graph_v_2.png}}
+    \qquad
+    \subfloat[The line segment Voronoi diagram.]{\includegraphics[height=0.3\textwidth]{images/graph_v_3.png}}
+    \qquad
+    \subfloat[The graph obtained by the diagram after pruning.]{\includegraphics[height=0.3\textwidth]{images/graph_v_4.png}}
+    \qquad
+    \subfloat[Rooms (red) and chokepoints (yellow) identification.]{\includegraphics[height=0.3\textwidth]{images/graph_v_5.png}}
+    \qquad
+    \subfloat[The final graph after rooms are heuristically merged.]{\includegraphics[height=0.3\textwidth]{images/graph_v_6.png}}
+    
+    \caption[Voronoi Region Decomposition example]{An example of the Voronoi Region Decomposition process.}
+    \label{fig:voronoi_region_decomposition}
+\end{figure}
+
+While results are similar, the Voronoi-based approach felt more suite to our needs, providing a graph that structurally resembles the map's topology and distinguishes relevantly between rooms and corridors. Moreover, the Distance Transform-based approach is often unable to identify multiple connections between two rooms, which is a common and important feature of FPS maps. In figure \ref{fig:graph_comparison} we show a comparison to facilitate the understanding of the problem at hand.
+
+\begin{figure}[H]
+    \centering
+    \subfloat[Distance Transform-based Segmentation]{\includegraphics[width=0.45\textwidth]{images/graph_compare_dist.png}}
+    \qquad
+    \subfloat[Voronoi Region Decomposition]{\includegraphics[width=0.45\textwidth]{images/graph_compare_vor.png}}
+    \caption[Graph comparison]{A comparison between the graphs obtained with the two methods. Notice how in the bottom-right corner of the left image the two rooms only have a single edge connecting them, while in the right image they have two.}
+    \label{fig:graph_comparison}
+\end{figure}
+
+We defined features that we believed to be relevant in order to describe and distinguish different FPS maps, such as loops, alternate routes and other concepts discussed in \ref{sec:level_design}.
+Thus, for each map we extract the following \textbf{graph-based} features:
+
+\begin{itemize}
+    \item \textit{roomNumber}: The number of nodes that represent rooms in the graph.
+    \item \textit{averageRoomMinDistance}: The average minimum distance between rooms, computed with the shortest path algorithm.
+    \item \textit{stdRoomMinDistance}: The standard deviation of the minimum distance between rooms.
+    \item \textit{averageRoomRadius}: The average radius of the rooms, computed as the minimum distance from the room's node to the nearest obstacle.
+    \item \textit{stdRoomRadius}: The standard deviation of the rooms' radius.
+    \item \textit{averageRoomBetweenness}: The average betweenness centrality of the rooms' nodes, which is based on the number of the shortest paths that pass through the room.
+    \item \textit{stdRoomBetweenness}: The standard deviation of the rooms' betweenness centrality.
+    \item \textit{averageRoomCloseness}: The average closeness centrality of the rooms' nodes, which based on the inverse of the sum of the shortest paths from the room to all other rooms.
+    \item \textit{stdRoomCloseness}: The standard deviation of the rooms' closeness centrality.
+    \item \textit{averageMincut}: The average value of the minimum cut between every couple of distinct rooms, which is the minimum number of edges that must be removed to disconnect the two rooms. 
+    \item \textit{stdMincut}: The standard deviation of the minimum cut.
+    \item \textit{maxMincut}: The minimum cut with the highest value.
+    \item \textit{minMincut}: The minimum cut with the lowest value.
+    \item \textit{averageEccentricity}: The average eccentricity of the rooms' nodes, which is the maximum distance from the room to all other rooms.
+    \item \textit{stdEccentricity}: The standard deviation of the rooms' eccentricity.
+    \item \textit{diameter}: The diameter of the graph, which is the maximum eccentricity.
+    \item \textit{radius}: The radius of the graph, which is the minimum eccentricity.
+    \item \textit{periphery}: The number of rooms that are in the periphery of the graph, which are the rooms with eccentricity equal to the diameter. In our case, since we use floating point distances, we heuristically consider rooms with eccentricity within 2 tiles of the diameter.
+    \item \textit{center}: The number of rooms that are in the center of the graph, which are the rooms with eccentricity equal to the radius. In our case, since we use floating point distances, we heuristically consider rooms with eccentricity within 2 tiles of the radius.
+    \item \textit{peripheryPercent}: The percentage of rooms that are in the periphery.
+    \item \textit{centerPercent}: The percentage of rooms that are in the center.
+    \item \textit{density}: The density of the graph, which is the ratio of the number of edges to the number of possible edges.
+    \item \textit{numberCyclesOneRoom}: The number of fundamental cycles that contain at least one room.
+    \item \textit{averageLengthCyclesOneRoom}: The average length of the cycles that contain at least one room.
+    \item \textit{stdLengthCyclesOneRoom}: The standard deviation of the length of the cycles that contain at least one room.
+    \item \textit{numberCyclesTwoRooms}: The number of fundamental cycles that contain at least two rooms.
+    \item \textit{averageLengthCyclesTwoRooms}:  The average length of the cycles that contain at least two rooms.
+    \item \textit{stdLengthCyclesTwoRooms}: The standard deviation of the length of the cycles that contain at least two rooms.
+\end{itemize}
+
+We also believe that another important component of a map's topology is the \textit{visibility} of the maps; maps in FPS games may reward certain playstiles depending on how far away a player can see from any point (e.g. a big arena with no obstacles will always favor long-ranged weapons), and designers alternate betweeen open and closed spaces to avoid favouring a single playstyle. Having observed that, we define the visibility of a walkable tile in a map as the number of walkable tiles that are visible from it. To compute the visibility we build the \textit{visibility graph}; each walkable tile is a node, and for each tile we run the DDA algorithm\footnote{Digital Differential Analyzer is an algorithm for line generation, typically used in computer graphics, to draw lines on a grid from a starting tile (or pixel) to an ending one.} to all other walkable tiles. If no wall is in the path we add an edge between the two nodes. Then, the resulting graph can be converted to a \textit{visibility matrix} by assigning to each tile the number of nodes it is connected to.
+
+While this naive approach works, the algorithm is $O\left(N^{2}\right)$ and even after careful optimization takes upwards of 40 seconds to compute the visibility of larger maps. For this reason, we opted for the faster, approximate approach of Grid-Based visibility \cite{goldstein_quick_2023}, in which we loop over every tile of the map and perform a linear interpolation on the whole map. The result can be computed in under a second for all tested maps and the visibility matrix is a good approximation of the true visibility, although generally the number of tiles visible from any tile is lower than with the naive method (see figure \ref{fig:visibility_example}).
+
+\begin{figure}[H]
+    \centering
+    \subfloat[Naive method, computed in 28.77s]{\includegraphics[width=0.45\textwidth]{images/visibility_old.png}}
+    \qquad
+    \subfloat[The visibility matrix, computed in 0.26s]{\includegraphics[width=0.45\textwidth]{images/visibility_new.png}}
+    \caption[Visibility comparison]{Examples of the visibility matrix obtained with the naive method and the grid-based method where the color of a tile represents the number of tiles visibile from it.}
+    \label{fig:visibility_example}
+\end{figure}
+
+From this visibility matrix we can extract the following \textbf{visibility-based} features:
+
+\begin{itemize}
+    \item \textit{maxValueVisibility}: Maximum value of the visibility matrix, which represents the maximum number of tiles visible from a single tile.
+    \item \textit{maxValuePercentVisibility}: Maximum value of the visibility matrix divided by the total number of walkable tiles.
+    \item \textit{averageLocalMaximaValuePercentVisibility}: The average of the values of all local maxima of the visibility matrix divided by the total number of walkable tiles.
+    \item \textit{averageValuePercentVisibility}: The average value of the visibility matrix divided by the total number of walkable tiles.
+    \item \textit{quantile25PercentVisibility}: The first quartile of the visibility matrix divided by the total number of walkable tiles.
+    \item \textit{quantile50PercentVisibility}: The second quartile (median) of the visibility matrix divided by the total number of walkable tiles.
+    \item \textit{quantile75PercentVisibility}: The third quartile of the visibility matrix divided by the total number of walkable tiles.
+    \item \textit{stdValuePercentVisibility}: The standard deviation of the values of the visibility matrix divided by the total number of walkable tiles.
+    \item \textit{localMaximaNumberVisibility}: The number of local maxima of the visibility matrix.
+    \item \textit{localMaximaTopDistanceVisibility}: The distance between the two local maxima with the highest values of the visibility matrix.
+    \item \textit{localMaximaAverageDistanceVisibility}: The average distance between all local maxima of the visibility matrix.
+    \item \textit{stdLocalMaximaValuePercentVisibility}: The standard deviation of the values of all local maxima of the visibility matrix divided by the total number of walkable tiles.
+\end{itemize}
+
+Another particularly intersting topological measure is a map's symmetry. Symmetry is an important concept in level design, both from a balancing perspective and from an aesthetic perspective. We have measured symmetry as the percentage of tiles that are equal to their symmetrical counterpart with respect to the map's center axis, obtaining the follwing \textbf{symmetry-based} features:
+
+\begin{itemize}
+    \item \textit{xSymmetry}: The percentage of tiles that are equal to their symmetrical counterpart with respect to the map's vertical axis.
+    \item \textit{ySymmetry}: The percentage of tiles that are equal to their symmetrical counterpart with respect to the map's horizontal axis.
+    \item \textit{maxSymmetry}: The maximum value between xSymmetry and ySymmetry.
+\end{itemize}
+
+Finally, we have tried to define measures that would describe certain types of maps that could be interesting to illuminate. We have thus defined the following \textbf{aggregate} features:
+
+\begin{itemize}
+    \item \textit{balanceTopology}: A measure of how balanced a map's topology is, meaning that rooms are well-connected, loops are present and rooms are generally well-distributed. It is calculated as follows:
+    \begin{equation}
+    \begin{split}
+        &explorationFactor = clip\left(\dfrac{averageMincut}{2}, 0, 1\right) \\
+        &evenlySpacedFactor = 1 - \dfrac{stdRoomMinDistance}{30} \\
+        &cyclesFactor = clip\left(\dfrac{numberCyclesTwoRoom}{5}, 0, 1\right) \\
+        &balanceTopology = explorationFactor + evenlySpacedFactor \\
+        &+ cyclesFactor
+    \end{split}
+    \end{equation}
+    Note that the value "30" in the evenlySpacedFactor is an empirical value from the observed maximum of \textit{stdRoomMinDistance}.
+    \item \textit{explorationPlusVisibility}: A measure to describe how much a map encourages exploration by being well connected and having good visibility. It is calculated as follows:
+    \begin{equation}
+    \begin{split}
+        &explorationFactor = clip\left(\dfrac{averageMincut}{2}, 0, 1\right) \\
+        &visibilityFactor = clip\left(localMaximaNumberVisibility, 0, 1\right)\\ 
+        &* averageValuePercentVisibility \\
+        &explorationPlusVisibility = explorationFactor + visibilityFactor
+    \end{split}
+    \end{equation}
+\end{itemize}
 
 \chapter{Conclusions and future developments}
 \label{ch:conclusions}%
 A final chapter containing the main conclusions of your research/study
-and possible future developments of your work have to be inserted in this chapter.
+and possible future developments of your work have to be inserted in this chapter. 
 
 %-------------------------------------------------------------------------
 %	BIBLIOGRAPHY

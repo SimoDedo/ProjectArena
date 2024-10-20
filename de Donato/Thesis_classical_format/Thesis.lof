@@ -1,24 +1,46 @@
 \babel@toc {english}{}\relax 
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {1.1}{\ignorespaces Caption of the Figure to appear in the List of Figures.}}{5}{figure.caption.13}%
-\contentsline {figure}{\numberline {1.2}{\ignorespaces Shorter caption}}{5}{figure.caption.14}%
-\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {One PoliMi logo.}}}{5}{subfigure.2.1}%
-\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Another one PoliMi logo.}}}{5}{subfigure.2.2}%
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Map comparison}}{6}{figure.caption.8}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {"Thunder mountain", a Capture the Flag map in \textit {Team Fortress 2}.}}}{6}{subfigure.1.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {"Dust II", a Bomb Defusal map in \textit {Counter-Strike}.}}}{6}{subfigure.1.2}%
+\contentsline {figure}{\numberline {1.2}{\ignorespaces PCG Games}}{7}{figure.caption.9}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {\textit {Minecraft}}}}{7}{subfigure.2.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {\textit {Pokémon Mystery Dungeon: Explorers of Sky}}}}{7}{subfigure.2.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {\textit {Hades}}}}{7}{subfigure.2.3}%
+\contentsline {figure}{\numberline {1.3}{\ignorespaces Comparison of SB-PCG with constructive and generate-and-test approaches.}}{8}{figure.caption.10}%
+\contentsline {figure}{\numberline {1.4}{\ignorespaces \citeauthor {cardamone_evolving_2011} example maps}}{11}{figure.caption.11}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {\textit {All-White}}}}{11}{subfigure.4.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {\textit {All-Black}}}}{11}{subfigure.4.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {\textit {Grid}}}}{11}{subfigure.4.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {\textit {Random-Digger}}}}{11}{subfigure.4.4}%
+\contentsline {figure}{\numberline {1.5}{\ignorespaces Visualization of the MAP-Elites algorithm.}}{14}{figure.caption.12}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {2.1}{\ignorespaces Map comparison}}{11}{figure.caption.19}%
-\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {"Thunder mountain", a Capture the Flag map in \textit {Team Fortress 2}.}}}{11}{subfigure.1.1}%
-\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {"Dust II", a Bomb Defusal map in \textit {Counter-Strike}.}}}{11}{subfigure.1.2}%
-\contentsline {figure}{\numberline {2.2}{\ignorespaces PCG Games}}{13}{figure.caption.20}%
-\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {\textit {Minecraft}}}}{13}{subfigure.2.1}%
-\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {\textit {Pokémon Mystery Dungeon: Explorers of Sky}}}}{13}{subfigure.2.2}%
-\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {\textit {Hades}}}}{13}{subfigure.2.3}%
-\contentsline {figure}{\numberline {2.3}{\ignorespaces Comparison of SB-PCG with constructive and generate-and-test approaches.}}{14}{figure.caption.21}%
-\contentsline {figure}{\numberline {2.4}{\ignorespaces \citeauthor {cardamone_evolving_2011} example maps}}{17}{figure.caption.22}%
-\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {\textit {All-White}}}}{17}{subfigure.4.1}%
-\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {\textit {All-Black}}}}{17}{subfigure.4.2}%
-\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {\textit {Grid}}}}{17}{subfigure.4.3}%
-\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {\textit {Random-Digger}}}}{17}{subfigure.4.4}%
-\contentsline {figure}{\numberline {2.5}{\ignorespaces Visualization of the MAP-Elites algorithm.}}{20}{figure.caption.23}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces All-Black example}}{30}{figure.caption.18}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Point-Line example}}{33}{figure.caption.19}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces SMT-Genome lines}}{35}{figure.caption.23}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Example of a simple SMT-Genome without added corridors}}}{35}{subfigure.3.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Example of a simple SMT-Genome with added corridors}}}{35}{subfigure.3.2}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces SMT-Genome determinism}}{36}{figure.caption.24}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Heatmaps example}}{39}{figure.caption.31}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Kill traces example}}{40}{figure.caption.32}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Distance Transform Segmentation example}}{41}{figure.caption.33}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {The rooms identified by the algorithm}}}{41}{subfigure.7.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {The graph obtained from the rooms}}}{41}{subfigure.7.2}%
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Voronoi Region Decomposition example}}{42}{figure.caption.34}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {The map as a grid.}}}{42}{subfigure.8.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {The map represented by polygons.}}}{42}{subfigure.8.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {The line segment Voronoi diagram.}}}{42}{subfigure.8.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {The graph obtained by the diagram after pruning.}}}{42}{subfigure.8.4}%
+\contentsline {subfigure}{\numberline {(e)}{\ignorespaces {Rooms (red) and chokepoints (yellow) identification.}}}{42}{subfigure.8.5}%
+\contentsline {subfigure}{\numberline {(f)}{\ignorespaces {The final graph after rooms are heuristically merged.}}}{42}{subfigure.8.6}%
+\contentsline {figure}{\numberline {4.9}{\ignorespaces Graph comparison}}{43}{figure.caption.35}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Distance Transform-based Segmentation}}}{43}{subfigure.9.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Voronoi Region Decomposition}}}{43}{subfigure.9.2}%
+\contentsline {figure}{\numberline {4.10}{\ignorespaces Visibility comparison}}{46}{figure.caption.36}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Naive method, computed in 28.77s}}}{46}{subfigure.10.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {The visibility matrix, computed in 0.26s}}}{46}{subfigure.10.2}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

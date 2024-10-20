@@ -176,12 +176,18 @@ def __save_graph_vornoi(outer_shell, obstacles, graph, x_limit, y_limit, path, n
     # Plot the outer wall
     x,y = outer_shell.exterior.xy
     plt.plot(x,y)
+    plt.fill([0, 0, y_limit, y_limit], 
+             [0, x_limit, x_limit, 0], 
+             color='lightgray', zorder=-10)
+    plt.fill(x, y, color='white', zorder=-10)
+    
 
 
     # Plot the obstacles
     for obstacle in obstacles:
         x,y = obstacle.exterior.xy
         plt.plot(x,y, color='darkred')
+        plt.fill(x, y, color='darkred', alpha=0.5, zorder=-10)
 
     # Plot the graph
     #graph.vs['label'] = [str(i) for i in range(len(graph.vs))]

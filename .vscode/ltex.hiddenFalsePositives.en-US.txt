@@ -5,3 +5,7 @@
 {"rule":"Y_ALL","sentence":"^\\Q\\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q developed Baba is Y'all, a mixed-initiative version of Baba is You (2019) where players design levels in collaboration with the machine.\\E$"}
 {"rule":"AGREEMENT_SENT_START","sentence":"^\\QBorderlands uses PCG to create weapons with different stats and abilities, while Deep Rock Galactic uses PCG to create levels that are different each time a mission is played.\\E$"}
 {"rule":"AGREEMENT_SENT_START","sentence":"^\\QBorderlands uses PCG to create weapons with different stats and abilities, while Deep Rock Galactic uses creates levels that are different each time a mission is played.\\E$"}
+{"rule":"AGREEMENT_SENT_START","sentence":"^\\QBorderlands uses PCG to create weapons with different stats and abilities, while Deep Rock Galactic creates levels that are different each time a mission is played.\\E$"}
+{"rule":"DECISION_MAKING","sentence":"^\\QThe Decision Making Layer is responsible for making decisions based on the information provided by the Knowledge Base Layer.\\E$"}
+{"rule":"STATE_OF_THE_ART","sentence":"^\\QThe pyribs library is a Python library that aids researchers in using state of the art Quality Diversity algorithms and in implementing new algorithms using pyribs's modular conceptual Quality Diversity framework.\\E$"}
+{"rule":"ON_COMPOUNDS","sentence":"^\\QThe second is the approach for region decomposition based on line segment Voronoi diagrams detailed by \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q, which we will describe here briefly.\\E$"}

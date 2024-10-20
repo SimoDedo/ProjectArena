@@ -13,7 +13,6 @@ from numba import jit
 from numba import types
 from numba.typed import Dict
 
-from test import upscale_matrix
 
 WALL_TILE = 0
 SPACE_TILE = 1
@@ -309,8 +308,10 @@ def show_visibility_matrix(visibility_matrix):
     plt.imshow(visibility_matrix, cmap='inferno', interpolation='nearest', zorder=0)
     mask = np.matrix(map_matrix)
     mask = np.ma.masked_where(mask == SPACE_TILE, mask)
-    plt.imshow(mask, cmap='binary', zorder=1)
+    plt.colorbar()
+    plt.axis('off')
     plt.gca().invert_yaxis()
+    plt.imshow(mask, cmap='binary', zorder=1)
     
 if __name__ == "__main__":
     genome = ABGenome.create_random_genome()

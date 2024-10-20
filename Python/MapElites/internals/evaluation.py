@@ -14,7 +14,17 @@ from internals.result_extractor import extract_match_data
 
 
 
-def evaluate(phenotype, iteration, individual_batch_num, bot1_data, bot2_data, game_length=120, folder_name='genome_evolution', experiment_name=None):
+def evaluate(
+        phenotype, 
+        iteration, 
+        individual_batch_num, 
+        bot1_data, 
+        bot2_data, 
+        game_length=120, 
+        folder_name='genome_evolution', 
+        experiment_name=None, 
+        num_parallel_simulations = NUM_PARALLEL_SIMULATIONS, 
+        num_matches_per_simulation = NUM_MATCHES_PER_SIMULATION):
     """
     Evaluate the given phenotype by running simulations
 
@@ -44,15 +54,19 @@ def evaluate(phenotype, iteration, individual_batch_num, bot1_data, bot2_data, g
     phenotype.write_to_file(os.path.join(GAME_DATA_FOLDER, 'Import', 'Genomes', complete_name + '.json'))
 
 
-    return __run_evaluation(phenotype, folder_name, experiment_name, bot1_data, bot2_data, game_length)
+    return __run_evaluation(phenotype, folder_name, experiment_name, bot1_data, bot2_data, game_length, num_parallel_simulations, num_matches_per_simulation)
 
 
-#TODO: fix
-def evaluate_from_file(folder_name, file_prefix, bot1_data, bot2_data, game_length, num_parallel_simulations = NUM_PARALLEL_SIMULATIONS):
-    return __run_evaluation(folder_name, file_prefix, bot1_data, bot2_data, game_length, num_parallel_simulations)
-
-
-def __run_evaluation(phenotype, folder_name, experiment_name, bot1_data, bot2_data, game_length, num_parallel_simulations = NUM_PARALLEL_SIMULATIONS):
+def __run_evaluation(
+        phenotype, 
+        folder_name, 
+        experiment_name, 
+        bot1_data, 
+        bot2_data, 
+        game_length, 
+        num_parallel_simulations = NUM_PARALLEL_SIMULATIONS,
+        num_matches_per_simulation = NUM_MATCHES_PER_SIMULATION
+    ):
     rel_std_dev_entropy = 100
     dataset = None
     repeat_count = 0
@@ -65,12 +79,12 @@ def __run_evaluation(phenotype, folder_name, experiment_name, bot1_data, bot2_da
         for i in range(num_parallel_simulations):
             processes.append(__run_simulation(folder_name, experiment_name, experiment_name + '.json', game_length,
                                               repeat_count * num_parallel_simulations + i,
-                                              NUM_MATCHES_PER_SIMULATION, bot1_data, bot2_data, False, i == 0))
+                                              num_matches_per_simulation, bot1_data, bot2_data, False, i == 0))
 
         # Wait for a timeout for each process before killing all processes
         for elem in processes:
             try:
-                received_error = received_error or (elem.wait(timeout=(game_length+10)*NUM_MATCHES_PER_SIMULATION) != 0) # TODO: serially waits for each process to finish, want to do it parallely
+                received_error = received_error or (elem.wait(timeout=(game_length+10)*num_matches_per_simulation) != 0) # TODO: serially waits for each process to finish, want to do it parallely
                 elem.kill()  
             except subprocess.TimeoutExpired as e:
                 elem.kill()  

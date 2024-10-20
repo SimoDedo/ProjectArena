@@ -667,3 +667,37 @@ def to_topology_graph_vornoi(phenotype):
     graph.es['weight'] = [w if w > 0 else 0.01 for w in weights] 
 
     return graph, outer_shell, obstacles
+
+def to_rooms_only_graph(graph):
+    rooms = [v.index for v in graph.vs if v['region']]
+    rooms_coords = [v['coords'] for v in graph.vs if v['region']]
+    rooms_radius = [v['radius'] for v in graph.vs if v['region']]
+    rooms_region = [v['region'] for v in graph.vs if v['region']]
+    new_edges = []
+
+    rooms_already_checked = []
+    for r in rooms:
+        neighbors = [v.index for v in graph.vs[r].neighbors()]
+        for n in neighbors:
+            neighbors_n = [v.index for v in graph.vs[n].neighbors()]
+            if len(neighbors_n) == 0:
+                continue
+            prev_n = r
+            while n not in rooms:
+                next_n_list = [v.index for v in graph.vs[n].neighbors() if v.index != prev_n]
+                if len(next_n_list) == 0:
+                    n = prev_n
+                    break
+                prev_n = n
+                n = next_n_list[0]
+            if n not in rooms_already_checked:
+                new_edges.append((r, n))
+        rooms_already_checked.append(r)
+    rooms_only_graph = graph.copy()
+    rooms_only_graph.add_edges(new_edges)
+    rooms_only_graph.delete_vertices([v.index for v in rooms_only_graph.vs if not v['region']])
+    weights = [round(np.linalg.norm(np.array(rooms_only_graph.vs[rooms_only_graph.es[i].source]['coords']) - np.array(rooms_only_graph.vs[rooms_only_graph.es[i].target]['coords'])),3) for i in (range(len(rooms_only_graph.es)))]
+    rooms_only_graph.es['weight'] = [w if w > 0 else 0.01 for w in weights]
+    #rooms_only_graph.simplify()
+
+    return rooms_only_graph
