@@ -77,17 +77,19 @@ def __run_evaluation(
         processes = []
         received_error = False
         for i in range(num_parallel_simulations):
-            processes.append(__run_simulation(folder_name, experiment_name, experiment_name + '.json', game_length,
+            #processes.append(__run_simulation(folder_name, experiment_name, experiment_name + '.json', game_length,
+            #                                  repeat_count * num_parallel_simulations + i,
+            #                                  num_matches_per_simulation, bot1_data, bot2_data, False, i == 0))
+            elem = __run_simulation(folder_name, experiment_name, experiment_name + '.json', game_length,
                                               repeat_count * num_parallel_simulations + i,
-                                              num_matches_per_simulation, bot1_data, bot2_data, False, i == 0))
-
-        # Wait for a timeout for each process before killing all processes
-        for elem in processes:
+                                              num_matches_per_simulation, bot1_data, bot2_data, False, i == 0)
             try:
                 received_error = received_error or (elem.wait(timeout=(game_length+10)*num_matches_per_simulation) != 0) # TODO: serially waits for each process to finish, want to do it parallely
                 elem.kill()  
             except subprocess.TimeoutExpired as e:
                 elem.kill()  
+        # Wait for a timeout for each process before killing all processes
+        #for elem in processes:
 
 
 

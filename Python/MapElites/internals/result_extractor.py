@@ -9,7 +9,7 @@ import igraph as ig
 import tqdm
 
 from internals.constants import GAME_DATA_FOLDER
-from internals.config import NUM_PARALLEL_SIMULATIONS
+from internals.config import NUM_PARALLEL_SIMULATIONS, NUM_MATCHES_PER_SIMULATION
 
 import pickle
 
@@ -33,6 +33,7 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
             return None
 
     dataset = pandas.concat(frames)
+    dataset.index = range(num_simulations * NUM_MATCHES_PER_SIMULATION)
 
     # Add ratio and killDiff columns
     ratios = []
@@ -58,19 +59,38 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
 
     initial_path = os.path.join(GAME_DATA_FOLDER, "Export", folder_name)
     # Analyze positions
-    positions_x, positions_y = extract_data(extract_bot_positions, initial_path, experiment_name, BOT_NUM, phenotype.mapScale)
-    dataset = __analyze_heatmap(dataset, positions_x, positions_y, "Position", BOT_NUM, map_matrix)
+    positions_x = [[] for _ in range(BOT_NUM)]
+    positions_y = [[] for _ in range(BOT_NUM)]
+    for num_sim in range(num_simulations):
+        pos_x, pos_y = extract_data(extract_bot_positions, initial_path, experiment_name, BOT_NUM, phenotype.mapScale, num_sim)
+        for bot_num in range(BOT_NUM):
+            positions_x[bot_num].append(pos_x[bot_num])
+            positions_y[bot_num].append(pos_y[bot_num])
+    
+    dataset = __analyze_heatmap(dataset, positions_x, positions_y, "Position", BOT_NUM, map_matrix, num_simulations)
     
     # Analyze kill positions
-    kills_x, kills_y = extract_data(extract_kill_positions, initial_path, experiment_name, BOT_NUM, phenotype.mapScale)
-    dataset = __analyze_heatmap(dataset, kills_x, kills_y, "Kill", BOT_NUM, map_matrix)
+    kills_x  = [[] for _ in range(BOT_NUM)]
+    kills_y = [[] for _ in range(BOT_NUM)]
+    for num_sim in range(num_simulations):
+        k_x, k_y = extract_data(extract_kill_positions, initial_path, experiment_name, BOT_NUM, phenotype.mapScale, num_sim)
+        for bot_num in range(BOT_NUM):
+            kills_x[bot_num].append(k_x[bot_num])
+            kills_y[bot_num].append(k_y[bot_num])
+    dataset = __analyze_heatmap(dataset, kills_x, kills_y, "Kill", BOT_NUM, map_matrix, num_simulations)
     
     # Analyze death positions
-    deaths_x, deaths_y = extract_data(extract_death_positions, initial_path, experiment_name, BOT_NUM, phenotype.mapScale)
-    dataset = __analyze_heatmap(dataset, deaths_x, deaths_y, "Death", BOT_NUM, map_matrix)
+    deaths_x = [[] for _ in range(BOT_NUM)]
+    deaths_y = [[] for _ in range(BOT_NUM)]
+    for num_sim in range(num_simulations):
+        d_x, d_y = extract_data(extract_death_positions, initial_path, experiment_name, BOT_NUM, phenotype.mapScale, num_sim)
+        for bot_num in range(BOT_NUM):
+            deaths_x[bot_num].append(d_x[bot_num])
+            deaths_y[bot_num].append(d_y[bot_num])
+    dataset = __analyze_heatmap(dataset, deaths_x, deaths_y, "Death", BOT_NUM, map_matrix, num_simulations)
 
     # Analyze kill traces
-    dataset = __analyze_traces(dataset, kills_x, kills_y, deaths_x, deaths_y, BOT_NUM)
+    dataset = __analyze_traces(dataset, kills_x, kills_y, deaths_x, deaths_y, BOT_NUM, num_simulations)
 
     # GRAPH ANALYSIS
 
@@ -124,6 +144,8 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
     peripheryCenterBalance = centerPercent - peripheryPercent
     dataset["peripheryCenterBalance"] = peripheryCenterBalance
 
+
+
     # Rewrite the dataset to include the new columns
     dataset.to_json(os.path.join(GAME_DATA_FOLDER, 'Export', folder_name, 'final_results_' + experiment_name + '.json'))
 
@@ -133,44 +155,68 @@ def extract_match_data(phenotype, folder_name, experiment_name, num_simulations=
 
     return dataset
 
-def extract_data(extract_function, initial_path, experiment_name, bot_num,map_scale):
+def extract_data(extract_function, initial_path, experiment_name, bot_num,map_scale,num_sim):
     p_x = [[] for _ in range(bot_num)]
     p_y = [[] for _ in range(bot_num)]
     for bot_n in range(0, bot_num):
-        (positions_x, positions_y) = extract_function(initial_path, experiment_name, bot_n)
+        (positions_x, positions_y) = extract_function(initial_path, experiment_name, bot_n, num_sim)
         positions_x = [x / map_scale for x in positions_x]
         positions_y = [y / map_scale for y in positions_y]
         p_x[bot_n] = positions_x
         p_y[bot_n] = positions_y
     return p_x, p_y
 
-def __analyze_heatmap(dataset, p_x, p_y, feature_name, bot_num, map_matrix):
+def __analyze_heatmap(dataset, p_x, p_y, feature_name, bot_num, map_matrix, num_simulations=NUM_PARALLEL_SIMULATIONS):
     for bot_n in range(0, bot_num):
-        positions_x = p_x[bot_n]
-        positions_y = p_y[bot_n]
+        positions_x_bot = p_x[bot_n]
+        positions_y_bot = p_y[bot_n]
+        maxValue = []
+        localMaximaNumber = []
+        localMaximaTopDistance = []
+        localMaximaAverageDistance = []
+        averageLocalMaximaValue = []
+        stdLocalMaximaValue = []
+        quantile25 = []
+        quantile50 = []
+        quantile75 = []
+        coverage = []
 
-        heatmap = __get_heatmap(positions_x, positions_y, map_matrix)
-        filtered_heatmap = gaussian_filter(heatmap, sigma=3.0)
-        masked_heatmap = __mask_heatmap(filtered_heatmap, map_matrix)
+        for num_sim in range(num_simulations):
+            positions_x = positions_x_bot[num_sim]
+            positions_y = positions_y_bot[num_sim]
 
-        max_value = np.max(masked_heatmap.compressed())
-        local_maxima = __get_heatmap_local_maxima(masked_heatmap)
-        local_maxima_values = [masked_heatmap[local_max[0], local_max[1]] for local_max in local_maxima]
-        distances = __get_local_maxima_distances(masked_heatmap, local_maxima)
-        q25, q50, q75 = __get_heatmap_quantiles(masked_heatmap)
-        coverage = __get_heatmap_coverage(masked_heatmap, map_matrix, 0.1)
+            heatmap = __get_heatmap(positions_x, positions_y, map_matrix)
+            filtered_heatmap = gaussian_filter(heatmap, sigma=3.0)
+            masked_heatmap = __mask_heatmap(filtered_heatmap, map_matrix)
 
-        dataset["maxValue" + feature_name + "Bot" + str(bot_n)] = max_value
-        dataset["localMaximaNumber" + feature_name + "Bot" + str(bot_n)] = len(local_maxima)
-        dataset["localMaximaTopDistance" + feature_name + "Bot" + str(bot_n)] = distances[0]
-        dataset["localMaximaAverageDistance" + feature_name + "Bot" + str(bot_n)] = np.mean(distances)
-        dataset["averageLocalMaximaValue" + feature_name + "Bot" + str(bot_n)] = np.mean(local_maxima_values) if len(local_maxima) > 0 else 0
-        dataset["stdLocalMaximaValue" + feature_name + "Bot" + str(bot_n)] = np.std(local_maxima_values) if len(local_maxima) > 0 else 0
-        dataset["quantile25" + feature_name + "Bot" + str(bot_n)] = q25 / max_value
-        dataset["quantile50" + feature_name + "Bot" + str(bot_n)] = q50 / max_value
-        dataset["quantile75" + feature_name + "Bot" + str(bot_n)] = q75 / max_value
+            max_value = np.max(masked_heatmap.compressed())
+            local_maxima = __get_heatmap_local_maxima(masked_heatmap)
+            local_maxima_values = [masked_heatmap[local_max[0], local_max[1]] for local_max in local_maxima]
+            distances = __get_local_maxima_distances(masked_heatmap, local_maxima)
+            q25, q50, q75 = __get_heatmap_quantiles(masked_heatmap)
+            coverage = __get_heatmap_coverage(masked_heatmap, map_matrix, 0.1)
+
+            maxValue.append(max_value)
+            localMaximaNumber.append(len(local_maxima))
+            localMaximaTopDistance.append(distances[0])
+            localMaximaAverageDistance.append(np.mean(distances))
+            averageLocalMaximaValue.append(np.mean(local_maxima_values) if len(local_maxima) > 0 else 0)
+            stdLocalMaximaValue.append(np.std(local_maxima_values) if len(local_maxima) > 0 else 0)
+            quantile25.append(q25 / max_value)
+            quantile50.append(q50 / max_value)
+            quantile75.append(q75 / max_value)
+
+        dataset["maxValue" + feature_name + "Bot" + str(bot_n)] = maxValue
+        dataset["localMaximaNumber" + feature_name + "Bot" + str(bot_n)] = localMaximaNumber
+        dataset["localMaximaTopDistance" + feature_name + "Bot" + str(bot_n)] = localMaximaTopDistance
+        dataset["localMaximaAverageDistance" + feature_name + "Bot" + str(bot_n)] = localMaximaAverageDistance
+        dataset["averageLocalMaximaValue" + feature_name + "Bot" + str(bot_n)] = averageLocalMaximaValue
+        dataset["stdLocalMaximaValue" + feature_name + "Bot" + str(bot_n)] = stdLocalMaximaValue
+        dataset["quantile25" + feature_name + "Bot" + str(bot_n)] = quantile25
+        dataset["quantile50" + feature_name + "Bot" + str(bot_n)] = quantile50
+        dataset["quantile75" + feature_name + "Bot" + str(bot_n)] = quantile75
         dataset["coverage" + feature_name + "Bot" + str(bot_n)] = coverage
-    
+
     # Average the values of the bot_num bots
     dataset["maxValue" + feature_name] = sum([dataset["maxValue" + feature_name + "Bot" + str(i)] for i in range(bot_num)]) / bot_num
     dataset["localMaximaNumber" + feature_name] = sum([dataset["localMaximaNumber" + feature_name + "Bot" + str(i)] for i in range(bot_num)]) / bot_num
@@ -185,29 +231,53 @@ def __analyze_heatmap(dataset, p_x, p_y, feature_name, bot_num, map_matrix):
 
     return dataset
 
-def __analyze_traces(dataset, kills_x, kills_y, deaths_x, deaths_y, bot_num):
+def __analyze_traces(dataset, kills_x, kills_y, deaths_x, deaths_y, bot_num, num_simulations=NUM_PARALLEL_SIMULATIONS):
     for bot_n in range(0, bot_num):
-        death_pos = [[x, y] for x, y in zip(deaths_x[bot_n], deaths_y[bot_n])]
-        kill_pos = [[x, y] for x, y in zip(kills_x[bot_n], kills_y[bot_n])]
+        death_pos_x_bot = deaths_x[bot_n]
+        death_pos_y_bot = deaths_y[bot_n]
+        kill_pos_x_bot = kills_x[bot_n]
+        kill_pos_y_bot = kills_y[bot_n]
 
-        traces = []
-        step = max(1, floor(len(death_pos) / 50))
-        for idx in range(0, len(death_pos), step):
-            start_pos = death_pos[idx]
-            end_pos = kill_pos[idx]
-            x = [start_pos[0], end_pos[0]]
-            y = [start_pos[1], end_pos[1]]
+        maxTraces = []
+        averageTraces = []
+        quantile25Traces = []
+        quantile50Traces = []
+        quantile75Traces = []
 
-            distance = sqrt(pow(x[0] - x[1], 2) + pow(y[0] - y[1], 2))
-            traces.append([distance])
-        
-        traces = np.array(traces)
-        length = len(traces)
-        dataset["maxTraces" + "Bot" + str(bot_n)] = np.max(traces) if length > 0 else 0
-        dataset["averageTraces" + "Bot" + str(bot_n)] = np.mean(traces) if length > 0 else 0
-        dataset["quantile25Traces" + "Bot" + str(bot_n)] = np.percentile(traces, 25) if length > 0 else 0
-        dataset["quantile50Traces" + "Bot" + str(bot_n)] = np.percentile(traces, 50) if length > 0 else 0
-        dataset["quantile75Traces" + "Bot" + str(bot_n)] = np.percentile(traces, 75) if length > 0 else 0
+        for num_sim in range(num_simulations):
+            death_pos_x = death_pos_x_bot[num_sim]
+            death_pos_y = death_pos_y_bot[num_sim]
+            kill_pos_x = kill_pos_x_bot[num_sim]
+            kill_pos_y = kill_pos_y_bot[num_sim]
+
+            death_pos = [[x, y] for x, y in zip(death_pos_x, death_pos_y)]
+            kill_pos = [[x, y] for x, y in zip(kill_pos_x, kill_pos_y)]
+
+            traces = []
+            step = max(1, floor(len(death_pos) / 50))
+            for idx in range(0, len(death_pos), step):
+                start_pos = death_pos[idx]
+                end_pos = kill_pos[idx]
+                x = [start_pos[0], end_pos[0]]
+                y = [start_pos[1], end_pos[1]]
+
+                distance = sqrt(pow(x[0] - x[1], 2) + pow(y[0] - y[1], 2))
+                traces.append([distance])
+
+            traces = np.array(traces)
+            length = len(traces)
+            maxTraces.append(np.max(traces) if length > 0 else 0)
+            averageTraces.append(np.mean(traces) if length > 0 else 0)
+            quantile25Traces.append(np.percentile(traces, 25) if length > 0 else 0)
+            quantile50Traces.append(np.percentile(traces, 50) if length > 0 else 0)
+            quantile75Traces.append(np.percentile(traces, 75) if length > 0 else 0)
+
+
+        dataset["maxTraces" + "Bot" + str(bot_n)] = maxTraces
+        dataset["averageTraces" + "Bot" + str(bot_n)] = averageTraces
+        dataset["quantile25Traces" + "Bot" + str(bot_n)] = quantile25Traces
+        dataset["quantile50Traces" + "Bot" + str(bot_n)] = quantile50Traces
+        dataset["quantile75Traces" + "Bot" + str(bot_n)] = quantile75Traces
         
     # Average the values of the bot_num bots
     dataset["maxTraces"] = sum([dataset["maxTraces" + "Bot" + str(i)] for i in range(bot_num)]) / bot_num
@@ -459,50 +529,47 @@ def read_map(experiment_name, folder_name):
         map_matrix.append(map_row)
     return map_matrix
 
-def extract_kill_positions(initial_path, experiment_name, bot_num, num_simulations=NUM_PARALLEL_SIMULATIONS):
+def extract_kill_positions(initial_path, experiment_name, bot_num, num_sim=0):
     positions_x = []
     positions_y = []
-    for i in range(num_simulations):
-        try:
-            temp = pandas.read_csv(
-                os.path.join(initial_path, "death_positions_" + experiment_name + "_" + str(i) + "_bot" + str(bot_num+1) + ".csv"),
-                header=None,
-            )
-            positions_x.extend(temp[2])
-            positions_y.extend(temp[3])
-        except pandas.errors.EmptyDataError:
-            # Not a single death, file is empty
-            pass
-    return positions_x, positions_y,
-
-
-def extract_death_positions(initial_path, experiment_name, bot_num, num_simulations=NUM_PARALLEL_SIMULATIONS):
-    positions_x = []
-    positions_y = []
-    for i in range(num_simulations):
-        try:
-            temp = pandas.read_csv(
-                os.path.join(initial_path, "death_positions_" + experiment_name + "_" + str(i) + "_bot" + str(bot_num+1) + ".csv"),
-                header=None,
-            )
-            positions_x.extend(temp[0])
-            positions_y.extend(temp[1])
-        except pandas.errors.EmptyDataError:
-            # Not a single death, file is empty
-            pass
-    return positions_x, positions_y,
-
-
-def extract_bot_positions(initial_path, experiment_name, bot_num, num_simulations=NUM_PARALLEL_SIMULATIONS):
-    positions_x = []
-    positions_y = []
-    for i in range(num_simulations):
+    try:
         temp = pandas.read_csv(
-            os.path.join(initial_path, "position_" + experiment_name + "_" + str(i) + "_bot" + str(bot_num+1) + ".csv"),
+            os.path.join(initial_path, "death_positions_" + experiment_name + "_" + str(num_sim) + "_bot" + str(bot_num+1) + ".csv"),
+            header=None,
+        )
+        positions_x.extend(temp[2])
+        positions_y.extend(temp[3])
+    except pandas.errors.EmptyDataError:
+        # Not a single death, file is empty
+        pass
+    return positions_x, positions_y,
+
+
+def extract_death_positions(initial_path, experiment_name, bot_num, num_sim=0):
+    positions_x = []
+    positions_y = []
+    try:
+        temp = pandas.read_csv(
+            os.path.join(initial_path, "death_positions_" + experiment_name + "_" + str(num_sim) + "_bot" + str(bot_num+1) + ".csv"),
             header=None,
         )
         positions_x.extend(temp[0])
         positions_y.extend(temp[1])
+    except pandas.errors.EmptyDataError:
+        # Not a single death, file is empty
+        pass
+    return positions_x, positions_y,
+
+
+def extract_bot_positions(initial_path, experiment_name, bot_num, num_sim=0):
+    positions_x = []
+    positions_y = []
+    temp = pandas.read_csv(
+        os.path.join(initial_path, "position_" + experiment_name + "_" + str(num_sim) + "_bot" + str(bot_num+1) + ".csv"),
+        header=None,
+    )
+    positions_x.extend(temp[0])
+    positions_y.extend(temp[1])
     return positions_x, positions_y,
 
 

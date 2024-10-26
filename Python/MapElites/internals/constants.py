@@ -6,7 +6,7 @@ EXPERIMENT_RUNNER_PATH = os.path.join (os.getcwd(), "ME_Build")
 GAME_DATA_FOLDER = os.path.join (os.getcwd(), "Data")
 MAP_ELITES_OUTPUT_FOLDER = os.path.join (GAME_DATA_FOLDER, "MapElitesOutput")
 ARCHIVE_ANALYSIS_OUTPUT_FOLDER = os.path.join (GAME_DATA_FOLDER, "ArchiveAnalysis")
-NOISE_ANALYSIS_OUTPUT_FOLDER = os.path.join (GAME_DATA_FOLDER, "NoiseAnalysisOutput")
+ANALYSIS_OUTPUT_FOLDER = os.path.join (GAME_DATA_FOLDER, "AnalysisOutput")
 
 """ Genome names """
 ALL_BLACK_NAME = "AB"

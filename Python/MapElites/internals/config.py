@@ -2,9 +2,9 @@ import internals.constants as constants
 """ Evaluation variables """
 
 # Number of parallel launches of the same experiment
-NUM_PARALLEL_SIMULATIONS = 1 # Numer of matches that are parallely started when simulating an individual
-NUM_MATCHES_PER_SIMULATION = 5 # Number of matches that are played in a single simulation. If we start multiple parallel simulation, each is gonna play this many matches
-
+NUM_PARALLEL_SIMULATIONS = 5 # Numer of matches that are parallely started when simulating an individual
+NUM_MATCHES_PER_SIMULATION = 1 # Number of matches that are played in a single simulation. If we start multiple parallel simulation, each is gonna play this many matches
+# Note that the framework does not distinguish the end of one match from another in the "position" file extracted, so NUM_MATCHES_PER_SIMULATION should be set to 1 to avoid problems
 
 """ Game variables """
 GAME_LENGTH = 600
@@ -18,9 +18,9 @@ BOT2_SKILL = "0.85"
 # Archive type used in the experiment. See constants.py for possible values
 ARCHIVE_TYPE = constants.SLIDING_BOUNDARIES_ARCHIVE_NAME
 # Map representation used in the experiment. See constants.py for possible values
-REPRESENTATION_NAME = constants.ALL_BLACK_NAME
+REPRESENTATION_NAME = constants.GRID_GRAPH_NAME
 # Emitter type used in the experiment. See constants.py for possible values
-EMITTER_TYPE_NAME = constants.ALL_BLACK_EMITTER_NAME
+EMITTER_TYPE_NAME = constants.GRID_GRAPH_EMITTER_NAME
 
 ITERATIONS = 400
 BATCH_SIZE = 1
@@ -42,7 +42,7 @@ CMA_ME_SIGMA0 = 0.01
 
 # These names are used to generate the folder name and the image captions
 OBJECTIVE_NAME = "entropy"
-MEASURES_NAMES = ["pace", "area"]
+MEASURES_NAMES = ["area", "maxSymmetry"]
 # If set to False, the names above are used to get the categories from the dataset. 
 # If set to True, the user is expected to manually choose the features in map_elites.py.
 # This is useful to combine different features without saving each one. 
@@ -50,7 +50,7 @@ MANUALLY_CHOOSE_FEATURES = False
 
 """ Experiment names """
 # This  is used as the basis of the folder name where the results of the experiment will be stored.
-EXPERIMENT_NAME = "Cov"
+EXPERIMENT_NAME = "Fin"
 
 """ Miscellaneous variables """
 SAVE_INTERMEDIATE_RESULTS = True

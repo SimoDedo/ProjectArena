@@ -1,4 +1,9 @@
 import pickle
+import PIL
+import PIL.Image
+from matplotlib.image import BboxImage
+from matplotlib.offsetbox import AnnotationBbox, OffsetImage
+from matplotlib.transforms import Bbox, TransformedBbox
 from z3 import *
 from internals.ab_genome.ab_genome import ABGenome
 from internals.graph import to_rooms_only_graph
@@ -11,7 +16,7 @@ import numpy as np
 import igraph as ig
 from matplotlib import cm
 from os import path
-from internals.constants import NOISE_ANALYSIS_OUTPUT_FOLDER, GAME_DATA_FOLDER, MAP_ELITES_OUTPUT_FOLDER
+from internals.constants import ANALYSIS_OUTPUT_FOLDER, GAME_DATA_FOLDER, MAP_ELITES_OUTPUT_FOLDER
 from internals.evaluation import evaluate
 from dask.distributed import Client, LocalCluster
 from internals import config as conf
@@ -138,7 +143,7 @@ symmetry_features = [
 aggregate_features = [
     'explorationPlusVisibility',
     'balanceTopology',
-    'balanceTopologyPlusPursueTime',
+    #'balanceTopologyPlusPursueTime',
     #'peripheryCenterBalance',
 ]
 
@@ -247,7 +252,7 @@ symmetry_features_reduced = [
 aggregate_features_reduced = [
     'explorationPlusVisibility',
     'balanceTopology',
-    'balanceTopologyPlusPursueTime',
+    #'balanceTopologyPlusPursueTime',
     #'peripheryCenterBalance',
 ]
 
@@ -308,21 +313,82 @@ features_final = [
     #"balanceTopologyPlusPursueTime",
 ]
 
-def plot_graph_vornoi(phenotype: Phenotype, rooms_only=False):
+features_final = [
+    "maxSymmetry",
+
+    "maxValuePosition",
+    #"coverageKill",
+    #"coverageDeath",
+    #"maxValueKill",
+    #"maxValueDeath",
+
+    "coveragePosition",
+
+    "peripheryPercent",
+
+    "pace",
+    #"maxValuePercentVisibility", #
+    
+    "stdValuePercentVisibility",
+    
+    "averageLocalMaximaValuePercentVisibility", #
+
+    "density",
+    #"averageRoomCloseness",
+
+    "averageEccentricity", #
+    
+    "area",
+    #"killDiff",
+    #"targetLossRate",
+    #"localMaximaNumberPosition",
+    #"localMaximaNumberKill",
+    #"localMaximaNumberDeath",
+
+    "averageRoomBetweenness", #
+    
+    "localMaximaNumberVisibility",
+
+    "balanceTopology",
+    #"balanceTopologyPlusPursueTime",
+    
+    "entropy",
+    "averageRoomRadius",
+    "stdLocalMaximaValuePercentVisibility",
+    "sightLossRate",
+    "periphery",
+    
+    "maxTraces",
+    "maxValueVisibility", #
+
+    "numberCyclesOneRoom",
+    "averageMincut",
+    #explorationPlusVisibility,
+    
+]
+
+def plot_graph_vornoi(phenotype: Phenotype, rooms_only=False, show=True):
     graph, outer_shell, obstacles = phenotype.to_topology_graph_vornoi()
     if rooms_only:
         graph = to_rooms_only_graph(graph)
-    fig, ax = plt.subplots()
+    
+    fig, ax = plt.subplots(frameon=False)
+    map_matrix = phenotype.map_matrix(inverted=True)
 
     # Plot the outer wall
     x,y = outer_shell.exterior.xy
     plt.plot(x,y)
+    plt.fill([0, 0, map_matrix.shape[1], map_matrix.shape[1]], 
+             [0, map_matrix.shape[0], map_matrix.shape[0], 0], 
+             color='lightgray', zorder=-10)
+    plt.fill(x, y, color='white', zorder=-10)
 
 
     # Plot the obstacles
     for obstacle in obstacles:
         x,y = obstacle.exterior.xy
-        plt.plot(x,y, color='darkred')
+        plt.plot(x,y, color='darkred', zorder=-10)
+        plt.fill(x, y, color='darkred', alpha=0.5, zorder=-10)
 
     # Plot the graph
     #graph.vs['label'] = [str(i) for i in range(len(graph.vs))]
@@ -346,69 +412,107 @@ def plot_graph_vornoi(phenotype: Phenotype, rooms_only=False):
     ax.set_xlim(0, phenotype.mapWidth)
     ax.set_ylim(0, phenotype.mapHeight)
     plt.gca().invert_yaxis()
+    #Remove white space 
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.axis('off')
 
-    plt.show()
+    if show:
+        plt.show()
+    
+    return fig, ax
 
-def run_variance_analysis(client: Client, baseoutdir, name, itr, genopme_type, feature_ranges: pd.DataFrame, num_repetitions=60, num_matches_per_simulation=1):
+def run_variance_analysis(
+        client: Client, 
+        baseoutdir, 
+        name, 
+        itr, 
+        genopme_type, 
+        feature_ranges: pd.DataFrame, 
+        num_repetitions=100, 
+        num_parallel_simulations=1, 
+        phenotype_path=None,
+        use_cache=False
+        ):
     exportdir = Path(os.path.join(GAME_DATA_FOLDER, "Export", name))
     exportdir.mkdir(exist_ok=True)
     importdir = Path(os.path.join(GAME_DATA_FOLDER, "Import", "Genomes", name))
     importdir.mkdir(exist_ok=True)
     outdir = Path(path.join(baseoutdir, name))
     outdir.mkdir(exist_ok=True)
-    # Create random Genome
-    if genopme_type == SMT_NAME:
-        genome = SMTGenome.create_random_genome()
-        found = False
-        while not found:
-            try:
-                phenotype = genome.phenotype()
-                found = True
-            except Exception as e:
-                genome = SMTGenome.create_random_genome()
-    elif genopme_type == ALL_BLACK_NAME:
-        genome = ABGenome.create_random_genome()
-        phenotype = genome.phenotype()
-    elif genopme_type == GRID_GRAPH_NAME:
-        genome = GraphGenome.create_random_genome()
-        phenotype = genome.phenotype()
-    elif genopme_type == POINT_AD_NAME:
-        genome = PointAdGenome.create_random_genome()
-        phenotype = genome.phenotype()
-    
-    phenotypes = [phenotype] * num_repetitions
-    futures = []
-    for idx, phenotype in enumerate(phenotypes):
-        futures.append(
-            client.submit(
-                evaluate,
-                phenotype,
-                itr,
-                idx,
-                bot1_data,
-                bot2_data,
-                1200,
-                folder_name=name,
-                num_matches_per_simulation=num_matches_per_simulation
-            )
-        )
-    results = client.gather(futures)
-    
-    datasets = []
-    for idx, (dataset, failed) in enumerate(results):
-        if failed:
-            print(f"Failed to evaluate phenotype {idx}")
+    if not use_cache:
+        if phenotype_path is not None:
+            with open(phenotype_path, "rb") as f:
+                phenotype = pickle.load(f)
         else:
-            mean = dataset.mean()
-            mean_dataset = pd.DataFrame([mean], columns=dataset.columns)
-            datasets.append(mean_dataset)
+            # Create random Genome
+            if genopme_type == SMT_NAME:
+                genome = SMTGenome.create_random_genome()
+                found = False
+                while not found:
+                    try:
+                        phenotype = genome.phenotype()
+                        found = True
+                    except Exception as e:
+                        genome = SMTGenome.create_random_genome()
+            elif genopme_type == ALL_BLACK_NAME:
+                genome = ABGenome.create_random_genome()
+                phenotype = genome.phenotype()
+            elif genopme_type == GRID_GRAPH_NAME:
+                genome = GraphGenome.create_random_genome()
+                phenotype = genome.phenotype()
+            elif genopme_type == POINT_AD_NAME:
+                genome = PointAdGenome.create_random_genome()
+                phenotype = genome.phenotype()
+
+        # Save the phenotype object
+        with open(os.path.join(outdir, f"phenotype_{name}.pkl"), "wb") as f:
+            pickle.dump(phenotype, f)
+        __save_map(os.path.join(outdir, f"phenotype_{name}.png"), phenotype.map_matrix(inverted=True))
+
+
+        phenotypes = [phenotype] * num_repetitions
+        futures = []
+        for idx, phenotype in enumerate(phenotypes):
+            futures.append(
+                client.submit(
+                    evaluate,
+                    phenotype,
+                    itr,
+                    idx,
+                    bot1_data,
+                    bot2_data,
+                    1200,
+                    folder_name=name,
+                    num_parallel_simulations=num_parallel_simulations
+                )
+            )
+        results = client.gather(futures)
+
+        datasets = []
+        for idx, (dataset, failed) in enumerate(results):
+            if failed:
+                print(f"Failed to evaluate phenotype {idx}")
+            else:
+                mean = dataset.mean()
+                mean_dataset = pd.DataFrame([mean], columns=dataset.columns)
+                datasets.append(mean_dataset)
+    else:
+        datasets = []
+        for num in tqdm.trange(0, num_repetitions):
+            final_result_name = f"final_results_{itr}_{num}"
+            try:
+                dataset = pd.read_json(os.path.join(exportdir, final_result_name + ".json"))
+                mean = dataset.mean()
+                mean_dataset = pd.DataFrame([mean], columns=dataset.columns)
+                datasets.append(mean_dataset)
+            except Exception as e:
+                #print(e)
+                continue
     df = pd.concat(datasets)
     df.index = range(len(df))
     df.to_json(os.path.join(outdir, f"final_results_{name}.json"), orient="columns", indent=4)
     min_values = df.min()
     max_values = df.max()
-
-    __save_map(os.path.join(outdir, f"phenotype_{name}.png"), phenotypes[0].map_matrix(inverted=True))
     
     # Normalize all features according to the feature ranges
     for feature in df.columns:
@@ -417,15 +521,28 @@ def run_variance_analysis(client: Client, baseoutdir, name, itr, genopme_type, f
         df[feature] = (df[feature] - min_value) / (max_value - min_value)
 
 
-    df.boxplot(column=column_variance, return_type='dict', fontsize=5)
-    plt.xticks(rotation=90)
+    df.boxplot(column=column_variance, return_type='dict', fontsize=7.5, flierprops=dict(marker='o', markersize=4))
+    plt.ylim(0, 1)  # Set the y-axis limits
+    plt.gcf().set_size_inches(9, 5)  # Adjust the figure size to make columns larger
+    plt.xticks(rotation=45, ha='right', fontsize=8, rotation_mode="anchor")
+    plt.yticks(fontsize=8)
     plt.tight_layout()
     #Save figure
-    plt.savefig(os.path.join(outdir, f"boxplot_{name}_numsim_{num_matches_per_simulation}.png"), format='png', dpi=300)
+    plt.savefig(os.path.join(outdir, f"boxplot_{name}_numsim_{num_parallel_simulations}.png"), format='png', dpi=300)
     plt.clf()
     plt.close()
 
-def run_covariance_analysis(client: Client, baseoutdir, name, itr, genopme_type, feature_ranges: pd.DataFrame, num_phenotypes=100, num_matches_per_simulation=1):
+def run_covariance_analysis(
+        client: Client, 
+        baseoutdir, 
+        name, 
+        itr, 
+        genopme_type, 
+        feature_ranges: pd.DataFrame, 
+        num_phenotypes=100, 
+        num_parallel_simulations=1,
+        use_cache=False
+        ):
     exportdir = Path(os.path.join(GAME_DATA_FOLDER, "Export", name))
     exportdir.mkdir(exist_ok=True)
     importdir = Path(os.path.join(GAME_DATA_FOLDER, "Import", "Genomes", name))
@@ -433,53 +550,71 @@ def run_covariance_analysis(client: Client, baseoutdir, name, itr, genopme_type,
     outdir = Path(path.join(baseoutdir, name))
     outdir.mkdir(exist_ok=True)
     # Create random Genome
-    phenotypes = []
-    for i in range(num_phenotypes):
-        if genopme_type == SMT_NAME:
-            genome = SMTGenome.create_random_genome()
-            found = False
-            while not found:
-                try:
-                    phenotype = genome.phenotype()
-                    found = True
-                except Exception as e:
-                    genome = SMTGenome.create_random_genome()
-        elif genopme_type == ALL_BLACK_NAME:
-            genome = ABGenome.create_random_genome()
-            phenotype = genome.phenotype()
-        elif genopme_type == GRID_GRAPH_NAME:
-            genome = GraphGenome.create_random_genome()
-            phenotype = genome.phenotype()
-        elif genopme_type == POINT_AD_NAME:
-            genome = PointAdGenome.create_random_genome()
-            phenotype = genome.phenotype()
-        phenotypes.append(phenotype)
-    
-    futures = []
-    for idx, phenotype in enumerate(phenotypes):
-        futures.append(
-            client.submit(
-                evaluate,
-                phenotype,
-                itr,
-                idx,
-                bot1_data,
-                bot2_data,
-                600,
-                folder_name=name,
-                num_matches_per_simulation=num_matches_per_simulation
+    if not use_cache:
+        phenotypes = []
+        for i in range(num_phenotypes):
+            if genopme_type == SMT_NAME:
+                genome = SMTGenome.create_random_genome()
+                found = False
+                while not found:
+                    try:
+                        phenotype = genome.phenotype()
+                        found = True
+                    except Exception as e:
+                        genome = SMTGenome.create_random_genome()
+            elif genopme_type == ALL_BLACK_NAME:
+                genome = ABGenome.create_random_genome()
+                phenotype = genome.phenotype()
+            elif genopme_type == GRID_GRAPH_NAME:
+                genome = GraphGenome.create_random_genome()
+                phenotype = genome.phenotype()
+            elif genopme_type == POINT_AD_NAME:
+                genome = PointAdGenome.create_random_genome()
+                phenotype = genome.phenotype()
+            phenotypes.append(phenotype)
+
+        futures = []
+        for idx, phenotype in enumerate(phenotypes):
+            futures.append(
+                client.submit(
+                    evaluate,
+                    phenotype,
+                    itr,
+                    idx,
+                    bot1_data,
+                    bot2_data,
+                    600,
+                    folder_name=name,
+                    num_parallel_simulations=num_parallel_simulations
+                )
             )
-        )
-    results = client.gather(futures)
-    
-    datasets = []
-    for idx, (dataset, failed) in enumerate(results):
-        if failed:
-            print(f"Failed to evaluate phenotype {idx}")
-        else:
-            mean = dataset.mean()
-            mean_dataset = pd.DataFrame([mean], columns=dataset.columns)
-            datasets.append(mean_dataset)
+        results = client.gather(futures)
+
+        datasets = []
+        for idx, (dataset, failed) in enumerate(results):
+            if failed:
+                print(f"Failed to evaluate phenotype {idx}")
+            else:
+                mean = dataset.mean()
+                mean_dataset = pd.DataFrame([mean], columns=dataset.columns)
+                datasets.append(mean_dataset)
+        
+        mapsdir = Path(os.path.join(outdir, "maps"))
+        mapsdir.mkdir(exist_ok=True)
+        for idx, phenotype in enumerate(phenotypes):
+            __save_map(os.path.join(mapsdir, f"phenotype_{name}_{idx}.png"), phenotypes[0].map_matrix())
+    else:
+        datasets = []
+        for num in tqdm.trange(0, num_phenotypes):
+            final_result_name = f"final_results_{itr}_{num}"
+            try:
+                dataset = pd.read_json(os.path.join(exportdir, final_result_name + ".json"))
+                mean = dataset.mean()
+                mean_dataset = pd.DataFrame([mean], columns=dataset.columns)
+                datasets.append(mean_dataset)
+            except Exception as e:
+                #print(e)
+                continue
     df = pd.concat(datasets)
     imputer = SimpleImputer(strategy='mean')
     df = pd.DataFrame(imputer.fit_transform(df), columns=df.columns)
@@ -488,10 +623,7 @@ def run_covariance_analysis(client: Client, baseoutdir, name, itr, genopme_type,
     min_values = df.min()
     max_values = df.max()
 
-    mapsdir = Path(os.path.join(outdir, "maps"))
-    mapsdir.mkdir(exist_ok=True)
-    for idx, phenotype in enumerate(phenotypes):
-        __save_map(os.path.join(mapsdir, f"phenotype_{name}_{idx}.png"), phenotypes[0].map_matrix())
+
     
     # Normalize all features according to the feature ranges
     for feature in df.columns:
@@ -517,7 +649,7 @@ def run_covariance_analysis(client: Client, baseoutdir, name, itr, genopme_type,
     # Whole covariance clustermap
     clustermap_ax = sns.clustermap(var_corr, xticklabels=var_corr.columns, yticklabels=var_corr.index, annot=False, annot_kws={"fontsize":3})
     plt.setp(clustermap_ax.ax_heatmap.get_yticklabels(), rotation=0, fontsize=5)
-    plt.setp(clustermap_ax.ax_heatmap.get_xticklabels(), rotation=45, ha='right', fontsize=5)
+    plt.setp(clustermap_ax.ax_heatmap.get_xticklabels(), rotation=45, ha='right', fontsize=5, rotation_mode="anchor")
     plt.savefig(os.path.join(outdir, f"covariance_clustermap_{name}.png"), format='png', dpi=300)
     plt.clf()
     plt.close()
@@ -539,7 +671,7 @@ def run_covariance_analysis(client: Client, baseoutdir, name, itr, genopme_type,
     # Reduced covariance clustermap
     clustermap_ax = sns.clustermap(var_corr_reduced, xticklabels=var_corr_reduced.columns, yticklabels=var_corr_reduced.index, annot=True, annot_kws={"fontsize":4})
     plt.setp(clustermap_ax.ax_heatmap.get_yticklabels(), rotation=0)
-    plt.setp(clustermap_ax.ax_heatmap.get_xticklabels(), rotation=45, ha='right', fontsize=8)
+    plt.setp(clustermap_ax.ax_heatmap.get_xticklabels(), rotation=45, ha='right', fontsize=8, rotation_mode="anchor")
     plt.savefig(os.path.join(outdir, f"covariance_clustermap_{name}_reduced.png"), format='png', dpi=300)
     plt.clf()
     plt.close()
@@ -561,7 +693,7 @@ def run_covariance_analysis(client: Client, baseoutdir, name, itr, genopme_type,
     # Final covariance clustermap
     clustermap_ax = sns.clustermap(var_corr_final, xticklabels=var_corr_final.columns, yticklabels=var_corr_final.index, annot=True, annot_kws={"fontsize":4})
     plt.setp(clustermap_ax.ax_heatmap.get_yticklabels(), rotation=0)
-    plt.setp(clustermap_ax.ax_heatmap.get_xticklabels(), rotation=45, ha='right', fontsize=8)
+    plt.setp(clustermap_ax.ax_heatmap.get_xticklabels(), rotation=45, ha='right', fontsize=8, rotation_mode="anchor")
     plt.savefig(os.path.join(outdir, f"covariance_clustermap_{name}_final.png"), format='png', dpi=300)
     plt.clf()
     plt.close()
@@ -592,23 +724,24 @@ def run_covariance_analysis(client: Client, baseoutdir, name, itr, genopme_type,
     plt.close()
 
     # Covariance maps for each category
-    items_list = list(features_categories.items())
-    for i in range(len(items_list)):
-        for j in range(i, len(items_list)):
-            features_i = items_list[i][1]
-            features_j = items_list[j][1]
-            var_corr_partial = var_corr.loc[features_i, features_j]
-            fig, ax = plt.subplots(figsize=(24, 16))
-            heatmap_ax = sns.heatmap(var_corr_partial, vmin=-1, vmax=1, xticklabels=var_corr_partial.columns, yticklabels=var_corr_partial.index, annot=False, annot_kws={"fontsize":6})
-            heatmap_ax.tick_params(axis='both', which='major', labelsize=15)
-            plt.setp(clustermap_ax.ax_heatmap.get_yticklabels(), rotation=0)
-            plt.setp(clustermap_ax.ax_heatmap.get_xticklabels(), rotation=45, ha='right')
-            plt.tight_layout()
-            plt.savefig(os.path.join(outdir, f"covariance_map_{name}_{items_list[i][0]}_{items_list[j][0]}.png"), format='png', dpi=300)
-            plt.clf()
-            plt.close()
+    #items_list = list(features_categories.items())
+    #for i in range(len(items_list)):
+    #    for j in range(i, len(items_list)):
+    #        features_i = items_list[i][1]
+    #        features_j = items_list[j][1]
+    #        var_corr_partial = var_corr.loc[features_i, features_j]
+    #        fig, ax = plt.subplots(figsize=(24, 16))
+    #        heatmap_ax = sns.heatmap(var_corr_partial, vmin=-1, vmax=1, xticklabels=var_corr_partial.columns, yticklabels=var_corr_partial.index, annot=False, annot_kws={"fontsize":6})
+    #        heatmap_ax.tick_params(axis='both', which='major', labelsize=15)
+    #        plt.setp(clustermap_ax.ax_heatmap.get_yticklabels(), rotation=0)
+    #        plt.setp(clustermap_ax.ax_heatmap.get_xticklabels(), rotation=45, ha='right', rotation_mode="anchor")
+    #        plt.tight_layout()
+    #        plt.savefig(os.path.join(outdir, f"covariance_map_{name}_{items_list[i][0]}_{items_list[j][0]}.png"), format='png', dpi=300)
+    #        plt.clf()
+    #        plt.close()
 
     print("Covariance analysis done for ", name)
+    return var_corr, var_corr_reduced, var_corr_final
 
 def get_feature_ranges(experiment_names, baseoutdir, to_compute=True):
     outdir = Path(path.join(baseoutdir, "feature_ranges"))
@@ -744,6 +877,7 @@ def tsne_analysis(
     datasets = []
     phenotypes = []
     graphs = []
+    graph_images = []
     for experiment_name in experiment_names:
         tqdm.tqdm.write(f"Processing {experiment_name}")
         exportdir = Path(os.path.join(GAME_DATA_FOLDER, "Export", experiment_name))
@@ -778,6 +912,19 @@ def tsne_analysis(
                     # Save pickle
                     with open(os.path.join(exportdir, graph_name + '.pkl'), 'wb') as f:
                         pickle.dump(graph, f)
+                #try:
+                #    if not use_stored_graphs:
+                #        raise Exception("Force recomputation")
+                #    graph_image_file = os.path.join(exportdir, graph_name + '_image.png')
+                #    graph_image = PIL.Image.open(graph_image_file)
+                #    graph_images.append(graph_image)
+                #except Exception as e:
+                #    fig, ax = plot_graph_vornoi(phenotype, rooms_only, show=False)
+                #    graph_image_file = os.path.join(exportdir, graph_name + '_image.png')
+                #    fig.savefig(graph_image_file, format='png', dpi=300)
+                #    image = PIL.Image.frombytes('RGB', fig.canvas.get_width_height(), fig.canvas.buffer_rgba())
+                #    graph_images.append(image)
+
                 # If last inserted graph has no node, remove phenotype
                 #if len(graph.nodes) == 0:
                 #    phenotypes.pop()
@@ -791,14 +938,15 @@ def tsne_analysis(
     phenotypes_flat = [phenotype.map_matrix().flatten() for phenotype in phenotypes]
     df_phenotypes = pd.DataFrame(phenotypes_flat)
 
-    #graph2vec = Graph2Vec(dimensions=128, wl_iterations=2, attributed=True, seed=42, min_count=1)  
-    graph2vec = GL2Vec(wl_iterations=2, dimensions=128*5, epochs=10, seed=42, min_count=1)
+    graph2vec = Graph2Vec(dimensions=128*5, wl_iterations=2, attributed=True, seed=42, min_count=1)  
     graph2vec.fit(graphs)
-    graph_embeddings = graph2vec.get_embedding()
+    graph2vec_embeddings = graph2vec.get_embedding()
+    df_graph_embeddings = pd.DataFrame(graph2vec_embeddings)
 
-    df_graph_embeddings = pd.DataFrame(graph_embeddings)
-
-    df_graph_plus_img = pd.concat([df_phenotypes, df_graph_embeddings], axis=1)
+    #gl2vec = GL2Vec(wl_iterations=2, dimensions=128*5, epochs=10, seed=42, min_count=1, attributed=True)
+    #gl2vec.fit(graphs)
+    #gl2vec_embeddings = gl2vec.get_embedding()
+    #df_graph_embeddings = pd.DataFrame(gl2vec_embeddings)
 
     # Get color map for 2D visualization
     color_map_resolution = 500
@@ -890,17 +1038,27 @@ def tsne_analysis(
         plt.clf()
         plt.close()
 
-        # Compute t-SNE for graph and image similarity
-        tsne = TSNE(n_components=2, random_state=42, perplexity=perplexity, max_iter=tsne_iterations)
-        points_graph_img = tsne.fit_transform(df_graph_plus_img)
-
-        #Scatter point by giving them a color corresponding to the 2D color map based on points feat positions
-        fig, ax = plt.subplots()
-        plt.scatter(points_graph_img[:, 0], points_graph_img[:, 1], s=1, c=colors)
-        plt.annotate(f"t-SNE with graphs and images. Color represents position in t-SNE with features. Perplexity: {perplexity}", (0.5, 1.05), xycoords='axes fraction', ha='center', va='bottom')
-        plt.savefig(os.path.join(outdir, f"{name}_graphimg_p{perplexity}.png"), format='png', dpi=300)
-        plt.clf()
-        plt.close()
+        # Scatter points as graph images
+        #fig = plt.figure()
+        #ax = fig.add_subplot(111)
+        ## Set the limits of the plot
+        #plt.xlim(min(points_graph[:, 0]), max(points_graph[:, 0]))
+        #plt.ylim(min(points_graph[:, 1]), max(points_graph[:, 1]))
+        #for (x0, y0, img) in zip(points_graph[:, 0], points_graph[:, 1], graph_images):
+        #    bb = Bbox.from_bounds(x0,y0,0.3,0.3)  
+        #    bb2 = TransformedBbox(bb,ax.transData)
+        #    bbox_image = BboxImage(bb2,
+        #                        norm = None,
+        #                        origin=None,
+        #                        clip_on=False)
+        #    bbox_image.set_data(img)
+        #    ax.add_artist(bbox_image)
+        #plt.annotate(f"t-SNE with graphs. Images represent the graphs. Perplexity: {perplexity}", (0.5, 1.05), xycoords='axes fraction', ha='center', va='bottom')
+        #plt.savefig(os.path.join(outdir, f"{name}_graph_wimg_p{perplexity}.png"), format='png', dpi=300)
+        #if visualize_tsne_graph:
+        #    plt.show()
+        #plt.clf()
+        #plt.close()
 
         for feature in column_tsne_reduced:
             plt.scatter(points_img[:, 0], points_img[:, 1], s=1, c=df[feature], cmap='viridis')
@@ -918,14 +1076,6 @@ def tsne_analysis(
             plt.clf()
             plt.close()
         
-        for feature in column_tsne_reduced:
-            plt.scatter(points_graph_img[:, 0], points_graph_img[:, 1], s=1, c=df[feature], cmap='viridis')
-            plt.colorbar()
-            plt.annotate(f"t-SNE with graphs and images. Color representing {feature}", (0.5, 1.05), xycoords='axes fraction', ha='center', va='bottom')
-            plt.savefig(os.path.join(outdirsub, f"{name}_graphimg_{feature}_p{perplexity}.png"), format='png', dpi=300)
-            plt.clf()
-            plt.close()
-
         # Visualize difference in distance for the feature and graph tsne
         distances_tsne_features = []
         distances_tsne_graph = []
@@ -933,6 +1083,7 @@ def tsne_analysis(
             for j in range(i+1, len(df)):
                 distances_tsne_features.append(np.linalg.norm(points_feat[i] - points_feat[j]))
                 distances_tsne_graph.append(np.linalg.norm(points_graph[i] - points_graph[j]))
+        plt.gcf().set_size_inches(18, 14) 
         plt.scatter(distances_tsne_features, distances_tsne_graph, s=0.1)
         plt.xlabel("Distance in Feature t-SNE")
         plt.ylabel("Distance in Graph t-SNE")
@@ -945,22 +1096,11 @@ def tsne_analysis(
         for i in range(len(df)):
             for j in range(i+1, len(df)):
                 distances_tsne_img.append(np.linalg.norm(points_img[i] - points_img[j]))
+        plt.gcf().set_size_inches(18, 14) 
         plt.scatter(distances_tsne_features, distances_tsne_img, s=0.1)
         plt.xlabel("Distance in Feature t-SNE")
         plt.ylabel("Distance in Image t-SNE")
         plt.savefig(os.path.join(outdirsub, f"{name}_disttsne_feat_img_p{perplexity}.png"), format='png', dpi=300)
-        plt.clf()
-        plt.close()
-
-        # Visualize difference in distance for the feature and graph+img tsne
-        distances_tsne_graph_img = []
-        for i in range(len(df)):
-            for j in range(i+1, len(df)):
-                distances_tsne_graph_img.append(np.linalg.norm(points_graph_img[i] - points_graph_img[j]))
-        plt.scatter(distances_tsne_features, distances_tsne_graph_img, s=0.1)
-        plt.xlabel("Distance in Feature t-SNE")
-        plt.ylabel("Distance in Graph+Image t-SNE")
-        plt.savefig(os.path.join(outdirsub, f"{name}_disttsne_feat_graphimg_p{perplexity}.png"), format='png', dpi=300)
         plt.clf()
         plt.close()
 
@@ -971,6 +1111,7 @@ def tsne_analysis(
             for j in range(i+1, len(df)):
                 distances_tsne_img.append(np.linalg.norm(points_img[i] - points_img[j]))
                 distances_tsne_graph.append(np.linalg.norm(points_graph[i] - points_graph[j]))
+        plt.gcf().set_size_inches(18, 14) 
         plt.scatter(distances_tsne_img, distances_tsne_graph, s=0.1)
         plt.xlabel("Distance in Image t-SNE")
         plt.ylabel("Distance in Graph t-SNE")
@@ -992,32 +1133,34 @@ def tsne_analysis(
             'averageMincut',
             'maxSymmetry',
         ]
+        column_main = features_final.copy()
+        column_main.remove('balanceTopology')
         for feature in column_main:
             differences_feature = []
-            distances_graph_tsne = []
-            distances_img_tsne = []
             for i in range(len(df)):
                 for j in range(i+1, len(df)):
                     differences_feature.append(df[feature][i] - df[feature][j])
-                    distances_graph_tsne.append(np.linalg.norm(points_graph[i] - points_graph[j]))
-                    distances_img_tsne.append(np.linalg.norm(points_img[i] - points_img[j]))
 
-            plt.scatter(differences_feature, distances_graph_tsne, s=0.1)
+            plt.gcf().set_size_inches(18, 14)
+            plt.scatter(differences_feature, distances_tsne_graph, s=0.02)
             plt.xlabel(f"Difference in {feature}")
             plt.ylabel("Distance in Graph t-SNE")
             plt.savefig(os.path.join(outdirsub, f"{name}_distfeat_graph_{feature}_p{perplexity}.png"), format='png', dpi=300)
             plt.clf()
             plt.close()
 
-            plt.scatter(differences_feature, distances_img_tsne, s=0.1)
+            plt.gcf().set_size_inches(18, 14) 
+            plt.scatter(differences_feature, distances_tsne_img, s=0.02)
             plt.xlabel(f"Difference in {feature}")
             plt.ylabel("Distance in Image t-SNE")
-            plt.savefig(os.path.join(outdirsub, f"{name}_distfeat_img_{name}_{feature}_p{perplexity}.png"), format='png', dpi=300)
+            plt.savefig(os.path.join(outdirsub, f"{name}_distfeat_img_{feature}_p{perplexity}.png"), format='png', dpi=300)
             plt.clf()
             plt.close()
 
+            print(f"Distance analysis done for {feature}")
+
 if __name__ == "__main__":
-    baseoutdir = Path(path.join(NOISE_ANALYSIS_OUTPUT_FOLDER, 'noise'))
+    baseoutdir = Path(path.join(ANALYSIS_OUTPUT_FOLDER, 'analysis'))
     baseoutdir.mkdir(exist_ok=True)
 
     experiment_names = [
@@ -1043,52 +1186,90 @@ if __name__ == "__main__":
 
     if VARIANCE_ANALYSIS:
         for i in tqdm.trange(0, 1):
-            name = f'var_ab_{i}'
-            run_variance_analysis(client, baseoutdir, name, i, ALL_BLACK_NAME, feature_ranges, num_matches_per_simulation=5)
+            name = f'var_ab_{i}_nm1'
+            phenotype_path = os.path.join(baseoutdir, name, f"phenotype_{name}.pkl")
+            name = f'var_ab_{i}_nm5'
+            run_variance_analysis(client, baseoutdir, name, i, ALL_BLACK_NAME, feature_ranges, num_parallel_simulations=5, phenotype_path=phenotype_path, use_cache=True)
         for i in tqdm.trange(0, 1):
-            name = f'var_grid_{i}'
-            run_variance_analysis(client, baseoutdir, name, i, GRID_GRAPH_NAME, feature_ranges, num_matches_per_simulation=5)
+            name = f'var_grid_{i}_nm1'
+            phenotype_path = os.path.join(baseoutdir, name, f"phenotype_{name}.pkl")
+            name = f'var_grid_{i}_nm5'
+            run_variance_analysis(client, baseoutdir, name, i, GRID_GRAPH_NAME, feature_ranges, num_parallel_simulations=5, phenotype_path=phenotype_path, use_cache=True)
         for i in tqdm.trange(0, 1):
-            name = f'var_smt_{i}'
-            run_variance_analysis(client, baseoutdir, name, i, SMT_NAME, feature_ranges, num_matches_per_simulation=5)
+            name = f'var_smt_{i}_nm1'
+            phenotype_path = os.path.join(baseoutdir, name, f"phenotype_{name}.pkl")
+            name = f'var_smt_{i}_nm5'
+            run_variance_analysis(client, baseoutdir, name, i, SMT_NAME, feature_ranges, num_parallel_simulations=5, phenotype_path=phenotype_path, use_cache=True)
         for i in tqdm.trange(0, 1):
-            name = f'var_pointad_{i}'
-            run_variance_analysis(client, baseoutdir, name, i, POINT_AD_NAME, feature_ranges, num_matches_per_simulation=5)
+            name = f'var_pointad_{i}_nm1'
+            phenotype_path = os.path.join(baseoutdir, name, f"phenotype_{name}.pkl")
+            name = f'var_pointad_{i}_nm5'
+            run_variance_analysis(client, baseoutdir, name, i, POINT_AD_NAME, feature_ranges, num_parallel_simulations=5, phenotype_path=phenotype_path, use_cache=True)
 
-    COVARIANCE_ANALYSIS = False
+    COVARIANCE_ANALYSIS = True
     if COVARIANCE_ANALYSIS:
         name = f'cov_ab'
-        run_covariance_analysis(client, baseoutdir, name, 0, ALL_BLACK_NAME, feature_ranges, num_matches_per_simulation=5)
+        var_corr_ab, var_corr_reduced_ab, var_corr_final_ab = run_covariance_analysis(client, baseoutdir, name, 0, ALL_BLACK_NAME, feature_ranges, num_parallel_simulations=5, use_cache=True)
         name = f'cov_grid'
-        run_covariance_analysis(client, baseoutdir, name, 0, GRID_GRAPH_NAME, feature_ranges, num_matches_per_simulation=5)
+        var_corr_grid, var_corr_reduced_grid, var_corr_final_grid = run_covariance_analysis(client, baseoutdir, name, 0, GRID_GRAPH_NAME, feature_ranges, num_parallel_simulations=5, use_cache=True)
         name = f'cov_smt'
-        run_covariance_analysis(client, baseoutdir, name, 0, SMT_NAME, feature_ranges, num_matches_per_simulation=5)
+        var_corr_smt, var_corr_reduced_smt, var_corr_final_smt = run_covariance_analysis(client, baseoutdir, name, 0, SMT_NAME, feature_ranges, num_parallel_simulations=5, use_cache=True)
         name = f'cov_pointad'
-        run_covariance_analysis(client, baseoutdir, name, 0, POINT_AD_NAME, feature_ranges, num_matches_per_simulation=5)
+        var_corr_pointad, var_corr_reduced_pointad, var_corr_final_pointad = run_covariance_analysis(client, baseoutdir, name, 0, POINT_AD_NAME, feature_ranges, num_parallel_simulations=5, use_cache=True)
 
-    TSNE_ANALYSIS = True
+        
+        # Given the correletion matrixes, we compute a median correlation matrix
+        var_corr = (var_corr_ab + var_corr_grid + var_corr_smt + var_corr_pointad) / 4
+        var_corr_reduced = (var_corr_reduced_ab + var_corr_reduced_grid + var_corr_reduced_smt + var_corr_reduced_pointad) / 4
+        var_corr_final = (var_corr_final_ab + var_corr_final_grid + var_corr_final_smt + var_corr_final_pointad) / 4
+
+        vcs = [var_corr, var_corr_reduced, var_corr_final]
+        names = ['_full', '_reduced', '_final']
+        annots = [False, True, True]
+        # Save the final correlation matrix
+        for i, var in enumerate(vcs):
+
+            fig, ax = plt.subplots(figsize=(24, 16))
+            heatmap_ax = sns.heatmap(var, xticklabels=var.columns, yticklabels=var.index, annot=annots[i], annot_kws={"fontsize":6})
+            heatmap_ax.tick_params(axis='both', which='major', labelsize=10)
+            plt.setp(heatmap_ax.get_xticklabels(), rotation=45, ha='right', rotation_mode="anchor")
+            plt.tight_layout()
+            plt.savefig(os.path.join(baseoutdir, f"covariance_map{names[i]}.png"), format='png', dpi=300) 
+            plt.clf()
+            plt.close()
+
+            clustermap_ax = sns.clustermap(var, xticklabels=var.columns, yticklabels=var.index, annot=annots[i], annot_kws={"fontsize":4})
+            plt.setp(clustermap_ax.ax_heatmap.get_yticklabels(), rotation=0)
+            plt.setp(clustermap_ax.ax_heatmap.get_xticklabels(), rotation=45, ha='right', fontsize=8, rotation_mode="anchor")
+            plt.savefig(os.path.join(baseoutdir, f"covariance_clustermap{names[i]}.png"), format='png', dpi=300)
+            plt.clf()
+            plt.close()
+
+
+
+    TSNE_ANALYSIS = False
     if TSNE_ANALYSIS:
         experiment_names = [
-            #"Bari_AB_ABEmitter_SB_entropy_balanceTopology_pursueTime_I400_B1_E10",
-            "Cov_AB_ABEmitter_SB_entropy_maxValuePercentVisibility_area_I400_B1_E10",
+            "Bari_AB_ABEmitter_SB_entropy_balanceTopology_pursueTime_I400_B1_E10",
+            #"Cov_AB_ABEmitter_SB_entropy_maxValuePercentVisibility_area_I400_B1_E10",
         ]        
-        name = f'tsne_ab_3'
-        tsne_analysis(client, baseoutdir, name, experiment_names, visualize_tsne_img=False, visualize_tsne_graph=True, num_experiment_iterations=400, use_stored_graphs=True) 
+        name = f'tsne_ab_graph2vecAttr'
 
-        #experiment_names = [
-        #    "BariInverse_PointAD_PointADEmitter_SB_entropy_balanceTopology_pursueTime_I400_B1_E10",
-        #]
-        #name = f'tsne_pointad'
-        #tsne_analysis(client, baseoutdir, name, experiment_names, num_experiment_iterations=400, use_stored_graphs=False)
-#
-        #experiment_names = [
-        #    "Bari_GG_GGEmitter_SB_entropy_balanceTopology_pursueTime_I400_B1_E10"
-        #]
-        #name = f'tsne_gg'
-        #tsne_analysis(client, baseoutdir, name, experiment_names, num_experiment_iterations=400, use_stored_graphs=False)
-#
-        #experiment_names = [
-        #    "EpV_SMT_SMTEmitter_SB_explorationPlusVisibility3_balanceTopology_averageRoomRadius_I400_B1_E10"
-        #]
-        #name = f'tsne_smt'
-        #tsne_analysis(client, baseoutdir, name, experiment_names, num_experiment_iterations=400, use_stored_graphs=False)
+        tsne_analysis(client, baseoutdir, name, experiment_names, num_experiment_iterations=200, use_stored_graphs=True) 
+        experiment_names = [
+            "BariInverse_PointAD_PointADEmitter_SB_entropy_balanceTopology_pursueTime_I400_B1_E10",
+        ]
+        name = f'tsne_pointad_graph2vecAttr'
+        tsne_analysis(client, baseoutdir, name, experiment_names, num_experiment_iterations=200, use_stored_graphs=True)
+
+        experiment_names = [
+            "Bari_GG_GGEmitter_SB_entropy_balanceTopology_pursueTime_I400_B1_E10"
+        ]
+        name = f'tsne_gg_graph2vecAttr'
+        tsne_analysis(client, baseoutdir, name, experiment_names, num_experiment_iterations=200, use_stored_graphs=True)
+
+        experiment_names = [
+            "EpV_SMT_SMTEmitter_SB_explorationPlusVisibility3_balanceTopology_averageRoomRadius_I400_B1_E10"
+        ]
+        name = f'tsne_smt_graph2vecAttr'
+        tsne_analysis(client, baseoutdir, name, experiment_names, num_experiment_iterations=200, use_stored_graphs=True)
