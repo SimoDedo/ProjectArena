@@ -42,6 +42,7 @@
 \usepackage{transparent} % Enables transparent images
 \usepackage{eso-pic} % For the background picture on the title page
 \usepackage{subfig} % Numbered and caption subfigures using \subfloat.
+\usepackage[export]{adjustbox}
 \usepackage{tikz} % A package for high-quality hand-made figures.
 \usetikzlibrary{}
 \graphicspath{{./Images/}} % Directory of the images
@@ -49,6 +50,7 @@
 \usepackage{xcolor} % Coloured captions
 \usepackage{amsthm,thmtools,xcolor} % Coloured "Theorem"
 \usepackage{float}
+\usepackage{placeins}
 
 % STANDARD MATH PACKAGES
 \usepackage{amsmath}
@@ -79,6 +81,7 @@
 \usepackage{afterpage}
 \usepackage{lipsum} % DUMMY PACKAGE
 \usepackage{fancyhdr} % For the headers
+\usepackage[export]{adjustbox}
 \fancyhf{}
 
 % Input of configuration file. Do not change config.tex file unless you really know what you are doing. 
@@ -192,6 +195,10 @@ Qui va l'Abstract in lingua italiana della tesi seguito dalla lista di parole ch
 % --------------------------------------------------------------------------
 % NUMBERED CHAPTERS % Regular chapters following
 % --------------------------------------------------------------------------
+\chapter{Introduction}
+\label{ch:introduction}
+
+TODO
 
 \chapter{State of the art}
 \label{ch:state_of_the_art}
@@ -244,7 +251,7 @@ Many competitive games, such as Real Time Strategy (RTS) games, Multiplayer Onli
 
 Moreover, what makes a multiplayer map balanced highly depends on the specific game mechanics and the game mode that is being played. In the "capture the flag" game mode\footnote{Popular game mode where two teams face off, and each one has to infiltrate the opposing base to steal a flag and bring it back to their own base.} two teams have to achieve the same objective, so a balanced map can be achieved with a symmetrical layout, as in Team Fortress 2\footnote{Valve Corporation, 2007} (Figure \ref{fig:ctf_tf2}). \textit{Counter-Strike} instead has a "Bomb Defusal" game mode\footnote{Game mode where a team, the "Terrorists", has to place and detonate a bomb while the other team, the "Counter-Terrorists", has to defend designated locations.} where a balanced map will probably have an asymmetrical layout, where, for example, the defending will spawn closer to the areas they will have to defend in order to organize themselves, while the attacking team will have multiple attacking routes to the sites (Figure \ref{fig:dust2}).
 
-\begin{figure}[H]
+\begin{figure}[hbt!]
     \centering
     \subfloat["Thunder mountain", a Capture the Flag map in \textit{Team Fortress 2}.\label{fig:ctf_tf2}]{
         \includegraphics[height=0.4\textwidth]{Images/Thunder_Mountain_(Capture_the_Flag).png}
@@ -264,12 +271,12 @@ The observations made in this section about balancing maps in competitive FPS ga
 Finally, we note that there is a lack of academic research on the topic of balancing maps in competitive FPS games, which leads to a lack of a clear methodology to follow when designing and balancing a map, having instead to rely on "common sense", trial and error, observation and experience.  
 
 \section{Procedural content generation in games}
-\label{sec:level_design}
+\label{sec:procedural_content_generation}
 We refer to \textit{Procedural Content Generation} (PCG) as the process of creating game content algorithmically, rather than manually. This can be used to create levels, characters, items, quests, dialogues, and more. 
 
 PCG has been used in games since the early days of the industry, with games like \textit{Rogue}\footnote{A.I. Design, 1980} using procedural generation to create levels, items, and enemies. The technique has helped developers create games that use less storage space and have more replayability. To this day, many successful games that span many genres employ PCG to create content, such as \textit{Minecraft}\footnote{Mojang, 2011}, \textit{No Man's Sky}\footnote{Hello Games, 2016}, the \textit{Mystery Dungeon}\footnote{Chunsoft, 1993} series or \textit{Hades}\footnote{Supergiant Games, 2020}.
 
-\begin{figure}[H]
+\begin{figure}[hbt!]
     \centering
     \subfloat[\textit{Minecraft}\label{fig:Minecraft}]{
         \includegraphics[height=0.2\textwidth]{Images/Minecraft.png}
@@ -297,7 +304,7 @@ In the domain of FPS games PCG has mostly been used for single player games or m
 \label{subsec:search_based_pcg}
 Referring to the taxonomy of PCG approaches just defined, \textit{Search Based Procedural Content Generation} (SB-PCG) is a particular case of \textit{generate-and-test} PCG, where the content is first generated, then the candidate is tested and evaluated with a \textit{fitness function}, and the generation of a new candidate depends on the result of this evaluation. \cite{togelius_search-based_2010}
 
-\begin{figure}[H]
+\begin{figure}[hbt!]
     \centering
     \includegraphics[width=0.6\textwidth]{Images/Togelius.png}
     \caption{Comparison of SB-PCG with constructive and generate-and-test approaches.}
@@ -332,9 +339,9 @@ We can classify fitness functions in 3 categories \cite{togelius_search-based_20
 \label{subsec:pcg_fps}
 While no acclaimed commercial game uses PCG to create maps for competitive multiplayer games, some academic research has been done on the topic.
 
-\citeauthor{cardamone_evolving_2011} have started research in this field by using search-based techniques to generate playable FPS maps for the "deathmatch" game mode of \textit{Cube 2: Sauerbraten}\footnote{Lee Salzman, Wouter van Oortmerssen, Mike Dysart, Robert Pointon, 2004}. In their work they defined four different genotypes (\textit{All-White}, \textit{All-Black}, \textit{Grid} and \textit{Random-Digger}), and mapped each to a phenotype that can be used to generate a map for Cube 2. The candidate maps are evaluated using a simulation-based fitness function; each map is played for 10 minutes by 4 bots and the fitness is based on the \textit{average fighting time}, that is defined as the amount time passed from the moment in which the player starts to fight an opponent to the moment in which the player is killed. They argue that interesting maps will have features, such as escape routes and well-placed resources, that allow for long fights to happen. \cite{cardamone_evolving_2011}
+\citeauthor{cardamone_evolving_2011} have started research in this field by using search-based techniques to generate playable FPS maps for the "deathmatch" game mode of \textit{Cube 2: Sauerbraten}\footnote{Lee Salzman, Wouter van Oortmerssen, Mike Dysart, Robert Pointon, 2004}. In their work they defined four different genotypes (\textit{All-White}, \textit{All-Black}, \textit{Grid} and \textit{Random-Digger}, in figure \ref{fig:map_genomes}), and mapped each to a phenotype that can be used to generate a map for Cube 2. The candidate maps are evaluated using a simulation-based fitness function; each map is played for 10 minutes by 4 bots and the fitness is based on the \textit{average fighting time}, that is defined as the amount time passed from the moment in which the player starts to fight an opponent to the moment in which the player is killed. They argue that interesting maps will have features, such as escape routes and well-placed resources, that allow for long fights to happen. \cite{cardamone_evolving_2011}
 
-\begin{figure}[H]
+\begin{figure}[hbt!]
     \centering
     \subfloat[\textit{All-White}\label{fig:allwhite}]{
         \includegraphics[height=0.2\textwidth]{Images/aw.png}
@@ -350,7 +357,7 @@ While no acclaimed commercial game uses PCG to create maps for competitive multi
         \includegraphics[height=0.2\textwidth]{Images/rd.png}
     }
     \caption[\citeauthor{cardamone_evolving_2011} example maps]{Different maps evolved by \citeauthor{cardamone_evolving_2011} with different genotypes.}
-    \label{fig:pcg_games}
+    \label{fig:map_genomes}
 \end{figure}
 
 
@@ -387,7 +394,7 @@ One of the first works leaning towards QD was done by \citeauthor{lehman_exploit
 
 The algorithm works by first choosing \textit{N} relevant behavioral features of our individuals, therefore defining the behavior (or feature) space. Each dimension of variation is discretized, creating an \textit{N}-dimensional grid called the \textit{archive}. The search starts by generating a number of random individuals, which are evaluated to determine both their fitness and their behavioral features. Based on the value of these feature, the individuals are placed in a cell of the archive. Since the archive is formed by discretizing a finite or possibly infinite space, multiple candidates may fall in the same cell. In this case, MAP-Elites will only keep the individual with the highest fitness for each cell (the \textit{elite}), forcing local competition within niches. Then, until a stopping criterion is met (iteration count, time, etc...) MAP-Elites selects a certain number of elites from the archive, generates new individuals by applying crossover, mutation or both to each elite, evaluates their fitness and measures their features to finally place them in the archive, only keeping the best individual in each cell. When elites are mutated, the new individual may, and should, end up in a different cell of the archive, allowing distant niches to be stepping stones for each other. As a matter of fact, experiments show that the lineage of elites can often be seen traversing long paths through different regions of the map. Some cells may instead remain empty, either because no genome exists with such features or because the search failed to produce one such genome, even if one existed. \cite{mouret_illuminating_2015}
 
-\begin{figure}[H]
+\begin{figure}[hbt!]
     \centering
     \includegraphics[width=0.7\textwidth]{Images/MAPElites.png}
     \caption{Visualization of the MAP-Elites algorithm.}
@@ -429,12 +436,15 @@ Quality Diversity methods have yet to be applied to FPS games, be them singlepla
 In this chapter we have outlined the main concepts of level design in games, with a specific focus on competitive FPS games and academic research on them. We then explored the definition of "game balance", focusing on competitive games, and discussed the importance of map design in competitive FPS games to achieve balance. Furthermore, we have also discussed the main concepts of Procedural Content Generation in games, focusing on search-based methods and Evolutionary Algorithms in particular, and how they have been used to generate maps for FPS games. We have then introduced the concept of Quality Diversity and the MAP-Elites algorithm, explaining how they came to be and how they differ from traditional optimization methods. Finally, we have reviewed the main works that have used Quality Diversity methods to generate content for different genres of games, highlighting some relevant MAP-Elites variants such as MAP-Elites with Sliding Boundaries.
 
 
-\chapter{Project Arena}
+\chapter{Tools}
+\label{ch:tools}
+
+\section{Project Arena}
 \label{ch:project_arena}
 
 [TODO: Intro]
 
-\section{Description and motivations}
+\subsection{Description and motivations}
 \label{sec:pa_description}
 Academic research on the topic of procedural map generation in FPS games has mostly used \textit{Cube 2: Sauerbraten} \cite{cardamone_evolving_2011}\cite{lanzi_evolving_2014}\cite{loiacono_fight_2017}; while undoubtedly a powerful option thanks to its rich map editor, its ability to run in headless mode and its open-source nature, modifying the source code of a game is never an easy task. Moreover, the game was never developed with the explicit intent of being used in academic research, which makes it cumbersome to run tasks such as user studies, with parties involved needing to download the game on their machines, which would often discourage participants.
 
@@ -442,17 +452,17 @@ Academic research on the topic of procedural map generation in FPS games has mos
 
 One issue with the framework, compared to \textit{Cube 2: Sauerbraten}, was the lack of bots, which are essential to perform simulations in search-based PCG methods. To solve this issue, \citeauthor{bari_evolutionary-based_2023} developed bots that can be used in the framework \cite{bari_evolutionary-based_2023}. This way games can be simulated and data can be recorded to be later analyzed or to be used for fitness calculations.
 
-\section{Framework overview}
+\subsection{Framework overview}
 \label{sec:pa_overview}
 
-\subsection{Map Representation}
+\subsubsection{Map Representation}
 \label{subsec:map_representation}
 
 Maps can be seen as matrices of orthogonal \textit{tiles}, and are internally represented as matrices of characters. A tile in the map corresponds to a cell in the matrix, and depending on the character in the cell the tile can be a wall, a floor or an object on the floor. Map can also have multiple levels, in which case they are represented as lists of matrices, with each representing a level.
 
 Two different formats can then be supplied to the framework, which are converted to the internal format just described. The first is a textual representation, where each line corresponds to a row of the matrix, and a blank line is used to divide multi-level maps. The second is a modified version of the \textit{All-Black} genotype originally defined by \citeauthor{cardamone_evolving_2011}, where rooms are encoded as triplets with the center's coordinates and size, corridors as triplets with the starting position's coordinates and length and objects as triplets with the object's coordinates and type. Multi-level maps are represented by dividing levels with special characters.
 
-\subsection{Structure}
+\subsubsection{Structure}
 \label{subsec:structure}
 The framework is organized in a series of modular "Managers" that handle different aspects of the game, aided by various other modules.
 
@@ -470,7 +480,7 @@ The \textbf{Experiment Manager} is a stand-alone module that helps researchers r
 
 Besides managers, other relevant components include \textbf{Entities}, which refer to any \textit{agent} that takes part in a match, and include the player, opponents and targets, \textbf{Weapons} (Assault Rifle, Shotgun, Sniper Rifle, Rocket Launcher and Laser Gun) which are highly parametrized, \textbf{Objects} such as decorations and spawners of healt packs and ammunitions. 
 
-\subsection{Bots}
+\subsubsection{Bots}
 \label{subsec:bots}
 
 \citeauthor{bari_evolutionary-based_2023} devloped bots for the framework with the aim of creating a modular system that would facilitate maintenance and modifications to the bots. \cite{bari_evolutionary-based_2023}
@@ -485,7 +495,7 @@ Finally, the \textbf{Actuator Layer} is responsible for actuating the physical a
 
 An important feature of the bots is their parametrization; this allows bots to be used to simulate players with different skillset, playstyles and skill level. In particular, we can modify a general \textit{skill score}, that expresses how skilled a bot is on a scale from 0 to 1, and many \textit{ability scores}, which define how skilled a bot is on a scale from 0 to 1 in a specific characteristic, such as reflexes, aiming skill and speed. These characteristic have been used to define three bot profiles which are the \textit{Shotgun}, an aggressive and agile player focused on close-quarters combat, the \textit{Sniper}, a patient player focused on long-range combat with exceptional aiming skills, and the \textit{Assault}, a balanced player who excels in medium-range combat.
 
-\subsection{Data gathering}
+\subsubsection{Data gathering}
 \label{subsec:pa_data_gathering}
 In order to perform experiments of any kind, data must be able to be gathered from matches. To that end, the framework is able to collect a variety of data which is saved to be later analyzed and enriched outside the framework.
 
@@ -526,10 +536,9 @@ Besides raw data, the framework also calculates some metrics that are useful to 
 
 \end{itemize}
 
-\chapter{Pyribs}
+\section{Pyribs}
 \label{ch:pyribs}
-
-\section{Description and motivations}
+\subsection{Description and motivations}
 \label{sec:pyribs_description}
 The \textit{pyribs} library\footnote{\url{https://pyribs.org/}} is a Python library that aids researchers in using state of the art Quality Diversity algorithms and in implementing new algorithms using pyribs's modular conceptual Quality Diversity framework called \textit{RIBS}.
 
@@ -542,7 +551,7 @@ Finally, \textit{QDax} \cite{lim_accelerated_2022} focuses on implementing QD al
 
 We chose \textit{pyribs} for our research because of its dedicated focus on Quality Diversity algorithms, its comprehensive selection of state-of-the-art methods, its user-friendly interface, its visualization methods and its flexibility for extension and customization. 
 
-\section{RIBS framework}
+\subsection{RIBS framework}
 \label{sec:ribs}
 
 To solve the challange of a lack of a conceptual framework, \citeauthor{tjanaka_pyribs_2023} introduce the \textit{RIBS} framework, whose goal is to be capable of implementing any QD algorithm, from MAP-Elites to Novelty-Search, and all variations that may use evolutionary strategies, such as  \textit{Covariance Matrix Adaptation MAP-Elites} \cite{fontaine_covariance_2020}, gradient ascent, or Bayesian Optimization.
@@ -564,10 +573,10 @@ This modular design allows for the implementation of a variety of QD algorithms,
 
 \chapter{Placeholder}
 
-\section{Map genomes}
+\section{Map representation}
 \label{sec:map_genomes}
-
-\subsection{All-Black}
+As discussed in section \ref{subsec:search_based_pcg}, in order to evolve maps we have to define a suitable representation (genome) which can be mapped to the actual map (phenotype) to be evaluated by the framework, which is \textit{Project Arena} in our case. In the following section we will discuss the genomes we examined and how they map to a common phenotype that can be used by the framework to generate the actual maps to be evaluated through simulations.
+\subsection{All-Black genome}
 \label{subsec:all_black}
 The \textit{All-Black} genome was first introduced by \citet{cardamone_evolving_2011} and later used in more academic researches \cite{lanzi_evolving_2014} \cite{loiacono_fight_2017} \cite{bari_evolutionary-based_2023}. \citeauthor{cardamone_evolving_2011} proposed four different genomes, \textit{All-Black}, \textit{All-White}, \textit{Grid} and \textit{Random-Digger}, and while on average All-White perfomed best, future research has instead focused on All-Black, given its capability of producing maps which more closely resemble topologies of man-made maps by using explicitely the concepts of rooms/arenas and corridors.
 
@@ -586,14 +595,14 @@ The genome supports mutation by randomly replacing \textit{rooms} and \textit{co
 
 As already noted by \citeauthor{bari_evolutionary-based_2023}, \textit{All-Black} sports two main problems. The first is a \textit{lack of locality}: the change of a single number of the genome, such as a corridor length's, can lead to a large change in the phenotype's topology. This lack of locality impedes the performance of Evolutionary Algorithms, as discussed in \ref{subsec:search_based_pcg}. The second is \textit{redundancy}: different genomes may result in the same final map; as an example, we could have a genome with a room fully contained in another bigger room, thus a number of different genomes would result in the same final map if the smaller room is moved while still being fully contained in the bigger room. Another problem is that resulting maps are on average very noisy, often having many dead ends and confusing topological features.
 
-\begin{figure}[H]
+\begin{figure}[hbt!]
     \centering
     \includegraphics[width=0.65\textwidth]{images/ABGenome.png}
     \caption[All-Black example]{An example of a simple All-Black genome}
     \label{fig:all_black}
 \end{figure}
 
-\subsection{Grid-Graph}
+\subsection{Grid-Graph genome}
 \label{subsec:grid_graph}
 \textit{Gird-Graph} was introduced by \citeauthor{bari_evolutionary-based_2023} with the aim of overcoming All-Black's problems.
 
@@ -603,11 +612,18 @@ Each cell can either contain one or no \textbf{room}, which is an axis aligned r
 
 Rooms can be connected by \textbf{corridors} if they are placed in horizontally or vertically adjacent cells. This is encoded in the genome via a single boolean value for each pair of horizontally or vertically adjacent cells, meaning that we have an $R$ x ($C$ - 1) matrix of boolean values for horizontal corridors, where the value in cell ($i$, $j$) indicates whether rooms in cell ($i$, $j$) and ($i$, $j$ + 1) are connected by a horizontal corridor, and a ($R$ - 1) x $C$ matrix of boolean values for vertical corridors, where the value in cell ($i$, $j$) indicates whether rooms in cell ($i$, $j$) and ($i$ + 1, $j$) are connected by a vertical corridor.
 
-Similarly to \textit{All-Black}, the genome is converted to the phenotype by placing rooms and corridors on the map and eliminating unconnected regions, keeping only the portion closest to the center of the map. The genome supports mutation by randomly changing \textit{rooms} and \textit{corridors} and crossover by randomly exchanging \textit{rooms} and \textit{corridors} between two genomes.
+Similarly to \textit{All-Black}, the genome is converted to the phenotype by placing rooms and corridors on the map and keeping only the connected portion closest to the center of the map, eliminating all other unconnected regions. The genome supports mutation by randomly changing \textit{rooms} and \textit{corridors} and crossover by randomly exchanging \textit{rooms} and \textit{corridors} between two genomes.
+
+\begin{figure}[hbt!]
+    \centering
+    \includegraphics[width=0.85\textwidth]{images/GridGraph.png}
+    \caption[Grid-Graph example]{An example of a simple Grid-Graph genome where rooms are shown in green, vertical corridors are shown in blue and horizontal corridors in red. Disconnected parts are filled with a zig-zagged line. Taken from \cite{bari_evolutionary-based_2023}.}
+    \label{fig:grid_graph}
+\end{figure}
 
 \citeauthor{bari_evolutionary-based_2023} argues that \textit{Grid-Graph} overcomes the problems of \textit{All-Black}. The genome is more compact and less redundant, as rooms have no way to overlap. However, locality is still a problem (although in a more controlled way, since connected regions are separated only if their respective corridor is removed) and the resulting maps appear very simple, with the possible amount of layouts being seemingly very limited.
 
-\subsection{Point-Line}
+\subsection{Point-Line genome}
 \label{subsec:point_line}
 
 We introduce in this work the \textit{Point-Line} genome, which takes its inspiration from \citet{olsted_interactive_2015}. The key idea that we borrow is that of defining explicitly the topology of the map by defining couples of point that are connected by L-shaped corridors.
@@ -624,10 +640,10 @@ As already noted for the other representations, the resulting map may not be ful
 
 We believe this genome to be capable of representing a wider range of topologies when compared to \textit{Grid-Graph}, while still being easily readable to the human player. Locality is improved with respect to \textit{All-Black} since rooms are explicitly connected by corridors, meaning that to remove a connection there needs to be a significant difference between the genomes, and simply moving a room also moves the corridor, keeping them connected. By coupling points and reusing coordinates between corridors and rooms, the genome is also more compact than \textit{All-Black}. We also believe that defining corridors by their start and end gives both long and short corridors an equal chance to appear, allowing \textit{Point-Line} to be more likely to explore different design, while long corridors in \textit{All-Black} are rarely found due to the need of placing a series of corridors to form a longer one.  However, the genome does not solve the problem of redundancy, as rooms can still overlap. This solution thus places itself in a sort of middle ground between \textit{All-Black} and \textit{Grid-Graph}, with the aim of combining the best of both.
 
-\begin{figure}[H]
+\begin{figure}[hbt!]
     \centering
     \includegraphics[width=0.65\textwidth]{images/PointGenome.png}
-    \caption[Point-Line example]{An example of a simple Point-Line genome where points, L-shaped connections, related corridors and rooms are shown.}
+    \caption[Point-Line example]{An example of a simple Point-Line genome where points, L-shaped connections and related corridors arw shown in blue and rooms are shown in red.}
     \label{fig:point_line}
 \end{figure}
 
@@ -682,10 +698,11 @@ Once the rooms positions are defined, rooms must be connected with corridors. Si
 
 We noted that the maps generated via this method were not sufficiently connected; \citeauthor{whitehead_spatial_2020} was interested in dungeon designs, where an SMT could suitably represent a linear layout with a start, an end and some optional rooms and paths, but multiplayer FPS maps require more complex topologies that entail loops, arenas and alternate routes, as discussed in \ref{sec:level_design}. We thus decided to add connections between rooms via a heuristic: given a line, rooms that are intersected by it are connected by a corridor, if they weren't already connected.
 
-\begin{figure}[H]
+\begin{figure}[hbt!]
     \centering
-    \subfloat[Example of a simple SMT-Genome without added corridors]{\includegraphics[width=0.5\textwidth]{images/SMT_NotAdded.png}}
-    \subfloat[Example of a simple SMT-Genome with added corridors]{\includegraphics[width=0.5\textwidth]{images/SMT_added.png}}
+    \subfloat[Example of a simple SMT-Genome without added corridors]{\includegraphics[width=0.45\textwidth]{images/SMT_NotAdded.png}}
+    \qquad
+    \subfloat[Example of a simple SMT-Genome with added corridors]{\includegraphics[width=0.45\textwidth]{images/SMT_added.png}}
     \caption[SMT-Genome lines]{An example of how corridors are added between rooms intersected by a line.}
     \label{fig:smt_genome}
 \end{figure}
@@ -694,17 +711,19 @@ The genome supports mutation by randomly changing the rooms and lines and crosso
 
 It must be noted that, differently from the other genomes, the SMT-Genome is not deterministic; while we can set a seed in \textit{Z3}, the result of the solving process may still vary when run on the same genome due to the nature of the solver itself. This could be a problem as it could lead to poor locality. Genomes may also have no feasible solution, in which case we are forced to discard it.
 
-\begin{figure}
+\begin{figure}[hbt!]
     \centering
-    \subfloat{\includegraphics[width=0.5\textwidth]{images/SMT_Added.png}}
-    \subfloat{\includegraphics[width=0.5\textwidth]{images/SMT_Added_2.png}}
+    \subfloat{\includegraphics[width=0.45\textwidth]{images/SMT_Added.png}}
+    \qquad
+    \subfloat{\includegraphics[width=0.45\textwidth]{images/SMT_Added_2.png}}
     \caption[SMT-Genome determinism]{Examples of how the same SMT genome may lead to different results.}
+    \label{fig:smt_genome_determinism}
 \end{figure}
 
 % TODO: Add a section on the evaluation of the genomes
 
 \subsection{Common Areas-Phenotype}
-All genomes are transformed to a common phenotype, called \textbf{Areas-Phenotype}. This phenotype is then supplied to \textit{Project Arena} where it is transformed in the internal textual representation used to build the actual map.
+All genomes are transformed to a common phenotype, called \textbf{Areas-Phenotype}. This phenotype is then supplied to \textit{Project Arena} where it is transformed in the internal textual representation used to build the actual map. This phenotype describes the map as rectangles of walkable tiles placed on a grid where each tile is a wall.
 
 The \textit{Areas-Phenotype} is an object which contains:
 
@@ -777,7 +796,7 @@ Besides these, we also define some features leveraging the data gathered by the 
     \item \textit{coverage}: The percentage of the walkable map covered by the heatmap, meaning that the value is not 0 in that position.
 \end{itemize}
 
-\begin{figure}[H]
+\begin{figure}[hbt!]
 \label{fig:heatmaps_example}
     \centering
     \subfloat{{\includegraphics[width=0.4\textwidth]{images/Deaths_Heat_Example.png} }}
@@ -796,7 +815,7 @@ We also utilize the kills and deaths' positions to calculate the "kill traces". 
     \item \textit{quantile75Traces}: The third quartile of the kill traces' lengths.
 \end{itemize}
 
-\begin{figure}[H]
+\begin{figure}[hbt!]
 \label{fig:kill_traces_example}
     \centering
     \includegraphics[width=0.4\textwidth]{images/Traces_Example.png}
@@ -819,14 +838,14 @@ The first is the "Distance Transform-based Segmentation" approach used in \citep
     \centering
     \subfloat[The rooms identified by the algorithm]{\includegraphics[height=0.4\textwidth]{images/graph_dist_color.png}}
     \qquad
-    \subfloat[The graph obtained from the rooms]{\includegraphics[height=0.4\textwidth]{images/graph_dist.png}}
+    \subfloat[The graph obtained connecting adjacent rooms]{\includegraphics[height=0.4\textwidth]{images/graph_dist.png}}
     \caption[Distance Transform Segmentation example]{An example of the Distance Transform-based Segmentation}
     \label{fig:dt_segmentation}
 \end{figure}
 
 The second is the approach for region decomposition based on line segment Voronoi diagrams detailed by \citet{perkins_terrain_2010}, which we will describe here briefly. Starting from a map represented by a grid of walkable or wall tiles, we use a flood fill algorithm to identify the external wall (which we ensure is always a single polygon by adding a wall border to the map) and all obstacles (contiguous areas of walls inside a walkable part of the map) and transform them into polygons. Then we create a Voronoi diagram\footnote{\raggedright\url{https://pypi.org/project/pyvoronoi/}} of the line segments of the polygons, removing from the diagram secondary edges and edges inside the obstacles' polygons. The Voronoi diagram is trasformed then into a graph, and for each node we compute a \textit{radius}, defined as the minimum distance from the node to the nearest obstacle. We use this radius to prune the graph by iteratively removing leafs whose radius is smaller than their parent's. Then we identify \textit{regions} (\textit{rooms}, in our case) and \textit{chokepoints} based on the degree of a node and its radius and, to simplify the graph, we merge adjacent rooms using some heuristics. The process and its results are shown in figure \ref{fig:voronoi_region_decomposition}.
 
-\begin{figure}[H]
+\begin{figure}[hbt!]
     \centering
     \subfloat[The map as a grid.]{\includegraphics[height=0.3\textwidth]{images/graph_v_1.png}}
     \qquad
@@ -846,7 +865,7 @@ The second is the approach for region decomposition based on line segment Vorono
 
 While results are similar, the Voronoi-based approach felt more suite to our needs, providing a graph that structurally resembles the map's topology and distinguishes relevantly between rooms and corridors. Moreover, the Distance Transform-based approach is often unable to identify multiple connections between two rooms, which is a common and important feature of FPS maps. In figure \ref{fig:graph_comparison} we show a comparison to facilitate the understanding of the problem at hand.
 
-\begin{figure}[H]
+\begin{figure}[hbt!]
     \centering
     \subfloat[Distance Transform-based Segmentation]{\includegraphics[width=0.45\textwidth]{images/graph_compare_dist.png}}
     \qquad
@@ -855,7 +874,7 @@ While results are similar, the Voronoi-based approach felt more suite to our nee
     \label{fig:graph_comparison}
 \end{figure}
 
-We defined features that we believed to be relevant in order to describe and distinguish different FPS maps, such as loops, alternate routes and other concepts discussed in \ref{sec:level_design}.
+Leveraging this graph we defined features that we believed to be relevant in order to describe and distinguish different FPS maps, such as loops, alternate routes and other concepts discussed in \ref{sec:level_design}.
 Thus, for each map we extract the following \textbf{graph-based} features:
 
 \begin{itemize}
@@ -893,12 +912,12 @@ We also believe that another important component of a map's topology is the \tex
 
 While this naive approach works, the algorithm is $O\left(N^{2}\right)$ and even after careful optimization takes upwards of 40 seconds to compute the visibility of larger maps. For this reason, we opted for the faster, approximate approach of Grid-Based visibility \cite{goldstein_quick_2023}, in which we loop over every tile of the map and perform a linear interpolation on the whole map. The result can be computed in under a second for all tested maps and the visibility matrix is a good approximation of the true visibility, although generally the number of tiles visible from any tile is lower than with the naive method (see figure \ref{fig:visibility_example}).
 
-\begin{figure}[H]
+\begin{figure}[hbt!]
     \centering
     \subfloat[Naive method, computed in 28.77s]{\includegraphics[width=0.45\textwidth]{images/visibility_old.png}}
     \qquad
     \subfloat[The visibility matrix, computed in 0.26s]{\includegraphics[width=0.45\textwidth]{images/visibility_new.png}}
-    \caption[Visibility comparison]{Examples of the visibility matrix obtained with the naive method and the grid-based method where the color of a tile represents the number of tiles visibile from it.}
+    \caption[Visibility comparison]{Examples of the visibility matrix obtained with the naive method and the grid-based method. The color of a tile represents the number of tiles visibile from it.}
     \label{fig:visibility_example}
 \end{figure}
 
@@ -941,7 +960,7 @@ Finally, we have tried to define measures that would describe certain types of m
     \end{split}
     \end{equation}
     Note that the value "30" in the evenlySpacedFactor is an empirical value from the observed maximum of \textit{stdRoomMinDistance}.
-    \item \textit{explorationPlusVisibility}: A measure to describe how much a map encourages exploration by being well connected and having good visibility. It is calculated as follows:
+    \item \textit{explorationPlusVisibility}: A measure to describe how much a map encourages exploration by being well-connected and having good visibility. It is calculated as follows:
     \begin{equation}
     \begin{split}
         &explorationFactor = clip\left(\dfrac{averageMincut}{2}, 0, 1\right) \\
@@ -952,8 +971,192 @@ Finally, we have tried to define measures that would describe certain types of m
     \end{equation}
 \end{itemize}
 
+\chapter{Experiments}
+\section{Pleriminary analyses}
+\subsection{Emergent features noisiness analysis}
+\label{subsec:emergent_features_noisiness}
+By their very nature, simulations are not deterministic given that bots perform many random actions during a single match. So while topological features are always the same for a given map, emergent features, such as entropy or pace, may vary. For this reason we have run an analysis to understand how noisy these features are; if a feature varies too wildly between different matches on the same map, then we may as well consider it random and unfit to describe an actual feature of the examined map.
+
+To gather and visualize this data we have generated a random genome (one for all genome representations discussed in \ref{sec:map_genomes}), converted it to a phenotype and run 100 different matches on the same map, recording the emergent features at the end of each match. Each feature has thus 100 data points which have been used to draw a boxplot\footnote{\url{https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.boxplot.html}}, which allows us to neatly visualize the distribution (median, first and third quartile, maximum, minum and outliers) of the data. While some features, such as entropy or pace, have a maximum and minimum possible value, others, such as the maximum value of the heatmaps, do not. In order to visualize and compare features we have normalized all features to the range $[0, 1]$, using the empirical minimum and maximum values, obtained from roughly 16000 matches on different maps, when needed. The results are shown in figures \ref{fig:emergent_features_noisiness_ab}, \ref{fig:emergent_features_noisiness_grid}, \ref{fig:emergent_features_noisiness_pointad} and \ref{fig:emergent_features_noisiness_smt}.
+
+\begin{figure}[p]
+    \centering
+    \subfloat{
+
+        \includegraphics[width=0.15\textwidth, valign=c]{images/phenotype_var_ab_0_nm1.png}
+        \includegraphics[width=0.85\textwidth, valign=c]{images/boxplot_var_ab_0_nm1_numsim_1.png}
+        }
+    \caption{Boxplot of emergent features for a random \textit{All-Black} phenotype.}
+    \label{fig:emergent_features_noisiness_ab}
+\end{figure}
+\begin{figure}[p]
+    \centering
+    \subfloat{
+        \includegraphics[width=0.15\textwidth, valign=c]{images/phenotype_var_grid_0_nm1.png}
+        \includegraphics[width=0.85\textwidth, valign=c]{images/boxplot_var_grid_0_nm1_numsim_1.png}
+        }
+    \caption{Boxplot of emergent features for a random \textit{Grid-Graph} phenotype.}
+    \label{fig:emergent_features_noisiness_grid}
+\end{figure}
+\begin{figure}[p]
+    \centering
+    \subfloat{
+        \includegraphics[width=0.15\textwidth, valign=c]{images/phenotype_var_pointad_0_nm1.png}
+        \includegraphics[width=0.85\textwidth, valign=c]{images/boxplot_var_pointad_0_nm1_numsim_1.png}
+    }
+    \caption{Boxplot of emergent features for a random Point-Line phenotype.}
+    \label{fig:emergent_features_noisiness_pointad}
+\end{figure}
+\begin{figure}[p]
+    \centering
+    \subfloat{
+        
+        \includegraphics[width=0.15\textwidth, valign=c]{images/phenotype_var_smt_0_nm1.png}
+        \includegraphics[width=0.85\textwidth, valign=c]{images/boxplot_var_smt_0_nm1_numsim_1.png}
+    }
+    \caption{Boxplot of emergent features for a random SMT phenotype.}
+    \label{fig:emergent_features_noisiness_smt}
+\end{figure}
+
+\clearpage
+We notice that results do not differ significantly bewteen different genomes. We can also conclude that, while some features are occasionally noisier (e.g. stdLocalMaximaValueKill in \ref{fig:emergent_features_noisiness_ab}, sightLossRate in \ref{fig:emergent_features_noisiness_grid} and entropy in \ref{fig:emergent_features_noisiness_smt}), in general all have a reasonable and similar amount of noise. To improve our results we believe that averaging the features over multiple matches would be beneficial. To this end, we repeated the analysis by averaging the features over 5 matches, obtaining again 100 data points for each feature, where each data point is the average of the result of 5 matches. The results are shown in figures \ref{fig:emergent_features_noisiness_5_ab}, \ref{fig:emergent_features_noisiness_5_grid}, \ref{fig:emergent_features_noisiness_5_pointad} and \ref{fig:emergent_features_noisiness_5_smt}.
+
+\vspace*{\fill}
+{
+\centering
+\begin{figure}[hbt!]
+    \centering
+    \subfloat{ 
+        \centering
+        \includegraphics[width=0.15\textwidth, valign=c]{images/phenotype_var_ab_0_nm5.png}
+        \includegraphics[width=0.85\textwidth, valign=c]{images/boxplot_var_ab_0_nm5_numsim_5.png}
+    }
+    \caption{Boxplot of emergent features for a random \textit{All-Black} phenotype averaging 5 matches.}
+    \label{fig:emergent_features_noisiness_5_ab}
+\end{figure}
+}
+\vspace*{\fill}
+\begin{figure}[p]
+    \subfloat{ 
+        \centering
+        \includegraphics[width=0.15\textwidth, valign=c]{images/phenotype_var_grid_0_nm5.png}
+        \includegraphics[width=0.85\textwidth, valign=c]{images/boxplot_var_grid_0_nm5_numsim_5.png}
+        }
+    \caption{Boxplot of emergent features for a random \textit{Grid-Graph} phenotype averaging 5 matches.}
+    \label{fig:emergent_features_noisiness_5_grid}
+\end{figure}
+\begin{figure}[p]
+    \subfloat{
+        \centering
+        \includegraphics[width=0.15\textwidth, valign=c]{images/phenotype_var_pointad_0_nm5.png}
+        \includegraphics[width=0.85\textwidth, valign=c]{images/boxplot_var_pointad_0_nm5_numsim_5.png}
+    }
+    \caption{Boxplot of emergent features for a random Point-Line phenotype averaging 5 matches.}
+    \label{fig:emergent_features_noisiness_5_pointad}
+\end{figure}
+\begin{figure}[H]
+    \subfloat{ 
+        \centering
+        \includegraphics[width=0.15\textwidth, valign=c]{images/phenotype_var_smt_0_nm5.png}
+        \includegraphics[width=0.85\textwidth, valign=c]{images/boxplot_var_smt_0_nm5_numsim_5.png}
+    }
+    \caption{Boxplot of emergent features for a random SMT phenotype averaging 5 matches.}
+    \label{fig:emergent_features_noisiness_5_smt}
+\end{figure}
+
+
+As expected results are even less noisy, and suggest that all metrics are suitable to describe maps. 
+
+\subsection{SMT-Genome phenotype mapping analysis}
+\label{subsec:smt_genome_phenotype_mapping}
+As we highlighted in \ref{subsec:smt_genome}, the SMT-Genome is not deterministic, meaning that the same genome could lead to different map layouts when mapped to a phenotype. In this section we determine the noisiness of an SMT-Genome by generating 200 phenotypes from the same genome and calculating both emergent and topological features by simulating 5 matches and averaging results. The 200 datapoints are used to draw a boxplot for each feature, which is shown in figures \ref{fig:smt_genome_noisiness_emergent} and \ref{fig:smt_genome_noisiness_topology}.
+
+\begin{figure}[hbt!]
+    \centering
+    \subfloat{
+        \includegraphics[width=0.85\textwidth]{images/boxplot_emergent_smtnoise_f_run2_numsim_5.png}
+        }
+    \caption{SMT-Genome emergent features noisiness analysis.}
+    \label{fig:smt_genome_noisiness_emergent}
+\end{figure}
+\begin{figure}[hbt!]
+    \centering
+    \subfloat{
+        \includegraphics[width=0.85\textwidth]{images/boxplot_topology_smtnoise_f_run2_numsim_5.png}
+    }
+    \caption{SMT-Genome topological features noisiness analysis.}
+    \label{fig:smt_genome_noisiness_topology}
+\end{figure}
+
+For the emergent features in figure \ref{fig:smt_genome_noisiness_emergent} we can clearly see that some features are very noisy, such as entropy, pace, sightLossRate and targetLossRate. For the topological features in figure \ref{fig:smt_genome_noisiness_topology} we can see that the features relating to the cycles are especially noisy, this is probably a consequence of the process of adding connections between rooms based on the lines in the genome, as described in \ref{subsec:smt_genome}, which relies on the intersection between lines and rooms, so often moving the room by a single tile can lead to the room not intersecting a line and thus to a completely different graph. This leads us to believe that the \textit{SMT-Genome} sports very little locality which may impact the evolution process negatively.
+
+\section{Correlation analysis}
+Given the large number of features that can be extracted it would be unfeasible to  try and illuminate all of them. Instead, we narrowed down the list of features through the examination of the correlation of the features.
+
+We generated 100 random genomes and simulated 5 matches on each resulting map, averaging the features obtained in those matches. We used these 100 data points to compute the correlation matrix of the features using Pearson's correlation coefficient\footnote{Correlation coefficient which measures the linear correlation between two sets of data. Its value range from -1 (perfect negative correlation) to 1 (perfect positive correlation), with 0 indicating no correlation.}. We repeated this process for each genome representation, obtaining a correlation matrix for each. We averaged the coefficients obtaining the correlation matrix shown in figure \ref{fig:correlation_matrix_full}.
+
+\begin{figure}[hbt!]
+    \centering
+    \includegraphics[width=1.0\textwidth]{images/covariance_map_full.png}
+    \caption{Correlation matrix of the features.}
+    \label{fig:correlation_matrix_full}
+\end{figure}
+
+From the figure it is immediately apparent that multiple features are not only highly correlated, as highlighted by the white squares on the diagonal, but also that they have similar correlation values with all other feeatures, since multiple consecutive rows are similar. Features are ordered "semantically", meaning that features that are conceptually similar are close to each other, so we reduce the number of features by selecting only one feature from each group of highly correlated features (e.g. we select \textit{pace} betweeen the similar \textit{pace}, \textit{fightTime} and \textit{pursueTime}). We then repeated the correlation analysis on the reduced set of features, this time utilizing a clustermap\footnote{\url{https://seaborn.pydata.org/generated/seaborn.clustermap.html}} to visualize the correlation, as seen in figure \ref{fig:correlation_clustermap_reduced}.
+
+\begin{figure}[hbt!]
+    \centering
+    \includegraphics[width=1.0\textwidth]{images/covariance_clustermap_reduced.png}
+    \caption{Clustermap of the reduced set of features.}
+    \label{fig:correlation_clustermap_reduced}
+\end{figure}
+
+The clustering helps us observe groups of features that are still highly correlated, so to further reduce the number of features, we selected one feature for each highly correlated group, preferring features that are conceptually more interesting. We consider features highly correlated when their correlation coefficient is grater than 0.7. This leads to the following groupings:
+
+\begin{itemize}
+    %\item \textit{maxSymmetry}
+    \item \textit{maxValuePosition} (grouped with \textit{coverageKill}, \textit{coverageDeath}, \textit{maxValueKill}, \textit{maxValueDeath})
+    \item \textit{coveragePosition}
+    %\item peripheryPercent
+    \item pace (grouped with \textit{maxValuePercentVisibility})
+    %\item stdValuePercentVisibility 
+    %\item averageLocalMaximaValuePercentVisibility
+    \item density (grouped with \textit{averageRoomCloseness})
+    %\item averageEccentricity
+    \item area (grouped with \textit{killDiff}, \textit{targetLossRate}, \textit{localMaximaNumberPosition}, \textit{localMaximaNumberKill}, \textit{localMaximaNumberDeath})
+    %\item averageRoomBetweenness 
+    %\item localMaximaNumberVisibility
+    %\item balanceTopology
+    %\item entropy
+    %\item averageRoomRadius
+    %\item stdLocalMaximaValuePercentVisibility
+    %\item sightLossRate
+    %\item periphery
+    %\item maxTraces
+    %\item maxValueVisibility
+    %\item numberCyclesOneRoom
+    \item averageMincut (grouped with \textit{explorationPlusVisibility})
+\end{itemize}
+All the other features are not highly correlated with any other feature, so we keep them.
+
+Finally, in figure \ref{fig:correlation_clustermap_final} we show the correlation clustermap of the final set of features.
+
+\begin{figure}[hbt!]
+    \centering
+    \includegraphics[width=1.0\textwidth]{images/covariance_clustermap_final.png}
+    \caption{Clustermap of the final set of features.}
+    \label{fig:correlation_clustermap_final}
+\end{figure}
+
+We are now interested in negatively correlated features; these offer interesting potential to be explored using a QD approaches, such as \textit{MAP-Elites}. 
+
+We have thus selected the following couples of features: \textit{area} / \textit{MaxSymmetry} (-0.88), \textit{pace} / \textit{averageEccentricity} (-0.79), \textit{averageMincut} / \textit{maxValuePosition} (-0.59), \textit{peripheryPercent} / \textit{averageRoomBetweennes} (-0.63), \textit{area} / \textit{coveragePosition} (-0.72), \textit{numberCyclesOneRoom}, \textit{maxSymmetry} (-0.54), \textit{maxTraces} / \textit{maxValuePosition} (-0.55), \textit{maxValueVisibility} / \textit{maxValuePosition} (-0.54), \textit{density} / \textit{averageRoomBetweennes} (-0.56).
+
+\section{t-SNE analysis}
+[TODO] To understand 
+
 \chapter{Conclusions and future developments}
-\label{ch:conclusions}%
+\label{ch:conclusions}
 A final chapter containing the main conclusions of your research/study
 and possible future developments of your work have to be inserted in this chapter. 
 
