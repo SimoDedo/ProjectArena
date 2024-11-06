@@ -1,0 +1,59 @@
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{Abstract}{i}{chapter*.2}%
+\contentsline {chapter}{Abstract in lingua italiana}{iii}{chapter*.4}%
+\contentsline {chapter}{Contents\markboth {\MakeUppercase []{Contents}}{\MakeUppercase []{Contents}}}{v}{chapter*.6}%
+\vspace {2em}
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Contents of the thesis}{2}{section.1.1}%
+\contentsline {chapter}{\numberline {2}State of the art}{5}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Level design in First-Person Shooter games}{5}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Balance in competitive multiplayer video games}{8}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Procedural content generation in games}{11}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Search based procedural content generation}{12}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Procedural map generation in competitive FPS games}{14}{subsection.2.3.2}%
+\contentsline {section}{\numberline {2.4}Quality diversity and MAP Elites}{16}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Quality Diversity for procedural content generation in games}{19}{subsection.2.4.1}%
+\contentsline {section}{\numberline {2.5}Summary}{22}{section.2.5}%
+\contentsline {chapter}{\numberline {3}Frameworks and tools}{23}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Project Arena}{23}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}Description and motivations}{23}{subsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.1.2}Framework overview}{24}{subsection.3.1.2}%
+\contentsline {subsubsection}{Map Representation}{24}{subsubsection*.15}%
+\contentsline {subsubsection}{Structure}{24}{subsubsection*.16}%
+\contentsline {subsubsection}{Bots}{25}{subsubsection*.17}%
+\contentsline {subsubsection}{Data gathering}{26}{subsubsection*.18}%
+\contentsline {section}{\numberline {3.2}Pyribs}{28}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Description and motivations}{28}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}RIBS framework}{28}{subsection.3.2.2}%
+\contentsline {section}{\numberline {3.3}Summary}{30}{section.3.3}%
+\contentsline {chapter}{\numberline {4}FPS map's representations and features}{31}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Map representation}{31}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}All-Black genome}{31}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Grid-Graph genome}{32}{subsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.1.3}Point-Line genome}{34}{subsection.4.1.3}%
+\contentsline {subsection}{\numberline {4.1.4}SMT-Genome}{36}{subsection.4.1.4}%
+\contentsline {subsection}{\numberline {4.1.5}Common Areas-Phenotype}{38}{subsection.4.1.5}%
+\contentsline {section}{\numberline {4.2}Features}{40}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Emergent features}{40}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Topological features}{42}{subsection.4.2.2}%
+\contentsline {section}{\numberline {4.3}Summary}{50}{section.4.3}%
+\contentsline {chapter}{\numberline {5}Experiments}{53}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Preliminary analysis}{53}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Emergent features noisiness analysis}{54}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}SMT-Genome phenotype mapping analysis}{59}{subsection.5.1.2}%
+\contentsline {section}{\numberline {5.2}Correlation analysis}{60}{section.5.2}%
+\contentsline {section}{\numberline {5.3}t-SNE analysis}{65}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}t-SNE of the feature space}{66}{subsection.5.3.1}%
+\contentsline {subsection}{\numberline {5.3.2}t-SNE of the image space}{67}{subsection.5.3.2}%
+\contentsline {subsection}{\numberline {5.3.3}t-SNE of the latent space of the gl2Vec graph embedding}{69}{subsection.5.3.3}%
+\contentsline {section}{\numberline {5.4}Experiments with MAP-Elites}{77}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}area - maxSymmetry}{77}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}pace - averageEccentricity}{88}{subsection.5.4.2}%
+\contentsline {subsection}{\numberline {5.4.3}averageMincut - maxValuePosition}{98}{subsection.5.4.3}%
+\contentsline {section}{\numberline {5.5}Summary}{107}{section.5.5}%
+\contentsline {chapter}{\numberline {6}Conclusions and future developments}{109}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Shortcomings and future developments}{110}{section.6.1}%
+\vspace {2em}
+\contentsline {chapter}{Bibliography\markboth {\MakeUppercase []{Bibliography}}{\MakeUppercase []{Bibliography}}}{113}{chapter*.102}%
+\vspace {2em}
+\contentsline {chapter}{List of Figures}{119}{chapter*.104}%

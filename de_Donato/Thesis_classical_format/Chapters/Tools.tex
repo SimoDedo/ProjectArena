@@ -1,0 +1,143 @@
+
+\chapter{Frameworks and tools}
+\label{ch:tools}
+In the following chapter we are going to present the two frameworks that we leveraged to perform our research and the tools they offer.
+
+First we will take a look at \textit{Project Arena}, a light and modular research-oriented framework developed by \citeauthor{ballabio_online_2018} in \textit{Unity}. The framework is used to generate maps and to simulate matches, and it has been later extended to support bots by \citeauthor{bari_evolutionary-based_2023}. We will present its main component and features to give an insight on how we have used it to evaluate and evolve maps.
+
+Then we will present Pyribs, a Python library that aids researchers in using state-of-the-art Quality Diversity algorithms and in implementing new algorithms using pyribs's modular conceptual Quality Diversity framework called \textit{RIBS}. We will delve into the \textit{RIBS} framework to understand how its main components work and how they have been used.
+
+\section{Project Arena}
+\label{ch:project_arena}
+
+
+\subsection{Description and motivations}
+\label{sec:pa_description}
+Academic research on the topic of procedural map generation in FPS games has mostly used \textit{Cube 2: Sauerbraten} \cite{cardamone_evolving_2011}\cite{lanzi_evolving_2014}\cite{loiacono_fight_2017}; while undoubtedly a powerful option thanks to its rich map editor, its ability to run in headless mode and its open-source nature, modifying the source code of a game is never an easy task. Moreover, the game was never developed with the explicit intent of being used in academic research, which makes it cumbersome to run tasks such as user studies, with parties involved needing to download the game on their machines, which would often discourage participants.
+
+\textit{Project Arena} \cite{ballabio_online_2018} is a research-oriented framework developed by \citeauthor{ballabio_online_2018} in \textit{Unity}\footnote{A popular game engine developed by Unity Technologies.} with the main goals of being light and modular. Using a game engine lends the framework to being modified more easily, since it is widely known in the industry, and also allows the game to be easily built for WebGL, allowing the game to be run in a browser. 
+
+One issue with the framework, compared to \textit{Cube 2: Sauerbraten}, was the lack of bots, which are essential to perform simulations in search-based PCG methods. To solve this issue, \citeauthor{bari_evolutionary-based_2023} developed bots that can be used in the framework \cite{bari_evolutionary-based_2023}. This way games can be simulated, and data can be recorded to be later analyzed or to be used for fitness calculations.
+
+\subsection{Framework overview}
+\label{sec:pa_overview}
+
+\subsubsection{Map Representation}
+\label{subsec:map_representation}
+
+Maps can be seen as matrices of orthogonal \textit{tiles} and are internally represented as matrices of characters. A tile in the map corresponds to a cell in the matrix, and depending on the character in the cell the tile can be a wall, a floor or an object on the floor. Maps can also have multiple levels, in which case they are represented as lists of matrices, with each representing a level.
+
+Two different formats can then be supplied to the framework, which are converted to the internal format just described. The first is a textual representation, where each line corresponds to a row of the matrix, and a blank line is used to divide multi-level maps. The second is a modified version of the \textit{All-Black} genotype originally defined by \citeauthor{cardamone_evolving_2011}, where rooms are encoded as triplets with the center's coordinates and size, corridors as triplets with the starting position's coordinates and length and objects as triplets with the object's coordinates and type. Multi-level maps are represented by dividing levels with special characters.
+
+\subsubsection{Structure}
+\label{subsec:structure}
+The framework is organized in a series of modular "Managers" that handle different aspects of the game, aided by various other modules.
+
+The \textbf{Game Manager} is the main manager and is responsible for the behavior of a game, with different Game Managers being used for different game modes, which include \textit{Duel}, a classic deathmatch, \textit{Target Rush}, where waves of enemies must be eliminated, and \textit{Target Hunt}, where a series of enemies must be eliminated within a time limit. The Game Manager is responsible for managing the lifecycle of a game, including setup, map generation, countdown, play and end.
+
+The \textbf{Map Manager} generates or loads a map, assembles it and displaces objects on the map, relying on other entities to perform these tasks. The Map Manager is further differentiated into the Single-Level Map Manager, which handles single-level maps, the Multi-Level Map Manager, which handles multi-level maps, and the All-Black Map Manager, which handles maps in the multi-level \textit{All-Black} format.
+
+The \textbf{Map Generator} is used to generate maps, with different versions being used to generate different topologies. The \textit{Cellular Generator} employs a parametric cellular automaton to generate a map, the \textit{Divisive Generator} uses instead a binary space partitioning algorithm, the \textit{Digger Generator} uses a random digger algorithm and the \textit{All-Black Generator} parses maps in the \textit{All-Black} format. The \textbf{Stairs Generator} then places or validates stairs for multi-level maps.
+
+The \textbf{Map Assembler} aids the assembly of the map and can either assemble meshes or prefabs.
+
+The \textbf{Object Displacer} is used to place objects, such as spawn ammunition, on the map based on the characters in the matrix. It also populates a dictionary that is used to decide where to place spawn points, which are stored by the \textbf{Spawn Point Manager}.
+
+The \textbf{Experiment Manager} is a stand-alone module that helps researchers run user-based studies. Experiments are first defined with an optional \textit{tutorial}, with a collection of \textit{studies}, each divided in multiple \textit{cases} containing each a pool of maps, which are to be validated, played on a specific game mode and finally with an optional survey. Once defined, the \textit{Experiment Manager} selects studies and cases in a round-robin fashion to assign players and runs the experiment, either online or offline. During the experiment, information is logged (e.g. the map's information, the game's information) and can be later downloaded from the server.
+
+Besides managers, other relevant components include \textbf{Entities}, which refer to any \textit{agent} that takes part in a match, and include the player, opponents and targets, \textbf{Weapons} (Assault Rifle, Shotgun, Sniper Rifle, Rocket Launcher and Laser Gun) which are highly parameterized, \textbf{Objects} such as decorations and spawners of health packs and ammunition. 
+
+\subsubsection{Bots}
+\label{subsec:bots}
+
+\citeauthor{bari_evolutionary-based_2023} developed bots for the framework with the aim of creating a modular system that would facilitate maintenance and modifications to the bots. \cite{bari_evolutionary-based_2023}
+
+The architecture of the bots is structured in layers, with the first being the \textbf{Sensing Layer}. This layer receives raw data from the game world so that other layers can process it to determine the bot's behavior. It is responsible for sightings of players, objects and obstacles, hearing sounds and sensing damage received.
+
+The \textbf{Knowledge Base Layer} analyzes the data and provides tactical information, which is then used to make decisions. The layer is divided in modules responsible for keeping a knowledge base of enemy locations, objects' locations and last visited map locations. This information is then used by the \textit{Navigation System} to calculate the path to a given destination. This layer is also responsible for introducing a delay between the bot's sight of an enemy and its actual detection, to simulate human reaction times.
+
+The \textbf{Decision Making Layer} is responsible for choosing the objective to pursue and the action plan to follow in order to achieve it, based on the bot's state and knowledge. To allow the bot to be easily understood and modified, the action plans that the bots are graphically defined by behavior trees and are followed to achieve the goal defined by the current state. The possible states are \textit{Wander}, \textit{Fight}, \textit{Collect pickup} and \textit{Search enemy}. 
+
+Finally, the \textbf{Actuator Layer} is responsible for actuating the physical actions of the bot, such as moving and rotating the camera, as a response to the decisions taken.
+
+An important feature of the bots is their parameterization; this allows bots to be used to simulate players with different skill set, play-styles and skill level. In particular, we can modify a general \textit{skill score}, that expresses how skilled a bot is on a scale from 0 to 1, and many \textit{ability scores}, which define how skilled a bot is on a scale from 0 to 1 in a specific characteristic, such as reflexes, aiming skill and speed. These characteristics have been used to define three bot profiles which are the \textit{Shotgun}, an aggressive and agile player focused on close-quarters combat, the \textit{Sniper}, a patient player focused on long-range combat with exceptional aiming skills, and the \textit{Assault}, a balanced player who excels in medium-range combat.
+
+\subsubsection{Data gathering}
+\label{subsec:pa_data_gathering}
+To perform experiments of any kind, data must be able to be gathered from matches. To that end, the framework can collect a variety of data which is saved to be later analyzed and enriched outside the framework.
+
+The framework collects the following raw data related to the match:
+
+\begin{itemize}
+    \item \textit{Time to engage}: The interval from the end of one combat event to the start of the next, or, at the beginning of the match, the time from respawn to the first combat encounter.
+    \item \textit{Time in fight}: The total time a bot spends actively engaged in combat, including the period spent searching for an enemy after losing visual contact.
+    \item \textit{Number of sights}: The total number of combat engagements.
+    \item \textit{Time between sights}: The time elapsed between losing sight of an enemy and detecting it again, measured for each combat event.
+    \item \textit{Number of re-sights}: The number of times an enemy is re-detected after initially becoming undetected.
+    \item \textit{Time to surrender}: The time taken for a bot to stop searching for an enemy after losing track of it.
+    \item \textit{Number of retreats}: The number of instances where a bot ceases searching for an enemy after losing sight of it.
+\end{itemize}
+
+The framework also records the following data for each entity:
+
+\begin{itemize}
+    \item \textit{Frags}: Number of kills performed. 
+    \item \textit{Deaths}: Number of deaths. 
+    \item \textit{Shots}: Number of bullets fired. 
+    \item \textit{Hits}: Number of times a projectile shot hit an entity (including itself).
+\end{itemize}
+
+Besides raw data, the framework also calculates some metrics that are useful to analyze the design of maps. These include:
+
+\begin{itemize}
+    \item \textit{Entropy}: As defined and used by \citet{lanzi_evolving_2014} and \citet{loiacono_fight_2017}, entropy is a measure used to infer the map's balance, calculated as follows:
+    \begin{equation}
+        entropy = \sum_{i=1}^{n} - \left(\dfrac{k_i}{k_{tot}}\right) \log_2 \left(\dfrac{k_i}{k_{tot}}\right)
+    \end{equation}
+    Where for each bot $i$ the number of kills $k_i$ is divided by the total number of kills $k_{tot}$ and multiplied by the logarithm of the result. The entropy is then the sum of these values and is meant to represent how balanced a match on a certain map has been, given that, as we already discussed in \cref{sec:balance}, the map's design could greatly influence the match's result. Possible values range from 0 to 1, with 1 representing a balanced match and 0 meaning a wildly unbalanced match.
+    \item \textit{Pace}: The frequency of combat engagements normalized between 0 and 1, calculated as follows:
+    \begin{equation}
+        pace = 2 * \dfrac{1}{1 + \exp \left(-5 * \dfrac{NumberOfFights}{\sum TimeToEngage}\right)} - 1
+    \end{equation}
+    This sigmoid function computes values close to 0.9 when the average time to engage is 3 seconds.
+
+\end{itemize}
+
+\section{Pyribs}
+\label{ch:pyribs}
+\subsection{Description and motivations}
+\label{sec:pyribs_description}
+The \textit{pyribs} library\footnote{\url{https://pyribs.org/}} is a Python library that aids researchers in using state of the art Quality Diversity algorithms and in implementing new algorithms using pyribs's modular conceptual Quality Diversity framework called \textit{RIBS}.
+
+\textit{pyribs} aims at solving two challenges found within the Quality Diversity community: a lack of a conceptual framework applicable to  recently developed QD algorithms that also incorporate evolution strategies, gradient ascent and Bayesian optimization, and a lack of an implementation of said framework in a software that supports many users. \textit{pyribs} attempts to do so by introducing the \textit{RIBS framework}, explained in \cref{sec:ribs}, and by providing a Python implementation of it. \cite{tjanaka_pyribs_2023}
+
+Other libraries exist in the field of Quality Diversity, written in different languages and serving different purposes. \textit{Sferes\textsubscript{v2}} \cite{mouret_sferesv2_2010} is a C++ framework designed for high performance focusing on Evolutionary Algorithms as a whole, including Quality Diversity algorithms. The use of templates makes the library efficient at the cost of accessibility. 
+\textit{QDpy} \cite{cazenille_qdpy_2018} is a Python library focused solely on QD algorithms which offers building blocks that can be composed into different algorithms, but requires the user to supply an evaluation function, limiting its flexibility. 
+\textit{pymap\_elites} \cite{mouret_python3_2019}  is a reference implementation of the MAP-Elites algorithm and of some variants, such as CVT-ME \cite{vassiliades_using_2017}, in Python, but it is not designed to be a general-purpose QD library.
+Finally, \textit{QDax} \cite{lim_accelerated_2022} focuses on implementing QD algorithms, EAs, and Reinforcement Learning algorithms for hardware accelerators\footnote{Hardware accelerators are specialized hardware designed to perform specific tasks more efficiently than general-purpose hardware. Some examples of hardware accelerators include GPUs and TPUs}.
+
+We chose \textit{pyribs} for our research because of its dedicated focus on Quality Diversity algorithms, its comprehensive selection of state-of-the-art methods, its user-friendly interface, its visualization methods and its flexibility for extension and customization. 
+
+\subsection{RIBS framework}
+\label{sec:ribs}
+
+To solve the challenge of a lack of a conceptual framework, \citeauthor{tjanaka_pyribs_2023} introduce the \textit{RIBS} framework, whose goal is to be capable of implementing any QD algorithm, from MAP-Elites to Novelty-Search, and all variations that may use evolutionary strategies, such as  \textit{Covariance Matrix Adaptation MAP-Elites} \cite{fontaine_covariance_2020}, gradient ascent, or Bayesian Optimization.
+
+The framework is made up of three main components: the \textit{Archive}, the \textit{Emitters} and the \textit{Scheduler}.
+
+The \textbf{Archive} is the component responsible for storing solutions. It allows for the addition of new solutions and querying of existing ones. When solutions are added, the archive provides feedback on the insertion, such as whether the new solution improved an existing elite or its novelty score\footnote{The novelty score is typically defined as the average distance in the measure space from the solution to its k-nearest neighbors in the archive}, depending on its type.
+
+The \textbf{Emitters} are responsible for generating new solutions. They can be asked for new solutions and may require to be told the fitness they achieved in order to update their internal algorithm. 
+For example, the basic \textit{MAP-Elites} \cite{mouret_illuminating_2015} algorithm uses one emitter which simply chooses a random elite in the archive and either mutates it or applies crossover to it and doesn't require to be told anything since it has no internal state to maintain. 
+\textit{CMA-ME} \cite{fontaine_covariance_2020}, instead, uses the \textit{CMA-ES} algorithm to generate new solutions, which requires to be told the fitness of the solution it generated in order to update its internal state.
+
+The \textbf{Scheduler} has two roles: facilitate the interactions between the archive and the emitters and choose which emitter to use between the pool, based on their previous performance.
+A Scheduler implements an "ask-tell" interface; when the "ask" method is called, the scheduler chooses some emitters and asks them for new solutions, which are returned to the user. Later, the user is expected to call the "tell" method of the scheduler, providing the fitness of the solutions, which the scheduler uses to update the emitters' internal state by telling them.
+
+It is worth noting that the framework does not include facilities to evaluate the solutions; this step is left to the user to allow for maximum flexibility. This is useful in the case of Search-Based Procedural Content Generation, where the evaluation of a solution may require running a simulation, as in the case of generating maps for a game. The user can thus ask for new solutions, perform the genotype-to-phenotype mapping, run the simulation using the phenotype, evaluate the solution and tell the results. 
+
+This modular design allows for the implementation of a variety of QD algorithms, many of which are already supported by the library, but also allows for more solutions to be explored. Creating novel QD algorithms is also facilitated by the framework, since the user can rely on existing components and modify only some to create a new algorithm.
+
+\section{Summary}
+\label{sec:tools_summary}
+In this chapter we have presented the two frameworks that we have used to perform our research. We have presented an overview of \textit{Project Arena}, a research-oriented framework developed by \citeauthor{ballabio_online_2018} in \textit{Unity}, focusing on why it was chosen, its main advantages compared to other popular games used for research, such as \textit{Cube 2}, its internal structure and the metrics that can be gathered from matches. We have also presented the bots developed by \citeauthor{bari_evolutionary-based_2023} and their architecture, focusing on the parameterization that allows for different play-styles and skill levels. We have then presented \textit{pyribs}, a Python library that aids researchers in using state-of-the-art Quality Diversity algorithms and in implementing new algorithms using pyribs's modular conceptual Quality Diversity framework called \textit{RIBS}, focusing on the motivations behind its development and the \textit{RIBS} framework, its main components and how they interact. We have also discussed the flexibility of the framework and how it allows for the implementation of new QD algorithms. 

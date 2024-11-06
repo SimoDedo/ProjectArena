@@ -1,0 +1,346 @@
+\begin{thebibliography}{51}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Alvarez et~al.(2019)Alvarez, Dahlskog, Font, and Togelius]{alvarez_empowering_2019}
+A.~Alvarez, S.~Dahlskog, J.~Font, and J.~Togelius.
+\newblock Empowering {Quality} {Diversity} in {Dungeon} {Design} with {Interactive} {Constrained} {MAP}-{Elites}.
+\newblock In \emph{2019 {IEEE} {Conference} on {Games} ({CoG})}, pages 1--8, Aug. 2019.
+\newblock \doi{10.1109/CIG.2019.8848022}.
+\newblock URL \url{http://arxiv.org/abs/1906.05175}.
+\newblock arXiv:1906.05175 [cs].
+
+\bibitem[Alvarez et~al.(2022)Alvarez, Dahlskog, Font, and Togelius]{alvarez_interactive_2022}
+A.~Alvarez, S.~Dahlskog, J.~Font, and J.~Togelius.
+\newblock Interactive {Constrained} {MAP}-{Elites}: {Analysis} and {Evaluation} of the {Expressiveness} of the {Feature} {Dimensions}.
+\newblock \emph{IEEE Transactions on Games}, 14\penalty0 (2):\penalty0 202--211, June 2022.
+\newblock ISSN 2475-1502, 2475-1510.
+\newblock \doi{10.1109/TG.2020.3046133}.
+\newblock URL \url{http://arxiv.org/abs/2003.03377}.
+\newblock arXiv:2003.03377 [cs].
+
+\bibitem[Ballabio(2018)]{ballabio_online_2018}
+M.~Ballabio.
+\newblock \emph{An online framework for user-based analysis of maps in first person shooters}.
+\newblock PhD thesis, Apr. 2018.
+\newblock URL \url{https://www.politesi.polimi.it/handle/10589/140194}.
+
+\bibitem[Bari(2023)]{bari_evolutionary-based_2023}
+S.~Bari.
+\newblock \emph{Evolutionary-based procedural content generation for {First} {Person} {Shooters} in {Unity}.}
+\newblock PhD thesis, May 2023.
+\newblock URL \url{https://www.politesi.polimi.it/handle/10589/203323}.
+
+\bibitem[Becker and Görlich(2020)]{becker_what_2020}
+A.~Becker and D.~Görlich.
+\newblock What is {Game} {Balancing}? - {An} {Examination} of {Concepts}.
+\newblock \emph{ParadigmPlus}, 1\penalty0 (1):\penalty0 22--41, Apr. 2020.
+\newblock ISSN 2711-4627.
+\newblock \doi{10.55969/paradigmplus.v1n1a2}.
+\newblock URL \url{http://journals.itiud.org/index.php/paradigmplus/article/view/7}.
+\newblock Number: 1.
+
+\bibitem[Bhojan and Wong(2014)]{bhojan_arena_2014}
+A.~Bhojan and H.~W. Wong.
+\newblock {ARENA} - {Dynamic} {Run}-{Time} {Map} {Generation} for {Multiplayer} {Shooters}.
+\newblock In Y.~Pisan, N.~M. Sgouros, and T.~Marsh, editors, \emph{Entertainment {Computing} – {ICEC} 2014}, pages 149--158, Berlin, Heidelberg, 2014. Springer.
+\newblock ISBN 978-3-662-45212-7.
+\newblock \doi{10.1007/978-3-662-45212-7_19}.
+
+\bibitem[Bormann et~al.(2016)Bormann, Jordan, Li, Hampp, and Hägele]{bormann_room_2016}
+R.~Bormann, F.~Jordan, W.~Li, J.~Hampp, and M.~Hägele.
+\newblock Room segmentation: {Survey}, implementation, and analysis.
+\newblock In \emph{2016 {IEEE} {International} {Conference} on {Robotics} and {Automation} ({ICRA})}, pages 1019--1026, May 2016.
+\newblock \doi{10.1109/ICRA.2016.7487234}.
+\newblock URL \url{https://ieeexplore.ieee.org/document/7487234}.
+
+\bibitem[Brown(2019)]{brown_how_2019}
+M.~Brown.
+\newblock How {Games} {Get} {Balanced}, Apr. 2019.
+\newblock URL \url{https://www.youtube.com/watch?v=WXQzdXPTb2A}.
+
+\bibitem[Cardamone et~al.(2011)Cardamone, Yannakakis, Togelius, and Lanzi]{cardamone_evolving_2011}
+L.~Cardamone, G.~Yannakakis, J.~Togelius, and P.~L. Lanzi.
+\newblock Evolving {Interesting} {Maps} for a {First} {Person} {Shooter}.
+\newblock pages 63--72, Apr. 2011.
+\newblock ISBN 978-3-642-20524-8.
+\newblock \doi{10.1007/978-3-642-20525-5_7}.
+
+\bibitem[Cazenille(2018)]{cazenille_qdpy_2018}
+L.~Cazenille.
+\newblock \emph{{QDpy}: {A} python framework for quality-diversity}.
+\newblock Oct. 2018.
+
+\bibitem[Charity et~al.(2020{\natexlab{a}})Charity, Green, Khalifa, and Togelius]{charity_mech-elites_2020}
+M.~Charity, M.~C. Green, A.~Khalifa, and J.~Togelius.
+\newblock Mech-{Elites}: {Illuminating} the {Mechanic} {Space} of {GVGAI}, Feb. 2020{\natexlab{a}}.
+\newblock URL \url{http://arxiv.org/abs/2002.04733}.
+\newblock arXiv:2002.04733 [cs].
+
+\bibitem[Charity et~al.(2020{\natexlab{b}})Charity, Khalifa, and Togelius]{charity_baba_2020}
+M.~Charity, A.~Khalifa, and J.~Togelius.
+\newblock Baba is {Y}'all: {Collaborative} {Mixed}-{Initiative} {Level} {Design}, June 2020{\natexlab{b}}.
+\newblock URL \url{http://arxiv.org/abs/2003.14294}.
+\newblock arXiv:2003.14294 [cs].
+
+\bibitem[Co(2006)]{co_level_2006}
+P.~Co.
+\newblock \emph{Level {Design} for {Games}: {Creating} {Compelling} {Game} {Experiences}}.
+\newblock 2006.
+
+\bibitem[Cully(2021)]{cully_multi-emitter_2021}
+A.~Cully.
+\newblock Multi-{Emitter} {MAP}-{Elites}: {Improving} quality, diversity and convergence speed with heterogeneous sets of emitters.
+\newblock In \emph{Proceedings of the {Genetic} and {Evolutionary} {Computation} {Conference}}, pages 84--92, June 2021.
+\newblock \doi{10.1145/3449639.3459326}.
+\newblock URL \url{http://arxiv.org/abs/2007.05352}.
+\newblock arXiv:2007.05352 [cs].
+
+\bibitem[Fontaine and Nikolaidis(2022)]{fontaine_covariance_2022}
+M.~C. Fontaine and S.~Nikolaidis.
+\newblock Covariance {Matrix} {Adaptation} {MAP}-{Annealing}, May 2022.
+\newblock URL \url{http://arxiv.org/abs/2205.10752}.
+\newblock arXiv:2205.10752 [cs].
+
+\bibitem[Fontaine et~al.(2019)Fontaine, Lee, Soros, Silva, Togelius, and Hoover]{fontaine_mapping_2019}
+M.~C. Fontaine, S.~Lee, L.~B. Soros, F.~D.~M. Silva, J.~Togelius, and A.~K. Hoover.
+\newblock Mapping {Hearthstone} {Deck} {Spaces} through {MAP}-{Elites} with {Sliding} {Boundaries}, Apr. 2019.
+\newblock URL \url{http://arxiv.org/abs/1904.10656}.
+\newblock arXiv:1904.10656 [cs].
+
+\bibitem[Fontaine et~al.(2020)Fontaine, Togelius, Nikolaidis, and Hoover]{fontaine_covariance_2020}
+M.~C. Fontaine, J.~Togelius, S.~Nikolaidis, and A.~K. Hoover.
+\newblock Covariance {Matrix} {Adaptation} for the {Rapid} {Illumination} of {Behavior} {Space}.
+\newblock In \emph{Proceedings of the 2020 {Genetic} and {Evolutionary} {Computation} {Conference}}, pages 94--102, June 2020.
+\newblock \doi{10.1145/3377930.3390232}.
+\newblock URL \url{http://arxiv.org/abs/1912.02400}.
+\newblock arXiv:1912.02400 [cs, stat].
+
+\bibitem[Fontaine et~al.(2021)Fontaine, Liu, Khalifa, Modi, Togelius, Hoover, and Nikolaidis]{fontaine_illuminating_2021}
+M.~C. Fontaine, R.~Liu, A.~Khalifa, J.~Modi, J.~Togelius, A.~K. Hoover, and S.~Nikolaidis.
+\newblock Illuminating {Mario} {Scenes} in the {Latent} {Space} of a {Generative} {Adversarial} {Network}, June 2021.
+\newblock URL \url{http://arxiv.org/abs/2007.05674}.
+\newblock arXiv:2007.05674 [cs].
+
+\bibitem[Goldstein(2023)]{goldstein_quick_2023}
+R.~Goldstein.
+\newblock A {Quick} and {Clear} {Look} at {Grid}-{Based} {Visibility}, May 2023.
+\newblock URL \url{https://towardsdatascience.com/a-quick-and-clear-look-at-grid-based-visibility-bf63769fbc78}.
+
+\bibitem[González-Duque et~al.(2020)González-Duque, Palm, Ha, and Risi]{gonzalez-duque_finding_2020}
+M.~González-Duque, R.~B. Palm, D.~Ha, and S.~Risi.
+\newblock Finding {Game} {Levels} with the {Right} {Difficulty} in a {Few} {Trials} through {Intelligent} {Trial}-and-{Error}, June 2020.
+\newblock URL \url{http://arxiv.org/abs/2005.07677}.
+\newblock arXiv:2005.07677 [cs].
+
+\bibitem[Gravina et~al.(2019)Gravina, Khalifa, Liapis, Togelius, and Yannakakis]{gravina_procedural_2019}
+D.~Gravina, A.~Khalifa, A.~Liapis, J.~Togelius, and G.~N. Yannakakis.
+\newblock Procedural {Content} {Generation} through {Quality} {Diversity}.
+\newblock In \emph{2019 {IEEE} {Conference} on {Games} ({CoG})}, pages 1--8, Aug. 2019.
+\newblock \doi{10.1109/CIG.2019.8848053}.
+\newblock URL \url{http://arxiv.org/abs/1907.04053}.
+\newblock arXiv:1907.04053 [cs].
+
+\bibitem[Güttler and Johansson(2003)]{guttler_spatial_2003}
+C.~Güttler and T.~D. Johansson.
+\newblock Spatial principles of level-design in multi-player first-person shooters.
+\newblock In \emph{Proceedings of the 2nd workshop on {Network} and system support for games}, {NetGames} '03, pages 158--170, New York, NY, USA, May 2003. Association for Computing Machinery.
+\newblock ISBN 978-1-58113-734-7.
+\newblock \doi{10.1145/963900.963915}.
+\newblock URL \url{https://dl.acm.org/doi/10.1145/963900.963915}.
+
+\bibitem[Hullett and Whitehead(2010)]{hullett_design_2010}
+K.~Hullett and J.~Whitehead.
+\newblock Design patterns in {FPS} levels.
+\newblock In \emph{Proceedings of the {Fifth} {International} {Conference} on the {Foundations} of {Digital} {Games}}, pages 78--85, Monterey California, June 2010. ACM.
+\newblock ISBN 978-1-60558-937-4.
+\newblock \doi{10.1145/1822348.1822359}.
+\newblock URL \url{https://dl.acm.org/doi/10.1145/1822348.1822359}.
+
+\bibitem[Johnston(2003)]{johnston_common_2003}
+D.~Johnston.
+\newblock Common {Sense} vs {Level} {Design}, May 2003.
+\newblock URL \url{https://www.johnsto.co.uk/design/common-sense/}.
+
+\bibitem[Khalifa et~al.(2018)Khalifa, Lee, Nealen, and Togelius]{khalifa_talakat_2018}
+A.~Khalifa, S.~Lee, A.~Nealen, and J.~Togelius.
+\newblock Talakat: {Bullet} {Hell} {Generation} through {Constrained} {Map}-{Elites}, June 2018.
+\newblock URL \url{http://arxiv.org/abs/1806.04718}.
+\newblock arXiv:1806.04718 [cs].
+
+\bibitem[Khalifa et~al.(2019)Khalifa, Green, Barros, and Togelius]{khalifa_intentional_2019}
+A.~Khalifa, M.~C. Green, G.~Barros, and J.~Togelius.
+\newblock Intentional {Computational} {Level} {Design}, Apr. 2019.
+\newblock URL \url{http://arxiv.org/abs/1904.08972}.
+\newblock arXiv:1904.08972 [cs].
+
+\bibitem[Kimbrough et~al.(2008)Kimbrough, Koehler, Lu, and Wood]{kimbrough_feasibleinfeasible_2008}
+S.~O. Kimbrough, G.~J. Koehler, M.~Lu, and D.~H. Wood.
+\newblock On a {Feasible}–{Infeasible} {Two}-{Population} ({FI}-{2Pop}) genetic algorithm for constrained optimization: {Distance} tracing and no free lunch.
+\newblock \emph{European Journal of Operational Research}, 190\penalty0 (2):\penalty0 310--327, Oct. 2008.
+\newblock ISSN 0377-2217.
+\newblock \doi{10.1016/j.ejor.2007.06.028}.
+\newblock URL \url{https://www.sciencedirect.com/science/article/pii/S0377221707005668}.
+
+\bibitem[Lanzi et~al.(2014)Lanzi, Loiacono, and Stucchi]{lanzi_evolving_2014}
+P.~L. Lanzi, D.~Loiacono, and R.~Stucchi.
+\newblock Evolving maps for match balancing in first person shooters.
+\newblock \emph{IEEE Conference on Computatonal Intelligence and Games, CIG}, Oct. 2014.
+\newblock \doi{10.1109/CIG.2014.6932901}.
+
+\bibitem[Larsen(2006)]{larsen_level_2006}
+S.~L. Larsen.
+\newblock Level design patterns - {Simon} {Lund} {Larsen}, 2006.
+\newblock URL \url{https://www.simonlundlarsen.com/level-design-patterns/}.
+\newblock Section: Writings.
+
+\bibitem[Lehman and Stanley(2008)]{lehman_exploiting_2008}
+J.~Lehman and K.~Stanley.
+\newblock Exploiting open-endedness to solve problems through the search for novelty.
+\newblock \emph{Artificial Life - ALIFE}, Jan. 2008.
+
+\bibitem[Lehman and Stanley(2011)]{lehman_evolving_2011}
+J.~Lehman and K.~Stanley.
+\newblock Evolving a diversity of creatures through novelty search and local competition.
+\newblock pages 211--218, July 2011.
+\newblock \doi{10.1145/2001576.2001606}.
+
+\bibitem[Lim et~al.(2022)Lim, Allard, Grillotti, and Cully]{lim_accelerated_2022}
+B.~Lim, M.~Allard, L.~Grillotti, and A.~Cully.
+\newblock Accelerated {Quality}-{Diversity} through {Massive} {Parallelism}, Oct. 2022.
+\newblock URL \url{http://arxiv.org/abs/2202.01258}.
+\newblock arXiv:2202.01258.
+
+\bibitem[Loiacono and Arnaboldi(2017)]{loiacono_fight_2017}
+D.~Loiacono and L.~Arnaboldi.
+\newblock Fight or flight: {Evolving} maps for cube 2 to foster a fleeing behavior.
+\newblock In \emph{2017 {IEEE} {Conference} on {Computational} {Intelligence} and {Games} ({CIG})}, pages 199--206, Aug. 2017.
+\newblock \doi{10.1109/CIG.2017.8080436}.
+\newblock URL \url{https://ieeexplore.ieee.org/abstract/document/8080436}.
+\newblock ISSN: 2325-4289.
+
+\bibitem[Lones(2011)]{lones_sean_2011}
+M.~Lones.
+\newblock Sean {Luke}: essentials of metaheuristics.
+\newblock \emph{Genetic Programming and Evolvable Machines}, 12:\penalty0 333--334, Sept. 2011.
+\newblock \doi{10.1007/s10710-011-9139-0}.
+
+\bibitem[Mouret(2019)]{mouret_python3_2019}
+J.-B. Mouret.
+\newblock Python3 map-elites, 2019.
+\newblock URL \url{https://github.com/resibots/pymap_elites}.
+\newblock original-date: 2019-04-12T08:27:07Z.
+
+\bibitem[Mouret and Clune(2015)]{mouret_illuminating_2015}
+J.-B. Mouret and J.~Clune.
+\newblock Illuminating search spaces by mapping elites, Apr. 2015.
+\newblock URL \url{http://arxiv.org/abs/1504.04909}.
+\newblock arXiv:1504.04909 [cs, q-bio].
+
+\bibitem[Mouret and Doncieux(2010)]{mouret_sferesv2_2010}
+J.-B. Mouret and S.~Doncieux.
+\newblock Sferesv2: {Evolvin}' in the multi-core world.
+\newblock In \emph{{IEEE} {Congress} on {Evolutionary} {Computation}}, pages 1--8, Barcelona, Spain, July 2010. IEEE.
+\newblock ISBN 978-1-4244-6909-3.
+\newblock \doi{10.1109/CEC.2010.5586158}.
+\newblock URL \url{http://ieeexplore.ieee.org/document/5586158/}.
+
+\bibitem[Perez-Liebana et~al.(2019)Perez-Liebana, Liu, Khalifa, Gaina, Togelius, and Lucas]{perez-liebana_general_2019}
+D.~Perez-Liebana, J.~Liu, A.~Khalifa, R.~D. Gaina, J.~Togelius, and S.~M. Lucas.
+\newblock General {Video} {Game} {AI}: a {Multi}-{Track} {Framework} for {Evaluating} {Agents}, {Games} and {Content} {Generation} {Algorithms}, Feb. 2019.
+\newblock URL \url{http://arxiv.org/abs/1802.10363}.
+\newblock arXiv:1802.10363 [cs].
+
+\bibitem[Perkins(2010)]{perkins_terrain_2010}
+L.~Perkins.
+\newblock Terrain {Analysis} in {Real}-{Time} {Strategy} {Games}: {An} {Integrated} {Approach} to {Choke} {Point} {Detection} and {Region} {Decomposition}.
+\newblock \emph{Proceedings of the AAAI Conference on Artificial Intelligence and Interactive Digital Entertainment}, 6\penalty0 (1):\penalty0 168--173, Oct. 2010.
+\newblock ISSN 2334-0924.
+\newblock \doi{10.1609/aiide.v6i1.12405}.
+\newblock URL \url{https://ojs.aaai.org/index.php/AIIDE/article/view/12405}.
+\newblock Number: 1.
+
+\bibitem[Portwnow(2012)]{portwnow_perfect_2012}
+J.~Portwnow.
+\newblock Perfect {Imbalance} - {Why} {Unbalanced} {Design} {Creates} {Balanced} {Play} - {Extra} {Credits}, Aug. 2012.
+\newblock URL \url{https://www.youtube.com/watch?v=e31OSVZF77w}.
+
+\bibitem[Pugh et~al.(2016)Pugh, Soros, and Stanley]{pugh_quality_2016}
+J.~K. Pugh, L.~B. Soros, and K.~O. Stanley.
+\newblock Quality {Diversity}: {A} {New} {Frontier} for {Evolutionary} {Computation}.
+\newblock \emph{Frontiers in Robotics and AI}, 3, July 2016.
+\newblock ISSN 2296-9144.
+\newblock \doi{10.3389/frobt.2016.00040}.
+\newblock URL \url{https://www.frontiersin.org/articles/10.3389/frobt.2016.00040}.
+\newblock Publisher: Frontiers.
+
+\bibitem[Sakurai(2024)]{sakurai_amplify_2024}
+M.~Sakurai.
+\newblock Amplify {Both} {Strengths} and {Weaknesses} [{Game} {Essence}], Aug. 2024.
+\newblock URL \url{https://www.youtube.com/watch?v=fc-hOvTBTCc}.
+
+\bibitem[Sirlin(2014)]{sirlin_balancing_2014}
+D.~Sirlin.
+\newblock Balancing {Multiplayer} {Games}, Aug. 2014.
+\newblock URL \url{https://www.sirlin.net/articles/balancing-multiplayer-games-part-1-definitions}.
+
+\bibitem[Stanley(2019)]{stanley_why_2019}
+K.~O. Stanley.
+\newblock Why {Open}-{Endedness} {Matters}.
+\newblock \emph{Artificial Life}, 25\penalty0 (3):\penalty0 232--235, 2019.
+\newblock ISSN 1530-9185.
+\newblock \doi{10.1162/artl_a_00294}.
+
+\bibitem[Tjanaka et~al.(2023)Tjanaka, Fontaine, Lee, Zhang, Balam, Dennler, Garlanka, Klapsis, and Nikolaidis]{tjanaka_pyribs_2023}
+B.~Tjanaka, M.~C. Fontaine, D.~H. Lee, Y.~Zhang, N.~R. Balam, N.~Dennler, S.~S. Garlanka, N.~D. Klapsis, and S.~Nikolaidis.
+\newblock pyribs: {A} {Bare}-{Bones} {Python} {Library} for {Quality} {Diversity} {Optimization}, Apr. 2023.
+\newblock URL \url{http://arxiv.org/abs/2303.00191}.
+\newblock arXiv:2303.00191 [cs].
+
+\bibitem[Togelius et~al.(2010)Togelius, Yannakakis, Stanley, and Browne]{togelius_search-based_2010}
+J.~Togelius, G.~Yannakakis, K.~Stanley, and C.~Browne.
+\newblock Search-{Based} {Procedural} {Content} {Generation}.
+\newblock pages 141--150, Apr. 2010.
+\newblock ISBN 978-3-642-12238-5.
+\newblock \doi{10.1007/978-3-642-12239-2_15}.
+
+\bibitem[Vassiliades et~al.(2017)Vassiliades, Chatzilygeroudis, and Mouret]{vassiliades_using_2017}
+V.~Vassiliades, K.~Chatzilygeroudis, and J.-B. Mouret.
+\newblock Using {Centroidal} {Voronoi} {Tessellations} to {Scale} {Up} the {Multi}-dimensional {Archive} of {Phenotypic} {Elites} {Algorithm}, July 2017.
+\newblock URL \url{http://arxiv.org/abs/1610.05729}.
+\newblock arXiv:1610.05729 [cs].
+
+\bibitem[Viana et~al.(2022)Viana, Pereira, and Toledo]{viana_illuminating_2022}
+B.~M.~F. Viana, L.~T. Pereira, and C.~F.~M. Toledo.
+\newblock Illuminating the {Space} of {Dungeon} {Maps}, {Locked}-door {Missions} and {Enemy} {Placement} {Through} {MAP}-{Elites}, Apr. 2022.
+\newblock URL \url{http://arxiv.org/abs/2202.09301}.
+\newblock arXiv:2202.09301 [cs].
+
+\bibitem[Warriar et~al.(2019)Warriar, Ugarte, Woodward, and Tokarchuk]{warriar_playmapper_2019}
+V.~R. Warriar, C.~Ugarte, J.~R. Woodward, and L.~Tokarchuk.
+\newblock {PlayMapper}: {Illuminating} {Design} {Spaces} of {Platform} {Games}.
+\newblock In \emph{2019 {IEEE} {Conference} on {Games} ({CoG})}, pages 1--4, Aug. 2019.
+\newblock \doi{10.1109/CIG.2019.8848118}.
+\newblock URL \url{https://ieeexplore.ieee.org/document/8848118}.
+\newblock ISSN: 2325-4289.
+
+\bibitem[Whitehead(2020)]{whitehead_spatial_2020}
+J.~Whitehead.
+\newblock Spatial {Layout} of {Procedural} {Dungeons} {Using} {Linear} {Constraints} and {SMT} {Solvers}.
+\newblock In \emph{Proceedings of the 15th {International} {Conference} on the {Foundations} of {Digital} {Games}}, {FDG} '20, pages 1--9, New York, NY, USA, Sept. 2020. Association for Computing Machinery.
+\newblock ISBN 978-1-4503-8807-8.
+\newblock \doi{10.1145/3402942.3409603}.
+\newblock URL \url{https://dl.acm.org/doi/10.1145/3402942.3409603}.
+
+\bibitem[Ølsted et~al.(2015)Ølsted, Ma, and Risi]{olsted_interactive_2015}
+P.~T. Ølsted, B.~Ma, and S.~Risi.
+\newblock Interactive evolution of levels for a competitive multiplayer {FPS}.
+\newblock In \emph{2015 {IEEE} {Congress} on {Evolutionary} {Computation} ({CEC})}, pages 1527--1534, May 2015.
+\newblock \doi{10.1109/CEC.2015.7257069}.
+\newblock URL \url{https://ieeexplore.ieee.org/document/7257069}.
+\newblock ISSN: 1941-0026.
+
+\end{thebibliography}

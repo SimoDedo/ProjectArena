@@ -1,0 +1,235 @@
+\babel@toc {english}{}\relax 
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Map comparison}}{10}{figure.caption.9}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {"Thunder mountain", a Capture the Flag map in \textit {Team Fortress 2}.}}}{10}{subfigure.1.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {"Dust II", a Bomb Defusal map in \textit {Counter-Strike}.}}}{10}{subfigure.1.2}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces PCG Games}}{11}{figure.caption.10}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {\textit {Minecraft}}}}{11}{subfigure.2.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {\textit {Pokémon Mystery Dungeon: Explorers of Sky}}}}{11}{subfigure.2.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {\textit {Hades}}}}{11}{subfigure.2.3}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Comparison of SB-PCG with constructive and generate-and-test approaches.}}{12}{figure.caption.11}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces \citeauthor {cardamone_evolving_2011} example maps}}{15}{figure.caption.12}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {\textit {All-White}}}}{15}{subfigure.4.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {\textit {All-Black}}}}{15}{subfigure.4.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {\textit {Grid}}}}{15}{subfigure.4.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {\textit {Random-Digger}}}}{15}{subfigure.4.4}%
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Visualization of the MAP-Elites algorithm.}}{18}{figure.caption.13}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces All-Black example}}{33}{figure.caption.22}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Grid-Graph example}}{34}{figure.caption.23}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Point-Line example}}{35}{figure.caption.24}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces SMT-Genome lines}}{38}{figure.caption.28}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Example of a simple SMT-Genome without added corridors}}}{38}{subfigure.4.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Example of a simple SMT-Genome with added corridors}}}{38}{subfigure.4.2}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces SMT-Genome determinism}}{39}{figure.caption.29}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Heatmaps example}}{42}{figure.caption.36}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Kill traces example}}{43}{figure.caption.37}%
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Distance Transform Segmentation example}}{44}{figure.caption.38}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {The rooms identified by the algorithm}}}{44}{subfigure.8.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {The graph obtained connecting adjacent rooms}}}{44}{subfigure.8.2}%
+\contentsline {figure}{\numberline {4.9}{\ignorespaces Voronoi Region Decomposition example}}{45}{figure.caption.39}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {The map as a grid.}}}{45}{subfigure.9.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {The map represented by polygons.}}}{45}{subfigure.9.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {The line segment Voronoi diagram.}}}{45}{subfigure.9.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {The graph obtained by the diagram after pruning.}}}{45}{subfigure.9.4}%
+\contentsline {subfigure}{\numberline {(e)}{\ignorespaces {Rooms (red) and chokepoints (yellow) identification.}}}{45}{subfigure.9.5}%
+\contentsline {subfigure}{\numberline {(f)}{\ignorespaces {The final graph after rooms are heuristically merged.}}}{45}{subfigure.9.6}%
+\contentsline {figure}{\numberline {4.10}{\ignorespaces Graph comparison}}{46}{figure.caption.40}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Distance Transform-based Segmentation}}}{46}{subfigure.10.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Voronoi Region Decomposition}}}{46}{subfigure.10.2}%
+\contentsline {figure}{\numberline {4.11}{\ignorespaces Visibility comparison}}{48}{figure.caption.41}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Naive method, computed in 28.77s}}}{48}{subfigure.11.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {The visibility matrix, computed in 0.26s}}}{48}{subfigure.11.2}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Boxplot of emergent features for a random \textit {All-Black} phenotype.}}{55}{figure.caption.45}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Boxplot of emergent features for a random \textit {Grid-Graph} phenotype.}}{55}{figure.caption.46}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Boxplot of emergent features for a random Point-Line phenotype.}}{56}{figure.caption.47}%
+\contentsline {figure}{\numberline {5.4}{\ignorespaces Boxplot of emergent features for a random SMT phenotype.}}{56}{figure.caption.48}%
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Boxplot of emergent features for a random \textit {All-Black} phenotype averaging 5 matches.}}{57}{figure.caption.49}%
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Boxplot of emergent features for a random \textit {Grid-Graph} phenotype averaging 5 matches.}}{58}{figure.caption.50}%
+\contentsline {figure}{\numberline {5.7}{\ignorespaces Boxplot of emergent features for a random Point-Line phenotype averaging 5 matches.}}{58}{figure.caption.51}%
+\contentsline {figure}{\numberline {5.8}{\ignorespaces Boxplot of emergent features for a random SMT phenotype averaging 5 matches.}}{59}{figure.caption.52}%
+\contentsline {figure}{\numberline {5.9}{\ignorespaces SMT-Genome emergent features noisiness analysis.}}{60}{figure.caption.53}%
+\contentsline {figure}{\numberline {5.10}{\ignorespaces SMT-Genome topological features noisiness analysis.}}{60}{figure.caption.54}%
+\contentsline {figure}{\numberline {5.11}{\ignorespaces Correlation matrix of the features.}}{61}{figure.caption.55}%
+\contentsline {figure}{\numberline {5.12}{\ignorespaces Clustermap of the reduced set of features.}}{62}{figure.caption.56}%
+\contentsline {figure}{\numberline {5.13}{\ignorespaces Clustermap of the final set of features.}}{65}{figure.caption.57}%
+\contentsline {figure}{\numberline {5.14}{\ignorespaces t-SNE analysis of the features for each genome representation.}}{66}{figure.caption.58}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {All-black}}}{66}{subfigure.14.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Grid-Graph}}}{66}{subfigure.14.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Point-Line}}}{66}{subfigure.14.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {SMT Genome}}}{66}{subfigure.14.4}%
+\contentsline {figure}{\numberline {5.15}{\ignorespaces t-SNE analysis of the images for each genome representation.}}{68}{figure.caption.59}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {All-black}}}{68}{subfigure.15.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Grid-Graph}}}{68}{subfigure.15.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Point-Line}}}{68}{subfigure.15.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {SMT Genome}}}{68}{subfigure.15.4}%
+\contentsline {figure}{\numberline {5.16}{\ignorespaces t-SNE image similarity examples}}{69}{figure.caption.60}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {0, 0}}}{69}{subfigure.16.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {60, 0}}}{69}{subfigure.16.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {18, 65}}}{69}{subfigure.16.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {-56, 18}}}{69}{subfigure.16.4}%
+\contentsline {subfigure}{\numberline {(e)}{\ignorespaces {0, -32}}}{69}{subfigure.16.5}%
+\contentsline {subfigure}{\numberline {(f)}{\ignorespaces {-26, -55}}}{69}{subfigure.16.6}%
+\contentsline {figure}{\numberline {5.17}{\ignorespaces Scatter plot of the distances in the feature space and in the image space.}}{70}{figure.caption.61}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {All-black}}}{70}{subfigure.17.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Grid-Graph}}}{70}{subfigure.17.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Point-Line}}}{70}{subfigure.17.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {SMT Genome}}}{70}{subfigure.17.4}%
+\contentsline {figure}{\numberline {5.18}{\ignorespaces t-SNE analysis of the graphs for each genome representation.}}{71}{figure.caption.62}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {All-black}}}{71}{subfigure.18.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Grid-Graph}}}{71}{subfigure.18.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Point-Line}}}{71}{subfigure.18.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {SMT Genome}}}{71}{subfigure.18.4}%
+\contentsline {figure}{\numberline {5.19}{\ignorespaces t-SNE graph similarity examples}}{72}{figure.caption.63}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {-30, -56}}}{72}{subfigure.19.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {-88, -6}}}{72}{subfigure.19.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {-51, -17}}}{72}{subfigure.19.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {-24, -20}}}{72}{subfigure.19.4}%
+\contentsline {subfigure}{\numberline {(e)}{\ignorespaces {12, 22}}}{72}{subfigure.19.5}%
+\contentsline {subfigure}{\numberline {(f)}{\ignorespaces {80, -4}}}{72}{subfigure.19.6}%
+\contentsline {figure}{\numberline {5.20}{\ignorespaces Scatter plot of the distances in the image space and in the graph space.}}{73}{figure.caption.64}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {All-black}}}{73}{subfigure.20.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Grid-Graph}}}{73}{subfigure.20.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Point-Line}}}{73}{subfigure.20.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {SMT Genome}}}{73}{subfigure.20.4}%
+\contentsline {figure}{\numberline {5.21}{\ignorespaces Scatter plot of the distances in the feature space and in the graph space.}}{74}{figure.caption.65}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {All-black}}}{74}{subfigure.21.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Grid-Graph}}}{74}{subfigure.21.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Point-Line}}}{74}{subfigure.21.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {SMT Genome}}}{74}{subfigure.21.4}%
+\contentsline {figure}{\numberline {5.22}{\ignorespaces Scatter plot of the difference of the feature and the distance in the \textit {t-SNE} of graphs for the \textit {All-Black} representation.}}{75}{figure.caption.66}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {area}}}{75}{subfigure.22.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {averageEccentricity}}}{75}{subfigure.22.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {averageLocalMaximaValuePercentVisibility}}}{75}{subfigure.22.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {averageMincut}}}{75}{subfigure.22.4}%
+\contentsline {subfigure}{\numberline {(e)}{\ignorespaces {averageRoomBetweenness}}}{75}{subfigure.22.5}%
+\contentsline {subfigure}{\numberline {(f)}{\ignorespaces {density}}}{75}{subfigure.22.6}%
+\contentsline {subfigure}{\numberline {(g)}{\ignorespaces {maxSymmetry}}}{75}{subfigure.22.7}%
+\contentsline {subfigure}{\numberline {(h)}{\ignorespaces {maxValuePosition}}}{75}{subfigure.22.8}%
+\contentsline {subfigure}{\numberline {(i)}{\ignorespaces {numberCyclesOneRoom}}}{75}{subfigure.22.9}%
+\contentsline {subfigure}{\numberline {(j)}{\ignorespaces {pace}}}{75}{subfigure.22.10}%
+\contentsline {subfigure}{\numberline {(k)}{\ignorespaces {peripheryPercent}}}{75}{subfigure.22.11}%
+\contentsline {subfigure}{\numberline {(l)}{\ignorespaces {stdValuePercentVisibility}}}{75}{subfigure.22.12}%
+\contentsline {figure}{\numberline {5.23}{\ignorespaces Scatter plot of the difference of the feature and the distance in the \textit {t-SNE} of graphs for the \textit {Grid-Graph} representation.}}{75}{figure.caption.67}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {area}}}{75}{subfigure.23.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {averageEccentricity}}}{75}{subfigure.23.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {averageMincut}}}{75}{subfigure.23.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {density}}}{75}{subfigure.23.4}%
+\contentsline {subfigure}{\numberline {(e)}{\ignorespaces {numberCyclesOneRoom}}}{75}{subfigure.23.5}%
+\contentsline {subfigure}{\numberline {(f)}{\ignorespaces {pace}}}{75}{subfigure.23.6}%
+\contentsline {subfigure}{\numberline {(g)}{\ignorespaces {peripheryPercent}}}{75}{subfigure.23.7}%
+\contentsline {figure}{\numberline {5.24}{\ignorespaces Scatter plot of the difference of the feature and the distance in the \textit {t-SNE} of graphs for the \textit {Point-Line} representation.}}{76}{figure.caption.68}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {area}}}{76}{subfigure.24.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {averageEccentricity}}}{76}{subfigure.24.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {averageLocalMaximaValuePercentVisibility}}}{76}{subfigure.24.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {averageMincut}}}{76}{subfigure.24.4}%
+\contentsline {subfigure}{\numberline {(e)}{\ignorespaces {averageRoomBetweenness}}}{76}{subfigure.24.5}%
+\contentsline {subfigure}{\numberline {(f)}{\ignorespaces {density}}}{76}{subfigure.24.6}%
+\contentsline {subfigure}{\numberline {(g)}{\ignorespaces {entropy}}}{76}{subfigure.24.7}%
+\contentsline {subfigure}{\numberline {(h)}{\ignorespaces {maxSymmetry}}}{76}{subfigure.24.8}%
+\contentsline {subfigure}{\numberline {(i)}{\ignorespaces {maxTraces}}}{76}{subfigure.24.9}%
+\contentsline {subfigure}{\numberline {(j)}{\ignorespaces {maxValuePosition}}}{76}{subfigure.24.10}%
+\contentsline {subfigure}{\numberline {(k)}{\ignorespaces {maxValueVisibility}}}{76}{subfigure.24.11}%
+\contentsline {subfigure}{\numberline {(l)}{\ignorespaces {pace}}}{76}{subfigure.24.12}%
+\contentsline {subfigure}{\numberline {(m)}{\ignorespaces {numberCyclesOneRoom}}}{76}{subfigure.24.13}%
+\contentsline {figure}{\numberline {5.25}{\ignorespaces Scatter plot of the difference of the feature and the distance in the \textit {t-SNE} of graphs for the \textit {SMT Genome} representation.}}{76}{figure.caption.69}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {averageLocalMaximaValuePercentVisibility}}}{76}{subfigure.25.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {averageMincut}}}{76}{subfigure.25.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {averageRoomBetweenness}}}{76}{subfigure.25.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {density}}}{76}{subfigure.25.4}%
+\contentsline {subfigure}{\numberline {(e)}{\ignorespaces {numberCyclesOneRoom}}}{76}{subfigure.25.5}%
+\contentsline {subfigure}{\numberline {(f)}{\ignorespaces {pace}}}{76}{subfigure.25.6}%
+\contentsline {figure}{\numberline {5.26}{\ignorespaces Heatmap of the archive obtained with the \textit {area} and \textit {maxSymmetry} features.}}{78}{figure.caption.70}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {All-Black}}}{78}{subfigure.26.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Grid-Graph}}}{78}{subfigure.26.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Point-Line}}}{78}{subfigure.26.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {SMT-Genome}}}{78}{subfigure.26.4}%
+\contentsline {figure}{\numberline {5.27}{\ignorespaces Size of the archive over time with the \textit {area} and \textit {maxSymmetry} features.}}{79}{figure.caption.71}%
+\contentsline {figure}{\numberline {5.28}{\ignorespaces CCDF of the fitness of elites obtained with the \textit {area} and \textit {maxSymmetry} features.}}{80}{figure.caption.72}%
+\contentsline {figure}{\numberline {5.29}{\ignorespaces QD score of the archive obtained with the \textit {area} and \textit {maxSymmetry} features.}}{80}{figure.caption.73}%
+\contentsline {figure}{\numberline {5.30}{\ignorespaces Maximum value of entropy achieved in the archive over time with the \textit {area} and \textit {maxSymmetry} features.}}{81}{figure.caption.74}%
+\contentsline {figure}{\numberline {5.31}{\ignorespaces Number of unfeasible individuals over time with the \textit {area} and \textit {maxSymmetry} features.}}{82}{figure.caption.75}%
+\contentsline {figure}{\numberline {5.32}{\ignorespaces Best performing \textit {All-Black} maps in the archive obtained with the \textit {area} and \textit {maxSymmetry} features.}}{83}{figure.caption.76}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Maps}}}{83}{subfigure.32.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Sniper traces}}}{83}{subfigure.32.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Shotgun traces}}}{83}{subfigure.32.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {Visibility}}}{83}{subfigure.32.4}%
+\contentsline {figure}{\numberline {5.33}{\ignorespaces Best performing \textit {Grid-Graph} maps in the archive obtained with the \textit {area} and \textit {maxSymmetry} features.}}{84}{figure.caption.77}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Maps}}}{84}{subfigure.33.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Sniper traces}}}{84}{subfigure.33.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Shotgun traces}}}{84}{subfigure.33.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {Visibility}}}{84}{subfigure.33.4}%
+\contentsline {figure}{\numberline {5.34}{\ignorespaces Best performing \textit {Point-Line} maps in the archive obtained with the \textit {area} and \textit {maxSymmetry} features.}}{85}{figure.caption.78}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Maps}}}{85}{subfigure.34.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Sniper traces}}}{85}{subfigure.34.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Shotgun traces}}}{85}{subfigure.34.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {Visibility}}}{85}{subfigure.34.4}%
+\contentsline {figure}{\numberline {5.35}{\ignorespaces Best performing \textit {SMT-Genome} maps in the archive obtained with the \textit {area} and \textit {maxSymmetry} features.}}{86}{figure.caption.79}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Maps}}}{86}{subfigure.35.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Sniper traces}}}{86}{subfigure.35.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Shotgun traces}}}{86}{subfigure.35.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {Visibility}}}{86}{subfigure.35.4}%
+\contentsline {figure}{\numberline {5.36}{\ignorespaces Heatmap of the archive obtained with the \textit {pace} and \textit {averageEccentricity} features.}}{88}{figure.caption.80}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {All-Black}}}{88}{subfigure.36.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Grid-Graph}}}{88}{subfigure.36.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Point-Line}}}{88}{subfigure.36.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {SMT-Genome}}}{88}{subfigure.36.4}%
+\contentsline {figure}{\numberline {5.37}{\ignorespaces Size of the archive over time with the \textit {pace} and \textit {averageEccentricity} features.}}{89}{figure.caption.81}%
+\contentsline {figure}{\numberline {5.38}{\ignorespaces CCDF of the fitness of elites obtained with the \textit {pace} and \textit {averageEccentricity} features.}}{90}{figure.caption.82}%
+\contentsline {figure}{\numberline {5.39}{\ignorespaces QD score of the archive obtained with the \textit {pace} and \textit {averageEccentricity} features.}}{90}{figure.caption.83}%
+\contentsline {figure}{\numberline {5.40}{\ignorespaces Maximum value of entropy achieved in the archive over time with the \textit {pace} and \textit {averageEccentricity} features.}}{91}{figure.caption.84}%
+\contentsline {figure}{\numberline {5.41}{\ignorespaces Number of unfeasible individuals over time with the \textit {pace} and \textit {averageEccentricity} features.}}{92}{figure.caption.85}%
+\contentsline {figure}{\numberline {5.42}{\ignorespaces Best performing \textit {All-Black} maps in the archive obtained with the \textit {pace} and \textit {averageEccentricity} features.}}{93}{figure.caption.86}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Maps}}}{93}{subfigure.42.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Sniper traces}}}{93}{subfigure.42.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Shotgun traces}}}{93}{subfigure.42.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {Visibility}}}{93}{subfigure.42.4}%
+\contentsline {figure}{\numberline {5.43}{\ignorespaces Best performing \textit {Grid-Graph} maps in the archive obtained with the \textit {pace} and \textit {averageEccentricity} features.}}{94}{figure.caption.87}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Maps}}}{94}{subfigure.43.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Sniper traces}}}{94}{subfigure.43.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Shotgun traces}}}{94}{subfigure.43.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {Visibility}}}{94}{subfigure.43.4}%
+\contentsline {figure}{\numberline {5.44}{\ignorespaces Best performing \textit {Point-Line} maps in the archive obtained with the \textit {pace} and \textit {averageEccentricity} features.}}{95}{figure.caption.88}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Maps}}}{95}{subfigure.44.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Sniper traces}}}{95}{subfigure.44.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Shotgun traces}}}{95}{subfigure.44.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {Visibility}}}{95}{subfigure.44.4}%
+\contentsline {figure}{\numberline {5.45}{\ignorespaces Best performing \textit {SMT-Genome} maps in the archive obtained with the \textit {pace} and \textit {averageEccentricity} features.}}{96}{figure.caption.89}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Maps}}}{96}{subfigure.45.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Sniper traces}}}{96}{subfigure.45.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Shotgun traces}}}{96}{subfigure.45.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {Visibility}}}{96}{subfigure.45.4}%
+\contentsline {figure}{\numberline {5.46}{\ignorespaces Heatmap of the archive obtained with the \textit {averageMincut} and \textit {maxValuePosition} features.}}{99}{figure.caption.90}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {All-Black}}}{99}{subfigure.46.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Grid-Graph}}}{99}{subfigure.46.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Point-Line}}}{99}{subfigure.46.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {SMT-Genome}}}{99}{subfigure.46.4}%
+\contentsline {figure}{\numberline {5.47}{\ignorespaces Size of the archive over time with the \textit {averageMincut} and \textit {maxValuePosition} features.}}{100}{figure.caption.91}%
+\contentsline {figure}{\numberline {5.48}{\ignorespaces CCDF of the fitness of elites obtained with the \textit {averageMincut} and \textit {maxValuePosition} features.}}{100}{figure.caption.92}%
+\contentsline {figure}{\numberline {5.49}{\ignorespaces QD score of the archive obtained with the \textit {averageMincut} and \textit {maxValuePosition} features.}}{101}{figure.caption.93}%
+\contentsline {figure}{\numberline {5.50}{\ignorespaces Maximum value of entropy achieved in the archive over time with the \textit {averageMincut} and \textit {maxValuePosition} features.}}{101}{figure.caption.94}%
+\contentsline {figure}{\numberline {5.51}{\ignorespaces Number of unfeasible individuals over time with the \textit {averageMincut} and \textit {maxValuePosition} features.}}{102}{figure.caption.95}%
+\contentsline {figure}{\numberline {5.52}{\ignorespaces Best performing \textit {All-Black} maps in the archive obtained with the \textit {averageMincut} and \textit {maxValuePosition} features.}}{103}{figure.caption.96}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Maps}}}{103}{subfigure.52.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Sniper traces}}}{103}{subfigure.52.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Shotgun traces}}}{103}{subfigure.52.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {Visibility}}}{103}{subfigure.52.4}%
+\contentsline {figure}{\numberline {5.53}{\ignorespaces Best performing \textit {Grid-Graph} maps in the archive obtained with the \textit {averageMincut} and \textit {maxValuePosition} features.}}{104}{figure.caption.97}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Maps}}}{104}{subfigure.53.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Sniper traces}}}{104}{subfigure.53.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Shotgun traces}}}{104}{subfigure.53.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {Visibility}}}{104}{subfigure.53.4}%
+\contentsline {figure}{\numberline {5.54}{\ignorespaces Best performing \textit {Point-Line} maps in the archive obtained with the \textit {averageMincut} and \textit {maxValuePosition} features.}}{105}{figure.caption.98}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Maps}}}{105}{subfigure.54.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Sniper traces}}}{105}{subfigure.54.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Shotgun traces}}}{105}{subfigure.54.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {Visibility}}}{105}{subfigure.54.4}%
+\contentsline {figure}{\numberline {5.55}{\ignorespaces Best performing \textit {SMT-Genome} maps in the archive obtained with the \textit {averageMincut} and \textit {maxValuePosition} features.}}{106}{figure.caption.99}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Maps}}}{106}{subfigure.55.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Sniper traces}}}{106}{subfigure.55.2}%
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Shotgun traces}}}{106}{subfigure.55.3}%
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {Visibility}}}{106}{subfigure.55.4}%
+\addvspace {10\p@ }

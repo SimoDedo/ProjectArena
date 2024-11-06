@@ -1,0 +1,54 @@
+This is BibTeX, Version 0.99d (TeX Live 2024)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: Thesis.aux
+The style file: abbrvnat.bst
+Database file #1: Thesis_bibliography.bib
+Warning--empty school in ballabio_online_2018
+Warning--empty school in bari_evolutionary-based_2023
+Warning--empty booktitle in cardamone_evolving_2011
+Warning--empty publisher in cazenille_qdpy_2018
+Warning--empty publisher in co_level_2006
+Warning--empty booktitle in lehman_evolving_2011
+Warning--empty booktitle in togelius_search-based_2010
+You've used 51 entries,
+            2773 wiz_defined-function locations,
+            938 strings with 16939 characters,
+and the built_in function-call counts, 24819 in all, are:
+= -- 2312
+> -- 1399
+< -- 43
++ -- 478
+- -- 426
+* -- 1966
+:= -- 3761
+add.period$ -- 241
+call.type$ -- 51
+change.case$ -- 290
+chr.to.int$ -- 50
+cite$ -- 109
+duplicate$ -- 1088
+empty$ -- 1962
+format.name$ -- 497
+if$ -- 5295
+int.to.chr$ -- 2
+int.to.str$ -- 1
+missing$ -- 29
+newline$ -- 346
+num.names$ -- 206
+pop$ -- 636
+preamble$ -- 1
+purify$ -- 243
+quote$ -- 0
+skip$ -- 892
+stack$ -- 0
+substring$ -- 665
+swap$ -- 227
+text.length$ -- 16
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 551
+warning$ -- 7
+while$ -- 214
+width$ -- 0
+write$ -- 815
+(There were 7 warnings)

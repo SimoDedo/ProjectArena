@@ -1,0 +1,263 @@
+% A LaTeX template for MSc Thesis submissions to 
+% Politecnico di Milano (PoliMi) - School of Industrial and Information Engineering
+%
+% S. Bonetti, A. Gruttadauria, G. Mescolini, A. Zingaro
+% e-mail: template-tesi-ingind@polimi.it
+%
+% Last Revision: October 2021
+%
+% Copyright 2021 Politecnico di Milano, Italy. NC-BY
+
+\documentclass{Configuration_Files/PoliMi3i_thesis}
+
+%------------------------------------------------------------------------------
+%	REQUIRED PACKAGES AND  CONFIGURATIONS
+%------------------------------------------------------------------------------
+
+% CONFIGURATIONS
+\usepackage{parskip} % For paragraph layout
+\usepackage{setspace} % For using single or double spacing
+\usepackage{emptypage} % To insert empty pages
+\usepackage{multicol} % To write in multiple columns (executive summary)
+\setlength\columnsep{15pt} % Column separation in executive summary
+\setlength\parindent{0pt} % Indentation
+\raggedbottom  
+
+% PACKAGES FOR TITLES
+\usepackage{titlesec}
+% \titlespacing{\section}{left spacing}{before spacing}{after spacing}
+\titlespacing{\section}{0pt}{3.3ex}{2ex}
+\titlespacing{\subsection}{0pt}{3.3ex}{1.65ex}
+\titlespacing{\subsubsection}{0pt}{3.3ex}{1ex}
+\usepackage{color}
+
+% PACKAGES FOR LANGUAGE AND FONT
+\usepackage[english]{babel} % The document is in English  
+\usepackage[utf8]{inputenc} % UTF8 encoding
+\usepackage[T1]{fontenc} % Font encoding
+\usepackage[11pt]{moresize} % Big fonts
+
+% PACKAGES FOR IMAGES
+\usepackage{graphicx}
+\usepackage{transparent} % Enables transparent images
+\usepackage{eso-pic} % For the background picture on the title page
+\usepackage{subfig} % Numbered and caption subfigures using \subfloat.
+\usepackage[export]{adjustbox}
+\usepackage{tikz} % A package for high-quality hand-made figures.
+\usetikzlibrary{}
+\graphicspath{{./Images/}} % Directory of the images
+\usepackage{caption} % Coloured captions
+\usepackage{xcolor} % Coloured captions
+\usepackage{amsthm,thmtools,xcolor} % Coloured "Theorem"
+\usepackage{float}
+\usepackage{placeins}
+
+% STANDARD MATH PACKAGES
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{bm}
+\usepackage[overload]{empheq} % For braced-style systems of equations.
+\usepackage{fix-cm} % To override original LaTeX restrictions on sizes
+
+% PACKAGES FOR TABLES
+\usepackage{tabularx}
+\usepackage{longtable} % Tables that can span several pages
+\usepackage{colortbl}
+
+% PACKAGES FOR ALGORITHMS (PSEUDO-CODE)
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+% PACKAGES FOR REFERENCES & BIBLIOGRAPHY
+\usepackage[colorlinks=true,linkcolor=black,anchorcolor=black,citecolor=black,filecolor=black,menucolor=black,runcolor=black,urlcolor=black]{hyperref} % Adds clickable links at references
+\usepackage{cleveref}
+\usepackage[square, numbers, sort&compress]{natbib} % Square brackets, citing references with numbers, citations sorted by appearance in the text and compressed
+\bibliographystyle{abbrvnat} % You may use a different style adapted to your field
+
+% OTHER PACKAGES
+\usepackage{pdfpages} % To include a pdf file
+\usepackage{afterpage}
+\usepackage{lipsum} % DUMMY PACKAGE
+\usepackage{fancyhdr} % For the headers
+\usepackage[export]{adjustbox}
+\fancyhf{}
+
+% Input of configuration file. Do not change config.tex file unless you really know what you are doing. 
+\input{Configuration_Files/config}
+
+%----------------------------------------------------------------------------
+%	NEW COMMANDS DEFINED
+%----------------------------------------------------------------------------
+
+% EXAMPLES OF NEW COMMANDS
+\newcommand{\bea}{\begin{eqnarray}} % Shortcut for equation arrays
+\newcommand{\eea}{\end{eqnarray}}
+\newcommand{\e}[1]{\times 10^{#1}}  % Powers of 10 notation
+
+%----------------------------------------------------------------------------
+%	ADD YOUR PACKAGES (be careful of package interaction)
+%----------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------
+%	ADD YOUR DEFINITIONS AND COMMANDS (be careful of existing commands)
+%----------------------------------------------------------------------------
+\Urlmuskip=0mu  plus 10mu
+%----------------------------------------------------------------------------
+%	BEGIN OF YOUR DOCUMENT
+%----------------------------------------------------------------------------
+
+\begin{document}
+
+\fancypagestyle{plain}{%
+\fancyhf{} % Clear all header and footer fields
+\fancyhead[RO,RE]{\thepage} %RO=right odd, RE=right even
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}}
+\interfootnotelinepenalty=10000
+%----------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------
+
+\pagestyle{empty} % No page numbers
+\frontmatter % Use roman page numbering style (i, ii, iii, iv...) for the preamble pages
+
+\puttitle{
+	title=Quality Diversity in Procedural Generation of First Person Shooter Maps, % Title of the thesis
+	name=Simone de Donato, % Author Name and Surname
+	course=Computer Science and Engineering - Ingegneria Informatica, % Study Programme (in Italian)
+	ID  = 223220,  % Student ID number (numero di matricola)
+	advisor= Prof. Pierluca Lanzi, % Supervisor name
+	coadvisor=Prof. Daniele Loiacono, % Co-Supervisor name, remove this line if there is none
+	academicyear={2023-24},  % Academic Year
+} % These info will be put into your Title page 
+
+%----------------------------------------------------------------------------
+%	PREAMBLE PAGES: ABSTRACT (inglese e italiano), EXECUTIVE SUMMARY
+%----------------------------------------------------------------------------
+\startpreamble
+\setcounter{page}{1} % Set page counter to 1
+
+% ABSTRACT IN ENGLISH
+\chapter*{Abstract} 
+\textit{Quality Diversity} algorithms are a relatively recent type of \textit{evolutionary algorithm} which takes inspiration from the process of biological evolution to generate a set of solutions which are not only trying to optimize for a certain objective, but that are also diverse and novel. These algorithms, such as MAP-Elites, have seen widespread use in many scientific fields, and have been used in the literature for \textit{Procedural Content Generation} in various games, including platformers, puzzle games and card games.
+
+Many commercial games have utilized \textit{Procedural Content Generation} to great success, yet competitive First-Person Shooters, despite being among the most popular games in the industry, rarely utilize it in any capacity, let alone for the generation of maps, which could decrease the time spent on the hard and time-consuming task of \textit{level design}, that otherwise relies mostly on talent and experience.
+
+Scientific studies have recently started to explore the use of \textit{evolutionary algorithms} for the generation of maps for FPS games, but have yet to use \textit{Quality Diversity} algorithms, which are particularly suited for the task, given their focus on both diversity and quality.
+
+In this work we aim to fill this gap by using \textit{MAP-Elites with Sliding Boundaries} (MESB) to generate maps for Project Arena, a research-oriented Unity framework for First-Person Shooters. We will define two new map representations (\textit{Point-Line} and \textit{SMT-Genome}) and extract metrics that describe each map, study the correlation between these metrics and use some of them to search for diverse and high-quality maps using \textit{MESB}.
+
+Results show that \textit{Quality Diversity} algorithms can be successfully used for this purpose, and we compared the performance of our new representations with two existing ones, \textit{All-Black} and \textit{Grid-Graph}, showing that the new representations can generate maps with higher diversity and overall quality, suggesting that the representation used for the generation of maps is a key factor.
+
+
+\textbf{Keywords:} Quality Diversity, Procedural Content Generation, FPS, MAP-Elites, level design % Keywords
+
+% ABSTRACT IN ITALIAN
+\chapter*{Abstract in lingua italiana}
+Gli algoritmi di \textit{Quality Diversity} sono una categoria di \textit{algoritmi evolutivi} relativamente recente che si ispira al processo dell'evoluzione biologica per generare un insieme di soluzioni che siano ottimali rispetto ad un obiettivo, ma che allo stesso tempo siano anche varie.
+Tali algoritmi, quale MAP-Elites, sono stati utilizzati in molti campi scientifici, tra i quali spicca per interesse la \textit{Genrazione Procedurale di Contenuti} nei giochi, tra cui si annoverano ad esempio platformer, giochi puzzle e giochi di carte.
+
+Molti giochi hanno utilizzato la \textit{Generazione Procedurale di Contenuti} con successo, tuttavia gli Sparatutto in Prima Persona competitivi, nonostante siano tra i più popolari del settore, raramente la utilizzano, tantomeno al fine di generare mappe di gioco, quando questa tecnica potrebbe ridurre il tempo speso per il dispendioso compito di \textit{level design}, il quale altrimenti si basa sul talento e sull'esperienza individuale.
+
+Di recente, diversi studi hanno utilizzato \textit{algoritmi evolutivi} per la generazione di mappe per giochi FPS, ma ancora non sono stati utilizzati algoritmi di \textit{Quality Diversity}, i quali sono particolarmente indicati dato il loro focus sia sulla diversità che sulla qualità.
+
+In questa tesi ci proponiamo di colmare questa lacuna utilizzando \textit{MAP-Elites with Sliding Boundaries} (MESB) per generare mappe per Project Arena, un framework sviluppato in Unity orientato alla ricerca per i First-Person Shooters. Definiremo due nuove rappresentazioni per le mappe (\textit{Point-Line} e \textit{SMT-Genome}) ed estrarremo metriche che descrivono ciascuna mappa, studieremo la correlazione tra queste metriche e ne utilizzaremo alcune per evolvere mappe che siano varie e di alta qualità utilizzando \textit{MESB}.
+
+I risultati mostrano che gli algoritmi di \textit{Quality Diversity} possono essere utilizzati con successo per questo scopo, e abbiamo confrontato le prestazioni delle nostre nuove rappresentazioni con due esistenti, \textit{All-Black} e \textit{Grid-Graph}, mostrando che le nuove rappresentazioni generano mappe con maggiore diversità e qualità complessiva, suggerendo che la rappresentazione scelta per la generazione di mappe è un fattore chiave.
+
+
+
+\textbf{Parole chiave:} Quality Diversity, Generazione Procedurale di Contenuti, FPS, MAP-Elites, level design % Keywords (italian)
+
+%----------------------------------------------------------------------------
+%	LIST OF CONTENTS/FIGURES/TABLES/SYMBOLS
+%----------------------------------------------------------------------------
+
+% TABLE OF CONTENTS
+\thispagestyle{empty}
+\tableofcontents % Table of contents 
+\thispagestyle{empty}
+\cleardoublepage
+
+%-------------------------------------------------------------------------
+%	THESIS MAIN TEXT
+%-------------------------------------------------------------------------
+% In the main text of your thesis you can write the chapters in two different ways:
+%
+%(1) As presented in this template you can write:
+%    \chapter{Title of the chapter}
+%    *body of the chapter*
+%
+%(2) You can write your chapter in a separated .tex file and then include it in the main file with the following command:
+%    \chapter{Title of the chapter}
+%    \input{chapter_file.tex}
+%
+% Especially for long thesis, we recommend you the second option.
+
+\addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
+\mainmatter % Begin numeric (1,2,3...) page numbering
+
+% --------------------------------------------------------------------------
+% NUMBERED CHAPTERS % Regular chapters following
+% --------------------------------------------------------------------------
+\input{Chapters/Introduction}
+
+\input{Chapters/State_of_the_art}
+
+\input{Chapters/Tools}
+
+\input{Chapters/Representations_and_features}
+
+\input{Chapters/Experiments}
+
+\input{Chapters/Conclusions}
+
+%-------------------------------------------------------------------------
+%	BIBLIOGRAPHY
+%-------------------------------------------------------------------------
+\addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
+\bibliography{Thesis_bibliography} % The references information are stored in the file named "Thesis_bibliography.bib"
+
+%-------------------------------------------------------------------------
+%	APPENDICES
+%-------------------------------------------------------------------------
+
+\cleardoublepage
+\addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
+%\appendix
+%\chapter{Appendix A}
+%If you need to include an appendix to support the research in your thesis, you can place it at the end of the manuscript.
+%An appendix contains supplementary material (figures, tables, data, codes, mathematical proofs, surveys, \dots)
+%which supplement the main results contained in the previous chapters.
+%
+%\chapter{Appendix B}
+%It may be necessary to include another appendix to better organize the presentation of supplementary material.
+
+
+% LIST OF FIGURES
+\listoffigures
+
+% LIST OF TABLES
+%\listoftables
+
+% LIST OF SYMBOLS
+% Write out the List of Symbols in this page
+%\chapter*{List of Symbols} % You have to include a chapter for your list of symbols (
+%\begin{table}[H]
+%    \centering
+%    \begin{tabular}{lll}
+%        \textbf{Variable} & \textbf{Description} & \textbf{SI unit} \\\hline\\[-9px]
+%        $\bm{u}$ & solid displacement & m \\[2px]
+%        $\bm{u}_f$ & fluid displacement & m \\[2px]
+%    \end{tabular}
+%\end{table}
+
+% ACKNOWLEDGEMENTS
+%\chapter*{Acknowledgements}
+%Here you might want to acknowledge someone.
+
+\cleardoublepage
+
+\end{document}
