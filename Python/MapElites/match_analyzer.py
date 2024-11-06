@@ -931,22 +931,25 @@ def tsne_analysis(
                 #    datasets.pop()
                 #    graphs.pop()
     df = pd.concat(datasets)
-    df = df[column_tsne]
+    column = features_final.copy()
+    # Remove balanceTopology
+    column.remove("balanceTopology")
+    df = df[column]
     # Substitute NaN values with the mean of the column
     imputer = SimpleImputer(strategy='mean')
     df = pd.DataFrame(imputer.fit_transform(df), columns=df.columns)
     phenotypes_flat = [phenotype.map_matrix().flatten() for phenotype in phenotypes]
     df_phenotypes = pd.DataFrame(phenotypes_flat)
 
-    graph2vec = Graph2Vec(dimensions=128*5, wl_iterations=2, attributed=True, seed=42, min_count=1)  
-    graph2vec.fit(graphs)
-    graph2vec_embeddings = graph2vec.get_embedding()
-    df_graph_embeddings = pd.DataFrame(graph2vec_embeddings)
+    #graph2vec = Graph2Vec(dimensions=128*5, wl_iterations=2, attributed=True, seed=42, min_count=1)  
+    #graph2vec.fit(graphs)
+    #graph2vec_embeddings = graph2vec.get_embedding()
+    #df_graph_embeddings = pd.DataFrame(graph2vec_embeddings)
 
-    #gl2vec = GL2Vec(wl_iterations=2, dimensions=128*5, epochs=10, seed=42, min_count=1, attributed=True)
-    #gl2vec.fit(graphs)
-    #gl2vec_embeddings = gl2vec.get_embedding()
-    #df_graph_embeddings = pd.DataFrame(gl2vec_embeddings)
+    gl2vec = GL2Vec(wl_iterations=2, dimensions=128*5, epochs=10, seed=42, min_count=1, attributed=True)
+    gl2vec.fit(graphs)
+    gl2vec_embeddings = gl2vec.get_embedding()
+    df_graph_embeddings = pd.DataFrame(gl2vec_embeddings)
 
     # Get color map for 2D visualization
     color_map_resolution = 500
@@ -999,6 +1002,7 @@ def tsne_analysis(
                 # Plot show map of closest point
                 phenotype = phenotypes[min_idx]
                 fig, ax = plt.subplots()
+                ax.axis('off')
                 plt.imshow(phenotype.map_matrix(inverted=True), cmap='gray')
                 plt.show()
             cid = fig.canvas.mpl_connect('button_press_event', onclick)
@@ -1060,7 +1064,7 @@ def tsne_analysis(
         #plt.clf()
         #plt.close()
 
-        for feature in column_tsne_reduced:
+        for feature in column:
             plt.scatter(points_img[:, 0], points_img[:, 1], s=1, c=df[feature], cmap='viridis')
             plt.colorbar()
             plt.annotate(f"t-SNE with images. Color representing {feature}", (0.5, 1.05), xycoords='axes fraction', ha='center', va='bottom')
@@ -1068,7 +1072,7 @@ def tsne_analysis(
             plt.clf()
             plt.close()
         
-        for feature in column_tsne_reduced:
+        for feature in column:
             plt.scatter(points_graph[:, 0], points_graph[:, 1], s=1, c=df[feature], cmap='viridis')
             plt.colorbar()
             plt.annotate(f"t-SNE with graphs. Color representing {feature}", (0.5, 1.05), xycoords='axes fraction', ha='center', va='bottom')
@@ -1085,8 +1089,8 @@ def tsne_analysis(
                 distances_tsne_graph.append(np.linalg.norm(points_graph[i] - points_graph[j]))
         plt.gcf().set_size_inches(18, 14) 
         plt.scatter(distances_tsne_features, distances_tsne_graph, s=0.1)
-        plt.xlabel("Distance in Feature t-SNE")
-        plt.ylabel("Distance in Graph t-SNE")
+        plt.xlabel("Distance in Feature t-SNE", fontsize=20)
+        plt.ylabel("Distance in Graph t-SNE", fontsize=20)
         plt.savefig(os.path.join(outdirsub, f"{name}_disttsne_feat_graph_p{perplexity}.png"), format='png', dpi=300)
         plt.clf()
         plt.close()
@@ -1098,8 +1102,8 @@ def tsne_analysis(
                 distances_tsne_img.append(np.linalg.norm(points_img[i] - points_img[j]))
         plt.gcf().set_size_inches(18, 14) 
         plt.scatter(distances_tsne_features, distances_tsne_img, s=0.1)
-        plt.xlabel("Distance in Feature t-SNE")
-        plt.ylabel("Distance in Image t-SNE")
+        plt.xlabel("Distance in Feature t-SNE", fontsize=20)
+        plt.ylabel("Distance in Image t-SNE", fontsize=20)
         plt.savefig(os.path.join(outdirsub, f"{name}_disttsne_feat_img_p{perplexity}.png"), format='png', dpi=300)
         plt.clf()
         plt.close()
@@ -1113,8 +1117,8 @@ def tsne_analysis(
                 distances_tsne_graph.append(np.linalg.norm(points_graph[i] - points_graph[j]))
         plt.gcf().set_size_inches(18, 14) 
         plt.scatter(distances_tsne_img, distances_tsne_graph, s=0.1)
-        plt.xlabel("Distance in Image t-SNE")
-        plt.ylabel("Distance in Graph t-SNE")
+        plt.xlabel("Distance in Image t-SNE", fontsize=20)
+        plt.ylabel("Distance in Graph t-SNE", fontsize=20)
         plt.savefig(os.path.join(outdirsub, f"{name}_disttsne_img_graph_{name}_p{perplexity}.png"), format='png', dpi=300)
         plt.clf()
         plt.close()
@@ -1143,16 +1147,16 @@ def tsne_analysis(
 
             plt.gcf().set_size_inches(18, 14)
             plt.scatter(differences_feature, distances_tsne_graph, s=0.02)
-            plt.xlabel(f"Difference in {feature}")
-            plt.ylabel("Distance in Graph t-SNE")
+            plt.xlabel(f"Difference in {feature}", fontsize=20)
+            plt.ylabel("Distance in Graph t-SNE", fontsize=20)
             plt.savefig(os.path.join(outdirsub, f"{name}_distfeat_graph_{feature}_p{perplexity}.png"), format='png', dpi=300)
             plt.clf()
             plt.close()
 
             plt.gcf().set_size_inches(18, 14) 
             plt.scatter(differences_feature, distances_tsne_img, s=0.02)
-            plt.xlabel(f"Difference in {feature}")
-            plt.ylabel("Distance in Image t-SNE")
+            plt.xlabel(f"Difference in {feature}", fontsize=20)
+            plt.ylabel("Distance in Image t-SNE", fontsize=20)
             plt.savefig(os.path.join(outdirsub, f"{name}_distfeat_img_{feature}_p{perplexity}.png"), format='png', dpi=300)
             plt.clf()
             plt.close()
@@ -1206,7 +1210,7 @@ if __name__ == "__main__":
             name = f'var_pointad_{i}_nm5'
             run_variance_analysis(client, baseoutdir, name, i, POINT_AD_NAME, feature_ranges, num_parallel_simulations=5, phenotype_path=phenotype_path, use_cache=True)
 
-    COVARIANCE_ANALYSIS = True
+    COVARIANCE_ANALYSIS = False
     if COVARIANCE_ANALYSIS:
         name = f'cov_ab'
         var_corr_ab, var_corr_reduced_ab, var_corr_final_ab = run_covariance_analysis(client, baseoutdir, name, 0, ALL_BLACK_NAME, feature_ranges, num_parallel_simulations=5, use_cache=True)
@@ -1247,29 +1251,33 @@ if __name__ == "__main__":
 
 
 
-    TSNE_ANALYSIS = False
+    TSNE_ANALYSIS = True
     if TSNE_ANALYSIS:
         experiment_names = [
+            #"Fin_AB_ABEmitter_SB_entropy_area_maxSymmetry_I400_B1_E10",
             "Bari_AB_ABEmitter_SB_entropy_balanceTopology_pursueTime_I400_B1_E10",
             #"Cov_AB_ABEmitter_SB_entropy_maxValuePercentVisibility_area_I400_B1_E10",
         ]        
-        name = f'tsne_ab_graph2vecAttr'
-
-        tsne_analysis(client, baseoutdir, name, experiment_names, num_experiment_iterations=200, use_stored_graphs=True) 
+        name = f'tsne_ab_gl2vecAttr_img'
+        tsne_analysis(client, baseoutdir, name, experiment_names, num_experiment_iterations=200, use_stored_graphs=True, visualize_tsne_img=True, visualize_tsne_graph=True) 
+        
         experiment_names = [
+            #"Fin_PointAD_PointADEmitter_SB_entropy_area_maxSymmetry_I400_B1_E10",
             "BariInverse_PointAD_PointADEmitter_SB_entropy_balanceTopology_pursueTime_I400_B1_E10",
         ]
-        name = f'tsne_pointad_graph2vecAttr'
-        tsne_analysis(client, baseoutdir, name, experiment_names, num_experiment_iterations=200, use_stored_graphs=True)
+        name = f'tsne_pointad_gl2vecAttr'
+        #tsne_analysis(client, baseoutdir, name, experiment_names, num_experiment_iterations=200, use_stored_graphs=True)
 
         experiment_names = [
-            "Bari_GG_GGEmitter_SB_entropy_balanceTopology_pursueTime_I400_B1_E10"
+            #"Fin_GG_GGEmitter_SB_entropy_area_maxSymmetry_I400_B1_E10",
+            "Bari_GG_GGEmitter_SB_entropy_balanceTopology_pursueTime_I400_B1_E10",
         ]
-        name = f'tsne_gg_graph2vecAttr'
-        tsne_analysis(client, baseoutdir, name, experiment_names, num_experiment_iterations=200, use_stored_graphs=True)
+        name = f'tsne_gg_gl2vecAttr'
+        #tsne_analysis(client, baseoutdir, name, experiment_names, num_experiment_iterations=200, use_stored_graphs=True)
 
         experiment_names = [
-            "EpV_SMT_SMTEmitter_SB_explorationPlusVisibility3_balanceTopology_averageRoomRadius_I400_B1_E10"
+            #"Fin_SMT_SMTEmitter_SB_entropy_area_maxSymmetry_I400_B1_E10",
+            "EpV_SMT_SMTEmitter_SB_explorationPlusVisibility3_balanceTopology_averageRoomRadius_I400_B1_E10",
         ]
-        name = f'tsne_smt_graph2vecAttr'
-        tsne_analysis(client, baseoutdir, name, experiment_names, num_experiment_iterations=200, use_stored_graphs=True)
+        name = f'tsne_smt_gl2vecAttr'
+        #tsne_analysis(client, baseoutdir, name, experiment_names, num_experiment_iterations=200, use_stored_graphs=True)
