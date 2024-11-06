@@ -18,9 +18,9 @@ BOT2_SKILL = "0.85"
 # Archive type used in the experiment. See constants.py for possible values
 ARCHIVE_TYPE = constants.SLIDING_BOUNDARIES_ARCHIVE_NAME
 # Map representation used in the experiment. See constants.py for possible values
-REPRESENTATION_NAME = constants.GRID_GRAPH_NAME
+REPRESENTATION_NAME = constants.ALL_BLACK_NAME
 # Emitter type used in the experiment. See constants.py for possible values
-EMITTER_TYPE_NAME = constants.GRID_GRAPH_EMITTER_NAME
+EMITTER_TYPE_NAME = constants.ALL_BLACK_EMITTER_NAME
 
 ITERATIONS = 400
 BATCH_SIZE = 1
@@ -29,9 +29,9 @@ N_EMITTERS = 10
 NUMBER_OF_INITAL_SOLUTIONS = 20
 
 MEASURES_BINS_NUMBER = [10,10]
-MEASURES_RANGES = [(0,4),(0,0.3)]
+MEASURES_RANGES = [(0,1),(0,1)]
 
-OBJECTIVE_RANGE = (None,None) # (None, None) if unkwnown
+OBJECTIVE_RANGE = (0,1) # (None, None) if unkwnown
 
 AB_STANDARD_CROSSOVER_CHANCE = 0.3
 GG_STANDARD_CROSSOVER_CHANCE = 0.3

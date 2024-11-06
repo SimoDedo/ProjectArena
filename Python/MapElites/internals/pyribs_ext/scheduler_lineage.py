@@ -263,7 +263,10 @@ class SchedulerLineage:
 
             for i in range(len(self._cur_solutions)):
                 single_data = {name: arr[i] for name, arr in data.items()}
-                single_info = self.archive.add_single(**single_data)
+                if "failed" in single_data and single_data["failed"] == 1:
+                    single_info = {"status": 0, "value": 0}
+                else:
+                    single_info = self.archive.add_single(**single_data)
                 for name, val in single_info.items():
                     add_info[name].append(val)
 

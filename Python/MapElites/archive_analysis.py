@@ -443,6 +443,7 @@ def analyze_archive(
     # Load lineages
     lineage_file = open(os.path.join(archiveDir, 'lineages.pkl'), 'rb')
     lineages = pickle.load(lineage_file)
+    lineage_file.close()
 
     # Analyze each solution
     for idx in tqdm.trange(0, len(solutions)):
@@ -458,10 +459,12 @@ def analyze_archive(
                 skip = True
         else:
             phenotype = get_phenotype_from_solution(sol, representation)
-
-        if not skip:
+        try:
             sol_map_matrix = read_map(
                 str(int(iterations[idx])) + "_" + str(int(individual_numbers[idx])), folder_name)
+        except:
+            skip = True
+        if not skip:
             map_scale = get_map_scale(representation)
             
             save_image_map(mapsDir, experiment_name, sol_map_matrix,
@@ -478,7 +481,7 @@ def analyze_archive(
             save_graphs_vornoi(graphsVornoiDir, experiment_name, phenotype, indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
             save_visibility_maps(visibilityDir, experiment_name, phenotype, indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
             cumulative_dataset = save_results(resultsDir, exportDir, int(iterations[idx]), int(individual_numbers[idx]), cumulative_dataset)
-            save_lineage_map(lineageDir, lineages[idx], experiment_name, indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
+            save_lineage_map(lineageDir, lineages[indexes[idx]], experiment_name, indexes[idx], obj[idx], meas_0[idx], meas_1[idx])
 
     
     cumulative_dataset.to_json(os.path.join(resultsDir, "_final_results.json"), orient='columns', indent=4)
@@ -501,6 +504,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args(sys.argv[1:])
     folder_name = args.folder_name if args.folder_name != "" else conf.folder_name()
+
 
     analyze_archive(
         representation=conf.REPRESENTATION_NAME,

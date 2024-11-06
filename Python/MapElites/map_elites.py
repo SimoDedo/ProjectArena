@@ -70,7 +70,7 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
                 ranges=conf.MEASURES_RANGES,
                 seed=seed,
                 qd_score_offset=0,
-                extra_fields={"iterations": ((), np.float32), "individual_numbers": ((), np.float32)}
+                extra_fields={"iterations": ((), np.float32), "individual_numbers": ((), np.float32), "failed": ((), np.float32)}
             )
         case constants.SLIDING_BOUNDARIES_ARCHIVE_NAME:
             archive = SlidingBoundariesArchive(
@@ -79,7 +79,7 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
                 ranges=conf.MEASURES_RANGES,
                 seed=seed,
                 qd_score_offset=0,
-                extra_fields={"iterations": ((), np.float32), "individual_numbers": ((), np.float32)}
+                extra_fields={"iterations": ((), np.float32), "individual_numbers": ((), np.float32), "failed": ((), np.float32)}
             )
 
 
@@ -187,7 +187,8 @@ def create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
                 ) for s in seeds
             ]
 
-    scheduler = SchedulerLineage(archive, emitters)
+    # Our scheduler can handle failed evaluations in "single" mode. Since SlidingBoundaries already works in "single" mode, we don't loose performance.
+    scheduler = SchedulerLineage(archive, emitters, add_mode="single") 
     return scheduler
 
 def initialize_solutions(creation_function, n_solutions):
@@ -266,6 +267,9 @@ def run_search(client: Client, scheduler: SchedulerLineage, representation, iter
         # Also remember the iteration and individual number for each solution.
         itrs, inds = [], []
 
+        # Remember if individual failed to evaluate
+        failed_inds = []
+
         # Ask the Dask client to distribute the simulations among the Dask
         # workers, then gather the results of the simulations.
         futures = []
@@ -306,15 +310,17 @@ def run_search(client: Client, scheduler: SchedulerLineage, representation, iter
 
                 itrs.append(itr-1)
                 inds.append(idx)
+                failed_inds.append(0)
             else:
                 num_failed += 1
                 objs.append(0 if conf.OBJECTIVE_RANGE[0] == None else conf.OBJECTIVE_RANGE[0])
                 meas.append([0, 0])
                 itrs.append(itr-1)
                 inds.append(idx)
+                failed_inds.append(1)
         
         # Send the results back to the scheduler.
-        scheduler.tell(objs, meas, iterations=itrs, individual_numbers=inds)
+        scheduler.tell(objs, meas, iterations=itrs, individual_numbers=inds, failed=failed_inds)
 
         # Logging.
         if itr % log_freq == 0 or itr == iterations:
@@ -341,6 +347,11 @@ def run_search(client: Client, scheduler: SchedulerLineage, representation, iter
                 plt.close('all')
                 lineage_table_file = open(os.path.join(outdir, 'lineages.pkl'), 'wb')
                 pickle.dump(scheduler.get_lineage_table(), lineage_table_file)
+                lineage_table_file.close()
+                archive_file = open(os.path.join(outdir, 'archive.pkl'), 'wb')
+                pickle.dump(scheduler.archive, archive_file)
+                archive_file.close()
+
 
     return metrics
 
@@ -414,7 +425,7 @@ def evolve_maps(
                 bot2_data,
                 representation,
                 emitter_type,
-                workers=4,
+                client,
                 iterations=500,
                 log_freq=10,
                 n_emitters=5,
@@ -442,17 +453,6 @@ def evolve_maps(
     importdir.mkdir(exist_ok=True)
     exportdir.mkdir(exist_ok=True)
 
-    # Setup Dask. The client connects to a "cluster" running on this machine.
-    # The cluster simply manages several concurrent worker processes. If using
-    # Dask across many workers, we would set up a more complicated cluster and
-    # connect the client to it.
-    cluster = LocalCluster(
-        processes=True,  # Each worker is a process.
-        n_workers=workers,  # Create this many worker processes.
-        threads_per_worker=1,  # Each worker process is single-threaded.
-    )
-    client = Client(cluster)
-
     scheduler = create_scheduler(seed, emitter_type, representation, n_emitters, batch_size)
     metrics = run_search(client, scheduler, representation,iterations, log_freq, folder_name, bot1_data, bot2_data, game_length)
 
@@ -474,6 +474,18 @@ if __name__ == "__main__":
     bot1_data = {"file": conf.BOT1_FILE_PREFIX, "skill": conf.BOT1_SKILL}
     bot2_data = {"file": conf.BOT2_FILE_PREFIX, "skill": conf.BOT2_SKILL}
 
+    
+    # Setup Dask. The client connects to a "cluster" running on this machine.
+    # The cluster simply manages several concurrent worker processes. If using
+    # Dask across many workers, we would set up a more complicated cluster and
+    # connect the client to it.
+    cluster = LocalCluster(
+        processes=True,  # Each worker is a process.
+        n_workers=args.workers,  # Create this many worker processes.
+        threads_per_worker=1,  # Each worker process is single-threaded.
+    )
+    client = Client(cluster)
+
     evolve_maps(
         bot1_data, 
         bot2_data, 
@@ -482,7 +494,7 @@ if __name__ == "__main__":
         batch_size=conf.BATCH_SIZE, 
         iterations=conf.ITERATIONS, 
         n_emitters=conf.N_EMITTERS, 
-        workers=args.workers, 
+        client=client, 
         folder_name=conf.folder_name(args.is_test),
         game_length=conf.GAME_LENGTH,
         )
